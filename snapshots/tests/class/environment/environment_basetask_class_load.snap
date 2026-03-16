@@ -1904,8 +1904,10 @@ cst:
                     text: With
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bst
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: bst
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
@@ -2092,8 +2094,10 @@ cst:
                     text: With
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bst
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: bst
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
@@ -5414,8 +5418,10 @@ cst:
                                                                                         text: With
                                                                                       - kind: Whitespace
                                                                                         text: " "
-                                                                                      - kind: Identifier
-                                                                                        text: StaticCollection
+                                                                                      - kind: IdentifierExpression
+                                                                                        children:
+                                                                                          - kind: Identifier
+                                                                                            text: StaticCollection
                                                                                       - kind: Newline
                                                                                         text: "\r\n"
                                                                                       - kind: StatementList
@@ -8644,30 +8650,26 @@ cst:
                                                                                                     text: " "
                                                                                                   - kind: WithKeyword
                                                                                                     text: With
+                                                                                                  - kind: IdentifierExpression
+                                                                                                    children:
+                                                                                                      - kind: Newline
+                                                                                                        text: "\r\n"
+                                                                                                  - kind: Whitespace
+                                                                                                    text: "   "
+                                                                                                  - kind: Identifier
+                                                                                                    text: AlterVar
+                                                                                                  - kind: Whitespace
+                                                                                                    text: " "
+                                                                                                  - kind: EqualityOperator
+                                                                                                    text: "="
+                                                                                                  - kind: Whitespace
+                                                                                                    text: " "
+                                                                                                  - kind: TrueKeyword
+                                                                                                    text: "True"
                                                                                                   - kind: Newline
                                                                                                     text: "\r\n"
                                                                                                   - kind: StatementList
                                                                                                     children:
-                                                                                                      - kind: Whitespace
-                                                                                                        text: "   "
-                                                                                                      - kind: AssignmentStatement
-                                                                                                        children:
-                                                                                                          - kind: IdentifierExpression
-                                                                                                            children:
-                                                                                                              - kind: Identifier
-                                                                                                                text: AlterVar
-                                                                                                          - kind: Whitespace
-                                                                                                            text: " "
-                                                                                                          - kind: EqualityOperator
-                                                                                                            text: "="
-                                                                                                          - kind: Whitespace
-                                                                                                            text: " "
-                                                                                                          - kind: BooleanLiteralExpression
-                                                                                                            children:
-                                                                                                              - kind: TrueKeyword
-                                                                                                                text: "True"
-                                                                                                          - kind: Newline
-                                                                                                            text: "\r\n"
                                                                                                       - kind: Unknown
                                                                                                         text: End
                                                                                                       - kind: Whitespace
@@ -12030,8 +12032,10 @@ cst:
                                                                                                                 text: With
                                                                                                               - kind: Whitespace
                                                                                                                 text: " "
-                                                                                                              - kind: Identifier
-                                                                                                                text: StaticCollection
+                                                                                                              - kind: IdentifierExpression
+                                                                                                                children:
+                                                                                                                  - kind: Identifier
+                                                                                                                    text: StaticCollection
                                                                                                               - kind: Newline
                                                                                                                 text: "\r\n"
                                                                                                               - kind: StatementList
@@ -12254,18 +12258,20 @@ cst:
                                                                                                                                 text: " "
                                                                                                                               - kind: WithKeyword
                                                                                                                                 text: With
+                                                                                                                              - kind: IdentifierExpression
+                                                                                                                                children:
+                                                                                                                                  - kind: Newline
+                                                                                                                                    text: "\r\n"
+                                                                                                                              - kind: EndKeyword
+                                                                                                                                text: End
+                                                                                                                              - kind: Whitespace
+                                                                                                                                text: " "
+                                                                                                                              - kind: SubKeyword
+                                                                                                                                text: Sub
                                                                                                                               - kind: Newline
                                                                                                                                 text: "\r\n"
                                                                                                                               - kind: StatementList
                                                                                                                                 children:
-                                                                                                                                  - kind: Unknown
-                                                                                                                                    text: End
-                                                                                                                                  - kind: Whitespace
-                                                                                                                                    text: " "
-                                                                                                                                  - kind: Unknown
-                                                                                                                                    text: Sub
-                                                                                                                                  - kind: Newline
-                                                                                                                                    text: "\r\n"
                                                                                                                                   - kind: DimStatement
                                                                                                                                     children:
                                                                                                                                       - kind: PublicKeyword
@@ -12422,8 +12428,10 @@ cst:
                                                                                                                                         text: With
                                                                                                                                       - kind: Whitespace
                                                                                                                                         text: " "
-                                                                                                                                      - kind: Identifier
-                                                                                                                                        text: StaticCollection
+                                                                                                                                      - kind: IdentifierExpression
+                                                                                                                                        children:
+                                                                                                                                          - kind: Identifier
+                                                                                                                                            text: StaticCollection
                                                                                                                                       - kind: Newline
                                                                                                                                         text: "\r\n"
                                                                                                                                       - kind: StatementList
@@ -12564,18 +12572,20 @@ cst:
                                                                                                                                                         text: " "
                                                                                                                                                       - kind: WithKeyword
                                                                                                                                                         text: With
+                                                                                                                                                      - kind: IdentifierExpression
+                                                                                                                                                        children:
+                                                                                                                                                          - kind: Newline
+                                                                                                                                                            text: "\r\n"
+                                                                                                                                                      - kind: EndKeyword
+                                                                                                                                                        text: End
+                                                                                                                                                      - kind: Whitespace
+                                                                                                                                                        text: " "
+                                                                                                                                                      - kind: SubKeyword
+                                                                                                                                                        text: Sub
                                                                                                                                                       - kind: Newline
                                                                                                                                                         text: "\r\n"
                                                                                                                                                       - kind: StatementList
                                                                                                                                                         children:
-                                                                                                                                                          - kind: Unknown
-                                                                                                                                                            text: End
-                                                                                                                                                          - kind: Whitespace
-                                                                                                                                                            text: " "
-                                                                                                                                                          - kind: Unknown
-                                                                                                                                                            text: Sub
-                                                                                                                                                          - kind: Newline
-                                                                                                                                                            text: "\r\n"
                                                                                                                                                           - kind: DimStatement
                                                                                                                                                             children:
                                                                                                                                                               - kind: PublicKeyword
@@ -12728,8 +12738,10 @@ cst:
                                                                                                                                                                 text: With
                                                                                                                                                               - kind: Whitespace
                                                                                                                                                                 text: " "
-                                                                                                                                                              - kind: Identifier
-                                                                                                                                                                text: StaticCollection
+                                                                                                                                                              - kind: IdentifierExpression
+                                                                                                                                                                children:
+                                                                                                                                                                  - kind: Identifier
+                                                                                                                                                                    text: StaticCollection
                                                                                                                                                               - kind: Newline
                                                                                                                                                                 text: "\r\n"
                                                                                                                                                               - kind: StatementList
@@ -12870,18 +12882,20 @@ cst:
                                                                                                                                                                                 text: " "
                                                                                                                                                                               - kind: WithKeyword
                                                                                                                                                                                 text: With
+                                                                                                                                                                              - kind: IdentifierExpression
+                                                                                                                                                                                children:
+                                                                                                                                                                                  - kind: Newline
+                                                                                                                                                                                    text: "\r\n"
+                                                                                                                                                                              - kind: EndKeyword
+                                                                                                                                                                                text: End
+                                                                                                                                                                              - kind: Whitespace
+                                                                                                                                                                                text: " "
+                                                                                                                                                                              - kind: SubKeyword
+                                                                                                                                                                                text: Sub
                                                                                                                                                                               - kind: Newline
                                                                                                                                                                                 text: "\r\n"
                                                                                                                                                                               - kind: StatementList
                                                                                                                                                                                 children:
-                                                                                                                                                                                  - kind: Unknown
-                                                                                                                                                                                    text: End
-                                                                                                                                                                                  - kind: Whitespace
-                                                                                                                                                                                    text: " "
-                                                                                                                                                                                  - kind: Unknown
-                                                                                                                                                                                    text: Sub
-                                                                                                                                                                                  - kind: Newline
-                                                                                                                                                                                    text: "\r\n"
                                                                                                                                                                                   - kind: DimStatement
                                                                                                                                                                                     children:
                                                                                                                                                                                       - kind: PublicKeyword
@@ -18928,12 +18942,14 @@ cst:
                                                                                                                                                                                                                         text: With
                                                                                                                                                                                                                       - kind: Whitespace
                                                                                                                                                                                                                         text: " "
-                                                                                                                                                                                                                      - kind: Identifier
-                                                                                                                                                                                                                        text: threadsnames
-                                                                                                                                                                                                                      - kind: PeriodOperator
-                                                                                                                                                                                                                        text: "."
-                                                                                                                                                                                                                      - kind: Identifier
-                                                                                                                                                                                                                        text: ValueObj
+                                                                                                                                                                                                                      - kind: MemberAccessExpression
+                                                                                                                                                                                                                        children:
+                                                                                                                                                                                                                          - kind: Identifier
+                                                                                                                                                                                                                            text: threadsnames
+                                                                                                                                                                                                                          - kind: PeriodOperator
+                                                                                                                                                                                                                            text: "."
+                                                                                                                                                                                                                          - kind: Identifier
+                                                                                                                                                                                                                            text: ValueObj
                                                                                                                                                                                                                       - kind: Newline
                                                                                                                                                                                                                         text: "\r\n"
                                                                                                                                                                                                                       - kind: StatementList
@@ -25226,8 +25242,10 @@ cst:
                                                                                                                                                                                                                         text: With
                                                                                                                                                                                                                       - kind: Whitespace
                                                                                                                                                                                                                         text: " "
-                                                                                                                                                                                                                      - kind: Identifier
-                                                                                                                                                                                                                        text: usehandler
+                                                                                                                                                                                                                      - kind: IdentifierExpression
+                                                                                                                                                                                                                        children:
+                                                                                                                                                                                                                          - kind: Identifier
+                                                                                                                                                                                                                            text: usehandler
                                                                                                                                                                                                                       - kind: Newline
                                                                                                                                                                                                                         text: "\r\n"
                                                                                                                                                                                                                       - kind: StatementList

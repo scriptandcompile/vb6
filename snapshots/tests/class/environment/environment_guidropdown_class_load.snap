@@ -1181,8 +1181,10 @@ cst:
                     text: With
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: PadGui
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: PadGui
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
@@ -1845,8 +1847,10 @@ cst:
                     text: With
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Pad
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Pad
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
@@ -2269,8 +2273,10 @@ cst:
                     text: With
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Textbox
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Textbox
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
@@ -9929,8 +9935,10 @@ cst:
                                                 text: With
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: Callback
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: Callback
                                               - kind: Newline
                                                 text: "\r\n"
                                               - kind: StatementList
@@ -10499,28 +10507,28 @@ cst:
                                                                                 text: " "
                                                                               - kind: WithKeyword
                                                                                 text: With
+                                                                              - kind: IdentifierExpression
+                                                                                children:
+                                                                                  - kind: Newline
+                                                                                    text: "\r\n"
+                                                                              - kind: SetKeyword
+                                                                                text: Set
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: Identifier
+                                                                                text: x1
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: EqualityOperator
+                                                                                text: "="
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: NothingKeyword
+                                                                                text: Nothing
                                                                               - kind: Newline
                                                                                 text: "\r\n"
                                                                               - kind: StatementList
                                                                                 children:
-                                                                                  - kind: SetStatement
-                                                                                    children:
-                                                                                      - kind: SetKeyword
-                                                                                        text: Set
-                                                                                      - kind: Whitespace
-                                                                                        text: " "
-                                                                                      - kind: Identifier
-                                                                                        text: x1
-                                                                                      - kind: Whitespace
-                                                                                        text: " "
-                                                                                      - kind: EqualityOperator
-                                                                                        text: "="
-                                                                                      - kind: Whitespace
-                                                                                        text: " "
-                                                                                      - kind: NothingKeyword
-                                                                                        text: Nothing
-                                                                                      - kind: Newline
-                                                                                        text: "\r\n"
                                                                                   - kind: Unknown
                                                                                     text: ElseIf
                                                                                   - kind: Whitespace
@@ -10611,8 +10619,10 @@ cst:
                                                                                         text: With
                                                                                       - kind: Whitespace
                                                                                         text: " "
-                                                                                      - kind: Identifier
-                                                                                        text: Callback
+                                                                                      - kind: IdentifierExpression
+                                                                                        children:
+                                                                                          - kind: Identifier
+                                                                                            text: Callback
                                                                                       - kind: Newline
                                                                                         text: "\r\n"
                                                                                       - kind: StatementList
@@ -11091,28 +11101,28 @@ cst:
                                                                                                                 text: " "
                                                                                                               - kind: WithKeyword
                                                                                                                 text: With
+                                                                                                              - kind: IdentifierExpression
+                                                                                                                children:
+                                                                                                                  - kind: Newline
+                                                                                                                    text: "\r\n"
+                                                                                                              - kind: SetKeyword
+                                                                                                                text: Set
+                                                                                                              - kind: Whitespace
+                                                                                                                text: " "
+                                                                                                              - kind: Identifier
+                                                                                                                text: x1
+                                                                                                              - kind: Whitespace
+                                                                                                                text: " "
+                                                                                                              - kind: EqualityOperator
+                                                                                                                text: "="
+                                                                                                              - kind: Whitespace
+                                                                                                                text: " "
+                                                                                                              - kind: NothingKeyword
+                                                                                                                text: Nothing
                                                                                                               - kind: Newline
                                                                                                                 text: "\r\n"
                                                                                                               - kind: StatementList
                                                                                                                 children:
-                                                                                                                  - kind: SetStatement
-                                                                                                                    children:
-                                                                                                                      - kind: SetKeyword
-                                                                                                                        text: Set
-                                                                                                                      - kind: Whitespace
-                                                                                                                        text: " "
-                                                                                                                      - kind: Identifier
-                                                                                                                        text: x1
-                                                                                                                      - kind: Whitespace
-                                                                                                                        text: " "
-                                                                                                                      - kind: EqualityOperator
-                                                                                                                        text: "="
-                                                                                                                      - kind: Whitespace
-                                                                                                                        text: " "
-                                                                                                                      - kind: NothingKeyword
-                                                                                                                        text: Nothing
-                                                                                                                      - kind: Newline
-                                                                                                                        text: "\r\n"
                                                                                                                   - kind: Unknown
                                                                                                                     text: ElseIf
                                                                                                                   - kind: Whitespace

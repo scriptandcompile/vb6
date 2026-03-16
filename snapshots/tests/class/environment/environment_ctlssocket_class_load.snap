@@ -13199,8 +13199,10 @@ cst:
                     text: With
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: LastError
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: LastError
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
@@ -13657,18 +13659,20 @@ cst:
                                 text: " "
                               - kind: WithKeyword
                                 text: With
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Newline
+                                    text: "\r\n"
+                              - kind: EndKeyword
+                                text: End
+                              - kind: Whitespace
+                                text: " "
+                              - kind: PropertyKeyword
+                                text: Property
                               - kind: Newline
                                 text: "\r\n"
                               - kind: StatementList
                                 children:
-                                  - kind: Unknown
-                                    text: End
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Unknown
-                                    text: Property
-                                  - kind: Newline
-                                    text: "\r\n"
                                   - kind: Newline
                                     text: "\r\n"
                                   - kind: DimStatement
@@ -52899,8 +52903,10 @@ cst:
                                                                                                         text: With
                                                                                                       - kind: Whitespace
                                                                                                         text: " "
-                                                                                                      - kind: Identifier
-                                                                                                        text: uSelect
+                                                                                                      - kind: IdentifierExpression
+                                                                                                        children:
+                                                                                                          - kind: Identifier
+                                                                                                            text: uSelect
                                                                                                       - kind: Newline
                                                                                                         text: "\r\n"
                                                                                                       - kind: StatementList
@@ -54365,8 +54371,10 @@ cst:
                                                                                                 text: With
                                                                                               - kind: Whitespace
                                                                                                 text: " "
-                                                                                              - kind: Identifier
-                                                                                                text: uProvInfo
+                                                                                              - kind: IdentifierExpression
+                                                                                                children:
+                                                                                                  - kind: Identifier
+                                                                                                    text: uProvInfo
                                                                                               - kind: Newline
                                                                                                 text: "\r\n"
                                                                                               - kind: StatementList
@@ -55697,8 +55705,10 @@ cst:
                                                                                         text: With
                                                                                       - kind: Whitespace
                                                                                         text: " "
-                                                                                      - kind: Identifier
-                                                                                        text: uName
+                                                                                      - kind: IdentifierExpression
+                                                                                        children:
+                                                                                          - kind: Identifier
+                                                                                            text: uName
                                                                                       - kind: Newline
                                                                                         text: "\r\n"
                                                                                       - kind: StatementList
@@ -69537,8 +69547,10 @@ cst:
                                                                                                                             text: With
                                                                                                                           - kind: Whitespace
                                                                                                                             text: " "
-                                                                                                                          - kind: Identifier
-                                                                                                                            text: uProvInfo
+                                                                                                                          - kind: IdentifierExpression
+                                                                                                                            children:
+                                                                                                                              - kind: Identifier
+                                                                                                                                text: uProvInfo
                                                                                                                           - kind: Newline
                                                                                                                             text: "\r\n"
                                                                                                                           - kind: StatementList
@@ -72629,8 +72641,10 @@ cst:
                                                                                                                 text: With
                                                                                                               - kind: Whitespace
                                                                                                                 text: " "
-                                                                                                              - kind: Identifier
-                                                                                                                text: uPrivKey
+                                                                                                              - kind: IdentifierExpression
+                                                                                                                children:
+                                                                                                                  - kind: Identifier
+                                                                                                                    text: uPrivKey
                                                                                                               - kind: Newline
                                                                                                                 text: "\r\n"
                                                                                                               - kind: StatementList
@@ -73991,8 +74005,10 @@ cst:
                                                                                                                 text: With
                                                                                                               - kind: Whitespace
                                                                                                                 text: " "
-                                                                                                              - kind: Identifier
-                                                                                                                text: uEccPrivKey
+                                                                                                              - kind: IdentifierExpression
+                                                                                                                children:
+                                                                                                                  - kind: Identifier
+                                                                                                                    text: uEccPrivKey
                                                                                                               - kind: Newline
                                                                                                                 text: "\r\n"
                                                                                                               - kind: StatementList
@@ -75617,18 +75633,28 @@ cst:
                                                                                                                 text: With
                                                                                                               - kind: Whitespace
                                                                                                                 text: " "
-                                                                                                              - kind: Identifier
-                                                                                                                text: uParams
-                                                                                                              - kind: PeriodOperator
-                                                                                                                text: "."
-                                                                                                              - kind: Identifier
-                                                                                                                text: Buffers
-                                                                                                              - kind: LeftParenthesis
-                                                                                                                text: (
-                                                                                                              - kind: IntegerLiteral
-                                                                                                                text: "0"
-                                                                                                              - kind: RightParenthesis
-                                                                                                                text: )
+                                                                                                              - kind: CallExpression
+                                                                                                                children:
+                                                                                                                  - kind: MemberAccessExpression
+                                                                                                                    children:
+                                                                                                                      - kind: Identifier
+                                                                                                                        text: uParams
+                                                                                                                      - kind: PeriodOperator
+                                                                                                                        text: "."
+                                                                                                                      - kind: Identifier
+                                                                                                                        text: Buffers
+                                                                                                                  - kind: LeftParenthesis
+                                                                                                                    text: (
+                                                                                                                  - kind: ArgumentList
+                                                                                                                    children:
+                                                                                                                      - kind: Argument
+                                                                                                                        children:
+                                                                                                                          - kind: NumericLiteralExpression
+                                                                                                                            children:
+                                                                                                                              - kind: IntegerLiteral
+                                                                                                                                text: "0"
+                                                                                                                  - kind: RightParenthesis
+                                                                                                                    text: )
                                                                                                               - kind: Newline
                                                                                                                 text: "\r\n"
                                                                                                               - kind: StatementList
@@ -75807,18 +75833,28 @@ cst:
                                                                                                                 text: With
                                                                                                               - kind: Whitespace
                                                                                                                 text: " "
-                                                                                                              - kind: Identifier
-                                                                                                                text: uParams
-                                                                                                              - kind: PeriodOperator
-                                                                                                                text: "."
-                                                                                                              - kind: Identifier
-                                                                                                                text: Buffers
-                                                                                                              - kind: LeftParenthesis
-                                                                                                                text: (
-                                                                                                              - kind: IntegerLiteral
-                                                                                                                text: "1"
-                                                                                                              - kind: RightParenthesis
-                                                                                                                text: )
+                                                                                                              - kind: CallExpression
+                                                                                                                children:
+                                                                                                                  - kind: MemberAccessExpression
+                                                                                                                    children:
+                                                                                                                      - kind: Identifier
+                                                                                                                        text: uParams
+                                                                                                                      - kind: PeriodOperator
+                                                                                                                        text: "."
+                                                                                                                      - kind: Identifier
+                                                                                                                        text: Buffers
+                                                                                                                  - kind: LeftParenthesis
+                                                                                                                    text: (
+                                                                                                                  - kind: ArgumentList
+                                                                                                                    children:
+                                                                                                                      - kind: Argument
+                                                                                                                        children:
+                                                                                                                          - kind: NumericLiteralExpression
+                                                                                                                            children:
+                                                                                                                              - kind: IntegerLiteral
+                                                                                                                                text: "1"
+                                                                                                                  - kind: RightParenthesis
+                                                                                                                    text: )
                                                                                                               - kind: Newline
                                                                                                                 text: "\r\n"
                                                                                                               - kind: StatementList
@@ -76003,18 +76039,28 @@ cst:
                                                                                                                 text: With
                                                                                                               - kind: Whitespace
                                                                                                                 text: " "
-                                                                                                              - kind: Identifier
-                                                                                                                text: uParams
-                                                                                                              - kind: PeriodOperator
-                                                                                                                text: "."
-                                                                                                              - kind: Identifier
-                                                                                                                text: Buffers
-                                                                                                              - kind: LeftParenthesis
-                                                                                                                text: (
-                                                                                                              - kind: IntegerLiteral
-                                                                                                                text: "2"
-                                                                                                              - kind: RightParenthesis
-                                                                                                                text: )
+                                                                                                              - kind: CallExpression
+                                                                                                                children:
+                                                                                                                  - kind: MemberAccessExpression
+                                                                                                                    children:
+                                                                                                                      - kind: Identifier
+                                                                                                                        text: uParams
+                                                                                                                      - kind: PeriodOperator
+                                                                                                                        text: "."
+                                                                                                                      - kind: Identifier
+                                                                                                                        text: Buffers
+                                                                                                                  - kind: LeftParenthesis
+                                                                                                                    text: (
+                                                                                                                  - kind: ArgumentList
+                                                                                                                    children:
+                                                                                                                      - kind: Argument
+                                                                                                                        children:
+                                                                                                                          - kind: NumericLiteralExpression
+                                                                                                                            children:
+                                                                                                                              - kind: IntegerLiteral
+                                                                                                                                text: "2"
+                                                                                                                  - kind: RightParenthesis
+                                                                                                                    text: )
                                                                                                               - kind: Newline
                                                                                                                 text: "\r\n"
                                                                                                               - kind: StatementList
@@ -77439,18 +77485,28 @@ cst:
                                                                                                                 text: With
                                                                                                               - kind: Whitespace
                                                                                                                 text: " "
-                                                                                                              - kind: Identifier
-                                                                                                                text: uParams
-                                                                                                              - kind: PeriodOperator
-                                                                                                                text: "."
-                                                                                                              - kind: Identifier
-                                                                                                                text: Buffers
-                                                                                                              - kind: LeftParenthesis
-                                                                                                                text: (
-                                                                                                              - kind: IntegerLiteral
-                                                                                                                text: "0"
-                                                                                                              - kind: RightParenthesis
-                                                                                                                text: )
+                                                                                                              - kind: CallExpression
+                                                                                                                children:
+                                                                                                                  - kind: MemberAccessExpression
+                                                                                                                    children:
+                                                                                                                      - kind: Identifier
+                                                                                                                        text: uParams
+                                                                                                                      - kind: PeriodOperator
+                                                                                                                        text: "."
+                                                                                                                      - kind: Identifier
+                                                                                                                        text: Buffers
+                                                                                                                  - kind: LeftParenthesis
+                                                                                                                    text: (
+                                                                                                                  - kind: ArgumentList
+                                                                                                                    children:
+                                                                                                                      - kind: Argument
+                                                                                                                        children:
+                                                                                                                          - kind: NumericLiteralExpression
+                                                                                                                            children:
+                                                                                                                              - kind: IntegerLiteral
+                                                                                                                                text: "0"
+                                                                                                                  - kind: RightParenthesis
+                                                                                                                    text: )
                                                                                                               - kind: Newline
                                                                                                                 text: "\r\n"
                                                                                                               - kind: StatementList
@@ -77631,18 +77687,28 @@ cst:
                                                                                                                         text: With
                                                                                                                       - kind: Whitespace
                                                                                                                         text: " "
-                                                                                                                      - kind: Identifier
-                                                                                                                        text: uParams
-                                                                                                                      - kind: PeriodOperator
-                                                                                                                        text: "."
-                                                                                                                      - kind: Identifier
-                                                                                                                        text: Buffers
-                                                                                                                      - kind: LeftParenthesis
-                                                                                                                        text: (
-                                                                                                                      - kind: IntegerLiteral
-                                                                                                                        text: "1"
-                                                                                                                      - kind: RightParenthesis
-                                                                                                                        text: )
+                                                                                                                      - kind: CallExpression
+                                                                                                                        children:
+                                                                                                                          - kind: MemberAccessExpression
+                                                                                                                            children:
+                                                                                                                              - kind: Identifier
+                                                                                                                                text: uParams
+                                                                                                                              - kind: PeriodOperator
+                                                                                                                                text: "."
+                                                                                                                              - kind: Identifier
+                                                                                                                                text: Buffers
+                                                                                                                          - kind: LeftParenthesis
+                                                                                                                            text: (
+                                                                                                                          - kind: ArgumentList
+                                                                                                                            children:
+                                                                                                                              - kind: Argument
+                                                                                                                                children:
+                                                                                                                                  - kind: NumericLiteralExpression
+                                                                                                                                    children:
+                                                                                                                                      - kind: IntegerLiteral
+                                                                                                                                        text: "1"
+                                                                                                                          - kind: RightParenthesis
+                                                                                                                            text: )
                                                                                                                       - kind: Newline
                                                                                                                         text: "\r\n"
                                                                                                                       - kind: StatementList

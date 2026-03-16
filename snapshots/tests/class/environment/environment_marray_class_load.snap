@@ -22598,14 +22598,22 @@ cst:
                                                 text: With
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: item
-                                              - kind: LeftParenthesis
-                                                text: (
-                                              - kind: IntegerLiteral
-                                                text: "0"
-                                              - kind: RightParenthesis
-                                                text: )
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: item
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "0"
+                                                  - kind: RightParenthesis
+                                                    text: )
                                               - kind: Newline
                                                 text: "\r\n"
                                               - kind: StatementList
@@ -23916,18 +23924,28 @@ cst:
                                                 text: With
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: MeKeyword
-                                                text: Me
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: item
-                                              - kind: LeftParenthesis
-                                                text: (
-                                              - kind: Identifier
-                                                text: i
-                                              - kind: RightParenthesis
-                                                text: )
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: MemberAccessExpression
+                                                    children:
+                                                      - kind: MeKeyword
+                                                        text: Me
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: item
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: i
+                                                  - kind: RightParenthesis
+                                                    text: )
                                               - kind: Newline
                                                 text: "\r\n"
                                               - kind: StatementList
@@ -26320,18 +26338,28 @@ cst:
                                                             text: With
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: MeKeyword
-                                                            text: Me
-                                                          - kind: PeriodOperator
-                                                            text: "."
-                                                          - kind: Identifier
-                                                            text: item
-                                                          - kind: LeftParenthesis
-                                                            text: (
-                                                          - kind: Identifier
-                                                            text: i
-                                                          - kind: RightParenthesis
-                                                            text: )
+                                                          - kind: CallExpression
+                                                            children:
+                                                              - kind: MemberAccessExpression
+                                                                children:
+                                                                  - kind: MeKeyword
+                                                                    text: Me
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: item
+                                                              - kind: LeftParenthesis
+                                                                text: (
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: i
+                                                              - kind: RightParenthesis
+                                                                text: )
                                                           - kind: Newline
                                                             text: "\r\n"
                                                           - kind: StatementList
@@ -27720,18 +27748,28 @@ cst:
                                                             text: With
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: MeKeyword
-                                                            text: Me
-                                                          - kind: PeriodOperator
-                                                            text: "."
-                                                          - kind: Identifier
-                                                            text: item
-                                                          - kind: LeftParenthesis
-                                                            text: (
-                                                          - kind: Identifier
-                                                            text: M1
-                                                          - kind: RightParenthesis
-                                                            text: )
+                                                          - kind: CallExpression
+                                                            children:
+                                                              - kind: MemberAccessExpression
+                                                                children:
+                                                                  - kind: MeKeyword
+                                                                    text: Me
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: item
+                                                              - kind: LeftParenthesis
+                                                                text: (
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: M1
+                                                              - kind: RightParenthesis
+                                                                text: )
                                                           - kind: Newline
                                                             text: "\r\n"
                                                           - kind: StatementList
@@ -29894,18 +29932,28 @@ cst:
                                                 text: With
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: MeKeyword
-                                                text: Me
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: item
-                                              - kind: LeftParenthesis
-                                                text: (
-                                              - kind: Identifier
-                                                text: i
-                                              - kind: RightParenthesis
-                                                text: )
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: MemberAccessExpression
+                                                    children:
+                                                      - kind: MeKeyword
+                                                        text: Me
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: item
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: i
+                                                  - kind: RightParenthesis
+                                                    text: )
                                               - kind: Newline
                                                 text: "\r\n"
                                               - kind: StatementList
@@ -47940,8 +47988,10 @@ cst:
                     text: With
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myobject
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myobject
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
@@ -48984,28 +49034,28 @@ cst:
                                 text: " "
                               - kind: WithKeyword
                                 text: With
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Newline
+                                    text: "\r\n"
+                              - kind: SetKeyword
+                                text: Set
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: myobject2
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: mygroup2
                               - kind: Newline
                                 text: "\r\n"
                               - kind: StatementList
                                 children:
-                                  - kind: SetStatement
-                                    children:
-                                      - kind: SetKeyword
-                                        text: Set
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: myobject2
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: EqualityOperator
-                                        text: "="
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: mygroup2
-                                      - kind: Newline
-                                        text: "\r\n"
                                   - kind: Unknown
                                     text: End
                                   - kind: Whitespace

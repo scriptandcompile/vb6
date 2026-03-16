@@ -4471,8 +4471,10 @@ cst:
                             text: With
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: IID_IDispatch
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: IID_IDispatch
                           - kind: Newline
                             text: "\r\n"
                           - kind: StatementList
@@ -4617,8 +4619,10 @@ cst:
                             text: With
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: pic
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: pic
                           - kind: Newline
                             text: "\r\n"
                           - kind: StatementList
@@ -9075,8 +9079,10 @@ cst:
                                                                                 text: With
                                                                               - kind: Whitespace
                                                                                 text: " "
-                                                                              - kind: Identifier
-                                                                                text: sapi
+                                                                              - kind: IdentifierExpression
+                                                                                children:
+                                                                                  - kind: Identifier
+                                                                                    text: sapi
                                                                               - kind: Newline
                                                                                 text: "\r\n"
                                                                               - kind: StatementList
@@ -10425,8 +10431,10 @@ cst:
                                                                                 text: With
                                                                               - kind: Whitespace
                                                                                 text: " "
-                                                                              - kind: Identifier
-                                                                                text: mybasket
+                                                                              - kind: IdentifierExpression
+                                                                                children:
+                                                                                  - kind: Identifier
+                                                                                    text: mybasket
                                                                               - kind: Newline
                                                                                 text: "\r\n"
                                                                               - kind: StatementList
@@ -16531,18 +16539,18 @@ cst:
                                                                                                                                                             text: " "
                                                                                                                                                           - kind: WithKeyword
                                                                                                                                                             text: With
+                                                                                                                                                          - kind: IdentifierExpression
+                                                                                                                                                            children:
+                                                                                                                                                              - kind: Newline
+                                                                                                                                                                text: "\r\n"
+                                                                                                                                                          - kind: Identifier
+                                                                                                                                                            text: finish
+                                                                                                                                                          - kind: ColonOperator
+                                                                                                                                                            text: ":"
                                                                                                                                                           - kind: Newline
                                                                                                                                                             text: "\r\n"
                                                                                                                                                           - kind: StatementList
                                                                                                                                                             children:
-                                                                                                                                                              - kind: LabelStatement
-                                                                                                                                                                children:
-                                                                                                                                                                  - kind: Identifier
-                                                                                                                                                                    text: finish
-                                                                                                                                                                  - kind: ColonOperator
-                                                                                                                                                                    text: ":"
-                                                                                                                                                                  - kind: Newline
-                                                                                                                                                                    text: "\r\n"
                                                                                                                                                               - kind: IfStatement
                                                                                                                                                                 children:
                                                                                                                                                                   - kind: IfKeyword
@@ -17691,8 +17699,10 @@ cst:
                                                                                                                                                                         text: With
                                                                                                                                                                       - kind: Whitespace
                                                                                                                                                                         text: " "
-                                                                                                                                                                      - kind: Identifier
-                                                                                                                                                                        text: mybasket
+                                                                                                                                                                      - kind: IdentifierExpression
+                                                                                                                                                                        children:
+                                                                                                                                                                          - kind: Identifier
+                                                                                                                                                                            text: mybasket
                                                                                                                                                                       - kind: Newline
                                                                                                                                                                         text: "\r\n"
                                                                                                                                                                       - kind: StatementList
@@ -27427,18 +27437,18 @@ cst:
                                                                                                                                                                                                                                                                         text: " "
                                                                                                                                                                                                                                                                       - kind: WithKeyword
                                                                                                                                                                                                                                                                         text: With
+                                                                                                                                                                                                                                                                      - kind: IdentifierExpression
+                                                                                                                                                                                                                                                                        children:
+                                                                                                                                                                                                                                                                          - kind: Newline
+                                                                                                                                                                                                                                                                            text: "\r\n"
+                                                                                                                                                                                                                                                                      - kind: Identifier
+                                                                                                                                                                                                                                                                        text: finish
+                                                                                                                                                                                                                                                                      - kind: ColonOperator
+                                                                                                                                                                                                                                                                        text: ":"
                                                                                                                                                                                                                                                                       - kind: Newline
                                                                                                                                                                                                                                                                         text: "\r\n"
                                                                                                                                                                                                                                                                       - kind: StatementList
                                                                                                                                                                                                                                                                         children:
-                                                                                                                                                                                                                                                                          - kind: LabelStatement
-                                                                                                                                                                                                                                                                            children:
-                                                                                                                                                                                                                                                                              - kind: Identifier
-                                                                                                                                                                                                                                                                                text: finish
-                                                                                                                                                                                                                                                                              - kind: ColonOperator
-                                                                                                                                                                                                                                                                                text: ":"
-                                                                                                                                                                                                                                                                              - kind: Newline
-                                                                                                                                                                                                                                                                                text: "\r\n"
                                                                                                                                                                                                                                                                           - kind: IfStatement
                                                                                                                                                                                                                                                                             children:
                                                                                                                                                                                                                                                                               - kind: IfKeyword

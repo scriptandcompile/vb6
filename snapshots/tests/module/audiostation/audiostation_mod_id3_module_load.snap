@@ -10755,14 +10755,22 @@ cst:
                                                                                                                     text: With
                                                                                                                   - kind: Whitespace
                                                                                                                     text: " "
-                                                                                                                  - kind: Identifier
-                                                                                                                    text: mMemFrames
-                                                                                                                  - kind: LeftParenthesis
-                                                                                                                    text: (
-                                                                                                                  - kind: Identifier
-                                                                                                                    text: mMemFraCnt
-                                                                                                                  - kind: RightParenthesis
-                                                                                                                    text: )
+                                                                                                                  - kind: CallExpression
+                                                                                                                    children:
+                                                                                                                      - kind: Identifier
+                                                                                                                        text: mMemFrames
+                                                                                                                      - kind: LeftParenthesis
+                                                                                                                        text: (
+                                                                                                                      - kind: ArgumentList
+                                                                                                                        children:
+                                                                                                                          - kind: Argument
+                                                                                                                            children:
+                                                                                                                              - kind: IdentifierExpression
+                                                                                                                                children:
+                                                                                                                                  - kind: Identifier
+                                                                                                                                    text: mMemFraCnt
+                                                                                                                      - kind: RightParenthesis
+                                                                                                                        text: )
                                                                                                                   - kind: Newline
                                                                                                                     text: "\n"
                                                                                                                   - kind: StatementList
@@ -13125,14 +13133,22 @@ cst:
                                                                                                                                 text: With
                                                                                                                               - kind: Whitespace
                                                                                                                                 text: " "
-                                                                                                                              - kind: Identifier
-                                                                                                                                text: mMemFrames
-                                                                                                                              - kind: LeftParenthesis
-                                                                                                                                text: (
-                                                                                                                              - kind: Identifier
-                                                                                                                                text: mMemFraCnt
-                                                                                                                              - kind: RightParenthesis
-                                                                                                                                text: )
+                                                                                                                              - kind: CallExpression
+                                                                                                                                children:
+                                                                                                                                  - kind: Identifier
+                                                                                                                                    text: mMemFrames
+                                                                                                                                  - kind: LeftParenthesis
+                                                                                                                                    text: (
+                                                                                                                                  - kind: ArgumentList
+                                                                                                                                    children:
+                                                                                                                                      - kind: Argument
+                                                                                                                                        children:
+                                                                                                                                          - kind: IdentifierExpression
+                                                                                                                                            children:
+                                                                                                                                              - kind: Identifier
+                                                                                                                                                text: mMemFraCnt
+                                                                                                                                  - kind: RightParenthesis
+                                                                                                                                    text: )
                                                                                                                               - kind: Newline
                                                                                                                                 text: "\n"
                                                                                                                               - kind: StatementList
@@ -17463,14 +17479,22 @@ cst:
                                                                                                 text: With
                                                                                               - kind: Whitespace
                                                                                                 text: " "
-                                                                                              - kind: Identifier
-                                                                                                text: mMemFrames
-                                                                                              - kind: LeftParenthesis
-                                                                                                text: (
-                                                                                              - kind: Identifier
-                                                                                                text: memIdx
-                                                                                              - kind: RightParenthesis
-                                                                                                text: )
+                                                                                              - kind: CallExpression
+                                                                                                children:
+                                                                                                  - kind: Identifier
+                                                                                                    text: mMemFrames
+                                                                                                  - kind: LeftParenthesis
+                                                                                                    text: (
+                                                                                                  - kind: ArgumentList
+                                                                                                    children:
+                                                                                                      - kind: Argument
+                                                                                                        children:
+                                                                                                          - kind: IdentifierExpression
+                                                                                                            children:
+                                                                                                              - kind: Identifier
+                                                                                                                text: memIdx
+                                                                                                  - kind: RightParenthesis
+                                                                                                    text: )
                                                                                               - kind: Newline
                                                                                                 text: "\n"
                                                                                               - kind: StatementList
@@ -23117,8 +23141,10 @@ cst:
                                                                                             text: With
                                                                                           - kind: Whitespace
                                                                                             text: " "
-                                                                                          - kind: Identifier
-                                                                                            text: BuildTag
+                                                                                          - kind: IdentifierExpression
+                                                                                            children:
+                                                                                              - kind: Identifier
+                                                                                                text: BuildTag
                                                                                           - kind: Newline
                                                                                             text: "\n"
                                                                                           - kind: StatementList
@@ -24785,8 +24811,10 @@ cst:
                                                                                             text: With
                                                                                           - kind: Whitespace
                                                                                             text: " "
-                                                                                          - kind: Identifier
-                                                                                            text: BuildTag
+                                                                                          - kind: IdentifierExpression
+                                                                                            children:
+                                                                                              - kind: Identifier
+                                                                                                text: BuildTag
                                                                                           - kind: Newline
                                                                                             text: "\n"
                                                                                           - kind: StatementList
@@ -29085,14 +29113,22 @@ cst:
                                                                                                 text: With
                                                                                               - kind: Whitespace
                                                                                                 text: " "
-                                                                                              - kind: Identifier
-                                                                                                text: mMemFrames
-                                                                                              - kind: LeftParenthesis
-                                                                                                text: (
-                                                                                              - kind: Identifier
-                                                                                                text: fraIdx
-                                                                                              - kind: RightParenthesis
-                                                                                                text: )
+                                                                                              - kind: CallExpression
+                                                                                                children:
+                                                                                                  - kind: Identifier
+                                                                                                    text: mMemFrames
+                                                                                                  - kind: LeftParenthesis
+                                                                                                    text: (
+                                                                                                  - kind: ArgumentList
+                                                                                                    children:
+                                                                                                      - kind: Argument
+                                                                                                        children:
+                                                                                                          - kind: IdentifierExpression
+                                                                                                            children:
+                                                                                                              - kind: Identifier
+                                                                                                                text: fraIdx
+                                                                                                  - kind: RightParenthesis
+                                                                                                    text: )
                                                                                               - kind: Newline
                                                                                                 text: "\n"
                                                                                               - kind: StatementList
@@ -43267,8 +43303,10 @@ cst:
                                                                                                             text: With
                                                                                                           - kind: Whitespace
                                                                                                             text: " "
-                                                                                                          - kind: Identifier
-                                                                                                            text: Tag
+                                                                                                          - kind: IdentifierExpression
+                                                                                                            children:
+                                                                                                              - kind: Identifier
+                                                                                                                text: Tag
                                                                                                           - kind: Newline
                                                                                                             text: "\n"
                                                                                                           - kind: StatementList
