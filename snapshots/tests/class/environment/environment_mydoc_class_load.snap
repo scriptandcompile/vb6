@@ -13428,18 +13428,20 @@ cst:
                                     text: ColorThis
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: LeftParenthesis
-                                    text: (
                                   - kind: ArgumentList
                                     children:
                                       - kind: Argument
                                         children:
-                                          - kind: IdentifierExpression
+                                          - kind: ParenthesizedExpression
                                             children:
-                                              - kind: Identifier
-                                                text: ParaNum
-                                  - kind: RightParenthesis
-                                    text: )
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: ParaNum
+                                              - kind: RightParenthesis
+                                                text: )
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
@@ -20712,50 +20714,34 @@ cst:
                                         children:
                                           - kind: Identifier
                                             text: textFormat
-                                  - kind: IdentifierExpression
-                                    children:
                                       - kind: Comma
                                         text: ","
-                              - kind: Whitespace
-                                text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: thiscur
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: Comma
-                                                text: ","
                                       - kind: Whitespace
                                         text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: l
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
+                                      - kind: IdentifierExpression
                                         children:
-                                          - kind: BinaryExpression
-                                            children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: RightParenthesis
-                                                    text: )
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: NeoData
+                                          - kind: Identifier
+                                            text: thiscur
+                                      - kind: Comma
+                                        text: ","
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: l
+                                      - kind: RightParenthesis
+                                        text: )
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: NeoData
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: AssignmentStatement
@@ -21544,50 +21530,34 @@ cst:
                                         children:
                                           - kind: Identifier
                                             text: textbuf
-                                  - kind: IdentifierExpression
-                                    children:
                                       - kind: Comma
                                         text: ","
-                              - kind: Whitespace
-                                text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: thiscur
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: Comma
-                                                text: ","
                                       - kind: Whitespace
                                         text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: l
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
+                                      - kind: IdentifierExpression
                                         children:
-                                          - kind: BinaryExpression
-                                            children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: RightParenthesis
-                                                    text: )
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: NeoData
+                                          - kind: Identifier
+                                            text: thiscur
+                                      - kind: Comma
+                                        text: ","
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: l
+                                      - kind: RightParenthesis
+                                        text: )
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: NeoData
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: AssignmentStatement
@@ -22482,50 +22452,34 @@ cst:
                                         children:
                                           - kind: Identifier
                                             text: textbuf
-                                  - kind: IdentifierExpression
-                                    children:
                                       - kind: Comma
                                         text: ","
-                              - kind: Whitespace
-                                text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: thiscur
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: Comma
-                                                text: ","
                                       - kind: Whitespace
                                         text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: l
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
+                                      - kind: IdentifierExpression
                                         children:
-                                          - kind: BinaryExpression
-                                            children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: RightParenthesis
-                                                    text: )
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: NeoData
+                                          - kind: Identifier
+                                            text: thiscur
+                                      - kind: Comma
+                                        text: ","
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: l
+                                      - kind: RightParenthesis
+                                        text: )
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: NeoData
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: AssignmentStatement
@@ -23348,50 +23302,34 @@ cst:
                                         children:
                                           - kind: Identifier
                                             text: textDoc
-                                  - kind: IdentifierExpression
-                                    children:
                                       - kind: Comma
                                         text: ","
-                              - kind: Whitespace
-                                text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: thiscur
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: Comma
-                                                text: ","
                                       - kind: Whitespace
                                         text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: l
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
+                                      - kind: IdentifierExpression
                                         children:
-                                          - kind: BinaryExpression
-                                            children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: RightParenthesis
-                                                    text: )
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: NeoData
+                                          - kind: Identifier
+                                            text: thiscur
+                                      - kind: Comma
+                                        text: ","
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: l
+                                      - kind: RightParenthesis
+                                        text: )
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: NeoData
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: AssignmentStatement
@@ -26102,52 +26040,36 @@ cst:
                                             children:
                                               - kind: Identifier
                                                 text: textDoc
-                                      - kind: IdentifierExpression
-                                        children:
                                           - kind: Comma
                                             text: ","
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: CallStatement
-                                    children:
-                                      - kind: Identifier
-                                        text: thiscur
-                                      - kind: ArgumentList
-                                        children:
-                                          - kind: Argument
-                                            children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Comma
-                                                    text: ","
                                           - kind: Whitespace
                                             text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: l
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: BinaryExpression
+                                          - kind: IdentifierExpression
                                             children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: RightParenthesis
-                                                    text: )
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: NeoData
-                                  - kind: Newline
-                                    text: "\r\n"
+                                              - kind: Identifier
+                                                text: thiscur
+                                          - kind: Comma
+                                            text: ","
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: l
+                                          - kind: RightParenthesis
+                                            text: )
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: EqualityOperator
+                                        text: "="
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: NeoData
+                                      - kind: Newline
+                                        text: "\r\n"
                               - kind: AssignmentStatement
                                 children:
                                   - kind: IdentifierExpression
@@ -30194,50 +30116,34 @@ cst:
                                         children:
                                           - kind: Identifier
                                             text: textHtmlDoc
-                                  - kind: IdentifierExpression
-                                    children:
                                       - kind: Comma
                                         text: ","
-                              - kind: Whitespace
-                                text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: thiscur
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: Comma
-                                                text: ","
                                       - kind: Whitespace
                                         text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: l
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
+                                      - kind: IdentifierExpression
                                         children:
-                                          - kind: BinaryExpression
-                                            children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: RightParenthesis
-                                                    text: )
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: NeoData
+                                          - kind: Identifier
+                                            text: thiscur
+                                      - kind: Comma
+                                        text: ","
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: l
+                                      - kind: RightParenthesis
+                                        text: )
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: NeoData
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: AssignmentStatement
@@ -31168,50 +31074,34 @@ cst:
                                         children:
                                           - kind: Identifier
                                             text: textDoc1LINE
-                                  - kind: IdentifierExpression
-                                    children:
                                       - kind: Comma
                                         text: ","
-                              - kind: Whitespace
-                                text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: thiscur
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: Comma
-                                                text: ","
                                       - kind: Whitespace
                                         text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: l
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
+                                      - kind: IdentifierExpression
                                         children:
-                                          - kind: BinaryExpression
-                                            children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: RightParenthesis
-                                                    text: )
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: NeoData
+                                          - kind: Identifier
+                                            text: thiscur
+                                      - kind: Comma
+                                        text: ","
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: l
+                                      - kind: RightParenthesis
+                                        text: )
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: NeoData
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: AssignmentStatement
@@ -42402,18 +42292,20 @@ cst:
                                                     text: ColorThis
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: LeftParenthesis
-                                                    text: (
                                                   - kind: ArgumentList
                                                     children:
                                                       - kind: Argument
                                                         children:
-                                                          - kind: IdentifierExpression
+                                                          - kind: ParenthesizedExpression
                                                             children:
-                                                              - kind: Identifier
-                                                                text: mycur
-                                                  - kind: RightParenthesis
-                                                    text: )
+                                                              - kind: LeftParenthesis
+                                                                text: (
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: mycur
+                                                              - kind: RightParenthesis
+                                                                text: )
                                                   - kind: Newline
                                                     text: "\r\n"
                                               - kind: Whitespace
@@ -52336,18 +52228,20 @@ cst:
                                             text: ColorThis
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: LeftParenthesis
-                                            text: (
                                           - kind: ArgumentList
                                             children:
                                               - kind: Argument
                                                 children:
-                                                  - kind: IdentifierExpression
+                                                  - kind: ParenthesizedExpression
                                                     children:
-                                                      - kind: Identifier
-                                                        text: ParaNum
-                                          - kind: RightParenthesis
-                                            text: )
+                                                      - kind: LeftParenthesis
+                                                        text: (
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: ParaNum
+                                                      - kind: RightParenthesis
+                                                        text: )
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: IfStatement
@@ -58616,18 +58510,20 @@ cst:
                                                         text: ColorThis
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: LeftParenthesis
-                                                        text: (
                                                       - kind: ArgumentList
                                                         children:
                                                           - kind: Argument
                                                             children:
-                                                              - kind: IdentifierExpression
+                                                              - kind: ParenthesizedExpression
                                                                 children:
-                                                                  - kind: Identifier
-                                                                    text: mycur
-                                                      - kind: RightParenthesis
-                                                        text: )
+                                                                  - kind: LeftParenthesis
+                                                                    text: (
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: mycur
+                                                                  - kind: RightParenthesis
+                                                                    text: )
                                                       - kind: Newline
                                                         text: "\r\n"
                                                   - kind: AssignmentStatement
