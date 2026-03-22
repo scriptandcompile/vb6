@@ -1,5 +1,6 @@
 ---
 source: vb6parse/tests/form/environment.rs
+assertion_line: 219
 expression: form_file
 ---
 form:
@@ -8755,12 +8756,20 @@ cst:
                                         text: As
                               - kind: Whitespace
                                 text: " "
-                              - kind: Unknown
-                                text: String
-                              - kind: Unknown
-                                text: )
-                              - kind: Newline
-                                text: "\r\n"
+                              - kind: CallStatement
+                                children:
+                                  - kind: StringKeyword
+                                    text: String
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: RightParenthesis
+                                                text: )
+                                  - kind: Newline
+                                    text: "\r\n"
                               - kind: Unknown
                                 text: mMyName
                               - kind: Unknown
@@ -8975,12 +8984,20 @@ cst:
                                         text: As
                               - kind: Whitespace
                                 text: " "
-                              - kind: Unknown
-                                text: String
-                              - kind: Unknown
-                                text: )
-                              - kind: Newline
-                                text: "\r\n"
+                              - kind: CallStatement
+                                children:
+                                  - kind: StringKeyword
+                                    text: String
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: RightParenthesis
+                                                text: )
+                                  - kind: Newline
+                                    text: "\r\n"
                               - kind: OnErrorStatement
                                 children:
                                   - kind: OnKeyword
