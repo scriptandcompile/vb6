@@ -7233,16 +7233,20 @@ cst:
                                                                                 text: "                                    "
                                                                               - kind: Argument
                                                                                 children:
+                                                                                  - kind: ByValKeyword
+                                                                                    text: ByVal
+                                                                                  - kind: Whitespace
+                                                                                    text: " "
                                                                                   - kind: IdentifierExpression
                                                                                     children:
-                                                                                      - kind: ByValKeyword
-                                                                                        text: ByVal
+                                                                                      - kind: Identifier
+                                                                                        text: EvalType
                                                                               - kind: Whitespace
                                                                                 text: " "
                                                                       - kind: CallStatement
                                                                         children:
-                                                                          - kind: Identifier
-                                                                            text: EvalType
+                                                                          - kind: AsKeyword
+                                                                            text: As
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                           - kind: ArgumentList
@@ -7251,18 +7255,8 @@ cst:
                                                                                 children:
                                                                                   - kind: IdentifierExpression
                                                                                     children:
-                                                                                      - kind: AsKeyword
-                                                                                        text: As
-                                                                              - kind: Whitespace
-                                                                                text: " "
-                                                                      - kind: CallStatement
-                                                                        children:
-                                                                          - kind: LongKeyword
-                                                                            text: Long
-                                                                          - kind: ArgumentList
-                                                                            children:
-                                                                              - kind: Argument
-                                                                                children: []
+                                                                                      - kind: LongKeyword
+                                                                                        text: Long
                                                                               - kind: Comma
                                                                                 text: ","
                                                                               - kind: Whitespace
@@ -7275,16 +7269,20 @@ cst:
                                                                                 text: "                                    "
                                                                               - kind: Argument
                                                                                 children:
+                                                                                  - kind: ByValKeyword
+                                                                                    text: ByVal
+                                                                                  - kind: Whitespace
+                                                                                    text: " "
                                                                                   - kind: IdentifierExpression
                                                                                     children:
-                                                                                      - kind: ByValKeyword
-                                                                                        text: ByVal
+                                                                                      - kind: Identifier
+                                                                                        text: EvalScore
                                                                               - kind: Whitespace
                                                                                 text: " "
                                                                       - kind: CallStatement
                                                                         children:
-                                                                          - kind: Identifier
-                                                                            text: EvalScore
+                                                                          - kind: AsKeyword
+                                                                            text: As
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                           - kind: ArgumentList
@@ -7293,18 +7291,8 @@ cst:
                                                                                 children:
                                                                                   - kind: IdentifierExpression
                                                                                     children:
-                                                                                      - kind: AsKeyword
-                                                                                        text: As
-                                                                              - kind: Whitespace
-                                                                                text: " "
-                                                                      - kind: CallStatement
-                                                                        children:
-                                                                          - kind: LongKeyword
-                                                                            text: Long
-                                                                          - kind: ArgumentList
-                                                                            children:
-                                                                              - kind: Argument
-                                                                                children: []
+                                                                                      - kind: LongKeyword
+                                                                                        text: Long
                                                                               - kind: Comma
                                                                                 text: ","
                                                                               - kind: Whitespace
@@ -7317,16 +7305,20 @@ cst:
                                                                                 text: "                                    "
                                                                               - kind: Argument
                                                                                 children:
+                                                                                  - kind: ByValKeyword
+                                                                                    text: ByVal
+                                                                                  - kind: Whitespace
+                                                                                    text: " "
                                                                                   - kind: IdentifierExpression
                                                                                     children:
-                                                                                      - kind: ByValKeyword
-                                                                                        text: ByVal
+                                                                                      - kind: Identifier
+                                                                                        text: StaticEval
                                                                               - kind: Whitespace
                                                                                 text: " "
                                                                       - kind: CallStatement
                                                                         children:
-                                                                          - kind: Identifier
-                                                                            text: StaticEval
+                                                                          - kind: AsKeyword
+                                                                            text: As
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                           - kind: ArgumentList
@@ -7335,18 +7327,8 @@ cst:
                                                                                 children:
                                                                                   - kind: IdentifierExpression
                                                                                     children:
-                                                                                      - kind: AsKeyword
-                                                                                        text: As
-                                                                              - kind: Whitespace
-                                                                                text: " "
-                                                                      - kind: CallStatement
-                                                                        children:
-                                                                          - kind: LongKeyword
-                                                                            text: Long
-                                                                          - kind: ArgumentList
-                                                                            children:
-                                                                              - kind: Argument
-                                                                                children: []
+                                                                                      - kind: LongKeyword
+                                                                                        text: Long
                                                                               - kind: Comma
                                                                                 text: ","
                                                                               - kind: Whitespace
@@ -7359,16 +7341,20 @@ cst:
                                                                                 text: "                                    "
                                                                               - kind: Argument
                                                                                 children:
+                                                                                  - kind: ByValKeyword
+                                                                                    text: ByVal
+                                                                                  - kind: Whitespace
+                                                                                    text: " "
                                                                                   - kind: IdentifierExpression
                                                                                     children:
-                                                                                      - kind: ByValKeyword
-                                                                                        text: ByVal
+                                                                                      - kind: Identifier
+                                                                                        text: PvHit
                                                                               - kind: Whitespace
                                                                                 text: " "
                                                                       - kind: CallStatement
                                                                         children:
-                                                                          - kind: Identifier
-                                                                            text: PvHit
+                                                                          - kind: AsKeyword
+                                                                            text: As
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                           - kind: ArgumentList
@@ -7377,12 +7363,8 @@ cst:
                                                                                 children:
                                                                                   - kind: IdentifierExpression
                                                                                     children:
-                                                                                      - kind: AsKeyword
-                                                                                        text: As
-                                                                              - kind: Whitespace
-                                                                                text: " "
-                                                                      - kind: Unknown
-                                                                        text: Boolean
+                                                                                      - kind: BooleanKeyword
+                                                                                        text: Boolean
                                                                       - kind: Unknown
                                                                         text: )
                                                                       - kind: Newline
