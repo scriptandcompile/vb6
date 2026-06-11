@@ -803,7 +803,7 @@ cst:
             text: ucsTlsSupportTls10
           - kind: Whitespace
             text: " "
-          - kind: Unknown
+          - kind: OrKeyword
             text: Or
           - kind: Whitespace
             text: " "
@@ -811,7 +811,7 @@ cst:
             text: ucsTlsSupportTls11
           - kind: Whitespace
             text: " "
-          - kind: Unknown
+          - kind: OrKeyword
             text: Or
           - kind: Whitespace
             text: " "
@@ -819,7 +819,7 @@ cst:
             text: ucsTlsSupportTls12
           - kind: Whitespace
             text: " "
-          - kind: Unknown
+          - kind: OrKeyword
             text: Or
           - kind: Whitespace
             text: " "
@@ -12471,10 +12471,12 @@ cst:
                 text: End
               - kind: Whitespace
                 text: " "
-              - kind: Unknown
-                text: Enum
-              - kind: Newline
-                text: "\r\n"
+              - kind: CallStatement
+                children:
+                  - kind: EnumKeyword
+                    text: Enum
+                  - kind: Newline
+                    text: "\r\n"
               - kind: Unknown
                 text: "#"
           - kind: EndKeyword
@@ -18587,20 +18589,20 @@ cst:
             children:
               - kind: Whitespace
                 text: "            "
-              - kind: Unknown
-                text: Optional
-              - kind: Whitespace
-                text: " "
               - kind: CallStatement
                 children:
-                  - kind: ByValKeyword
-                    text: ByVal
+                  - kind: OptionalKeyword
+                    text: Optional
                   - kind: Whitespace
                     text: " "
                   - kind: ArgumentList
                     children:
                       - kind: Argument
                         children:
+                          - kind: ByValKeyword
+                            text: ByVal
+                          - kind: Whitespace
+                            text: " "
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
@@ -30417,20 +30419,20 @@ cst:
             children:
               - kind: Whitespace
                 text: "            "
-              - kind: Unknown
-                text: Optional
-              - kind: Whitespace
-                text: " "
               - kind: CallStatement
                 children:
-                  - kind: ByValKeyword
-                    text: ByVal
+                  - kind: OptionalKeyword
+                    text: Optional
                   - kind: Whitespace
                     text: " "
                   - kind: ArgumentList
                     children:
                       - kind: Argument
                         children:
+                          - kind: ByValKeyword
+                            text: ByVal
+                          - kind: Whitespace
+                            text: " "
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
@@ -92079,12 +92081,20 @@ cst:
                                                                                 text: )
                                                                               - kind: Whitespace
                                                                                 text: " "
-                                                                              - kind: Unknown
-                                                                                text: Xor
-                                                                              - kind: Whitespace
-                                                                                text: " "
-                                                                              - kind: Unknown
-                                                                                text: "&"
+                                                                              - kind: CallStatement
+                                                                                children:
+                                                                                  - kind: XorKeyword
+                                                                                    text: Xor
+                                                                                  - kind: Whitespace
+                                                                                    text: " "
+                                                                                  - kind: ArgumentList
+                                                                                    children:
+                                                                                      - kind: Argument
+                                                                                        children:
+                                                                                          - kind: IdentifierExpression
+                                                                                            children:
+                                                                                              - kind: Ampersand
+                                                                                                text: "&"
                                                                               - kind: CallStatement
                                                                                 children:
                                                                                   - kind: Identifier

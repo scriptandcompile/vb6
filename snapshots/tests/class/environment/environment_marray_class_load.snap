@@ -39984,14 +39984,10 @@ cst:
                 text: "0"
               - kind: Whitespace
                 text: " "
-              - kind: Unknown
-                text: And
-              - kind: Whitespace
-                text: " "
               - kind: CallStatement
                 children:
-                  - kind: Identifier
-                    text: curitem
+                  - kind: AndKeyword
+                    text: And
                   - kind: Whitespace
                     text: " "
                   - kind: ArgumentList
@@ -40002,16 +39998,22 @@ cst:
                             children:
                               - kind: IdentifierExpression
                                 children:
-                                  - kind: InequalityOperator
-                                    text: "<>"
+                                  - kind: Identifier
+                                    text: curitem
                               - kind: Whitespace
                                 text: " "
-                              - kind: SubtractionOperator
-                                text: "-"
-                              - kind: NumericLiteralExpression
+                              - kind: InequalityOperator
+                                text: "<>"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: UnaryExpression
                                 children:
-                                  - kind: IntegerLiteral
-                                    text: "2"
+                                  - kind: SubtractionOperator
+                                    text: "-"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "2"
                       - kind: Whitespace
                         text: " "
               - kind: Unknown
@@ -50028,16 +50030,16 @@ cst:
                 text: As
               - kind: Whitespace
                 text: " "
-              - kind: Unknown
-                text: Boolean
-              - kind: Whitespace
-                text: " "
               - kind: AssignmentStatement
                 children:
                   - kind: IdentifierExpression
                     children:
-                      - kind: EqualityOperator
-                        text: "="
+                      - kind: BooleanKeyword
+                        text: Boolean
+                  - kind: Whitespace
+                    text: " "
+                  - kind: EqualityOperator
+                    text: "="
                   - kind: Whitespace
                     text: " "
                   - kind: BooleanLiteralExpression
@@ -76844,12 +76846,20 @@ cst:
                 text: )
               - kind: Whitespace
                 text: " "
-              - kind: Unknown
-                text: Xor
-              - kind: Whitespace
-                text: " "
-              - kind: Unknown
-                text: "&"
+              - kind: CallStatement
+                children:
+                  - kind: XorKeyword
+                    text: Xor
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Ampersand
+                                text: "&"
               - kind: CallStatement
                 children:
                   - kind: Identifier

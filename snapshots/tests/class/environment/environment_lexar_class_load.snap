@@ -39361,30 +39361,34 @@ cst:
                                 text: "\r\n"
                               - kind: Whitespace
                                 text: "                    "
-                              - kind: Unknown
-                                text: ElseIf
-                              - kind: Whitespace
-                                text: " "
                               - kind: AssignmentStatement
                                 children:
                                   - kind: IdentifierExpression
                                     children:
-                                      - kind: Identifier
-                                        text: feedback
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: EqualityOperator
-                                    text: "="
+                                      - kind: ElseIfKeyword
+                                        text: ElseIf
                                   - kind: Whitespace
                                     text: " "
                                   - kind: BinaryExpression
                                     children:
                                       - kind: BinaryExpression
                                         children:
-                                          - kind: NumericLiteralExpression
+                                          - kind: BinaryExpression
                                             children:
-                                              - kind: IntegerLiteral
-                                                text: "0"
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: feedback
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: EqualityOperator
+                                                text: "="
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "0"
                                           - kind: Whitespace
                                             text: " "
                                           - kind: AndKeyword
@@ -44773,26 +44777,30 @@ cst:
                                 text: "\r\n"
                               - kind: Whitespace
                                 text: "        "
-                              - kind: Unknown
-                                text: ElseIf
-                              - kind: Whitespace
-                                text: " "
                               - kind: AssignmentStatement
                                 children:
                                   - kind: IdentifierExpression
                                     children:
-                                      - kind: Identifier
-                                        text: pos2
+                                      - kind: ElseIfKeyword
+                                        text: ElseIf
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: EqualityOperator
-                                    text: "="
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: NumericLiteralExpression
+                                  - kind: BinaryExpression
                                     children:
-                                      - kind: IntegerLiteral
-                                        text: "0"
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: pos2
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: EqualityOperator
+                                        text: "="
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "0"
                               - kind: Whitespace
                                 text: " "
                               - kind: Unknown
@@ -65119,26 +65127,30 @@ cst:
                                         text: "\r\n"
                                       - kind: Whitespace
                                         text: "        "
-                                      - kind: Unknown
-                                        text: ElseIf
-                                      - kind: Whitespace
-                                        text: " "
                                       - kind: AssignmentStatement
                                         children:
                                           - kind: IdentifierExpression
                                             children:
-                                              - kind: Identifier
-                                                text: pos2
+                                              - kind: ElseIfKeyword
+                                                text: ElseIf
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: EqualityOperator
-                                            text: "="
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: NumericLiteralExpression
+                                          - kind: BinaryExpression
                                             children:
-                                              - kind: IntegerLiteral
-                                                text: "0"
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: pos2
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: EqualityOperator
+                                                text: "="
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "0"
                                       - kind: Whitespace
                                         text: " "
                                       - kind: Unknown
@@ -90755,14 +90767,22 @@ cst:
                                                         text: ","
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Unknown
-                                                        text: Optional
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: RemComment
-                                                        text: Remove As Boolean = False) As Boolean
-                                                      - kind: Newline
-                                                        text: "\r\n"
+                                                      - kind: CallStatement
+                                                        children:
+                                                          - kind: OptionalKeyword
+                                                            text: Optional
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: RemComment
+                                                                        text: Remove As Boolean = False) As Boolean
+                                                          - kind: Newline
+                                                            text: "\r\n"
                                                       - kind: DimStatement
                                                         children:
                                                           - kind: DimKeyword
