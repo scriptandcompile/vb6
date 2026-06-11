@@ -1,12 +1,10 @@
 ---
-source: vb6parse/src/syntax/library/functions/graphics/spc.rs
+source: vb6parse/src/syntax/statements/objects/call.rs
 expression: tree
 ---
 root:
   kind: Root
   children:
-    - kind: Newline
-      text: "\n"
     - kind: SubStatement
       children:
         - kind: SubKeyword
@@ -44,51 +42,21 @@ root:
                         - kind: CallExpression
                           children:
                             - kind: Identifier
-                              text: GetLabel
-                            - kind: LeftParenthesis
-                              text: (
-                            - kind: ArgumentList
-                              children: []
-                            - kind: RightParenthesis
-                              text: )
-                    - kind: Semicolon
-                      text: ;
-                    - kind: Whitespace
-                      text: " "
-                    - kind: Argument
-                      children:
-                        - kind: CallExpression
-                          children:
-                            - kind: Identifier
-                              text: Spc
+                              text: Hex
                             - kind: LeftParenthesis
                               text: (
                             - kind: ArgumentList
                               children:
                                 - kind: Argument
                                   children:
-                                    - kind: NumericLiteralExpression
+                                    - kind: IdentifierExpression
                                       children:
-                                        - kind: IntegerLiteral
-                                          text: "10"
+                                        - kind: Identifier
+                                          text: i
                             - kind: RightParenthesis
                               text: )
                     - kind: Semicolon
                       text: ;
-                    - kind: Whitespace
-                      text: " "
-                    - kind: Argument
-                      children:
-                        - kind: CallExpression
-                          children:
-                            - kind: Identifier
-                              text: GetValue
-                            - kind: LeftParenthesis
-                              text: (
-                            - kind: ArgumentList
-                              children: []
-                            - kind: RightParenthesis
-                              text: )
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

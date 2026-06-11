@@ -1,12 +1,10 @@
 ---
-source: vb6parse/src/syntax/library/functions/graphics/spc.rs
+source: vb6parse/src/syntax/statements/objects/call.rs
 expression: tree
 ---
 root:
   kind: Root
   children:
-    - kind: Newline
-      text: "\n"
     - kind: SubStatement
       children:
         - kind: SubKeyword
@@ -30,7 +28,7 @@ root:
             - kind: CallStatement
               children:
                 - kind: Identifier
-                  text: Debug
+                  text: Printer
                 - kind: PeriodOperator
                   text: "."
                 - kind: PrintKeyword
@@ -47,36 +45,6 @@ root:
                               text: "\"A\""
                     - kind: Semicolon
                       text: ;
-                    - kind: Whitespace
-                      text: " "
-                    - kind: Argument
-                      children:
-                        - kind: CallExpression
-                          children:
-                            - kind: Identifier
-                              text: Spc
-                            - kind: LeftParenthesis
-                              text: (
-                            - kind: ArgumentList
-                              children:
-                                - kind: Argument
-                                  children:
-                                    - kind: NumericLiteralExpression
-                                      children:
-                                        - kind: IntegerLiteral
-                                          text: "0"
-                            - kind: RightParenthesis
-                              text: )
-                    - kind: Semicolon
-                      text: ;
-                    - kind: Whitespace
-                      text: " "
-                    - kind: Argument
-                      children:
-                        - kind: StringLiteralExpression
-                          children:
-                            - kind: StringLiteral
-                              text: "\"B\""
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword
