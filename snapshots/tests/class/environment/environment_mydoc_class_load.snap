@@ -46395,27 +46395,21 @@ cst:
                                           - kind: Whitespace
                                             text: " "
                                           - kind: Argument
+                                            children: []
+                                          - kind: Comma
+                                            text: ","
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: Argument
                                             children:
                                               - kind: IdentifierExpression
                                                 children:
-                                                  - kind: Comma
-                                                    text: ","
-                                          - kind: Whitespace
-                                            text: " "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: mlcid
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: RightParenthesis
-                                                text: )
-                                      - kind: Whitespace
-                                        text: "   "
+                                                  - kind: Identifier
+                                                    text: mlcid
+                                      - kind: RightParenthesis
+                                        text: )
+                              - kind: Whitespace
+                                text: "   "
                               - kind: EndOfLineComment
                                 text: "'using default locale????"
                               - kind: Newline
