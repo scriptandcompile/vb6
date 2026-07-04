@@ -44295,36 +44295,38 @@ cst:
                                                                         children:
                                                                           - kind: Argument
                                                                             children:
-                                                                              - kind: IdentifierExpression
+                                                                              - kind: UnaryExpression
                                                                                 children:
                                                                                   - kind: ByValKeyword
                                                                                     text: ByVal
+                                                                                  - kind: Whitespace
+                                                                                    text: " "
+                                                                                  - kind: IdentifierExpression
+                                                                                    children:
+                                                                                      - kind: Identifier
+                                                                                        text: RHS
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                   - kind: IdentifierExpression
                                                                     children:
-                                                                      - kind: Identifier
-                                                                        text: RHS
+                                                                      - kind: AsKeyword
+                                                                        text: As
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: CallStatement
                                                                 children:
-                                                                  - kind: AsKeyword
-                                                                    text: As
-                                                                  - kind: Whitespace
-                                                                    text: " "
+                                                                  - kind: LongKeyword
+                                                                    text: Long
                                                                   - kind: ArgumentList
                                                                     children:
                                                                       - kind: Argument
                                                                         children:
                                                                           - kind: IdentifierExpression
                                                                             children:
-                                                                              - kind: LongKeyword
-                                                                                text: Long
-                                                              - kind: Unknown
-                                                                text: )
-                                                              - kind: Newline
-                                                                text: "\r\n"
+                                                                              - kind: RightParenthesis
+                                                                                text: )
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
                                                               - kind: AssignmentStatement
                                                                 children:
                                                                   - kind: IdentifierExpression
@@ -74353,36 +74355,38 @@ cst:
                                                                         children:
                                                                           - kind: Argument
                                                                             children:
-                                                                              - kind: IdentifierExpression
+                                                                              - kind: UnaryExpression
                                                                                 children:
                                                                                   - kind: ByValKeyword
                                                                                     text: ByVal
+                                                                                  - kind: Whitespace
+                                                                                    text: " "
+                                                                                  - kind: IdentifierExpression
+                                                                                    children:
+                                                                                      - kind: Identifier
+                                                                                        text: RHS
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                   - kind: IdentifierExpression
                                                                     children:
-                                                                      - kind: Identifier
-                                                                        text: RHS
+                                                                      - kind: AsKeyword
+                                                                        text: As
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: CallStatement
                                                                 children:
-                                                                  - kind: AsKeyword
-                                                                    text: As
-                                                                  - kind: Whitespace
-                                                                    text: " "
+                                                                  - kind: StringKeyword
+                                                                    text: String
                                                                   - kind: ArgumentList
                                                                     children:
                                                                       - kind: Argument
                                                                         children:
                                                                           - kind: IdentifierExpression
                                                                             children:
-                                                                              - kind: StringKeyword
-                                                                                text: String
-                                                              - kind: Unknown
-                                                                text: )
-                                                              - kind: Newline
-                                                                text: "\r\n"
+                                                                              - kind: RightParenthesis
+                                                                                text: )
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
                                                               - kind: Unknown
                                                                 text: PRmodulename
                                                               - kind: Unknown
