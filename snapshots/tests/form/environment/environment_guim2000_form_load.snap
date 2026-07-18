@@ -49857,12 +49857,14 @@ cst:
                                                                                                     text: If
                                                                                                   - kind: Newline
                                                                                                     text: "\r\n"
-                                                                                              - kind: Unknown
-                                                                                                text: "1000"
-                                                                                              - kind: IfStatement
+                                                                                              - kind: LabelStatement
                                                                                                 children:
+                                                                                                  - kind: IntegerLiteral
+                                                                                                    text: "1000"
                                                                                                   - kind: Whitespace
                                                                                                     text: "             "
+                                                                                              - kind: IfStatement
+                                                                                                children:
                                                                                                   - kind: IfKeyword
                                                                                                     text: If
                                                                                                   - kind: Whitespace
