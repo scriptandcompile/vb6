@@ -22321,10 +22321,22 @@ cst:
                                     text: "' check to see if is our"
                                   - kind: Newline
                                     text: "\r\n"
-                                  - kind: RemComment
-                                    text: RemoveOneConn base
-                                  - kind: Newline
-                                    text: "\r\n"
+                                  - kind: CallStatement
+                                    children:
+                                      - kind: Identifier
+                                        text: RemoveOneConn
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: BaseKeyword
+                                                    text: base
+                                      - kind: Newline
+                                        text: "\r\n"
                                   - kind: IfStatement
                                     children:
                                       - kind: IfKeyword
@@ -31257,10 +31269,22 @@ cst:
                         children:
                           - kind: Whitespace
                             text: "     "
-                          - kind: RemComment
-                            text: RemoveOneConn myBase
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: CallStatement
+                            children:
+                              - kind: Identifier
+                                text: RemoveOneConn
+                              - kind: Whitespace
+                                text: " "
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: myBase
+                              - kind: Newline
+                                text: "\r\n"
                           - kind: Whitespace
                             text: "     "
                           - kind: CallStatement
@@ -35533,8 +35557,20 @@ cst:
                                                     text: fieldlist
                                                   - kind: PeriodOperator
                                                     text: "."
-                                                  - kind: RemComment
-                                                    text: Remove prevkey$
+                                                  - kind: Identifier
+                                                    text: Remove
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: prevkey
+                                                              - kind: DollarSign
+                                                                text: $
                                                   - kind: Newline
                                                     text: "\r\n"
                                               - kind: IfStatement
@@ -38495,10 +38531,22 @@ cst:
                             text: Nothing
                           - kind: Newline
                             text: "\r\n"
-                      - kind: RemComment
-                        text: RemoveOneConn base
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: CallStatement
+                        children:
+                          - kind: Identifier
+                            text: RemoveOneConn
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: BaseKeyword
+                                        text: base
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: SetStatement
                         children:
                           - kind: Whitespace
@@ -50201,10 +50249,22 @@ cst:
                             text: Nothing
                           - kind: Newline
                             text: "\r\n"
-                      - kind: RemComment
-                        text: RemoveOneConn base
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: CallStatement
+                        children:
+                          - kind: Identifier
+                            text: RemoveOneConn
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: BaseKeyword
+                                        text: base
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: SetStatement
                         children:
                           - kind: Whitespace
@@ -55997,10 +56057,22 @@ cst:
                             text: Nothing
                           - kind: Newline
                             text: "\r\n"
-                      - kind: RemComment
-                        text: RemoveOneConn base
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: CallStatement
+                        children:
+                          - kind: Identifier
+                            text: RemoveOneConn
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: BaseKeyword
+                                        text: base
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: SetStatement
                         children:
                           - kind: Whitespace
@@ -63055,10 +63127,22 @@ cst:
                             text: Nothing
                           - kind: Newline
                             text: "\r\n"
-                      - kind: RemComment
-                        text: RemoveOneConn base
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: CallStatement
+                        children:
+                          - kind: Identifier
+                            text: RemoveOneConn
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: BaseKeyword
+                                        text: base
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: SetStatement
                         children:
                           - kind: Whitespace
@@ -63389,7 +63473,7 @@ cst:
                 children:
                   - kind: PeriodOperator
                     text: "."
-                  - kind: RemComment
+                  - kind: Identifier
                     text: Remove
                   - kind: Newline
                     text: "\r\n"
@@ -63891,8 +63975,18 @@ cst:
                             children:
                               - kind: PeriodOperator
                                 text: "."
-                              - kind: RemComment
-                                text: "Remove  ' remove the old index/"
+                              - kind: Identifier
+                                text: Remove
+                              - kind: Whitespace
+                                text: "  "
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: EndOfLineComment
+                                            text: "' remove the old index/"
                               - kind: Newline
                                 text: "\r\n"
                           - kind: Whitespace
@@ -68167,10 +68261,22 @@ cst:
                             text: Nothing
                           - kind: Newline
                             text: "\r\n"
-                      - kind: RemComment
-                        text: RemoveOneConn base
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: CallStatement
+                        children:
+                          - kind: Identifier
+                            text: RemoveOneConn
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: BaseKeyword
+                                        text: base
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: SetStatement
                         children:
                           - kind: Whitespace
@@ -73275,8 +73381,18 @@ cst:
                                     text: aa
                                   - kind: PeriodOperator
                                     text: "."
-                                  - kind: RemComment
-                                    text: Remove p
+                                  - kind: Identifier
+                                    text: Remove
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: p
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: IfStatement
@@ -73431,8 +73547,20 @@ cst:
                                         text: aa
                                       - kind: PeriodOperator
                                         text: "."
-                                      - kind: RemComment
-                                        text: Remove first$
+                                      - kind: Identifier
+                                        text: Remove
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: first
+                                                  - kind: DollarSign
+                                                    text: $
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement
@@ -78359,8 +78487,22 @@ cst:
                                         text: conCollection
                                       - kind: PeriodOperator
                                         text: "."
-                                      - kind: RemComment
-                                        text: Remove conCollection.KeyToString
+                                      - kind: Identifier
+                                        text: Remove
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: conCollection
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: KeyToString
                                       - kind: Newline
                                         text: "\r\n"
                               - kind: CallStatement
@@ -78442,7 +78584,15 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: RemoveOneConn(conname)
+            text: RemoveOneConn
+          - kind: ParameterList
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: Identifier
+                text: conname
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
           - kind: StatementList
@@ -79115,8 +79265,18 @@ cst:
                     text: conCollection
                   - kind: PeriodOperator
                     text: "."
-                  - kind: RemComment
-                    text: Remove conname
+                  - kind: Identifier
+                    text: Remove
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: conname
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace

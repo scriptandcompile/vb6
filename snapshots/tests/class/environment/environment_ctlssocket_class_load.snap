@@ -14274,17 +14274,45 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: RemoteHostName() As String
+            text: RemoteHostName
+          - kind: ParameterList
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: RightParenthesis
+                text: )
+          - kind: Whitespace
+            text: " "
+          - kind: AsKeyword
+            text: As
+          - kind: Whitespace
+            text: " "
+          - kind: StringKeyword
+            text: String
           - kind: Newline
             text: "\r\n"
           - kind: StatementList
             children:
               - kind: Whitespace
                 text: "    "
-              - kind: RemComment
-                text: RemoteHostName = m_sRemoteHostName
-              - kind: Newline
-                text: "\r\n"
+              - kind: AssignmentStatement
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: RemoteHostName
+                  - kind: Whitespace
+                    text: " "
+                  - kind: EqualityOperator
+                    text: "="
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: m_sRemoteHostName
+                  - kind: Newline
+                    text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -14650,7 +14678,21 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: RemoteCertificates() As Collection
+            text: RemoteCertificates
+          - kind: ParameterList
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: RightParenthesis
+                text: )
+          - kind: Whitespace
+            text: " "
+          - kind: AsKeyword
+            text: As
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: Collection
           - kind: Newline
             text: "\r\n"
           - kind: StatementList
@@ -14663,8 +14705,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: RemComment
-                    text: RemoteCertificates = m_uCtx.RemoteCertificates
+                  - kind: Identifier
+                    text: RemoteCertificates
+                  - kind: Whitespace
+                    text: " "
+                  - kind: EqualityOperator
+                    text: "="
+                  - kind: Whitespace
+                    text: " "
+                  - kind: Identifier
+                    text: m_uCtx
+                  - kind: PeriodOperator
+                    text: "."
+                  - kind: Identifier
+                    text: RemoteCertificates
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -14692,7 +14746,21 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: RemoteCertStatuses() As Collection
+            text: RemoteCertStatuses
+          - kind: ParameterList
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: RightParenthesis
+                text: )
+          - kind: Whitespace
+            text: " "
+          - kind: AsKeyword
+            text: As
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: Collection
           - kind: Newline
             text: "\r\n"
           - kind: StatementList
@@ -14705,8 +14773,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: RemComment
-                    text: RemoteCertStatuses = m_uCtx.RemoteCertStatuses
+                  - kind: Identifier
+                    text: RemoteCertStatuses
+                  - kind: Whitespace
+                    text: " "
+                  - kind: EqualityOperator
+                    text: "="
+                  - kind: Whitespace
+                    text: " "
+                  - kind: Identifier
+                    text: m_uCtx
+                  - kind: PeriodOperator
+                    text: "."
+                  - kind: Identifier
+                    text: RemoteCertStatuses
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -18433,154 +18513,106 @@ cst:
                 text: Optional
               - kind: Whitespace
                 text: " "
-          - kind: RemComment
-            text: "RemoteHostName As String, _"
+              - kind: Identifier
+                text: RemoteHostName
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: LocalFeatures
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: UcsTlsLocalFeaturesEnum
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: RootCa
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: cTlsSocket
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: AlpnProtocols
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: RightParenthesis
+                text: )
+          - kind: Whitespace
+            text: " "
+          - kind: AsKeyword
+            text: As
+          - kind: Whitespace
+            text: " "
+          - kind: BooleanKeyword
+            text: Boolean
           - kind: Newline
             text: "\r\n"
           - kind: StatementList
             children:
-              - kind: Whitespace
-                text: "            "
-              - kind: CallStatement
-                children:
-                  - kind: OptionalKeyword
-                    text: Optional
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: ByValKeyword
-                            text: ByVal
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: LocalFeatures
-                      - kind: Whitespace
-                        text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: UcsTlsLocalFeaturesEnum
-                      - kind: Comma
-                        text: ","
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Underscore
-                        text: _
-                      - kind: Newline
-                        text: "\r\n"
-                      - kind: Whitespace
-                        text: "            "
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: OptionalKeyword
-                                text: Optional
-                      - kind: Whitespace
-                        text: " "
-              - kind: CallStatement
-                children:
-                  - kind: Identifier
-                    text: RootCa
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: AsKeyword
-                                text: As
-                      - kind: Whitespace
-                        text: " "
-              - kind: CallStatement
-                children:
-                  - kind: Identifier
-                    text: cTlsSocket
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children: []
-                      - kind: Comma
-                        text: ","
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Underscore
-                        text: _
-                      - kind: Newline
-                        text: "\r\n"
-                      - kind: Whitespace
-                        text: "            "
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: OptionalKeyword
-                                text: Optional
-                      - kind: Whitespace
-                        text: " "
-              - kind: CallStatement
-                children:
-                  - kind: Identifier
-                    text: AlpnProtocols
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: AsKeyword
-                                text: As
-                      - kind: Whitespace
-                        text: " "
-              - kind: CallStatement
-                children:
-                  - kind: StringKeyword
-                    text: String
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: RightParenthesis
-                                text: )
-                      - kind: Whitespace
-                        text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: BooleanKeyword
-                                text: Boolean
-                  - kind: Newline
-                    text: "\r\n"
               - kind: Whitespace
                 text: "    "
               - kind: DimStatement
@@ -18821,20 +18853,38 @@ cst:
                     text: If
                   - kind: Whitespace
                     text: " "
-                  - kind: CallExpression
+                  - kind: BinaryExpression
                     children:
-                      - kind: Identifier
-                        text: LenB
-                      - kind: LeftParenthesis
-                        text: (
-                      - kind: ArgumentList
+                      - kind: CallExpression
                         children:
-                          - kind: Argument
+                          - kind: Identifier
+                            text: LenB
+                          - kind: LeftParenthesis
+                            text: (
+                          - kind: ArgumentList
                             children:
-                              - kind: IdentifierExpression
+                              - kind: Argument
                                 children:
-                                  - kind: RemComment
-                                    text: RemoteHostName) <> 0 Then
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: RemoteHostName
+                          - kind: RightParenthesis
+                            text: )
+                      - kind: Whitespace
+                        text: " "
+                      - kind: InequalityOperator
+                        text: "<>"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "0"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ThenKeyword
+                    text: Then
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
@@ -18855,7 +18905,7 @@ cst:
                             text: " "
                           - kind: IdentifierExpression
                             children:
-                              - kind: RemComment
+                              - kind: Identifier
                                 text: RemoteHostName
                           - kind: Newline
                             text: "\r\n"
@@ -30217,116 +30267,86 @@ cst:
                         text: Optional
                       - kind: Whitespace
                         text: " "
-                  - kind: RemComment
-                    text: "RemoteHostName As String, _"
+                      - kind: Identifier
+                        text: RemoteHostName
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: StringKeyword
+                        text: String
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Underscore
+                        text: _
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "            "
+                      - kind: OptionalKeyword
+                        text: Optional
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ByValKeyword
+                        text: ByVal
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: LocalFeatures
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: UcsTlsLocalFeaturesEnum
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Underscore
+                        text: _
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "            "
+                      - kind: OptionalKeyword
+                        text: Optional
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ByValKeyword
+                        text: ByVal
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: Timeout
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: LongKeyword
+                        text: Long
+                      - kind: RightParenthesis
+                        text: )
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AsKeyword
+                    text: As
+                  - kind: Whitespace
+                    text: " "
+                  - kind: BooleanKeyword
+                    text: Boolean
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
                     children:
-                      - kind: Whitespace
-                        text: "            "
-                      - kind: CallStatement
-                        children:
-                          - kind: OptionalKeyword
-                            text: Optional
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ArgumentList
-                            children:
-                              - kind: Argument
-                                children:
-                                  - kind: ByValKeyword
-                                    text: ByVal
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: LocalFeatures
-                              - kind: Whitespace
-                                text: " "
-                      - kind: CallStatement
-                        children:
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ArgumentList
-                            children:
-                              - kind: Argument
-                                children:
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: UcsTlsLocalFeaturesEnum
-                              - kind: Comma
-                                text: ","
-                              - kind: Whitespace
-                                text: " "
-                              - kind: Underscore
-                                text: _
-                              - kind: Newline
-                                text: "\r\n"
-                              - kind: Whitespace
-                                text: "            "
-                              - kind: Argument
-                                children:
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: OptionalKeyword
-                                        text: Optional
-                              - kind: Whitespace
-                                text: " "
-                      - kind: CallStatement
-                        children:
-                          - kind: ByValKeyword
-                            text: ByVal
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ArgumentList
-                            children:
-                              - kind: Argument
-                                children:
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: Timeout
-                              - kind: Whitespace
-                                text: " "
-                      - kind: CallStatement
-                        children:
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ArgumentList
-                            children:
-                              - kind: Argument
-                                children:
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: LongKeyword
-                                        text: Long
-                      - kind: Unknown
-                        text: )
-                      - kind: Whitespace
-                        text: " "
-                      - kind: CallStatement
-                        children:
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ArgumentList
-                            children:
-                              - kind: Argument
-                                children:
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: BooleanKeyword
-                                        text: Boolean
-                          - kind: Newline
-                            text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                       - kind: DimStatement
@@ -30427,8 +30447,24 @@ cst:
                                         children:
                                           - kind: IdentifierExpression
                                             children:
-                                              - kind: RemComment
-                                                text: "RemoteHostName, LocalFeatures) Then"
+                                              - kind: Identifier
+                                                text: RemoteHostName
+                                      - kind: Comma
+                                        text: ","
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: LocalFeatures
+                                  - kind: RightParenthesis
+                                    text: )
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ThenKeyword
+                            text: Then
                           - kind: Newline
                             text: "\r\n"
                           - kind: StatementList
@@ -33031,7 +33067,7 @@ cst:
                                                                         text: " "
                                                                       - kind: IdentifierExpression
                                                                         children:
-                                                                          - kind: RemComment
+                                                                          - kind: Identifier
                                                                             text: RemoteHostName
                                                           - kind: Newline
                                                             text: "\r\n"
@@ -33055,10 +33091,26 @@ cst:
                                                 text: ElseIf
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: IdentifierExpression
+                                              - kind: BinaryExpression
                                                 children:
-                                                  - kind: RemComment
-                                                    text: RemoteCertificates Is Nothing Then
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: RemoteCertificates
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: IsKeyword
+                                                    text: Is
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: NothingKeyword
+                                                        text: Nothing
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ThenKeyword
+                                                text: Then
                                               - kind: Newline
                                                 text: "\r\n"
                                               - kind: StatementList
@@ -33191,8 +33243,54 @@ cst:
                                                             children:
                                                               - kind: IdentifierExpression
                                                                 children:
-                                                                  - kind: RemComment
-                                                                    text: "RemoteHostName, RemoteCertificates, RemoteCertStatuses, frRootStore, sError) Then"
+                                                                  - kind: Identifier
+                                                                    text: RemoteHostName
+                                                          - kind: Comma
+                                                            text: ","
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: RemoteCertificates
+                                                          - kind: Comma
+                                                            text: ","
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: RemoteCertStatuses
+                                                          - kind: Comma
+                                                            text: ","
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: frRootStore
+                                                          - kind: Comma
+                                                            text: ","
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: sError
+                                                      - kind: RightParenthesis
+                                                        text: )
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ThenKeyword
+                                                text: Then
                                               - kind: Newline
                                                 text: "\r\n"
                                               - kind: StatementList
@@ -69789,8 +69887,22 @@ cst:
                                     text: cCerts
                                   - kind: PeriodOperator
                                     text: "."
-                                  - kind: RemComment
-                                    text: Remove cCerts.count
+                                  - kind: Identifier
+                                    text: Remove
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: MemberAccessExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: cCerts
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: count
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace

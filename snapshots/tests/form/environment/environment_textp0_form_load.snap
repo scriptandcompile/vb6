@@ -16827,8 +16827,22 @@ cst:
                                                             text: TEXT1
                                                           - kind: PeriodOperator
                                                             text: "."
-                                                          - kind: RemComment
-                                                            text: RemoveUndo TEXT1.SelText
+                                                          - kind: Identifier
+                                                            text: RemoveUndo
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: MemberAccessExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: TEXT1
+                                                                      - kind: PeriodOperator
+                                                                        text: "."
+                                                                      - kind: Identifier
+                                                                        text: SelText
                                                           - kind: Newline
                                                             text: "\r\n"
                                                       - kind: ExitStatement
@@ -17197,8 +17211,22 @@ cst:
                                             text: TEXT1
                                           - kind: PeriodOperator
                                             text: "."
-                                          - kind: RemComment
-                                            text: RemoveUndo TEXT1.SelText
+                                          - kind: Identifier
+                                            text: RemoveUndo
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: MemberAccessExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: TEXT1
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: SelText
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: CallStatement
@@ -17993,8 +18021,22 @@ cst:
                                                                 text: TEXT1
                                                               - kind: PeriodOperator
                                                                 text: "."
-                                                              - kind: RemComment
-                                                                text: RemoveUndo TEXT1.SelText
+                                                              - kind: Identifier
+                                                                text: RemoveUndo
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: MemberAccessExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: TEXT1
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: SelText
                                                               - kind: Newline
                                                                 text: "\r\n"
                                                           - kind: ExitStatement
@@ -18365,8 +18407,22 @@ cst:
                                                 text: TEXT1
                                               - kind: PeriodOperator
                                                 text: "."
-                                              - kind: RemComment
-                                                text: RemoveUndo TEXT1.SelText
+                                              - kind: Identifier
+                                                text: RemoveUndo
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: MemberAccessExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: TEXT1
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: SelText
                                               - kind: Newline
                                                 text: "\r\n"
                                           - kind: CallStatement
@@ -55889,8 +55945,30 @@ cst:
                                                                         text: TEXT1
                                                                       - kind: PeriodOperator
                                                                         text: "."
-                                                                      - kind: RemComment
-                                                                        text: RemoveUndo space(TabControl)
+                                                                      - kind: Identifier
+                                                                        text: RemoveUndo
+                                                                      - kind: Whitespace
+                                                                        text: " "
+                                                                      - kind: ArgumentList
+                                                                        children:
+                                                                          - kind: Argument
+                                                                            children:
+                                                                              - kind: CallExpression
+                                                                                children:
+                                                                                  - kind: Identifier
+                                                                                    text: space
+                                                                                  - kind: LeftParenthesis
+                                                                                    text: (
+                                                                                  - kind: ArgumentList
+                                                                                    children:
+                                                                                      - kind: Argument
+                                                                                        children:
+                                                                                          - kind: IdentifierExpression
+                                                                                            children:
+                                                                                              - kind: Identifier
+                                                                                                text: TabControl
+                                                                                  - kind: RightParenthesis
+                                                                                    text: )
                                                                       - kind: Newline
                                                                         text: "\r\n"
                                                                   - kind: Whitespace
@@ -56011,8 +56089,18 @@ cst:
                                                                             text: TEXT1
                                                                           - kind: PeriodOperator
                                                                             text: "."
-                                                                          - kind: RemComment
-                                                                            text: RemoveUndo vbTab
+                                                                          - kind: Identifier
+                                                                            text: RemoveUndo
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: ArgumentList
+                                                                            children:
+                                                                              - kind: Argument
+                                                                                children:
+                                                                                  - kind: IdentifierExpression
+                                                                                    children:
+                                                                                      - kind: Identifier
+                                                                                        text: vbTab
                                                                           - kind: Newline
                                                                             text: "\r\n"
                                                                       - kind: Whitespace
@@ -56131,8 +56219,30 @@ cst:
                                                                     text: TEXT1
                                                                   - kind: PeriodOperator
                                                                     text: "."
-                                                                  - kind: RemComment
-                                                                    text: RemoveUndo space(TabControl)
+                                                                  - kind: Identifier
+                                                                    text: RemoveUndo
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: ArgumentList
+                                                                    children:
+                                                                      - kind: Argument
+                                                                        children:
+                                                                          - kind: CallExpression
+                                                                            children:
+                                                                              - kind: Identifier
+                                                                                text: space
+                                                                              - kind: LeftParenthesis
+                                                                                text: (
+                                                                              - kind: ArgumentList
+                                                                                children:
+                                                                                  - kind: Argument
+                                                                                    children:
+                                                                                      - kind: IdentifierExpression
+                                                                                        children:
+                                                                                          - kind: Identifier
+                                                                                            text: TabControl
+                                                                              - kind: RightParenthesis
+                                                                                text: )
                                                                   - kind: Newline
                                                                     text: "\r\n"
                                                               - kind: Whitespace
@@ -71309,8 +71419,14 @@ cst:
                         children:
                           - kind: PeriodOperator
                             text: "."
-                          - kind: RemComment
-                            text: RemoveUndo .SelText
+                          - kind: Identifier
+                            text: RemoveUndo
+                          - kind: Whitespace
+                            text: " "
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: SelText
                           - kind: Newline
                             text: "\r\n"
                   - kind: EndKeyword

@@ -7934,7 +7934,15 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: RemoveGuiControl(thisKey)
+            text: RemoveGuiControl
+          - kind: ParameterList
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: Identifier
+                text: thisKey
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
           - kind: StatementList
@@ -8069,8 +8077,18 @@ cst:
                                     text: GuiControls
                                   - kind: PeriodOperator
                                     text: "."
-                                  - kind: RemComment
-                                    text: Remove i
+                                  - kind: Identifier
+                                    text: Remove
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: i
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: ExitStatement
@@ -8217,8 +8235,18 @@ cst:
                     text: Controls
                   - kind: PeriodOperator
                     text: "."
-                  - kind: RemComment
-                    text: Remove thisKey
+                  - kind: Identifier
+                    text: Remove
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: thisKey
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -10883,8 +10911,20 @@ cst:
                                                                                         text: excludeme
                                                                                       - kind: PeriodOperator
                                                                                         text: "."
-                                                                                      - kind: RemComment
-                                                                                        text: Remove Mark$
+                                                                                      - kind: Identifier
+                                                                                        text: Remove
+                                                                                      - kind: Whitespace
+                                                                                        text: " "
+                                                                                      - kind: ArgumentList
+                                                                                        children:
+                                                                                          - kind: Argument
+                                                                                            children:
+                                                                                              - kind: IdentifierExpression
+                                                                                                children:
+                                                                                                  - kind: Identifier
+                                                                                                    text: Mark
+                                                                                                  - kind: DollarSign
+                                                                                                    text: $
                                                                                       - kind: Newline
                                                                                         text: "\r\n"
                                                                               - kind: Whitespace
@@ -11471,8 +11511,20 @@ cst:
                                                                 text: excludeme
                                                               - kind: PeriodOperator
                                                                 text: "."
-                                                              - kind: RemComment
-                                                                text: Remove Mark$
+                                                              - kind: Identifier
+                                                                text: Remove
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: Mark
+                                                                          - kind: DollarSign
+                                                                            text: $
                                                               - kind: Newline
                                                                 text: "\r\n"
                                                   - kind: EndKeyword
@@ -62266,7 +62318,15 @@ cst:
                                                                                   - kind: Whitespace
                                                                                     text: " "
                                                                                   - kind: Identifier
-                                                                                    text: Remove(item)
+                                                                                    text: Remove
+                                                                                  - kind: ParameterList
+                                                                                    children:
+                                                                                      - kind: LeftParenthesis
+                                                                                        text: (
+                                                                                      - kind: Identifier
+                                                                                        text: item
+                                                                                      - kind: RightParenthesis
+                                                                                        text: )
                                                                                   - kind: Newline
                                                                                     text: "\r\n"
                                                                                   - kind: StatementList
@@ -62365,8 +62425,18 @@ cst:
                                                                                             text: glistN
                                                                                           - kind: PeriodOperator
                                                                                             text: "."
-                                                                                          - kind: RemComment
-                                                                                            text: Removeitem item
+                                                                                          - kind: Identifier
+                                                                                            text: Removeitem
+                                                                                          - kind: Whitespace
+                                                                                            text: " "
+                                                                                          - kind: ArgumentList
+                                                                                            children:
+                                                                                              - kind: Argument
+                                                                                                children:
+                                                                                                  - kind: IdentifierExpression
+                                                                                                    children:
+                                                                                                      - kind: Identifier
+                                                                                                        text: item
                                                                                           - kind: Newline
                                                                                             text: "\r\n"
                                                                                   - kind: EndKeyword
@@ -74677,7 +74747,7 @@ cst:
                                                                                                 text: acclist
                                                                                               - kind: PeriodOperator
                                                                                                 text: "."
-                                                                                              - kind: RemComment
+                                                                                              - kind: Identifier
                                                                                                 text: RemoveWithNoFind
                                                                                               - kind: Newline
                                                                                                 text: "\r\n"

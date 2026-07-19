@@ -3243,7 +3243,23 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: RemoveDocParaIndex(ParaNum As Long)
+            text: RemoveDocParaIndex
+          - kind: ParameterList
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: Identifier
+                text: ParaNum
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
           - kind: StatementList
@@ -31754,8 +31770,28 @@ cst:
                         text: Optional
                       - kind: Whitespace
                         text: " "
-                  - kind: RemComment
-                    text: removenbsp As Boolean = False)
+                      - kind: Identifier
+                        text: removenbsp
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: BooleanKeyword
+                        text: Boolean
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EqualityOperator
+                        text: "="
+                      - kind: Whitespace
+                        text: " "
+                      - kind: BooleanLiteralExpression
+                        children:
+                          - kind: FalseKeyword
+                            text: "False"
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
@@ -32472,8 +32508,12 @@ cst:
                                             text: " "
                                           - kind: IdentifierExpression
                                             children:
-                                              - kind: RemComment
-                                                text: removenbsp Then
+                                              - kind: Identifier
+                                                text: removenbsp
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: ThenKeyword
+                                            text: Then
                                           - kind: Newline
                                             text: "\r\n"
                                           - kind: StatementList
@@ -39079,7 +39119,31 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: RemoveEmptyParagraph(ParaNum As Long) As Boolean
+                    text: RemoveEmptyParagraph
+                  - kind: ParameterList
+                    children:
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: Identifier
+                        text: ParaNum
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: LongKeyword
+                        text: Long
+                      - kind: RightParenthesis
+                        text: )
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AsKeyword
+                    text: As
+                  - kind: Whitespace
+                    text: " "
+                  - kind: BooleanKeyword
+                    text: Boolean
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList
@@ -39148,10 +39212,24 @@ cst:
                             text: "\r\n"
                           - kind: StatementList
                             children:
-                              - kind: RemComment
-                                text: RemoveEmptyParagraph = True
-                              - kind: Newline
-                                text: "\r\n"
+                              - kind: AssignmentStatement
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: RemoveEmptyParagraph
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: BooleanLiteralExpression
+                                    children:
+                                      - kind: TrueKeyword
+                                        text: "True"
+                                  - kind: Newline
+                                    text: "\r\n"
                               - kind: AssignmentStatement
                                 children:
                                   - kind: IdentifierExpression
@@ -39422,10 +39500,22 @@ cst:
                                         text: "\r\n"
                                       - kind: StatementList
                                         children:
-                                          - kind: RemComment
-                                            text: RemoveDocParaIndex ParaNum
-                                          - kind: Newline
-                                            text: "\r\n"
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: RemoveDocParaIndex
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: ParaNum
+                                              - kind: Newline
+                                                text: "\r\n"
                                           - kind: AssignmentStatement
                                             children:
                                               - kind: IdentifierExpression
@@ -45272,10 +45362,22 @@ cst:
                                     text: "\r\n"
                               - kind: Whitespace
                                 text: "         "
-                              - kind: RemComment
-                                text: RemoveDocParaIndex mycur
-                              - kind: Newline
-                                text: "\r\n"
+                              - kind: CallStatement
+                                children:
+                                  - kind: Identifier
+                                    text: RemoveDocParaIndex
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: mycur
+                                  - kind: Newline
+                                    text: "\r\n"
                               - kind: ExitStatement
                                 children:
                                   - kind: Whitespace
@@ -45512,10 +45614,22 @@ cst:
                                             text: "\r\n"
                                       - kind: Whitespace
                                         text: "            "
-                                      - kind: RemComment
-                                        text: RemoveDocParaIndex mycur
-                                      - kind: Newline
-                                        text: "\r\n"
+                                      - kind: CallStatement
+                                        children:
+                                          - kind: Identifier
+                                            text: RemoveDocParaIndex
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: mycur
+                                          - kind: Newline
+                                            text: "\r\n"
                                       - kind: ExitStatement
                                         children:
                                           - kind: Whitespace
@@ -51400,10 +51514,22 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "        "
-                      - kind: RemComment
-                        text: RemoveDocParaIndex mynextcur
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: CallStatement
+                        children:
+                          - kind: Identifier
+                            text: RemoveDocParaIndex
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: mynextcur
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword
@@ -51598,10 +51724,22 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "        "
-                      - kind: RemComment
-                        text: RemoveDocParaIndex mybackcur
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: CallStatement
+                        children:
+                          - kind: Identifier
+                            text: RemoveDocParaIndex
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: mybackcur
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword
@@ -59956,10 +60094,22 @@ cst:
                                         children:
                                           - kind: Whitespace
                                             text: "        "
-                                          - kind: RemComment
-                                            text: RemoveDocParaIndex fromPARA
-                                          - kind: Newline
-                                            text: "\r\n"
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: RemoveDocParaIndex
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: fromPARA
+                                              - kind: Newline
+                                                text: "\r\n"
                                           - kind: Whitespace
                                             text: "        "
                                           - kind: Newline
@@ -80128,10 +80278,22 @@ cst:
                                                             text: "1"
                                                   - kind: Newline
                                                     text: "\r\n"
-                                              - kind: RemComment
-                                                text: RemoveDocParaIndex nextCur
-                                              - kind: Newline
-                                                text: "\r\n"
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: RemoveDocParaIndex
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: nextCur
+                                                  - kind: Newline
+                                                    text: "\r\n"
                                               - kind: AssignmentStatement
                                                 children:
                                                   - kind: IdentifierExpression
