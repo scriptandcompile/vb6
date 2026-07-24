@@ -2704,9 +2704,6 @@ impl<'a> Parser<'a> {
                     || self.at_compiler_directive_keyword(Token::ElseIfKeyword)
                     || self.at_token(Token::ElseKeyword)
                     || self.at_compiler_directive_keyword(Token::ElseKeyword)
-                    || self.at_token(Token::CaseKeyword)
-                    || (self.at_token(Token::EndKeyword)
-                        && self.peek_next_keyword() == Some(Token::SelectKeyword))
                     || self.at_if_block_end()
                     || self.at_procedure_block_end()
                     || self.is_at_end()
@@ -3508,8 +3505,12 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_case_clause(&mut self, frame_stack: &mut Vec<ControlFlowFrame>, depth: usize) -> bool {
-        // Consume any whitespace/newlines before checking for Case
-        while self.at_token(Token::Whitespace) || self.at_token(Token::Newline) {
+        // Consume any whitespace/newlines/comments before checking for Case
+        while self.at_token(Token::Whitespace)
+            || self.at_token(Token::Newline)
+            || self.at_token(Token::EndOfLineComment)
+            || self.at_token(Token::RemComment)
+        {
             self.consume_token();
         }
 
