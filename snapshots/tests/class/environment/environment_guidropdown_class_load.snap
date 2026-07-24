@@ -10961,20 +10961,18 @@ cst:
                                             text: If
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: BinaryExpression
+                                          - kind: TypeOfExpression
                                             children:
+                                              - kind: TypeOfKeyword
+                                                text: TypeOf
+                                              - kind: Whitespace
+                                                text: " "
                                               - kind: CallExpression
                                                 children:
-                                                  - kind: MemberAccessExpression
-                                                    children:
-                                                      - kind: Identifier
-                                                        text: TypeOf
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: Controls
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: Controls
                                                   - kind: LeftParenthesis
                                                     text: (
                                                   - kind: ArgumentList
@@ -10993,10 +10991,8 @@ cst:
                                                 text: Is
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: gList
+                                              - kind: Identifier
+                                                text: gList
                                           - kind: Whitespace
                                             text: " "
                                           - kind: ThenKeyword
@@ -11689,20 +11685,18 @@ cst:
                                                 text: If
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: BinaryExpression
+                                              - kind: TypeOfExpression
                                                 children:
+                                                  - kind: TypeOfKeyword
+                                                    text: TypeOf
+                                                  - kind: Whitespace
+                                                    text: " "
                                                   - kind: CallExpression
                                                     children:
-                                                      - kind: MemberAccessExpression
-                                                        children:
-                                                          - kind: Identifier
-                                                            text: TypeOf
-                                                          - kind: Whitespace
-                                                            text: " "
-                                                          - kind: PeriodOperator
-                                                            text: "."
-                                                          - kind: Identifier
-                                                            text: Controls
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: Controls
                                                       - kind: LeftParenthesis
                                                         text: (
                                                       - kind: ArgumentList
@@ -11721,10 +11715,8 @@ cst:
                                                     text: Is
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: IdentifierExpression
-                                                    children:
-                                                      - kind: Identifier
-                                                        text: gList
+                                                  - kind: Identifier
+                                                    text: gList
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: ThenKeyword

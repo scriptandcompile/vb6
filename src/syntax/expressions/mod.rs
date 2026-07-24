@@ -109,6 +109,11 @@ enum ExprParseFrame {
         min_bp: BindingPower,
         lhs_checkpoint: Checkpoint,
     },
+    /// Finish a `TypeOf` expression node and continue with outer infix loop
+    FinishTypeOf {
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    },
     /// Finish a parenthesized expression node and continue with outer infix loop
     FinishParenthesized {
         min_bp: BindingPower,
@@ -280,6 +285,10 @@ impl Parser<'_> {
                 min_bp,
                 lhs_checkpoint,
             } => self.handle_finish_binary_frame(frame_stack, min_bp, lhs_checkpoint),
+            ExprParseFrame::FinishTypeOf {
+                min_bp,
+                lhs_checkpoint,
+            } => self.handle_finish_typeof_frame(frame_stack, min_bp, lhs_checkpoint),
             ExprParseFrame::FinishUnary {
                 min_bp,
                 lhs_checkpoint,
@@ -390,6 +399,35 @@ impl Parser<'_> {
         self.builder.finish_node();
 
         // After finishing unary expression, continue with outer infix loop
+        frame_stack.push(ExprParseFrame::InfixLoop {
+            min_bp,
+            lhs_checkpoint,
+        });
+    }
+
+    fn handle_finish_typeof_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        // Operand expression has been parsed. Now consume "Is TypeName".
+        self.consume_whitespace();
+
+        if self.at_token(Token::IsKeyword) {
+            self.consume_token(); // Is
+        }
+
+        self.consume_whitespace();
+
+        // Parse the type name (identifier)
+        if self.is_identifier() || self.at_keyword() {
+            self.consume_token();
+        }
+
+        self.builder.finish_node(); // TypeOfExpression
+
+        // Continue with outer infix loop
         frame_stack.push(ExprParseFrame::InfixLoop {
             min_bp,
             lhs_checkpoint,
@@ -786,6 +824,32 @@ impl Parser<'_> {
         });
     }
 
+    fn push_typeof_prefix_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        self.builder
+            .start_node(SyntaxKind::TypeOfExpression.to_raw());
+        self.consume_token(); // TypeOf
+        self.consume_whitespace();
+
+        // Push finish frame: will consume "Is TypeName" after operand is parsed
+        frame_stack.push(ExprParseFrame::FinishTypeOf {
+            min_bp,
+            lhs_checkpoint,
+        });
+
+        // Parse the operand expression with CONCATENATION binding power (80),
+        // which is higher than COMPARISON (70), so "Is" is not consumed as an operator
+        let operand_checkpoint = self.builder.checkpoint();
+        frame_stack.push(ExprParseFrame::ParsePrefix {
+            min_bp: BindingPower::CONCATENATION,
+            lhs_checkpoint: operand_checkpoint,
+        });
+    }
+
     fn push_parenthesized_prefix_frame(
         &mut self,
         frame_stack: &mut Vec<ExprParseFrame>,
@@ -904,6 +968,10 @@ impl Parser<'_> {
             Some(Token::Octothorpe) => {
                 self.parse_file_number_reference();
                 is_identifier = true;
+            }
+            Some(Token::TypeOfKeyword) => {
+                self.push_typeof_prefix_frame(frame_stack, min_bp, lhs_checkpoint);
+                return (true, checkpoint);
             }
             // Period operator at start of expression (With block member access)
             // In a With block, ".Property" is shorthand for accessing the With object's property

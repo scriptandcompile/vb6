@@ -6913,46 +6913,32 @@ cst:
                             text: Not
                           - kind: Whitespace
                             text: " "
-                          - kind: IdentifierExpression
+                          - kind: TypeOfExpression
                             children:
-                              - kind: Identifier
+                              - kind: TypeOfKeyword
                                 text: TypeOf
-                      - kind: Whitespace
-                        text: " "
-                      - kind: StatementList
-                        children:
-                          - kind: CallStatement
-                            children:
-                              - kind: Identifier
-                                text: buf
                               - kind: Whitespace
                                 text: " "
-                              - kind: ArgumentList
+                              - kind: IdentifierExpression
                                 children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: IsKeyword
-                                            text: Is
-                                  - kind: Whitespace
-                                    text: " "
-                          - kind: CallStatement
-                            children:
+                                  - kind: Identifier
+                                    text: buf
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IsKeyword
+                                text: Is
+                              - kind: Whitespace
+                                text: " "
                               - kind: Identifier
                                 text: MemBlock
-                              - kind: Whitespace
-                                text: " "
-                              - kind: ArgumentList
-                                children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: ThenKeyword
-                                            text: Then
-                              - kind: Newline
-                                text: "\r\n"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: StatementList
+                        children:
                           - kind: GotoStatement
                             children:
                               - kind: Whitespace
@@ -8509,46 +8495,32 @@ cst:
                             text: Not
                           - kind: Whitespace
                             text: " "
-                          - kind: IdentifierExpression
+                          - kind: TypeOfExpression
                             children:
-                              - kind: Identifier
+                              - kind: TypeOfKeyword
                                 text: TypeOf
-                      - kind: Whitespace
-                        text: " "
-                      - kind: StatementList
-                        children:
-                          - kind: CallStatement
-                            children:
-                              - kind: Identifier
-                                text: buf
                               - kind: Whitespace
                                 text: " "
-                              - kind: ArgumentList
+                              - kind: IdentifierExpression
                                 children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: IsKeyword
-                                            text: Is
-                                  - kind: Whitespace
-                                    text: " "
-                          - kind: CallStatement
-                            children:
+                                  - kind: Identifier
+                                    text: buf
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IsKeyword
+                                text: Is
+                              - kind: Whitespace
+                                text: " "
                               - kind: Identifier
                                 text: MemBlock
-                              - kind: Whitespace
-                                text: " "
-                              - kind: ArgumentList
-                                children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: ThenKeyword
-                                            text: Then
-                              - kind: Newline
-                                text: "\r\n"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: StatementList
+                        children:
                           - kind: GotoStatement
                             children:
                               - kind: Whitespace
