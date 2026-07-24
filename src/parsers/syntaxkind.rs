@@ -319,6 +319,8 @@ pub enum SyntaxKind {
     FalseKeyword,
     /// Enum keyword
     EnumKeyword,
+    /// `TypeOf` keyword
+    TypeOfKeyword,
     /// Type keyword
     TypeKeyword,
     /// Boolean keyword
@@ -698,6 +700,7 @@ impl From<Token> for SyntaxKind {
             Token::FalseKeyword => SyntaxKind::FalseKeyword,
             Token::EnumKeyword => SyntaxKind::EnumKeyword,
             Token::TypeKeyword => SyntaxKind::TypeKeyword,
+            Token::TypeOfKeyword => SyntaxKind::TypeOfKeyword,
             Token::BooleanKeyword => SyntaxKind::BooleanKeyword,
             Token::DoubleKeyword => SyntaxKind::DoubleKeyword,
             Token::CurrencyKeyword => SyntaxKind::CurrencyKeyword,

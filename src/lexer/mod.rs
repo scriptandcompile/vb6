@@ -216,6 +216,7 @@ static KEYWORD_TOKEN_LOOKUP_TABLE: Map<&'static str, Token> = phf_map! {
     "TIME" => Token::TimeKeyword,
     "TO" => Token::ToKeyword,
     "TRUE" => Token::TrueKeyword,
+    "TYPEOF" => Token::TypeOfKeyword,
     "TYPE" => Token::TypeKeyword,
     "UNLOCK" => Token::UnlockKeyword,
     "UNTIL" => Token::UntilKeyword,

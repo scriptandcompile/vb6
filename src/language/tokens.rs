@@ -225,6 +225,12 @@ pub enum Token {
     ///
     /// [Reference](https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa266315(v=vs.60))
     TypeKeyword,
+    /// Represents the `TypeOf` keyword.
+    ///
+    /// Used to check the data type of an object variable.
+    ///
+    /// [Reference](http://vbi.org/Items/article.asp?id=80)
+    TypeOfKeyword,
     /// Represents the `Boolean` keyword.
     ///
     /// Used to declare a variable that can contain one of two values: True or
@@ -1265,6 +1271,7 @@ impl Token {
                 | Token::PrivateKeyword
                 | Token::DimKeyword
                 | Token::TypeKeyword
+                | Token::TypeOfKeyword
                 | Token::ByValKeyword
                 | Token::LongKeyword
                 | Token::AsKeyword

@@ -17915,36 +17915,28 @@ cst:
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: IdentifierExpression
+                  - kind: TypeOfExpression
                     children:
-                      - kind: Identifier
+                      - kind: TypeOfKeyword
                         text: TypeOf
-              - kind: Whitespace
-                text: " "
-              - kind: CallStatement
-                children:
-                  - kind: Identifier
-                    text: bstack
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Owner
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: IsKeyword
-                                text: Is
                       - kind: Whitespace
                         text: " "
-              - kind: CallStatement
-                children:
-                  - kind: Identifier
-                    text: MetaDc
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: bstack
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: Owner
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IsKeyword
+                        text: Is
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: MetaDc
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement

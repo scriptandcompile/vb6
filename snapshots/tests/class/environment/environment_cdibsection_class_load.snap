@@ -70436,182 +70436,178 @@ cst:
                             text: If
                           - kind: Whitespace
                             text: " "
-                          - kind: IdentifierExpression
+                          - kind: TypeOfExpression
                             children:
-                              - kind: Identifier
+                              - kind: TypeOfKeyword
                                 text: TypeOf
-                          - kind: Whitespace
-                            text: " "
-                          - kind: CallStatement
-                            children:
-                              - kind: Identifier
-                                text: where
                               - kind: Whitespace
                                 text: " "
-                              - kind: ArgumentList
+                              - kind: IdentifierExpression
                                 children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: IsKeyword
-                                            text: Is
-                                  - kind: Whitespace
-                                    text: " "
-                          - kind: CallStatement
-                            children:
+                                  - kind: Identifier
+                                    text: where
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IsKeyword
+                                text: Is
+                              - kind: Whitespace
+                                text: " "
                               - kind: Identifier
                                 text: PictureBox
-                              - kind: Whitespace
-                                text: " "
-                              - kind: ArgumentList
-                                children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: ThenKeyword
-                                            text: Then
-                              - kind: Newline
-                                text: "\r\n"
-                      - kind: AssignmentStatement
-                        children:
-                          - kind: MemberAccessExpression
-                            children:
-                              - kind: CallExpression
-                                children:
-                                  - kind: MemberAccessExpression
-                                    children:
-                                      - kind: MemberAccessExpression
-                                        children:
-                                          - kind: Identifier
-                                            text: where
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: Parent
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: gonia
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: Identifier
-                                                text: gid
-                                  - kind: RightParenthesis
-                                    text: )
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Visible
                           - kind: Whitespace
                             text: " "
-                          - kind: EqualityOperator
-                            text: "="
-                          - kind: Whitespace
-                            text: " "
-                          - kind: BinaryExpression
-                            children:
-                              - kind: MemberAccessExpression
-                                children:
-                                  - kind: Identifier
-                                    text: vso
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: Visible
-                              - kind: Whitespace
-                                text: " "
-                              - kind: AndKeyword
-                                text: And
-                              - kind: Whitespace
-                                text: " "
-                              - kind: MemberAccessExpression
-                                children:
-                                  - kind: Identifier
-                                    text: hso
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: Visible
+                          - kind: ThenKeyword
+                            text: Then
                           - kind: Newline
                             text: "\r\n"
-                  - kind: ElseClause
-                    children:
-                      - kind: ElseKeyword
-                        text: Else
-                      - kind: Newline
-                        text: "\r\n"
-                      - kind: StatementList
-                        children:
-                          - kind: AssignmentStatement
+                          - kind: StatementList
                             children:
-                              - kind: MemberAccessExpression
+                              - kind: AssignmentStatement
                                 children:
-                                  - kind: CallExpression
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: MemberAccessExpression
+                                            children:
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: where
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: Parent
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: gonia
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: gid
+                                          - kind: RightParenthesis
+                                            text: )
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: Visible
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: BinaryExpression
                                     children:
                                       - kind: MemberAccessExpression
                                         children:
                                           - kind: Identifier
-                                            text: where
+                                            text: vso
                                           - kind: PeriodOperator
                                             text: "."
                                           - kind: Identifier
-                                            text: gonia
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: ArgumentList
+                                            text: Visible
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AndKeyword
+                                        text: And
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: MemberAccessExpression
                                         children:
-                                          - kind: Argument
-                                            children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: gid
-                                      - kind: RightParenthesis
-                                        text: )
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: Visible
-                              - kind: Whitespace
-                                text: " "
-                              - kind: EqualityOperator
-                                text: "="
-                              - kind: Whitespace
-                                text: " "
-                              - kind: BinaryExpression
-                                children:
-                                  - kind: MemberAccessExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: vso
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: Visible
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: AndKeyword
-                                    text: And
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: MemberAccessExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: hso
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: Visible
+                                          - kind: Identifier
+                                            text: hso
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Visible
+                                  - kind: Newline
+                                    text: "\r\n"
+                          - kind: ElseClause
+                            children:
+                              - kind: ElseKeyword
+                                text: Else
                               - kind: Newline
                                 text: "\r\n"
+                              - kind: StatementList
+                                children:
+                                  - kind: AssignmentStatement
+                                    children:
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: CallExpression
+                                            children:
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: where
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: gonia
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: gid
+                                              - kind: RightParenthesis
+                                                text: )
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Visible
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: EqualityOperator
+                                        text: "="
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: MemberAccessExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: vso
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: Visible
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: AndKeyword
+                                            text: And
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: MemberAccessExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: hso
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: Visible
+                                      - kind: Newline
+                                        text: "\r\n"
+                          - kind: EndKeyword
+                            text: End
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IfKeyword
+                            text: If
+                          - kind: Newline
+                            text: "\r\n"
                   - kind: EndKeyword
                     text: End
                   - kind: Whitespace
@@ -70620,28 +70616,16 @@ cst:
                     text: If
                   - kind: Newline
                     text: "\r\n"
-              - kind: Unknown
-                text: End
-              - kind: IfStatement
+              - kind: CallStatement
                 children:
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: Newline
-                        text: "\r\n"
-                  - kind: CallStatement
-                    children:
-                      - kind: Identifier
-                        text: where
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: Identifier
-                        text: Refresh
-                      - kind: Newline
-                        text: "\r\n"
+                  - kind: Identifier
+                    text: where
+                  - kind: PeriodOperator
+                    text: "."
+                  - kind: Identifier
+                    text: Refresh
+                  - kind: Newline
+                    text: "\r\n"
               - kind: AssignmentStatement
                 children:
                   - kind: IdentifierExpression

@@ -77985,48 +77985,34 @@ cst:
                             text: If
                           - kind: Whitespace
                             text: " "
-                          - kind: IdentifierExpression
+                          - kind: TypeOfExpression
                             children:
-                              - kind: Identifier
+                              - kind: TypeOfKeyword
                                 text: TypeOf
-                          - kind: Whitespace
-                            text: " "
-                          - kind: CallStatement
-                            children:
-                              - kind: Identifier
-                                text: Screen
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: ActiveForm
                               - kind: Whitespace
                                 text: " "
-                              - kind: ArgumentList
+                              - kind: MemberAccessExpression
                                 children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: IsKeyword
-                                            text: Is
-                                  - kind: Whitespace
-                                    text: " "
-                          - kind: CallStatement
-                            children:
+                                  - kind: Identifier
+                                    text: Screen
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: ActiveForm
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IsKeyword
+                                text: Is
+                              - kind: Whitespace
+                                text: " "
                               - kind: Identifier
                                 text: GuiM2000
-                              - kind: Whitespace
-                                text: " "
-                              - kind: ArgumentList
-                                children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: ThenKeyword
-                                            text: Then
-                                  - kind: Whitespace
-                                    text: " "
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ThenKeyword
+                            text: Then
+                          - kind: Whitespace
+                            text: " "
                           - kind: CallStatement
                             children:
                               - kind: Identifier
