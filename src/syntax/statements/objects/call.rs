@@ -398,6 +398,7 @@ impl Parser<'_> {
         // it's an assignment, not a procedure call
         let mut paren_depth: i32 = 0;
         let mut seen_other_operator = false;
+        let mut seen_top_level_comma = false;
         let mut previous_non_whitespace: Option<Token> = None;
         for (_text, token) in self.tokens.iter().skip(self.pos) {
             match token {
@@ -421,10 +422,18 @@ impl Parser<'_> {
                         previous_non_whitespace = Some(*token);
                         continue;
                     }
+                    // If we've already seen a top-level comma, we're in argument-list
+                    // style syntax and '=' belongs to an argument expression.
+                    if seen_top_level_comma {
+                        return true;
+                    }
                     // Found = operator at depth 0
                     // If we've seen other operators (like >=, And, Or), this is part of an expression in a procedure call
                     // Otherwise, it's an assignment
                     return seen_other_operator;
+                }
+                Token::Comma if paren_depth == 0 => {
+                    seen_top_level_comma = true;
                 }
                 // Track operators that indicate we're in an expression context
                 Token::AndKeyword
@@ -806,5 +815,23 @@ mod tests {
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn procedure_call_argument_expression_with_top_level_equals_after_comma() {
+        let source = "aCopy.Construct ItemLen, CLng(p), , R = 0 And Not mExecBloc\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+
+        let debug = format!("{:#?}", cst.to_serializable());
+
+        assert!(
+            debug.contains("kind: CallStatement"),
+            "Expected procedure call to parse as CallStatement"
+        );
+        assert!(
+            !debug.contains("kind: Unknown"),
+            "Did not expect Unknown nodes for call with '=' inside argument expression"
+        );
     }
 }

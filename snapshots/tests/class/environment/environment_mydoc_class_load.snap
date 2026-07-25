@@ -84604,20 +84604,32 @@ cst:
                                 text: ThisObject1
                       - kind: Whitespace
                         text: " "
-              - kind: Unknown
-                text: As
-              - kind: Whitespace
-                text: " "
-              - kind: Unknown
-                text: Object
-              - kind: Unknown
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: Unknown
-                text: Optional
-              - kind: Whitespace
-                text: " "
+              - kind: CallStatement
+                children:
+                  - kind: AsKeyword
+                    text: As
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: ObjectKeyword
+                                text: Object
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: OptionalKeyword
+                                text: Optional
+                      - kind: Whitespace
+                        text: " "
               - kind: Unknown
                 text: usenumbers
               - kind: Whitespace
@@ -93278,36 +93290,56 @@ cst:
                                 text: Position
                       - kind: Whitespace
                         text: " "
-              - kind: Unknown
-                text: As
-              - kind: Whitespace
-                text: " "
-              - kind: Unknown
-                text: Long
-              - kind: Unknown
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: Unknown
-                text: from
-              - kind: Unknown
-                text: $
-              - kind: Unknown
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: Unknown
-                text: this
-              - kind: Unknown
-                text: $
-              - kind: Unknown
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: Unknown
-                text: Optional
-              - kind: Whitespace
-                text: " "
+              - kind: CallStatement
+                children:
+                  - kind: AsKeyword
+                    text: As
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: LongKeyword
+                                text: Long
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: from
+                              - kind: DollarSign
+                                text: $
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: this
+                              - kind: DollarSign
+                                text: $
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: OptionalKeyword
+                                text: Optional
+                      - kind: Whitespace
+                        text: " "
               - kind: Unknown
                 text: uLCID
               - kind: Whitespace
