@@ -5,11 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project (tries!) to adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.0]
 
 ### Added
 - Font PropertyGroup parsing support in both CST and token-based control loading
 - Standard Rust `TryFrom`/`From` trait implementations for `PropertyGroup` conversions (replaced custom traits)
+
+### Changed
+- Improved to handled even more statements that we were not fully parsing before. (VBA-7 Declare SafePtr support, TypeOf, etc).
+- Fixed a few issues with missparsing of Assignments as Call statements as well as some Call statements as Assignments.
+- Significant speed improvements [See Benchmarks](https://scriptandcompile.github.io/vb6parse/benchmarks.html)
+- Removed the last few clone's that aren't in the initial unicode conversion pipeline (that clone is not in my library!)
+- Significant improvements to the [Playground](https://scriptandcompile.github.io/vb6parse/playground.html)
 
 ## [1.0.0] - 2026-02-16
 
