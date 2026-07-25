@@ -1022,6 +1022,10 @@ fn environment_errorbag_class_load() {
 
 #[test]
 fn environment_exifread_class_load() {
+    // This test result contains lots of unknown tokens because the original source code has
+    // an error where the programmer commented out the start of a line which contained multiple
+    // continuation characters making a large multi-line statement but failed to comment out the
+    // rest of the lines, resulting in many unknown tokens during parsing.
     let class_bytes = include_bytes!("../data/Environment/ExifRead.cls");
 
     let result = SourceFile::decode_with_replacement("ExifRead.cls", class_bytes);
