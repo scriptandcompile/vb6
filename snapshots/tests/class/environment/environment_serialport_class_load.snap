@@ -8932,28 +8932,34 @@ cst:
                     text: Then
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Err1
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: Err
-                  - kind: AssignmentStatement
+                  - kind: CallStatement
                     children:
-                      - kind: IdentifierExpression
+                      - kind: Identifier
+                        text: Err1
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ArgumentList
                         children:
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: LastDllError
-                      - kind: IdentifierExpression
-                        children:
+                          - kind: Argument
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Err
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: LastDllError
                           - kind: Comma
                             text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"GetCommModemStatus\""
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"GetCommModemStatus\""
                   - kind: ColonOperator
                     text: ":"
                   - kind: Whitespace

@@ -9812,26 +9812,30 @@ cst:
                                         text: Then
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Form4
-                                      - kind: AssignmentStatement
+                                      - kind: CallStatement
                                         children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: Show
+                                          - kind: Identifier
+                                            text: Form4
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Show
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: IdentifierExpression
+                                          - kind: ArgumentList
                                             children:
+                                              - kind: Argument
+                                                children: []
                                               - kind: Comma
                                                 text: ","
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: Form1
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: Form1
                                       - kind: ColonOperator
                                         text: ":"
                                       - kind: Whitespace
@@ -9874,26 +9878,30 @@ cst:
                                         text: Then
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Form2
-                                      - kind: AssignmentStatement
+                                      - kind: CallStatement
                                         children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: Show
+                                          - kind: Identifier
+                                            text: Form2
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Show
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: IdentifierExpression
+                                          - kind: ArgumentList
                                             children:
+                                              - kind: Argument
+                                                children: []
                                               - kind: Comma
                                                 text: ","
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: Form1
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: Form1
                                       - kind: ColonOperator
                                         text: ":"
                                       - kind: Whitespace

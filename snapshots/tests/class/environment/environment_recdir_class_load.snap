@@ -13178,18 +13178,30 @@ cst:
                     text: Then
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: AddAFile
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"...\""
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: Level
+                  - kind: CallStatement
+                    children:
+                      - kind: Identifier
+                        text: AddAFile
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"...\""
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Level
                   - kind: ColonOperator
                     text: ":"
                   - kind: Whitespace

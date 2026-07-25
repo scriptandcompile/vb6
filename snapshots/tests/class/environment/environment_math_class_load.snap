@@ -31062,30 +31062,40 @@ cst:
                             text: Then
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CopyMemory
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: a
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: VarPtr
-                          - kind: LeftParenthesis
-                            text: (
                           - kind: CallStatement
                             children:
                               - kind: Identifier
-                                text: q
+                                text: CopyMemory
+                              - kind: Whitespace
+                                text: " "
                               - kind: ArgumentList
                                 children:
                                   - kind: Argument
                                     children:
                                       - kind: IdentifierExpression
                                         children:
+                                          - kind: Identifier
+                                            text: a
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: VarPtr
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: q
                                           - kind: RightParenthesis
                                             text: )
                                   - kind: Comma
@@ -31104,30 +31114,40 @@ cst:
                             text: Else
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CopyMemory
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: b
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: VarPtr
-                          - kind: LeftParenthesis
-                            text: (
                           - kind: CallStatement
                             children:
                               - kind: Identifier
-                                text: q
+                                text: CopyMemory
+                              - kind: Whitespace
+                                text: " "
                               - kind: ArgumentList
                                 children:
                                   - kind: Argument
                                     children:
                                       - kind: IdentifierExpression
                                         children:
+                                          - kind: Identifier
+                                            text: b
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: VarPtr
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: q
                                           - kind: RightParenthesis
                                             text: )
                                   - kind: Comma
@@ -33686,30 +33706,40 @@ cst:
                             text: Then
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CopyMemory
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: a
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: VarPtr
-                          - kind: LeftParenthesis
-                            text: (
                           - kind: CallStatement
                             children:
                               - kind: Identifier
-                                text: q
+                                text: CopyMemory
+                              - kind: Whitespace
+                                text: " "
                               - kind: ArgumentList
                                 children:
                                   - kind: Argument
                                     children:
                                       - kind: IdentifierExpression
                                         children:
+                                          - kind: Identifier
+                                            text: a
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: VarPtr
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: q
                                           - kind: RightParenthesis
                                             text: )
                                   - kind: Comma
@@ -33728,30 +33758,40 @@ cst:
                             text: Else
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CopyMemory
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: c
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: VarPtr
-                          - kind: LeftParenthesis
-                            text: (
                           - kind: CallStatement
                             children:
                               - kind: Identifier
-                                text: q
+                                text: CopyMemory
+                              - kind: Whitespace
+                                text: " "
                               - kind: ArgumentList
                                 children:
                                   - kind: Argument
                                     children:
                                       - kind: IdentifierExpression
                                         children:
+                                          - kind: Identifier
+                                            text: c
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: VarPtr
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: q
                                           - kind: RightParenthesis
                                             text: )
                                   - kind: Comma
@@ -34306,30 +34346,40 @@ cst:
                             text: Then
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CopyMemory
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: a
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: VarPtr
-                          - kind: LeftParenthesis
-                            text: (
                           - kind: CallStatement
                             children:
                               - kind: Identifier
-                                text: q
+                                text: CopyMemory
+                              - kind: Whitespace
+                                text: " "
                               - kind: ArgumentList
                                 children:
                                   - kind: Argument
                                     children:
                                       - kind: IdentifierExpression
                                         children:
+                                          - kind: Identifier
+                                            text: a
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: VarPtr
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: q
                                           - kind: RightParenthesis
                                             text: )
                                   - kind: Comma
@@ -34348,30 +34398,40 @@ cst:
                             text: Else
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CopyMemory
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: c
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: VarPtr
-                          - kind: LeftParenthesis
-                            text: (
                           - kind: CallStatement
                             children:
                               - kind: Identifier
-                                text: q
+                                text: CopyMemory
+                              - kind: Whitespace
+                                text: " "
                               - kind: ArgumentList
                                 children:
                                   - kind: Argument
                                     children:
                                       - kind: IdentifierExpression
                                         children:
+                                          - kind: Identifier
+                                            text: c
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: VarPtr
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: q
                                           - kind: RightParenthesis
                                             text: )
                                   - kind: Comma
@@ -38600,30 +38660,40 @@ cst:
                             text: Then
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CopyMemory
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: a
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: VarPtr
-                          - kind: LeftParenthesis
-                            text: (
                           - kind: CallStatement
                             children:
                               - kind: Identifier
-                                text: q
+                                text: CopyMemory
+                              - kind: Whitespace
+                                text: " "
                               - kind: ArgumentList
                                 children:
                                   - kind: Argument
                                     children:
                                       - kind: IdentifierExpression
                                         children:
+                                          - kind: Identifier
+                                            text: a
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: VarPtr
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: q
                                           - kind: RightParenthesis
                                             text: )
                                   - kind: Comma
@@ -38642,30 +38712,40 @@ cst:
                             text: Else
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CopyMemory
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: b
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: VarPtr
-                          - kind: LeftParenthesis
-                            text: (
                           - kind: CallStatement
                             children:
                               - kind: Identifier
-                                text: q
+                                text: CopyMemory
+                              - kind: Whitespace
+                                text: " "
                               - kind: ArgumentList
                                 children:
                                   - kind: Argument
                                     children:
                                       - kind: IdentifierExpression
                                         children:
+                                          - kind: Identifier
+                                            text: b
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: VarPtr
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: q
                                           - kind: RightParenthesis
                                             text: )
                                   - kind: Comma

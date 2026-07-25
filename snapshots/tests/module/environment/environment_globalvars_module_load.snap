@@ -2719,42 +2719,46 @@ cst:
                     text: If
                   - kind: Newline
                     text: "\r\n"
-              - kind: AssignmentStatement
+              - kind: CallStatement
                 children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: Identifier
-                        text: MoveFormToOtherMonitorOnly
+                  - kind: Identifier
+                    text: MoveFormToOtherMonitorOnly
                   - kind: Whitespace
                     text: " "
-                  - kind: IdentifierExpression
+                  - kind: ArgumentList
                     children:
-                      - kind: Identifier
-                        text: ColorDialog
-              - kind: Unknown
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: AssignmentStatement
-                children:
-                  - kind: MemberAccessExpression
-                    children:
-                      - kind: Identifier
-                        text: Scr
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: NameKeyword
-                        text: Name
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EqualityOperator
-                    text: "="
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteralExpression
-                    children:
-                      - kind: StringLiteral
-                        text: "\"GuiM2000\""
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ColorDialog
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: NameKeyword
+                                    text: Name
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"GuiM2000\""
                   - kind: Newline
                     text: "\r\n"
               - kind: AssignmentStatement
@@ -4089,42 +4093,46 @@ cst:
                     text: If
                   - kind: Newline
                     text: "\r\n"
-              - kind: AssignmentStatement
+              - kind: CallStatement
                 children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: Identifier
-                        text: MoveFormToOtherMonitorOnly
+                  - kind: Identifier
+                    text: MoveFormToOtherMonitorOnly
                   - kind: Whitespace
                     text: " "
-                  - kind: IdentifierExpression
+                  - kind: ArgumentList
                     children:
-                      - kind: Identifier
-                        text: FontDialog
-              - kind: Unknown
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: AssignmentStatement
-                children:
-                  - kind: MemberAccessExpression
-                    children:
-                      - kind: Identifier
-                        text: Scr
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: NameKeyword
-                        text: Name
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EqualityOperator
-                    text: "="
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteralExpression
-                    children:
-                      - kind: StringLiteral
-                        text: "\"GuiM2000\""
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: FontDialog
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: NameKeyword
+                                    text: Name
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"GuiM2000\""
                   - kind: Newline
                     text: "\r\n"
               - kind: AssignmentStatement
@@ -6169,42 +6177,46 @@ cst:
                     text: If
                   - kind: Newline
                     text: "\r\n"
-              - kind: AssignmentStatement
+              - kind: CallStatement
                 children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: Identifier
-                        text: MoveFormToOtherMonitorOnly
+                  - kind: Identifier
+                    text: MoveFormToOtherMonitorOnly
                   - kind: Whitespace
                     text: " "
-                  - kind: IdentifierExpression
+                  - kind: ArgumentList
                     children:
-                      - kind: Identifier
-                        text: LoadFile
-              - kind: Unknown
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: AssignmentStatement
-                children:
-                  - kind: MemberAccessExpression
-                    children:
-                      - kind: Identifier
-                        text: Scr
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: NameKeyword
-                        text: Name
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EqualityOperator
-                    text: "="
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteralExpression
-                    children:
-                      - kind: StringLiteral
-                        text: "\"GuiM2000\""
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: LoadFile
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: NameKeyword
+                                    text: Name
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"GuiM2000\""
                   - kind: Newline
                     text: "\r\n"
               - kind: AssignmentStatement
@@ -8395,42 +8407,46 @@ cst:
                     text: If
                   - kind: Newline
                     text: "\r\n"
-              - kind: AssignmentStatement
+              - kind: CallStatement
                 children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: Identifier
-                        text: MoveFormToOtherMonitorOnly
+                  - kind: Identifier
+                    text: MoveFormToOtherMonitorOnly
                   - kind: Whitespace
                     text: " "
-                  - kind: IdentifierExpression
+                  - kind: ArgumentList
                     children:
-                      - kind: Identifier
-                        text: LoadFile
-              - kind: Unknown
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: AssignmentStatement
-                children:
-                  - kind: MemberAccessExpression
-                    children:
-                      - kind: Identifier
-                        text: Scr
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: NameKeyword
-                        text: Name
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EqualityOperator
-                    text: "="
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteralExpression
-                    children:
-                      - kind: StringLiteral
-                        text: "\"GuiM2000\""
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: LoadFile
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: NameKeyword
+                                    text: Name
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"GuiM2000\""
                   - kind: Newline
                     text: "\r\n"
               - kind: AssignmentStatement
@@ -10629,42 +10645,46 @@ cst:
                     text: If
                   - kind: Newline
                     text: "\r\n"
-              - kind: AssignmentStatement
+              - kind: CallStatement
                 children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: Identifier
-                        text: MoveFormToOtherMonitorOnly
+                  - kind: Identifier
+                    text: MoveFormToOtherMonitorOnly
                   - kind: Whitespace
                     text: " "
-                  - kind: IdentifierExpression
+                  - kind: ArgumentList
                     children:
-                      - kind: Identifier
-                        text: LoadFile
-              - kind: Unknown
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: AssignmentStatement
-                children:
-                  - kind: MemberAccessExpression
-                    children:
-                      - kind: Identifier
-                        text: Scr
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: NameKeyword
-                        text: Name
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EqualityOperator
-                    text: "="
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteralExpression
-                    children:
-                      - kind: StringLiteral
-                        text: "\"GuiM2000\""
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: LoadFile
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: NameKeyword
+                                    text: Name
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"GuiM2000\""
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -12797,42 +12817,46 @@ cst:
                     text: If
                   - kind: Newline
                     text: "\r\n"
-              - kind: AssignmentStatement
+              - kind: CallStatement
                 children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: Identifier
-                        text: MoveFormToOtherMonitorOnly
+                  - kind: Identifier
+                    text: MoveFormToOtherMonitorOnly
                   - kind: Whitespace
                     text: " "
-                  - kind: IdentifierExpression
+                  - kind: ArgumentList
                     children:
-                      - kind: Identifier
-                        text: LoadFile
-              - kind: Unknown
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: AssignmentStatement
-                children:
-                  - kind: MemberAccessExpression
-                    children:
-                      - kind: Identifier
-                        text: Scr
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: NameKeyword
-                        text: Name
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EqualityOperator
-                    text: "="
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteralExpression
-                    children:
-                      - kind: StringLiteral
-                        text: "\"GuiM2000\""
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: LoadFile
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: NameKeyword
+                                    text: Name
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"GuiM2000\""
                   - kind: Newline
                     text: "\r\n"
               - kind: AssignmentStatement

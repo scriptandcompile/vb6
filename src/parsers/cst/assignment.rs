@@ -125,6 +125,7 @@ impl Parser<'_> {
         let mut at_start = true;
         let mut paren_depth: i32 = 0;
         let mut seen_other_operator = false;
+        let mut seen_top_level_comma = false;
 
         for (_text, token) in self.tokens.iter().skip(self.pos) {
             match token {
@@ -143,6 +144,11 @@ impl Parser<'_> {
                     at_start = false;
                 }
                 Token::EqualityOperator if paren_depth == 0 => {
+                    // A top-level comma before '=' indicates we're already in
+                    // argument-list style syntax (procedure call), not an assignment.
+                    if seen_top_level_comma {
+                        return false;
+                    }
                     // Found an = operator at depth 0
                     // If we've seen other operators (like >=, And, Or), this is part of an expression, not assignment
                     return !seen_other_operator;
@@ -171,6 +177,9 @@ impl Parser<'_> {
                 | Token::ExclamationMark
                 | Token::Octothorpe
                 | Token::Comma => {
+                    if *token == Token::Comma && paren_depth == 0 {
+                        seen_top_level_comma = true;
+                    }
                     last_was_period = false;
                     at_start = false;
                 }
