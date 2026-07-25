@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-07-20T00:25:38Z",
+  "last_updated": "2026-07-25T08:44:44Z",
   "snapshots": [
     {
       "timestamp": "2026-07-06T07:06:31Z",
@@ -239,6 +239,40 @@
           "percent": 95.98
         }
       }
+    },
+    {
+      "timestamp": "2026-07-25T08:44:44Z",
+      "commit_sha": "b6c992a1902afcfa5ceac86eb8bbd8248a682220",
+      "commit_message": "Fixed missparse that was missing an assignment statement when we had a call expression in the LHS on a with block.",
+      "coverage": {
+        "line_coverage": 95.84,
+        "function_coverage": 92.99,
+        "region_coverage": 95.98
+      },
+      "tests": {
+        "total": 6240,
+        "lib_tests": 5530,
+        "doc_tests": 119,
+        "integration_tests": 591,
+        "fuzz_targets": 9
+      },
+      "details": {
+        "lines": {
+          "covered": 97552,
+          "total": 101787,
+          "percent": 95.84
+        },
+        "functions": {
+          "covered": 6266,
+          "total": 6738,
+          "percent": 92.99
+        },
+        "regions": {
+          "covered": 155888,
+          "total": 162421,
+          "percent": 95.98
+        }
+      }
     }
   ],
   "coverage_summary": {
@@ -248,7 +282,7 @@
       "change_percent": 0.0,
       "best": 95.87,
       "worst": 95.84,
-      "average": 95.86
+      "average": 95.85
     },
     "function_coverage": {
       "latest": 92.99,
@@ -267,10 +301,10 @@
       "average": 95.99
     },
     "test_count": {
-      "latest": 6238,
+      "latest": 6240,
       "trend": "stable",
-      "change_count": 0,
-      "growth_rate": 0.0
+      "change_count": 2,
+      "growth_rate": 0.03
     }
   }
 }
