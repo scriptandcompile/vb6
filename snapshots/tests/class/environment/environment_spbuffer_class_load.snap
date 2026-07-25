@@ -3050,59 +3050,53 @@ cst:
             text: Property
           - kind: Newline
             text: "\r\n"
-      - kind: Octothorpe
-        text: "#"
-      - kind: EndKeyword
-        text: End
-      - kind: Whitespace
-        text: " "
-      - kind: IfStatement
-        children:
+          - kind: Octothorpe
+            text: "#"
+          - kind: EndKeyword
+            text: End
+          - kind: Whitespace
+            text: " "
           - kind: IfKeyword
             text: If
-          - kind: IdentifierExpression
+          - kind: Newline
+            text: "\r\n"
+      - kind: Newline
+        text: "\r\n"
+      - kind: SubStatement
+        children:
+          - kind: PrivateKeyword
+            text: Private
+          - kind: Whitespace
+            text: " "
+          - kind: SubKeyword
+            text: Sub
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: Class_Initialize
+          - kind: ParameterList
             children:
-              - kind: Newline
-                text: "\r\n"
+              - kind: LeftParenthesis
+                text: (
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
           - kind: StatementList
             children:
-              - kind: SubStatement
+              - kind: Whitespace
+                text: "    "
+              - kind: CallStatement
                 children:
-                  - kind: PrivateKeyword
-                    text: Private
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubKeyword
-                    text: Sub
-                  - kind: Whitespace
-                    text: " "
                   - kind: Identifier
-                    text: Class_Initialize
-                  - kind: ParameterList
-                    children:
-                      - kind: LeftParenthesis
-                        text: (
-                      - kind: RightParenthesis
-                        text: )
+                    text: Clear
                   - kind: Newline
                     text: "\r\n"
-                  - kind: StatementList
-                    children:
-                      - kind: Whitespace
-                        text: "    "
-                      - kind: CallStatement
-                        children:
-                          - kind: Identifier
-                            text: Clear
-                          - kind: Newline
-                            text: "\r\n"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubKeyword
-                    text: Sub
-                  - kind: Newline
-                    text: "\r\n"
+          - kind: EndKeyword
+            text: End
+          - kind: Whitespace
+            text: " "
+          - kind: SubKeyword
+            text: Sub
+          - kind: Newline
+            text: "\r\n"

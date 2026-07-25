@@ -107,6 +107,11 @@ impl Parser<'_> {
 
         self.consume_property_terminator();
 
+        if self.at_compiler_end_if_directive() {
+            self.consume_compiler_directive_prefix();
+            self.consume_until_after(Token::Newline);
+        }
+
         self.builder.finish_node(); // PropertyStatement
     }
 
@@ -547,5 +552,30 @@ End Property
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn compiler_conditional_property_consumes_end_if() {
+        let source = r#"
+#If DEBUG Then
+Public Property Get TimerEx() As Double
+    TimerEx = 1
+End Property
+#End If
+"#;
+
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.cls", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let text = format!("{tree:#?}");
+        assert!(
+            !text.contains("Unknown"),
+            "Compiler-conditional property blocks should not leave Unknown tokens: {text}"
+        );
+        assert!(
+            text.contains("PropertyStatement"),
+            "Expected the compiler-conditional property to be parsed as a property statement"
+        );
     }
 }
