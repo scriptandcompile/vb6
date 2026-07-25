@@ -2368,7 +2368,9 @@ impl<'a> Parser<'a> {
                 | Token::BackwardSlashOperator
                 | Token::ExponentiationOperator
                 | Token::Ampersand => {
-                    seen_other_operator = true;
+                    if paren_depth == 0 {
+                        seen_other_operator = true;
+                    }
                 }
                 // Other tokens are allowed in the lvalue or rvalue
                 _ => {}
@@ -3911,6 +3913,34 @@ mod tests {
 
         assert!(cst.contains_kind(SyntaxKind::EndOfLineComment));
         assert!(cst.contains_kind(SyntaxKind::RemComment));
+    }
+
+    #[test]
+    fn parse_with_member_assignment_with_index_expression() {
+        let source = r#"
+Sub Test()
+    With mstack
+        .item(i - 1) = aa.ObjectRef
+    End With
+End Sub
+"#;
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert!(
+            failures.is_empty(),
+            "unexpected parse failures: {failures:?}"
+        );
+
+        let cst = cst_opt.expect("Failed to parse source");
+        let debug = cst.debug_tree();
+
+        assert!(
+            debug.contains("AssignmentStatement"),
+            "expected assignment statement in tree: {debug}"
+        );
+        assert!(
+            !debug.contains("kind: Unknown"),
+            "unexpected unknown token in tree: {debug}"
+        );
     }
 
     #[test]
