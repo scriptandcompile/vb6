@@ -9,8 +9,8 @@ use std::collections::HashMap;
 use std::fmt::Display;
 use std::path::Path;
 
-use crate::errors::{ErrorDetails, ErrorKind, ResourceError};
 use crate::ParseResult;
+use crate::errors::{ErrorDetails, ErrorKind, ResourceError};
 
 /// Represents a parsed VB6 Form Resource file (.frx).
 ///

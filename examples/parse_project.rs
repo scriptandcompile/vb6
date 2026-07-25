@@ -4,7 +4,7 @@
 //!
 
 use vb6parse::{
-    files::common::ObjectReference, files::project::ProjectReference, ProjectFile, SourceFile,
+    ProjectFile, SourceFile, files::common::ObjectReference, files::project::ProjectReference,
 };
 
 const INPUT: &str = r#"Type=Exe

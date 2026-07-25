@@ -176,6 +176,7 @@
 use std::collections::HashMap;
 use std::num::NonZeroUsize;
 
+use crate::ParseResult;
 use crate::errors::{ErrorDetails, ErrorKind, FormError, ModuleError, Severity, Span};
 use crate::files::common::{
     Creatable, Exposed, FileAttributes, FileFormatVersion, NameSpace, ObjectReference,
@@ -189,9 +190,8 @@ use crate::language::{
     MDIFormProperties, MenuControl, MenuProperties, OptionButtonProperties, PictureBoxProperties,
     PropertyGroup, TextBoxProperties, Token,
 };
-use crate::lexer::{tokenize, TokenStream};
+use crate::lexer::{TokenStream, tokenize};
 use crate::parsers::SyntaxKind;
-use crate::ParseResult;
 
 use either::Either;
 use rowan::{GreenNode, GreenNodeBuilder, Language};
@@ -221,7 +221,7 @@ pub mod visitor;
 
 // Re-export navigation types
 pub use navigation::CstNode;
-pub use visitor::{walk_node, walk_node_mut, Visitor, VisitorMut};
+pub use visitor::{Visitor, VisitorMut, walk_node, walk_node_mut};
 
 /// Maximum depth for nested property groups to prevent stack overflow.
 const MAX_PROPERTY_GROUP_DEPTH: usize = 100;
@@ -267,12 +267,14 @@ impl Language for VB6Language {
 fn extract_property_groups(groups: &[PropertyGroup]) -> ExtractedGroups {
     let mut font = None;
 
-    for group in groups {
-        if group.name.eq_ignore_ascii_case("Font") {
-            if let Ok(f) = Font::try_from(group) {
-                font = Some(f);
-            }
+    for group in groups
+        .iter()
+        .filter(|g| g.name.eq_ignore_ascii_case("Font"))
+    {
+        if let Ok(f) = Font::try_from(group) {
+            font = Some(f);
         }
+
         // Future: handle other property group types (Images, etc.)
     }
 
@@ -1131,10 +1133,10 @@ impl<'a> Parser<'a> {
                     self.consume_advance();
 
                     // Peek ahead - if next token is colon, this is a resource reference
-                    if let Some((_, next_token)) = self.tokens.get(self.pos) {
-                        if *next_token == Token::ColonOperator {
-                            in_resource_reference = true;
-                        }
+                    if let Some((_, next_token)) = self.tokens.get(self.pos)
+                        && *next_token == Token::ColonOperator
+                    {
+                        in_resource_reference = true;
                     }
                 }
                 // If in resource reference, capture colon
@@ -1352,16 +1354,17 @@ impl<'a> Parser<'a> {
         let mut _is_embedded = false;
         if self.at_token(Token::MultiplicationOperator) {
             self.consume_advance(); // *
-                                    // Expect \G (backslash followed by identifier "G")
-            if let Some((_text, token)) = self.tokens.get(self.pos) {
-                if *token == Token::BackwardSlashOperator {
-                    self.consume_advance(); // \
-                    if let Some((text2, token2)) = self.tokens.get(self.pos) {
-                        if *token2 == Token::Identifier && text2.eq_ignore_ascii_case("G") {
-                            self.consume_advance(); // G
-                            _is_embedded = true;
-                        }
-                    }
+            // Expect \G (backslash followed by identifier "G")
+            if let Some((_text, token)) = self.tokens.get(self.pos)
+                && *token == Token::BackwardSlashOperator
+            {
+                self.consume_advance(); // \
+                if let Some((text2, token2)) = self.tokens.get(self.pos)
+                    && *token2 == Token::Identifier
+                    && text2.eq_ignore_ascii_case("G")
+                {
+                    self.consume_advance(); // G
+                    _is_embedded = true;
                 }
             }
         }

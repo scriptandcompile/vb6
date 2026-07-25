@@ -23,6 +23,12 @@ pub use color::{
 pub use crate::files::common::PropertyGroup;
 
 pub use controls::{
+    Activation, Align, Alignment, Appearance, AutoRedraw, AutoSize, BackStyle, BorderStyle,
+    CausesValidation, ClipControls, Control, ControlKind, DragMode, DrawMode, DrawStyle, FillStyle,
+    Font, FontTransparency, Form, FormLinkMode, FormRoot, HasDeviceContext, JustifyAlignment,
+    LinkMode, MDIForm, MousePointer, Movability, MultiSelect, OLEDragMode, OLEDropMode, ScaleMode,
+    SizeMode, StartUpPosition, Style, TabStop, TextDirection, UseMaskColor, Visibility,
+    WhatsThisHelp, WindowState,
     checkbox::{CheckBoxProperties, CheckBoxValue},
     combobox::{ComboBoxProperties, ComboBoxStyle},
     commandbutton::CommandButtonProperties,
@@ -55,12 +61,6 @@ pub use controls::{
     shape::{Shape, ShapeProperties},
     textbox::{MultiLine, ScrollBars, TextBoxProperties},
     timer::TimerProperties,
-    Activation, Align, Alignment, Appearance, AutoRedraw, AutoSize, BackStyle, BorderStyle,
-    CausesValidation, ClipControls, Control, ControlKind, DragMode, DrawMode, DrawStyle, FillStyle,
-    Font, FontTransparency, Form, FormLinkMode, FormRoot, HasDeviceContext, JustifyAlignment,
-    LinkMode, MDIForm, MousePointer, Movability, MultiSelect, OLEDragMode, OLEDropMode, ScaleMode,
-    SizeMode, StartUpPosition, Style, TabStop, TextDirection, UseMaskColor, Visibility,
-    WhatsThisHelp, WindowState,
 };
 
 pub use tokens::Token;

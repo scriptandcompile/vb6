@@ -61,7 +61,7 @@ pub mod token_stream;
 pub use crate::language::Token;
 pub use token_stream::TokenStream;
 
-use phf::{phf_map, Map};
+use phf::{Map, phf_map};
 
 use crate::{
     errors::LexerError,

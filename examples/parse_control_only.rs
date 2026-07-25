@@ -8,7 +8,7 @@
 //! properties) and don't need the code implementation.
 //!
 
-use vb6parse::{tokenize, FormFile, SourceFile};
+use vb6parse::{FormFile, SourceFile, tokenize};
 
 // Example Form file content
 const FORM_CONTENT: &[u8] = br#"VERSION 5.00

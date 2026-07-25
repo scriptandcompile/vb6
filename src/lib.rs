@@ -204,13 +204,13 @@ pub mod wasm;
 pub use crate::io::{SourceFile, SourceStream};
 
 // Lexer Layer - Tokenization
-pub use crate::lexer::{tokenize, Token, TokenStream};
+pub use crate::lexer::{Token, TokenStream, tokenize};
 
 // File Parsers - Main entry points for parsing VB6 files
 pub use crate::files::{ClassFile, FormFile, FormResourceFile, ModuleFile, ProjectFile};
 
 // Syntax Parsers - CST parsing and tree types
-pub use crate::parsers::{parse, ConcreteSyntaxTree, ParseResult, SerializableTree, SyntaxKind};
+pub use crate::parsers::{ConcreteSyntaxTree, ParseResult, SerializableTree, SyntaxKind, parse};
 
 // Error Types - New unified error handling (Phase 4)
 pub use crate::errors::{ErrorDetails, ErrorKind, Severity};

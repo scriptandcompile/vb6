@@ -95,8 +95,7 @@ fn brightness_effect_part_1_project_load() {
 
 #[test]
 fn brightness_effect_part_2_project_load() {
-    let file_path =
-        "./tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.vbp";
+    let file_path = "./tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.vbp";
     let project_file_bytes = std::fs::read(file_path).expect("Failed to read project file");
 
     let result = SourceFile::decode_with_replacement(file_path, &project_file_bytes);

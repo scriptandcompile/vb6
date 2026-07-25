@@ -21,7 +21,7 @@ use crate::{
     files::common::ObjectReference,
     files::project::{
         compilesettings::CompilationType,
-        messages::{report_parameter_error, DummyEnumType, ParameterErrorKind},
+        messages::{DummyEnumType, ParameterErrorKind, report_parameter_error},
         properties::{CompileTargetType, ProjectProperties},
     },
     io::{Comparator, SourceFile, SourceStream},
@@ -86,7 +86,9 @@ pub struct ProjectFile<'a> {
 
 impl Display for ProjectFile<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "VB6 Project File: Type={:?}, References={}, Objects={}, Modules={}, Classes={}, Forms={}, UserControls={}, UserDocuments={}, RelatedDocuments={}, PropertyPages={}", 
+        write!(
+            f,
+            "VB6 Project File: Type={:?}, References={}, Objects={}, Modules={}, Classes={}, Forms={}, UserControls={}, UserDocuments={}, RelatedDocuments={}, PropertyPages={}",
             self.project_type,
             self.references.len(),
             self.objects.len(),
@@ -3007,13 +3009,13 @@ fn parse_dll_base_address(ctx: &mut ParserContext, input: &mut SourceStream) -> 
 
 #[cfg(test)]
 mod tests {
+    use crate::ProjectFile;
     use crate::errors::{ErrorKind, ParserContext, ProjectError};
     use crate::files::common::ObjectReference;
+    use crate::files::project::ProjectReference;
     use crate::files::project::compilesettings::*;
     use crate::files::project::properties::*;
-    use crate::files::project::ProjectReference;
     use crate::io::{Comparator, SourceFile, SourceStream};
-    use crate::ProjectFile;
 
     use assert_matches::assert_matches;
     use uuid::Uuid;
@@ -3246,7 +3248,10 @@ mod tests {
     fn reference_compiled_line_valid() {
         use crate::files::project::parse_reference;
 
-        let mut input = SourceStream::new("", "Reference=*\\G{000440D8-E9ED-4435-A9A2-06B05387BB16}#c.0#0#..\\DBCommon\\Libs\\VbIntellisenseFix.dll#VbIntellisenseFix\r\n");
+        let mut input = SourceStream::new(
+            "",
+            "Reference=*\\G{000440D8-E9ED-4435-A9A2-06B05387BB16}#c.0#0#..\\DBCommon\\Libs\\VbIntellisenseFix.dll#VbIntellisenseFix\r\n",
+        );
 
         let _ = input
             .take("Reference", Comparator::CaseSensitive)

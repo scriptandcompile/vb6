@@ -10,10 +10,10 @@ use crate::{
     files::common::{FileAttributes, FileFormatVersion, ObjectReference},
     io::SourceFile,
     language::FormRoot,
-    lexer::{tokenize, TokenStream},
+    lexer::{TokenStream, tokenize},
     parsers::{
-        cst::{parse, ConcreteSyntaxTree},
         ParseResult,
+        cst::{ConcreteSyntaxTree, parse},
     },
 };
 
@@ -183,9 +183,9 @@ impl FormFile {
 mod tests {
 
     use super::*;
+    use crate::SyntaxKind;
     use crate::files::common::extract_version;
     use crate::io::SourceFile;
-    use crate::SyntaxKind;
 
     use assert_matches::assert_matches;
     use either::Either;
@@ -293,15 +293,19 @@ End
         assert_eq!(obj_statements.len(), 2);
 
         // Verify the content of the first Object statement
-        assert!(obj_statements[0]
-            .text()
-            .contains("831FDD16-0C5C-11D2-A9FC-0000F8754DA1"));
+        assert!(
+            obj_statements[0]
+                .text()
+                .contains("831FDD16-0C5C-11D2-A9FC-0000F8754DA1")
+        );
         assert!(obj_statements[0].text().contains("mscomctl.ocx"));
 
         // Verify the content of the second Object statement
-        assert!(obj_statements[1]
-            .text()
-            .contains("F9043C88-F6F2-101A-A3C9-08002B2F49FB"));
+        assert!(
+            obj_statements[1]
+                .text()
+                .contains("F9043C88-F6F2-101A-A3C9-08002B2F49FB")
+        );
         assert!(obj_statements[1].text().contains("COMDLG32.OCX"));
     }
 

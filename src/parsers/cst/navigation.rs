@@ -1082,9 +1082,10 @@ mod tests {
 
         // Test first_child_by_kind
         assert!(cst.first_child_by_kind(SyntaxKind::DimStatement).is_some());
-        assert!(cst
-            .first_child_by_kind(SyntaxKind::FunctionStatement)
-            .is_none());
+        assert!(
+            cst.first_child_by_kind(SyntaxKind::FunctionStatement)
+                .is_none()
+        );
     }
 
     #[test]
@@ -1241,9 +1242,11 @@ mod tests {
         assert_ne!(first_non_ws.unwrap().kind, SyntaxKind::Whitespace);
 
         let significant: Vec<_> = root.significant_children().collect();
-        assert!(significant
-            .iter()
-            .all(|n| { n.kind != SyntaxKind::Whitespace && n.kind != SyntaxKind::Newline }));
+        assert!(
+            significant
+                .iter()
+                .all(|n| { n.kind != SyntaxKind::Whitespace && n.kind != SyntaxKind::Newline })
+        );
     }
 
     #[test]
@@ -1292,9 +1295,11 @@ mod tests {
 
         // significant_children should exclude whitespace/newlines
         let significant: Vec<_> = cst.significant_children().collect();
-        assert!(significant
-            .iter()
-            .all(|n| { n.kind != SyntaxKind::Whitespace && n.kind != SyntaxKind::Newline }));
+        assert!(
+            significant
+                .iter()
+                .all(|n| { n.kind != SyntaxKind::Whitespace && n.kind != SyntaxKind::Newline })
+        );
     }
 
     #[test]

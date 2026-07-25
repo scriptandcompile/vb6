@@ -3,8 +3,8 @@ authors = ["ScriptAndCompile"]
 name = "vb6parse"
 homepage = "https://github.com/scriptandcompile/vb6parse"
 documentation = "https://docs.rs/vb6parse"
-version = "1.0.1"
-edition = "2021"
+version = "1.1.0"
+edition = "2024"
 license = "MIT"
 description = "vb6parse is a library for parsing and analyzing VB6 code, from projects, to controls, to modules, and forms."
 repository = "https://github.com/scriptandcompile/vb6parse"
@@ -63,16 +63,16 @@ exclude = [
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-uuid = "1.23.4"
-thiserror = "2.0.18"
+uuid = "1.24.0"
+thiserror = "2.0.19"
 ariadne = "0.6.0"
 image = "0.25.10"
 num_enum = "0.7.6"
 strum = "0.28.0"
 strum_macros = "0.28.0"
 encoding_rs = "0.8.35"
-either = { version = "1.16.0", features = ["serde"] }
-serde = { version = "1.0.228", features = ["derive"] }
+either = { version = "1.17.0", features = ["serde"] }
+serde = { version = "1.0.229", features = ["derive"] }
 phf = { version = "0.14.0", features = ["macros"] }
 rowan = "0.16.1"
 
@@ -81,7 +81,7 @@ rowan = "0.16.1"
 wasm-bindgen = "0.2.126"
 serde-wasm-bindgen = "0.6.5"
 console_error_panic_hook = "0.1.7"
-serde_json = "1.0.150"
+serde_json = "1.0.151"
 
 [profile.release]
 opt-level = "z"     # Optimize for size

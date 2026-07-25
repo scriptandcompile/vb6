@@ -1,4 +1,4 @@
-use vb6parse::{tokenize, SourceStream};
+use vb6parse::{SourceStream, tokenize};
 
 fn main() {
     let code = "Dim x As Integer ' Declare a variable";

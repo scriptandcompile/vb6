@@ -20,17 +20,17 @@ use std::fmt::Display;
 use std::str::FromStr;
 
 use crate::{
+    ErrorKind,
     errors::FormError,
     files::common::Properties,
     language::{
+        Color, VB_BUTTON_FACE, VB_BUTTON_TEXT,
         controls::{
             Activation, Appearance, CausesValidation, DragMode, Font, JustifyAlignment,
             MousePointer, OLEDropMode, ReferenceOrValue, Style, TabStop, TextDirection,
             UseMaskColor, Visibility,
         },
-        Color, VB_BUTTON_FACE, VB_BUTTON_TEXT,
     },
-    ErrorKind,
 };
 
 use image::DynamicImage;

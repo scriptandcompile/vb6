@@ -34,8 +34,8 @@
 
 use crate::errors::ModuleError;
 use crate::language::Token;
-use crate::parsers::cst::Parser;
 use crate::parsers::SyntaxKind;
+use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
     /// Parse a Call statement:

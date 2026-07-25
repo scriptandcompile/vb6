@@ -1,6 +1,6 @@
 use vb6parse::FormResourceFile;
 
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
+use criterion::{BenchmarkId, Criterion, Throughput, criterion_group, criterion_main};
 use std::hint::black_box;
 
 // Define file size categories
@@ -67,19 +67,27 @@ fn form_resource_benchmarks(criterion: &mut Criterion) {
         // Medium resources - typical icons/images
         ResourceBenchmark::new(
             "Brightness/VB6/Brightness.frx",
-            include_bytes!("../tests/data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frx"),
+            include_bytes!(
+                "../tests/data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frx"
+            ),
         ),
         ResourceBenchmark::new(
             "Brightness/API/Brightness2.frx",
-            include_bytes!("../tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frx"),
+            include_bytes!(
+                "../tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frx"
+            ),
         ),
         ResourceBenchmark::new(
             "Brightness/DIBs/Brightness3.frx",
-            include_bytes!("../tests/data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frx"),
+            include_bytes!(
+                "../tests/data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frx"
+            ),
         ),
         ResourceBenchmark::new(
             "Brightness/FasterDIBs/Brightness.frx",
-            include_bytes!("../tests/data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frx"),
+            include_bytes!(
+                "../tests/data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frx"
+            ),
         ),
         // Large resources - complex forms with many images
         ResourceBenchmark::new(

@@ -4,8 +4,8 @@
 //! the Concrete Syntax Tree.
 //!
 
-use vb6parse::parsers::cst::CstNode;
 use vb6parse::ConcreteSyntaxTree;
+use vb6parse::parsers::cst::CstNode;
 
 fn main() {
     let source = r"

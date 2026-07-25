@@ -6,7 +6,7 @@
 //! Predominantly, this is designed for the needs of the `VB6Parser` playground.
 //!
 
-use crate::{parsers, tokenize, Token, TokenStream};
+use crate::{Token, TokenStream, parsers, tokenize};
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::prelude::*;

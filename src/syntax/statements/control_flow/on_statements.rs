@@ -1,8 +1,8 @@
 //! On-prefixed statement parsing for VB6 (`On Error`, `On GoTo`, `On GoSub`).
 
 use crate::language::Token;
-use crate::parsers::cst::Parser;
 use crate::parsers::SyntaxKind;
+use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
     /// Parse an `On Error` statement.

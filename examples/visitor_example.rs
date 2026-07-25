@@ -1,10 +1,10 @@
+use vb6parse::ConcreteSyntaxTree;
+use vb6parse::parsers::SyntaxKind;
 /// Example demonstrating the visitor pattern for CST analysis
 ///
 /// This example shows how to use the Visitor trait to traverse and analyze
 /// a VB6 Concrete Syntax Tree without writing complex pattern matching code.
 use vb6parse::parsers::cst::{CstNode, Visitor};
-use vb6parse::parsers::SyntaxKind;
-use vb6parse::ConcreteSyntaxTree;
 
 /// A visitor that collects statistics about a VB6 module
 struct StatisticsVisitor {
