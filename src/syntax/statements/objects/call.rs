@@ -379,6 +379,7 @@ impl Parser<'_> {
                 | Token::ForKeyword
                 | Token::ToKeyword
                 | Token::StepKeyword
+                | Token::DeclareKeyword
                 | Token::SubKeyword
                 | Token::FunctionKeyword
                 | Token::PropertyKeyword
