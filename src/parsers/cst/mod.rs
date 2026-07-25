@@ -2883,6 +2883,11 @@ impl<'a> Parser<'a> {
     }
 
     fn try_parse_statement_list_keyword_dispatch(&mut self) -> bool {
+        if self.at_token(Token::EventKeyword) {
+            self.parse_event_statement();
+            return true;
+        }
+
         if self.is_library_statement_keyword() {
             self.parse_library_statement();
             return true;

@@ -239,6 +239,16 @@ impl Parser<'_> {
                 break;
             }
 
+            if self.at_compiler_directive_keyword(Token::IfKeyword)
+                || self.at_compiler_directive_keyword(Token::ElseIfKeyword)
+                || self.at_compiler_directive_keyword(Token::ElseKeyword)
+                || self.at_compiler_end_if_directive()
+            {
+                self.consume_compiler_directive_prefix();
+                self.consume_until_after(Token::Newline);
+                continue;
+            }
+
             // Consume type member lines (elementname [(subscripts)] As type)
             // This includes whitespace, comments, identifiers, operators, and newlines
             match self.current_token() {
@@ -917,5 +927,29 @@ End Type
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn type_with_compiler_conditional_members() {
+        let source = r#"
+Type UcsExtraData
+    Aes As Long
+#If ImplCrypto Then
+    DecDat As Byte
+    Password As String
+#End If
+    Flags As Long
+End Type
+"#;
+
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let text = format!("{tree:#?}");
+        assert!(
+            !text.contains("Unknown"),
+            "Compiler-conditional Type members should not leave Unknown tokens: {text}"
+        );
     }
 }

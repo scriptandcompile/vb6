@@ -490,134 +490,78 @@ cst:
             children:
               - kind: Whitespace
                 text: "    "
-              - kind: CallStatement
+              - kind: EventStatement
                 children:
                   - kind: EventKeyword
                     text: Event
                   - kind: Whitespace
                     text: " "
-                  - kind: ArgumentList
+                  - kind: Identifier
+                    text: BeforeCompress
+                  - kind: ParameterList
                     children:
-                      - kind: Argument
-                        children:
-                          - kind: CallExpression
-                            children:
-                              - kind: Identifier
-                                text: BeforeCompress
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: ArgumentList
-                                children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: UnaryExpression
-                                        children:
-                                          - kind: ByValKeyword
-                                            text: ByVal
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: Identifier
-                                                text: FileIdx
-                                  - kind: Whitespace
-                                    text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: LongKeyword
-                                text: Long
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ByValKeyword
+                        text: ByVal
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: FileIdx
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: LongKeyword
+                        text: Long
                       - kind: Comma
                         text: ","
                       - kind: Whitespace
                         text: " "
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: level
+                      - kind: Identifier
+                        text: level
                       - kind: Whitespace
                         text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: LongKeyword
-                                text: Long
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: LongKeyword
+                        text: Long
                       - kind: Comma
                         text: ","
                       - kind: Whitespace
                         text: " "
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: SkipFile
+                      - kind: Identifier
+                        text: SkipFile
                       - kind: Whitespace
                         text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: BooleanKeyword
-                                text: Boolean
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: BooleanKeyword
+                        text: Boolean
                       - kind: Comma
                         text: ","
                       - kind: Whitespace
                         text: " "
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: Cancel
+                      - kind: Identifier
+                        text: Cancel
                       - kind: Whitespace
                         text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: BooleanKeyword
-                                text: Boolean
-              - kind: Unknown
-                text: )
-              - kind: Newline
-                text: "\r\n"
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: BooleanKeyword
+                        text: Boolean
+                      - kind: RightParenthesis
+                        text: )
+                  - kind: Newline
+                    text: "\r\n"
               - kind: Whitespace
                 text: "    "
               - kind: EndOfLineComment
@@ -626,50 +570,32 @@ cst:
                 text: "\r\n"
               - kind: Whitespace
                 text: "    "
-              - kind: CallStatement
+              - kind: EventStatement
                 children:
                   - kind: EventKeyword
                     text: Event
                   - kind: Whitespace
                     text: " "
-                  - kind: ArgumentList
+                  - kind: Identifier
+                    text: TotalSize
+                  - kind: ParameterList
                     children:
-                      - kind: Argument
-                        children:
-                          - kind: CallExpression
-                            children:
-                              - kind: Identifier
-                                text: TotalSize
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: ArgumentList
-                                children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: Identifier
-                                            text: aSize
-                                  - kind: Whitespace
-                                    text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: DoubleKeyword
-                                text: Double
-              - kind: Unknown
-                text: )
-              - kind: Newline
-                text: "\r\n"
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: Identifier
+                        text: aSize
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: DoubleKeyword
+                        text: Double
+                      - kind: RightParenthesis
+                        text: )
+                  - kind: Newline
+                    text: "\r\n"
           - kind: Octothorpe
             text: "#"
           - kind: EndKeyword
@@ -706,212 +632,124 @@ cst:
             children:
               - kind: Whitespace
                 text: "    "
-              - kind: CallStatement
+              - kind: EventStatement
                 children:
                   - kind: EventKeyword
                     text: Event
                   - kind: Whitespace
                     text: " "
-                  - kind: ArgumentList
+                  - kind: Identifier
+                    text: BeforeExtract
+                  - kind: ParameterList
                     children:
-                      - kind: Argument
-                        children:
-                          - kind: CallExpression
-                            children:
-                              - kind: Identifier
-                                text: BeforeExtract
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: ArgumentList
-                                children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: UnaryExpression
-                                        children:
-                                          - kind: ByValKeyword
-                                            text: ByVal
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: Identifier
-                                                text: FileIdx
-                                  - kind: Whitespace
-                                    text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: LongKeyword
-                                text: Long
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ByValKeyword
+                        text: ByVal
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: FileIdx
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: LongKeyword
+                        text: Long
                       - kind: Comma
                         text: ","
                       - kind: Whitespace
                         text: " "
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: File
+                      - kind: Identifier
+                        text: File
                       - kind: Whitespace
                         text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: VariantKeyword
-                                text: Variant
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: VariantKeyword
+                        text: Variant
                       - kind: Comma
                         text: ","
                       - kind: Whitespace
                         text: " "
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: SkipFile
+                      - kind: Identifier
+                        text: SkipFile
                       - kind: Whitespace
                         text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: BooleanKeyword
-                                text: Boolean
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: BooleanKeyword
+                        text: Boolean
                       - kind: Comma
                         text: ","
                       - kind: Whitespace
                         text: " "
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: Cancel
+                      - kind: Identifier
+                        text: Cancel
                       - kind: Whitespace
                         text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: BooleanKeyword
-                                text: Boolean
-              - kind: Unknown
-                text: )
-              - kind: Newline
-                text: "\r\n"
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: BooleanKeyword
+                        text: Boolean
+                      - kind: RightParenthesis
+                        text: )
+                  - kind: Newline
+                    text: "\r\n"
               - kind: Whitespace
                 text: "    "
-              - kind: CallStatement
+              - kind: EventStatement
                 children:
                   - kind: EventKeyword
                     text: Event
                   - kind: Whitespace
                     text: " "
-                  - kind: ArgumentList
+                  - kind: Identifier
+                    text: ExtractComplete
+                  - kind: ParameterList
                     children:
-                      - kind: Argument
-                        children:
-                          - kind: CallExpression
-                            children:
-                              - kind: Identifier
-                                text: ExtractComplete
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: ArgumentList
-                                children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: UnaryExpression
-                                        children:
-                                          - kind: ByValKeyword
-                                            text: ByVal
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: Identifier
-                                                text: FileIdx
-                                  - kind: Whitespace
-                                    text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: LongKeyword
-                                text: Long
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ByValKeyword
+                        text: ByVal
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: FileIdx
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: LongKeyword
+                        text: Long
                       - kind: Comma
                         text: ","
                       - kind: Whitespace
                         text: " "
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: File
+                      - kind: Identifier
+                        text: File
                       - kind: Whitespace
                         text: " "
-              - kind: CallStatement
-                children:
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ArgumentList
-                    children:
-                      - kind: Argument
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: VariantKeyword
-                                text: Variant
-              - kind: Unknown
-                text: )
-              - kind: Newline
-                text: "\r\n"
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: VariantKeyword
+                        text: Variant
+                      - kind: RightParenthesis
+                        text: )
+                  - kind: Newline
+                    text: "\r\n"
           - kind: Octothorpe
             text: "#"
           - kind: EndKeyword
@@ -11404,7 +11242,7 @@ cst:
             text: "\r\n"
           - kind: Whitespace
             text: "    "
-          - kind: Unknown
+          - kind: Octothorpe
             text: "#"
           - kind: IfKeyword
             text: If
@@ -11462,7 +11300,7 @@ cst:
             text: "\r\n"
           - kind: Whitespace
             text: "    "
-          - kind: Unknown
+          - kind: Octothorpe
             text: "#"
           - kind: EndKeyword
             text: End
