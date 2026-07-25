@@ -872,6 +872,9 @@ fn environment_ctlssocket_class_load() {
 
 #[test]
 fn environment_cwinsockrequest_class_load() {
+    // The source code has a large amount of unknown token errors because
+    // the original source code contains an error where a Property block is not properly closed.
+    // Instead of closing with 'End Property', is is 'closed' with 'End Function' which is incorrect.
     let class_bytes = include_bytes!("../data/Environment/cWinSockRequest.cls");
 
     let result = SourceFile::decode_with_replacement("cWinSockRequest.cls", class_bytes);
