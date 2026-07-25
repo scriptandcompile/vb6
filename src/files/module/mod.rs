@@ -12,7 +12,7 @@ use crate::{
     errors::{ModuleError, ParserContext},
     io::{Comparator, SourceFile},
     lexer::tokenize,
-    parsers::{cst::serialize_cst, cst::ConcreteSyntaxTree, ParseResult, SyntaxKind},
+    parsers::{ParseResult, SyntaxKind, cst::ConcreteSyntaxTree, cst::serialize_cst},
 };
 
 use serde::Serialize;

@@ -7,11 +7,11 @@
 //!
 
 use crate::files::common::Properties;
+use crate::language::Color;
 use crate::language::controls::{
     Activation, Appearance, CausesValidation, DragMode, Font, MousePointer, OLEDropMode,
     ReferenceOrValue, TabStop, Visibility,
 };
-use crate::language::Color;
 
 use image::DynamicImage;
 use serde::Serialize;

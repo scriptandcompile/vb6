@@ -344,12 +344,10 @@ impl<'a> ErrorDetails<'a> {
 
 impl Display for ErrorDetails<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ErrorDetails {{ source_name: {}, error_offset: {}, line_start: {}, line_end: {}, kind: {:?} }}",
-            self.source_name,
-            self.error_offset,
-            self.line_start,
-            self.line_end,
-            self.kind,
+        write!(
+            f,
+            "ErrorDetails {{ source_name: {}, error_offset: {}, line_start: {}, line_end: {}, kind: {:?} }}",
+            self.source_name, self.error_offset, self.line_start, self.line_end, self.kind,
         )
     }
 }

@@ -140,48 +140,46 @@ impl Parser<'_> {
             )
         );
 
-        if is_dollar_keyword {
-            if let Some(Token::DollarSign) = self.peek_next_token() {
-                return true;
-            }
+        if is_dollar_keyword && let Some(Token::DollarSign) = self.peek_next_token() {
+            return true;
         }
 
         // Check for Identifier (like "UCase", "LCase", "Left", etc.) + DollarSign
-        if self.at_token(Token::Identifier) {
-            if let Some(Token::DollarSign) = self.peek_next_token() {
-                // Only merge if it's one of the known dollar functions
-                if let Some((text, _)) = self.tokens.get(self.pos) {
-                    let text_upper = text.to_uppercase();
-                    if matches!(
-                        text_upper.as_str(),
-                        "CHR"
-                            | "CHRB"
-                            | "CHRW"
-                            | "COMMAND"
-                            | "CURDIR"
-                            | "DATE"
-                            | "ENVIRON"
-                            | "ERROR"
-                            | "FORMAT"
-                            | "HEX"
-                            | "LCASE"
-                            | "LEFT"
-                            | "LEFTB"
-                            | "LTRIM"
-                            | "MID"
-                            | "MIDB"
-                            | "OCT"
-                            | "RIGHT"
-                            | "RIGHTB"
-                            | "RTRIM"
-                            | "SPACE"
-                            | "STR"
-                            | "TIME"
-                            | "TRIM"
-                            | "UCASE"
-                    ) {
-                        return true;
-                    }
+        if self.at_token(Token::Identifier)
+            && matches!(self.peek_next_token(), Some(Token::DollarSign))
+        {
+            // Only merge if it's one of the known dollar functions
+            if let Some((text, _)) = self.tokens.get(self.pos) {
+                let text_upper = text.to_uppercase();
+                if matches!(
+                    text_upper.as_str(),
+                    "CHR"
+                        | "CHRB"
+                        | "CHRW"
+                        | "COMMAND"
+                        | "CURDIR"
+                        | "DATE"
+                        | "ENVIRON"
+                        | "ERROR"
+                        | "FORMAT"
+                        | "HEX"
+                        | "LCASE"
+                        | "LEFT"
+                        | "LEFTB"
+                        | "LTRIM"
+                        | "MID"
+                        | "MIDB"
+                        | "OCT"
+                        | "RIGHT"
+                        | "RIGHTB"
+                        | "RTRIM"
+                        | "SPACE"
+                        | "STR"
+                        | "TIME"
+                        | "TRIM"
+                        | "UCASE"
+                ) {
+                    return true;
                 }
             }
         }
@@ -344,7 +342,7 @@ impl Parser<'_> {
                         Token::Underscore => {
                             // Found line continuation! Consume the newline and keep going
                             self.consume_token(); // Consume the newline
-                                                  // Continue consuming until we find a newline without continuation
+                            // Continue consuming until we find a newline without continuation
                             self.consume_until(target);
                             return;
                         }

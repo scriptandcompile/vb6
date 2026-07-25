@@ -11,6 +11,7 @@ pub mod properties;
 use std::fmt::Display;
 
 use crate::{
+    ConcreteSyntaxTree, ParseResult,
     errors::{ClassError, ParserContext},
     files::{
         class::properties::{
@@ -22,10 +23,9 @@ use crate::{
     io::SourceFile,
     lexer::tokenize,
     parsers::{
-        cst::{parse, serialize_cst},
         SyntaxKind,
+        cst::{parse, serialize_cst},
     },
-    ConcreteSyntaxTree, ParseResult,
 };
 
 use serde::Serialize;

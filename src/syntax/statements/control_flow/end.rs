@@ -1,7 +1,7 @@
 //! End statement parsing for VB6.
 
-use crate::parsers::cst::Parser;
 use crate::parsers::SyntaxKind;
+use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
     /// Parse a standalone `End` statement.

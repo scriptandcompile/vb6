@@ -1,6 +1,6 @@
 use vb6parse::{FormFile, SourceFile};
 
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
+use criterion::{BenchmarkId, Criterion, Throughput, criterion_group, criterion_main};
 use std::hint::black_box;
 
 // Define file size categories
@@ -134,19 +134,27 @@ fn form_benchmarks(criterion: &mut Criterion) {
         ),
         FormBenchmark::new(
             "Brightness/DIBs/Brightness3.frm",
-            include_bytes!("../tests/data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frm"),
+            include_bytes!(
+                "../tests/data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frm"
+            ),
         ),
         FormBenchmark::new(
             "Brightness/FasterDIBs/Brightness.frm",
-            include_bytes!("../tests/data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frm"),
+            include_bytes!(
+                "../tests/data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frm"
+            ),
         ),
         FormBenchmark::new(
             "Brightness/API/Brightness2.frm",
-            include_bytes!("../tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frm"),
+            include_bytes!(
+                "../tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frm"
+            ),
         ),
         FormBenchmark::new(
             "Brightness/VB6/Brightness.frm",
-            include_bytes!("../tests/data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frm"),
+            include_bytes!(
+                "../tests/data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frm"
+            ),
         ),
         FormBenchmark::new(
             "MapEditor/FrmResize.frm",

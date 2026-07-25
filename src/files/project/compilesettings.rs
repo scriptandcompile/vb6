@@ -420,7 +420,7 @@ impl CompilationType {
                 optimization_type: setting,
                 ..Default::default()
             }),
-            CompilationType::NativeCode(mut value) => {
+            &mut CompilationType::NativeCode(mut value) => {
                 value.optimization_type = setting;
                 CompilationType::NativeCode(value)
             }
@@ -444,7 +444,7 @@ impl CompilationType {
                 favor_pentium_pro: setting,
                 ..Default::default()
             }),
-            CompilationType::NativeCode(mut value) => {
+            &mut CompilationType::NativeCode(mut value) => {
                 value.favor_pentium_pro = setting;
                 CompilationType::NativeCode(value)
             }
@@ -468,7 +468,7 @@ impl CompilationType {
                 code_view_debug_info: setting,
                 ..Default::default()
             }),
-            CompilationType::NativeCode(mut value) => {
+            &mut CompilationType::NativeCode(mut value) => {
                 value.code_view_debug_info = setting;
                 CompilationType::NativeCode(value)
             }
@@ -492,7 +492,7 @@ impl CompilationType {
                 aliasing: setting,
                 ..Default::default()
             }),
-            CompilationType::NativeCode(mut value) => {
+            &mut CompilationType::NativeCode(mut value) => {
                 value.aliasing = setting;
                 CompilationType::NativeCode(value)
             }
@@ -516,7 +516,7 @@ impl CompilationType {
                 bounds_check: setting,
                 ..Default::default()
             }),
-            CompilationType::NativeCode(mut value) => {
+            &mut CompilationType::NativeCode(mut value) => {
                 value.bounds_check = setting;
                 CompilationType::NativeCode(value)
             }
@@ -540,7 +540,7 @@ impl CompilationType {
                 overflow_check: setting,
                 ..Default::default()
             }),
-            CompilationType::NativeCode(mut value) => {
+            &mut CompilationType::NativeCode(mut value) => {
                 value.overflow_check = setting;
                 CompilationType::NativeCode(value)
             }
@@ -567,7 +567,7 @@ impl CompilationType {
                 floating_point_check: setting,
                 ..Default::default()
             }),
-            CompilationType::NativeCode(mut value) => {
+            &mut CompilationType::NativeCode(mut value) => {
                 value.floating_point_check = setting;
                 CompilationType::NativeCode(value)
             }
@@ -585,13 +585,16 @@ impl CompilationType {
     /// * `CompilationType` - A new `CompilationType` with the updated setting.
     ///
     #[must_use]
-    pub fn update_pentium_fdiv_bug_check(self, setting: PentiumFDivBugCheck) -> CompilationType {
+    pub fn update_pentium_fdiv_bug_check(
+        &mut self,
+        setting: PentiumFDivBugCheck,
+    ) -> CompilationType {
         match self {
             CompilationType::PCode => CompilationType::NativeCode(NativeCodeSettings {
                 pentium_fdiv_bug_check: setting,
                 ..Default::default()
             }),
-            CompilationType::NativeCode(mut value) => {
+            &mut CompilationType::NativeCode(mut value) => {
                 value.pentium_fdiv_bug_check = setting;
                 CompilationType::NativeCode(value)
             }
@@ -618,7 +621,7 @@ impl CompilationType {
                 unrounded_floating_point: setting,
                 ..Default::default()
             }),
-            CompilationType::NativeCode(mut value) => {
+            &mut CompilationType::NativeCode(mut value) => {
                 value.unrounded_floating_point = setting;
                 CompilationType::NativeCode(value)
             }

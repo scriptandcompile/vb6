@@ -11,11 +11,11 @@ use std::str::FromStr;
 
 use crate::errors::{ErrorKind, FormError};
 use crate::files::common::Properties;
+use crate::language::Color;
 use crate::language::controls::{
     Activation, Align, Appearance, DragMode, Font, MousePointer, OLEDropMode, TextDirection,
     Visibility,
 };
-use crate::language::Color;
 
 use image::DynamicImage;
 use num_enum::TryFromPrimitive;

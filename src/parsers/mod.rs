@@ -12,6 +12,6 @@ pub mod parseresults;
 pub mod syntaxkind;
 
 pub use crate::io::{Comparator, SourceFile, SourceStream};
-pub use crate::parsers::cst::{parse, ConcreteSyntaxTree, CstNode, SerializableTree};
+pub use crate::parsers::cst::{ConcreteSyntaxTree, CstNode, SerializableTree, parse};
 pub use crate::parsers::syntaxkind::SyntaxKind;
 pub use parseresults::{Diagnostics, ParseResult};

@@ -34,8 +34,8 @@
 //! [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/set-statement)
 
 use crate::language::Token;
-use crate::parsers::cst::Parser;
 use crate::parsers::SyntaxKind;
+use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
     /// Parse a Set statement.

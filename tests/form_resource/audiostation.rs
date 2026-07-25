@@ -34,7 +34,10 @@ fn audiostation_about_frx() {
     if let ResourceEntry::Record4ByteHeader { data } = entries[2].1 {
         assert_eq!(data.len(), 141);
         let text = entries[2].1.as_text().expect("Should decode as text");
-        assert_eq!(text, "The program is distributed in the hope that it will be useful, but without any warranty. it is provided \"as is\" without warranty of any kind.");
+        assert_eq!(
+            text,
+            "The program is distributed in the hope that it will be useful, but without any warranty. it is provided \"as is\" without warranty of any kind."
+        );
     } else {
         panic!("Expected Record4ByteHeader at 0x31F");
     }
@@ -44,7 +47,10 @@ fn audiostation_about_frx() {
     if let ResourceEntry::Record4ByteHeader { data } = entries[3].1 {
         assert_eq!(data.len(), 299);
         let text = entries[3].1.as_text().expect("Should decode as text");
-        assert_eq!(text, "Audiostation is a typical old media player. Media players like audiostation where made for Windows 98 and changed the way of playing music on your computer. But now you can bring back those times with our Audiostation software. Just download and install and enjoy the old look and feel of Windows 98");
+        assert_eq!(
+            text,
+            "Audiostation is a typical old media player. Media players like audiostation where made for Windows 98 and changed the way of playing music on your computer. But now you can bring back those times with our Audiostation software. Just download and install and enjoy the old look and feel of Windows 98"
+        );
     } else {
         panic!("Expected Record4ByteHeader at 0x3B0");
     }

@@ -14,13 +14,13 @@ use crate::{
     errors::{ErrorKind, FormError},
     files::common::Properties,
     language::{
+        Color, FormLinkMode, VB_BUTTON_FACE, VB_BUTTON_TEXT, VB_SCROLL_BARS,
         controls::{
             Activation, Appearance, AutoRedraw, ClipControls, DrawMode, DrawStyle, FillStyle, Font,
             FontTransparency, HasDeviceContext, MousePointer, Movability, OLEDropMode,
             ReferenceOrValue, ScaleMode, StartUpPosition, TextDirection, Visibility, WhatsThisHelp,
             WindowState,
         },
-        Color, FormLinkMode, VB_BUTTON_FACE, VB_BUTTON_TEXT, VB_SCROLL_BARS,
     },
 };
 

@@ -1,5 +1,5 @@
-use vb6parse::parsers::SyntaxKind;
 use vb6parse::ConcreteSyntaxTree;
+use vb6parse::parsers::SyntaxKind;
 
 fn main() {
     let code = r"Sub Calculate()

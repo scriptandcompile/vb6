@@ -6,14 +6,18 @@ use thiserror::Error;
 #[derive(Error, Debug, Clone, PartialEq, Eq)]
 pub enum FormError {
     /// The `ComboBox` style is invalid.
-    #[error("The `ComboBox` style is invalid: '{value}'. Only 0 (Dropdown Combo), 1 (Simple Combo), or 2 (Dropdown List) are valid styles.")]
+    #[error(
+        "The `ComboBox` style is invalid: '{value}'. Only 0 (Dropdown Combo), 1 (Simple Combo), or 2 (Dropdown List) are valid styles."
+    )]
     InvalidComboBoxStyle {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `CheckBox` value is invalid.
-    #[error("The `CheckBox` value is invalid: '{value}'. Only 0 (Unchecked), 1 (Checked), or 2 (Grayed) are valid values.")]
+    #[error(
+        "The `CheckBox` value is invalid: '{value}'. Only 0 (Unchecked), 1 (Checked), or 2 (Grayed) are valid values."
+    )]
     InvalidCheckBoxValue {
         /// The invalid value that was found.
         value: String,
@@ -29,112 +33,144 @@ pub enum FormError {
     },
 
     /// The `BOFAction` property has an invalid value.
-    #[error("The `BOFAction` value is invalid: '{value}'. Only 0 (MoveFirst), or 1 (BOF) are valid values.")]
+    #[error(
+        "The `BOFAction` value is invalid: '{value}'. Only 0 (MoveFirst), or 1 (BOF) are valid values."
+    )]
     InvalidBOFAction {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `ConnectionType` property has an invalid value.
-    #[error("The `ConnectionType` value is invalid: '{value}'. Only 'Access', 'dBase III', 'dBase IV', 'dBase 5.0', 'Excel 3.0', 'Excel 4.0', 'Excel 5.0', 'Excel 8.0', 'FoxPro 2.0', 'FoxPro 2.5', 'FoxPro 2.6', 'FoxPro 3.0', 'Lotus WK1', 'Lotus WK3', 'Lotus WK4', 'Paradox 3.X', 'Paradox 4.X', 'Paradox 5.X', or 'Text' are valid values.")]
+    #[error(
+        "The `ConnectionType` value is invalid: '{value}'. Only 'Access', 'dBase III', 'dBase IV', 'dBase 5.0', 'Excel 3.0', 'Excel 4.0', 'Excel 5.0', 'Excel 8.0', 'FoxPro 2.0', 'FoxPro 2.5', 'FoxPro 2.6', 'FoxPro 3.0', 'Lotus WK1', 'Lotus WK3', 'Lotus WK4', 'Paradox 3.X', 'Paradox 4.X', 'Paradox 5.X', or 'Text' are valid values."
+    )]
     InvalidConnectionType {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `DefaultCursorType` property has an invalid value.
-    #[error("The `DefaultCursorType` value is invalid: '{value}'. Only 0 (Default), 1 (Odbc), or 2 (ServerSide) are valid values.")]
+    #[error(
+        "The `DefaultCursorType` value is invalid: '{value}'. Only 0 (Default), 1 (Odbc), or 2 (ServerSide) are valid values."
+    )]
     InvalidDefaultCursorType {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `DatabaseDriverType` property has an invalid value.
-    #[error("The `DatabaseDriverType` value is invalid: '{value}'. Only 1 (ODBC), or 2 (Jet) are valid values.")]
+    #[error(
+        "The `DatabaseDriverType` value is invalid: '{value}'. Only 1 (ODBC), or 2 (Jet) are valid values."
+    )]
     InvalidDatabaseDriverType {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `EOFAction` property has an invalid value.
-    #[error("The `EOFAction` value is invalid: '{value}'. Only 0 (MoveLast), 1 (EOF), or 2 (AddNew) are valid values.")]
+    #[error(
+        "The `EOFAction` value is invalid: '{value}'. Only 0 (MoveLast), 1 (EOF), or 2 (AddNew) are valid values."
+    )]
     InvalidEOFAction {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The record set type is invalid.
-    #[error("The `RecordSetType` value is invalid: '{value}'. Only 0 (Table), 1 (Dynaset), or 2 (Snapshot) are valid values.")]
+    #[error(
+        "The `RecordSetType` value is invalid: '{value}'. Only 0 (Table), 1 (Dynaset), or 2 (Snapshot) are valid values."
+    )]
     InvalidRecordSetType {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The archive attribute is invalid.
-    #[error("The `ArchiveAttribute` value is invalid: '{value}'. Only 0 (Exclude) or -1 (Include) are valid values.")]
+    #[error(
+        "The `ArchiveAttribute` value is invalid: '{value}'. Only 0 (Exclude) or -1 (Include) are valid values."
+    )]
     InvalidArchiveAttribute {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The hidden attribute is invalid.
-    #[error("The `Hidden` valud is invalid: '{value}'. Only 0 (Exclude) or -1 (Include) are valid values.")]
+    #[error(
+        "The `Hidden` valud is invalid: '{value}'. Only 0 (Exclude) or -1 (Include) are valid values."
+    )]
     InvalidHiddenAttribute {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `ReadOnly` attribute is invalid.
-    #[error("The `ReadOnly` value is invalid: '{value}'. Only 0 (Exclude) or -1 (Include) are valid values.")]
+    #[error(
+        "The `ReadOnly` value is invalid: '{value}'. Only 0 (Exclude) or -1 (Include) are valid values."
+    )]
     InvalidReadOnlyAttribute {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `System` attribute is invalid.
-    #[error("The `System` value is invalid: '{value}'. Only 0 (Exclude) or -1 (Include) are valid values.")]
+    #[error(
+        "The `System` value is invalid: '{value}'. Only 0 (Exclude) or -1 (Include) are valid values."
+    )]
     InvalidSystemAttribute {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `Normal` attribute is invalid.
-    #[error("The `Normal` value is invalid: '{value}'. Only 0 (Exclude) or -1 (Include) are valid values.")]
+    #[error(
+        "The `Normal` value is invalid: '{value}'. Only 0 (Exclude) or -1 (Include) are valid values."
+    )]
     InvalidNormalAttribute {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `FormBorderStyle` property has an invalid value.
-    #[error("The `FormBorderStyle` value is invalid: '{value}'. Only 0 (None), 1 (FixedSingle), 2 (Sizable), 3 (FixedDialog), 4 (FixedToolWindow), or 5 (SizableToolWindow) are valid values.")]
+    #[error(
+        "The `FormBorderStyle` value is invalid: '{value}'. Only 0 (None), 1 (FixedSingle), 2 (Sizable), 3 (FixedDialog), 4 (FixedToolWindow), or 5 (SizableToolWindow) are valid values."
+    )]
     InvalidFormBorderStyle {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `ControlBox` property has an invalid value.
-    #[error("The `ControlBox` value is invalid: '{value}'. Only 0 (Excluded) or -1 (Included) are valid values.")]
+    #[error(
+        "The `ControlBox` value is invalid: '{value}'. Only 0 (Excluded) or -1 (Included) are valid values."
+    )]
     InvalidControlBox {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `MaxButton` property has an invalid value.
-    #[error("The `MaxButton` value is invalid: '{value}'. Only 0 (Excluded) or -1 (Included) are valid values.")]
+    #[error(
+        "The `MaxButton` value is invalid: '{value}'. Only 0 (Excluded) or -1 (Included) are valid values."
+    )]
     InvalidMaxButton {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `MinButton` property has an invalid value.
-    #[error("The `MinButton` value is invalid: '{value}'. Only 0 (Excluded) or -1 (Included) are valid values.")]
+    #[error(
+        "The `MinButton` value is invalid: '{value}'. Only 0 (Excluded) or -1 (Included) are valid values."
+    )]
     InvalidMinButton {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `PaletteMode` property has an invalid value.
-    #[error("The `PaletteMode` value is invalid: '{value}'. Only 0 (HalfTone), 1 (UseZOrder), or 2 (Custom) are valid values.")]
+    #[error(
+        "The `PaletteMode` value is invalid: '{value}'. Only 0 (HalfTone), 1 (UseZOrder), or 2 (Custom) are valid values."
+    )]
     InvalidPaletteMode {
         /// The invalid value that was found.
         value: String,
@@ -150,105 +186,135 @@ pub enum FormError {
     },
 
     /// The `WhatsThisButton` value is invalid.
-    #[error("The `WhatsThisButton` value is invalid: '{value}'. Only 0 (Excluded) or -1 (Included) are valid values.")]
+    #[error(
+        "The `WhatsThisButton` value is invalid: '{value}'. Only 0 (Excluded) or -1 (Included) are valid values."
+    )]
     InvalidWhatsThisButton {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `ShowInTaskbar` value is invalid.
-    #[error("The `ShowInTaskbar` value is invalid: '{value}'. Only 0 (Hide) or -1 (Show) are valid values.")]
+    #[error(
+        "The `ShowInTaskbar` value is invalid: '{value}'. Only 0 (Hide) or -1 (Show) are valid values."
+    )]
     InvalidShowInTaskbar {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `NegotiatePosition` value is invalid.
-    #[error("The `NegotiatePosition` value is invalid: '{value}'. Only 0 (None), 1 (Left), 2 (Middle), or 3 (Right) are valid values.")]
+    #[error(
+        "The `NegotiatePosition` value is invalid: '{value}'. Only 0 (None), 1 (Left), 2 (Middle), or 3 (Right) are valid values."
+    )]
     InvalidNegotiatePosition {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `ListBoxStyle` value is invalid.
-    #[error("The `ListBoxStyle` value is invalid: '{value}'. Only 0 (Standard) or 1 (Checkbox) are valid values.")]
+    #[error(
+        "The `ListBoxStyle` value is invalid: '{value}'. Only 0 (Standard) or 1 (Checkbox) are valid values."
+    )]
     InvalidListBoxStyle {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `AutoSize` value is invalid.
-    #[error("The `AutoSize` value is invalid: '{value}'. Only 0 (Fixed) or -1 (Resize) are valid values.")]
+    #[error(
+        "The `AutoSize` value is invalid: '{value}'. Only 0 (Fixed) or -1 (Resize) are valid values."
+    )]
     InvalidAutoSize {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `AutoRedraw` value is invalid.
-    #[error("The `AutoRedraw` value is invalid: '{value}'. Only 0 (Manual) or -1 (Automatic) are valid values.")]
+    #[error(
+        "The `AutoRedraw` value is invalid: '{value}'. Only 0 (Manual) or -1 (Automatic) are valid values."
+    )]
     InvalidAutoRedraw {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `TextDirection` value is invalid.
-    #[error("The `TextAlign` value is invalid: '{value}'. Only 0 (LeftToRight) or -1 (RightToLeft) are valid values.")]
+    #[error(
+        "The `TextAlign` value is invalid: '{value}'. Only 0 (LeftToRight) or -1 (RightToLeft) are valid values."
+    )]
     InvalidTextDirection {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `TabStop` value is invalid.
-    #[error("The `TabStop` value is invalid: '{value}'. Only 0 (ProgrammaticOnly) or -1 (Included) are valid values.")]
+    #[error(
+        "The `TabStop` value is invalid: '{value}'. Only 0 (ProgrammaticOnly) or -1 (Included) are valid values."
+    )]
     InvalidTabStop {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `Visibility` value is invalid.
-    #[error("The `Visibility` value is invalid: '{value}'. Only 0 (Hidden) or -1 (Visible) are valid values.")]
+    #[error(
+        "The `Visibility` value is invalid: '{value}'. Only 0 (Hidden) or -1 (Visible) are valid values."
+    )]
     InvalidVisibility {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `HasDeviceContext` value is invalid.
-    #[error("The `HasDeviceContext` value is invalid: '{value}'. Only 0 (No) or -1 (Yes) are valid values.")]
+    #[error(
+        "The `HasDeviceContext` value is invalid: '{value}'. Only 0 (No) or -1 (Yes) are valid values."
+    )]
     InvalidHasDeviceContext {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `CausesValidation` value is invalid.
-    #[error("The `CausesValidation` value is invalid: '{value}'. Only 0 (No) or -1 (Yes) are valid values.")]
+    #[error(
+        "The `CausesValidation` value is invalid: '{value}'. Only 0 (No) or -1 (Yes) are valid values."
+    )]
     InvalidCausesValidation {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `Movability` value is invalid.
-    #[error("The `Movability` value is invalid: '{value}'. Only 0 (Fixed) or -1 (Movable) are valid values.")]
+    #[error(
+        "The `Movability` value is invalid: '{value}'. Only 0 (Fixed) or -1 (Movable) are valid values."
+    )]
     InvalidMovability {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `FontTransparency` value is invalid.
-    #[error("The `FontTransparency` value is invalid: '{value}'. Only 0 (Opaque) or -1 (Transparent) are valid values.")]
+    #[error(
+        "The `FontTransparency` value is invalid: '{value}'. Only 0 (Opaque) or -1 (Transparent) are valid values."
+    )]
     InvalidFontTransparency {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `WhatsThisHelp` value is invalid.
-    #[error("The `WhatsThisHelp` value is invalid: '{value}'. Only 0 (F1Help) or -1 (WhatsThisHelp) are valid values.")]
+    #[error(
+        "The `WhatsThisHelp` value is invalid: '{value}'. Only 0 (F1Help) or -1 (WhatsThisHelp) are valid values."
+    )]
     InvalidWhatsThisHelp {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `Activation` value is invalid.
-    #[error("The `Activation` value is invalid: '{value}'. Only 0 (Disabled) or -1 (Enabled) are valid values.")]
+    #[error(
+        "The `Activation` value is invalid: '{value}'. Only 0 (Disabled) or -1 (Enabled) are valid values."
+    )]
     InvalidActivation {
         /// The invalid value that was found.
         value: String,
@@ -262,196 +328,252 @@ pub enum FormError {
     },
 
     /// The `WindowState` value is invalid.
-    #[error("The `WindowState` value is invalid: '{value}'. Only 0 (Normal), 1 (Minimized), or 2 (Maximized) are valid values.")]
+    #[error(
+        "The `WindowState` value is invalid: '{value}'. Only 0 (Normal), 1 (Minimized), or 2 (Maximized) are valid values."
+    )]
     InvalidWindowState {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `Align` value is invalid.
-    #[error("The `Align` value is invalid: '{value}'. Only 0 (None), 1 (Top), 2 (Bottom), 3 (Left), or 4 (Right) are valid values.")]
+    #[error(
+        "The `Align` value is invalid: '{value}'. Only 0 (None), 1 (Top), 2 (Bottom), 3 (Left), or 4 (Right) are valid values."
+    )]
     InvalidAlign {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `Appearance` value is invalid.
-    #[error("The `Appearance` value is invalid: '{value}'. Only 0 (Flat) or 1 (ThreeD) are valid values.")]
+    #[error(
+        "The `Appearance` value is invalid: '{value}'. Only 0 (Flat) or 1 (ThreeD) are valid values."
+    )]
     InvalidAppearance {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `JustifyAlignment` value is invalid.
-    #[error("The `JustifyAlignment` value is invalid: '{value}'. Only 0 (Left), 1 (Right) are valid values.")]
+    #[error(
+        "The `JustifyAlignment` value is invalid: '{value}'. Only 0 (Left), 1 (Right) are valid values."
+    )]
     InvalidJustifyAlignment {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `Alignment` value is invalid.
-    #[error("The `Alignment` value is invalid: '{value}'. Only 0 (Left), 1 (Center), or 2 (Right) are valid values.")]
+    #[error(
+        "The `Alignment` value is invalid: '{value}'. Only 0 (Left), 1 (Center), or 2 (Right) are valid values."
+    )]
     InvalidAlignment {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `BackStyle` value is invalid.
-    #[error("The `BackStyle` value is invalid: '{value}'. Only 0 (Transparent) or 1 (Opaque) are valid values.")]
+    #[error(
+        "The `BackStyle` value is invalid: '{value}'. Only 0 (Transparent) or 1 (Opaque) are valid values."
+    )]
     InvalidBackStyle {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `BorderStyle` value is invalid.
-    #[error("The `BorderStyle` value is invalid: '{value}'. Only 0 (None) or 1 (FixedSingle) are valid values.")]
+    #[error(
+        "The `BorderStyle` value is invalid: '{value}'. Only 0 (None) or 1 (FixedSingle) are valid values."
+    )]
     InvalidBorderStyle {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `DragMode` value is invalid.
-    #[error("The `DragMode` value is invalid: '{value}'. Only 0 (Manual) or 1 (Automatic) are valid values.")]
+    #[error(
+        "The `DragMode` value is invalid: '{value}'. Only 0 (Manual) or 1 (Automatic) are valid values."
+    )]
     InvalidDragMode {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `DrawMode` value is invalid.
-    #[error("The `DrawMode` value is invalid: '{value}'. Only 1 (Blackness), 2 (NotMergePen), 3 (MaskNotPen), 4 (NotCopyPen), 5 (MaskPenNot), 6 (Invert), 7 (XorPen), 8 (NotMaskPen), 9 (MaskPen), 10 (NotXorPen), 11 (Nop), 12 (MergeNotPen), 13 (CopyPen), 14 (MergePenNot), 15 (Merge Pen), or 16 (Whiteness) are valid values.")]
+    #[error(
+        "The `DrawMode` value is invalid: '{value}'. Only 1 (Blackness), 2 (NotMergePen), 3 (MaskNotPen), 4 (NotCopyPen), 5 (MaskPenNot), 6 (Invert), 7 (XorPen), 8 (NotMaskPen), 9 (MaskPen), 10 (NotXorPen), 11 (Nop), 12 (MergeNotPen), 13 (CopyPen), 14 (MergePenNot), 15 (Merge Pen), or 16 (Whiteness) are valid values."
+    )]
     InvalidDrawMode {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `DrawStyle` value is invalid.
-    #[error("The `DrawStyle` value is invalid: '{value}'. Only 0 (Solid), 1 (Dash), 2 (Dot), 3 (DashDot), 4 (DashDotDot), 5 (Transparent), or 6 (InsideSolid) are valid values.")]
+    #[error(
+        "The `DrawStyle` value is invalid: '{value}'. Only 0 (Solid), 1 (Dash), 2 (Dot), 3 (DashDot), 4 (DashDotDot), 5 (Transparent), or 6 (InsideSolid) are valid values."
+    )]
     InvalidDrawStyle {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `MousePointer` value is invalid.
-    #[error("The `MousePointer` value is invalid: '{value}'. Only 0 (Default), 1 (Arrow), 2 (Cross), 3 (IBeam), 4 (Icon), 5 (Size), 6 (SizeNESW), 7 (SizeNS), 8 (SizeNWSE), 9 (SizeWE), 10 (UpArrow), 11 (Hourglass), 12 (NoDrop), 13 (ArrowHourglass), 14 (ArrowQuestion), 15 (SizeAll), or 99 (Custom) are valid values.")]
+    #[error(
+        "The `MousePointer` value is invalid: '{value}'. Only 0 (Default), 1 (Arrow), 2 (Cross), 3 (IBeam), 4 (Icon), 5 (Size), 6 (SizeNESW), 7 (SizeNS), 8 (SizeNWSE), 9 (SizeWE), 10 (UpArrow), 11 (Hourglass), 12 (NoDrop), 13 (ArrowHourglass), 14 (ArrowQuestion), 15 (SizeAll), or 99 (Custom) are valid values."
+    )]
     InvalidMousePointer {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `OLEDragMode` value is invalid.
-    #[error("The `OLEDragMode` value is invalid: '{value}'. Only 0 (Manual), or 1 (Automatic) are valid values.")]
+    #[error(
+        "The `OLEDragMode` value is invalid: '{value}'. Only 0 (Manual), or 1 (Automatic) are valid values."
+    )]
     InvalidOLEDragMode {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `OLEDropMode` value is invalid.
-    #[error("The `OLEDropMode` value is invalid: '{value}'. Only 0 (None), or 1 (Manual) are valid values.")]
+    #[error(
+        "The `OLEDropMode` value is invalid: '{value}'. Only 0 (None), or 1 (Manual) are valid values."
+    )]
     InvalidOLEDropMode {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `ClipControls` value is invalid.
-    #[error("The `ClipControls` value is invalid: '{value}'. Only 0 (Unbounded) or 1 (Clipped) are valid values.")]
+    #[error(
+        "The `ClipControls` value is invalid: '{value}'. Only 0 (Unbounded) or 1 (Clipped) are valid values."
+    )]
     InvalidClipControls {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `Style` value is invalid.
-    #[error("The `Style` value is invalid: '{value}'. Only 0 (Standard) or 1 (Graphical) are valid values.")]
+    #[error(
+        "The `Style` value is invalid: '{value}'. Only 0 (Standard) or 1 (Graphical) are valid values."
+    )]
     InvalidStyle {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `FillStyle` value is invalid.
-    #[error("The `FillStyle` value is invalid: '{value}'. Only 0 (Solid), 1 (Transparent), 2 (HorizontalLine), 3 (VerticalLine), 4 (UpwardDiagonal), 5 (DownwardDiagonal), 6 (Cross), or 7 (DiagonalCross) are valid values.")]
+    #[error(
+        "The `FillStyle` value is invalid: '{value}'. Only 0 (Solid), 1 (Transparent), 2 (HorizontalLine), 3 (VerticalLine), 4 (UpwardDiagonal), 5 (DownwardDiagonal), 6 (Cross), or 7 (DiagonalCross) are valid values."
+    )]
     InvalidFillStyle {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `LinkMode` value is invalid.
-    #[error("The `LinkMode` value is invalid: '{value}'. Only 0 (None), 1 (Automatic), 2 (Manual), or 3 (Notify) are valid values.")]
+    #[error(
+        "The `LinkMode` value is invalid: '{value}'. Only 0 (None), 1 (Automatic), 2 (Manual), or 3 (Notify) are valid values."
+    )]
     InvalidLinkMode {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `MultiSelect` value is invalid.
-    #[error("The `MultiSelect` value is invalid: '{value}'. Only 0 (None), 1 (Simple), or 2 (Extended) are valid values.")]
+    #[error(
+        "The `MultiSelect` value is invalid: '{value}'. Only 0 (None), 1 (Simple), or 2 (Extended) are valid values."
+    )]
     InvalidMultiSelect {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `OLETypeAllowed` value is invalid.
-    #[error("The `OLETypeAllowed` value is invalid: '{value}'. Only 0 (Link), 1 (Embedded), or 2 (Either) are valid values.")]
+    #[error(
+        "The `OLETypeAllowed` value is invalid: '{value}'. Only 0 (Link), 1 (Embedded), or 2 (Either) are valid values."
+    )]
     InvalidOLETypeAllowed {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `ScaleMode` value is invalid.
-    #[error("The `ScaleMode` value is invalid: '{value}'. Only 0 (User), 1 (Twips), 2 (Points), 3 (Pixels), 4 (Characters), 5 (Inches), 6 (Millimeters), 7 (Centimeters), 8 (HiMetric), 9 (ContainerPosition), 10 (ContainerSize) are valid values.")]
+    #[error(
+        "The `ScaleMode` value is invalid: '{value}'. Only 0 (User), 1 (Twips), 2 (Points), 3 (Pixels), 4 (Characters), 5 (Inches), 6 (Millimeters), 7 (Centimeters), 8 (HiMetric), 9 (ContainerPosition), 10 (ContainerSize) are valid values."
+    )]
     InvalidScaleMode {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `SizeMode` value is invalid.
-    #[error("The `SizeMode` value is invalid: '{value}'. Only 0 (Clip), 1 (Stretch), 2 (AutoSize), or 3 (Zoom) are valid values.")]
+    #[error(
+        "The `SizeMode` value is invalid: '{value}'. Only 0 (Clip), 1 (Stretch), 2 (AutoSize), or 3 (Zoom) are valid values."
+    )]
     InvalidSizeMode {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `OptionButtonValue` value is invalid.
-    #[error("The `OptionButtonValue` value is invalid: '{value}'. Only 0 (UnSelected), or 1 (Selected) are valid values.")]
+    #[error(
+        "The `OptionButtonValue` value is invalid: '{value}'. Only 0 (UnSelected), or 1 (Selected) are valid values."
+    )]
     InvalidOptionButtonValue {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `UpdateOptions` value is invalid.
-    #[error("The `UpdateOptions` value is invalid: '{value}'. Only 0 (Automatic), 1 (Frozen), or 2 (Manual) are valid values.")]
+    #[error(
+        "The `UpdateOptions` value is invalid: '{value}'. Only 0 (Automatic), 1 (Frozen), or 2 (Manual) are valid values."
+    )]
     InvalidUpdateOptions {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `AutoActivate` value is invalid.
-    #[error("The `AutoActivate` value is invalid: '{value}'. Only 0 (Manual), 1 (GetFocus), 2 (DoubleClick), or 3 (Automatic) are valid values.")]
+    #[error(
+        "The `AutoActivate` value is invalid: '{value}'. Only 0 (Manual), 1 (GetFocus), 2 (DoubleClick), or 3 (Automatic) are valid values."
+    )]
     InvalidAutoActivate {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `DisplayType` value is invalid.
-    #[error("The `DisplayType` value is invalid: '{value}'. Only 0 (Content) or 1 (Icon) are valid values.")]
+    #[error(
+        "The `DisplayType` value is invalid: '{value}'. Only 0 (Content) or 1 (Icon) are valid values."
+    )]
     InvalidDisplayType {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `ScrollBars` value is invalid.
-    #[error("The `ScrollBars` value is invalid: '{value}'. Only 0 (None), 1 (Horizontal), 2 (Vertical), or 3 (Both) are valid values.")]
+    #[error(
+        "The `ScrollBars` value is invalid: '{value}'. Only 0 (None), 1 (Horizontal), 2 (Vertical), or 3 (Both) are valid values."
+    )]
     InvalidScrollBars {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `MultiLine` value is invalid.
-    #[error("The `MultiLine` value is invalid: '{value}'. Only 0 (SingleLine) or -1 (MultiLine) are valid values.")]
+    #[error(
+        "The `MultiLine` value is invalid: '{value}'. Only 0 (SingleLine) or -1 (MultiLine) are valid values."
+    )]
     InvalidMultiLine {
         /// The invalid value that was found.
         value: String,
     },
 
     /// The `Shape` value is invalid.
-    #[error("The `Shape` value is invalid: '{value}'. Only 0 (Rectangle), 1 (Square), 2 (Oval), 3 (Circle), 4 (RoundedRectangle), or 5 (RoundSquare) are valid values.")]
+    #[error(
+        "The `Shape` value is invalid: '{value}'. Only 0 (Rectangle), 1 (Square), 2 (Oval), 3 (Circle), 4 (RoundedRectangle), or 5 (RoundSquare) are valid values."
+    )]
     InvalidShape {
         /// The invalid value that was found.
         value: String,
@@ -488,7 +610,9 @@ pub enum FormError {
     },
 
     /// The file contains non-English character set.
-    #[error("The file contains more than a significant number of non-ASCII characters. This file was likely saved in a non-English character set. The vb6parse crate currently does not support non-english vb6 files.")]
+    #[error(
+        "The file contains more than a significant number of non-ASCII characters. This file was likely saved in a non-English character set. The vb6parse crate currently does not support non-english vb6 files."
+    )]
     LikelyNonEnglishCharacterSet,
 
     /// The reference line has too many elements.
@@ -572,19 +696,27 @@ pub enum FormError {
     DllBaseAddressUnparsable,
 
     /// The Startup object is not a valid parameter.
-    #[error("The Startup object is not a valid parameter. Must be a quoted startup method/object, \"(None)\", !(None)!, \"\", or \"!!\"")]
+    #[error(
+        "The Startup object is not a valid parameter. Must be a quoted startup method/object, \"(None)\", !(None)!, \"\", or \"!!\""
+    )]
     StartupUnparsable,
 
     /// The Name parameter is invalid.
-    #[error("The Name parameter is invalid. Must be a quoted name, \"(None)\", !(None)!, \"\", or \"!!\"")]
+    #[error(
+        "The Name parameter is invalid. Must be a quoted name, \"(None)\", !(None)!, \"\", or \"!!\""
+    )]
     NameUnparsable,
 
     /// The `CommandLine` parameter is invalid.
-    #[error("The CommandLine parameter is invalid. Must be a quoted command line, \"(None)\", !(None)!, \"\", or \"!!\"")]
+    #[error(
+        "The CommandLine parameter is invalid. Must be a quoted command line, \"(None)\", !(None)!, \"\", or \"!!\""
+    )]
     CommandLineUnparsable,
 
     /// The `HelpContextId` parameter is not a valid parameter line.
-    #[error("The HelpContextId parameter is not a valid parameter line. Must be a quoted help context id, \"(None)\", !(None)!, \"\", or \"!!\"")]
+    #[error(
+        "The HelpContextId parameter is not a valid parameter line. Must be a quoted help context id, \"(None)\", !(None)!, \"\", or \"!!\""
+    )]
     HelpContextIdUnparsable,
 
     /// Minor version is not a number.
@@ -616,11 +748,15 @@ pub enum FormError {
     AutoIncrementUnparsable,
 
     /// `CompatibilityMode` value is invalid.
-    #[error("CompatibilityMode can only be a 0 (CompatibilityMode::NoCompatibility), 1 (CompatibilityMode::Project), or 2 (CompatibilityMode::CompatibleExe)")]
+    #[error(
+        "CompatibilityMode can only be a 0 (CompatibilityMode::NoCompatibility), 1 (CompatibilityMode::Project), or 2 (CompatibilityMode::CompatibleExe)"
+    )]
     CompatibilityModeUnparsable,
 
     /// `NoControlUpgrade` value is invalid.
-    #[error("NoControlUpgrade can only be a 0 (UpgradeControls::Upgrade) or a 1 (UpgradeControls::NoUpgrade)")]
+    #[error(
+        "NoControlUpgrade can only be a 0 (UpgradeControls::Upgrade) or a 1 (UpgradeControls::NoUpgrade)"
+    )]
     NoControlUpgradeUnparsable,
 
     /// `ServerSupportFiles` can only be 0 or -1.
@@ -676,7 +812,9 @@ pub enum FormError {
     NoAliasingUnparsable,
 
     /// `RemoveUnusedControlInfo` value is invalid.
-    #[error("RemoveUnusedControlInfo can only be 0 (UnusedControlInfo::Retain) or -1 (UnusedControlInfo::Remove)")]
+    #[error(
+        "RemoveUnusedControlInfo can only be 0 (UnusedControlInfo::Retain) or -1 (UnusedControlInfo::Remove)"
+    )]
     UnusedControlInfoUnparsable,
 
     /// `BoundsCheck` can only be 0 or -1.
@@ -692,11 +830,15 @@ pub enum FormError {
     FlPointCheckUnparsable,
 
     /// `FDIVCheck` value is invalid.
-    #[error("FDIVCheck can only be a 0 (PentiumFDivBugCheck::CheckPentiumFDivBug) or a -1 (PentiumFDivBugCheck::NoPentiumFDivBugCheck)")]
+    #[error(
+        "FDIVCheck can only be a 0 (PentiumFDivBugCheck::CheckPentiumFDivBug) or a -1 (PentiumFDivBugCheck::NoPentiumFDivBugCheck)"
+    )]
     FDIVCheckUnparsable,
 
     /// `UnroundedFP` value is invalid.
-    #[error("UnroundedFP can only be a 0 (UnroundedFloatingPoint::DoNotAllow) or a -1 (UnroundedFloatingPoint::Allow)")]
+    #[error(
+        "UnroundedFP can only be a 0 (UnroundedFloatingPoint::DoNotAllow) or a -1 (UnroundedFloatingPoint::Allow)"
+    )]
     UnroundedFPUnparsable,
 
     /// `StartMode` value is invalid.
@@ -722,7 +864,9 @@ pub enum FormError {
     DebugStartupOptionUnparsable,
 
     /// `UseExistingBrowser` value is invalid.
-    #[error("UseExistingBrowser can only be a 0 (UseExistingBrowser::DoNotUse) or a -1 (UseExistingBrowser::Use)")]
+    #[error(
+        "UseExistingBrowser can only be a 0 (UseExistingBrowser::DoNotUse) or a -1 (UseExistingBrowser::Use)"
+    )]
     UseExistingBrowserUnparsable,
 
     /// `AutoRefresh` can only be 0 or -1.
@@ -734,7 +878,9 @@ pub enum FormError {
     ThreadPerObjectUnparsable,
 
     /// Unknown attribute in class header file.
-    #[error("Unknown attribute in class header file. Must be one of: VB_Name, VB_GlobalNameSpace, VB_Creatable, VB_PredeclaredId, VB_Exposed, VB_Description, VB_Ext_KEY")]
+    #[error(
+        "Unknown attribute in class header file. Must be one of: VB_Name, VB_GlobalNameSpace, VB_Creatable, VB_PredeclaredId, VB_Exposed, VB_Description, VB_Ext_KEY"
+    )]
     UnknownAttribute,
 
     /// Error parsing header.
@@ -846,35 +992,45 @@ pub enum FormError {
     VariableNameTooLong,
 
     /// Invalid top-level control type.
-    #[error("Invalid top-level control type: '{control_type}'. Form files must have either 'VB.Form' or 'VB.MDIForm' as the top-level element.")]
+    #[error(
+        "Invalid top-level control type: '{control_type}'. Form files must have either 'VB.Form' or 'VB.MDIForm' as the top-level element."
+    )]
     InvalidTopLevelControl {
         /// The invalid control type that was found.
         control_type: String,
     },
 
     /// Expression nesting depth exceeded.
-    #[error("Expression nesting depth exceeded (maximum: {max_depth}). Deep nesting can cause stack overflow.")]
+    #[error(
+        "Expression nesting depth exceeded (maximum: {max_depth}). Deep nesting can cause stack overflow."
+    )]
     ExpressionDepthExceeded {
         /// The maximum allowed depth.
         max_depth: usize,
     },
 
     /// Control nesting depth exceeded.
-    #[error("Control nesting depth exceeded (maximum: {max_depth}). Deep nesting can cause stack overflow.")]
+    #[error(
+        "Control nesting depth exceeded (maximum: {max_depth}). Deep nesting can cause stack overflow."
+    )]
     ControlDepthExceeded {
         /// The maximum allowed depth.
         max_depth: usize,
     },
 
     /// Statement nesting depth exceeded.
-    #[error("Statement nesting depth exceeded (maximum: {max_depth}). Deep nesting can cause stack overflow.")]
+    #[error(
+        "Statement nesting depth exceeded (maximum: {max_depth}). Deep nesting can cause stack overflow."
+    )]
     StatementDepthExceeded {
         /// The maximum allowed depth.
         max_depth: usize,
     },
 
     /// Property group nesting depth exceeded.
-    #[error("Property group nesting depth exceeded (maximum: {max_depth}). Deep nesting can cause stack overflow.")]
+    #[error(
+        "Property group nesting depth exceeded (maximum: {max_depth}). Deep nesting can cause stack overflow."
+    )]
     PropertyGroupDepthExceeded {
         /// The maximum allowed depth.
         max_depth: usize,

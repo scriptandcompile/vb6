@@ -8,7 +8,9 @@ pub enum ModuleError {
     AttributeKeywordMissing,
 
     /// Missing whitespace in module header.
-    #[error("The 'Attribute' keyword and the 'VB_Name' attribute must be separated by at least one ASCII whitespace character.")]
+    #[error(
+        "The 'Attribute' keyword and the 'VB_Name' attribute must be separated by at least one ASCII whitespace character."
+    )]
     MissingWhitespaceInHeader,
 
     /// The `VB_Name` attribute is missing from the module file header.
@@ -33,6 +35,8 @@ pub enum ModuleError {
     },
 
     /// Invalid semicolon separator in a non-print procedure call.
-    #[error("Invalid ';' separator in procedure call arguments. Semicolon separators are only valid for print-like calls (e.g., Debug.Print, Printer.Print).")]
+    #[error(
+        "Invalid ';' separator in procedure call arguments. Semicolon separators are only valid for print-like calls (e.g., Debug.Print, Printer.Print)."
+    )]
     InvalidSemicolonSeparatorInProcedureCall,
 }

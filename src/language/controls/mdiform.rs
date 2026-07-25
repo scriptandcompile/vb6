@@ -8,11 +8,11 @@
 
 use crate::files::common::Properties;
 use crate::language::{
+    Color, VB_APPLICATION_WORKSPACE,
     controls::{
         Activation, Appearance, Font, FormLinkMode, MousePointer, Movability, OLEDropMode,
         ReferenceOrValue, StartUpPosition, TextDirection, Visibility, WhatsThisHelp, WindowState,
     },
-    Color, VB_APPLICATION_WORKSPACE,
 };
 
 use image::DynamicImage;

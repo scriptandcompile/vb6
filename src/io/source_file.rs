@@ -37,7 +37,7 @@ use std::sync::Arc;
 use crate::errors::{ErrorDetails, ErrorKind, Severity, SourceFileError};
 use crate::io::SourceStream;
 
-use encoding_rs::{mem::utf8_latin1_up_to, CoderResult, WINDOWS_1252};
+use encoding_rs::{CoderResult, WINDOWS_1252, mem::utf8_latin1_up_to};
 
 /// Immutable source context shared by all errors from the same file.
 #[derive(Debug, Clone)]

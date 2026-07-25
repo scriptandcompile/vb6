@@ -191,11 +191,7 @@ impl<'a> SourceStream<'a> {
             Comparator::CaseInsensitive => peek_slice.eq_ignore_ascii_case(compare),
         };
 
-        if matches {
-            Some(peek_slice)
-        } else {
-            None
-        }
+        if matches { Some(peek_slice) } else { None }
     }
 
     /// Peeks at the next character in the stream to see if it matches a linux

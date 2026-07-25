@@ -15,4 +15,4 @@ pub mod library;
 pub mod statements;
 
 // Re-export commonly used types from the CST module for convenience
-pub use crate::parsers::{parse, ConcreteSyntaxTree, CstNode, SyntaxKind};
+pub use crate::parsers::{ConcreteSyntaxTree, CstNode, SyntaxKind, parse};

@@ -42,8 +42,8 @@
 //! - **Random Numbers**: `Randomize`
 
 use crate::language::Token;
-use crate::parsers::cst::Parser;
 use crate::parsers::SyntaxKind;
+use crate::parsers::cst::Parser;
 
 pub(crate) mod file_operations;
 pub(crate) mod filesystem;

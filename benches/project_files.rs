@@ -1,6 +1,6 @@
 use vb6parse::{ProjectFile, SourceFile};
 
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
+use criterion::{BenchmarkId, Criterion, Throughput, criterion_group, criterion_main};
 use std::hint::black_box;
 
 // Define file size categories
@@ -68,11 +68,15 @@ fn initialize_project_benchmarks() -> Vec<ProjectBenchmark> {
         ),
         ProjectBenchmark::new(
             "Brightness2.vbp",
-            include_bytes!("../tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.vbp"),
+            include_bytes!(
+                "../tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.vbp"
+            ),
         ),
         ProjectBenchmark::new(
             "Brightness3.vbp",
-            include_bytes!("../tests/data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.vbp"),
+            include_bytes!(
+                "../tests/data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.vbp"
+            ),
         ),
         ProjectBenchmark::new(
             "ShiftColor.vbp",

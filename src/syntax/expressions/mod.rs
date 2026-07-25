@@ -81,8 +81,8 @@
 //! ```
 
 use crate::language::Token;
-use crate::parsers::cst::Parser;
 use crate::parsers::SyntaxKind;
+use crate::parsers::cst::Parser;
 use rowan::Checkpoint;
 
 /// Frame for iterative expression parsing.
@@ -1093,12 +1093,12 @@ impl Parser<'_> {
         }
 
         // Emit closing bracket token if present.
-        if let Some((text, _)) = self.tokens.get(self.pos) {
-            if self.at_token(Token::RightSquareBracket) {
-                self.builder
-                    .token(SyntaxKind::RightSquareBracket.to_raw(), text);
-                self.pos += 1;
-            }
+        if let Some((text, _)) = self.tokens.get(self.pos)
+            && self.at_token(Token::RightSquareBracket)
+        {
+            self.builder
+                .token(SyntaxKind::RightSquareBracket.to_raw(), text);
+            self.pos += 1;
         }
 
         // Support optional VB6 type characters after escaped identifiers.

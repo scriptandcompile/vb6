@@ -78,11 +78,12 @@ impl Parser<'_> {
         self.consume_whitespace();
 
         // Consume optional PtrSafe modifier used in 64-bit VBA declarations.
-        if let Some((text, token)) = self.tokens.get(self.pos) {
-            if *token == Token::Identifier && text.eq_ignore_ascii_case("ptrsafe") {
-                self.consume_token();
-                self.consume_whitespace();
-            }
+        if let Some((text, token)) = self.tokens.get(self.pos)
+            && *token == Token::Identifier
+            && text.eq_ignore_ascii_case("ptrsafe")
+        {
+            self.consume_token();
+            self.consume_whitespace();
         }
 
         // Consume "Sub" or "Function" keyword
