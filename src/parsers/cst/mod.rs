@@ -2367,10 +2367,10 @@ impl<'a> Parser<'a> {
                 | Token::DivisionOperator
                 | Token::BackwardSlashOperator
                 | Token::ExponentiationOperator
-                | Token::Ampersand => {
-                    if paren_depth == 0 {
-                        seen_other_operator = true;
-                    }
+                | Token::Ampersand
+                    if paren_depth == 0 =>
+                {
+                    seen_other_operator = true;
                 }
                 // Other tokens are allowed in the lvalue or rvalue
                 _ => {}
