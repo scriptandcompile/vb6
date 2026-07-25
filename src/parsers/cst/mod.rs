@@ -2906,6 +2906,10 @@ impl<'a> Parser<'a> {
             ) => {
                 self.consume_token();
             }
+            // Declare statement: Declare Sub/Function Name Lib "..."
+            Some(Token::DeclareKeyword) => {
+                self.parse_declare_statement();
+            }
             // Variable declarations: Dim/Const.
             Some(Token::DimKeyword | Token::ConstKeyword) => {
                 self.parse_dim();
