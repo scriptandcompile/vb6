@@ -2,7 +2,7 @@ use vb6parse::*;
 
 #[test]
 fn cdiu_beat_up_editor_ccommondialog_class_load() {
-    let class_bytes = include_bytes!("../data/CdiuBeatUpEditor/cCommonDialog.cls");
+    let class_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/cCommonDialog.cls");
 
     let result = SourceFile::decode_with_replacement("cCommonDialog.cls", class_bytes);
 
@@ -32,7 +32,8 @@ fn cdiu_beat_up_editor_ccommondialog_class_load() {
 
 #[test]
 fn cdiu_beat_up_editor_clscryptoapiandcompression_class_load() {
-    let class_bytes = include_bytes!("../data/CdiuBeatUpEditor/clsCryptoAPIandCompression.cls");
+    let class_bytes =
+        include_bytes!("../../../../test-data/CdiuBeatUpEditor/clsCryptoAPIandCompression.cls");
 
     let result = SourceFile::decode_with_replacement("clsCryptoAPIandCompression.cls", class_bytes);
 
@@ -62,7 +63,7 @@ fn cdiu_beat_up_editor_clscryptoapiandcompression_class_load() {
 
 #[test]
 fn cdiu_beat_up_editor_gcommondialog_class_load() {
-    let class_bytes = include_bytes!("../data/CdiuBeatUpEditor/GCommonDialog.cls");
+    let class_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/GCommonDialog.cls");
 
     let result = SourceFile::decode_with_replacement("GCommonDialog.cls", class_bytes);
 

@@ -3,7 +3,7 @@ use vb6parse::io::SourceFile;
 
 #[test]
 fn cdiu_beat_up_editor_chatbox_form_load() {
-    let form_file_bytes = include_bytes!("../data/CdiuBeatUpEditor/ChatBox.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/ChatBox.frm");
 
     let source_file = SourceFile::decode_with_replacement("ChatBox.frm", form_file_bytes);
 
@@ -34,7 +34,7 @@ fn cdiu_beat_up_editor_chatbox_form_load() {
 
 #[test]
 fn cdiu_beat_up_editor_goroom_form_load() {
-    let form_file_bytes = include_bytes!("../data/CdiuBeatUpEditor/GoRoom.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/GoRoom.frm");
 
     let source_file = SourceFile::decode_with_replacement("GoRoom.frm", form_file_bytes);
 
@@ -65,7 +65,7 @@ fn cdiu_beat_up_editor_goroom_form_load() {
 
 #[test]
 fn cdiu_beat_up_editor_openroom_form_load() {
-    let form_file_bytes = include_bytes!("../data/CdiuBeatUpEditor/OpenRoom.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/OpenRoom.frm");
 
     let source_file = SourceFile::decode_with_replacement("OpenRoom.frm", form_file_bytes);
 
@@ -96,7 +96,7 @@ fn cdiu_beat_up_editor_openroom_form_load() {
 
 #[test]
 fn cdiu_beat_up_editor_systemread_form_load() {
-    let form_file_bytes = include_bytes!("../data/CdiuBeatUpEditor/systemRead.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/systemRead.frm");
 
     let source_file = SourceFile::decode_with_replacement("systemRead.frm", form_file_bytes);
 
@@ -127,7 +127,7 @@ fn cdiu_beat_up_editor_systemread_form_load() {
 
 #[test]
 fn cdiu_beat_up_editor_test_form_load() {
-    let form_file_bytes = include_bytes!("../data/CdiuBeatUpEditor/test.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/test.frm");
 
     let source_file = SourceFile::decode_with_replacement("test.frm", form_file_bytes);
 

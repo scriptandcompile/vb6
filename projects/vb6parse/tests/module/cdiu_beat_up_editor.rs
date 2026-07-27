@@ -2,7 +2,7 @@ use vb6parse::*;
 
 #[test]
 fn cdiu_beat_up_editor_cdiu_12_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/cdiu_12.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/cdiu_12.bas");
 
     let result = SourceFile::decode_with_replacement("cdiu_12.bas", module_bytes);
 
@@ -32,7 +32,7 @@ fn cdiu_beat_up_editor_cdiu_12_module_load() {
 
 #[test]
 fn cdiu_beat_up_editor_cma1_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/cma1.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/cma1.bas");
 
     let result = SourceFile::decode_with_replacement("cma1.bas", module_bytes);
 
@@ -62,7 +62,7 @@ fn cdiu_beat_up_editor_cma1_module_load() {
 
 #[test]
 fn cdiu_beat_up_editor_cma2_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/cma2.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/cma2.bas");
 
     let result = SourceFile::decode_with_replacement("cma2.bas", module_bytes);
 
@@ -92,7 +92,7 @@ fn cdiu_beat_up_editor_cma2_module_load() {
 
 #[test]
 fn cdiu_beat_up_editor_cma3_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/cma3.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/cma3.bas");
 
     let result = SourceFile::decode_with_replacement("cma3.bas", module_bytes);
 
@@ -122,7 +122,7 @@ fn cdiu_beat_up_editor_cma3_module_load() {
 
 #[test]
 fn cdiu_beat_up_editor_cma4_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/cma4.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/cma4.bas");
 
     let result = SourceFile::decode_with_replacement("cma4.bas", module_bytes);
 
@@ -152,7 +152,7 @@ fn cdiu_beat_up_editor_cma4_module_load() {
 
 #[test]
 fn cdiu_beat_up_editor_cma5_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/cma5.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/cma5.bas");
 
     let result = SourceFile::decode_with_replacement("cma5.bas", module_bytes);
 
@@ -182,7 +182,7 @@ fn cdiu_beat_up_editor_cma5_module_load() {
 
 #[test]
 fn cdiu_beat_up_editor_cma6_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/cma6.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/cma6.bas");
 
     let result = SourceFile::decode_with_replacement("cma6.bas", module_bytes);
 
@@ -212,7 +212,7 @@ fn cdiu_beat_up_editor_cma6_module_load() {
 
 #[test]
 fn cdiu_beat_up_editor_cma7_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/cma7.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/cma7.bas");
 
     let result = SourceFile::decode_with_replacement("cma7.bas", module_bytes);
 
@@ -242,7 +242,7 @@ fn cdiu_beat_up_editor_cma7_module_load() {
 
 #[test]
 fn cdiu_beat_up_editor_fmod_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/fmod.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/fmod.bas");
 
     let result = SourceFile::decode_with_replacement("fmod.bas", module_bytes);
 
@@ -272,7 +272,7 @@ fn cdiu_beat_up_editor_fmod_module_load() {
 
 #[test]
 fn cdiu_beat_up_editor_icecopymemory_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/icecopymemory.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/icecopymemory.bas");
 
     let result = SourceFile::decode_with_replacement("icecopymemory.bas", module_bytes);
 
@@ -302,7 +302,7 @@ fn cdiu_beat_up_editor_icecopymemory_module_load() {
 
 #[test]
 fn cdiu_beat_up_editor_mcpu_proc_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/MCPU_Proc.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/MCPU_Proc.bas");
 
     let result = SourceFile::decode_with_replacement("MCPU_Proc.bas", module_bytes);
 
@@ -333,7 +333,7 @@ fn cdiu_beat_up_editor_mcpu_proc_module_load() {
 #[test]
 #[ignore = "generates an assert issue on the yaml snapshot for some reason. insta review bug"]
 fn cdiu_beat_up_editor_other_do_module_load() {
-    let module_bytes = include_bytes!("../data/CdiuBeatUpEditor/other_do.bas");
+    let module_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/other_do.bas");
 
     let result = SourceFile::decode_with_replacement("other_do.bas", module_bytes);
 

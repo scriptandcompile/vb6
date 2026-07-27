@@ -2,7 +2,7 @@ use vb6parse::*;
 
 #[test]
 fn environment_activex_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/ActiveX.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/ActiveX.bas");
 
     let result = SourceFile::decode_with_replacement("ActiveX.bas", module_bytes);
 
@@ -32,7 +32,7 @@ fn environment_activex_module_load() {
 
 #[test]
 fn environment_changeres_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/changeres.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/changeres.bas");
 
     let result = SourceFile::decode_with_replacement("changeres.bas", module_bytes);
 
@@ -62,7 +62,7 @@ fn environment_changeres_module_load() {
 
 #[test]
 fn environment_dbx_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/dbX.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/dbX.bas");
 
     let result = SourceFile::decode_with_replacement("dbX.bas", module_bytes);
 
@@ -92,7 +92,7 @@ fn environment_dbx_module_load() {
 
 #[test]
 fn environment_dc_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/dc.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/dc.bas");
 
     let result = SourceFile::decode_with_replacement("dc.bas", module_bytes);
 
@@ -122,7 +122,7 @@ fn environment_dc_module_load() {
 
 #[test]
 fn environment_eduardocircle_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/EduardoCircle.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/EduardoCircle.bas");
 
     let result = SourceFile::decode_with_replacement("EduardoCircle.bas", module_bytes);
 
@@ -152,7 +152,7 @@ fn environment_eduardocircle_module_load() {
 
 #[test]
 fn environment_fcall_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/Fcall.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/Fcall.bas");
 
     let result = SourceFile::decode_with_replacement("Fcall.bas", module_bytes);
 
@@ -182,7 +182,7 @@ fn environment_fcall_module_load() {
 
 #[test]
 fn environment_getadaptsinfo_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/GetAdaptsInfo.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/GetAdaptsInfo.bas");
 
     let result = SourceFile::decode_with_replacement("GetAdaptsInfo.bas", module_bytes);
 
@@ -212,7 +212,7 @@ fn environment_getadaptsinfo_module_load() {
 
 #[test]
 fn environment_globalvars_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/globalvars.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/globalvars.bas");
 
     let result = SourceFile::decode_with_replacement("globalvars.bas", module_bytes);
 
@@ -242,7 +242,7 @@ fn environment_globalvars_module_load() {
 
 #[test]
 fn environment_gpp1_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/gpp1.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/gpp1.bas");
 
     let result = SourceFile::decode_with_replacement("gpp1.bas", module_bytes);
 
@@ -272,7 +272,7 @@ fn environment_gpp1_module_load() {
 
 #[test]
 fn environment_helpmod_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/helpmod.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/helpmod.bas");
 
     let result = SourceFile::decode_with_replacement("helpmod.bas", module_bytes);
 
@@ -302,7 +302,7 @@ fn environment_helpmod_module_load() {
 
 #[test]
 fn environment_isprinter_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/IsPrinter.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/IsPrinter.bas");
 
     let result = SourceFile::decode_with_replacement("IsPrinter.bas", module_bytes);
 
@@ -332,7 +332,7 @@ fn environment_isprinter_module_load() {
 
 #[test]
 fn environment_jpg_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/jpg.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/jpg.bas");
 
     let result = SourceFile::decode_with_replacement("jpg.bas", module_bytes);
 
@@ -362,7 +362,7 @@ fn environment_jpg_module_load() {
 
 #[test]
 fn environment_libmemory_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/LibMemory.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/LibMemory.bas");
 
     let result = SourceFile::decode_with_replacement("LibMemory.bas", module_bytes);
 
@@ -392,7 +392,7 @@ fn environment_libmemory_module_load() {
 
 #[test]
 fn environment_mdlidispatch_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/mdlIDispatch.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/mdlIDispatch.bas");
 
     let result = SourceFile::decode_with_replacement("mdlIDispatch.bas", module_bytes);
 
@@ -422,7 +422,7 @@ fn environment_mdlidispatch_module_load() {
 
 #[test]
 fn environment_mdqrcodegen_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/mdQRCodegen.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/mdQRCodegen.bas");
 
     let result = SourceFile::decode_with_replacement("mdQRCodegen.bas", module_bytes);
 
@@ -452,7 +452,7 @@ fn environment_mdqrcodegen_module_load() {
 
 #[test]
 fn environment_mexe_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/mexe.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/mexe.bas");
 
     let result = SourceFile::decode_with_replacement("mexe.bas", module_bytes);
 
@@ -482,7 +482,7 @@ fn environment_mexe_module_load() {
 
 #[test]
 fn environment_mhlsrgb_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/mHLSRGB.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/mHLSRGB.bas");
 
     let result = SourceFile::decode_with_replacement("mHLSRGB.bas", module_bytes);
 
@@ -512,7 +512,7 @@ fn environment_mhlsrgb_module_load() {
 
 #[test]
 fn environment_modgdiplusresize_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/modGDIPlusResize.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/modGDIPlusResize.bas");
 
     let result = SourceFile::decode_with_replacement("modGDIPlusResize.bas", module_bytes);
 
@@ -542,7 +542,7 @@ fn environment_modgdiplusresize_module_load() {
 
 #[test]
 fn environment_modobjectextender_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/modObjectExtender.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/modObjectExtender.bas");
 
     let result = SourceFile::decode_with_replacement("modObjectExtender.bas", module_bytes);
 
@@ -573,7 +573,7 @@ fn environment_modobjectextender_module_load() {
 #[test]
 #[ignore = "Massive file (+50k lines) so snapshot is very large."]
 fn environment_mod_text_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/Mod_Text.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/Mod_Text.bas");
 
     let result = SourceFile::decode_with_replacement("Mod_Text.bas", module_bytes);
 
@@ -603,7 +603,7 @@ fn environment_mod_text_module_load() {
 
 #[test]
 fn environment_modtrickunregcom_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/modTrickUnregCOM.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/modTrickUnregCOM.bas");
 
     let result = SourceFile::decode_with_replacement("modTrickUnregCOM.bas", module_bytes);
 
@@ -633,7 +633,7 @@ fn environment_modtrickunregcom_module_load() {
 
 #[test]
 fn environment_modtypeinfo_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/modTypeInfo.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/modTypeInfo.bas");
 
     let result = SourceFile::decode_with_replacement("modTypeInfo.bas", module_bytes);
 
@@ -663,7 +663,7 @@ fn environment_modtypeinfo_module_load() {
 
 #[test]
 fn environment_module10_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/Module10.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/Module10.bas");
 
     let result = SourceFile::decode_with_replacement("Module10.bas", module_bytes);
 
@@ -693,7 +693,7 @@ fn environment_module10_module_load() {
 
 #[test]
 fn environment_module12_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/Module12.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/Module12.bas");
 
     let result = SourceFile::decode_with_replacement("Module12.bas", module_bytes);
 
@@ -724,7 +724,7 @@ fn environment_module12_module_load() {
 #[test]
 #[ignore = "stack overflow issue"]
 fn environment_mod_util_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/Mod_Util.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/Mod_Util.bas");
 
     let result = SourceFile::decode_with_replacement("Mod_Util.bas", module_bytes);
 
@@ -754,7 +754,7 @@ fn environment_mod_util_module_load() {
 
 #[test]
 fn environment_monitor_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/monitor.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/monitor.bas");
 
     let result = SourceFile::decode_with_replacement("monitor.bas", module_bytes);
 
@@ -784,7 +784,7 @@ fn environment_monitor_module_load() {
 
 #[test]
 fn environment_newrnd_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/newRND.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/newRND.bas");
 
     let result = SourceFile::decode_with_replacement("newRND.bas", module_bytes);
 
@@ -814,7 +814,7 @@ fn environment_newrnd_module_load() {
 
 #[test]
 fn environment_pipe_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/pipe.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/pipe.bas");
 
     let result = SourceFile::decode_with_replacement("pipe.bas", module_bytes);
 
@@ -844,7 +844,7 @@ fn environment_pipe_module_load() {
 
 #[test]
 fn environment_servermod_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/ServerMod.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/ServerMod.bas");
 
     let result = SourceFile::decode_with_replacement("ServerMod.bas", module_bytes);
 
@@ -874,7 +874,7 @@ fn environment_servermod_module_load() {
 
 #[test]
 fn environment_sleep_module_load() {
-    let module_bytes = include_bytes!("../data/Environment/sleep.bas");
+    let module_bytes = include_bytes!("../../../../test-data/Environment/sleep.bas");
 
     let result = SourceFile::decode_with_replacement("sleep.bas", module_bytes);
 

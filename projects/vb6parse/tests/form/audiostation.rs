@@ -6,7 +6,7 @@ use vb6parse::io::SourceFile;
 #[test]
 fn audiostation_about_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_About.frm");
+        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_About.frm");
 
     let source_file = SourceFile::decode_with_replacement("Form_About.frm", form_file_bytes);
 
@@ -38,7 +38,7 @@ fn audiostation_about_form_load() {
 #[test]
 fn audiostation_busy_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Busy.frm");
+        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Busy.frm");
 
     let source_file = SourceFile::decode_with_replacement("Form_Busy.frm", form_file_bytes);
 
@@ -70,7 +70,7 @@ fn audiostation_busy_form_load() {
 #[test]
 fn audiostation_init_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Init.frm");
+        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Init.frm");
 
     let source_file = SourceFile::decode_with_replacement("Form_Init.frm", form_file_bytes);
 
@@ -102,7 +102,7 @@ fn audiostation_init_form_load() {
 #[test]
 fn audiostation_main_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Main.frm");
+        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Main.frm");
 
     let source_file = SourceFile::decode_with_replacement("Form_Main.frm", form_file_bytes);
 
@@ -134,7 +134,7 @@ fn audiostation_main_form_load() {
 #[test]
 fn audiostation_midi_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Midi.frm");
+        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Midi.frm");
 
     let source_file = SourceFile::decode_with_replacement("Form_Midi.frm", form_file_bytes);
 
@@ -166,7 +166,7 @@ fn audiostation_midi_form_load() {
 #[test]
 fn audiostation_normalize_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Normalize.frm");
+        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Normalize.frm");
 
     let source_file = SourceFile::decode_with_replacement("Form_Normalize.frm", form_file_bytes);
 
@@ -197,8 +197,9 @@ fn audiostation_normalize_form_load() {
 
 #[test]
 fn audiostation_open_dialog_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_OpenDialog.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/audiostation/Audiostation/src/Forms/Form_OpenDialog.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form_OpenDialog.frm", form_file_bytes);
 
@@ -230,7 +231,7 @@ fn audiostation_open_dialog_form_load() {
 #[test]
 fn audiostation_playlist_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Playlist.frm");
+        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Playlist.frm");
 
     let source_file = SourceFile::decode_with_replacement("Form_Playlist.frm", form_file_bytes);
 
@@ -262,7 +263,7 @@ fn audiostation_playlist_form_load() {
 #[test]
 fn audiostation_plugins_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Plugins.frm");
+        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Plugins.frm");
 
     let source_file = SourceFile::decode_with_replacement("Form_Plugins.frm", form_file_bytes);
 
@@ -293,8 +294,9 @@ fn audiostation_plugins_form_load() {
 
 #[test]
 fn audiostation_settings_recorder_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Settings_Recorder.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/audiostation/Audiostation/src/Forms/Form_Settings_Recorder.frm"
+    );
 
     let source_file =
         SourceFile::decode_with_replacement("Form_Settings_Recorder.frm", form_file_bytes);
@@ -326,8 +328,9 @@ fn audiostation_settings_recorder_form_load() {
 
 #[test]
 fn audiostation_settings_record_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Settings_Record.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/audiostation/Audiostation/src/Forms/Form_Settings_Record.frm"
+    );
 
     let source_file =
         SourceFile::decode_with_replacement("Form_Settings_Record.frm", form_file_bytes);
@@ -360,7 +363,7 @@ fn audiostation_settings_record_form_load() {
 #[test]
 fn audiostation_streams_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Streams.frm");
+        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Streams.frm");
 
     let source_file = SourceFile::decode_with_replacement("Form_Streams.frm", form_file_bytes);
 
@@ -392,7 +395,7 @@ fn audiostation_streams_form_load() {
 #[test]
 fn audiostation_system_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_System.frm");
+        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_System.frm");
 
     let source_file = SourceFile::decode_with_replacement("Form_System.frm", form_file_bytes);
 
@@ -423,8 +426,9 @@ fn audiostation_system_form_load() {
 
 #[test]
 fn audiostation_track_properties_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/audiostation/Audiostation/src/Forms/Form_Track_Properties.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/audiostation/Audiostation/src/Forms/Form_Track_Properties.frm"
+    );
 
     let source_file =
         SourceFile::decode_with_replacement("Form_Track_Properties.frm", form_file_bytes);

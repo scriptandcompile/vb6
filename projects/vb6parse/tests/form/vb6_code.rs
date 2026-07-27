@@ -3,7 +3,7 @@ use vb6parse::io::SourceFile;
 
 #[test]
 fn artificial_life_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Artificial-life/frmMain.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Artificial-life/frmMain.frm");
 
     let source_file = SourceFile::decode_with_replacement("frmMain.frm", form_file_bytes);
 
@@ -36,7 +36,7 @@ fn artificial_life_form_load() {
 
 #[test]
 fn blacklight_effect_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Blacklight-effect/Blacklight.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Blacklight-effect/Blacklight.frm");
 
     let source_file = SourceFile::decode_with_replacement("Blacklight.frm", form_file_bytes);
 
@@ -68,7 +68,7 @@ fn blacklight_effect_form_load() {
 #[test]
 fn brightness_effect_part_1_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frm");
+        include_bytes!("../../../../test-data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frm");
 
     let source_file = SourceFile::decode_with_replacement("Brightness.frm", form_file_bytes);
 
@@ -100,7 +100,7 @@ fn brightness_effect_part_1_form_load() {
 #[test]
 fn brightness_effect_part_2_form_load() {
     let form_file_bytes = include_bytes!(
-        "../data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frm"
+        "../../../../test-data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frm"
     );
 
     let source_file = SourceFile::decode_with_replacement("Brightness2.frm", form_file_bytes);
@@ -133,7 +133,7 @@ fn brightness_effect_part_2_form_load() {
 #[test]
 fn brightness_effect_part_3_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frm");
+        include_bytes!("../../../../test-data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frm");
 
     let source_file = SourceFile::decode_with_replacement("Brightness3.frm", form_file_bytes);
 
@@ -165,7 +165,7 @@ fn brightness_effect_part_3_form_load() {
 #[test]
 fn brightness_effect_part_4_form_load() {
     let form_file_bytes = include_bytes!(
-        "../data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frm"
+        "../../../../test-data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frm"
     );
 
     let source_file = SourceFile::decode_with_replacement("Brightness.frm", form_file_bytes);
@@ -197,7 +197,7 @@ fn brightness_effect_part_4_form_load() {
 
 #[test]
 fn color_shift_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Color-shift-effect/ShiftColors.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Color-shift-effect/ShiftColors.frm");
 
     let source_file = SourceFile::decode_with_replacement("ShiftColors.frm", form_file_bytes);
 
@@ -228,7 +228,7 @@ fn color_shift_form_load() {
 
 #[test]
 fn colorize_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Colorize-effect/Colorize.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Colorize-effect/Colorize.frm");
 
     let source_file = SourceFile::decode_with_replacement("Colorize.frm", form_file_bytes);
 
@@ -259,7 +259,7 @@ fn colorize_form_load() {
 
 #[test]
 fn contrast_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Contrast-effect/Contrast.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Contrast-effect/Contrast.frm");
 
     let source_file = SourceFile::decode_with_replacement("Contrast.frm", form_file_bytes);
 
@@ -290,7 +290,7 @@ fn contrast_form_load() {
 
 #[test]
 fn curves_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Curves-effect/Curves.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Curves-effect/Curves.frm");
 
     let source_file = SourceFile::decode_with_replacement("Curves.frm", form_file_bytes);
 
@@ -321,7 +321,7 @@ fn curves_form_load() {
 
 #[test]
 fn custom_image_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Custom-image-filters/CustomFilters.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Custom-image-filters/CustomFilters.frm");
 
     let source_file = SourceFile::decode_with_replacement("CustomFilters.frm", form_file_bytes);
 
@@ -352,7 +352,7 @@ fn custom_image_form_load() {
 
 #[test]
 fn diffuse_effect_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Diffuse-effect/Diffuse.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Diffuse-effect/Diffuse.frm");
 
     let source_file = SourceFile::decode_with_replacement("Diffuse.frm", form_file_bytes);
 
@@ -383,7 +383,7 @@ fn diffuse_effect_form_load() {
 
 #[test]
 fn edge_detection_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Edge-detection/EdgeDetection.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Edge-detection/EdgeDetection.frm");
 
     let source_file = SourceFile::decode_with_replacement("EdgeDetection.frm", form_file_bytes);
 
@@ -415,7 +415,7 @@ fn edge_detection_form_load() {
 #[test]
 fn emboss_engrave_effect_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/vb6-code/Emboss-engrave-effect/EmbossEngrave.frm");
+        include_bytes!("../../../../test-data/vb6-code/Emboss-engrave-effect/EmbossEngrave.frm");
 
     let source_file = SourceFile::decode_with_replacement("EmbossEngrave.frm", form_file_bytes);
 
@@ -446,7 +446,7 @@ fn emboss_engrave_effect_form_load() {
 
 #[test]
 fn fill_image_region_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Fill-image-region/frmFill.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Fill-image-region/frmFill.frm");
 
     let source_file = SourceFile::decode_with_replacement("frmFill.frm", form_file_bytes);
 
@@ -486,7 +486,7 @@ fn fill_image_region_form_load() {
 
 #[test]
 fn fire_effect_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Fire-effect/frmFire.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Fire-effect/frmFire.frm");
 
     let source_file = SourceFile::decode_with_replacement("frmFire.frm", form_file_bytes);
 
@@ -517,7 +517,7 @@ fn fire_effect_form_load() {
 
 #[test]
 fn game_physics_basic_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Game-physics-basic/FormPhysics.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Game-physics-basic/FormPhysics.frm");
 
     let source_file = SourceFile::decode_with_replacement("FormPhysics.frm", form_file_bytes);
 
@@ -548,7 +548,7 @@ fn game_physics_basic_form_load() {
 
 #[test]
 fn gradient_2d_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Gradient-2D/Gradient.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Gradient-2D/Gradient.frm");
 
     let source_file = SourceFile::decode_with_replacement("Gradient.frm", form_file_bytes);
 
@@ -579,7 +579,7 @@ fn gradient_2d_form_load() {
 
 #[test]
 fn grayscale_effect_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Grayscale-effect/Grayscale.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Grayscale-effect/Grayscale.frm");
 
     let source_file = SourceFile::decode_with_replacement("Grayscale.frm", form_file_bytes);
 
@@ -610,7 +610,7 @@ fn grayscale_effect_form_load() {
 
 #[test]
 fn hidden_markov_model_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Hidden-Markov-model/frmHMM.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Hidden-Markov-model/frmHMM.frm");
 
     let source_file = SourceFile::decode_with_replacement("frmHMM.frm", form_file_bytes);
 
@@ -641,7 +641,7 @@ fn hidden_markov_model_form_load() {
 
 #[test]
 fn histograms_advanced_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Histograms-advanced/Histogram.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Histograms-advanced/Histogram.frm");
 
     let source_file = SourceFile::decode_with_replacement("Histogram.frm", form_file_bytes);
 
@@ -672,7 +672,7 @@ fn histograms_advanced_form_load() {
 
 #[test]
 fn histograms_basic_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Histograms-basic/Histogram.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Histograms-basic/Histogram.frm");
 
     let source_file = SourceFile::decode_with_replacement("Histogram.frm", form_file_bytes);
 
@@ -703,7 +703,7 @@ fn histograms_basic_form_load() {
 
 #[test]
 fn levels_effect_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Levels-effect/Main.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Levels-effect/Main.frm");
 
     let source_file = SourceFile::decode_with_replacement("Main.frm", form_file_bytes);
 
@@ -734,7 +734,7 @@ fn levels_effect_form_load() {
 
 #[test]
 fn mandelbrot_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Mandelbrot/Mandelbrot.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Mandelbrot/Mandelbrot.frm");
 
     let source_file = SourceFile::decode_with_replacement("Mandelbrot.frm", form_file_bytes);
 
@@ -765,7 +765,7 @@ fn mandelbrot_form_load() {
 
 #[test]
 fn map_editor_2d_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Map-editor-2D/Main Editor.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Map-editor-2D/Main Editor.frm");
 
     let source_file = SourceFile::decode_with_replacement("Main Editor.frm", form_file_bytes);
 
@@ -796,7 +796,7 @@ fn map_editor_2d_form_load() {
 
 #[test]
 fn nature_effects_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Nature-effects/NatureFilters.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Nature-effects/NatureFilters.frm");
 
     let source_file = SourceFile::decode_with_replacement("NatureFilters.frm", form_file_bytes);
 
@@ -827,7 +827,7 @@ fn nature_effects_form_load() {
 
 #[test]
 fn randomize_effects_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Randomize-effects/RandomizationFX.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Randomize-effects/RandomizationFX.frm");
 
     let source_file = SourceFile::decode_with_replacement("RandomizationFX.frm", form_file_bytes);
 
@@ -858,7 +858,7 @@ fn randomize_effects_form_load() {
 
 #[test]
 fn scanner_twain_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Scanner-TWAIN/frmScanner.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Scanner-TWAIN/frmScanner.frm");
 
     let source_file = SourceFile::decode_with_replacement("frmScanner.frm", form_file_bytes);
 
@@ -889,7 +889,7 @@ fn scanner_twain_form_load() {
 
 #[test]
 fn screen_capture_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Screen-capture/FormScreenCapture.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Screen-capture/FormScreenCapture.frm");
 
     let source_file = SourceFile::decode_with_replacement("FormScreenCapture.frm", form_file_bytes);
 
@@ -920,7 +920,7 @@ fn screen_capture_form_load() {
 
 #[test]
 fn sepia_effect_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Sepia-effect/Sepia.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Sepia-effect/Sepia.frm");
 
     let source_file = SourceFile::decode_with_replacement("Sepia.frm", form_file_bytes);
 
@@ -951,7 +951,7 @@ fn sepia_effect_form_load() {
 
 #[test]
 fn threshold_effect_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Threshold-effect/Threshold.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Threshold-effect/Threshold.frm");
 
     let source_file = SourceFile::decode_with_replacement("Threshold.frm", form_file_bytes);
 
@@ -982,7 +982,7 @@ fn threshold_effect_form_load() {
 
 #[test]
 fn transparency_2d_form_load() {
-    let form_file_bytes = include_bytes!("../data/vb6-code/Transparency-2D/frmTransparency.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/vb6-code/Transparency-2D/frmTransparency.frm");
 
     let source_file = SourceFile::decode_with_replacement("frmTransparency.frm", form_file_bytes);
 

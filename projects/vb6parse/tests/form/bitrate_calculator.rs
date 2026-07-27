@@ -4,7 +4,7 @@ use vb6parse::io::SourceFile;
 #[test]
 fn bitrate_calculator_about_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/Bitrate-calculator/Windows/Source-code/frmAbout.frm");
+        include_bytes!("../../../../test-data/Bitrate-calculator/Windows/Source-code/frmAbout.frm");
 
     let source_file = SourceFile::decode_with_replacement("frmAbout.frm", form_file_bytes);
 
@@ -36,7 +36,7 @@ fn bitrate_calculator_about_form_load() {
 #[test]
 fn bitrate_calculator_main_form_load() {
     let form_file_bytes =
-        include_bytes!("../data/Bitrate-calculator/Windows/Source-code/frmMain.frm");
+        include_bytes!("../../../../test-data/Bitrate-calculator/Windows/Source-code/frmMain.frm");
 
     let source_file = SourceFile::decode_with_replacement("frmMain.frm", form_file_bytes);
 

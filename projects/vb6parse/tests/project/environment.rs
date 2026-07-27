@@ -2,7 +2,7 @@ use vb6parse::*;
 
 #[test]
 fn environment_m2000_project_load() {
-    let project_file_bytes = include_bytes!("../data/Environment/M2000.vbp");
+    let project_file_bytes = include_bytes!("../../../../test-data/Environment/M2000.vbp");
 
     let result = SourceFile::decode_with_replacement("M2000.vbp", project_file_bytes);
 
@@ -32,7 +32,7 @@ fn environment_m2000_project_load() {
 
 #[test]
 fn environment_mexe_project_load() {
-    let project_file_bytes = include_bytes!("../data/Environment/mexe.vbp");
+    let project_file_bytes = include_bytes!("../../../../test-data/Environment/mexe.vbp");
 
     let result = SourceFile::decode_with_replacement("mexe.vbp", project_file_bytes);
 
@@ -62,7 +62,7 @@ fn environment_mexe_project_load() {
 
 #[test]
 fn environment_testme_project_load() {
-    let project_file_bytes = include_bytes!("../data/Environment/testme.vbp");
+    let project_file_bytes = include_bytes!("../../../../test-data/Environment/testme.vbp");
 
     let result = SourceFile::decode_with_replacement("testme.vbp", project_file_bytes);
 
