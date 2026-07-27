@@ -1,0 +1,62 @@
+{
+  "name": "vscode-vb6",
+  "displayName": "VB6 Language Tools",
+  "description": "VB6 syntax highlighting extension with a parser-synced roadmap to full language tooling.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:vb6",
+    "onCommand:vb6.updateKeywordManifest"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "vb6",
+        "aliases": [
+          "Visual Basic 6",
+          "VB6"
+        ],
+        "extensions": [
+          ".bas",
+          ".cls",
+          ".frm",
+          ".ctl",
+          ".dob",
+          ".vbp"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "vb6",
+        "scopeName": "source.vb6",
+        "path": "./syntaxes/vb6.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "vb6.updateKeywordManifest",
+        "title": "VB6: Update Keyword Manifest"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "update-keywords": "node ./scripts/update-keywords.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^7.0.2"
+  }
+}

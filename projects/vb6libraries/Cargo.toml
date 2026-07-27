@@ -1,0 +1,73 @@
+[package]
+name = "vb6libraries"
+version = "0.1.0"
+edition = "2021"
+authors = ["VB6 Project Contributors"]
+description = "VB6 third-party library and Windows API integration hooks"
+license = "MIT"
+repository = "https://github.com/scriptandcompile/vb6"
+keywords = ["vb6", "visual-basic", "windows-api", "interop"]
+categories = ["development-tools", "os::windows-apis"]
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+thiserror = "2.0.18"
+serde = { version = "1.0", optional = true, features = ["derive"] }
+
+[features]
+default = []
+
+# Windows APIs
+win32-core = []          # Core Win32 API (GetWindowText, SendMessage, etc.)
+win32-gdi = []           # GDI/GDI+ for graphics
+win32-shell = []         # Shell APIs (SHBrowseForFolder, etc.)
+win32-registry = []      # Registry access
+win32-networking = []    # WinSock, HTTP, etc.
+
+# Common VB6 UI Libraries
+mscomctl = []            # Microsoft Common Controls (ListView, TreeView, etc.)
+mscomctl2 = []           # Extended Common Controls (Calendar, Animation, etc.)
+richtextbox = []         # Rich Text Box control
+datagrid = []            # DataGrid/FlexGrid controls
+webview = []             # WebBrowser control
+
+# Office Automation
+office-automation = []   # Base Office automation support
+excel-automation = ["office-automation"]   # Excel automation
+word-automation = ["office-automation"]    # Word automation
+outlook-automation = ["office-automation"] # Outlook automation
+access-automation = ["office-automation"]  # Access automation
+
+# Database Libraries
+database-common = []         # Common database traits
+dao = ["database-common"]    # Data Access Objects
+ado = ["database-common"]    # ActiveX Data Objects
+rdo = ["database-common"]    # Remote Data Objects
+odbc = ["database-common"]   # ODBC direct access
+
+# Database Vendors
+sql-server = ["ado"]     # SQL Server specific
+oracle-db = ["ado"]      # Oracle specific
+mysql-db = ["ado"]       # MySQL specific
+postgresql-db = ["ado"]  # PostgreSQL specific
+access-db = ["dao"]      # MS Access specific
+
+# Third-Party Controls
+vbscript = []            # VBScript engine integration
+crystalreports = []      # Crystal Reports
+activereports = []       # Active Reports
+devexpress = []          # DevExpress controls
+infragistics = []        # Infragistics controls
+componentone = []        # ComponentOne controls
+
+# Presets
+full-win32 = ["win32-core", "win32-gdi", "win32-shell", "win32-registry", "win32-networking"]
+full-office = ["office-automation", "excel-automation", "word-automation", "outlook-automation"]
+full-database = ["database-common", "dao", "ado", "sql-server", "access-db"]
+full-ui-controls = ["mscomctl", "mscomctl2", "richtextbox", "datagrid", "webview"]
+full = ["full-win32", "full-office", "full-database", "full-ui-controls"]
+
+# Optional features
+serde-support = ["serde"]
