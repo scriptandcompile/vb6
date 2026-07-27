@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/chess_brain_vb.rs
+source: projects/vb6parse/tests/module/chess_brain_vb.rs
 expression: module
 ---
 name: basTime
@@ -1045,6 +1045,54 @@ cst:
                         text: )
                   - kind: Newline
                     text: "\r\n"
+              - kind: IfStatement
+                children:
+                  - kind: Whitespace
+                    text: "  "
+                  - kind: IfKeyword
+                    text: If
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: pbPonderMode
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ThenKeyword
+                    text: Then
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AssignmentStatement
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: OptimalTime
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EqualityOperator
+                        text: "="
+                      - kind: Whitespace
+                        text: " "
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: OptimalTime
+                          - kind: Whitespace
+                            text: " "
+                          - kind: MultiplicationOperator
+                            text: "*"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: SingleLiteral
+                                text: "1.25"
+                      - kind: Newline
+                        text: "\r\n"
               - kind: Whitespace
                 text: "  "
               - kind: AssignmentStatement
@@ -3692,7 +3740,7 @@ cst:
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
-                text: "  "
+                text: "    "
               - kind: Newline
                 text: "\r\n"
               - kind: Whitespace
@@ -4451,30 +4499,52 @@ cst:
                     text: "\r\n"
                   - kind: StatementList
                     children:
-                      - kind: Whitespace
-                        text: "    "
-                      - kind: AssignmentStatement
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: CheckTime
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EqualityOperator
-                            text: "="
-                          - kind: Whitespace
-                            text: " "
-                          - kind: BooleanLiteralExpression
-                            children:
-                              - kind: FalseKeyword
-                                text: "False"
-                          - kind: Newline
-                            text: "\r\n"
                       - kind: IfStatement
                         children:
                           - kind: Whitespace
-                            text: "    "
+                            text: "      "
+                          - kind: IfKeyword
+                            text: If
+                          - kind: Whitespace
+                            text: " "
+                          - kind: UnaryExpression
+                            children:
+                              - kind: NotKeyword
+                                text: Not
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: pbPondering
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ThenKeyword
+                            text: Then
+                          - kind: Whitespace
+                            text: " "
+                          - kind: AssignmentStatement
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: CheckTime
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: BooleanLiteralExpression
+                                children:
+                                  - kind: FalseKeyword
+                                    text: "False"
+                              - kind: Newline
+                                text: "\r\n"
+                      - kind: IfStatement
+                        children:
+                          - kind: Whitespace
+                            text: "      "
                           - kind: IfKeyword
                             text: If
                           - kind: Whitespace
@@ -4492,7 +4562,7 @@ cst:
                           - kind: StatementList
                             children:
                               - kind: Whitespace
-                                text: "        "
+                                text: "          "
                               - kind: CallStatement
                                 children:
                                   - kind: Identifier
@@ -4706,7 +4776,7 @@ cst:
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
-                                text: "    "
+                                text: "      "
                           - kind: EndKeyword
                             text: End
                           - kind: Whitespace
@@ -4725,6 +4795,8 @@ cst:
                     text: If
                   - kind: Newline
                     text: "\r\n"
+              - kind: Whitespace
+                text: "  "
               - kind: Newline
                 text: "\r\n"
           - kind: EndKeyword

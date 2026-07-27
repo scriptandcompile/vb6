@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/chess_brain_vb.rs
+source: projects/vb6parse/tests/module/chess_brain_vb.rs
 expression: module
 ---
 name: basCmdOutput
@@ -629,22 +629,10 @@ cst:
             text: If
           - kind: Whitespace
             text: " "
-          - kind: BinaryExpression
+          - kind: IdentifierExpression
             children:
-              - kind: IdentifierExpression
-                children:
-                  - kind: Identifier
-                    text: VBA7
-              - kind: Whitespace
-                text: " "
-              - kind: AndKeyword
-                text: And
-              - kind: Whitespace
-                text: " "
-              - kind: IdentifierExpression
-                children:
-                  - kind: Identifier
-                    text: Win64
+              - kind: Identifier
+                text: Win64
           - kind: Whitespace
             text: " "
           - kind: ThenKeyword
