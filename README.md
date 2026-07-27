@@ -6,7 +6,7 @@ A workspace for the VB6 toolchain.
 
 - [Workspace hub](docs/index.html)
 - [Workspace status board](docs/status.html)
-- [VB6Parse docs](vb6parse/docs/)
+- [VB6Parse docs](projects/vb6parse/docs/)
 
 ## Generated Docs Data
 
