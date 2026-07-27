@@ -1,0 +1,31 @@
+---
+source: vb6parse/src/syntax/library/functions/math/rnd.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: CallStatement
+      children:
+        - kind: CallKeyword
+          text: Call
+        - kind: Whitespace
+          text: " "
+        - kind: Identifier
+          text: ProcessValue
+        - kind: LeftParenthesis
+          text: (
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: Rnd
+        - kind: RightParenthesis
+          text: )
+        - kind: Newline
+          text: "\n"

@@ -1,0 +1,29 @@
+---
+source: vb6parse/src/syntax/statements/objects/call.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: CallStatement
+      children:
+        - kind: CallKeyword
+          text: Call
+        - kind: Whitespace
+          text: " "
+        - kind: Identifier
+          text: ShowMessage
+        - kind: LeftParenthesis
+          text: (
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"Hello, World!\""
+        - kind: RightParenthesis
+          text: )
+        - kind: Newline
+          text: "\n"

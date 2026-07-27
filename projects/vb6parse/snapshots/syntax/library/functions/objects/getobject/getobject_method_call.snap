@@ -1,0 +1,29 @@
+---
+source: vb6parse/src/syntax/library/functions/objects/getobject.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: CallStatement
+      children:
+        - kind: Identifier
+          text: GetObject
+        - kind: LeftParenthesis
+          text: (
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: filePath
+        - kind: RightParenthesis
+          text: )
+    - kind: CallStatement
+      children:
+        - kind: PeriodOperator
+          text: "."
+        - kind: Identifier
+          text: Save

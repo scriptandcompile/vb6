@@ -1,0 +1,2046 @@
+//! Expression parsing for VB6 CST.
+//!
+//! This module implements expression parsing for Visual Basic 6 using a Pratt parsing
+//! approach (also known as operator precedence parsing or precedence climbing). This
+//! technique cleanly handles operator precedence and associativity while maintaining
+//! a simple recursive descent structure.
+//!
+//! # VB6 Expression Types
+//!
+//! VB6 supports various expression types:
+//!
+//! - **Literal expressions**: Numbers, strings, dates, `True`, `False`, `Nothing`, `Null`, `Empty`
+//! - **Identifier expressions**: Variable names, constants
+//! - **Unary expressions**: `-x`, `Not x`, `AddressOf proc`
+//! - **Binary expressions**: Arithmetic, comparison, logical operations
+//! - **Member access**: `object.property`, `object.method`
+//! - **Function calls**: `Function(arg1, arg2)`, `Function arg1, arg2`
+//! - **Array indexing**: `array(index)`, `array(i, j)`
+//! - **Parenthesized**: `(expression)`
+//! - **Object creation**: `New ClassName`
+//! - **Type operations**: `TypeOf object Is type`
+//!
+//! # Operator Precedence
+//!
+//! VB6 operators are parsed according to the following precedence levels (highest to lowest):
+//!
+//! 1. Member access (`.`), function calls `()`
+//! 2. Exponentiation (`^`) - right-associative
+//! 3. Unary negation (`-`)
+//! 4. Multiplication (`*`), division (`/`)
+//! 5. Integer division (`\`)
+//! 6. Modulo (`Mod`)
+//! 7. Addition (`+`), subtraction (`-`)
+//! 8. String concatenation (`&`)
+//! 9. Comparison (`=`, `<>`, `<`, `>`, `<=`, `>=`, `Like`, `Is`)
+//! 10. Logical `Not`
+//! 11. Logical `And`
+//! 12. Logical `Or`
+//! 13. Logical `Xor`
+//! 14. Logical `Eqv`
+//! 15. Logical `Imp`
+//!
+//! # Pratt Parsing
+//!
+//! The implementation uses Pratt parsing, which associates a binding power (precedence level)
+//! with each operator. The parser works by:
+//!
+//! 1. Parsing a prefix expression (literal, identifier, unary operator, etc.)
+//! 2. Looking at the next operator and comparing its binding power to the current minimum
+//! 3. If the operator's binding power is higher, it binds tighter and is parsed as an infix operation
+//! 4. This continues recursively until an operator with lower binding power is encountered
+//!
+//! This approach naturally handles precedence and associativity without complex lookahead
+//! or multiple parsing passes.
+//!
+//! # Naming Conventions
+//!
+//! Expression parsing follows parser-wide naming conventions:
+//!
+//! - `parse_*` methods parse grammar/token constructs.
+//! - `handle_*_frame` methods advance explicit frame states in the iterative parser loop.
+//! - `try_*` methods probe a branch and return whether it matched.
+//!
+//! # Examples
+//!
+//! ```vb6
+//! ' Arithmetic with proper precedence
+//! result = 2 + 3 * 4        ' Parsed as: 2 + (3 * 4)
+//! result = 10 - 5 - 2       ' Parsed as: (10 - 5) - 2
+//! result = 2 ^ 3 ^ 2        ' Parsed as: 2 ^ (3 ^ 2) - right associative
+//!
+//! ' Logical operations
+//! condition = x > 5 And y < 10       ' Parsed as: (x > 5) And (y < 10)
+//! condition = Not flag1 Or flag2     ' Parsed as: (Not flag1) Or flag2
+//!
+//! ' Member access and calls
+//! value = obj.property.method(arg1, arg2)
+//!
+//! ' Complex expressions
+//! result = (a + b) * c - d / e Mod f
+//! ```
+
+use crate::language::Token;
+use crate::parsers::SyntaxKind;
+use crate::parsers::cst::Parser;
+use rowan::Checkpoint;
+
+/// Frame for iterative expression parsing.
+/// Tracks the state of expression parsing to eliminate recursion.
+#[derive(Debug, Clone, Copy)]
+enum ExprParseFrame {
+    /// Parse a prefix expression and start the infix loop
+    ParsePrefix {
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    },
+    /// Finish processing infix operators after parsing RHS
+    InfixLoop {
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    },
+    /// Finish a binary expression node
+    FinishBinary {
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    },
+    /// Finish a unary expression node and continue with outer infix loop
+    FinishUnary {
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    },
+    /// Finish a `TypeOf` expression node and continue with outer infix loop
+    FinishTypeOf {
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    },
+    /// Finish a parenthesized expression node and continue with outer infix loop
+    FinishParenthesized {
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    },
+    /// Check for and handle postfix operators (., (, !)
+    ParsePostfix {
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    },
+    /// Start parsing an argument list after consuming '('
+    StartArgumentList {
+        min_bp: BindingPower,
+        call_checkpoint: Checkpoint,
+    },
+    /// After finishing an argument, check for comma or close paren
+    NextArgument {
+        min_bp: BindingPower,
+        call_checkpoint: Checkpoint,
+    },
+}
+
+/// Operator binding power (precedence) levels.
+///
+/// Higher values indicate tighter binding (higher precedence).
+/// These values are based on the VB6 language specification and determine
+/// the order in which operators are applied when parsing expressions.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub(crate) struct BindingPower(u8);
+
+impl BindingPower {
+    /// No binding power - used as a minimum baseline
+    pub(super) const NONE: BindingPower = BindingPower(0);
+
+    /// Logical implication operator (`Imp`) - lowest precedence
+    pub(super) const IMP: BindingPower = BindingPower(10);
+
+    /// Logical equivalence operator (`Eqv`)
+    pub(super) const EQV: BindingPower = BindingPower(20);
+
+    /// Logical exclusive or operator (`Xor`)
+    pub(super) const XOR: BindingPower = BindingPower(30);
+
+    /// Logical or operator (`Or`)
+    pub(super) const OR: BindingPower = BindingPower(40);
+
+    /// Logical and operator (`And`)
+    pub(super) const AND: BindingPower = BindingPower(50);
+
+    /// Logical not operator (`Not`) - prefix operator
+    pub(super) const NOT: BindingPower = BindingPower(60);
+
+    /// Comparison operators (`=`, `<>`, `<`, `>`, `<=`, `>=`, `Like`, `Is`)
+    pub(super) const COMPARISON: BindingPower = BindingPower(70);
+
+    /// String concatenation operator (`&`)
+    pub(super) const CONCATENATION: BindingPower = BindingPower(80);
+
+    /// Addition and subtraction operators (`+`, `-`)
+    pub(super) const ADDITION: BindingPower = BindingPower(90);
+
+    /// Modulo operator (`Mod`)
+    pub(super) const MODULO: BindingPower = BindingPower(100);
+
+    /// Integer division operator (`\`)
+    pub(super) const INT_DIVISION: BindingPower = BindingPower(110);
+
+    /// Multiplication and division operators (`*`, `/`)
+    pub(super) const MULTIPLICATION: BindingPower = BindingPower(120);
+
+    /// Unary operators (unary `-`, `AddressOf`) - prefix operators
+    pub(super) const UNARY: BindingPower = BindingPower(130);
+
+    /// Exponentiation operator (`^`) - right-associative
+    pub(super) const EXPONENTIATION: BindingPower = BindingPower(140);
+
+    // Function/method calls and array indexing
+    //pub(super) const CALL: BindingPower = BindingPower(150);
+
+    // Member access operator (`.`) - highest precedence
+    //pub(super) const MEMBER: BindingPower = BindingPower(160);
+}
+
+impl Parser<'_> {
+    /// Parse an expression starting with no minimum binding power.
+    ///
+    /// This is the main entry point for expression parsing. It delegates to
+    /// [`parse_expression_with_binding_power`](Self::parse_expression_with_binding_power)
+    /// with a minimum binding power of zero.
+    ///
+    /// # Examples
+    ///
+    /// ```vb6
+    /// x = 5 + 3 * 2          ' Simple arithmetic
+    /// y = obj.method(arg)    ' Member access and call
+    /// z = (a + b) * c        ' Parenthesized expression
+    /// ```
+    pub(crate) fn parse_expression(&mut self) {
+        self.parse_expression_with_binding_power(BindingPower::NONE);
+    }
+
+    /// Parse an lvalue (left-hand side of assignment).
+    ///
+    /// This parses expressions but stops before the `=` operator,
+    /// since `=` in VB6 can be both assignment and comparison.
+    ///
+    /// # Examples
+    ///
+    /// ```vb6
+    /// x = 5                  ' x is the lvalue
+    /// obj.property = value   ' obj.property is the lvalue
+    /// arr(i) = 10           ' arr(i) is the lvalue
+    /// ```
+    pub(crate) fn parse_lvalue(&mut self) {
+        // Parse with a minimum binding power HIGHER than COMPARISON
+        // This ensures = is not treated as a binary operator
+        // COMPARISON is 70, so we use 75 to exclude it
+        self.parse_expression_with_binding_power(BindingPower(75));
+    }
+
+    /// Parse an expression with a minimum binding power.
+    ///
+    /// This is the core of the Pratt parser, implemented iteratively to prevent
+    /// stack overflow on deeply nested expressions.
+    ///
+    /// # Parameters
+    ///
+    /// - `min_bp`: The minimum binding power required for an operator to be parsed.
+    ///   Operators with lower binding power will end the current expression.
+    ///
+    /// # Implementation Note
+    ///
+    /// This uses an explicit frame stack instead of recursion to handle arbitrary
+    /// nesting depth without stack overflow.
+    pub(crate) fn parse_expression_with_binding_power(&mut self, min_bp: BindingPower) {
+        // Use iterative approach with explicit stack
+        // This prevents stack overflow on deeply nested expressions
+
+        let mut frame_stack: Vec<ExprParseFrame> = Vec::new();
+
+        // Start with the initial frame
+        self.consume_whitespace();
+        let initial_checkpoint = self.builder.checkpoint();
+        frame_stack.push(ExprParseFrame::ParsePrefix {
+            min_bp,
+            lhs_checkpoint: initial_checkpoint,
+        });
+
+        while let Some(frame) = frame_stack.pop() {
+            self.dispatch_expression_frame(frame, &mut frame_stack);
+        }
+    }
+
+    fn dispatch_expression_frame(
+        &mut self,
+        frame: ExprParseFrame,
+        frame_stack: &mut Vec<ExprParseFrame>,
+    ) {
+        match frame {
+            ExprParseFrame::ParsePrefix {
+                min_bp,
+                lhs_checkpoint,
+            } => self.handle_prefix_frame(frame_stack, min_bp, lhs_checkpoint),
+            ExprParseFrame::InfixLoop {
+                min_bp,
+                lhs_checkpoint,
+            } => self.handle_infix_loop_frame(frame_stack, min_bp, lhs_checkpoint),
+            ExprParseFrame::FinishBinary {
+                min_bp,
+                lhs_checkpoint,
+            } => self.handle_finish_binary_frame(frame_stack, min_bp, lhs_checkpoint),
+            ExprParseFrame::FinishTypeOf {
+                min_bp,
+                lhs_checkpoint,
+            } => self.handle_finish_typeof_frame(frame_stack, min_bp, lhs_checkpoint),
+            ExprParseFrame::FinishUnary {
+                min_bp,
+                lhs_checkpoint,
+            } => self.handle_finish_unary_frame(frame_stack, min_bp, lhs_checkpoint),
+            ExprParseFrame::FinishParenthesized {
+                min_bp,
+                lhs_checkpoint,
+            } => self.handle_finish_parenthesized_frame(frame_stack, min_bp, lhs_checkpoint),
+            ExprParseFrame::ParsePostfix {
+                min_bp,
+                lhs_checkpoint,
+            } => self.handle_postfix_frame(frame_stack, min_bp, lhs_checkpoint),
+            ExprParseFrame::StartArgumentList {
+                min_bp,
+                call_checkpoint,
+            } => self.handle_argument_list_start_frame(frame_stack, min_bp, call_checkpoint),
+            ExprParseFrame::NextArgument {
+                min_bp,
+                call_checkpoint,
+            } => self.handle_argument_next_frame(frame_stack, min_bp, call_checkpoint),
+        }
+    }
+
+    fn handle_prefix_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        // Parse a prefix expression using explicit parser frames.
+        let (pushes_frames, prefix_checkpoint) =
+            self.parse_prefix_expression_frame(frame_stack, min_bp, lhs_checkpoint);
+
+        // Only push postfix/infix if no frames were pushed
+        // If frames were pushed, those frames will handle the continuation
+        if !pushes_frames {
+            // First handle postfix operators (., (, !) then infix
+            frame_stack.push(ExprParseFrame::ParsePostfix {
+                min_bp,
+                lhs_checkpoint: prefix_checkpoint,
+            });
+        }
+    }
+
+    fn handle_infix_loop_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        let Some((left_bp, right_bp)) = self.peek_infix_binding_power_after_trivia() else {
+            return;
+        };
+
+        // If the operator doesn't bind tightly enough, stop
+        if left_bp < min_bp {
+            return;
+        }
+
+        // Now actually consume the whitespace
+        self.consume_whitespace();
+
+        // Wrap the left-hand side in a BinaryExpression
+        self.builder
+            .start_node_at(lhs_checkpoint, SyntaxKind::BinaryExpression.to_raw());
+
+        // Consume the operator
+        self.consume_token();
+
+        // Skip whitespace after operator
+        self.consume_whitespace();
+
+        // Parse the right-hand side - push frames instead of recursing
+        let rhs_checkpoint = self.builder.checkpoint();
+
+        // After parsing RHS, we need to finish binary, then continue infix loop
+        frame_stack.push(ExprParseFrame::FinishBinary {
+            min_bp,
+            lhs_checkpoint,
+        });
+        frame_stack.push(ExprParseFrame::ParsePrefix {
+            min_bp: right_bp,
+            lhs_checkpoint: rhs_checkpoint,
+        });
+    }
+
+    fn handle_finish_binary_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        self.builder.finish_node();
+
+        // Continue with infix loop to check for more operators
+        frame_stack.push(ExprParseFrame::InfixLoop {
+            min_bp,
+            lhs_checkpoint,
+        });
+    }
+
+    fn handle_finish_unary_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        self.builder.finish_node();
+
+        // After finishing unary expression, continue with outer infix loop
+        frame_stack.push(ExprParseFrame::InfixLoop {
+            min_bp,
+            lhs_checkpoint,
+        });
+    }
+
+    fn handle_finish_typeof_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        // Operand expression has been parsed. Now consume "Is TypeName".
+        self.consume_whitespace();
+
+        if self.at_token(Token::IsKeyword) {
+            self.consume_token(); // Is
+        }
+
+        self.consume_whitespace();
+
+        // Parse the type name (identifier)
+        if self.is_identifier() || self.at_keyword() {
+            self.consume_token();
+        }
+
+        self.builder.finish_node(); // TypeOfExpression
+
+        // Continue with outer infix loop
+        frame_stack.push(ExprParseFrame::InfixLoop {
+            min_bp,
+            lhs_checkpoint,
+        });
+    }
+
+    fn handle_finish_parenthesized_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        // Check for comma - in VB6, parentheses can contain comma-separated expressions
+        // This is used in graphics methods like Line: Picture1.Line (x1, y1)-(x2, y2)
+        self.consume_whitespace();
+
+        if self.at_token(Token::Comma) {
+            // Consume comma and any whitespace
+            self.consume_token();
+            self.consume_whitespace();
+
+            // Check if there's another expression or if we hit the closing paren
+            if !self.at_token(Token::RightParenthesis) && !self.is_at_end() {
+                // Parse the next expression in the comma-separated list
+                // Push this frame again to handle more commas after the next expression
+                frame_stack.push(ExprParseFrame::FinishParenthesized {
+                    min_bp,
+                    lhs_checkpoint,
+                });
+
+                // Parse the next expression
+                let inner_checkpoint = self.builder.checkpoint();
+                frame_stack.push(ExprParseFrame::ParsePrefix {
+                    min_bp: BindingPower::NONE,
+                    lhs_checkpoint: inner_checkpoint,
+                });
+                return;
+            }
+        }
+
+        // Trailing comma before closing paren or no comma - just finish
+        if self.at_token(Token::RightParenthesis) {
+            self.consume_token();
+        }
+        self.builder.finish_node();
+
+        // After finishing parenthesized expression, continue with postfix then infix
+        frame_stack.push(ExprParseFrame::ParsePostfix {
+            min_bp,
+            lhs_checkpoint,
+        });
+    }
+
+    fn handle_argument_list_start_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        call_checkpoint: Checkpoint,
+    ) {
+        // Start the ArgumentList node
+        self.builder.start_node(SyntaxKind::ArgumentList.to_raw());
+
+        // Skip whitespace after opening paren
+        self.consume_whitespace();
+
+        // Check if argument list is empty
+        if self.at_token(Token::RightParenthesis) {
+            // Empty argument list - finish nodes and continue
+            self.builder.finish_node(); // ArgumentList
+            self.consume_token(); // )
+            self.builder.finish_node(); // CallExpression
+
+            // Check for more postfix operators
+            frame_stack.push(ExprParseFrame::ParsePostfix {
+                min_bp,
+                lhs_checkpoint: call_checkpoint,
+            });
+            return;
+        }
+
+        // Support an empty first argument: e.g., GetObject(, "Excel.Application")
+        if self.at_token(Token::Comma) {
+            self.builder.start_node(SyntaxKind::Argument.to_raw());
+            self.builder.finish_node(); // Argument (empty)
+            self.consume_token(); // ,
+            self.consume_whitespace();
+            self.parse_argument_after_separator(frame_stack, min_bp, call_checkpoint);
+            return;
+        }
+
+        // Parse first argument
+        self.parse_argument_expression(frame_stack, min_bp, call_checkpoint);
+    }
+
+    /// Parse the argument that follows a comma separator.
+    /// Handles empty arguments between separators and before the closing parenthesis.
+    fn parse_argument_after_separator(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        call_checkpoint: Checkpoint,
+    ) {
+        loop {
+            if self.at_token(Token::RightParenthesis) {
+                // Trailing separator means final empty argument.
+                self.builder.start_node(SyntaxKind::Argument.to_raw());
+                self.builder.finish_node(); // Argument (empty)
+
+                self.builder.finish_node(); // ArgumentList
+                self.consume_token(); // )
+                self.builder.finish_node(); // CallExpression
+
+                frame_stack.push(ExprParseFrame::ParsePostfix {
+                    min_bp,
+                    lhs_checkpoint: call_checkpoint,
+                });
+                return;
+            }
+
+            if self.at_token(Token::Comma) {
+                // Consecutive separators imply an empty argument.
+                self.builder.start_node(SyntaxKind::Argument.to_raw());
+                self.builder.finish_node(); // Argument (empty)
+                self.consume_token(); // ,
+                self.consume_whitespace();
+                continue;
+            }
+
+            // Non-empty argument expression.
+            self.parse_argument_expression(frame_stack, min_bp, call_checkpoint);
+            return;
+        }
+    }
+
+    /// Start parsing a non-empty argument expression.
+    ///
+    /// VB6 supports named arguments in calls using `name := value`.
+    /// The lexer emits `:` and `=` as separate tokens, so we consume that
+    /// prefix here before parsing the argument value expression.
+    fn parse_argument_expression(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        call_checkpoint: Checkpoint,
+    ) {
+        self.builder.start_node(SyntaxKind::Argument.to_raw());
+
+        // Consume optional named-argument prefix: `Identifier :=`
+        let _ = self.try_consume_named_argument_prefix();
+
+        frame_stack.push(ExprParseFrame::NextArgument {
+            min_bp,
+            call_checkpoint,
+        });
+
+        let arg_checkpoint = self.builder.checkpoint();
+        frame_stack.push(ExprParseFrame::ParsePrefix {
+            min_bp: BindingPower::NONE,
+            lhs_checkpoint: arg_checkpoint,
+        });
+    }
+
+    /// Try to consume a VB6 named-argument prefix (`name :=`) at the start
+    /// of an argument. Returns true if consumed.
+    fn try_consume_named_argument_prefix(&mut self) -> bool {
+        let mut idx = self.pos;
+
+        let Some((_, first_token)) = self.tokens.get(idx) else {
+            return false;
+        };
+
+        if !(*first_token == Token::Identifier || first_token.is_keyword()) {
+            return false;
+        }
+
+        idx += 1;
+        while let Some((_, Token::Whitespace)) = self.tokens.get(idx) {
+            idx += 1;
+        }
+
+        if self.tokens.get(idx).map(|(_, token)| *token) != Some(Token::ColonOperator) {
+            return false;
+        }
+
+        idx += 1;
+        while let Some((_, Token::Whitespace)) = self.tokens.get(idx) {
+            idx += 1;
+        }
+
+        if self.tokens.get(idx).map(|(_, token)| *token) != Some(Token::EqualityOperator) {
+            return false;
+        }
+
+        while self.pos <= idx {
+            self.consume_token();
+        }
+
+        self.consume_whitespace();
+        true
+    }
+
+    fn handle_argument_next_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        call_checkpoint: Checkpoint,
+    ) {
+        // Finish the Argument node
+        self.builder.finish_node();
+
+        // Skip whitespace
+        self.consume_whitespace();
+
+        // Check if there's a comma for next argument
+        if self.at_token(Token::Comma) {
+            self.consume_token();
+            self.consume_whitespace();
+
+            self.parse_argument_after_separator(frame_stack, min_bp, call_checkpoint);
+            return;
+        }
+
+        // No more arguments - finish nodes
+        self.builder.finish_node(); // ArgumentList
+
+        // Consume closing paren if present
+        if self.at_token(Token::RightParenthesis) {
+            self.consume_token();
+        }
+
+        self.builder.finish_node(); // CallExpression
+
+        // Check for more postfix operators
+        frame_stack.push(ExprParseFrame::ParsePostfix {
+            min_bp,
+            lhs_checkpoint: call_checkpoint,
+        });
+    }
+
+    fn skip_expression_trivia(&mut self) {
+        loop {
+            match self.current_token() {
+                Some(Token::Whitespace) => {
+                    self.pos += 1;
+                }
+                Some(Token::Underscore) => {
+                    // Check for line continuation
+                    let mut lookahead = 1;
+                    let mut is_continuation = false;
+                    while let Some((_, token)) = self.tokens.get(self.pos + lookahead) {
+                        if *token == Token::Whitespace {
+                            lookahead += 1;
+                        } else if *token == Token::Newline {
+                            is_continuation = true;
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if is_continuation {
+                        self.pos += lookahead + 1;
+                    } else {
+                        break;
+                    }
+                }
+                _ => break,
+            }
+        }
+    }
+
+    fn has_postfix_operator_ahead(&mut self) -> bool {
+        let saved_pos = self.pos;
+        self.skip_expression_trivia();
+
+        let found_postfix = matches!(
+            self.current_token(),
+            Some(Token::PeriodOperator | Token::LeftParenthesis | Token::ExclamationMark)
+        );
+
+        self.pos = saved_pos;
+        found_postfix
+    }
+
+    fn peek_infix_binding_power_after_trivia(&mut self) -> Option<(BindingPower, BindingPower)> {
+        let saved_pos = self.pos;
+        self.skip_expression_trivia();
+
+        if self.is_at_end() || self.is_at_expression_delimiter() {
+            self.pos = saved_pos;
+            return None;
+        }
+
+        let binding_power = self.get_infix_binding_power();
+        self.pos = saved_pos;
+        binding_power
+    }
+
+    fn handle_postfix_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        // Check for postfix operators: ., (, !
+        let found_postfix = self.has_postfix_operator_ahead();
+
+        if found_postfix {
+            // Found postfix operator - consume whitespace and handle it
+            self.consume_whitespace();
+
+            match self.current_token() {
+                Some(Token::PeriodOperator) => {
+                    // Member access: .property or .method
+                    self.builder
+                        .start_node_at(lhs_checkpoint, SyntaxKind::MemberAccessExpression.to_raw());
+
+                    self.parse_member_access_content();
+                    self.builder.finish_node();
+
+                    // Check for more postfix operators
+                    frame_stack.push(ExprParseFrame::ParsePostfix {
+                        min_bp,
+                        lhs_checkpoint,
+                    });
+                }
+                Some(Token::LeftParenthesis) => {
+                    // Function call or array indexing
+                    // Wrap in CallExpression and start parsing arguments
+                    self.builder
+                        .start_node_at(lhs_checkpoint, SyntaxKind::CallExpression.to_raw());
+
+                    // Consume '('
+                    self.consume_token();
+
+                    // Push frames to handle argument list
+                    frame_stack.push(ExprParseFrame::StartArgumentList {
+                        min_bp,
+                        call_checkpoint: lhs_checkpoint,
+                    });
+                }
+                Some(Token::ExclamationMark) => {
+                    // Dictionary access: collection!key
+                    self.builder
+                        .start_node_at(lhs_checkpoint, SyntaxKind::MemberAccessExpression.to_raw());
+
+                    self.parse_dictionary_access_content();
+                    self.builder.finish_node();
+
+                    // Check for more postfix operators
+                    frame_stack.push(ExprParseFrame::ParsePostfix {
+                        min_bp,
+                        lhs_checkpoint,
+                    });
+                }
+                _ => {
+                    // Shouldn't happen since we checked above
+                    frame_stack.push(ExprParseFrame::InfixLoop {
+                        min_bp,
+                        lhs_checkpoint,
+                    });
+                }
+            }
+        } else {
+            // No postfix operator - continue to infix loop
+            frame_stack.push(ExprParseFrame::InfixLoop {
+                min_bp,
+                lhs_checkpoint,
+            });
+        }
+    }
+
+    fn push_unary_prefix_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+        operand_min_bp: BindingPower,
+    ) {
+        self.builder
+            .start_node(SyntaxKind::UnaryExpression.to_raw());
+        self.consume_token();
+        self.consume_whitespace();
+
+        frame_stack.push(ExprParseFrame::FinishUnary {
+            min_bp,
+            lhs_checkpoint,
+        });
+
+        let operand_checkpoint = self.builder.checkpoint();
+        frame_stack.push(ExprParseFrame::ParsePrefix {
+            min_bp: operand_min_bp,
+            lhs_checkpoint: operand_checkpoint,
+        });
+    }
+
+    fn push_typeof_prefix_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        self.builder
+            .start_node(SyntaxKind::TypeOfExpression.to_raw());
+        self.consume_token(); // TypeOf
+        self.consume_whitespace();
+
+        // Push finish frame: will consume "Is TypeName" after operand is parsed
+        frame_stack.push(ExprParseFrame::FinishTypeOf {
+            min_bp,
+            lhs_checkpoint,
+        });
+
+        // Parse the operand expression with CONCATENATION binding power (80),
+        // which is higher than COMPARISON (70), so "Is" is not consumed as an operator
+        let operand_checkpoint = self.builder.checkpoint();
+        frame_stack.push(ExprParseFrame::ParsePrefix {
+            min_bp: BindingPower::CONCATENATION,
+            lhs_checkpoint: operand_checkpoint,
+        });
+    }
+
+    fn push_parenthesized_prefix_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) {
+        self.builder
+            .start_node(SyntaxKind::ParenthesizedExpression.to_raw());
+        self.consume_token();
+        self.consume_whitespace();
+
+        frame_stack.push(ExprParseFrame::FinishParenthesized {
+            min_bp,
+            lhs_checkpoint,
+        });
+
+        let inner_checkpoint = self.builder.checkpoint();
+        frame_stack.push(ExprParseFrame::ParsePrefix {
+            min_bp: BindingPower::NONE,
+            lhs_checkpoint: inner_checkpoint,
+        });
+    }
+
+    fn try_push_prefix_frames(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) -> bool {
+        match self.current_token() {
+            // Logical NOT
+            Some(Token::NotKeyword) => {
+                self.push_unary_prefix_frame(
+                    frame_stack,
+                    min_bp,
+                    lhs_checkpoint,
+                    BindingPower::NOT,
+                );
+                true
+            }
+            // Argument passing modifiers used in Declare/API calls, e.g. WriteFile(..., ByVal ptr, ...)
+            // or, the value is being negated which is another unary operation.
+            Some(Token::ByValKeyword | Token::ByRefKeyword | Token::SubtractionOperator) => {
+                self.push_unary_prefix_frame(
+                    frame_stack,
+                    min_bp,
+                    lhs_checkpoint,
+                    BindingPower::UNARY,
+                );
+                true
+            }
+            // Parenthesized expression
+            Some(Token::LeftParenthesis) => {
+                self.push_parenthesized_prefix_frame(frame_stack, min_bp, lhs_checkpoint);
+                true
+            }
+            _ => false,
+        }
+    }
+
+    /// Parse a prefix expression using explicit parser frames.
+    ///
+    /// This pushes follow-up work onto `frame_stack` instead of relying on call-stack recursion.
+    /// Returns (`pushed_frames`, `checkpoint`) where:
+    /// - `pushed_frames`: true if frames were pushed (meaning caller shouldn't push `ParsePostfix` yet)
+    /// - `checkpoint`: the checkpoint to use for wrapping postfix operations
+    fn parse_prefix_expression_frame(
+        &mut self,
+        frame_stack: &mut Vec<ExprParseFrame>,
+        min_bp: BindingPower,
+        lhs_checkpoint: Checkpoint,
+    ) -> (bool, Checkpoint) {
+        // Skip any leading whitespace
+        self.consume_whitespace();
+
+        // Create checkpoint at the start - this will be used for wrapping
+        let checkpoint = self.builder.checkpoint();
+
+        let mut is_identifier = false;
+        if self.try_push_prefix_frames(frame_stack, min_bp, lhs_checkpoint) {
+            return (true, checkpoint);
+        }
+
+        match self.current_token() {
+            // AddressOf operator
+            Some(Token::AddressOfKeyword) => {
+                self.parse_addressof_expression();
+            }
+            // New operator
+            Some(Token::NewKeyword) => {
+                self.parse_new_expression();
+            }
+            // Numeric literals
+            Some(
+                Token::IntegerLiteral
+                | Token::LongLiteral
+                | Token::SingleLiteral
+                | Token::DoubleLiteral
+                | Token::DecimalLiteral,
+            ) => {
+                self.parse_numeric_literal();
+            }
+            Some(Token::StringLiteral) => {
+                self.parse_string_literal();
+            }
+            Some(Token::TrueKeyword | Token::FalseKeyword) => {
+                self.parse_boolean_literal();
+            }
+            Some(Token::NullKeyword | Token::EmptyKeyword) => {
+                self.parse_special_literal();
+            }
+            Some(Token::DateTimeLiteral) => {
+                self.parse_date_literal();
+            }
+            // File number reference in expressions (for example: #1, #fileNum, #.FileNum)
+            Some(Token::Octothorpe) => {
+                self.parse_file_number_reference();
+                is_identifier = true;
+            }
+            Some(Token::TypeOfKeyword) => {
+                self.push_typeof_prefix_frame(frame_stack, min_bp, lhs_checkpoint);
+                return (true, checkpoint);
+            }
+            // Period operator at start of expression (With block member access)
+            // In a With block, ".Property" is shorthand for accessing the With object's property
+            Some(Token::PeriodOperator) => {
+                self.parse_with_member_expression();
+                is_identifier = true;
+            }
+            // Identifiers (including keywords that can be identifiers in expression context)
+            _ => {
+                self.parse_identifier_or_call_expression();
+                is_identifier = true;
+            }
+        }
+
+        // If we didn't push frames and this was a bare identifier, wrap it
+        if is_identifier {
+            self.parse_bare_identifier(checkpoint);
+        }
+
+        (false, checkpoint)
+    }
+
+    /// If we parsed an identifier but it doesn't have any postfix operators, wrap it in an `IdentifierExpression`.
+    ///
+    /// This ensures that simple identifiers are represented as `IdentifierExpression` nodes, while identifiers
+    /// that are part of member access or calls are wrapped in the appropriate nodes (`MemberAccessExpression`, `CallExpression`)
+    /// without an extra `IdentifierExpression` layer.
+    fn parse_bare_identifier(&mut self, checkpoint: Checkpoint) {
+        // Check if we'll have postfix operators (peek ahead)
+        let has_postfix = self.has_postfix_operator_ahead();
+
+        if !has_postfix {
+            // Wrap bare identifier in IdentifierExpression using the prefix checkpoint
+            self.builder
+                .start_node_at(checkpoint, SyntaxKind::IdentifierExpression.to_raw());
+            self.builder.finish_node();
+        }
+    }
+
+    /// Parse an identifier or a function/method call expression.
+    ///
+    /// This handles:
+    /// - Simple identifiers: `myVar`
+    /// - Identifiers with type characters: `myVar$`, `count%`
+    /// - Keywords used as identifiers in expression context
+    fn parse_identifier_or_call_expression(&mut self) {
+        // Escaped identifiers in VB6 use square brackets and can contain spaces/keywords.
+        if self.at_token(Token::LeftSquareBracket) {
+            self.parse_bracketed_identifier();
+            return;
+        }
+
+        // In expression context, many keywords can be used as identifiers
+        if self.is_identifier() || self.at_keyword() {
+            // Check if this is a dollar-sign library function (Chr$, UCase$, etc.)
+            if self.at_keyword_dollar() {
+                // Consume both the identifier/keyword and the dollar sign as a single identifier
+                self.consume_keyword_dollar_as_identifier();
+            } else {
+                // Consume just the identifier/keyword
+                self.consume_token();
+
+                // Check for type character suffix ($, %, &, #, @) - but NOT for library functions
+                // Only consume dollar sign if it's NOT part of a library function name
+                if matches!(
+                    self.current_token(),
+                    Some(
+                        Token::DollarSign
+                            | Token::Percent
+                            | Token::Ampersand
+                            | Token::Octothorpe
+                            | Token::AtSign
+                    )
+                ) {
+                    self.consume_token();
+                }
+            }
+        } else {
+            // Unexpected token - consume it anyway to avoid infinite loop
+            self.consume_token();
+        }
+
+        // Don't wrap in a node here - let parse_postfix_operators handle it
+    }
+
+    /// Parse a bracketed VB6 escaped identifier.
+    ///
+    /// Examples: `[eRender]`, `[Get Default Audio Endpoint]`, `[Property]`
+    fn parse_bracketed_identifier(&mut self) {
+        // Emit opening bracket token.
+        if let Some((text, _)) = self.tokens.get(self.pos) {
+            self.builder
+                .token(SyntaxKind::LeftSquareBracket.to_raw(), text);
+            self.pos += 1;
+        }
+
+        // Merge all tokens inside brackets into one Identifier token.
+        let content_start = self.pos;
+        while !self.is_at_end() && !self.at_token(Token::RightSquareBracket) {
+            self.pos += 1;
+        }
+        let content_end = self.pos;
+
+        if let Some((start_offset, end_offset)) =
+            self.tokens_span_offsets(content_start, content_end)
+        {
+            let content = &self.source_content[start_offset..end_offset];
+            self.builder.token(SyntaxKind::Identifier.to_raw(), content);
+        } else {
+            // Fallback for parser modes that do not have a usable source backing slice.
+            let mut merged_identifier = String::new();
+            for idx in content_start..content_end {
+                if let Some((text, _)) = self.tokens.get(idx) {
+                    merged_identifier.push_str(text);
+                }
+            }
+            self.builder
+                .token(SyntaxKind::Identifier.to_raw(), &merged_identifier);
+        }
+
+        // Emit closing bracket token if present.
+        if let Some((text, _)) = self.tokens.get(self.pos)
+            && self.at_token(Token::RightSquareBracket)
+        {
+            self.builder
+                .token(SyntaxKind::RightSquareBracket.to_raw(), text);
+            self.pos += 1;
+        }
+
+        // Support optional VB6 type characters after escaped identifiers.
+        if matches!(
+            self.current_token(),
+            Some(
+                Token::DollarSign
+                    | Token::Percent
+                    | Token::Ampersand
+                    | Token::Octothorpe
+                    | Token::AtSign
+            )
+        ) {
+            self.consume_token();
+        }
+    }
+
+    /// Parse a VB6 file-number reference used in expressions.
+    ///
+    /// Examples: `#1`, `#fileNum`, `#.FileNum`
+    fn parse_file_number_reference(&mut self) {
+        // Consume the octothorpe prefix.
+        self.consume_token();
+        self.consume_whitespace();
+
+        // Allow with-block member style references, such as #.FileNum
+        if self.at_token(Token::PeriodOperator) {
+            self.parse_with_member_expression();
+            return;
+        }
+
+        // Normal file number references: #1 or #fileNum
+        if self.is_number() {
+            self.consume_token();
+            return;
+        }
+
+        if self.is_identifier() || self.at_keyword() {
+            self.consume_token_as_identifier();
+        }
+    }
+
+    /// Parse an `AddressOf` expression.
+    ///
+    /// Syntax: `AddressOf procedureName`
+    ///
+    /// Used to pass procedure addresses to API functions.
+    fn parse_addressof_expression(&mut self) {
+        self.builder
+            .start_node(SyntaxKind::AddressOfExpression.to_raw());
+
+        // Consume "AddressOf"
+        self.consume_token();
+
+        // Skip whitespace
+        self.consume_whitespace();
+
+        // Parse the procedure name (identifier)
+        if self.is_identifier() || self.at_keyword() {
+            self.consume_token();
+        }
+
+        self.builder.finish_node();
+    }
+
+    /// Parse a `New` expression.
+    ///
+    /// Syntax: `New ClassName`
+    ///
+    /// Creates a new instance of a class.
+    fn parse_new_expression(&mut self) {
+        self.builder.start_node(SyntaxKind::NewExpression.to_raw());
+
+        // Consume "New"
+        self.consume_token();
+
+        // Skip whitespace
+        self.consume_whitespace();
+
+        // Parse the class name (identifier)
+        if self.is_identifier() || self.at_keyword() {
+            self.consume_token();
+        }
+
+        self.builder.finish_node();
+    }
+
+    /// Parse a numeric literal.
+    ///
+    /// Examples: `42`, `3.14`, `&HFF` (hex), `&O77` (octal), `123.45E-6` (scientific)
+    fn parse_numeric_literal(&mut self) {
+        self.builder
+            .start_node(SyntaxKind::NumericLiteralExpression.to_raw());
+
+        // Consume the number token (already includes type suffix in tokenizer)
+        self.consume_token();
+
+        self.builder.finish_node();
+    }
+
+    /// Parse a string literal.
+    ///
+    /// Example: `"Hello, World!"`
+    fn parse_string_literal(&mut self) {
+        self.builder
+            .start_node(SyntaxKind::StringLiteralExpression.to_raw());
+
+        // Consume the string literal token
+        self.consume_token();
+
+        self.builder.finish_node();
+    }
+
+    /// Parse a boolean literal.
+    ///
+    /// Examples: `True`, `False`
+    fn parse_boolean_literal(&mut self) {
+        self.builder
+            .start_node(SyntaxKind::BooleanLiteralExpression.to_raw());
+
+        // Consume True or False keyword
+        self.consume_token();
+
+        self.builder.finish_node();
+    }
+
+    /// Parse a special literal.
+    ///
+    /// Examples: `Nothing`, `Null`, `Empty`
+    fn parse_special_literal(&mut self) {
+        self.builder
+            .start_node(SyntaxKind::LiteralExpression.to_raw());
+
+        // Consume the keyword
+        self.consume_token();
+
+        self.builder.finish_node();
+    }
+
+    /// Parse a date literal.
+    ///
+    /// Syntax: `#1/1/2024#`, `#12:30:45 PM#`, `#1/1/2024 3:45 PM#`
+    ///
+    /// Note: VB6 has `DateLiteral` as a token, so it's already parsed as a single token
+    fn parse_date_literal(&mut self) {
+        self.builder
+            .start_node(SyntaxKind::LiteralExpression.to_raw());
+
+        // Consume the date literal token
+        self.consume_token();
+
+        self.builder.finish_node();
+    }
+
+    /// Parse a With block member expression.
+    ///
+    /// Syntax: `.PropertyName` or `.MethodName`
+    ///
+    /// This is used inside With blocks where the period operator at the start
+    /// indicates a member access on the implicit With object.
+    ///
+    /// Example:
+    /// ```vb
+    /// With myObject
+    ///     .Property = 123  ' .Property accesses myObject.Property
+    /// End With
+    /// ```
+    fn parse_with_member_expression(&mut self) {
+        // Consume the period operator
+        self.consume_token();
+
+        // Skip whitespace after period
+        self.consume_whitespace();
+
+        // Parse the member name (can be a keyword in VB6)
+        if self.is_identifier() || self.at_keyword() {
+            self.consume_token_as_identifier();
+
+            // Check for type character suffix
+            if matches!(
+                self.current_token(),
+                Some(
+                    Token::DollarSign
+                        | Token::Percent
+                        | Token::Ampersand
+                        | Token::ExclamationMark
+                        | Token::Octothorpe
+                        | Token::AtSign
+                )
+            ) {
+                self.consume_token();
+            }
+        }
+    }
+
+    /// Parse the content of a member access (everything after the dot).
+    fn parse_member_access_content(&mut self) {
+        // Consume the period
+        self.consume_token();
+
+        // Skip whitespace after period
+        self.consume_whitespace();
+
+        // Parse the member name (can be a keyword in VB6)
+        if self.is_identifier() || self.at_keyword() {
+            self.consume_token();
+
+            // Check for type character suffix
+            if matches!(
+                self.current_token(),
+                Some(
+                    Token::DollarSign
+                        | Token::Percent
+                        | Token::Ampersand
+                        | Token::ExclamationMark
+                        | Token::Octothorpe
+                        | Token::AtSign
+                )
+            ) {
+                self.consume_token();
+            }
+        }
+    }
+
+    /// Parse the content of dictionary access (everything after the !).
+    fn parse_dictionary_access_content(&mut self) {
+        // Consume the exclamation mark
+        self.consume_token();
+
+        // Skip whitespace
+        self.consume_whitespace();
+
+        // Parse the key (identifier or string)
+        if self.is_identifier() || self.at_keyword() || self.at_token(Token::StringLiteral) {
+            self.consume_token();
+        }
+    }
+
+    /// Get the binding power for an infix operator.
+    ///
+    /// Returns `Some((left_bp, right_bp))` if the current token is an infix operator,
+    /// where `left_bp` is the left binding power and `right_bp` is the right binding power.
+    /// Returns `None` if the current token is not an infix operator.
+    ///
+    /// The difference between left and right binding power determines associativity:
+    /// - Left-associative: `right_bp = left_bp + 1` (most operators)
+    /// - Right-associative: `right_bp = left_bp` (exponentiation)
+    fn get_infix_binding_power(&self) -> Option<(BindingPower, BindingPower)> {
+        let token = self.current_token()?;
+
+        let (left_bp, right_bp) = match token {
+            // Exponentiation (right-associative)
+            Token::ExponentiationOperator => {
+                (BindingPower::EXPONENTIATION, BindingPower::EXPONENTIATION)
+            }
+
+            // Multiplication and division
+            Token::MultiplicationOperator | Token::DivisionOperator => {
+                let bp = BindingPower::MULTIPLICATION;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            // Integer division
+            Token::BackwardSlashOperator => {
+                let bp = BindingPower::INT_DIVISION;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            // Modulo
+            Token::ModKeyword => {
+                let bp = BindingPower::MODULO;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            // Addition and subtraction
+            Token::AdditionOperator | Token::SubtractionOperator => {
+                let bp = BindingPower::ADDITION;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            // String concatenation
+            Token::Ampersand => {
+                let bp = BindingPower::CONCATENATION;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            // Comparison operators
+            Token::EqualityOperator
+            | Token::InequalityOperator
+            | Token::LessThanOrEqualOperator
+            | Token::GreaterThanOrEqualOperator
+            | Token::LessThanOperator
+            | Token::GreaterThanOperator
+            | Token::LikeKeyword
+            | Token::IsKeyword => {
+                let bp = BindingPower::COMPARISON;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            // Logical AND
+            Token::AndKeyword => {
+                let bp = BindingPower::AND;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            // Logical OR
+            Token::OrKeyword => {
+                let bp = BindingPower::OR;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            // Logical XOR
+            Token::XorKeyword => {
+                let bp = BindingPower::XOR;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            // Logical EQV
+            Token::EqvKeyword => {
+                let bp = BindingPower::EQV;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            // Logical IMP
+            Token::ImpKeyword => {
+                let bp = BindingPower::IMP;
+                (bp, BindingPower(bp.0 + 1))
+            }
+
+            _ => return None,
+        };
+
+        Some((left_bp, right_bp))
+    }
+
+    /// Check if we're at a delimiter that ends an expression.
+    ///
+    /// Expression delimiters include:
+    /// - Newline
+    /// - `Then` (in If statements)
+    /// - `To` (in For loops)
+    /// - `Step` (in For loops)
+    /// - Colon (statement separator)
+    /// - Comma (argument separator)
+    /// - Closing parenthesis/bracket (in some contexts)
+    fn is_at_expression_delimiter(&self) -> bool {
+        matches!(
+            self.current_token(),
+            Some(
+                Token::Newline
+                    | Token::ThenKeyword
+                    | Token::ToKeyword
+                    | Token::StepKeyword
+                    | Token::ColonOperator
+                    | Token::EndOfLineComment
+                    | Token::RemComment
+                    | Token::Comma
+                    | Token::RightParenthesis
+            )
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn numeric_literal() {
+        let source = "x = 42\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn numeric_literal_with_type_suffix() {
+        let source = "x = 42%\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn string_literal() {
+        let source = "x = \"Hello, World!\"\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn boolean_literal_true() {
+        let source = "x = True\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn boolean_literal_false() {
+        let source = "x = False\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn identifier_expression() {
+        let source = "x = myVariable\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn octothorpe_file_number_reference() {
+        let source = "x = #1\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn simple_addition() {
+        let source = "x = 2 + 3\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn simple_subtraction() {
+        let source = "x = 10 - 5\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn simple_multiplication() {
+        let source = "x = 4 * 5\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn simple_division() {
+        let source = "x = 20 / 4\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn operator_precedence_multiplication_before_addition() {
+        let source = "x = 2 + 3 * 4\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn operator_precedence_with_line_continuation() {
+        let source = "x = 2 + _\n    3 * 4\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn operator_precedence_left_associativity() {
+        let source = "x = 10 - 5 - 2\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn unary_negation() {
+        let source = "x = -5\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn logical_not() {
+        let source = "x = Not True\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn logical_and() {
+        let source = "x = True And False\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn logical_or() {
+        let source = "x = True Or False\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn comparison_equal() {
+        let source = "x = a = b\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn comparison_less_than() {
+        let source = "x = a < b\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn comparison_greater_than() {
+        let source = "x = a > b\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn parenthesized_expression() {
+        let source = "x = (5 + 3)\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn parenthesized_changes_precedence() {
+        let source = "x = (2 + 3) * 4\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn member_access() {
+        let source = "x = obj.property\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn chained_member_access() {
+        let source = "x = obj.prop1.prop2\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn function_call_no_args() {
+        let source = "x = MyFunction()\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn function_call_one_arg() {
+        let source = "x = MyFunction(42)\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn function_call_multiple_args() {
+        let source = "x = MyFunction(1, 2, 3)\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn method_call() {
+        let source = "x = obj.Method(arg)\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn new_expression() {
+        let source = "Set x = New MyClass\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn addressof_expression() {
+        let source = "x = AddressOf MyProc\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn string_concatenation() {
+        let source = "x = \"Hello\" & \" \" & \"World\"\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn modulo_operator() {
+        let source = "x = 10 Mod 3\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn integer_division() {
+        let source = "x = 10 \\ 3\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn exponentiation() {
+        let source = "x = 2 ^ 8\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn complex_arithmetic() {
+        let source = "x = (a + b) * c - d / e\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn complex_logical() {
+        let source = "x = Not a And b Or c\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn nothing_literal() {
+        let source = "Set x = Nothing\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn null_literal() {
+        let source = "x = Null\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn empty_literal() {
+        let source = "x = Empty\n";
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn dollar_sign_functions_merged() {
+        let source = r#"
+x = Chr$(65)
+y = UCase$("hello")
+z = Left$("test", 2)
+"#;
+        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/syntax/expressions");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+}

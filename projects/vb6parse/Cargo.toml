@@ -1,0 +1,159 @@
+[package]
+authors = ["ScriptAndCompile"]
+name = "vb6parse"
+homepage = "https://github.com/scriptandcompile/vb6parse"
+documentation = "https://docs.rs/vb6parse"
+version = "1.1.0"
+edition = "2024"
+license = "MIT"
+description = "vb6parse is a library for parsing and analyzing VB6 code, from projects, to controls, to modules, and forms."
+repository = "https://github.com/scriptandcompile/vb6parse"
+readme = "README.md"
+keywords = ["vb6", "parser", "analyzer", "vb6parse"]
+categories = ["development-tools", "parsing", "parser-implementations"]
+
+# exclude the test data files from the package
+exclude = [
+    "tests/data/audiostation/*",
+    "tests/data/Binary-metamorphosis/*",
+    "tests/data/Bitrate-calculator/*",
+    "tests/data/CdiuBeatUpEditor/*",
+    "tests/data/ChessBrainVB/*",
+    "tests/data/Discrete-Probability-Detector-in-VB6/*",
+    "tests/data/Endless-runner-Game_VB6.0/*",
+    "tests/data/Environment/*",
+    "tests/data/framework-vb6/*",
+    "tests/data/Genomin/*",
+    "tests/data/Markov-Chains-VB6/*",
+    "tests/data/Mix-two-signals-by-using-Spectral-Forecast-in-VB6-app-v1.0/*",
+    "tests/data/Mix-two-signals-by-using-Spectral-Forecast-in-VB6-app-v2.0/*",
+    "tests/data/NewTab/*",
+    "tests/data/OCX_Advanced_Control__VB6/*",
+    "tests/data/OCX_Advanced_Grid__VB6/*",
+    "tests/data/omelette-vb6/*",
+    "tests/data/opendialup/*",
+    "tests/data/Papaver-Genomics/*",
+    "tests/data/project-duplication-detection-system/*",
+    "tests/data/ProjectExaminer/*",
+    "tests/data/PromKappa-1.0-makes-Objective-Digital-Stains/*",
+    "tests/data/Prototype-software-for-Photon-pixel-coupling/*",
+    "tests/data/SK-ADO_Dan_SQL_Demo__VB6/*",
+    "tests/data/SK-Alarm_Clock__VB6/*",
+    "tests/data/SK-Password-Application-ADD-ON__VB6/*",
+    "tests/data/SK-SQL_Code_Generator_V2__VB6/*",
+    "tests/data/stdVBA-Inspiration/*",
+    "tests/data/SteamyDock/*",
+    "tests/data/Troyano-VB6-PoC/*",
+    "tests/data/ucJLDatePicker/*",
+    "tests/data/unlightvbe_qs/*",
+    "tests/data/vb6/*",
+    "tests/data/vb6-code/*",
+    "tests/data/Vb6.0/*",
+    "tests/data/VB6-2D-Physic-Engine/*",
+    "tests/data/VB6-add-GUI-objects-at-runtime/*",
+    "tests/data/VB6-samples/*",
+    "tests/data/VbScalesReader/*",
+    "tests/data/VPN-Lifeguard/*",
+    "tests/data/w.bloggar/*",
+    "tests/data/Win_Dialogs/*",
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+uuid = "1.24.0"
+thiserror = "2.0.19"
+ariadne = "0.6.0"
+image = "0.25.10"
+num_enum = "0.7.6"
+strum = "0.28.0"
+strum_macros = "0.28.0"
+encoding_rs = "0.8.35"
+either = { version = "1.17.0", features = ["serde"] }
+serde = { version = "1.0.229", features = ["derive"] }
+phf = { version = "0.14.0", features = ["macros"] }
+rowan = "0.16.1"
+
+# WASM-specific dependencies - only compiled for wasm32 target
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.126"
+serde-wasm-bindgen = "0.6.5"
+console_error_panic_hook = "0.1.7"
+serde_json = "1.0.151"
+
+[profile.release]
+opt-level = "z"     # Optimize for size
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Reduce parallel code generation units for better optimization
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+criterion = { version = "0.8.2", features = ["html_reports"] }
+insta = { version = "1.48.0", features = ["yaml"] }
+assert_matches = { version = "1.5.0" }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+criterion = { version = "0.8.2", default-features = false }
+insta = { version = "1.48.0", features = ["yaml"] }
+wasm-bindgen-test = "0.3.76"
+
+[profile.samply]
+inherits = "release"
+debug = true
+
+[[bench]]
+name = "lexer"
+harness = false
+
+[[bench]]
+name = "parser"
+harness = false
+
+[[bench]]
+name = "project_files"
+harness = false
+
+[[bench]]
+name = "class_files"
+harness = false
+
+[[bench]]
+name = "module_files"
+harness = false
+
+[[bench]]
+name = "form_files"
+harness = false
+
+[[bench]]
+name = "form_resources"
+harness = false
+
+# Documentation examples in examples/docs/ subdirectory
+[[example]]
+name = "hello_world"
+path = "examples/docs/hello_world.rs"
+
+[[example]]
+name = "project_parsing"
+path = "examples/docs/project_parsing.rs"
+
+[[example]]
+name = "error_handling"
+path = "examples/docs/error_handling.rs"
+
+[[example]]
+name = "tokenization"
+path = "examples/docs/tokenization.rs"
+
+[[example]]
+name = "cst_navigation_docs"
+path = "examples/docs/cst_navigation.rs"
+
+[[example]]
+name = "form_parsing"
+path = "examples/docs/form_parsing.rs"
+
+[lints.clippy]
+pedantic = "warn"

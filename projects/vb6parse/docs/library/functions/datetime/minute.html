@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Parse Library Reference - minute - Datetime">
+    <title>minute - Datetime - VB6Parse Library Reference</title>
+    <link rel="stylesheet" href="../../../assets/css/style.css">
+    <link rel="stylesheet" href="../../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../../../index.html">VB6Parse</a> / <a href="../../../library/index.html">Library</a> / <a href="../../../library/functions/datetime/index.html">Datetime</a> / minute</h1>
+            <p class="tagline">VB6 Library Reference</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../../../index.html">Home</a>
+            <a href="../../../library/index.html">Library Reference</a>
+            <a href="../../../documentation.html">Documentation</a>
+            <a href="https://docs.rs/vb6parse" target="_blank">API Docs</a>
+            <a href="https://github.com/scriptandcompile/vb6parse" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container">
+        
+        <article class="library-item">
+            <h1 id="minute-function">Minute Function</h1>
+<p>Returns a Variant (Integer) specifying a whole number between 0 and 59, inclusive, representing the minute of the hour.</p>
+<h2 id="syntax">Syntax</h2>
+<pre><code class="language-vbnet">Minute(time)</code></pre>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li><code>time</code> (Required): Any Variant, numeric expression, string expression, or combination that can represent a time</li>
+<li>Can be a Date literal, Date variable, or numeric expression</li>
+<li>String must be recognizable as a date/time</li>
+<li>If Null, returns Null</li>
+<li>If invalid date/time, error 13 (Type mismatch)</li>
+</ul>
+<h2 id="return-value">Return Value</h2>
+<p>Returns a Variant (Integer):
+- Whole number from 0 to 59
+- Represents the minute component of the time
+- 0 = first minute of the hour (00:00-00:00:59)
+- 59 = last minute of the hour (XX:59:00-XX:59:59)
+- Returns Null if input is Null
+- Independent of date component (only extracts minute)</p>
+<h2 id="remarks">Remarks</h2>
+<p>The Minute function extracts the minute from a time value:
+- <strong>Returns Integer</strong>: Value is always between 0 and 59
+- <strong>Time component only</strong>: Ignores date portion of Date values
+- <strong>Null propagation</strong>: Returns Null if input is Null
+- <strong>Type mismatch</strong>: Error 13 if input cannot be converted to date/time
+- <strong>Various formats</strong>: Accepts Date, String, or numeric time values
+- <strong>24-hour time</strong>: Works with both 12-hour and 24-hour formats
+- <strong>Common use</strong>: Extract minute for time calculations, formatting, validation
+- <strong>Related functions</strong>: Hour (hour component), Second (second component), <code>TimeSerial</code> (create time)
+- <strong>Part of suite</strong>: Day, Month, Year for dates; Hour, Minute, Second for times
+- <strong>Performance</strong>: Fast operation, optimized in VB6
+- <strong>Available in</strong>: All VB versions, VBA, <code>VBScript</code></p>
+<h2 id="typical-uses">Typical Uses</h2>
+<ol>
+<li><strong>Extract Minute from Time</strong></li>
+</ol>
+<pre><code class="language-vbnet">   currentMinute = Minute(Now)
+   ```
+2. **Format Time Display**
+   ```vb
+   timeText = Hour(Now) &amp; &quot;:&quot; &amp; Format(Minute(Now), &quot;00&quot;)
+   ```
+3. **Validate Time Range**
+   ```vb
+   If Minute(appointmentTime) &lt; 30 Then
+       &#x27; First half of the hour
+   End If
+   ```
+4. **Round to Nearest Hour**
+   ```vb
+   If Minute(timeValue) &gt;= 30 Then
+       roundedHour = Hour(timeValue) + 1
+   Else
+       roundedHour = Hour(timeValue)
+   End If
+   ```
+5. **Time Calculations**
+   ```vb
+   minutesPastHour = Minute(Time)
+   minutesUntilHour = 60 - Minute(Time)
+   ```
+6. **Validate Appointment Times**
+   ```vb
+   If Minute(startTime) Mod 15 &lt;&gt; 0 Then
+       MsgBox &quot;Appointments must start on 15-minute intervals&quot;
+   End If
+   ```
+7. **Build Time String**
+   ```vb
+   timeStr = Format(Hour(t), &quot;00&quot;) &amp; &quot;:&quot; &amp; Format(Minute(t), &quot;00&quot;)
+   ```
+8. **Calculate Duration**
+   ```vb
+   durationMinutes = (Hour(endTime) - Hour(startTime)) * 60 + _
+                     (Minute(endTime) - Minute(startTime))
+   ```
+## Basic Examples
+### Example 1: Basic Usage</code></pre>
+<p>vb
+Dim currentMinute As Integer
+Dim timeValue As Date
+' Get current minute
+currentMinute = Minute(Now)        ' Returns 0-59
+' Extract minute from specific time
+timeValue = #2:45:30 PM#
+currentMinute = Minute(timeValue)  ' Returns 45
+' Extract minute from time string
+currentMinute = Minute("3:27 PM")  ' Returns 27
+' Extract minute from numeric value
+currentMinute = Minute(0.5)        ' Returns 0 (noon = 12:00)
+currentMinute = Minute(0.75)       ' Returns 0 (6 PM = 18:00)</p>
+<pre><code>### Example 2: Digital Clock Display</code></pre>
+<p>vb
+Sub UpdateClock()
+    Dim h As Integer
+    Dim m As Integer
+    Dim s As Integer
+    Dim currentTime As Date
+    currentTime = Now
+    h = Hour(currentTime)
+    m = Minute(currentTime)
+    s = Second(currentTime)
+    ' Display in 24-hour format
+    lblClock.Caption = Format(h, "00") &amp; ":" &amp; _
+                      Format(m, "00") &amp; ":" &amp; _
+                      Format(s, "00")
+    ' Display in 12-hour format
+    Dim ampm As String
+    Dim h12 As Integer
+    If h &gt;= 12 Then
+        ampm = "PM"
+        h12 = IIf(h = 12, 12, h - 12)
+    Else
+        ampm = "AM"
+        h12 = IIf(h = 0, 12, h)
+    End If
+    lblClock12.Caption = h12 &amp; ":" &amp; Format(m, "00") &amp; " " &amp; ampm
+End Sub</p>
+<pre><code>### Example 3: Appointment Scheduler Validation</code></pre>
+<p>vb
+Function ValidateAppointmentTime(ByVal appointmentTime As Date) As Boolean
+    Dim m As Integer
+    m = Minute(appointmentTime)
+    ' Check if time is on a 15-minute interval
+    If m Mod 15 = 0 Then
+        ValidateAppointmentTime = True
+    Else
+        MsgBox "Appointments must start on 15-minute intervals" &amp; vbCrLf &amp; _
+               "Valid minutes: 00, 15, 30, 45", _
+               vbExclamation, "Invalid Time"
+        ValidateAppointmentTime = False
+    End If
+End Function
+' Usage:
+' If ValidateAppointmentTime(#2:15 PM#) Then  ' Valid
+' If ValidateAppointmentTime(#2:23 PM#) Then  ' Invalid</p>
+<pre><code>### Example 4: Time Rounding</code></pre>
+<p>vb
+Function RoundToNearestQuarterHour(ByVal timeValue As Date) As Date
+    Dim h As Integer
+    Dim m As Integer
+    Dim roundedMinute As Integer
+    h = Hour(timeValue)
+    m = Minute(timeValue)
+    ' Round to nearest 15 minutes
+    Select Case m
+        Case 0 To 7
+            roundedMinute = 0
+        Case 8 To 22
+            roundedMinute = 15
+        Case 23 To 37
+            roundedMinute = 30
+        Case 38 To 52
+            roundedMinute = 45
+        Case 53 To 59
+            roundedMinute = 0
+            h = h + 1
+            If h = 24 Then h = 0
+    End Select
+    RoundToNearestQuarterHour = TimeSerial(h, roundedMinute, 0)
+End Function
+' Usage:
+' rounded = RoundToNearestQuarterHour(#2:23 PM#)  ' Returns #2:30 PM#
+' rounded = RoundToNearestQuarterHour(#2:57 PM#)  ' Returns #3:00 PM#</p>
+<pre><code>## Common Patterns
+### Pattern 1: `SafeMinute` (handle Null)</code></pre>
+<p>vb
+Function SafeMinute(ByVal timeValue As Variant) As Integer
+    If IsNull(timeValue) Then
+        SafeMinute = 0
+    ElseIf Not IsDate(timeValue) Then
+        SafeMinute = 0
+    Else
+        SafeMinute = Minute(timeValue)
+    End If
+End Function</p>
+<pre><code>### Pattern 2: `IsTopOfHour`</code></pre>
+<p>vb
+Function IsTopOfHour(ByVal timeValue As Date) As Boolean
+    IsTopOfHour = (Minute(timeValue) = 0 And Second(timeValue) = 0)
+End Function</p>
+<pre><code>### Pattern 3: `GetMinutesPastHour`</code></pre>
+<p>vb
+Function GetMinutesPastHour(ByVal timeValue As Date) As Integer
+    GetMinutesPastHour = Minute(timeValue)
+End Function</p>
+<pre><code>### Pattern 4: `GetMinutesUntilNextHour`</code></pre>
+<p>vb
+Function GetMinutesUntilNextHour(ByVal timeValue As Date) As Integer
+    Dim m As Integer
+    m = Minute(timeValue)
+    If m = 0 And Second(timeValue) = 0 Then
+        GetMinutesUntilNextHour = 60
+    Else
+        GetMinutesUntilNextHour = 60 - m
+        If Second(timeValue) &gt; 0 Then
+            GetMinutesUntilNextHour = GetMinutesUntilNextHour - 1
+        End If
+    End If
+End Function</p>
+<pre><code>### Pattern 5: `FormatMinute`</code></pre>
+<p>vb
+Function FormatMinute(ByVal timeValue As Date) As String
+    FormatMinute = Format(Minute(timeValue), "00")
+End Function</p>
+<pre><code>### Pattern 6: `IsQuarterHour`</code></pre>
+<p>vb
+Function IsQuarterHour(ByVal timeValue As Date) As Boolean
+    IsQuarterHour = (Minute(timeValue) Mod 15 = 0)
+End Function</p>
+<pre><code>### Pattern 7: `GetQuarterHourIndex`</code></pre>
+<p>vb
+Function GetQuarterHourIndex(ByVal timeValue As Date) As Integer
+    ' Returns 0-3 for which quarter hour (0=:00, 1=:15, 2=:30, 3=:45)
+    GetQuarterHourIndex = Minute(timeValue) \ 15
+End Function</p>
+<pre><code>### Pattern 8: `IsHalfHour`</code></pre>
+<p>vb
+Function IsHalfHour(ByVal timeValue As Date) As Boolean
+    IsHalfHour = (Minute(timeValue) = 0 Or Minute(timeValue) = 30)
+End Function</p>
+<pre><code>### Pattern 9: `CompareMinutes`</code></pre>
+<p>vb
+Function CompareMinutes(ByVal time1 As Date, ByVal time2 As Date) As Integer
+    CompareMinutes = Minute(time1) - Minute(time2)
+End Function</p>
+<pre><code>### Pattern 10: `MinutesSinceMidnight`</code></pre>
+<p>vb
+Function MinutesSinceMidnight(ByVal timeValue As Date) As Long
+    MinutesSinceMidnight = Hour(timeValue) * 60 + Minute(timeValue)
+End Function</p>
+<pre><code>## Advanced Examples
+### Example 1: Time Slot Scheduler</code></pre>
+<p>vb
+' Class: TimeSlotScheduler
+Private m_slotDuration As Integer  ' Minutes per slot
+Private m_slots As Collection
+Private Sub Class_Initialize()
+    m_slotDuration = 30  ' Default 30-minute slots
+    Set m_slots = New Collection
+End Sub
+Public Property Let SlotDuration(ByVal minutes As Integer)
+    If minutes &gt; 0 And minutes &lt;= 60 And (60 Mod minutes = 0) Then
+        m_slotDuration = minutes
+    Else
+        Err.Raise 5, , "Slot duration must evenly divide 60 (5, 10, 15, 20, 30, or 60)"
+    End If
+End Property
+Public Function GetSlotIndex(ByVal timeValue As Date) As Integer
+    Dim totalMinutes As Long
+    totalMinutes = Hour(timeValue) * 60 + Minute(timeValue)
+    GetSlotIndex = totalMinutes \ m_slotDuration
+End Function
+Public Function GetSlotStartTime(ByVal slotIndex As Integer) As Date
+    Dim totalMinutes As Long
+    Dim h As Integer
+    Dim m As Integer
+    totalMinutes = slotIndex * m_slotDuration
+    h = totalMinutes \ 60
+    m = totalMinutes Mod 60
+    GetSlotStartTime = TimeSerial(h, m, 0)
+End Function
+Public Function IsSlotAvailable(ByVal slotIndex As Integer) As Boolean
+    On Error Resume Next
+    Dim temp As Variant
+    temp = m_slots(CStr(slotIndex))
+    IsSlotAvailable = (Err.Number &lt;&gt; 0)
+    On Error GoTo 0
+End Function
+Public Sub BookSlot(ByVal slotIndex As Integer, ByVal description As String)
+    If IsSlotAvailable(slotIndex) Then
+        m_slots.Add description, CStr(slotIndex)
+    Else
+        Err.Raise 5, , "Slot already booked"
+    End If
+End Sub
+Public Function GetSlotsInHour(ByVal hour As Integer) As Integer
+    GetSlotsInHour = 60 \ m_slotDuration
+End Function</p>
+<pre><code>### Example 2: Timesheet Entry Validator</code></pre>
+<p>vb
+' Class: TimesheetValidator
+Private m_roundingInterval As Integer
+Private Sub Class_Initialize()
+    m_roundingInterval = 15  ' Default to 15-minute intervals
+End Sub
+Public Property Let RoundingInterval(ByVal minutes As Integer)
+    Select Case minutes
+        Case 1, 5, 10, 15, 30
+            m_roundingInterval = minutes
+        Case Else
+            Err.Raise 5, , "Invalid rounding interval"
+    End Select
+End Property
+Public Function ValidateTime(ByVal timeValue As Date) As Boolean
+    Dim m As Integer
+    m = Minute(timeValue)
+    ValidateTime = (m Mod m_roundingInterval = 0)
+End Function
+Public Function RoundTime(ByVal timeValue As Date, _
+                         Optional ByVal roundUp As Boolean = False) As Date
+    Dim h As Integer
+    Dim m As Integer
+    Dim s As Integer
+    Dim roundedMinute As Integer
+    h = Hour(timeValue)
+    m = Minute(timeValue)
+    s = Second(timeValue)
+    If roundUp Then
+        ' Round up to next interval
+        roundedMinute = ((m \ m_roundingInterval) + 1) * m_roundingInterval
+        If roundedMinute &gt;= 60 Then
+            roundedMinute = 0
+            h = h + 1
+            If h = 24 Then h = 0
+        End If
+    Else
+        ' Round to nearest interval
+        Dim remainder As Integer
+        remainder = m Mod m_roundingInterval
+        If remainder &gt;= (m_roundingInterval \ 2) Or s &gt; 0 Then
+            roundedMinute = m - remainder + m_roundingInterval
+            If roundedMinute &gt;= 60 Then
+                roundedMinute = 0
+                h = h + 1
+                If h = 24 Then h = 0
+            End If
+        Else
+            roundedMinute = m - remainder
+        End If
+    End If
+    RoundTime = TimeSerial(h, roundedMinute, 0)
+End Function
+Public Function GetTimesheetString(ByVal timeValue As Date) As String
+    GetTimesheetString = Format(Hour(timeValue), "00") &amp; ":" &amp; _
+                        Format(Minute(timeValue), "00")
+End Function</p>
+<pre><code>### Example 3: Meeting Reminder System</code></pre>
+<p>vb
+' Module: MeetingReminders
+Public Function CheckReminders() As Collection
+    Dim reminders As New Collection
+    Dim currentTime As Date
+    Dim currentMinute As Integer
+    currentTime = Now
+    currentMinute = Minute(currentTime)
+    ' Check for hourly reminder (at :00)
+    If currentMinute = 0 Then
+        reminders.Add "Top of the hour reminder"
+    End If
+    ' Check for quarter-hour reminders
+    If currentMinute Mod 15 = 0 Then
+        reminders.Add "Quarter hour: " &amp; Format(currentTime, "h:mm AM/PM")
+    End If
+    ' Check for upcoming meeting (5 minutes before)
+    If currentMinute Mod 60 = 25 Or currentMinute Mod 60 = 55 Then
+        reminders.Add "Meeting in 5 minutes"
+    End If
+    Set CheckReminders = reminders
+End Function
+Public Function GetNextQuarterHour(ByVal fromTime As Date) As Date
+    Dim h As Integer
+    Dim m As Integer
+    Dim nextMinute As Integer
+    h = Hour(fromTime)
+    m = Minute(fromTime)
+    ' Calculate next quarter hour
+    nextMinute = ((m \ 15) + 1) * 15
+    If nextMinute &gt;= 60 Then
+        nextMinute = 0
+        h = h + 1
+        If h = 24 Then h = 0
+    End If
+    GetNextQuarterHour = TimeSerial(h, nextMinute, 0)
+End Function
+Public Function MinutesUntilQuarterHour(ByVal fromTime As Date) As Integer
+    Dim m As Integer
+    Dim remainder As Integer
+    m = Minute(fromTime)
+    remainder = m Mod 15
+    If remainder = 0 Then
+        MinutesUntilQuarterHour = 15
+    Else
+        MinutesUntilQuarterHour = 15 - remainder
+    End If
+End Function</p>
+<pre><code>### Example 4: Bus Schedule Matcher</code></pre>
+<p>vb
+' Class: BusSchedule
+Private m_departureMinutes() As Integer
+Private m_routeName As String
+Public Sub Initialize(ByVal routeName As String, departureMinutes As Variant)
+    Dim i As Long
+    m_routeName = routeName
+    ReDim m_departureMinutes(LBound(departureMinutes) To UBound(departureMinutes))
+    For i = LBound(departureMinutes) To UBound(departureMinutes)
+        m_departureMinutes(i) = departureMinutes(i)
+    Next i
+End Sub
+Public Function GetNextDeparture(ByVal currentTime As Date) As Date
+    Dim currentMinuteOfDay As Long
+    Dim i As Long
+    Dim h As Integer
+    Dim m As Integer
+    currentMinuteOfDay = Hour(currentTime) * 60 + Minute(currentTime)
+    ' Find next departure
+    For i = LBound(m_departureMinutes) To UBound(m_departureMinutes)
+        If m_departureMinutes(i) &gt; currentMinuteOfDay Then
+            h = m_departureMinutes(i) \ 60
+            m = m_departureMinutes(i) Mod 60
+            GetNextDeparture = TimeSerial(h, m, 0)
+            Exit Function
+        End If
+    Next i
+    ' No more departures today, return first tomorrow
+    h = m_departureMinutes(LBound(m_departureMinutes)) \ 60
+    m = m_departureMinutes(LBound(m_departureMinutes)) Mod 60
+    GetNextDeparture = DateSerial(Year(currentTime), Month(currentTime), Day(currentTime) + 1) + _
+                       TimeSerial(h, m, 0)
+End Function
+Public Function GetMinutesUntilNext(ByVal currentTime As Date) As Long
+    Dim nextDeparture As Date
+    nextDeparture = GetNextDeparture(currentTime)
+    GetMinutesUntilNext = DateDiff("n", currentTime, nextDeparture)
+End Function
+Public Function IsAtDeparture(ByVal currentTime As Date, _
+                             Optional ByVal toleranceMinutes As Integer = 0) As Boolean
+    Dim currentMinuteOfDay As Long
+    Dim i As Long
+    currentMinuteOfDay = Hour(currentTime) * 60 + Minute(currentTime)
+    For i = LBound(m_departureMinutes) To UBound(m_departureMinutes)
+        If Abs(m_departureMinutes(i) - currentMinuteOfDay) &lt;= toleranceMinutes Then
+            IsAtDeparture = True
+            Exit Function
+        End If
+    Next i
+    IsAtDeparture = False
+End Function</p>
+<pre><code>## Error Handling</code></pre>
+<p>vb
+' Error 13: Type mismatch
+' - Input cannot be converted to date/time
+' Safe minute extraction with error handling
+Function SafeGetMinute(ByVal timeValue As Variant) As Integer
+    On Error GoTo ErrorHandler
+    If IsNull(timeValue) Then
+        SafeGetMinute = 0
+    ElseIf Not IsDate(timeValue) Then
+        SafeGetMinute = 0
+    Else
+        SafeGetMinute = Minute(timeValue)
+    End If
+    Exit Function
+ErrorHandler:
+    SafeGetMinute = 0
+End Function
+' Validate before extracting
+Function GetMinuteOrDefault(ByVal timeValue As Variant, _
+                           Optional ByVal defaultValue As Integer = 0) As Integer
+    If IsNull(timeValue) Then
+        GetMinuteOrDefault = defaultValue
+    ElseIf IsDate(timeValue) Then
+        GetMinuteOrDefault = Minute(timeValue)
+    Else
+        GetMinuteOrDefault = defaultValue
+    End If
+End Function</p>
+<pre><code>## Performance Considerations
+- **Fast Operation**: Extracting time components is highly optimized in VB6
+- **No String Parsing**: Direct access to internal time representation
+- **Cache for Repeated Use**: If calling multiple times on same value
+- **Combine Extractions**: Use Hour, Minute, Second together efficiently
+## Best Practices
+1. **Use with Format** - Pad with leading zero: `Format(Minute(t), &quot;00&quot;)`
+2. **Validate input** - Check `IsDate` before calling Minute
+3. **Handle Null gracefully** - Use `IsNull` check for Variant inputs
+4. **Combine with Hour/Second** - Extract all time components together
+5. **Use for validation** - Check minute intervals for appointments
+6. **Consider `TimeSerial`** - To reconstruct time from components
+7. **Document assumptions** - Clarify if using 0-59 or 1-60 range
+8. **Use constants** - Define meaningful minute values (`TOP_OF_HOUR` = 0)
+9. **Test edge cases** - Null values, invalid strings, midnight
+10. **Remember range** - Always 0-59, never 60 or negative
+## Comparison with Related Functions
+| Function | Returns | Range | Use Case |
+|----------|---------|-------|----------|
+| **Minute** | Minute of hour | 0-59 | Extract minute component |
+| **Hour** | Hour of day | 0-23 | Extract hour component |
+| **Second** | Second of minute | 0-59 | Extract second component |
+| **`TimeSerial`** | Date/Time | N/A | Create time from components |
+## Minute vs Hour vs Second</code></pre>
+<p>vb
+Dim timeValue As Date
+timeValue = #2:45:30 PM#
+' Extract individual components
+Debug.Print Hour(timeValue)    ' 14 (2 PM in 24-hour format)
+Debug.Print Minute(timeValue)  ' 45
+Debug.Print Second(timeValue)  ' 30
+' Reconstruct time
+Dim reconstructed As Date
+reconstructed = TimeSerial(Hour(timeValue), Minute(timeValue), Second(timeValue))
+' reconstructed = #2:45:30 PM#
+' Format as string
+Debug.Print Format(Hour(timeValue), "00") &amp; ":" &amp; _
+           Format(Minute(timeValue), "00") &amp; ":" &amp; _
+           Format(Second(timeValue), "00")
+' Output: "14:45:30"</p>
+<pre><code>## Minute Range (0-59)</code></pre>
+<p>vb
+' Minute function always returns 0-59
+Debug.Print Minute(#12:00:00 AM#)  ' 0 (midnight)
+Debug.Print Minute(#12:15:00 AM#)  ' 15
+Debug.Print Minute(#12:30:00 AM#)  ' 30
+Debug.Print Minute(#12:45:00 AM#)  ' 45
+Debug.Print Minute(#12:59:59 PM#)  ' 59 (last minute of noon hour)
+Debug.Print Minute(#11:59:59 PM#)  ' 59 (last minute before midnight)
+' Common minute values
+Const TOP_OF_HOUR As Integer = 0
+Const QUARTER_PAST As Integer = 15
+Const HALF_PAST As Integer = 30
+Const QUARTER_TO As Integer = 45
+```</p>
+<h2 id="platform-notes">Platform Notes</h2>
+<ul>
+<li>Available in all VB6 versions</li>
+<li>Part of VBA core library</li>
+<li>Available in <code>VBScript</code></li>
+<li>Returns Integer (not Long)</li>
+<li>Range is always 0-59 (inclusive)</li>
+<li>Handles Null by returning Null</li>
+<li>Type mismatch error for invalid input</li>
+<li>Same behavior across all Windows versions</li>
+<li>Works with Date variables and literals</li>
+<li>Ignores date component of Date values</li>
+</ul>
+<h2 id="limitations">Limitations</h2>
+<ul>
+<li><strong>No milliseconds</strong>: Does not access millisecond component</li>
+<li><strong>Integer only</strong>: Returns whole minutes, not fractional</li>
+<li><strong>No timezone</strong>: Does not handle timezone information</li>
+<li><strong>Type mismatch</strong>: Error 13 for non-date inputs</li>
+<li><strong>Null propagation</strong>: Returns Null for Null input (may need handling)</li>
+</ul>
+<h2 id="related-functions">Related Functions</h2>
+<ul>
+<li><code>Hour</code>: Returns hour component (0-23)</li>
+<li><code>Second</code>: Returns second component (0-59)</li>
+<li><code>Day</code>: Returns day of month (1-31)</li>
+<li><code>Month</code>: Returns month (1-12)</li>
+<li><code>Year</code>: Returns year</li>
+<li><code>Now</code>: Returns current date and time</li>
+<li><code>Time</code>: Returns current time</li>
+<li><code>TimeSerial</code>: Creates time from hour, minute, second</li>
+<li><code>TimeValue</code>: Converts string to time</li>
+<li><code>Format</code>: Formats date/time as string</li>
+</ul>
+        </article>
+        
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+            <p>
+                <a href="index.html">← Back to Datetime</a> |
+                <a href="../index.html">View all functions</a>
+            </p>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024-2026 VB6Parse Contributors. Licensed under the MIT License.</p>
+        </div>
+    </footer>
+</body>
+</html>
