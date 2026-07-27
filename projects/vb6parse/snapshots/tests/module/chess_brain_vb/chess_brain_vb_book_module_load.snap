@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/chess_brain_vb.rs
+source: projects/vb6parse/tests/module/chess_brain_vb.rs
 expression: module
 ---
 name: basBook
@@ -915,98 +915,10 @@ cst:
                                 text: )
                           - kind: Newline
                             text: "\r\n"
-                      - kind: IfStatement
-                        children:
-                          - kind: Whitespace
-                            text: "   "
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Whitespace
-                            text: " "
-                          - kind: BinaryExpression
-                            children:
-                              - kind: IdentifierExpression
-                                children:
-                                  - kind: Identifier
-                                    text: pbIsOfficeMode
-                              - kind: Whitespace
-                                text: " "
-                              - kind: AndKeyword
-                                text: And
-                              - kind: Whitespace
-                                text: " "
-                              - kind: BinaryExpression
-                                children:
-                                  - kind: CallExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: Trim
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: ArgumentList
-                                        children:
-                                          - kind: Argument
-                                            children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: sBookFile
-                                      - kind: RightParenthesis
-                                        text: )
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: EqualityOperator
-                                    text: "="
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: StringLiteralExpression
-                                    children:
-                                      - kind: StringLiteral
-                                        text: "\"\""
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ThenKeyword
-                            text: Then
-                          - kind: Newline
-                            text: "\r\n"
-                          - kind: StatementList
-                            children:
-                              - kind: Whitespace
-                                text: "     "
-                              - kind: EndOfLineComment
-                                text: "' Always use default book if not set in INI file"
-                              - kind: Newline
-                                text: "\r\n"
-                              - kind: Whitespace
-                                text: "     "
-                              - kind: AssignmentStatement
-                                children:
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: sBookFile
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: EqualityOperator
-                                    text: "="
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: StringLiteralExpression
-                                    children:
-                                      - kind: StringLiteral
-                                        text: "\"CB_BOOK.TXT\""
-                                  - kind: Newline
-                                    text: "\r\n"
-                              - kind: Whitespace
-                                text: "   "
-                          - kind: EndKeyword
-                            text: End
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Newline
-                            text: "\r\n"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "   "
                       - kind: AssignmentStatement
@@ -2897,64 +2809,26 @@ cst:
                             text: String
                           - kind: Newline
                             text: "\r\n"
-                      - kind: IfStatement
+                      - kind: Whitespace
+                        text: "    "
+                      - kind: AssignmentStatement
                         children:
-                          - kind: Whitespace
-                            text: "    "
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Whitespace
-                            text: " "
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: pbIsOfficeMode
+                                text: sDefault
                           - kind: Whitespace
                             text: " "
-                          - kind: ThenKeyword
-                            text: Then
+                          - kind: EqualityOperator
+                            text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: AssignmentStatement
+                          - kind: StringLiteralExpression
                             children:
-                              - kind: IdentifierExpression
-                                children:
-                                  - kind: Identifier
-                                    text: sDefault
-                              - kind: Whitespace
-                                text: " "
-                              - kind: EqualityOperator
-                                text: "="
-                              - kind: Whitespace
-                                text: " "
-                              - kind: StringLiteralExpression
-                                children:
-                                  - kind: StringLiteral
-                                    text: "\"1\""
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ElseKeyword
-                            text: Else
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AssignmentStatement
-                            children:
-                              - kind: IdentifierExpression
-                                children:
-                                  - kind: Identifier
-                                    text: sDefault
-                              - kind: Whitespace
-                                text: " "
-                              - kind: EqualityOperator
-                                text: "="
-                              - kind: Whitespace
-                                text: " "
-                              - kind: StringLiteralExpression
-                                children:
-                                  - kind: StringLiteral
-                                    text: "\"0\""
-                              - kind: Newline
-                                text: "\r\n"
+                              - kind: StringLiteral
+                                text: "\"0\""
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                       - kind: Newline
@@ -3041,90 +2915,22 @@ cst:
                                         text: "True"
                                   - kind: Newline
                                     text: "\r\n"
-                              - kind: IfStatement
+                              - kind: Whitespace
+                                text: "      "
+                              - kind: CallStatement
                                 children:
-                                  - kind: Whitespace
-                                    text: "      "
-                                  - kind: IfKeyword
-                                    text: If
+                                  - kind: Identifier
+                                    text: SendCommand
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: IdentifierExpression
+                                  - kind: ArgumentList
                                     children:
-                                      - kind: Identifier
-                                        text: pbIsOfficeMode
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: ThenKeyword
-                                    text: Then
-                                  - kind: Newline
-                                    text: "\r\n"
-                                  - kind: StatementList
-                                    children:
-                                      - kind: Whitespace
-                                        text: "        "
-                                      - kind: CallStatement
+                                      - kind: Argument
                                         children:
-                                          - kind: Identifier
-                                            text: SendCommand
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: ArgumentList
+                                          - kind: StringLiteralExpression
                                             children:
-                                              - kind: Argument
-                                                children:
-                                                  - kind: StringLiteralExpression
-                                                    children:
-                                                      - kind: StringLiteral
-                                                        text: "\"internal opening book active\""
-                                          - kind: Newline
-                                            text: "\r\n"
-                                      - kind: Whitespace
-                                        text: "      "
-                                  - kind: ElseIfClause
-                                    children:
-                                      - kind: ElseIfKeyword
-                                        text: ElseIf
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: Identifier
-                                            text: UCIMode
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: ThenKeyword
-                                        text: Then
-                                      - kind: Newline
-                                        text: "\r\n"
-                                      - kind: StatementList
-                                        children:
-                                          - kind: Whitespace
-                                            text: "        "
-                                          - kind: CallStatement
-                                            children:
-                                              - kind: Identifier
-                                                text: SendCommand
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: ArgumentList
-                                                children:
-                                                  - kind: Argument
-                                                    children:
-                                                      - kind: StringLiteralExpression
-                                                        children:
-                                                          - kind: StringLiteral
-                                                            text: "\"info string internal opening book active\""
-                                              - kind: Newline
-                                                text: "\r\n"
-                                          - kind: Whitespace
-                                            text: "      "
-                                  - kind: EndKeyword
-                                    text: End
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IfKeyword
-                                    text: If
+                                              - kind: StringLiteral
+                                                text: "\"info string internal opening book active\""
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
@@ -3573,114 +3379,34 @@ cst:
                     text: "\r\n"
                   - kind: StatementList
                     children:
-                      - kind: IfStatement
+                      - kind: Whitespace
+                        text: "        "
+                      - kind: CallStatement
                         children:
-                          - kind: Whitespace
-                            text: "      "
-                          - kind: IfKeyword
-                            text: If
+                          - kind: Identifier
+                            text: SendCommand
                           - kind: Whitespace
                             text: " "
-                          - kind: IdentifierExpression
+                          - kind: ArgumentList
                             children:
-                              - kind: Identifier
-                                text: pbIsOfficeMode
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ThenKeyword
-                            text: Then
-                          - kind: Newline
-                            text: "\r\n"
-                          - kind: StatementList
-                            children:
-                              - kind: Whitespace
-                                text: "        "
-                              - kind: CallStatement
+                              - kind: Argument
                                 children:
-                                  - kind: Identifier
-                                    text: SendCommand
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: ArgumentList
+                                  - kind: BinaryExpression
                                     children:
-                                      - kind: Argument
+                                      - kind: StringLiteralExpression
                                         children:
-                                          - kind: BinaryExpression
-                                            children:
-                                              - kind: StringLiteralExpression
-                                                children:
-                                                  - kind: StringLiteral
-                                                    text: "\"opening book found: \""
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: Ampersand
-                                                text: "&"
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: isFile
-                                  - kind: Newline
-                                    text: "\r\n"
-                              - kind: Whitespace
-                                text: "      "
-                          - kind: ElseIfClause
-                            children:
-                              - kind: ElseIfKeyword
-                                text: ElseIf
-                              - kind: Whitespace
-                                text: " "
-                              - kind: IdentifierExpression
-                                children:
-                                  - kind: Identifier
-                                    text: UCIMode
-                              - kind: Whitespace
-                                text: " "
-                              - kind: ThenKeyword
-                                text: Then
-                              - kind: Newline
-                                text: "\r\n"
-                              - kind: StatementList
-                                children:
-                                  - kind: Whitespace
-                                    text: "        "
-                                  - kind: CallStatement
-                                    children:
-                                      - kind: Identifier
-                                        text: SendCommand
+                                          - kind: StringLiteral
+                                            text: "\"info string opening book found: \""
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: ArgumentList
+                                      - kind: Ampersand
+                                        text: "&"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IdentifierExpression
                                         children:
-                                          - kind: Argument
-                                            children:
-                                              - kind: BinaryExpression
-                                                children:
-                                                  - kind: StringLiteralExpression
-                                                    children:
-                                                      - kind: StringLiteral
-                                                        text: "\"info string opening book found: \""
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: Ampersand
-                                                    text: "&"
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IdentifierExpression
-                                                    children:
-                                                      - kind: Identifier
-                                                        text: isFile
-                                      - kind: Newline
-                                        text: "\r\n"
-                                  - kind: Whitespace
-                                    text: "      "
-                          - kind: EndKeyword
-                            text: End
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IfKeyword
-                            text: If
+                                          - kind: Identifier
+                                            text: isFile
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/chess_brain_vb.rs
+source: projects/vb6parse/tests/form/chess_brain_vb.rs
 expression: form_file
 ---
 form:
@@ -75,6 +75,46 @@ form:
       width: 240
       window_state: Normal
     controls:
+      - name: Command1
+        tag: ""
+        index: 0
+        kind:
+          CommandButton:
+            properties:
+              appearance: ThreeD
+              back_color:
+                System:
+                  index: 15
+              cancel: false
+              caption: Test Eval
+              causes_validation: "Yes"
+              default: false
+              disabled_picture: ~
+              down_picture: ~
+              drag_icon: ~
+              drag_mode: Manual
+              enabled: Enabled
+              height: 330
+              help_context_id: 0
+              left: 3000
+              mask_color:
+                RGB:
+                  red: 192
+                  green: 192
+                  blue: 192
+              mouse_icon: ~
+              mouse_pointer: Default
+              ole_drop_mode: None
+              picture: ~
+              right_to_left: LeftToRight
+              style: Standard
+              tab_index: 11
+              tab_stop: Included
+              tool_tip_text: ""
+              top: 600
+              use_mask_color: DoNotUseMaskColor
+              whats_this_help_id: 0
+              width: 1065
       - name: cmdRunUCI
         tag: ""
         index: 0
@@ -185,7 +225,7 @@ form:
               enabled: Enabled
               height: 330
               help_context_id: 0
-              left: 1800
+              left: 1680
               mask_color:
                 RGB:
                   red: 192
@@ -203,7 +243,7 @@ form:
               top: 600
               use_mask_color: DoNotUseMaskColor
               whats_this_help_id: 0
-              width: 1425
+              width: 945
       - name: cmdNewgame
         tag: ""
         index: 0
@@ -844,12 +884,6 @@ cst:
                         text: "False"
                   - kind: Newline
                     text: "\r\n"
-              - kind: Whitespace
-                text: " "
-              - kind: EndOfLineComment
-                text: "' pbIsOfficeMode = True ' TEst"
-              - kind: Newline
-                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1590,6 +1624,46 @@ cst:
                     children:
                       - kind: IntegerLiteral
                         text: "2"
+                  - kind: Newline
+                    text: "\r\n"
+          - kind: EndKeyword
+            text: End
+          - kind: Whitespace
+            text: " "
+          - kind: SubKeyword
+            text: Sub
+          - kind: Newline
+            text: "\r\n"
+      - kind: Newline
+        text: "\r\n"
+      - kind: SubStatement
+        children:
+          - kind: PrivateKeyword
+            text: Private
+          - kind: Whitespace
+            text: " "
+          - kind: SubKeyword
+            text: Sub
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: Command1_Click
+          - kind: ParameterList
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: RightParenthesis
+                text: )
+          - kind: Newline
+            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: " "
+              - kind: CallStatement
+                children:
+                  - kind: Identifier
+                    text: TestEval
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword

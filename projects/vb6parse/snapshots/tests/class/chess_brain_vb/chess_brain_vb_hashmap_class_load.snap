@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/chess_brain_vb.rs
+source: projects/vb6parse/tests/class/chess_brain_vb.rs
 expression: class
 ---
 header:
@@ -382,22 +382,10 @@ cst:
             text: If
           - kind: Whitespace
             text: " "
-          - kind: BinaryExpression
+          - kind: IdentifierExpression
             children:
-              - kind: IdentifierExpression
-                children:
-                  - kind: Identifier
-                    text: VBA7
-              - kind: Whitespace
-                text: " "
-              - kind: AndKeyword
-                text: And
-              - kind: Whitespace
-                text: " "
-              - kind: IdentifierExpression
-                children:
-                  - kind: Identifier
-                    text: Win64
+              - kind: Identifier
+                text: Win64
           - kind: Whitespace
             text: " "
           - kind: ThenKeyword
@@ -2424,20 +2412,6 @@ cst:
             text: " "
           - kind: ByteKeyword
             text: Byte
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: CheckDataPtr
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -4520,62 +4494,8 @@ cst:
                         text: Size
                   - kind: Newline
                     text: "\r\n"
-              - kind: Whitespace
-                text: "  "
-              - kind: AssignmentStatement
-                children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: Identifier
-                        text: CheckDataPtr
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EqualityOperator
-                    text: "="
-                  - kind: Whitespace
-                    text: " "
-                  - kind: CallExpression
-                    children:
-                      - kind: Identifier
-                        text: CLng
-                      - kind: LeftParenthesis
-                        text: (
-                      - kind: ArgumentList
-                        children:
-                          - kind: Argument
-                            children:
-                              - kind: CallExpression
-                                children:
-                                  - kind: Identifier
-                                    text: VarPtr
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: CallExpression
-                                            children:
-                                              - kind: Identifier
-                                                text: CheckData
-                                              - kind: LeftParenthesis
-                                                text: (
-                                              - kind: ArgumentList
-                                                children:
-                                                  - kind: Argument
-                                                    children:
-                                                      - kind: NumericLiteralExpression
-                                                        children:
-                                                          - kind: IntegerLiteral
-                                                            text: "0"
-                                              - kind: RightParenthesis
-                                                text: )
-                                  - kind: RightParenthesis
-                                    text: )
-                      - kind: RightParenthesis
-                        text: )
-                  - kind: Newline
-                    text: "\r\n"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
