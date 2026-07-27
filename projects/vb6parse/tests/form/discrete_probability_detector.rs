@@ -3,7 +3,8 @@ use vb6parse::io::SourceFile;
 
 #[test]
 fn discrete_probability_detector_dpd_form_load() {
-    let form_file_bytes = include_bytes!("../data/Discrete-Probability-Detector-in-VB6/DPD.frm");
+    let form_file_bytes =
+        include_bytes!("../../../../test-data/Discrete-Probability-Detector-in-VB6/DPD.frm");
 
     let source_file = SourceFile::decode_with_replacement("DPD.frm", form_file_bytes);
 

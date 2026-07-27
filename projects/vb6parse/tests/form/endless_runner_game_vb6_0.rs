@@ -3,8 +3,9 @@ use vb6parse::io::SourceFile;
 
 #[test]
 fn endless_runner_game_vb6_0_desert_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/desert.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/desert.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("desert.frm", form_file_bytes);
 
@@ -35,8 +36,9 @@ fn endless_runner_game_vb6_0_desert_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_dialog_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Dialog.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Dialog.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Dialog.frm", form_file_bytes);
 
@@ -67,8 +69,9 @@ fn endless_runner_game_vb6_0_dialog_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_form10_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Form10.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Form10.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form10.frm", form_file_bytes);
 
@@ -99,8 +102,9 @@ fn endless_runner_game_vb6_0_form10_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_form11_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Form11.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Form11.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form11.frm", form_file_bytes);
 
@@ -131,8 +135,9 @@ fn endless_runner_game_vb6_0_form11_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_form12_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Form12.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Form12.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form12.frm", form_file_bytes);
 
@@ -163,8 +168,9 @@ fn endless_runner_game_vb6_0_form12_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_form2_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Form2.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Form2.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form2.frm", form_file_bytes);
 
@@ -195,8 +201,9 @@ fn endless_runner_game_vb6_0_form2_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_form3_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Form3.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Form3.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form3.frm", form_file_bytes);
 
@@ -227,8 +234,9 @@ fn endless_runner_game_vb6_0_form3_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_form5_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Form5.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Form5.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form5.frm", form_file_bytes);
 
@@ -259,8 +267,9 @@ fn endless_runner_game_vb6_0_form5_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_form6_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Form6.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Form6.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form6.frm", form_file_bytes);
 
@@ -291,8 +300,9 @@ fn endless_runner_game_vb6_0_form6_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_form7_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Form7.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Form7.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form7.frm", form_file_bytes);
 
@@ -323,8 +333,9 @@ fn endless_runner_game_vb6_0_form7_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_form8_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Form8.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Form8.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form8.frm", form_file_bytes);
 
@@ -355,8 +366,9 @@ fn endless_runner_game_vb6_0_form8_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_form9_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Form9.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Form9.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form9.frm", form_file_bytes);
 
@@ -388,7 +400,7 @@ fn endless_runner_game_vb6_0_form9_form_load() {
 #[test]
 fn endless_runner_game_vb6_0_frmsplash_form_load() {
     let form_file_bytes = include_bytes!(
-        "../data/Endless-runner-Game_VB6.0/Endless runner project files/frmSplash.frm"
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/frmSplash.frm"
     );
 
     let source_file = SourceFile::decode_with_replacement("frmSplash.frm", form_file_bytes);
@@ -421,7 +433,7 @@ fn endless_runner_game_vb6_0_frmsplash_form_load() {
 #[test]
 fn endless_runner_game_vb6_0_howtoplay_form_load() {
     let form_file_bytes = include_bytes!(
-        "../data/Endless-runner-Game_VB6.0/Endless runner project files/howtoplay.frm"
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/howtoplay.frm"
     );
 
     let source_file = SourceFile::decode_with_replacement("howtoplay.frm", form_file_bytes);
@@ -453,8 +465,9 @@ fn endless_runner_game_vb6_0_howtoplay_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_jp2_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/jp2.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/jp2.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("jp2.frm", form_file_bytes);
 
@@ -485,8 +498,9 @@ fn endless_runner_game_vb6_0_jp2_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_jump4_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/jump4.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/jump4.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("jump4.frm", form_file_bytes);
 
@@ -518,7 +532,7 @@ fn endless_runner_game_vb6_0_jump4_form_load() {
 #[test]
 fn endless_runner_game_vb6_0_jump_king_form_load() {
     let form_file_bytes = include_bytes!(
-        "../data/Endless-runner-Game_VB6.0/Endless runner project files/jump king.frm"
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/jump king.frm"
     );
 
     let source_file = SourceFile::decode_with_replacement("jump king.frm", form_file_bytes);
@@ -551,7 +565,7 @@ fn endless_runner_game_vb6_0_jump_king_form_load() {
 #[test]
 fn endless_runner_game_vb6_0_leaderboard_form_load() {
     let form_file_bytes = include_bytes!(
-        "../data/Endless-runner-Game_VB6.0/Endless runner project files/Leaderboard.frm"
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Leaderboard.frm"
     );
 
     let source_file = SourceFile::decode_with_replacement("Leaderboard.frm", form_file_bytes);
@@ -583,8 +597,9 @@ fn endless_runner_game_vb6_0_leaderboard_form_load() {
 
 #[test]
 fn endless_runner_game_vb6_0_report_form_load() {
-    let form_file_bytes =
-        include_bytes!("../data/Endless-runner-Game_VB6.0/Endless runner project files/Report.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/Report.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Report.frm", form_file_bytes);
 

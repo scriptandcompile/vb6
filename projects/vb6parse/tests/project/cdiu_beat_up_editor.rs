@@ -2,7 +2,7 @@ use vb6parse::*;
 
 #[test]
 fn cdiu_beat_up_editor_project_load() {
-    let project_file_bytes = include_bytes!("../data/CdiuBeatUpEditor/Project1.vbp");
+    let project_file_bytes = include_bytes!("../../../../test-data/CdiuBeatUpEditor/Project1.vbp");
 
     let result = SourceFile::decode_with_replacement("Project1.vbp", project_file_bytes);
 

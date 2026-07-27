@@ -7,7 +7,7 @@ use vb6parse::*;
 #[test]
 fn bitrate_calculator_project_load() {
     let project_file_bytes =
-        include_bytes!("../data/Bitrate-calculator/Windows/Source-code/BitrateCalc.vbp");
+        include_bytes!("../../../../test-data/Bitrate-calculator/Windows/Source-code/BitrateCalc.vbp");
 
     let result = SourceFile::decode_with_replacement("BitrateCalc.vbp", project_file_bytes);
 

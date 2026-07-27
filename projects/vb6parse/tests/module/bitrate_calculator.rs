@@ -2,8 +2,9 @@ use vb6parse::*;
 
 #[test]
 fn bitrate_calculator_global_module_load() {
-    let module_bytes =
-        include_bytes!("../data/Bitrate-calculator/Windows/Source-code/modGlobal.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/Bitrate-calculator/Windows/Source-code/modGlobal.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("modGlobal.bas", module_bytes);
 
@@ -33,8 +34,9 @@ fn bitrate_calculator_global_module_load() {
 
 #[test]
 fn bitrate_calculator_hook_wheel_mouse_module_load() {
-    let module_bytes =
-        include_bytes!("../data/Bitrate-calculator/Windows/Source-code/modHookWheelMouse.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/Bitrate-calculator/Windows/Source-code/modHookWheelMouse.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("modHookWheelMouse.bas", module_bytes);
 

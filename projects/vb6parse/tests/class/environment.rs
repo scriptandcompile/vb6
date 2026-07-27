@@ -2,7 +2,7 @@ use vb6parse::*;
 
 #[test]
 fn environment_asynccall_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/AsyncCall.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/AsyncCall.cls");
 
     let result = SourceFile::decode_with_replacement("AsyncCall.cls", class_bytes);
 
@@ -32,7 +32,7 @@ fn environment_asynccall_class_load() {
 
 #[test]
 fn environment_basecollection_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/BaseCollection.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/BaseCollection.cls");
 
     let result = SourceFile::decode_with_replacement("BaseCollection.cls", class_bytes);
 
@@ -62,7 +62,7 @@ fn environment_basecollection_class_load() {
 
 #[test]
 fn environment_basetask_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/basetask.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/basetask.cls");
 
     let result = SourceFile::decode_with_replacement("basetask.cls", class_bytes);
 
@@ -92,7 +92,7 @@ fn environment_basetask_class_load() {
 
 #[test]
 fn environment_callback2_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/CallBack2.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/CallBack2.cls");
 
     let result = SourceFile::decode_with_replacement("CallBack2.cls", class_bytes);
 
@@ -122,7 +122,7 @@ fn environment_callback2_class_load() {
 
 #[test]
 fn environment_callback_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/callback.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/callback.cls");
 
     let result = SourceFile::decode_with_replacement("callback.cls", class_bytes);
 
@@ -152,7 +152,7 @@ fn environment_callback_class_load() {
 
 #[test]
 fn environment_casyncsocket_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cAsyncSocket.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cAsyncSocket.cls");
 
     let result = SourceFile::decode_with_replacement("cAsyncSocket.cls", class_bytes);
 
@@ -182,7 +182,7 @@ fn environment_casyncsocket_class_load() {
 
 #[test]
 fn environment_cdibsection_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cDIBSection.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cDIBSection.cls");
 
     let result = SourceFile::decode_with_replacement("cDIBSection.cls", class_bytes);
 
@@ -212,7 +212,7 @@ fn environment_cdibsection_class_load() {
 
 #[test]
 fn environment_checkbox_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/checkbox.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/checkbox.cls");
 
     let result = SourceFile::decode_with_replacement("checkbox.cls", class_bytes);
 
@@ -242,7 +242,7 @@ fn environment_checkbox_class_load() {
 
 #[test]
 fn environment_chttpdownload_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cHttpDownload.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cHttpDownload.cls");
 
     let result = SourceFile::decode_with_replacement("cHttpDownload.cls", class_bytes);
 
@@ -272,7 +272,7 @@ fn environment_chttpdownload_class_load() {
 
 #[test]
 fn environment_ciefeatures_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cIEFeatures.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cIEFeatures.cls");
 
     let result = SourceFile::decode_with_replacement("cIEFeatures.cls", class_bytes);
 
@@ -302,7 +302,7 @@ fn environment_ciefeatures_class_load() {
 
 #[test]
 fn environment_cjpeg_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cJpeg.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cJpeg.cls");
 
     let result = SourceFile::decode_with_replacement("cJpeg.cls", class_bytes);
 
@@ -332,7 +332,7 @@ fn environment_cjpeg_class_load() {
 
 #[test]
 fn environment_class1_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/Class1.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/Class1.cls");
 
     let result = SourceFile::decode_with_replacement("Class1.cls", class_bytes);
 
@@ -362,7 +362,7 @@ fn environment_class1_class_load() {
 
 #[test]
 fn environment_clsfie_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/clsFIE.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/clsFIE.cls");
 
     let result = SourceFile::decode_with_replacement("clsFIE.cls", class_bytes);
 
@@ -392,7 +392,7 @@ fn environment_clsfie_class_load() {
 
 #[test]
 fn environment_clsosinfo_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/clsOSInfo.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/clsOSInfo.cls");
 
     let result = SourceFile::decode_with_replacement("clsOSInfo.cls", class_bytes);
 
@@ -422,7 +422,7 @@ fn environment_clsosinfo_class_load() {
 
 #[test]
 fn environment_clsprofiler_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/clsProfiler.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/clsProfiler.cls");
 
     let result = SourceFile::decode_with_replacement("clsProfiler.cls", class_bytes);
 
@@ -452,7 +452,7 @@ fn environment_clsprofiler_class_load() {
 
 #[test]
 fn environment_cninepatch_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cNinePatch.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cNinePatch.cls");
 
     let result = SourceFile::decode_with_replacement("cNinePatch.cls", class_bytes);
 
@@ -482,7 +482,7 @@ fn environment_cninepatch_class_load() {
 
 #[test]
 fn environment_codeblock_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/CodeBlock.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/CodeBlock.cls");
 
     let result = SourceFile::decode_with_replacement("CodeBlock.cls", class_bytes);
 
@@ -512,7 +512,7 @@ fn environment_codeblock_class_load() {
 
 #[test]
 fn environment_coder_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/coder.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/coder.cls");
 
     let result = SourceFile::decode_with_replacement("coder.cls", class_bytes);
 
@@ -542,7 +542,7 @@ fn environment_coder_class_load() {
 
 #[test]
 fn environment_comevents_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/ComEvents.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ComEvents.cls");
 
     let result = SourceFile::decode_with_replacement("ComEvents.cls", class_bytes);
 
@@ -572,7 +572,7 @@ fn environment_comevents_class_load() {
 
 #[test]
 fn environment_comshinkevent_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/ComShinkEvent.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ComShinkEvent.cls");
 
     let result = SourceFile::decode_with_replacement("ComShinkEvent.cls", class_bytes);
 
@@ -602,7 +602,7 @@ fn environment_comshinkevent_class_load() {
 
 #[test]
 fn environment_comshinkeventnew_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/ComShinkEventNew.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ComShinkEventNew.cls");
 
     let result = SourceFile::decode_with_replacement("ComShinkEventNew.cls", class_bytes);
 
@@ -632,7 +632,7 @@ fn environment_comshinkeventnew_class_load() {
 
 #[test]
 fn environment_constantclass_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/constantclass.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/constantclass.cls");
 
     let result = SourceFile::decode_with_replacement("constantclass.cls", class_bytes);
 
@@ -662,7 +662,7 @@ fn environment_constantclass_class_load() {
 
 #[test]
 fn environment_copyinout_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/CopyInOut.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/CopyInOut.cls");
 
     let result = SourceFile::decode_with_replacement("CopyInOut.cls", class_bytes);
 
@@ -692,7 +692,7 @@ fn environment_copyinout_class_load() {
 
 #[test]
 fn environment_counter_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/counter.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/counter.cls");
 
     let result = SourceFile::decode_with_replacement("counter.cls", class_bytes);
 
@@ -722,7 +722,7 @@ fn environment_counter_class_load() {
 
 #[test]
 fn environment_cratelimiter_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cRateLimiter.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cRateLimiter.cls");
 
     let result = SourceFile::decode_with_replacement("cRateLimiter.cls", class_bytes);
 
@@ -752,7 +752,7 @@ fn environment_cratelimiter_class_load() {
 
 #[test]
 fn environment_cregistry_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cRegistry.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cRegistry.cls");
 
     let result = SourceFile::decode_with_replacement("cRegistry.cls", class_bytes);
 
@@ -782,7 +782,7 @@ fn environment_cregistry_class_load() {
 
 #[test]
 fn environment_ctlsclient1_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cTlsClient1.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cTlsClient1.cls");
 
     let result = SourceFile::decode_with_replacement("cTlsClient1.cls", class_bytes);
 
@@ -812,7 +812,7 @@ fn environment_ctlsclient1_class_load() {
 
 #[test]
 fn environment_ctlsclient_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cTlsClient.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cTlsClient.cls");
 
     let result = SourceFile::decode_with_replacement("cTlsClient.cls", class_bytes);
 
@@ -842,7 +842,7 @@ fn environment_ctlsclient_class_load() {
 
 #[test]
 fn environment_ctlssocket_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cTlsSocket.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cTlsSocket.cls");
 
     let result = SourceFile::decode_with_replacement("cTlsSocket.cls", class_bytes);
 
@@ -875,7 +875,7 @@ fn environment_cwinsockrequest_class_load() {
     // The source code has a large amount of unknown token errors because
     // the original source code contains an error where a Property block is not properly closed.
     // Instead of closing with 'End Property', is is 'closed' with 'End Function' which is incorrect.
-    let class_bytes = include_bytes!("../data/Environment/cWinSockRequest.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cWinSockRequest.cls");
 
     let result = SourceFile::decode_with_replacement("cWinSockRequest.cls", class_bytes);
 
@@ -905,7 +905,7 @@ fn environment_cwinsockrequest_class_load() {
 
 #[test]
 fn environment_cziparchive_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/cZipArchive.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/cZipArchive.cls");
 
     let result = SourceFile::decode_with_replacement("cZipArchive.cls", class_bytes);
 
@@ -935,7 +935,7 @@ fn environment_cziparchive_class_load() {
 
 #[test]
 fn environment_dropdownlist_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/dropdownlist.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/dropdownlist.cls");
 
     let result = SourceFile::decode_with_replacement("dropdownlist.cls", class_bytes);
 
@@ -965,7 +965,7 @@ fn environment_dropdownlist_class_load() {
 
 #[test]
 fn environment_enumeration_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/Enumeration.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/Enumeration.cls");
 
     let result = SourceFile::decode_with_replacement("Enumeration.cls", class_bytes);
 
@@ -995,7 +995,7 @@ fn environment_enumeration_class_load() {
 
 #[test]
 fn environment_errorbag_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/ErrorBag.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ErrorBag.cls");
 
     let result = SourceFile::decode_with_replacement("ErrorBag.cls", class_bytes);
 
@@ -1029,7 +1029,7 @@ fn environment_exifread_class_load() {
     // an error where the programmer commented out the start of a line which contained multiple
     // continuation characters making a large multi-line statement but failed to comment out the
     // rest of the lines, resulting in many unknown tokens during parsing.
-    let class_bytes = include_bytes!("../data/Environment/ExifRead.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ExifRead.cls");
 
     let result = SourceFile::decode_with_replacement("ExifRead.cls", class_bytes);
 
@@ -1059,7 +1059,7 @@ fn environment_exifread_class_load() {
 
 #[test]
 fn environment_extcontrol_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/ExtControl.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ExtControl.cls");
 
     let result = SourceFile::decode_with_replacement("ExtControl.cls", class_bytes);
 
@@ -1089,7 +1089,7 @@ fn environment_extcontrol_class_load() {
 
 #[test]
 fn environment_fastcollection_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/FastCollection.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/FastCollection.cls");
 
     let result = SourceFile::decode_with_replacement("FastCollection.cls", class_bytes);
 
@@ -1119,7 +1119,7 @@ fn environment_fastcollection_class_load() {
 
 #[test]
 fn environment_fileselector_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/FileSelector.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/FileSelector.cls");
 
     let result = SourceFile::decode_with_replacement("FileSelector.cls", class_bytes);
 
@@ -1149,7 +1149,7 @@ fn environment_fileselector_class_load() {
 
 #[test]
 fn environment_gcommondialog_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/GCommonDialog.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/GCommonDialog.cls");
 
     let result = SourceFile::decode_with_replacement("GCommonDialog.cls", class_bytes);
 
@@ -1179,7 +1179,7 @@ fn environment_gcommondialog_class_load() {
 
 #[test]
 fn environment_group_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/Group.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/Group.cls");
 
     let result = SourceFile::decode_with_replacement("Group.cls", class_bytes);
 
@@ -1209,7 +1209,7 @@ fn environment_group_class_load() {
 
 #[test]
 fn environment_guibutton_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/GuiButton.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/GuiButton.cls");
 
     let result = SourceFile::decode_with_replacement("GuiButton.cls", class_bytes);
 
@@ -1239,7 +1239,7 @@ fn environment_guibutton_class_load() {
 
 #[test]
 fn environment_guicheckbox_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/GuiCheckBox.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/GuiCheckBox.cls");
 
     let result = SourceFile::decode_with_replacement("GuiCheckBox.cls", class_bytes);
 
@@ -1269,7 +1269,7 @@ fn environment_guicheckbox_class_load() {
 
 #[test]
 fn environment_guidropdown_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/GuiDropDown.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/GuiDropDown.cls");
 
     let result = SourceFile::decode_with_replacement("GuiDropDown.cls", class_bytes);
 
@@ -1299,7 +1299,7 @@ fn environment_guidropdown_class_load() {
 
 #[test]
 fn environment_guiimage_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/GuiImage.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/GuiImage.cls");
 
     let result = SourceFile::decode_with_replacement("GuiImage.cls", class_bytes);
 
@@ -1330,7 +1330,7 @@ fn environment_guiimage_class_load() {
 #[test]
 #[ignore = "test takes an extremely long time. this may be a stack overflow / recursion issue."]
 fn environment_guilistbox_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/GuiListBox.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/GuiListBox.cls");
 
     let result = SourceFile::decode_with_replacement("GuiListBox.cls", class_bytes);
 
@@ -1360,7 +1360,7 @@ fn environment_guilistbox_class_load() {
 
 #[test]
 fn environment_guitextbox_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/GuiTextBox.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/GuiTextBox.cls");
 
     let result = SourceFile::decode_with_replacement("GuiTextBox.cls", class_bytes);
 
@@ -1390,7 +1390,7 @@ fn environment_guitextbox_class_load() {
 
 #[test]
 fn environment_hash_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/Hash.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/Hash.cls");
 
     let result = SourceFile::decode_with_replacement("Hash.cls", class_bytes);
 
@@ -1420,7 +1420,7 @@ fn environment_hash_class_load() {
 
 #[test]
 fn environment_hashlist_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/HashList.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/HashList.cls");
 
     let result = SourceFile::decode_with_replacement("HashList.cls", class_bytes);
 
@@ -1450,7 +1450,7 @@ fn environment_hashlist_class_load() {
 
 #[test]
 fn environment_httpsrequest_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/HttpsRequest.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/HttpsRequest.cls");
 
     let result = SourceFile::decode_with_replacement("HttpsRequest.cls", class_bytes);
 
@@ -1480,7 +1480,7 @@ fn environment_httpsrequest_class_load() {
 
 #[test]
 fn environment_iboxarray_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/iBoxArray.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/iBoxArray.cls");
 
     let result = SourceFile::decode_with_replacement("iBoxArray.cls", class_bytes);
 
@@ -1510,7 +1510,7 @@ fn environment_iboxarray_class_load() {
 
 #[test]
 fn environment_icontrolindex_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/IControlIndex.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/IControlIndex.cls");
 
     let result = SourceFile::decode_with_replacement("IControlIndex.cls", class_bytes);
 
@@ -1540,7 +1540,7 @@ fn environment_icontrolindex_class_load() {
 
 #[test]
 fn environment_idhash_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/idHash.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/idHash.cls");
 
     let result = SourceFile::decode_with_replacement("idHash.cls", class_bytes);
 
@@ -1570,7 +1570,7 @@ fn environment_idhash_class_load() {
 
 #[test]
 fn environment_indexes_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/Indexes.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/Indexes.cls");
 
     let result = SourceFile::decode_with_replacement("Indexes.cls", class_bytes);
 
@@ -1600,7 +1600,7 @@ fn environment_indexes_class_load() {
 
 #[test]
 fn environment_interpress_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/InterPress.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/InterPress.cls");
 
     let result = SourceFile::decode_with_replacement("InterPress.cls", class_bytes);
 
@@ -1630,7 +1630,7 @@ fn environment_interpress_class_load() {
 
 #[test]
 fn environment_itask_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/ITask.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ITask.cls");
 
     let result = SourceFile::decode_with_replacement("ITask.cls", class_bytes);
 
@@ -1660,7 +1660,7 @@ fn environment_itask_class_load() {
 
 #[test]
 fn environment_jsonarray_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/JsonArray.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/JsonArray.cls");
 
     let result = SourceFile::decode_with_replacement("JsonArray.cls", class_bytes);
 
@@ -1690,7 +1690,7 @@ fn environment_jsonarray_class_load() {
 
 #[test]
 fn environment_jsonobject_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/JsonObject.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/JsonObject.cls");
 
     let result = SourceFile::decode_with_replacement("JsonObject.cls", class_bytes);
 
@@ -1720,7 +1720,7 @@ fn environment_jsonobject_class_load() {
 
 #[test]
 fn environment_lambda_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/lambda.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/lambda.cls");
 
     let result = SourceFile::decode_with_replacement("lambda.cls", class_bytes);
 
@@ -1750,7 +1750,7 @@ fn environment_lambda_class_load() {
 
 #[test]
 fn environment_lexar_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/Lexar.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/Lexar.cls");
 
     let result = SourceFile::decode_with_replacement("Lexar.cls", class_bytes);
 
@@ -1780,7 +1780,7 @@ fn environment_lexar_class_load() {
 
 #[test]
 fn environment_longhash_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/LongHash.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/LongHash.cls");
 
     let result = SourceFile::decode_with_replacement("LongHash.cls", class_bytes);
 
@@ -1810,7 +1810,7 @@ fn environment_longhash_class_load() {
 
 #[test]
 fn environment_marray_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/mArray.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/mArray.cls");
 
     let result = SourceFile::decode_with_replacement("mArray.cls", class_bytes);
 
@@ -1840,7 +1840,7 @@ fn environment_marray_class_load() {
 
 #[test]
 fn environment_math_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/Math.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/Math.cls");
 
     let result = SourceFile::decode_with_replacement("Math.cls", class_bytes);
 
@@ -1870,7 +1870,7 @@ fn environment_math_class_load() {
 
 #[test]
 fn environment_memblock_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/MemBlock.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/MemBlock.cls");
 
     let result = SourceFile::decode_with_replacement("MemBlock.cls", class_bytes);
 
@@ -1900,7 +1900,7 @@ fn environment_memblock_class_load() {
 
 #[test]
 fn environment_metadc_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/MetaDc.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/MetaDc.cls");
 
     let result = SourceFile::decode_with_replacement("MetaDc.cls", class_bytes);
 
@@ -1930,7 +1930,7 @@ fn environment_metadc_class_load() {
 
 #[test]
 fn environment_mevent_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/mEvent.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/mEvent.cls");
 
     let result = SourceFile::decode_with_replacement("mEvent.cls", class_bytes);
 
@@ -1960,7 +1960,7 @@ fn environment_mevent_class_load() {
 
 #[test]
 fn environment_mhandler_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/mHandler.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/mHandler.cls");
 
     let result = SourceFile::decode_with_replacement("mHandler.cls", class_bytes);
 
@@ -1990,7 +1990,7 @@ fn environment_mhandler_class_load() {
 
 #[test]
 fn environment_mk2base_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/Mk2Base.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/Mk2Base.cls");
 
     let result = SourceFile::decode_with_replacement("Mk2Base.cls", class_bytes);
 
@@ -2020,7 +2020,7 @@ fn environment_mk2base_class_load() {
 
 #[test]
 fn environment_moviemodule_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/MovieModule.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/MovieModule.cls");
 
     let result = SourceFile::decode_with_replacement("MovieModule.cls", class_bytes);
 
@@ -2050,7 +2050,7 @@ fn environment_moviemodule_class_load() {
 
 #[test]
 fn environment_mstiva2_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/mStiva2.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/mStiva2.cls");
 
     let result = SourceFile::decode_with_replacement("mStiva2.cls", class_bytes);
 
@@ -2080,7 +2080,7 @@ fn environment_mstiva2_class_load() {
 
 #[test]
 fn environment_mstiva_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/mStiva.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/mStiva.cls");
 
     let result = SourceFile::decode_with_replacement("mStiva.cls", class_bytes);
 
@@ -2110,7 +2110,7 @@ fn environment_mstiva_class_load() {
 
 #[test]
 fn environment_mthreadref_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/mThreadref.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/mThreadref.cls");
 
     let result = SourceFile::decode_with_replacement("mThreadref.cls", class_bytes);
 
@@ -2140,7 +2140,7 @@ fn environment_mthreadref_class_load() {
 
 #[test]
 fn environment_musicbox_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/MusicBox.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/MusicBox.cls");
 
     let result = SourceFile::decode_with_replacement("MusicBox.cls", class_bytes);
 
@@ -2170,7 +2170,7 @@ fn environment_musicbox_class_load() {
 
 #[test]
 fn environment_mutex_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/Mutex.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/Mutex.cls");
 
     let result = SourceFile::decode_with_replacement("Mutex.cls", class_bytes);
 
@@ -2200,7 +2200,7 @@ fn environment_mutex_class_load() {
 
 #[test]
 fn environment_mybutton_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/myButton.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/myButton.cls");
 
     let result = SourceFile::decode_with_replacement("myButton.cls", class_bytes);
 
@@ -2230,7 +2230,7 @@ fn environment_mybutton_class_load() {
 
 #[test]
 fn environment_mydoc_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/myDoc.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/myDoc.cls");
 
     let result = SourceFile::decode_with_replacement("myDoc.cls", class_bytes);
 
@@ -2260,7 +2260,7 @@ fn environment_mydoc_class_load() {
 
 #[test]
 fn environment_myprocess_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/MyProcess.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/MyProcess.cls");
 
     let result = SourceFile::decode_with_replacement("MyProcess.cls", class_bytes);
 
@@ -2290,7 +2290,7 @@ fn environment_myprocess_class_load() {
 
 #[test]
 fn environment_mytextbox_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/myTextBox.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/myTextBox.cls");
 
     let result = SourceFile::decode_with_replacement("myTextBox.cls", class_bytes);
 
@@ -2320,7 +2320,7 @@ fn environment_mytextbox_class_load() {
 
 #[test]
 fn environment_pppplight_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/ppppLight.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ppppLight.cls");
 
     let result = SourceFile::decode_with_replacement("ppppLight.cls", class_bytes);
 
@@ -2350,7 +2350,7 @@ fn environment_pppplight_class_load() {
 
 #[test]
 fn environment_propreference_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/PropReference.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/PropReference.cls");
 
     let result = SourceFile::decode_with_replacement("PropReference.cls", class_bytes);
 
@@ -2380,7 +2380,7 @@ fn environment_propreference_class_load() {
 
 #[test]
 fn environment_recdir_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/RecDir.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/RecDir.cls");
 
     let result = SourceFile::decode_with_replacement("RecDir.cls", class_bytes);
 
@@ -2410,7 +2410,7 @@ fn environment_recdir_class_load() {
 
 #[test]
 fn environment_recordmci_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/RecordMci.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/RecordMci.cls");
 
     let result = SourceFile::decode_with_replacement("RecordMci.cls", class_bytes);
 
@@ -2440,7 +2440,7 @@ fn environment_recordmci_class_load() {
 
 #[test]
 fn environment_refarray_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/RefArray.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/RefArray.cls");
 
     let result = SourceFile::decode_with_replacement("RefArray.cls", class_bytes);
 
@@ -2470,7 +2470,7 @@ fn environment_refarray_class_load() {
 
 #[test]
 fn environment_safeforms_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/safeforms.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/safeforms.cls");
 
     let result = SourceFile::decode_with_replacement("safeforms.cls", class_bytes);
 
@@ -2500,7 +2500,7 @@ fn environment_safeforms_class_load() {
 
 #[test]
 fn environment_sbhash_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/sbHash.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/sbHash.cls");
 
     let result = SourceFile::decode_with_replacement("sbHash.cls", class_bytes);
 
@@ -2530,7 +2530,7 @@ fn environment_sbhash_class_load() {
 
 #[test]
 fn environment_serialport_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/SerialPort.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/SerialPort.cls");
 
     let result = SourceFile::decode_with_replacement("SerialPort.cls", class_bytes);
 
@@ -2560,7 +2560,7 @@ fn environment_serialport_class_load() {
 
 #[test]
 fn environment_shellpipe_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/ShellPipe.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ShellPipe.cls");
 
     let result = SourceFile::decode_with_replacement("ShellPipe.cls", class_bytes);
 
@@ -2590,7 +2590,7 @@ fn environment_shellpipe_class_load() {
 
 #[test]
 fn environment_sinkevent_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/SinkEvent.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/SinkEvent.cls");
 
     let result = SourceFile::decode_with_replacement("SinkEvent.cls", class_bytes);
 
@@ -2620,7 +2620,7 @@ fn environment_sinkevent_class_load() {
 
 #[test]
 fn environment_socket_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/Socket.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/Socket.cls");
 
     let result = SourceFile::decode_with_replacement("Socket.cls", class_bytes);
 
@@ -2650,7 +2650,7 @@ fn environment_socket_class_load() {
 
 #[test]
 fn environment_spbuffer_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/SPBuffer.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/SPBuffer.cls");
 
     let result = SourceFile::decode_with_replacement("SPBuffer.cls", class_bytes);
 
@@ -2680,7 +2680,7 @@ fn environment_spbuffer_class_load() {
 
 #[test]
 fn environment_stdcallfunction_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/stdCallFunction.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/stdCallFunction.cls");
 
     let result = SourceFile::decode_with_replacement("stdCallFunction.cls", class_bytes);
 
@@ -2710,7 +2710,7 @@ fn environment_stdcallfunction_class_load() {
 
 #[test]
 fn environment_taskbase_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/TaskBase.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/TaskBase.cls");
 
     let result = SourceFile::decode_with_replacement("TaskBase.cls", class_bytes);
 
@@ -2740,7 +2740,7 @@ fn environment_taskbase_class_load() {
 
 #[test]
 fn environment_taskmaster_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/TaskMaster.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/TaskMaster.cls");
 
     let result = SourceFile::decode_with_replacement("TaskMaster.cls", class_bytes);
 
@@ -2770,7 +2770,7 @@ fn environment_taskmaster_class_load() {
 
 #[test]
 fn environment_threadsclass_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/ThreadsClass.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ThreadsClass.cls");
 
     let result = SourceFile::decode_with_replacement("ThreadsClass.cls", class_bytes);
 
@@ -2800,7 +2800,7 @@ fn environment_threadsclass_class_load() {
 
 #[test]
 fn environment_varitem_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/VarItem.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/VarItem.cls");
 
     let result = SourceFile::decode_with_replacement("VarItem.cls", class_bytes);
 
@@ -2830,7 +2830,7 @@ fn environment_varitem_class_load() {
 
 #[test]
 fn environment_xmlmono_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/XmlMono.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/XmlMono.cls");
 
     let result = SourceFile::decode_with_replacement("XmlMono.cls", class_bytes);
 
@@ -2860,7 +2860,7 @@ fn environment_xmlmono_class_load() {
 
 #[test]
 fn environment_xmlmonointernal_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/XmlMonoInternal.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/XmlMonoInternal.cls");
 
     let result = SourceFile::decode_with_replacement("XmlMonoInternal.cls", class_bytes);
 
@@ -2890,7 +2890,7 @@ fn environment_xmlmonointernal_class_load() {
 
 #[test]
 fn environment_xmlnode_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/XmlNode.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/XmlNode.cls");
 
     let result = SourceFile::decode_with_replacement("XmlNode.cls", class_bytes);
 
@@ -2920,7 +2920,7 @@ fn environment_xmlnode_class_load() {
 
 #[test]
 fn environment_ziptool_class_load() {
-    let class_bytes = include_bytes!("../data/Environment/ZipTool.cls");
+    let class_bytes = include_bytes!("../../../../test-data/Environment/ZipTool.cls");
 
     let result = SourceFile::decode_with_replacement("ZipTool.cls", class_bytes);
 

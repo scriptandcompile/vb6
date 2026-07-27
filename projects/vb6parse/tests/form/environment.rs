@@ -3,7 +3,7 @@ use vb6parse::io::SourceFile;
 
 #[test]
 fn environment_avi_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/Avi.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/Avi.frm");
 
     let source_file = SourceFile::decode_with_replacement("Avi.frm", form_file_bytes);
 
@@ -34,7 +34,7 @@ fn environment_avi_form_load() {
 
 #[test]
 fn environment_colordialog_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/ColorDialog.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/ColorDialog.frm");
 
     let source_file = SourceFile::decode_with_replacement("ColorDialog.frm", form_file_bytes);
 
@@ -65,7 +65,7 @@ fn environment_colordialog_form_load() {
 
 #[test]
 fn environment_fileselectordialog_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/FileSelectorDialog.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/FileSelectorDialog.frm");
 
     let source_file =
         SourceFile::decode_with_replacement("FileSelectorDialog.frm", form_file_bytes);
@@ -97,7 +97,7 @@ fn environment_fileselectordialog_form_load() {
 
 #[test]
 fn environment_fontdialog1_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/FontDialog1.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/FontDialog1.frm");
 
     let source_file = SourceFile::decode_with_replacement("FontDialog1.frm", form_file_bytes);
 
@@ -128,7 +128,7 @@ fn environment_fontdialog1_form_load() {
 
 #[test]
 fn environment_fontdialog_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/FontDialog.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/FontDialog.frm");
 
     let source_file = SourceFile::decode_with_replacement("FontDialog.frm", form_file_bytes);
 
@@ -159,7 +159,7 @@ fn environment_fontdialog_form_load() {
 
 #[test]
 fn environment_frmabout_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/frmAbout.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/frmAbout.frm");
 
     let source_file = SourceFile::decode_with_replacement("frmAbout.frm", form_file_bytes);
 
@@ -190,7 +190,7 @@ fn environment_frmabout_form_load() {
 
 #[test]
 fn environment_guim2000_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/GuiM2000.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/GuiM2000.frm");
 
     let source_file = SourceFile::decode_with_replacement("GuiM2000.frm", form_file_bytes);
 
@@ -221,7 +221,7 @@ fn environment_guim2000_form_load() {
 
 #[test]
 fn environment_help_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/help.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/help.frm");
 
     let source_file = SourceFile::decode_with_replacement("help.frm", form_file_bytes);
 
@@ -252,7 +252,7 @@ fn environment_help_form_load() {
 
 #[test]
 fn environment_layer_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/layer.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/layer.frm");
 
     let source_file = SourceFile::decode_with_replacement("layer.frm", form_file_bytes);
 
@@ -283,7 +283,7 @@ fn environment_layer_form_load() {
 
 #[test]
 fn environment_loadfile_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/LoadFile.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/LoadFile.frm");
 
     let source_file = SourceFile::decode_with_replacement("LoadFile.frm", form_file_bytes);
 
@@ -314,7 +314,7 @@ fn environment_loadfile_form_load() {
 
 #[test]
 fn environment_mform1_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/mForm1.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/mForm1.frm");
 
     let source_file = SourceFile::decode_with_replacement("mForm1.frm", form_file_bytes);
 
@@ -345,7 +345,7 @@ fn environment_mform1_form_load() {
 
 #[test]
 fn environment_mypopup_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/MyPopUp.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/MyPopUp.frm");
 
     let source_file = SourceFile::decode_with_replacement("MyPopUp.frm", form_file_bytes);
 
@@ -376,7 +376,7 @@ fn environment_mypopup_form_load() {
 
 #[test]
 fn environment_neomsgbox_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/NeoMsgBox.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/NeoMsgBox.frm");
 
     let source_file = SourceFile::decode_with_replacement("NeoMsgBox.frm", form_file_bytes);
 
@@ -407,7 +407,7 @@ fn environment_neomsgbox_form_load() {
 
 #[test]
 fn environment_small_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/SMALL.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/SMALL.frm");
 
     let source_file = SourceFile::decode_with_replacement("SMALL.frm", form_file_bytes);
 
@@ -438,7 +438,7 @@ fn environment_small_form_load() {
 
 #[test]
 fn environment_test_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/TEST.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/TEST.frm");
 
     let source_file = SourceFile::decode_with_replacement("TEST.frm", form_file_bytes);
 
@@ -469,7 +469,7 @@ fn environment_test_form_load() {
 
 #[test]
 fn environment_testme_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/testme.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/testme.frm");
 
     let source_file = SourceFile::decode_with_replacement("testme.frm", form_file_bytes);
 
@@ -500,7 +500,7 @@ fn environment_testme_form_load() {
 
 #[test]
 fn environment_textp0_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/TextP0.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/TextP0.frm");
 
     let source_file = SourceFile::decode_with_replacement("TextP0.frm", form_file_bytes);
 
@@ -531,7 +531,7 @@ fn environment_textp0_form_load() {
 
 #[test]
 fn environment_tweakprive_form_load() {
-    let form_file_bytes = include_bytes!("../data/Environment/tweakprive.frm");
+    let form_file_bytes = include_bytes!("../../../../test-data/Environment/tweakprive.frm");
 
     let source_file = SourceFile::decode_with_replacement("tweakprive.frm", form_file_bytes);
 
