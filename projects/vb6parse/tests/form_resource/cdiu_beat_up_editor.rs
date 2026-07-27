@@ -2,7 +2,7 @@ use vb6parse::files::resource::FormResourceFile;
 
 #[test]
 fn cdiu_beat_up_editor_chatbox_frx() {
-    let result = FormResourceFile::from_file("./tests/data/CdiuBeatUpEditor/ChatBox.frx")
+    let result = FormResourceFile::from_file("../../test-data/CdiuBeatUpEditor/ChatBox.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -16,7 +16,7 @@ fn cdiu_beat_up_editor_chatbox_frx() {
 
 #[test]
 fn cdiu_beat_up_editor_openroom_frx() {
-    let result = FormResourceFile::from_file("./tests/data/CdiuBeatUpEditor/OpenRoom.frx")
+    let result = FormResourceFile::from_file("../../test-data/CdiuBeatUpEditor/OpenRoom.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -30,7 +30,7 @@ fn cdiu_beat_up_editor_openroom_frx() {
 
 #[test]
 fn cdiu_beat_up_editor_systemread_frx() {
-    let result = FormResourceFile::from_file("./tests/data/CdiuBeatUpEditor/systemRead.frx")
+    let result = FormResourceFile::from_file("../../test-data/CdiuBeatUpEditor/systemRead.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -44,7 +44,7 @@ fn cdiu_beat_up_editor_systemread_frx() {
 
 #[test]
 fn cdiu_beat_up_editor_test_frx() {
-    let result = FormResourceFile::from_file("./tests/data/CdiuBeatUpEditor/test.frx")
+    let result = FormResourceFile::from_file("../../test-data/CdiuBeatUpEditor/test.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());

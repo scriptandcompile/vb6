@@ -3,7 +3,7 @@ use vb6parse::files::resource::FormResourceFile;
 #[test]
 fn bitrate_calculator_about_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/Bitrate-calculator/Windows/Source-code/frmAbout.frx",
+        "../../test-data/Bitrate-calculator/Windows/Source-code/frmAbout.frx",
     )
     .expect("Failed to read file");
 
@@ -19,7 +19,7 @@ fn bitrate_calculator_about_frx() {
 #[test]
 fn bitrate_calculator_main_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/Bitrate-calculator/Windows/Source-code/frmMain.frx",
+        "../../test-data/Bitrate-calculator/Windows/Source-code/frmMain.frx",
     )
     .expect("Failed to read file");
 

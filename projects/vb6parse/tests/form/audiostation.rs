@@ -165,8 +165,9 @@ fn audiostation_midi_form_load() {
 
 #[test]
 fn audiostation_normalize_form_load() {
-    let form_file_bytes =
-        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Normalize.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/audiostation/Audiostation/src/Forms/Form_Normalize.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form_Normalize.frm", form_file_bytes);
 
@@ -230,8 +231,9 @@ fn audiostation_open_dialog_form_load() {
 
 #[test]
 fn audiostation_playlist_form_load() {
-    let form_file_bytes =
-        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Playlist.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/audiostation/Audiostation/src/Forms/Form_Playlist.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form_Playlist.frm", form_file_bytes);
 
@@ -262,8 +264,9 @@ fn audiostation_playlist_form_load() {
 
 #[test]
 fn audiostation_plugins_form_load() {
-    let form_file_bytes =
-        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Plugins.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/audiostation/Audiostation/src/Forms/Form_Plugins.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form_Plugins.frm", form_file_bytes);
 
@@ -362,8 +365,9 @@ fn audiostation_settings_record_form_load() {
 
 #[test]
 fn audiostation_streams_form_load() {
-    let form_file_bytes =
-        include_bytes!("../../../../test-data/audiostation/Audiostation/src/Forms/Form_Streams.frm");
+    let form_file_bytes = include_bytes!(
+        "../../../../test-data/audiostation/Audiostation/src/Forms/Form_Streams.frm"
+    );
 
     let source_file = SourceFile::decode_with_replacement("Form_Streams.frm", form_file_bytes);
 

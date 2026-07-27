@@ -2,7 +2,7 @@ use vb6parse::*;
 
 #[test]
 fn artificial_life_organism_class_load() {
-    let file_path = "./tests/data/vb6-code/Artificial-life/Organism.cls";
+    let file_path = "../../test-data/vb6-code/Artificial-life/Organism.cls";
     let class_bytes = std::fs::read(file_path).expect("Failed to read class file");
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);
@@ -33,7 +33,7 @@ fn artificial_life_organism_class_load() {
 
 #[test]
 fn blacklight_effect_class_load() {
-    let file_path1 = "./tests/data/vb6-code/Blacklight-effect/FastDrawing.cls";
+    let file_path1 = "../../test-data/vb6-code/Blacklight-effect/FastDrawing.cls";
     let class_bytes1 = std::fs::read(file_path1).expect("Failed to read class file");
 
     let result1 = SourceFile::decode_with_replacement(file_path1, &class_bytes1);
@@ -61,7 +61,7 @@ fn blacklight_effect_class_load() {
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(class1);
 
-    let file_path2 = "./tests/data/vb6-code/Blacklight-effect/pdOpenSaveDialog.cls";
+    let file_path2 = "../../test-data/vb6-code/Blacklight-effect/pdOpenSaveDialog.cls";
     let class_bytes2 = std::fs::read(file_path2).expect("Failed to read class file");
 
     let result2 = SourceFile::decode_with_replacement(file_path2, &class_bytes2);
@@ -88,7 +88,7 @@ fn blacklight_effect_class_load() {
 
 #[test]
 fn gradient_2d_class_load() {
-    let file_path = "./tests/data/vb6-code/Gradient-2D/cSystemColorDialog.cls";
+    let file_path = "../../test-data/vb6-code/Gradient-2D/cSystemColorDialog.cls";
     let class_bytes = std::fs::read(file_path).expect("Failed to read class file");
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);
@@ -119,7 +119,7 @@ fn gradient_2d_class_load() {
 
 #[test]
 fn hidden_markov_model_class_load() {
-    let file_path = "./tests/data/vb6-code/Hidden-Markov-model/cCommonDialog.cls";
+    let file_path = "../../test-data/vb6-code/Hidden-Markov-model/cCommonDialog.cls";
     let class_bytes = std::fs::read(file_path).expect("Failed to read class file");
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);

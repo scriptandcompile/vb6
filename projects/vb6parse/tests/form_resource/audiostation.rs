@@ -5,7 +5,7 @@ use assert_matches::assert_matches;
 #[test]
 fn audiostation_about_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_About.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_About.frx",
     )
     .expect("Failed to read file");
 
@@ -59,7 +59,7 @@ fn audiostation_about_frx() {
 #[test]
 fn audiostation_busy_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_Busy.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_Busy.frx",
     )
     .expect("Failed to read file");
 
@@ -77,7 +77,7 @@ fn audiostation_busy_frx() {
 #[test]
 fn audiostation_init_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_Init.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_Init.frx",
     )
     .expect("Failed to read file");
 
@@ -141,7 +141,7 @@ fn audiostation_init_frx() {
 #[test]
 fn audiostation_main_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_Main.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_Main.frx",
     )
     .expect("Failed to read file");
 
@@ -207,7 +207,7 @@ fn audiostation_main_frx() {
 #[test]
 fn audiostation_normalize_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_Normalize.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_Normalize.frx",
     )
     .expect("Failed to read file");
 
@@ -225,7 +225,7 @@ fn audiostation_normalize_frx() {
 #[test]
 fn audiostation_open_dialog_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_OpenDialog.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_OpenDialog.frx",
     )
     .expect("Failed to read file");
 
@@ -269,7 +269,7 @@ fn audiostation_open_dialog_frx() {
 #[test]
 fn audiostation_playlist_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_Playlist.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_Playlist.frx",
     )
     .expect("Failed to read file");
 
@@ -287,7 +287,7 @@ fn audiostation_playlist_frx() {
 #[test]
 fn audiostation_plugins_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_Plugins.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_Plugins.frx",
     )
     .expect("Failed to read file");
 
@@ -305,7 +305,7 @@ fn audiostation_plugins_frx() {
 #[test]
 fn audiostation_settings_recorder_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_Settings_Recorder.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_Settings_Recorder.frx",
     )
     .expect("Failed to read file");
 
@@ -323,7 +323,7 @@ fn audiostation_settings_recorder_frx() {
 #[test]
 fn audiostation_settings_record_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_Settings_Record.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_Settings_Record.frx",
     )
     .expect("Failed to read file");
 
@@ -387,7 +387,7 @@ fn audiostation_settings_record_frx() {
 #[test]
 fn audiostation_streams_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_Streams.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_Streams.frx",
     )
     .expect("Failed to read file");
 
@@ -405,7 +405,7 @@ fn audiostation_streams_frx() {
 #[test]
 fn audiostation_track_properties_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_Track_Properties.frx",
+        "../../test-data/audiostation/Audiostation/src/Forms/Form_Track_Properties.frx",
     )
     .expect("Failed to read file");
 

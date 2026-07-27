@@ -3,7 +3,7 @@ use vb6parse::files::resource::FormResourceFile;
 #[test]
 fn chess_brain_vb_debugmain_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Forms/DebugMain.frx",
+        "../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Forms/DebugMain.frx",
     )
     .expect("Failed to read file");
 
@@ -19,7 +19,7 @@ fn chess_brain_vb_debugmain_frx() {
 #[test]
 fn chess_brain_vb_frmchessx_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Forms/frmChessX.frx",
+        "../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Forms/frmChessX.frx",
     )
     .expect("Failed to read file");
 
@@ -40,7 +40,7 @@ fn chess_brain_vb_frmchessx_frx() {
 #[test]
 fn chess_brain_vb_main_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Forms/main.frx",
+        "../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Forms/main.frx",
     )
     .expect("Failed to read file");
 

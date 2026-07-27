@@ -2,7 +2,7 @@ use vb6parse::files::resource::FormResourceFile;
 
 #[test]
 fn environment_avi_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/Avi.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/Avi.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -16,7 +16,7 @@ fn environment_avi_frx() {
 
 #[test]
 fn environment_colordialog_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/ColorDialog.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/ColorDialog.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -30,7 +30,7 @@ fn environment_colordialog_frx() {
 
 #[test]
 fn environment_fileselectordialog_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/FileSelectorDialog.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/FileSelectorDialog.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -44,7 +44,7 @@ fn environment_fileselectordialog_frx() {
 
 #[test]
 fn environment_fontdialog1_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/FontDialog1.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/FontDialog1.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -58,7 +58,7 @@ fn environment_fontdialog1_frx() {
 
 #[test]
 fn environment_frmabout_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/frmAbout.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/frmAbout.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -72,7 +72,7 @@ fn environment_frmabout_frx() {
 
 #[test]
 fn environment_guim2000_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/GuiM2000.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/GuiM2000.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -86,7 +86,7 @@ fn environment_guim2000_frx() {
 
 #[test]
 fn environment_help_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/help.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/help.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -100,7 +100,7 @@ fn environment_help_frx() {
 
 #[test]
 fn environment_mform1_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/mForm1.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/mForm1.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -114,7 +114,7 @@ fn environment_mform1_frx() {
 
 #[test]
 fn environment_neomsgbox_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/NeoMsgBox.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/NeoMsgBox.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -128,7 +128,7 @@ fn environment_neomsgbox_frx() {
 
 #[test]
 fn environment_small_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/SMALL.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/SMALL.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -142,7 +142,7 @@ fn environment_small_frx() {
 
 #[test]
 fn environment_test_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/TEST.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/TEST.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -156,7 +156,7 @@ fn environment_test_frx() {
 
 #[test]
 fn environment_textp0_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/TextP0.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/TextP0.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -170,7 +170,7 @@ fn environment_textp0_frx() {
 
 #[test]
 fn environment_tweakprive_frx() {
-    let result = FormResourceFile::from_file("./tests/data/Environment/tweakprive.frx")
+    let result = FormResourceFile::from_file("../../test-data/Environment/tweakprive.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
