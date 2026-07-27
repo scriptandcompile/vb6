@@ -1,0 +1,209 @@
+(startRule 
+	(module 
+		(moduleOptions 
+			(moduleOption Option Explicit) \n \n) 
+		(moduleBody 
+			(moduleBodyElement 
+				(moduleBlock 
+					(block 
+						(blockStmt 
+							(variableStmt 
+								(visibility Private)   WithEvents   
+								(variableListStmt 
+									(variableSubStmt 
+										(ambiguousIdentifier mText)   
+										(asTypeClause As   
+											(type 
+												(complexType 
+													(ambiguousIdentifier TimerState))))))))))) \n \n 
+			(moduleBodyElement 
+				(subStmt 
+					(visibility Private)   Sub   
+					(ambiguousIdentifier Command1_Click) 
+					(argList ( )) \n 
+					(block 
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_MembersCall 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Text1)) 
+										(iCS_S_MemberCall . 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier 
+													(ambiguousKeyword Text))))))   =   
+								(valueStmt 
+									(literal "From Now")))) \n     
+						(blockStmt 
+							(implicitCallStmt_InBlock 
+								(iCS_B_MemberProcedureCall 
+									(implicitCallStmt_InStmt 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Text1))) . 
+									(ambiguousIdentifier Refresh)))) \n     
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_MembersCall 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Text2)) 
+										(iCS_S_MemberCall . 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier 
+													(ambiguousKeyword Text))))))   =   
+								(valueStmt 
+									(literal "0")))) \n     
+						(blockStmt 
+							(implicitCallStmt_InBlock 
+								(iCS_B_MemberProcedureCall 
+									(implicitCallStmt_InStmt 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Text2))) . 
+									(ambiguousIdentifier Refresh)))) \n 
+						(blockStmt 
+							(explicitCallStmt 
+								(eCS_MemberProcedureCall Call   
+									(implicitCallStmt_InStmt 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier mText))) . 
+									(ambiguousIdentifier TimerTask) ( 
+									(argsCall 
+										(argCall 
+											(valueStmt 
+												(literal 9.84)))) ))))) \n End Sub)) \n \n 
+			(moduleBodyElement 
+				(subStmt 
+					(visibility Private)   Sub   
+					(ambiguousIdentifier Form_Load) 
+					(argList ( )) \n     
+					(block 
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_MembersCall 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Command1)) 
+										(iCS_S_MemberCall . 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier Caption)))))   =   
+								(valueStmt 
+									(literal "Click to Start Timer")))) \n     
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_MembersCall 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Text1)) 
+										(iCS_S_MemberCall . 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier 
+													(ambiguousKeyword Text))))))   =   
+								(valueStmt 
+									(literal "")))) \n     
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_MembersCall 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Text2)) 
+										(iCS_S_MemberCall . 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier 
+													(ambiguousKeyword Text))))))   =   
+								(valueStmt 
+									(literal "")))) \n     
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_MembersCall 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Label1)) 
+										(iCS_S_MemberCall . 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier Caption)))))   =   
+								(valueStmt 
+									(literal "The fastest 100 meter run took this long:")))) \n     
+						(blockStmt 
+							(setStmt Set   
+								(implicitCallStmt_InStmt 
+									(iCS_S_VariableOrProcedureCall 
+										(ambiguousIdentifier mText)))   =   
+								(valueStmt New   
+									(valueStmt 
+										(implicitCallStmt_InStmt 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier TimerState)))))))) \n     End Sub)) \n \n 
+			(moduleBodyElement 
+				(subStmt 
+					(visibility Private)   Sub   
+					(ambiguousIdentifier mText_ChangeText) 
+					(argList ( )) \n     
+					(block 
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_MembersCall 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Text1)) 
+										(iCS_S_MemberCall . 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier 
+													(ambiguousKeyword Text))))))   =   
+								(valueStmt 
+									(literal "Until Now")))) \n     
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_MembersCall 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Text2)) 
+										(iCS_S_MemberCall . 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier 
+													(ambiguousKeyword Text))))))   =   
+								(valueStmt 
+									(literal "9.84"))))) \n End Sub)) \n \n 
+			(moduleBodyElement 
+				(subStmt 
+					(visibility Private)   Sub   
+					(ambiguousIdentifier mText_UpdateTime) 
+					(argList ( 
+						(arg ByVal   
+							(ambiguousIdentifier dblJump)   
+							(asTypeClause As   
+								(type 
+									(baseType Double)))) )) \n     
+					(block 
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_MembersCall 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier Text2)) 
+										(iCS_S_MemberCall . 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier 
+													(ambiguousKeyword Text))))))   =   
+								(valueStmt 
+									(implicitCallStmt_InStmt 
+										(iCS_S_ProcedureOrArrayCall 
+											(ambiguousIdentifier Str) ( 
+											(argsCall 
+												(argCall 
+													(valueStmt 
+														(implicitCallStmt_InStmt 
+															(iCS_S_ProcedureOrArrayCall 
+																(ambiguousIdentifier Format) ( 
+																(argsCall 
+																	(argCall 
+																		(valueStmt 
+																			(implicitCallStmt_InStmt 
+																				(iCS_S_VariableOrProcedureCall 
+																					(ambiguousIdentifier dblJump))))) ,   
+																	(argCall 
+																		(valueStmt 
+																			(literal "0")))) )))))) )))))) \n     
+						(blockStmt 
+							(implicitCallStmt_InBlock 
+								(iCS_B_ProcedureCall 
+									(certainIdentifier DoEvents))))) \n End Sub)))) <EOF>)

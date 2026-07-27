@@ -1,0 +1,42 @@
+(startRule 
+	(module 
+		(moduleBody 
+			(moduleBodyElement 
+				(moduleBlock 
+					(block 
+						(blockStmt 
+							(variableStmt Dim   
+								(variableListStmt 
+									(variableSubStmt 
+										(ambiguousIdentifier FileNumber))))) \n 
+						(blockStmt 
+							(forNextStmt For   
+								(iCS_S_VariableOrProcedureCall 
+									(ambiguousIdentifier FileNumber))   =   
+								(valueStmt 
+									(literal 1))   To   
+								(valueStmt 
+									(literal 5)) \n    \n    \n    
+								(block 
+									(blockStmt 
+										(openStmt Open   
+											(valueStmt 
+												(valueStmt 
+													(literal "TEST"))   &   
+												(valueStmt 
+													(implicitCallStmt_InStmt 
+														(iCS_S_VariableOrProcedureCall 
+															(ambiguousIdentifier FileNumber)))))   For   Output   As   
+											(valueStmt 
+												(literal #FileNumber)))) \n    
+									(blockStmt 
+										(writeStmt Write   
+											(valueStmt 
+												(literal #FileNumber)) ,   
+											(outputList 
+												(outputList_Expression 
+													(valueStmt 
+														(literal "Hello World"))))))) \n Next   
+								(ambiguousIdentifier FileNumber))) \n 
+						(blockStmt 
+							(resetStmt Reset)))))) \n      ) <EOF>)

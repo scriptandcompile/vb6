@@ -1,0 +1,11 @@
+[package]
+name = "vb6grammarfuzz"
+version = "0.1.0"
+edition = "2021"
+description = "Grammar-based fuzzer for vb6parse using ANTLR4 .g4 grammar files"
+
+[dependencies]
+vb6parse = { path = "../vb6parse" }
+clap = { version = "4.5", features = ["derive"] }
+rand = "0.10.0"
+anyhow = "1.0"
