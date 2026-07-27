@@ -1,0 +1,44 @@
+name: Update Library Documentation
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'projects/vb6parse/src/syntax/library/**'
+      - 'projects/vb6parse/scripts/generate-library-docs.py'
+  workflow_dispatch:
+
+jobs:
+  library:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        run: pip install markdown
+
+      - name: Generate library documentation
+        run: |
+          python3 projects/vb6parse/scripts/generate-library-docs.py \
+            --src projects/vb6parse/src/syntax/library \
+            --output docs/library \
+            --clean
+
+      - name: Commit and push if changed
+        run: |
+          git pull --rebase --autostash
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add docs/library/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update library documentation [skip ci]"
+            git push
+          fi
