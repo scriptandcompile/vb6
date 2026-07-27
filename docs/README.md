@@ -6,6 +6,7 @@ This directory is the umbrella GitHub Pages scaffold for the full VB6 workspace.
 
 - `index.html` - workspace hub and project launcher
 - `status.html` - status board and remaining work
+- `vb6parse/` - VB6Parse project docs (library reference, benchmarks, coverage, playground)
 
 ## Local Preview
 

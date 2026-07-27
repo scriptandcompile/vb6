@@ -1,0 +1,64 @@
+name: Build WASM for Playground
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'projects/vb6parse/tests/**'
+      - 'projects/vb6parse/benches/**'
+      - 'projects/vb6parse/examples/**'
+  workflow_dispatch:
+
+jobs:
+  wasm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+
+      - name: Install wasm-opt
+        run: cargo install wasm-opt
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Show build tool versions
+        run: |
+          rustc --version
+          cargo --version
+          wasm-pack --version
+          wasm-opt --version
+          python3 --version
+
+      - name: Build WASM module
+        working-directory: projects/vb6parse
+        run: python3 scripts/build-wasm.py --optimize --no-typescript
+
+      - name: Copy WASM output to umbrella docs
+        run: cp -r projects/vb6parse/docs/assets/wasm docs/assets/wasm
+
+      - name: Commit and push if changed
+        run: |
+          git pull --rebase --autostash
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -f docs/assets/wasm/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update WASM files for playground [skip ci]"
+            git push
+          fi
