@@ -53,31 +53,31 @@ fn module_benchmarks(criterion: &mut Criterion) {
     let modules = vec![
         ModuleBenchmark::new(
             "Physics_Logic.bas",
-            include_bytes!("../tests/data/vb6-code/Game-physics-basic/Physics_Logic.bas"),
+            include_bytes!("../../../test-data/vb6-code/Game-physics-basic/Physics_Logic.bas"),
         ),
         ModuleBenchmark::new(
             "Levels/mod_PublicVars.bas",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/mod_PublicVars.bas"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/mod_PublicVars.bas"),
         ),
         ModuleBenchmark::new(
             "HistogramsAdv/mod_PublicVars.bas",
-            include_bytes!("../tests/data/vb6-code/Histograms-advanced/mod_PublicVars.bas"),
+            include_bytes!("../../../test-data/vb6-code/Histograms-advanced/mod_PublicVars.bas"),
         ),
         ModuleBenchmark::new(
             "MapEditor/Declarations.bas",
-            include_bytes!("../tests/data/vb6-code/Map-editor-2D/Declarations.bas"),
+            include_bytes!("../../../test-data/vb6-code/Map-editor-2D/Declarations.bas"),
         ),
         ModuleBenchmark::new(
             "MapEditor/Subs.bas",
-            include_bytes!("../tests/data/vb6-code/Map-editor-2D/Subs.bas"),
+            include_bytes!("../../../test-data/vb6-code/Map-editor-2D/Subs.bas"),
         ),
         ModuleBenchmark::new(
             "Histograms/mod_PublicVars.bas",
-            include_bytes!("../tests/data/vb6-code/Histograms-basic/mod_PublicVars.bas"),
+            include_bytes!("../../../test-data/vb6-code/Histograms-basic/mod_PublicVars.bas"),
         ),
         ModuleBenchmark::new(
             "ArtificialLife/Declarations.bas",
-            include_bytes!("../tests/data/vb6-code/Artificial-life/Declarations.bas"),
+            include_bytes!("../../../test-data/vb6-code/Artificial-life/Declarations.bas"),
         ),
     ];
 

@@ -54,53 +54,53 @@ fn form_resource_benchmarks(criterion: &mut Criterion) {
         // Small resources - minimal data
         ResourceBenchmark::new(
             "FormPhysics.frx",
-            include_bytes!("../tests/data/vb6-code/Game-physics-basic/FormPhysics.frx"),
+            include_bytes!("../../../test-data/vb6-code/Game-physics-basic/FormPhysics.frx"),
         ),
         ResourceBenchmark::new(
             "Gradient.frx",
-            include_bytes!("../tests/data/vb6-code/Gradient-2D/Gradient.frx"),
+            include_bytes!("../../../test-data/vb6-code/Gradient-2D/Gradient.frx"),
         ),
         ResourceBenchmark::new(
             "frmTransparency.frx",
-            include_bytes!("../tests/data/vb6-code/Transparency-2D/frmTransparency.frx"),
+            include_bytes!("../../../test-data/vb6-code/Transparency-2D/frmTransparency.frx"),
         ),
         // Medium resources - typical icons/images
         ResourceBenchmark::new(
             "Brightness/VB6/Brightness.frx",
             include_bytes!(
-                "../tests/data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frx"
+                "../../../test-data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frx"
             ),
         ),
         ResourceBenchmark::new(
             "Brightness/API/Brightness2.frx",
             include_bytes!(
-                "../tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frx"
+                "../../../test-data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frx"
             ),
         ),
         ResourceBenchmark::new(
             "Brightness/DIBs/Brightness3.frx",
             include_bytes!(
-                "../tests/data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frx"
+                "../../../test-data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frx"
             ),
         ),
         ResourceBenchmark::new(
             "Brightness/FasterDIBs/Brightness.frx",
             include_bytes!(
-                "../tests/data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frx"
+                "../../../test-data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frx"
             ),
         ),
         // Large resources - complex forms with many images
         ResourceBenchmark::new(
             "MapEditor/Main Editor.frx",
-            include_bytes!("../tests/data/vb6-code/Map-editor-2D/Main Editor.frx"),
+            include_bytes!("../../../test-data/vb6-code/Map-editor-2D/Main Editor.frx"),
         ),
         ResourceBenchmark::new(
             "frmHMM.frx",
-            include_bytes!("../tests/data/vb6-code/Hidden-Markov-model/frmHMM.frx"),
+            include_bytes!("../../../test-data/vb6-code/Hidden-Markov-model/frmHMM.frx"),
         ),
         ResourceBenchmark::new(
             "frmFire.frx",
-            include_bytes!("../tests/data/vb6-code/Fire-effect/frmFire.frx"),
+            include_bytes!("../../../test-data/vb6-code/Fire-effect/frmFire.frx"),
         ),
     ];
 

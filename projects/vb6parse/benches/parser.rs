@@ -54,53 +54,53 @@ fn parser_benchmarks(criterion: &mut Criterion) {
         // Small files - simple CST construction
         ParserBenchmark::new(
             "Physics_Logic.bas",
-            include_bytes!("../tests/data/vb6-code/Game-physics-basic/Physics_Logic.bas"),
+            include_bytes!("../../../test-data/vb6-code/Game-physics-basic/Physics_Logic.bas"),
         ),
         ParserBenchmark::new(
             "Declarations.bas",
-            include_bytes!("../tests/data/vb6-code/Artificial-life/Declarations.bas"),
+            include_bytes!("../../../test-data/vb6-code/Artificial-life/Declarations.bas"),
         ),
         ParserBenchmark::new(
             "Subs.bas",
-            include_bytes!("../tests/data/vb6-code/Map-editor-2D/Subs.bas"),
+            include_bytes!("../../../test-data/vb6-code/Map-editor-2D/Subs.bas"),
         ),
         // Medium files - typical complexity
         ParserBenchmark::new(
             "mod_PublicVars.bas",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/mod_PublicVars.bas"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/mod_PublicVars.bas"),
         ),
         ParserBenchmark::new(
             "MapEditor/Declarations.bas",
-            include_bytes!("../tests/data/vb6-code/Map-editor-2D/Declarations.bas"),
+            include_bytes!("../../../test-data/vb6-code/Map-editor-2D/Declarations.bas"),
         ),
         ParserBenchmark::new(
             "FastDrawing.cls",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/FastDrawing.cls"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/FastDrawing.cls"),
         ),
         ParserBenchmark::new(
             "FormPhysics.frm",
-            include_bytes!("../tests/data/vb6-code/Game-physics-basic/FormPhysics.frm"),
+            include_bytes!("../../../test-data/vb6-code/Game-physics-basic/FormPhysics.frm"),
         ),
         // Large files - complex CST
         ParserBenchmark::new(
             "Organism.cls",
-            include_bytes!("../tests/data/vb6-code/Artificial-life/Organism.cls"),
+            include_bytes!("../../../test-data/vb6-code/Artificial-life/Organism.cls"),
         ),
         ParserBenchmark::new(
             "cCommonDialog.cls",
-            include_bytes!("../tests/data/vb6-code/Randomize-effects/cCommonDialog.cls"),
+            include_bytes!("../../../test-data/vb6-code/Randomize-effects/cCommonDialog.cls"),
         ),
         ParserBenchmark::new(
             "pdOpenSaveDialog.cls",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/pdOpenSaveDialog.cls"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/pdOpenSaveDialog.cls"),
         ),
         ParserBenchmark::new(
             "Levels/Main.frm",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/Main.frm"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/Main.frm"),
         ),
         ParserBenchmark::new(
             "Curves.frm",
-            include_bytes!("../tests/data/vb6-code/Curves-effect/Curves.frm"),
+            include_bytes!("../../../test-data/vb6-code/Curves-effect/Curves.frm"),
         ),
     ];
 
