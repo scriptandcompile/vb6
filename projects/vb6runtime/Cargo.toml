@@ -1,0 +1,37 @@
+[package]
+name = "vb6runtime"
+version = "0.1.0"
+edition = "2021"
+authors = ["Arthur <scriptandcompile@gmail.com>"]
+license = "MIT"
+description = "VB6 runtime library - value system, type conversions, and standard library implementations"
+repository = "https://github.com/scriptandcompile/vb6"
+keywords = ["vb6", "visual-basic", "runtime", "stdlib"]
+categories = ["development-tools", "compilers"]
+
+[dependencies]
+vb6parse = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+anyhow = { workspace = true }
+
+# For numeric operations
+num-traits = "0.2"
+
+# For date/time operations
+chrono = "0.4"
+
+# For file I/O
+encoding_rs = "0.8"
+
+[dev-dependencies]
+tempfile = "3.0"
+criterion = "0.5"
+
+[features]
+default = []
+com-interop = []  # Future: COM object support
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

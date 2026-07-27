@@ -1,0 +1,49 @@
+[package]
+name = "vb6compile"
+version = "0.1.0"
+edition = "2021"
+authors = ["Arthur <scriptandcompile@gmail.com>"]
+license = "MIT"
+description = "VB6 compiler - compile VB6 to native code or other languages"
+repository = "https://github.com/scriptandcompile/vb6"
+keywords = ["vb6", "visual-basic", "compiler", "code-generation"]
+categories = ["development-tools", "compilers"]
+
+[[bin]]
+name = "vb6compile"
+path = "src/main.rs"
+
+[dependencies]
+vb6parse = { workspace = true }
+vb6semantic = { path = "../vb6semantic" }
+vb6runtime = { path = "../vb6runtime" }
+vb6core = { path = "../vb6core" }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true }
+
+# For code generation
+heck = "0.4"  # Case conversions
+indoc = "2.0"  # Indented string literals
+
+# For formatting generated code
+rustfmt-wrapper = "0.2"
+
+# Optional LLVM backend
+[dependencies.inkwell]
+version = "0.4"
+optional = true
+default-features = false
+features = ["llvm16-0"]
+
+[dev-dependencies]
+tempfile = "3.8"
+criterion = "0.5"
+pretty_assertions = "1.4"
+
+[features]
+default = ["rust-backend"]
+rust-backend = []
+llvm-backend = ["inkwell", "vb6core/llvm"]
+javascript-backend = []
+all-backends = ["rust-backend", "llvm-backend", "javascript-backend"]
