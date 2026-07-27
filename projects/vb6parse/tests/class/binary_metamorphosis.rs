@@ -3,7 +3,7 @@ use vb6parse::*;
 #[test]
 fn binary_metamorphosis_v1_common_dialog_class_load() {
     let file_path =
-        "./tests/data/Binary-metamorphosis/Binary metamorphosis V1.0/src/cCommonDialog.cls";
+        "../../test-data//Binary-metamorphosis/Binary metamorphosis V1.0/src/cCommonDialog.cls";
     let class_bytes = std::fs::read(file_path).expect("Failed to read class file");
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);
@@ -35,7 +35,7 @@ fn binary_metamorphosis_v1_common_dialog_class_load() {
 #[test]
 fn binary_metamorphosis_v2_common_dialog_class_load() {
     let file_path =
-        "./tests/data/Binary-metamorphosis/Binary metamorphosis V2.0/src/cCommonDialog.cls";
+        "../../test-data//Binary-metamorphosis/Binary metamorphosis V2.0/src/cCommonDialog.cls";
     let class_bytes = std::fs::read(file_path).expect("Failed to read class file");
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);
@@ -67,7 +67,7 @@ fn binary_metamorphosis_v2_common_dialog_class_load() {
 #[test]
 fn binary_metamorphosis_v3_common_dialog_class_load() {
     let file_path =
-        "./tests/data/Binary-metamorphosis/Binary metamorphosis V3.0/src/cCommonDialog.cls";
+        "../../test-data//Binary-metamorphosis/Binary metamorphosis V3.0/src/cCommonDialog.cls";
     let class_bytes = std::fs::read(file_path).expect("Failed to read class file");
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);

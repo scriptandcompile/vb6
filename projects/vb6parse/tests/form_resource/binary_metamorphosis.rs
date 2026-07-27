@@ -3,7 +3,7 @@ use vb6parse::files::resource::FormResourceFile;
 #[test]
 fn binary_metamorphosis_v1_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/Binary-metamorphosis/Binary metamorphosis V1.0/src/Bin_To_VB.frx",
+        "../../test-data/Binary-metamorphosis/Binary metamorphosis V1.0/src/Bin_To_VB.frx",
     )
     .expect("Failed to read file");
 
@@ -20,7 +20,7 @@ fn binary_metamorphosis_v1_frx() {
 #[test]
 fn binary_metamorphosis_v2_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/Binary-metamorphosis/Binary metamorphosis V2.0/src/Bin_To_VB.frx",
+        "../../test-data/Binary-metamorphosis/Binary metamorphosis V2.0/src/Bin_To_VB.frx",
     )
     .expect("Failed to read file");
 
@@ -37,7 +37,7 @@ fn binary_metamorphosis_v2_frx() {
 #[test]
 fn binary_metamorphosis_v3_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/Binary-metamorphosis/Binary metamorphosis V3.0/src/Bin_To_VB.frx",
+        "../../test-data/Binary-metamorphosis/Binary metamorphosis V3.0/src/Bin_To_VB.frx",
     )
     .expect("Failed to read file");
 

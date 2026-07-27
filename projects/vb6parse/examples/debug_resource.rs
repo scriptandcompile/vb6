@@ -14,7 +14,7 @@ fn main() {
     let file_path = if args.len() > 1 {
         &args[1]
     } else {
-        "./tests/data/audiostation/Audiostation/src/Forms/Form_About.frx"
+        "test-data//audiostation/Audiostation/src/Forms/Form_About.frx"
     };
 
     let result = FormResourceFile::from_file(file_path).expect("Failed to read file");

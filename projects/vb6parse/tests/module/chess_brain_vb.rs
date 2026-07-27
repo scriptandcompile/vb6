@@ -2,8 +2,9 @@ use vb6parse::*;
 
 #[test]
 fn chess_brain_vb_bitboard32_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/BitBoard32.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/BitBoard32.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("BitBoard32.bas", module_bytes);
 
@@ -33,8 +34,9 @@ fn chess_brain_vb_bitboard32_module_load() {
 
 #[test]
 fn chess_brain_vb_board_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Board.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Board.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("Board.bas", module_bytes);
 
@@ -64,8 +66,9 @@ fn chess_brain_vb_board_module_load() {
 
 #[test]
 fn chess_brain_vb_book_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Book.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Book.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("Book.bas", module_bytes);
 
@@ -95,8 +98,9 @@ fn chess_brain_vb_book_module_load() {
 
 #[test]
 fn chess_brain_vb_chessbrainvb_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/ChessBrainVB.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/ChessBrainVB.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("ChessBrainVB.bas", module_bytes);
 
@@ -126,8 +130,9 @@ fn chess_brain_vb_chessbrainvb_module_load() {
 
 #[test]
 fn chess_brain_vb_cmdoutput_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/CmdOutput.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/CmdOutput.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("CmdOutput.bas", module_bytes);
 
@@ -157,8 +162,9 @@ fn chess_brain_vb_cmdoutput_module_load() {
 
 #[test]
 fn chess_brain_vb_const_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Const.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Const.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("Const.bas", module_bytes);
 
@@ -188,8 +194,9 @@ fn chess_brain_vb_const_module_load() {
 
 #[test]
 fn chess_brain_vb_debug_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Debug.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Debug.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("Debug.bas", module_bytes);
 
@@ -219,8 +226,9 @@ fn chess_brain_vb_debug_module_load() {
 
 #[test]
 fn chess_brain_vb_epd_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/EPD.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/EPD.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("EPD.bas", module_bytes);
 
@@ -251,8 +259,9 @@ fn chess_brain_vb_epd_module_load() {
 #[test]
 #[ignore = "Failing due to a stack overflow in the parser."]
 fn chess_brain_vb_eval_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Eval.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Eval.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("Eval.bas", module_bytes);
 
@@ -282,8 +291,9 @@ fn chess_brain_vb_eval_module_load() {
 
 #[test]
 fn chess_brain_vb_hash_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Hash.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Hash.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("Hash.bas", module_bytes);
 
@@ -313,8 +323,9 @@ fn chess_brain_vb_hash_module_load() {
 
 #[test]
 fn chess_brain_vb_io_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/IO.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/IO.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("IO.bas", module_bytes);
 
@@ -344,8 +355,9 @@ fn chess_brain_vb_io_module_load() {
 
 #[test]
 fn chess_brain_vb_process_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Process.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Process.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("Process.bas", module_bytes);
 
@@ -375,8 +387,9 @@ fn chess_brain_vb_process_module_load() {
 
 #[test]
 fn chess_brain_vb_search_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Search.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Search.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("Search.bas", module_bytes);
 
@@ -406,8 +419,9 @@ fn chess_brain_vb_search_module_load() {
 
 #[test]
 fn chess_brain_vb_time_module_load() {
-    let module_bytes =
-        include_bytes!("../data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Time.bas");
+    let module_bytes = include_bytes!(
+        "../../../../test-data/ChessBrainVB/ChessBrainVB_V4_03a/Source/Modules/Time.bas"
+    );
 
     let result = SourceFile::decode_with_replacement("Time.bas", module_bytes);
 

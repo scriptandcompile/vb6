@@ -9,7 +9,7 @@ use vb6parse::io::SourceFile;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let current_directory = env::current_dir()?;
 
-    let project_directory = current_directory.join("tests/data/audiostation/Audiostation");
+    let project_directory = current_directory.join("test-data/audiostation/Audiostation");
     let project_path = project_directory.join("Audiostation.vbp");
 
     println!("Reading project file from: {}", project_path.display());

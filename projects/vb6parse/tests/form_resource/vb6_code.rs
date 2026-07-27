@@ -4,7 +4,7 @@ use vb6parse::files::resource::{FormResourceFile, ResourceEntry};
 #[test]
 fn brightness_effect_part_1_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frx",
+        "../../test-data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frx",
     )
     .expect("Failed to read file");
 
@@ -22,7 +22,7 @@ fn brightness_effect_part_1_frx() {
 #[test]
 fn brightness_effect_part_2_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frx",
+        "../../test-data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frx",
     )
     .expect("Failed to read file");
 
@@ -40,7 +40,7 @@ fn brightness_effect_part_2_frx() {
 #[test]
 fn brightness_effect_part_3_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frx",
+        "../../test-data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frx",
     )
     .expect("Failed to read file");
 
@@ -58,7 +58,7 @@ fn brightness_effect_part_3_frx() {
 #[test]
 fn brightness_effect_part_4_frx() {
     let result = FormResourceFile::from_file(
-        "./tests/data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frx",
+        "../../test-data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frx",
     )
     .expect("Failed to read file");
 
@@ -75,7 +75,7 @@ fn brightness_effect_part_4_frx() {
 
 #[test]
 fn fire_effect_frx() {
-    let result = FormResourceFile::from_file("./tests/data/vb6-code/Fire-effect/frmFire.frx")
+    let result = FormResourceFile::from_file("../../test-data/vb6-code/Fire-effect/frmFire.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -92,7 +92,7 @@ fn fire_effect_frx() {
 #[test]
 fn game_physics_basic_frx() {
     let result =
-        FormResourceFile::from_file("./tests/data/vb6-code/Game-physics-basic/FormPhysics.frx")
+        FormResourceFile::from_file("../../test-data/vb6-code/Game-physics-basic/FormPhysics.frx")
             .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -115,7 +115,7 @@ fn game_physics_basic_frx() {
 
 #[test]
 fn gradient_2d_frx() {
-    let result = FormResourceFile::from_file("./tests/data/vb6-code/Gradient-2D/Gradient.frx")
+    let result = FormResourceFile::from_file("../../test-data/vb6-code/Gradient-2D/Gradient.frx")
         .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -132,7 +132,7 @@ fn gradient_2d_frx() {
 #[test]
 fn hidden_markov_model_frx() {
     let result =
-        FormResourceFile::from_file("./tests/data/vb6-code/Hidden-Markov-model/frmHMM.frx")
+        FormResourceFile::from_file("../../test-data/vb6-code/Hidden-Markov-model/frmHMM.frx")
             .expect("Failed to read file");
 
     assert!(!result.has_failures());
@@ -148,8 +148,9 @@ fn hidden_markov_model_frx() {
 
 #[test]
 fn map_editor_2d_frx() {
-    let result = FormResourceFile::from_file("./tests/data/vb6-code/Map-editor-2D/Main Editor.frx")
-        .expect("Failed to read file");
+    let result =
+        FormResourceFile::from_file("../../test-data/vb6-code/Map-editor-2D/Main Editor.frx")
+            .expect("Failed to read file");
 
     assert!(!result.has_failures());
     let resource_file = result.unwrap_or_fail();
@@ -165,7 +166,7 @@ fn map_editor_2d_frx() {
 #[test]
 fn transparency_2d_frx() {
     let result =
-        FormResourceFile::from_file("./tests/data/vb6-code/Transparency-2D/frmTransparency.frx")
+        FormResourceFile::from_file("../../test-data/vb6-code/Transparency-2D/frmTransparency.frx")
             .expect("Failed to read file");
 
     assert!(!result.has_failures());
