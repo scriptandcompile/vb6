@@ -1,0 +1,47 @@
+---
+source: vb6parse/src/syntax/statements/objects/call.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: CallStatement
+      children:
+        - kind: CallKeyword
+          text: Call
+        - kind: Whitespace
+          text: "  "
+        - kind: Identifier
+          text: MyFunction
+        - kind: Whitespace
+          text: " "
+        - kind: LeftParenthesis
+          text: (
+        - kind: ArgumentList
+          children:
+            - kind: Whitespace
+              text: "  "
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: arg1
+            - kind: Whitespace
+              text: " "
+            - kind: Comma
+              text: ","
+            - kind: Whitespace
+              text: "  "
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: arg2
+            - kind: Whitespace
+              text: "  "
+        - kind: RightParenthesis
+          text: )
+        - kind: Newline
+          text: "\n"

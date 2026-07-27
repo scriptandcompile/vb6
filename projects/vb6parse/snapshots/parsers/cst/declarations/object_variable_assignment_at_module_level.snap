@@ -1,0 +1,25 @@
+---
+source: vb6parse/src/parsers/cst/declarations.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: AssignmentStatement
+      children:
+        - kind: IdentifierExpression
+          children:
+            - kind: ObjectKeyword
+              text: Object
+        - kind: Whitespace
+          text: " "
+        - kind: EqualityOperator
+          text: "="
+        - kind: Whitespace
+          text: " "
+        - kind: NumericLiteralExpression
+          children:
+            - kind: IntegerLiteral
+              text: "5"
+        - kind: Newline
+          text: "\n"

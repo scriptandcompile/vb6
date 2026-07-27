@@ -1,0 +1,41 @@
+---
+source: vb6parse/src/syntax/library/functions/string/rtrim.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: Whitespace
+      text: "            "
+    - kind: CallStatement
+      children:
+        - kind: Identifier
+          text: MsgBox
+        - kind: Whitespace
+          text: " "
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: RTrim
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: message
+                    - kind: RightParenthesis
+                      text: )
+        - kind: Newline
+          text: "\n"
+    - kind: Whitespace
+      text: "        "

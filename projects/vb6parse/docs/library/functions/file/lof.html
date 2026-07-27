@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Parse Library Reference - lof - File">
+    <title>lof - File - VB6Parse Library Reference</title>
+    <link rel="stylesheet" href="../../../assets/css/style.css">
+    <link rel="stylesheet" href="../../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../../../index.html">VB6Parse</a> / <a href="../../../library/index.html">Library</a> / <a href="../../../library/functions/file/index.html">File</a> / lof</h1>
+            <p class="tagline">VB6 Library Reference</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../../../index.html">Home</a>
+            <a href="../../../library/index.html">Library Reference</a>
+            <a href="../../../documentation.html">Documentation</a>
+            <a href="https://docs.rs/vb6parse" target="_blank">API Docs</a>
+            <a href="https://github.com/scriptandcompile/vb6parse" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container">
+        
+        <article class="library-item">
+            <h1 id="lof-function">LOF Function</h1>
+<p>Returns a Long representing the size, in bytes, of a file opened using the Open statement.</p>
+<h2 id="syntax">Syntax</h2>
+<pre><code class="language-vbnet">LOF(filenumber)</code></pre>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li><code>filenumber</code> (Required): Integer file number used in the Open statement</li>
+<li>Must be a valid file number from a currently open file</li>
+<li>File numbers typically obtained from <code>FreeFile</code> function</li>
+<li>Must be between 1 and 511</li>
+</ul>
+<h2 id="return-value">Return Value</h2>
+<p>Returns a Long:
+- Size of the file in bytes
+- For files opened in any mode (Binary, Random, Input, Output, Append)
+- Returns 0 for empty files
+- Maximum value 2,147,483,647 (Long type limit ~2GB)
+- Returns actual file size on disk
+- Updated immediately if file grows during operation</p>
+<h2 id="remarks">Remarks</h2>
+<p>The LOF function returns the length (size) of an open file:
+- Works with all file access modes (Binary, Random, Input, Output, Append)
+- Returns size in bytes regardless of mode
+- File must be open before calling LOF
+- Does not change file pointer position
+- Read-only operation (non-destructive)
+- Useful for calculating progress during file operations
+- Essential for determining number of records in Random files
+- Used to allocate buffers for reading entire file
+- Can be used with Loc to calculate percentage complete
+- Error 52 "Bad file name or number" if file not open
+- Error 68 "Device unavailable" if device unavailable
+- For Random files, divide by record length to get record count
+- Returns current size, even if file is being written to
+- More reliable than <code>FileLen</code> for open files
+- <code>FileLen</code> works on closed files, LOF works on open files
+- Common in loops reading files to completion
+- Used to detect empty files (LOF returns 0)
+- Essential for progress bars and status indicators
+- Helps prevent reading past end of file</p>
+<h2 id="typical-uses">Typical Uses</h2>
+<ol>
+<li><strong>Get File Size</strong></li>
+</ol>
+<pre><code class="language-vbnet">   fileSize = LOF(1)
+   ```
+2. **Calculate Record Count**
+   ```vb
+   recordCount = LOF(fileNum) / Len(record)
+   ```
+3. **Read Entire File**
+   ```vb
+   buffer = String(LOF(fileNum), 0)
+   Get #fileNum, , buffer
+   ```
+4. **Progress Calculation**
+   ```vb
+   percent = (Loc(fileNum) / LOF(fileNum)) * 100
+   ```
+5. **Check Empty File**
+   ```vb
+   If LOF(fileNum) = 0 Then
+       MsgBox &quot;File is empty&quot;
+   End If
+   ```
+6. **Loop Until End**
+   ```vb
+   Do While Loc(fileNum) &lt; LOF(fileNum)
+       Get #fileNum, , data
+   Loop
+   ```
+7. **Display File Size**
+   ```vb
+   lblSize.Caption = &quot;Size: &quot; &amp; LOF(fileNum) &amp; &quot; bytes&quot;
+   ```
+8. **Allocate Byte Array**
+   ```vb
+   ReDim fileData(1 To LOF(fileNum)) As Byte
+   ```
+## Basic Examples
+### Example 1: Get File Size</code></pre>
+<p>vb
+Dim fileNum As Integer
+Dim fileSize As Long
+fileNum = FreeFile
+Open "data.bin" For Binary As #fileNum
+fileSize = LOF(fileNum)
+MsgBox "File size: " &amp; fileSize &amp; " bytes"
+Close #fileNum</p>
+<pre><code>### Example 2: Calculate Record Count</code></pre>
+<p>vb
+Type CustomerRecord
+    ID As Long
+    Name As String * 50
+    Balance As Currency
+End Type
+Dim customer As CustomerRecord
+Dim fileNum As Integer
+Dim totalRecords As Long
+fileNum = FreeFile
+Open "customers.dat" For Random As #fileNum Len = Len(customer)
+totalRecords = LOF(fileNum) / Len(customer)
+MsgBox "Total customers: " &amp; totalRecords
+Close #fileNum</p>
+<pre><code>### Example 3: Read Entire File</code></pre>
+<p>vb
+Dim fileNum As Integer
+Dim fileContents As String
+Dim fileSize As Long
+fileNum = FreeFile
+Open "readme.txt" For Binary As #fileNum
+fileSize = LOF(fileNum)
+fileContents = String(fileSize, 0)
+Get #fileNum, , fileContents
+Close #fileNum
+MsgBox fileContents</p>
+<pre><code>### Example 4: Progress Indicator</code></pre>
+<p>vb
+Dim fileNum As Integer
+Dim data As Byte
+Dim fileSize As Long
+Dim bytesRead As Long
+fileNum = FreeFile
+Open "large.dat" For Binary As #fileNum
+fileSize = LOF(fileNum)
+Do While Loc(fileNum) &lt; fileSize
+    Get #fileNum, , data
+    ProcessByte data
+    bytesRead = Loc(fileNum)
+    If bytesRead Mod 1024 = 0 Then
+        lblProgress.Caption = Format((bytesRead / fileSize) * 100, "0.0") &amp; "%"
+        DoEvents
+    End If
+Loop
+Close #fileNum</p>
+<pre><code>## Common Patterns
+### Pattern 1: `GetFileSize`</code></pre>
+<p>vb
+Function GetFileSize(ByVal fileNum As Integer) As Long
+    On Error Resume Next
+    GetFileSize = LOF(fileNum)
+    If Err.Number &lt;&gt; 0 Then
+        GetFileSize = -1
+        Err.Clear
+    End If
+End Function</p>
+<pre><code>### Pattern 2: `CalculateRecordCount`</code></pre>
+<p>vb
+Function CalculateRecordCount(ByVal fileNum As Integer, _
+                               ByVal recordLength As Long) As Long
+    Dim fileSize As Long
+    fileSize = LOF(fileNum)
+    If recordLength &gt; 0 Then
+        CalculateRecordCount = fileSize \ recordLength
+    Else
+        CalculateRecordCount = 0
+    End If
+End Function</p>
+<pre><code>### Pattern 3: `ReadEntireFile`</code></pre>
+<p>vb
+Function ReadEntireFile(ByVal fileNum As Integer) As String
+    Dim fileSize As Long
+    Dim buffer As String
+    fileSize = LOF(fileNum)
+    If fileSize &gt; 0 Then
+        buffer = String(fileSize, 0)
+        Get #fileNum, 1, buffer
+        ReadEntireFile = buffer
+    Else
+        ReadEntireFile = ""
+    End If
+End Function</p>
+<pre><code>### Pattern 4: `ReadEntireFileAsBytes`</code></pre>
+<p>vb
+Function ReadEntireFileAsBytes(ByVal fileNum As Integer) As Byte()
+    Dim fileSize As Long
+    Dim buffer() As Byte
+    fileSize = LOF(fileNum)
+    If fileSize &gt; 0 Then
+        ReDim buffer(0 To fileSize - 1) As Byte
+        Get #fileNum, 1, buffer
+        ReadEntireFileAsBytes = buffer
+    End If
+End Function</p>
+<pre><code>### Pattern 5: `CalculateProgress`</code></pre>
+<p>vb
+Function CalculateProgress(ByVal fileNum As Integer) As Single
+    Dim currentPos As Long
+    Dim totalSize As Long
+    currentPos = Loc(fileNum)
+    totalSize = LOF(fileNum)
+    If totalSize &gt; 0 Then
+        CalculateProgress = (currentPos / totalSize) * 100
+    Else
+        CalculateProgress = 0
+    End If
+End Function</p>
+<pre><code>### Pattern 6: `IsEmptyFile`</code></pre>
+<p>vb
+Function IsEmptyFile(ByVal fileNum As Integer) As Boolean
+    IsEmptyFile = (LOF(fileNum) = 0)
+End Function</p>
+<pre><code>### Pattern 7: `GetBytesRemaining`</code></pre>
+<p>vb
+Function GetBytesRemaining(ByVal fileNum As Integer) As Long
+    GetBytesRemaining = LOF(fileNum) - Loc(fileNum)
+End Function</p>
+<pre><code>### Pattern 8: `FormatFileSize`</code></pre>
+<p>vb
+Function FormatFileSize(ByVal fileNum As Integer) As String
+    Dim bytes As Long
+    bytes = LOF(fileNum)
+    If bytes &lt; 1024 Then
+        FormatFileSize = bytes &amp; " bytes"
+    ElseIf bytes &lt; 1048576 Then
+        FormatFileSize = Format(bytes / 1024, "0.0") &amp; " KB"
+    Else
+        FormatFileSize = Format(bytes / 1048576, "0.0") &amp; " MB"
+    End If
+End Function</p>
+<pre><code>### Pattern 9: `IsAtEndOfFile`</code></pre>
+<p>vb
+Function IsAtEndOfFile(ByVal fileNum As Integer) As Boolean
+    IsAtEndOfFile = (Loc(fileNum) &gt;= LOF(fileNum))
+End Function</p>
+<pre><code>### Pattern 10: `AllocateBuffer`</code></pre>
+<p>vb
+Function AllocateBuffer(ByVal fileNum As Integer) As String
+    Dim size As Long
+    size = LOF(fileNum)
+    If size &gt; 0 Then
+        AllocateBuffer = String(size, 0)
+    Else
+        AllocateBuffer = ""
+    End If
+End Function</p>
+<pre><code>## Advanced Examples
+### Example 1: File Reader Class</code></pre>
+<p>vb
+' Class: FileReader
+Private m_fileNum As Integer
+Private m_filename As String
+Private m_fileSize As Long
+Private m_isOpen As Boolean
+Public Sub OpenFile(ByVal filename As String)
+    If m_isOpen Then CloseFile
+    m_filename = filename
+    m_fileNum = FreeFile
+    Open filename For Binary As #m_fileNum
+    m_fileSize = LOF(m_fileNum)
+    m_isOpen = True
+End Sub
+Public Property Get Size() As Long
+    If m_isOpen Then
+        Size = m_fileSize
+    Else
+        Size = 0
+    End If
+End Property
+Public Property Get Position() As Long
+    If m_isOpen Then
+        Position = Loc(m_fileNum)
+    Else
+        Position = 0
+    End If
+End Property
+Public Property Get Progress() As Single
+    If m_isOpen And m_fileSize &gt; 0 Then
+        Progress = (Loc(m_fileNum) / m_fileSize) * 100
+    Else
+        Progress = 0
+    End If
+End Property
+Public Property Get IsEOF() As Boolean
+    If m_isOpen Then
+        IsEOF = (Loc(m_fileNum) &gt;= m_fileSize)
+    Else
+        IsEOF = True
+    End If
+End Property
+Public Property Get IsEmpty() As Boolean
+    IsEmpty = (m_fileSize = 0)
+End Property
+Public Function ReadAll() As String
+    If m_isOpen And m_fileSize &gt; 0 Then
+        ReadAll = String(m_fileSize, 0)
+        Get #m_fileNum, 1, ReadAll
+    Else
+        ReadAll = ""
+    End If
+End Function
+Public Sub CloseFile()
+    If m_isOpen Then
+        Close #m_fileNum
+        m_isOpen = False
+        m_fileSize = 0
+    End If
+End Sub
+Private Sub Class_Terminate()
+    CloseFile
+End Sub</p>
+<pre><code>### Example 2: Random File Manager</code></pre>
+<p>vb
+' Class: RandomFileManager
+Private m_fileNum As Integer
+Private m_recordLength As Long
+Private m_totalRecords As Long
+Private m_isOpen As Boolean
+Public Sub OpenFile(ByVal filename As String, _
+                    ByVal recordLength As Long)
+    If m_isOpen Then CloseFile
+    m_recordLength = recordLength
+    m_fileNum = FreeFile
+    Open filename For Random As #m_fileNum Len = recordLength
+    m_totalRecords = LOF(m_fileNum) \ recordLength
+    m_isOpen = True
+End Sub
+Public Property Get RecordCount() As Long
+    If m_isOpen Then
+        RecordCount = m_totalRecords
+    Else
+        RecordCount = 0
+    End If
+End Property
+Public Property Get FileSize() As Long
+    If m_isOpen Then
+        FileSize = LOF(m_fileNum)
+    Else
+        FileSize = 0
+    End If
+End Property
+Public Property Get CurrentRecord() As Long
+    If m_isOpen Then
+        CurrentRecord = Loc(m_fileNum)
+    Else
+        CurrentRecord = 0
+    End If
+End Property
+Public Function IsValidRecord(ByVal recordNum As Long) As Boolean
+    IsValidRecord = (recordNum &gt;= 1 And recordNum &lt;= m_totalRecords)
+End Function
+Public Sub RefreshRecordCount()
+    If m_isOpen Then
+        m_totalRecords = LOF(m_fileNum) \ m_recordLength
+    End If
+End Sub
+Public Sub CloseFile()
+    If m_isOpen Then
+        Close #m_fileNum
+        m_isOpen = False
+        m_totalRecords = 0
+    End If
+End Sub
+Private Sub Class_Terminate()
+    CloseFile
+End Sub</p>
+<pre><code>### Example 3: File Copy with Progress</code></pre>
+<p>vb
+Sub CopyFileWithProgress(ByVal sourceFile As String, _
+                         ByVal destFile As String, _
+                         Optional ByVal progressBar As ProgressBar = Nothing)
+    Dim sourceNum As Integer, destNum As Integer
+    Dim buffer(1 To 4096) As Byte
+    Dim bytesRead As Long
+    Dim totalSize As Long
+    Dim lastPercent As Integer
+    Dim currentPercent As Integer
+    ' Open source file
+    sourceNum = FreeFile
+    Open sourceFile For Binary As #sourceNum
+    totalSize = LOF(sourceNum)
+    ' Open destination file
+    destNum = FreeFile
+    Open destFile For Binary As #destNum
+    ' Copy in chunks
+    Do While Loc(sourceNum) &lt; totalSize
+        Get #sourceNum, , buffer
+        Put #destNum, , buffer
+        If Not progressBar Is Nothing Then
+            bytesRead = Loc(sourceNum)
+            currentPercent = Int((bytesRead / totalSize) * 100)
+            If currentPercent &lt;&gt; lastPercent Then
+                progressBar.Value = currentPercent
+                lastPercent = currentPercent
+                DoEvents
+            End If
+        End If
+    Loop
+    Close #sourceNum
+    Close #destNum
+End Sub</p>
+<pre><code>### Example 4: File Information Display</code></pre>
+<p>vb
+' Form with labels and progress bar
+Private m_fileNum As Integer
+Private m_fileSize As Long
+Private Sub OpenAndDisplayFile(ByVal filename As String)
+    m_fileNum = FreeFile
+    Open filename For Binary As #m_fileNum
+    m_fileSize = LOF(m_fileNum)
+    ' Display file information
+    lblFilename.Caption = filename
+    lblFileSize.Caption = FormatBytes(m_fileSize)
+    ProgressBar1.Min = 0
+    ProgressBar1.Max = 100
+    Timer1.Enabled = True
+End Sub
+Private Sub ProcessFile()
+    Dim data As Byte
+    Do While Loc(m_fileNum) &lt; m_fileSize
+        Get #m_fileNum, , data
+        ProcessByte data
+    Loop
+    Timer1.Enabled = False
+    Close #m_fileNum
+    MsgBox "Processing complete!"
+End Sub
+Private Sub Timer1_Timer()
+    UpdateProgress
+End Sub
+Private Sub UpdateProgress()
+    Dim bytesProcessed As Long
+    Dim percent As Single
+    On Error Resume Next
+    bytesProcessed = Loc(m_fileNum)
+    If m_fileSize &gt; 0 Then
+        percent = (bytesProcessed / m_fileSize) * 100
+        ProgressBar1.Value = percent
+        lblProgress.Caption = FormatBytes(bytesProcessed) &amp; " of " &amp; _
+                             FormatBytes(m_fileSize) &amp; " (" &amp; _
+                             Format(percent, "0.0") &amp; "%)"
+    End If
+End Sub
+Private Function FormatBytes(ByVal bytes As Long) As String
+    If bytes &lt; 1024 Then
+        FormatBytes = bytes &amp; " B"
+    ElseIf bytes &lt; 1048576 Then
+        FormatBytes = Format(bytes / 1024, "0.0") &amp; " KB"
+    ElseIf bytes &lt; 1073741824 Then
+        FormatBytes = Format(bytes / 1048576, "0.0") &amp; " MB"
+    Else
+        FormatBytes = Format(bytes / 1073741824, "0.0") &amp; " GB"
+    End If
+End Function</p>
+<pre><code>## Error Handling</code></pre>
+<p>vb
+' Error 52: Bad file name or number
+On Error Resume Next
+size = LOF(999)
+If Err.Number = 52 Then
+    MsgBox "File not open!"
+End If
+' Error 68: Device unavailable
+size = LOF(fileNum)
+If Err.Number = 68 Then
+    MsgBox "Device unavailable!"
+End If
+' Safe size retrieval
+Function GetSafeFileSize(ByVal fileNum As Integer) As Long
+    On Error Resume Next
+    GetSafeFileSize = LOF(fileNum)
+    If Err.Number &lt;&gt; 0 Then
+        GetSafeFileSize = -1
+        Err.Clear
+    End If
+End Function</p>
+<pre><code>## Performance Considerations
+- **Very Fast**: LOF is a simple file system query
+- **No I/O**: Does not read file contents
+- **Cache Result**: Store in variable if using multiple times
+- **No Side Effects**: Does not change file pointer
+- **Constant Time**: O(1) operation regardless of file size
+## Best Practices
+1. **Cache the value** if using LOF multiple times in a loop
+2. **Check for zero** to detect empty files
+3. **Use for buffer allocation** when reading entire files
+4. **Combine with Loc** for progress calculation
+5. **Use integer division** (\\) for record count calculation
+6. **Handle errors** for unopened files
+7. **Check 2GB limit** for very large files
+8. **Refresh if writing** as file size may change
+9. **Use with Random files** to calculate record count
+10. **Prefer over `FileLen`** for open files
+## Comparison with Related Functions
+| Function | Purpose | File State | Return Value |
+|----------|---------|------------|--------------|
+| **LOF** | Get file size | Must be open | Size in bytes |
+| **`FileLen`** | Get file size | Must be closed | Size in bytes |
+| **Loc** | Get position | Must be open | Current position |
+| **Seek** | Get/set position | Must be open | Next position |
+| **EOF** | Check end | Must be open | Boolean |
+## LOF vs `FileLen`</code></pre>
+<p>vb
+' FileLen - for closed files
+size = FileLen("data.dat")
+' LOF - for open files
+Open "data.dat" For Binary As #1
+size = LOF(1)
+Close #1
+' LOF is better for open files:
+' - Reflects current size if file is being written
+' - Faster (no need to close and reopen)
+' - Works with all file modes</p>
+<pre><code>## Mode-Specific Usage</code></pre>
+<p>vb
+' Binary mode - get exact byte count
+Open "data.bin" For Binary As #1
+totalBytes = LOF(1)
+' Random mode - calculate record count
+Open "records.dat" For Random As #1 Len = 128
+totalRecords = LOF(1) \ 128
+' Input mode - get file size for progress
+Open "text.txt" For Input As #1
+fileSize = LOF(1)
+' Output/Append mode - check current size
+Open "log.txt" For Append As #1
+currentSize = LOF(1)
+```</p>
+<h2 id="platform-notes">Platform Notes</h2>
+<ul>
+<li>Available in all VB6 versions</li>
+<li>Part of VBA core library</li>
+<li>Returns Long (max ~2GB file support)</li>
+<li>For files &gt; 2GB, result may overflow (wraps to negative)</li>
+<li>Windows-specific file I/O</li>
+<li>Behavior identical across Windows versions</li>
+<li>Works with local and network files</li>
+<li>UNC paths supported</li>
+</ul>
+<h2 id="limitations">Limitations</h2>
+<ul>
+<li><strong>2GB Limit</strong>: Long type limits to ~2,147,483,647 bytes</li>
+<li><strong>Files &gt; 2GB</strong>: Result overflows and becomes negative</li>
+<li><strong>Requires Open File</strong>: Error 52 if file not open</li>
+<li><strong>No String Files</strong>: Works with file numbers only</li>
+<li><strong>Not for Directories</strong>: Only for files</li>
+<li><strong>Static at Call</strong>: Returns size at moment of call</li>
+<li><strong>No Metadata</strong>: Only returns size, not other attributes</li>
+</ul>
+<h2 id="related-functions">Related Functions</h2>
+<ul>
+<li><code>Loc</code>: Get current read/write position in file</li>
+<li><code>Seek</code>: Get/set file position</li>
+<li><code>EOF</code>: Check if at end of file</li>
+<li><code>FileLen</code>: Get length of closed file</li>
+<li><code>Open</code>: Open file for I/O</li>
+<li><code>Close</code>: Close open file</li>
+<li><code>FreeFile</code>: Get available file number</li>
+<li><code>FileAttr</code>: Get file mode or handle</li>
+</ul>
+        </article>
+        
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+            <p>
+                <a href="index.html">← Back to File</a> |
+                <a href="../index.html">View all functions</a>
+            </p>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024-2026 VB6Parse Contributors. Licensed under the MIT License.</p>
+        </div>
+    </footer>
+</body>
+</html>

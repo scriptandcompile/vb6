@@ -1,0 +1,21 @@
+---
+source: vb6parse/src/syntax/library/functions/interaction/doevents.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: CallStatement
+      children:
+        - kind: Identifier
+          text: DoEvents
+        - kind: LeftParenthesis
+          text: (
+        - kind: ArgumentList
+          children: []
+        - kind: RightParenthesis
+          text: )
+        - kind: Newline
+          text: "\n"

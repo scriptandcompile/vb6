@@ -1,0 +1,19 @@
+---
+source: vb6parse/src/syntax/statements/objects/call.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: CallStatement
+      children:
+        - kind: Identifier
+          text: DoSomething
+        - kind: LeftParenthesis
+          text: (
+        - kind: ArgumentList
+          children: []
+        - kind: RightParenthesis
+          text: )
+        - kind: Newline
+          text: "\n"

@@ -1,0 +1,147 @@
+---
+source: vb6parse/src/syntax/library/functions/graphics/spc.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: CallStatement
+      children:
+        - kind: ClassKeyword
+          text: Class
+        - kind: Whitespace
+          text: " "
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: Reporter
+        - kind: Newline
+          text: "\n"
+    - kind: Whitespace
+      text: "    "
+    - kind: SubStatement
+      children:
+        - kind: PublicKeyword
+          text: Public
+        - kind: Whitespace
+          text: " "
+        - kind: SubKeyword
+          text: Sub
+        - kind: Whitespace
+          text: " "
+        - kind: Identifier
+          text: WriteRow
+        - kind: ParameterList
+          children:
+            - kind: LeftParenthesis
+              text: (
+            - kind: Identifier
+              text: f
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IntegerKeyword
+              text: Integer
+            - kind: Comma
+              text: ","
+            - kind: Whitespace
+              text: " "
+            - kind: Identifier
+              text: a
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: StringKeyword
+              text: String
+            - kind: Comma
+              text: ","
+            - kind: Whitespace
+              text: " "
+            - kind: Identifier
+              text: b
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: StringKeyword
+              text: String
+            - kind: RightParenthesis
+              text: )
+        - kind: Newline
+          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: PrintStatement
+              children:
+                - kind: Whitespace
+                  text: "        "
+                - kind: PrintKeyword
+                  text: Print
+                - kind: Whitespace
+                  text: " "
+                - kind: Octothorpe
+                  text: "#"
+                - kind: Identifier
+                  text: f
+                - kind: Comma
+                  text: ","
+                - kind: Whitespace
+                  text: " "
+                - kind: Identifier
+                  text: a
+                - kind: Semicolon
+                  text: ;
+                - kind: Whitespace
+                  text: " "
+                - kind: Identifier
+                  text: Spc
+                - kind: LeftParenthesis
+                  text: (
+                - kind: IntegerLiteral
+                  text: "10"
+                - kind: RightParenthesis
+                  text: )
+                - kind: Semicolon
+                  text: ;
+                - kind: Whitespace
+                  text: " "
+                - kind: Identifier
+                  text: b
+                - kind: Newline
+                  text: "\n"
+            - kind: Whitespace
+              text: "    "
+        - kind: EndKeyword
+          text: End
+        - kind: Whitespace
+          text: " "
+        - kind: SubKeyword
+          text: Sub
+        - kind: Newline
+          text: "\n"
+    - kind: EndStatement
+      children:
+        - kind: EndKeyword
+          text: End
+    - kind: Whitespace
+      text: " "
+    - kind: CallStatement
+      children:
+        - kind: ClassKeyword
+          text: Class
+        - kind: Newline
+          text: "\n"

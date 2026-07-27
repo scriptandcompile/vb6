@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Parse Library Reference - loadpicture - Resources">
+    <title>loadpicture - Resources - VB6Parse Library Reference</title>
+    <link rel="stylesheet" href="../../../assets/css/style.css">
+    <link rel="stylesheet" href="../../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../../../index.html">VB6Parse</a> / <a href="../../../library/index.html">Library</a> / <a href="../../../library/functions/resources/index.html">Resources</a> / loadpicture</h1>
+            <p class="tagline">VB6 Library Reference</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../../../index.html">Home</a>
+            <a href="../../../library/index.html">Library Reference</a>
+            <a href="../../../documentation.html">Documentation</a>
+            <a href="https://docs.rs/vb6parse" target="_blank">API Docs</a>
+            <a href="https://github.com/scriptandcompile/vb6parse" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container">
+        
+        <article class="library-item">
+            <h1 id="loadpicture-function">LoadPicture Function</h1>
+<p>Returns a picture object (<code>StdPicture</code>) containing an image from a file or memory.</p>
+<h2 id="syntax">Syntax</h2>
+<pre><code class="language-vbnet">LoadPicture([filename] [, size] [, colordepth] [, x, y])</code></pre>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li><code>filename</code> (Optional): <code>String</code> expression specifying the name of the file to load</li>
+<li>Can be bitmap (.bmp), icon (.ico), cursor (.cur), metafile (.wmf), or enhanced metafile (.emf)</li>
+<li>Can be empty string ("") to unload picture (returns Nothing)</li>
+<li>If omitted, returns empty picture object</li>
+<li><code>size</code> (Optional): <code>Long</code> specifying desired icon/cursor size (only for .ico and .cur files)</li>
+<li>Specified in HIMETRIC units (1 HIMETRIC = 0.01 mm)</li>
+<li><code>colordepth</code> (Optional): <code>Long</code> specifying desired color depth</li>
+<li><code>x, y</code> (Optional): <code>Long</code> values specifying desired width and height</li>
+</ul>
+<h2 id="return-value">Return Value</h2>
+<p>Returns a <code>StdPicture</code> object:
+- For valid filename: <code>Picture</code> object containing the loaded image
+- For empty string (""): Nothing (unloads picture)
+- For no parameters: Empty picture object
+- Object can be assigned to <code>Picture</code> properties of controls
+- Object implements <code>IPicture</code> interface</p>
+<h2 id="remarks">Remarks</h2>
+<p>The <code>LoadPicture</code> function loads graphics from files:
+- Primary method for loading images in VB6
+- Supports BMP, ICO, CUR, WMF, and EMF formats
+- Does NOT support JPG, GIF, or PNG natively
+- Returns <code>StdPicture</code> object implementing <code>IPicture</code>
+- <code>LoadPicture("")</code> explicitly unloads picture (returns <code>Nothing</code>)
+- <code>LoadPicture()</code> with no arguments returns empty picture
+- File must exist or runtime error 53 occurs
+- Invalid image format causes runtime error 481
+- Pictures are not cached (loaded each time)
+- For .ico and .cur files, can specify size/colordepth
+- Size and colordepth parameters select best match
+- Pictures consume memory until released
+- Set object = Nothing to release memory
+- Common in <code>Form_Load</code> for initial graphics
+- Used with <code>Image</code>, <code>PictureBox</code>, and <code>Form.Picture</code>
+- Can load from resource file with <code>LoadResPicture</code> instead
+- <code>SavePicture</code> is the inverse function (saves to file)
+- <code>Picture</code> objects are <code>OLE</code> objects</p>
+<h2 id="typical-uses">Typical Uses</h2>
+<ol>
+<li><strong>Load <code>Image</code> to <code>PictureBox</code></strong></li>
+</ol>
+<pre><code class="language-vbnet">   Picture1.Picture = LoadPicture(&quot;C:\Images\logo.bmp&quot;)
+   ```
+2. **Load `Image` to `Form` Background**
+   ```vb
+   Me.Picture = LoadPicture(App.Path &amp; &quot;\background.bmp&quot;)
+   ```
+3. **Load `Icon` to `Image` Control**
+   ```vb
+   Image1.Picture = LoadPicture(&quot;C:\Icons\app.ico&quot;)
+   ```
+4. **Clear/Unload `Picture`**
+   ```vb
+   Picture1.Picture = LoadPicture(&quot;&quot;)
+   ```
+5. **Dynamic `Image` Loading**
+   ```vb
+   Picture1.Picture = LoadPicture(imageFiles(index))
+   ```
+6. **Conditional `Image` Loading**
+   ```vb
+   If fileExists Then
+       imgStatus.Picture = LoadPicture(&quot;ok.bmp&quot;)
+   Else
+       imgStatus.Picture = LoadPicture(&quot;error.bmp&quot;)
+   End If
+   ```
+7. **Button `Icons`**
+   ```vb
+   cmdSave.Picture = LoadPicture(&quot;save.ico&quot;)
+   ```
+8. **Animation Frame Loading**
+   ```vb
+   For i = 1 To 10
+       frames(i) = LoadPicture(&quot;frame&quot; &amp; i &amp; &quot;.bmp&quot;)
+   Next i
+   ```
+## Basic Examples
+### Example 1: Basic Picture Loading</code></pre>
+<p>vb
+' Load a bitmap to a picture box
+Picture1.Picture = LoadPicture("C:\MyApp\logo.bmp")
+' Load using relative path
+Picture1.Picture = LoadPicture(App.Path &amp; "\images\banner.bmp")
+' Load icon to image control
+Image1.Picture = LoadPicture(App.Path &amp; "\icon.ico")</p>
+<pre><code>### Example 2: Clearing Pictures</code></pre>
+<p>vb
+' Unload picture to free memory
+Picture1.Picture = LoadPicture("")
+' Alternative way to clear
+Set Picture1.Picture = LoadPicture()
+' Clear form background
+Me.Picture = LoadPicture("")</p>
+<pre><code>### Example 3: Error Handling</code></pre>
+<p>vb
+On Error Resume Next
+Picture1.Picture = LoadPicture(filename)
+If Err.Number &lt;&gt; 0 Then
+    MsgBox "Could not load image: " &amp; filename, vbCritical
+    Picture1.Picture = LoadPicture("") ' Clear on error
+    Err.Clear
+End If</p>
+<pre><code>### Example 4: File Existence Check</code></pre>
+<p>vb
+Dim picPath As String
+picPath = App.Path &amp; "\logo.bmp"
+If Dir(picPath) &lt;&gt; "" Then
+    Picture1.Picture = LoadPicture(picPath)
+Else
+    MsgBox "Image file not found!", vbExclamation
+End If</p>
+<pre><code>## Common Patterns
+### Pattern 1: `SafeLoadPicture`</code></pre>
+<p>vb
+Function SafeLoadPicture(ByVal filename As String, _
+                         ByVal ctrl As Object) As Boolean
+    On Error Resume Next
+    Set ctrl.Picture = LoadPicture(filename)
+    SafeLoadPicture = (Err.Number = 0)
+    Err.Clear
+End Function</p>
+<pre><code>### Pattern 2: `ImageSwitcher`</code></pre>
+<p>vb
+Sub SwitchImage(ByVal imageIndex As Long)
+    Dim imageFiles As Variant
+    imageFiles = Array("image1.bmp", "image2.bmp", "image3.bmp")
+    If imageIndex &gt;= 0 And imageIndex &lt;= UBound(imageFiles) Then
+        Picture1.Picture = LoadPicture(App.Path &amp; "\" &amp; imageFiles(imageIndex))
+    End If
+End Sub</p>
+<pre><code>### Pattern 3: `PreloadImages`</code></pre>
+<p>vb
+Dim preloadedPics() As StdPicture
+Sub PreloadImages()
+    Dim i As Long
+    ReDim preloadedPics(1 To 5)
+    For i = 1 To 5
+        Set preloadedPics(i) = LoadPicture("pic" &amp; i &amp; ".bmp")
+    Next i
+End Sub
+Sub ShowImage(ByVal index As Long)
+    Set Picture1.Picture = preloadedPics(index)
+End Sub</p>
+<pre><code>### Pattern 4: `TogglePicture`</code></pre>
+<p>vb
+Dim currentState As Boolean
+Sub TogglePicture()
+    If currentState Then
+        Picture1.Picture = LoadPicture("on.bmp")
+    Else
+        Picture1.Picture = LoadPicture("off.bmp")
+    End If
+    currentState = Not currentState
+End Sub</p>
+<pre><code>### Pattern 5: `LoadPictureWithDefault`</code></pre>
+<p>vb
+Function LoadPictureWithDefault(ByVal filename As String, _
+                                 ByVal defaultFile As String) As StdPicture
+    On Error Resume Next
+    Set LoadPictureWithDefault = LoadPicture(filename)
+    If Err.Number &lt;&gt; 0 Then
+        Set LoadPictureWithDefault = LoadPicture(defaultFile)
+    End If
+    Err.Clear
+End Function</p>
+<pre><code>### Pattern 6: `ClearAllPictures`</code></pre>
+<p>vb
+Sub ClearAllPictures(frm As Form)
+    Dim ctrl As Control
+    For Each ctrl In frm.Controls
+        If TypeOf ctrl Is PictureBox Or TypeOf ctrl Is Image Then
+            ctrl.Picture = LoadPicture("")
+        End If
+    Next ctrl
+    frm.Picture = LoadPicture("")
+End Sub</p>
+<pre><code>### Pattern 7: `LoadFromResourceOrFile`</code></pre>
+<p>vb
+Function LoadFromResourceOrFile(ByVal resID As Long, _
+                                 ByVal filename As String) As StdPicture
+    On Error Resume Next
+    ' Try resource first
+    Set LoadFromResourceOrFile = LoadResPicture(resID, vbResBitmap)
+    ' Fall back to file
+    If Err.Number &lt;&gt; 0 Then
+        Set LoadFromResourceOrFile = LoadPicture(filename)
+    End If
+    Err.Clear
+End Function</p>
+<pre><code>### Pattern 8: `ButtonImageState`</code></pre>
+<p>vb
+Sub SetButtonState(btn As CommandButton, enabled As Boolean)
+    If enabled Then
+        btn.Picture = LoadPicture(App.Path &amp; "\btn_enabled.ico")
+        btn.Enabled = True
+    Else
+        btn.Picture = LoadPicture(App.Path &amp; "\btn_disabled.ico")
+        btn.Enabled = False
+    End If
+End Sub</p>
+<pre><code>### Pattern 9: `LoadPictureIfExists`</code></pre>
+<p>vb
+Function LoadPictureIfExists(ByVal filename As String) As StdPicture
+    If Dir(filename) &lt;&gt; "" Then
+        Set LoadPictureIfExists = LoadPicture(filename)
+    Else
+        Set LoadPictureIfExists = LoadPicture() ' Empty picture
+    End If
+End Function</p>
+<pre><code>### Pattern 10: `CachedPictureLoader`</code></pre>
+<p>vb
+Dim pictureCache As New Collection
+Function LoadPictureCached(ByVal filename As String) As StdPicture
+    On Error Resume Next
+    ' Try to get from cache
+    Set LoadPictureCached = pictureCache(filename)
+    ' If not in cache, load and cache it
+    If Err.Number &lt;&gt; 0 Then
+        Set LoadPictureCached = LoadPicture(filename)
+        pictureCache.Add LoadPictureCached, filename
+    End If
+    Err.Clear
+End Function</p>
+<pre><code>## Advanced Examples
+### Example 1: `PictureManager` Class</code></pre>
+<p>vb
+' Class: PictureManager
+Private m_pictures As Collection
+Private m_basePath As String
+Private Sub Class_Initialize()
+    Set m_pictures = New Collection
+    m_basePath = App.Path &amp; "\images\"
+End Sub
+Public Sub LoadPicture(ByVal name As String, ByVal filename As String)
+    Dim pic As StdPicture
+    On Error Resume Next
+    Set pic = VBA.LoadPicture(m_basePath &amp; filename)
+    If Err.Number = 0 Then
+        m_pictures.Add pic, name
+    Else
+        Err.Raise vbObjectError + 1000, "PictureManager", _
+                  "Failed to load: " &amp; filename
+    End If
+End Sub
+Public Function GetPicture(ByVal name As String) As StdPicture
+    On Error Resume Next
+    Set GetPicture = m_pictures(name)
+    If Err.Number &lt;&gt; 0 Then
+        Err.Raise vbObjectError + 1001, "PictureManager", _
+                  "Picture not found: " &amp; name
+    End If
+End Function
+Public Sub ClearAll()
+    Dim i As Long
+    For i = m_pictures.Count To 1 Step -1
+        m_pictures.Remove i
+    Next i
+End Sub
+Public Property Get Count() As Long
+    Count = m_pictures.Count
+End Property
+Private Sub Class_Terminate()
+    ClearAll
+    Set m_pictures = Nothing
+End Sub</p>
+<pre><code>### Example 2: Image Slideshow</code></pre>
+<p>vb
+' Form with Picture1, Timer1, cmdNext, cmdPrev
+Dim imageFiles() As String
+Dim currentIndex As Long
+Private Sub Form_Load()
+    LoadImageList
+    currentIndex = 0
+    ShowCurrentImage
+    Timer1.Interval = 3000 ' 3 seconds
+    Timer1.Enabled = True
+End Sub
+Private Sub LoadImageList()
+    imageFiles = Array( _
+        "slide1.bmp", _
+        "slide2.bmp", _
+        "slide3.bmp", _
+        "slide4.bmp", _
+        "slide5.bmp" _
+    )
+End Sub
+Private Sub ShowCurrentImage()
+    On Error Resume Next
+    Picture1.Picture = LoadPicture(App.Path &amp; "\slides\" &amp; imageFiles(currentIndex))
+    If Err.Number &lt;&gt; 0 Then
+        Picture1.Cls
+        Picture1.Print "Image not found"
+    End If
+End Sub
+Private Sub Timer1_Timer()
+    NextImage
+End Sub
+Private Sub cmdNext_Click()
+    NextImage
+End Sub
+Private Sub cmdPrev_Click()
+    PrevImage
+End Sub
+Private Sub NextImage()
+    currentIndex = currentIndex + 1
+    If currentIndex &gt; UBound(imageFiles) Then
+        currentIndex = 0
+    End If
+    ShowCurrentImage
+End Sub
+Private Sub PrevImage()
+    currentIndex = currentIndex - 1
+    If currentIndex &lt; 0 Then
+        currentIndex = UBound(imageFiles)
+    End If
+    ShowCurrentImage
+End Sub</p>
+<pre><code>### Example 3: Dynamic Button Icons</code></pre>
+<p>vb
+' Form with command buttons array: cmdAction(0 to 4)
+Private Type ButtonConfig
+    caption As String
+    iconFile As String
+    enabled As Boolean
+End Type
+Private buttonConfigs() As ButtonConfig
+Private Sub Form_Load()
+    InitializeButtons
+    ApplyButtonConfigs
+End Sub
+Private Sub InitializeButtons()
+    ReDim buttonConfigs(0 To 4)
+    With buttonConfigs(0)
+        .caption = "New"
+        .iconFile = "new.ico"
+        .enabled = True
+    End With
+    With buttonConfigs(1)
+        .caption = "Open"
+        .iconFile = "open.ico"
+        .enabled = True
+    End With
+    With buttonConfigs(2)
+        .caption = "Save"
+        .iconFile = "save.ico"
+        .enabled = False
+    End With
+    With buttonConfigs(3)
+        .caption = "Print"
+        .iconFile = "print.ico"
+        .enabled = False
+    End With
+    With buttonConfigs(4)
+        .caption = "Exit"
+        .iconFile = "exit.ico"
+        .enabled = True
+    End With
+End Sub
+Private Sub ApplyButtonConfigs()
+    Dim i As Long
+    Dim iconPath As String
+    For i = 0 To UBound(buttonConfigs)
+        With cmdAction(i)
+            .caption = buttonConfigs(i).caption
+            .enabled = buttonConfigs(i).enabled
+            iconPath = App.Path &amp; "\icons\" &amp; buttonConfigs(i).iconFile
+            If Dir(iconPath) &lt;&gt; "" Then
+                .Picture = LoadPicture(iconPath)
+            End If
+        End With
+    Next i
+End Sub
+Public Sub SetButtonEnabled(ByVal index As Long, ByVal enabled As Boolean)
+    If index &gt;= 0 And index &lt;= UBound(buttonConfigs) Then
+        buttonConfigs(index).enabled = enabled
+        cmdAction(index).enabled = enabled
+    End If
+End Sub</p>
+<pre><code>### Example 4: Status Indicator</code></pre>
+<p>vb
+' Form with imgStatus (Image control)
+Public Enum StatusType
+    stIdle = 0
+    stProcessing = 1
+    stSuccess = 2
+    stWarning = 3
+    stError = 4
+End Enum
+Private statusIcons() As StdPicture
+Private currentStatus As StatusType
+Private Sub Form_Load()
+    LoadStatusIcons
+    SetStatus stIdle
+End Sub
+Private Sub LoadStatusIcons()
+    Dim basePath As String
+    basePath = App.Path &amp; "\icons\"
+    ReDim statusIcons(0 To 4)
+    On Error Resume Next
+    Set statusIcons(stIdle) = LoadPicture(basePath &amp; "idle.ico")
+    Set statusIcons(stProcessing) = LoadPicture(basePath &amp; "processing.ico")
+    Set statusIcons(stSuccess) = LoadPicture(basePath &amp; "success.ico")
+    Set statusIcons(stWarning) = LoadPicture(basePath &amp; "warning.ico")
+    Set statusIcons(stError) = LoadPicture(basePath &amp; "error.ico")
+    If Err.Number &lt;&gt; 0 Then
+        MsgBox "Warning: Some status icons could not be loaded", vbExclamation
+        Err.Clear
+    End If
+End Sub
+Public Sub SetStatus(ByVal newStatus As StatusType)
+    currentStatus = newStatus
+    If newStatus &gt;= 0 And newStatus &lt;= UBound(statusIcons) Then
+        If Not statusIcons(newStatus) Is Nothing Then
+            Set imgStatus.Picture = statusIcons(newStatus)
+        End If
+    End If
+End Sub
+Public Function GetStatus() As StatusType
+    GetStatus = currentStatus
+End Function
+Private Sub Form_Unload(Cancel As Integer)
+    Dim i As Long
+    For i = 0 To UBound(statusIcons)
+        Set statusIcons(i) = Nothing
+    Next i
+End Sub</p>
+<pre><code>## Error Handling</code></pre>
+<p>vb
+' Error 53: File not found
+On Error Resume Next
+Picture1.Picture = LoadPicture("nonexistent.bmp")
+If Err.Number = 53 Then
+    MsgBox "File not found!"
+End If
+' Error 481: Invalid picture
+Picture1.Picture = LoadPicture("corrupt.bmp")
+If Err.Number = 481 Then
+    MsgBox "Invalid or corrupt image file!"
+End If
+' Error 7: Out of memory (very large images)
+Picture1.Picture = LoadPicture("huge.bmp")
+If Err.Number = 7 Then
+    MsgBox "Insufficient memory to load image!"
+End If
+' Safe loading pattern
+Function TryLoadPicture(ByVal filename As String, _
+                        ByRef pic As StdPicture) As Boolean
+    On Error Resume Next
+    Set pic = LoadPicture(filename)
+    TryLoadPicture = (Err.Number = 0)
+    Err.Clear
+End Function</p>
+<pre><code>## Performance Considerations
+- **File I/O Overhead**: `LoadPicture` reads from disk (relatively slow)
+- **Memory Usage**: Large images consume significant memory
+- **No Caching**: Each call loads from disk (not cached automatically)
+- **Preloading**: For frequently used images, load once and cache
+- **Release Memory**: Set ```picture = Nothing``` when done
+- **Format Matters**: BMP files are larger but faster to load than compressed formats
+- **Network Paths**: Loading from network shares is much slower
+## Best Practices
+1. **Always handle errors** when loading pictures (file may not exist)
+2. **Check file existence** before loading (use Dir function)
+3. **Use relative paths** (`App.Path`) for portability
+4. **Release memory** by setting picture objects to `Nothing` when done
+5. **Preload frequently used images** for better performance
+6. **Clear pictures** with ```LoadPicture(&quot;&quot;)``` not by setting to `Nothing` directly
+7. **Validate file extensions** before attempting to load
+8. **Use resource files** (`LoadResPicture`) for embedded images
+9. **Handle Out of Memory** errors for large images
+10. **Consider image size** - large BMPs consume lots of memory
+## Comparison with Related Functions
+| Function | Purpose | Return Type | Notes |
+|----------|---------|-------------|-------|
+| **`LoadPicture`** | Load from file | `StdPicture` | Supports BMP, ICO, CUR, WMF, EMF |
+| **`LoadResPicture`** | Load from resources | `StdPicture` | Embedded in compiled EXE |
+| **`SavePicture`** | Save to file | N/A (Sub) | Inverse of `LoadPicture` |
+| **`Set` statement** | Assign picture | N/A | Used to assign picture objects |
+## `LoadPicture` vs `LoadResPicture`</code></pre>
+<p>vb
+' LoadPicture - from file (requires external file)
+Picture1.Picture = LoadPicture("logo.bmp")
+' LoadResPicture - from resources (embedded in EXE)
+Picture1.Picture = LoadResPicture(101, vbResBitmap)
+<code>``
+**When to use each:**
+- **</code>LoadPicture<code>**: Images that change, user-selected files, development
+- **</code>LoadResPicture`**: Static images, distribution (no external files), resources</p>
+<h2 id="platform-notes">Platform Notes</h2>
+<ul>
+<li>Available in all VB6 versions</li>
+<li>Part of VBA core library</li>
+<li>Returns <code>StdPicture</code> object (OLE automation object)</li>
+<li>Implemented in MSVBVM60.DLL runtime</li>
+<li>Supports Windows native image formats</li>
+<li>No built-in support for JPG, GIF, PNG (requires third-party controls or APIs)</li>
+<li>Icon/Cursor files can contain multiple sizes - <code>LoadPicture</code> selects best match</li>
+<li>Metafiles (WMF/EMF) are vector formats (scalable)</li>
+<li>Bitmaps (BMP) are raster formats (not scalable)</li>
+</ul>
+<h2 id="limitations">Limitations</h2>
+<ul>
+<li><strong>No JPG/GIF/PNG</strong>: Native support limited to BMP, ICO, CUR, WMF, EMF</li>
+<li><strong>No compression</strong>: BMP files can be very large</li>
+<li><strong>No caching</strong>: Each call reloads from disk</li>
+<li><strong>Memory intensive</strong>: Large images consume lots of RAM</li>
+<li><strong>Synchronous</strong>: Blocks while loading (no async loading)</li>
+<li><strong>No progress</strong>: Cannot monitor loading progress</li>
+<li><strong>No metadata</strong>: Cannot read EXIF or other metadata</li>
+<li><strong>No transformations</strong>: Cannot resize/rotate during load</li>
+<li><strong>File path only</strong>: Cannot load from memory or stream</li>
+<li><strong>Error codes limited</strong>: Generic error messages for problems</li>
+</ul>
+<h2 id="related-functions">Related Functions</h2>
+<ul>
+<li><code>LoadResPicture</code>: Load picture from resource file</li>
+<li><code>SavePicture</code>: Save picture object to file</li>
+<li><code>Set</code>: Assign object references</li>
+<li><code>Nothing</code>: Release object references</li>
+<li><code>Dir</code>: Check file existence before loading</li>
+<li><code>App.Path</code>: Get application directory for relative paths</li>
+</ul>
+        </article>
+        
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+            <p>
+                <a href="index.html">← Back to Resources</a> |
+                <a href="../index.html">View all functions</a>
+            </p>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024-2026 VB6Parse Contributors. Licensed under the MIT License.</p>
+        </div>
+    </footer>
+</body>
+</html>
