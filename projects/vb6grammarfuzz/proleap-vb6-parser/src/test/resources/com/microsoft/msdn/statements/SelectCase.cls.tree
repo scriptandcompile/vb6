@@ -1,0 +1,455 @@
+(startRule 
+	(module 
+		(moduleBody 
+			(moduleBodyElement 
+				(moduleBlock 
+					(block 
+						(blockStmt 
+							(selectCaseStmt Select   Case   
+								(valueStmt 
+									(implicitCallStmt_InStmt 
+										(iCS_S_MembersCall 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier Application)) 
+											(iCS_S_MemberCall . 
+												(iCS_S_VariableOrProcedureCall 
+													(ambiguousIdentifier MailSystem)))))) \n     
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlMAPI)))))) \n         
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Mail system is Microsoft Mail")))))))) \n    ) 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlPowerTalk)))))) \n         
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Mail system is PowerTalk")))))))) \n    ) 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlNoMailSystem)))))) \n         
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "No mail system installed")))))))) \n) End Select)) \n \n 
+						(blockStmt 
+							(implicitCallStmt_InBlock 
+								(iCS_B_MemberProcedureCall 
+									(implicitCallStmt_InStmt 
+										(iCS_S_ProcedureOrArrayCall 
+											(ambiguousIdentifier Worksheets) ( 
+											(argsCall 
+												(argCall 
+													(valueStmt 
+														(literal "Sheet1")))) ))) . 
+									(ambiguousIdentifier Activate)))) \n 
+						(blockStmt 
+							(selectCaseStmt Select   Case   
+								(valueStmt 
+									(implicitCallStmt_InStmt 
+										(iCS_S_MembersCall 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier ActiveCell)) 
+											(iCS_S_MemberCall . 
+												(iCS_S_VariableOrProcedureCall 
+													(ambiguousIdentifier LocationInTable)))))) \n 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlRowHeader)))))) \n     
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Active cell is part of a row header")))))))) \n) 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlColumnHeader)))))) \n     
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Active cell is part of a column header")))))))) \n) 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlPageHeader)))))) \n     
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Active cell is part of a page header")))))))) \n) 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlDataHeader)))))) \n     
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Active cell is part of a data header")))))))) \n) 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlRowItem)))))) \n     
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Active cell is part of a row item")))))))) \n) 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlColumnItem)))))) \n     
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Active cell is part of a column item")))))))) \n) 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlPageItem)))))) \n     
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Active cell is part of a page item")))))))) \n) 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlDataItem)))))) \n     
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Active cell is part of a data item")))))))) \n) 
+								(sC_Case Case   
+									(sC_Cond 
+										(sC_CondExpr Is   
+											(comparisonOperator =)   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier xlTableBody)))))) \n     
+									(block 
+										(blockStmt 
+											(implicitCallStmt_InBlock 
+												(iCS_B_ProcedureCall 
+													(certainIdentifier MsgBox)   
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(literal "Active cell is part of the table body")))))))) \n) End Select)) \n \n 
+						(blockStmt 
+							(implicitCallStmt_InBlock 
+								(iCS_B_MemberProcedureCall 
+									(implicitCallStmt_InStmt 
+										(iCS_S_ProcedureOrArrayCall 
+											(ambiguousIdentifier Worksheets) ( 
+											(argsCall 
+												(argCall 
+													(valueStmt 
+														(literal "Sheet1")))) ))) . 
+									(ambiguousIdentifier Activate)))) \n 
+						(blockStmt 
+							(ifThenElseStmt 
+								(ifBlockStmt If   
+									(ifConditionStmt 
+										(valueStmt 
+											(implicitCallStmt_InStmt 
+												(iCS_S_ProcedureOrArrayCall 
+													(ambiguousIdentifier IsError) ( 
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(implicitCallStmt_InStmt 
+																	(iCS_S_MembersCall 
+																		(iCS_S_VariableOrProcedureCall 
+																			(ambiguousIdentifier ActiveCell)) 
+																		(iCS_S_MemberCall . 
+																			(iCS_S_VariableOrProcedureCall 
+																				(ambiguousIdentifier Value)))))))) )))))   Then \n     
+									(block 
+										(blockStmt 
+											(letStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier errval)))   =   
+												(valueStmt 
+													(implicitCallStmt_InStmt 
+														(iCS_S_MembersCall 
+															(iCS_S_VariableOrProcedureCall 
+																(ambiguousIdentifier ActiveCell)) 
+															(iCS_S_MemberCall . 
+																(iCS_S_VariableOrProcedureCall 
+																	(ambiguousIdentifier Value)))))))) \n     
+										(blockStmt 
+											(selectCaseStmt Select   Case   
+												(valueStmt 
+													(implicitCallStmt_InStmt 
+														(iCS_S_VariableOrProcedureCall 
+															(ambiguousIdentifier errval)))) \n         
+												(sC_Case Case   
+													(sC_Cond 
+														(sC_CondExpr 
+															(valueStmt 
+																(implicitCallStmt_InStmt 
+																	(iCS_S_ProcedureOrArrayCall 
+																		(ambiguousIdentifier CVErr) ( 
+																		(argsCall 
+																			(argCall 
+																				(valueStmt 
+																					(implicitCallStmt_InStmt 
+																						(iCS_S_VariableOrProcedureCall 
+																							(ambiguousIdentifier xlErrDiv0)))))) )))))) \n             
+													(block 
+														(blockStmt 
+															(implicitCallStmt_InBlock 
+																(iCS_B_ProcedureCall 
+																	(certainIdentifier MsgBox)   
+																	(argsCall 
+																		(argCall 
+																			(valueStmt 
+																				(literal "#DIV/0! error")))))))) \n        ) 
+												(sC_Case Case   
+													(sC_Cond 
+														(sC_CondExpr 
+															(valueStmt 
+																(implicitCallStmt_InStmt 
+																	(iCS_S_ProcedureOrArrayCall 
+																		(ambiguousIdentifier CVErr) ( 
+																		(argsCall 
+																			(argCall 
+																				(valueStmt 
+																					(implicitCallStmt_InStmt 
+																						(iCS_S_VariableOrProcedureCall 
+																							(ambiguousIdentifier xlErrNA)))))) )))))) \n             
+													(block 
+														(blockStmt 
+															(implicitCallStmt_InBlock 
+																(iCS_B_ProcedureCall 
+																	(certainIdentifier MsgBox)   
+																	(argsCall 
+																		(argCall 
+																			(valueStmt 
+																				(literal "#N/A error")))))))) \n        ) 
+												(sC_Case Case   
+													(sC_Cond 
+														(sC_CondExpr 
+															(valueStmt 
+																(implicitCallStmt_InStmt 
+																	(iCS_S_ProcedureOrArrayCall 
+																		(ambiguousIdentifier CVErr) ( 
+																		(argsCall 
+																			(argCall 
+																				(valueStmt 
+																					(implicitCallStmt_InStmt 
+																						(iCS_S_VariableOrProcedureCall 
+																							(ambiguousIdentifier xlErrName)))))) )))))) \n             
+													(block 
+														(blockStmt 
+															(implicitCallStmt_InBlock 
+																(iCS_B_ProcedureCall 
+																	(certainIdentifier MsgBox)   
+																	(argsCall 
+																		(argCall 
+																			(valueStmt 
+																				(literal "#NAME? error")))))))) \n        ) 
+												(sC_Case Case   
+													(sC_Cond 
+														(sC_CondExpr 
+															(valueStmt 
+																(implicitCallStmt_InStmt 
+																	(iCS_S_ProcedureOrArrayCall 
+																		(ambiguousIdentifier CVErr) ( 
+																		(argsCall 
+																			(argCall 
+																				(valueStmt 
+																					(implicitCallStmt_InStmt 
+																						(iCS_S_VariableOrProcedureCall 
+																							(ambiguousIdentifier xlErrNull)))))) )))))) \n             
+													(block 
+														(blockStmt 
+															(implicitCallStmt_InBlock 
+																(iCS_B_ProcedureCall 
+																	(certainIdentifier MsgBox)   
+																	(argsCall 
+																		(argCall 
+																			(valueStmt 
+																				(literal "#NULL! error")))))))) \n        ) 
+												(sC_Case Case   
+													(sC_Cond 
+														(sC_CondExpr 
+															(valueStmt 
+																(implicitCallStmt_InStmt 
+																	(iCS_S_ProcedureOrArrayCall 
+																		(ambiguousIdentifier CVErr) ( 
+																		(argsCall 
+																			(argCall 
+																				(valueStmt 
+																					(implicitCallStmt_InStmt 
+																						(iCS_S_VariableOrProcedureCall 
+																							(ambiguousIdentifier xlErrNum)))))) )))))) \n             
+													(block 
+														(blockStmt 
+															(implicitCallStmt_InBlock 
+																(iCS_B_ProcedureCall 
+																	(certainIdentifier MsgBox)   
+																	(argsCall 
+																		(argCall 
+																			(valueStmt 
+																				(literal "#NUM! error")))))))) \n        ) 
+												(sC_Case Case   
+													(sC_Cond 
+														(sC_CondExpr 
+															(valueStmt 
+																(implicitCallStmt_InStmt 
+																	(iCS_S_ProcedureOrArrayCall 
+																		(ambiguousIdentifier CVErr) ( 
+																		(argsCall 
+																			(argCall 
+																				(valueStmt 
+																					(implicitCallStmt_InStmt 
+																						(iCS_S_VariableOrProcedureCall 
+																							(ambiguousIdentifier xlErrRef)))))) )))))) \n             
+													(block 
+														(blockStmt 
+															(implicitCallStmt_InBlock 
+																(iCS_B_ProcedureCall 
+																	(certainIdentifier MsgBox)   
+																	(argsCall 
+																		(argCall 
+																			(valueStmt 
+																				(literal "#REF! error")))))))) \n        ) 
+												(sC_Case Case   
+													(sC_Cond 
+														(sC_CondExpr 
+															(valueStmt 
+																(implicitCallStmt_InStmt 
+																	(iCS_S_ProcedureOrArrayCall 
+																		(ambiguousIdentifier CVErr) ( 
+																		(argsCall 
+																			(argCall 
+																				(valueStmt 
+																					(implicitCallStmt_InStmt 
+																						(iCS_S_VariableOrProcedureCall 
+																							(ambiguousIdentifier xlErrValue)))))) )))))) \n             
+													(block 
+														(blockStmt 
+															(implicitCallStmt_InBlock 
+																(iCS_B_ProcedureCall 
+																	(certainIdentifier MsgBox)   
+																	(argsCall 
+																		(argCall 
+																			(valueStmt 
+																				(literal "#VALUE! error")))))))) \n        ) 
+												(sC_Case Case   
+													(sC_Cond Else) \n             
+													(block 
+														(blockStmt 
+															(implicitCallStmt_InBlock 
+																(iCS_B_ProcedureCall 
+																	(certainIdentifier MsgBox)   
+																	(argsCall 
+																		(argCall 
+																			(valueStmt 
+																				(literal "This should never happen!!")))))))) \n    ) End Select))) \n) End If))))))) <EOF>)

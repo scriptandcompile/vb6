@@ -1,0 +1,84 @@
+(startRule 
+	(module \n 
+		(moduleBody 
+			(moduleBodyElement 
+				(moduleBlock 
+					(block 
+						(blockStmt 
+							(deftypeStmt DefInt   
+								(letterrange 
+									(certainIdentifier A) - 
+									(certainIdentifier K)))) \n \n 
+						(blockStmt 
+							(deftypeStmt DefStr   
+								(letterrange 
+									(certainIdentifier L) - 
+									(certainIdentifier Z)))) \n 
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_VariableOrProcedureCall 
+										(ambiguousIdentifier CalcVar)))   =   
+								(valueStmt 
+									(literal 4)))) \n 
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_VariableOrProcedureCall 
+										(ambiguousIdentifier StringVar)))   =   
+								(valueStmt 
+									(literal "Hello there")))) \n 
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_VariableOrProcedureCall 
+										(ambiguousIdentifier AnyVar)))   =   
+								(valueStmt 
+									(literal "Hello")))) \n 
+						(blockStmt 
+							(variableStmt Dim   
+								(variableListStmt 
+									(variableSubStmt 
+										(ambiguousIdentifier Calc)   
+										(asTypeClause As   
+											(type 
+												(baseType Double))))))) \n 
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_VariableOrProcedureCall 
+										(ambiguousIdentifier Calc)))   =   
+								(valueStmt 
+									(literal 2.3455)))) \n \n \n 
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_VariableOrProcedureCall 
+										(ambiguousIdentifier CalcNum)))   =   
+								(valueStmt 
+									(implicitCallStmt_InStmt 
+										(iCS_S_ProcedureOrArrayCall 
+											(ambiguousIdentifier ATestFunction) ( 
+											(argsCall 
+												(argCall 
+													(valueStmt 
+														(literal 4)))) ))))))))) \n \n 
+			(moduleBodyElement 
+				(functionStmt Function   
+					(ambiguousIdentifier ATestFunction) 
+					(argList ( 
+						(arg 
+							(ambiguousIdentifier INumber)) )) \n    
+					(block 
+						(blockStmt 
+							(letStmt 
+								(implicitCallStmt_InStmt 
+									(iCS_S_VariableOrProcedureCall 
+										(ambiguousIdentifier ATestFunction)))   =   
+								(valueStmt 
+									(valueStmt 
+										(implicitCallStmt_InStmt 
+											(iCS_S_VariableOrProcedureCall 
+												(ambiguousIdentifier INumber))))   *   
+									(valueStmt 
+										(literal 2)))))) \n End Function)))) <EOF>)

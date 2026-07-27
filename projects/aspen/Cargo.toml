@@ -1,0 +1,19 @@
+[package]
+name = "aspen"
+version = "0.4.1"
+edition = "2021"
+license-file = "LICENSE"
+description = """
+Aspen, a VB6 tool for parsing and analyzing VB6 code, in the spirit of cargo check, cargo fmt, etc.
+"""
+repository = "https://github.com/scriptandcompile/aspen"
+readme = "README.md"
+keywords = ["vb6", "parser", "analyzer", "vb6parse"]
+categories = ["development-tools", "parsing", "parser-implementations"]
+
+[dependencies]
+vb6parse.workspace = true
+clap.workspace = true
+walkdir.workspace = true
+anyhow.workspace = true
+rayon.workspace = true

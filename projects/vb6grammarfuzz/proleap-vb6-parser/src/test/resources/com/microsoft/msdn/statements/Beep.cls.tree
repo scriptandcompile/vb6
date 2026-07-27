@@ -1,0 +1,23 @@
+(startRule 
+	(module 
+		(moduleBody 
+			(moduleBodyElement 
+				(moduleBlock 
+					(block 
+						(blockStmt 
+							(variableStmt Dim   
+								(variableListStmt 
+									(variableSubStmt 
+										(ambiguousIdentifier I))))) \n 
+						(blockStmt 
+							(forNextStmt For   
+								(iCS_S_VariableOrProcedureCall 
+									(ambiguousIdentifier I))   =   
+								(valueStmt 
+									(literal 1))   To   
+								(valueStmt 
+									(literal 3)) \n    
+								(block 
+									(blockStmt 
+										(beepStmt Beep))) \n Next   
+								(ambiguousIdentifier I)))))))) <EOF>)

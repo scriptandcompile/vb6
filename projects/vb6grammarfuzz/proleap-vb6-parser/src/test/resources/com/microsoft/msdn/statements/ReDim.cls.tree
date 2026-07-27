@@ -1,0 +1,94 @@
+(startRule 
+	(module 
+		(moduleBody 
+			(moduleBodyElement 
+				(moduleBlock 
+					(block 
+						(blockStmt 
+							(variableStmt Dim   
+								(variableListStmt 
+									(variableSubStmt 
+										(ambiguousIdentifier MyArray) ( )   
+										(asTypeClause As   
+											(type 
+												(baseType Integer))))))) \n 
+						(blockStmt 
+							(redimStmt Redim   
+								(redimSubStmt 
+									(implicitCallStmt_InStmt 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier MyArray))) ( 
+									(subscripts 
+										(subscript 
+											(valueStmt 
+												(literal 5)))) )))) \n 
+						(blockStmt 
+							(forNextStmt For   
+								(iCS_S_VariableOrProcedureCall 
+									(ambiguousIdentifier I))   =   
+								(valueStmt 
+									(literal 1))   To   
+								(valueStmt 
+									(literal 5)) \n    
+								(block 
+									(blockStmt 
+										(letStmt 
+											(implicitCallStmt_InStmt 
+												(iCS_S_ProcedureOrArrayCall 
+													(ambiguousIdentifier MyArray) ( 
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(implicitCallStmt_InStmt 
+																	(iCS_S_VariableOrProcedureCall 
+																		(ambiguousIdentifier I)))))) )))   =   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier I))))))) \n Next   
+								(ambiguousIdentifier I))) \n \n 
+						(blockStmt 
+							(redimStmt Redim   
+								(redimSubStmt 
+									(implicitCallStmt_InStmt 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier MyArray))) ( 
+									(subscripts 
+										(subscript 
+											(valueStmt 
+												(literal 10)))) )))) \n 
+						(blockStmt 
+							(forNextStmt For   
+								(iCS_S_VariableOrProcedureCall 
+									(ambiguousIdentifier I))   =   
+								(valueStmt 
+									(literal 1))   To   
+								(valueStmt 
+									(literal 10)) \n    
+								(block 
+									(blockStmt 
+										(letStmt 
+											(implicitCallStmt_InStmt 
+												(iCS_S_ProcedureOrArrayCall 
+													(ambiguousIdentifier MyArray) ( 
+													(argsCall 
+														(argCall 
+															(valueStmt 
+																(implicitCallStmt_InStmt 
+																	(iCS_S_VariableOrProcedureCall 
+																		(ambiguousIdentifier I)))))) )))   =   
+											(valueStmt 
+												(implicitCallStmt_InStmt 
+													(iCS_S_VariableOrProcedureCall 
+														(ambiguousIdentifier I))))))) \n Next   
+								(ambiguousIdentifier I))) \n \n 
+						(blockStmt 
+							(redimStmt Redim   Preserve   
+								(redimSubStmt 
+									(implicitCallStmt_InStmt 
+										(iCS_S_VariableOrProcedureCall 
+											(ambiguousIdentifier MyArray))) ( 
+									(subscripts 
+										(subscript 
+											(valueStmt 
+												(literal 15)))) ))))))))) <EOF>)
