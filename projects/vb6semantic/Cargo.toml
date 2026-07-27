@@ -1,0 +1,22 @@
+[package]
+name = "vb6semantic"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Semantic analysis and symbol table construction for VB6 code"
+keywords = ["vb6", "semantic-analysis", "symbol-table", "type-checking"]
+categories = ["development-tools", "parser-implementations"]
+
+[dependencies]
+vb6parse.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+tempfile = "3.0"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

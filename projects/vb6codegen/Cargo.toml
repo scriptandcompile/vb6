@@ -1,0 +1,49 @@
+[package]
+name = "vb6codegen"
+version = "0.1.0"
+edition = "2021"
+authors = ["VB6 Project Contributors"]
+description = "Shared code generation backends for VB6 conversion and compilation"
+license = "MIT"
+repository = "https://github.com/scriptandcompile/vb6"
+keywords = ["vb6", "visual-basic", "codegen", "compiler", "transpiler"]
+categories = ["development-tools", "compilers"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+#[dependencies]
+#thiserror = "2.0.18"
+#heck = "0.5"
+#indoc = "2.0"
+
+# Optional dependencies for specific backends
+#inkwell = { version = "0.8.0", optional = true, features = ["llvm17-0"] }
+#serde = { version = "1.0", optional = true, features = ["derive"] }
+
+#[dev-dependencies]
+#anyhow = "1.0"
+#pretty_assertions = "1.4"
+
+#[features]
+#default = ["rust-backend"]
+
+# Individual backends
+#rust-backend = []
+#javascript-backend = []
+#typescript-backend = ["javascript-backend"]
+#llvm-backend = ["inkwell"]
+
+# Feature groups
+#all-backends = ["rust-backend", "javascript-backend", "typescript-backend", "llvm-backend"]
+
+# Optional features
+#serde-support = ["serde"]
+
+# [[example]]
+#name = "rust_codegen"
+#required-features = ["rust-backend"]
+
+#[[example]]
+#name = "javascript_codegen"
+#required-features = ["javascript-backend"]

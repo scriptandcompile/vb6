@@ -1,0 +1,81 @@
+[package]
+name = "vb6convert"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "A modular tool for converting VB6 projects to modern languages and frameworks"
+keywords = ["vb6", "converter", "transpiler", "modernization"]
+categories = ["development-tools", "parser-implementations"]
+
+[[bin]]
+name = "vb6convert"
+path = "src/main.rs"
+
+[dependencies]
+vb6parse.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+walkdir.workspace = true
+rayon.workspace = true
+
+[features]
+default = []
+
+# Language conversion targets
+rust = ["rust-code", "rust-ui"]
+rust-code = []
+rust-ui = ["tauri"]
+
+javascript = ["js-code", "js-ui"]
+js-code = []
+js-ui = ["html", "css"]
+
+typescript = ["javascript"]
+
+# UI Framework targets
+tauri = ["rust", "html", "css", "javascript"]
+svelte = ["javascript", "html", "css"]
+react = ["javascript", "html", "css"]
+vue = ["javascript", "html", "css"]
+
+# Mobile targets
+flutter = ["dart"]
+dart = []
+
+# Web fundamentals
+html = []
+css = []
+
+# Testing and validation
+test-harness = []
+validation = []
+
+# Full conversion support (enables all targets)
+full = [
+    "rust",
+    "javascript",
+    "typescript",
+    "tauri",
+    "svelte",
+    "react",
+    "vue",
+    "flutter",
+    "dart",
+    "test-harness",
+    "validation",
+]
+
+[dev-dependencies]
+tempfile = "3.0"
+assert_fs = "1.0"
+predicates = "3.0"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

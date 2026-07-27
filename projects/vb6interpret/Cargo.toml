@@ -1,0 +1,40 @@
+[package]
+name = "vb6interpret"
+version = "0.1.0"
+edition = "2021"
+authors = ["Arthur <scriptandcompile@gmail.com>"]
+license = "MIT"
+description = "VB6 interpreter for executing VB6 code directly"
+repository = "https://github.com/scriptandcompile/vb6"
+keywords = ["vb6", "visual-basic", "interpreter", "runtime"]
+categories = ["development-tools", "compilers"]
+
+[[bin]]
+name = "vb6interpret"
+path = "src/main.rs"
+
+[dependencies]
+vb6parse = { workspace = true }
+vb6semantic = { path = "../vb6semantic" }
+vb6runtime = { path = "../vb6runtime" }
+vb6core = { path = "../vb6core" }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true }
+
+# For REPL
+rustyline = { version = "17.0.2", optional = true }
+colored = { version = "3.1.1", optional = true }
+
+# For performance monitoring
+tracing = { version = "0.1", optional = true }
+tracing-subscriber = { version = "0.3", optional = true }
+
+[dev-dependencies]
+criterion = "0.8.2"
+tempfile = "3.8"
+
+[features]
+default = ["repl"]
+repl = ["rustyline", "colored"]
+trace = ["tracing", "tracing-subscriber"]
