@@ -54,147 +54,147 @@ fn form_benchmarks(criterion: &mut Criterion) {
     let forms = vec![
         FormBenchmark::new(
             "FormPhysics.frm",
-            include_bytes!("../tests/data/vb6-code/Game-physics-basic/FormPhysics.frm"),
+            include_bytes!("../../../test-data/vb6-code/Game-physics-basic/FormPhysics.frm"),
         ),
         FormBenchmark::new(
             "Levels/Histogram.frm",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/Histogram.frm"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/Histogram.frm"),
         ),
         FormBenchmark::new(
             "Levels/Main.frm",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/Main.frm"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/Main.frm"),
         ),
         FormBenchmark::new(
             "Contrast.frm",
-            include_bytes!("../tests/data/vb6-code/Contrast-effect/Contrast.frm"),
+            include_bytes!("../../../test-data/vb6-code/Contrast-effect/Contrast.frm"),
         ),
         FormBenchmark::new(
             "Colorize.frm",
-            include_bytes!("../tests/data/vb6-code/Colorize-effect/Colorize.frm"),
+            include_bytes!("../../../test-data/vb6-code/Colorize-effect/Colorize.frm"),
         ),
         FormBenchmark::new(
             "CustomFilters.frm",
-            include_bytes!("../tests/data/vb6-code/Custom-image-filters/CustomFilters.frm"),
+            include_bytes!("../../../test-data/vb6-code/Custom-image-filters/CustomFilters.frm"),
         ),
         FormBenchmark::new(
             "frmHMM.frm",
-            include_bytes!("../tests/data/vb6-code/Hidden-Markov-model/frmHMM.frm"),
+            include_bytes!("../../../test-data/vb6-code/Hidden-Markov-model/frmHMM.frm"),
         ),
         FormBenchmark::new(
             "Grayscale.frm",
-            include_bytes!("../tests/data/vb6-code/Grayscale-effect/Grayscale.frm"),
+            include_bytes!("../../../test-data/vb6-code/Grayscale-effect/Grayscale.frm"),
         ),
         FormBenchmark::new(
             "frmScanner.frm",
-            include_bytes!("../tests/data/vb6-code/Scanner-TWAIN/frmScanner.frm"),
+            include_bytes!("../../../test-data/vb6-code/Scanner-TWAIN/frmScanner.frm"),
         ),
         FormBenchmark::new(
             "ShiftColors.frm",
-            include_bytes!("../tests/data/vb6-code/Color-shift-effect/ShiftColors.frm"),
+            include_bytes!("../../../test-data/vb6-code/Color-shift-effect/ShiftColors.frm"),
         ),
         FormBenchmark::new(
             "frmFill.frm",
-            include_bytes!("../tests/data/vb6-code/Fill-image-region/frmFill.frm"),
+            include_bytes!("../../../test-data/vb6-code/Fill-image-region/frmFill.frm"),
         ),
         FormBenchmark::new(
             "frmTransparency.frm",
-            include_bytes!("../tests/data/vb6-code/Transparency-2D/frmTransparency.frm"),
+            include_bytes!("../../../test-data/vb6-code/Transparency-2D/frmTransparency.frm"),
         ),
         FormBenchmark::new(
             "EdgeDetection.frm",
-            include_bytes!("../tests/data/vb6-code/Edge-detection/EdgeDetection.frm"),
+            include_bytes!("../../../test-data/vb6-code/Edge-detection/EdgeDetection.frm"),
         ),
         FormBenchmark::new(
             "NatureFilters.frm",
-            include_bytes!("../tests/data/vb6-code/Nature-effects/NatureFilters.frm"),
+            include_bytes!("../../../test-data/vb6-code/Nature-effects/NatureFilters.frm"),
         ),
         FormBenchmark::new(
             "FormScreenCapture.frm",
-            include_bytes!("../tests/data/vb6-code/Screen-capture/FormScreenCapture.frm"),
+            include_bytes!("../../../test-data/vb6-code/Screen-capture/FormScreenCapture.frm"),
         ),
         FormBenchmark::new(
             "HistogramsAdv/Histogram.frm",
-            include_bytes!("../tests/data/vb6-code/Histograms-advanced/Histogram.frm"),
+            include_bytes!("../../../test-data/vb6-code/Histograms-advanced/Histogram.frm"),
         ),
         FormBenchmark::new(
             "HistogramsAdv/Main.frm",
-            include_bytes!("../tests/data/vb6-code/Histograms-advanced/Main.frm"),
+            include_bytes!("../../../test-data/vb6-code/Histograms-advanced/Main.frm"),
         ),
         FormBenchmark::new(
             "Sepia.frm",
-            include_bytes!("../tests/data/vb6-code/Sepia-effect/Sepia.frm"),
+            include_bytes!("../../../test-data/vb6-code/Sepia-effect/Sepia.frm"),
         ),
         FormBenchmark::new(
             "frmFire.frm",
-            include_bytes!("../tests/data/vb6-code/Fire-effect/frmFire.frm"),
+            include_bytes!("../../../test-data/vb6-code/Fire-effect/frmFire.frm"),
         ),
         FormBenchmark::new(
             "RandomizationFX.frm",
-            include_bytes!("../tests/data/vb6-code/Randomize-effects/RandomizationFX.frm"),
+            include_bytes!("../../../test-data/vb6-code/Randomize-effects/RandomizationFX.frm"),
         ),
         FormBenchmark::new(
             "Brightness/DIBs/Brightness3.frm",
             include_bytes!(
-                "../tests/data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frm"
+                "../../../test-data/vb6-code/Brightness-effect/Part 3 - DIBs/Brightness3.frm"
             ),
         ),
         FormBenchmark::new(
             "Brightness/FasterDIBs/Brightness.frm",
             include_bytes!(
-                "../tests/data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frm"
+                "../../../test-data/vb6-code/Brightness-effect/Part 4 - Even faster DIBs/Brightness.frm"
             ),
         ),
         FormBenchmark::new(
             "Brightness/API/Brightness2.frm",
             include_bytes!(
-                "../tests/data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frm"
+                "../../../test-data/vb6-code/Brightness-effect/Part 2 - API - GetPixel and SetPixel/Brightness2.frm"
             ),
         ),
         FormBenchmark::new(
             "Brightness/VB6/Brightness.frm",
             include_bytes!(
-                "../tests/data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frm"
+                "../../../test-data/vb6-code/Brightness-effect/Part 1 - Pure VB6/Brightness.frm"
             ),
         ),
         FormBenchmark::new(
             "MapEditor/FrmResize.frm",
-            include_bytes!("../tests/data/vb6-code/Map-editor-2D/FrmResize.frm"),
+            include_bytes!("../../../test-data/vb6-code/Map-editor-2D/FrmResize.frm"),
         ),
         FormBenchmark::new(
             "MapEditor/Main Editor.frm",
-            include_bytes!("../tests/data/vb6-code/Map-editor-2D/Main Editor.frm"),
+            include_bytes!("../../../test-data/vb6-code/Map-editor-2D/Main Editor.frm"),
         ),
         FormBenchmark::new(
             "Histograms/Histogram.frm",
-            include_bytes!("../tests/data/vb6-code/Histograms-basic/Histogram.frm"),
+            include_bytes!("../../../test-data/vb6-code/Histograms-basic/Histogram.frm"),
         ),
         FormBenchmark::new(
             "Histograms/Main.frm",
-            include_bytes!("../tests/data/vb6-code/Histograms-basic/Main.frm"),
+            include_bytes!("../../../test-data/vb6-code/Histograms-basic/Main.frm"),
         ),
         FormBenchmark::new(
             "EmbossEngrave.frm",
-            include_bytes!("../tests/data/vb6-code/Emboss-engrave-effect/EmbossEngrave.frm"),
+            include_bytes!("../../../test-data/vb6-code/Emboss-engrave-effect/EmbossEngrave.frm"),
         ),
         FormBenchmark::new(
             "Blacklight.frm",
-            include_bytes!("../tests/data/vb6-code/Blacklight-effect/Blacklight.frm"),
+            include_bytes!("../../../test-data/vb6-code/Blacklight-effect/Blacklight.frm"),
         ),
         FormBenchmark::new(
             "Gradient.frm",
-            include_bytes!("../tests/data/vb6-code/Gradient-2D/Gradient.frm"),
+            include_bytes!("../../../test-data/vb6-code/Gradient-2D/Gradient.frm"),
         ),
         FormBenchmark::new(
             "Mandelbrot.frm",
-            include_bytes!("../tests/data/vb6-code/Mandelbrot/Mandelbrot.frm"),
+            include_bytes!("../../../test-data/vb6-code/Mandelbrot/Mandelbrot.frm"),
         ),
         FormBenchmark::new(
             "Curves.frm",
-            include_bytes!("../tests/data/vb6-code/Curves-effect/Curves.frm"),
+            include_bytes!("../../../test-data/vb6-code/Curves-effect/Curves.frm"),
         ),
         FormBenchmark::new(
             "frmMain.frm",
-            include_bytes!("../tests/data/vb6-code/Artificial-life/frmMain.frm"),
+            include_bytes!("../../../test-data/vb6-code/Artificial-life/frmMain.frm"),
         ),
     ];
 

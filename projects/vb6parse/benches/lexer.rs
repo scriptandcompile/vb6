@@ -54,53 +54,53 @@ fn lexer_benchmarks(criterion: &mut Criterion) {
         // Small files - simple tokenization
         LexerBenchmark::new(
             "Physics_Logic.bas",
-            include_bytes!("../tests/data/vb6-code/Game-physics-basic/Physics_Logic.bas"),
+            include_bytes!("../../../test-data/vb6-code/Game-physics-basic/Physics_Logic.bas"),
         ),
         LexerBenchmark::new(
             "Declarations.bas",
-            include_bytes!("../tests/data/vb6-code/Artificial-life/Declarations.bas"),
+            include_bytes!("../../../test-data/vb6-code/Artificial-life/Declarations.bas"),
         ),
         LexerBenchmark::new(
             "Subs.bas",
-            include_bytes!("../tests/data/vb6-code/Map-editor-2D/Subs.bas"),
+            include_bytes!("../../../test-data/vb6-code/Map-editor-2D/Subs.bas"),
         ),
         // Medium files - typical code complexity
         LexerBenchmark::new(
             "mod_PublicVars.bas",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/mod_PublicVars.bas"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/mod_PublicVars.bas"),
         ),
         LexerBenchmark::new(
             "MapEditor/Declarations.bas",
-            include_bytes!("../tests/data/vb6-code/Map-editor-2D/Declarations.bas"),
+            include_bytes!("../../../test-data/vb6-code/Map-editor-2D/Declarations.bas"),
         ),
         LexerBenchmark::new(
             "FastDrawing.cls",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/FastDrawing.cls"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/FastDrawing.cls"),
         ),
         LexerBenchmark::new(
             "FormPhysics.frm",
-            include_bytes!("../tests/data/vb6-code/Game-physics-basic/FormPhysics.frm"),
+            include_bytes!("../../../test-data/vb6-code/Game-physics-basic/FormPhysics.frm"),
         ),
         // Large files - complex with many tokens
         LexerBenchmark::new(
             "Organism.cls",
-            include_bytes!("../tests/data/vb6-code/Artificial-life/Organism.cls"),
+            include_bytes!("../../../test-data/vb6-code/Artificial-life/Organism.cls"),
         ),
         LexerBenchmark::new(
             "cCommonDialog.cls",
-            include_bytes!("../tests/data/vb6-code/Randomize-effects/cCommonDialog.cls"),
+            include_bytes!("../../../test-data/vb6-code/Randomize-effects/cCommonDialog.cls"),
         ),
         LexerBenchmark::new(
             "pdOpenSaveDialog.cls",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/pdOpenSaveDialog.cls"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/pdOpenSaveDialog.cls"),
         ),
         LexerBenchmark::new(
             "Levels/Main.frm",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/Main.frm"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/Main.frm"),
         ),
         LexerBenchmark::new(
             "Curves.frm",
-            include_bytes!("../tests/data/vb6-code/Curves-effect/Curves.frm"),
+            include_bytes!("../../../test-data/vb6-code/Curves-effect/Curves.frm"),
         ),
     ];
 

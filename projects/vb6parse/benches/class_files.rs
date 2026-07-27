@@ -53,23 +53,25 @@ fn class_benchmarks(criterion: &mut Criterion) {
     let classes = vec![
         ClassBenchmark::new(
             "FastDrawing.cls",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/FastDrawing.cls"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/FastDrawing.cls"),
         ),
         ClassBenchmark::new(
             "pdOpenSaveDialog.cls",
-            include_bytes!("../tests/data/vb6-code/Levels-effect/pdOpenSaveDialog.cls"),
+            include_bytes!("../../../test-data/vb6-code/Levels-effect/pdOpenSaveDialog.cls"),
         ),
         ClassBenchmark::new(
             "cCommonDialog.cls",
-            include_bytes!("../tests/data/vb6-code/Randomize-effects/cCommonDialog.cls"),
+            include_bytes!("../../../test-data/vb6-code/Randomize-effects/cCommonDialog.cls"),
         ),
         ClassBenchmark::new(
             "cSystemColorDialog.cls",
-            include_bytes!("../tests/data/vb6-code/Emboss-engrave-effect/cSystemColorDialog.cls"),
+            include_bytes!(
+                "../../../test-data/vb6-code/Emboss-engrave-effect/cSystemColorDialog.cls"
+            ),
         ),
         ClassBenchmark::new(
             "Organism.cls",
-            include_bytes!("../tests/data/vb6-code/Artificial-life/Organism.cls"),
+            include_bytes!("../../../test-data/vb6-code/Artificial-life/Organism.cls"),
         ),
     ];
 
