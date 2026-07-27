@@ -1,0 +1,47 @@
+[workspace]
+resolver = "2"
+members = [
+    "projects/aspen",
+    "projects/vb6parse",
+    "projects/vb6convert",
+    "projects/vb6semantic",
+    "projects/vb6runtime",
+    "projects/vb6core",
+    "projects/vb6interpret",
+    "projects/vb6compile",
+    "projects/vb6codegen",
+    "projects/vb6libraries",
+    "projects/vb6grammarfuzz",
+    #"projects/vb6lsp",
+    #"projects/vscode-vb6"
+]
+
+[workspace.package]
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/scriptandcompile/vb6"
+authors = ["ScriptAndCompile"]
+
+[workspace.dependencies]
+# Shared dependencies across workspace members
+vb6parse = { path = "projects/vb6parse", version = "^1.0.0" }
+vb6codegen = { path = "projects/vb6codegen", version = "0.1.0" }
+anyhow = "1.0.104"
+thiserror = "2.0.19"
+clap = { version = "4.6.4", features = ["cargo", "derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "1.1.3+spec-1.1.0"
+walkdir = "2.5"
+rayon = "1.10"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.samply]
+inherits = "release"
+debug = true
+strip = false

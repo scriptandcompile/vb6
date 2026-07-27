@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6 workspace hub for the Rust-based VB6 toolchain">
+    <meta name="keywords" content="vb6, rust, workspace, parser, compiler, runtime, docs">
+    <title>VB6 Workspace</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/theme-switcher.js"></script>
+    <script src="assets/js/site.js" defer></script>
+</head>
+<body>
+    <header class="hero">
+        <div class="container hero-inner">
+            <div class="hero-copy">
+                <p class="eyebrow">VB6 umbrella workspace</p>
+                <h1>VB6</h1>
+                <p class="tagline">A coordinated set of Rust and tooling projects for parsing, analyzing, converting, and extending Visual Basic 6.</p>
+                <div class="hero-actions">
+                    <a class="button button-primary" href="status.html">View status board</a>
+                    <a class="button button-secondary" href="https://github.com/scriptandcompile/vb6" target="_blank" rel="noreferrer">GitHub repository</a>
+                </div>
+            </div>
+            <div class="hero-panel">
+                <div class="stat-grid compact-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="project-count">0</div>
+                        <div class="stat-label">Projects tracked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="stable-count">0</div>
+                        <div class="stat-label">Stable or mature</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="docs-count">0</div>
+                        <div class="stat-label">With docs entrypoints</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container nav-inner">
+            <a href="#overview">Overview</a>
+            <a href="#projects">Projects</a>
+            <a href="#roadmap">Roadmap</a>
+            <a href="status.html">Status</a>
+            <a href="https://github.com/scriptandcompile/vb6" target="_blank" rel="noreferrer">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container page-body">
+        <section id="overview">
+            <div class="section-heading">
+                <p class="eyebrow">Workspace shape</p>
+                <h2>One repository, multiple layers</h2>
+            </div>
+            <div class="intro-grid">
+                <div class="info-card">
+                    <h3>Core path</h3>
+                    <p>vb6parse is the foundation: tokenizer, parser, CST, library documentation, wasm playground, coverage, and benchmarks.</p>
+                </div>
+                <div class="info-card">
+                    <h3>Analysis path</h3>
+                    <p>vb6semantic, vb6runtime, and vb6core build the semantic and execution layers that sit above parsing.</p>
+                </div>
+                <div class="info-card">
+                    <h3>Migration path</h3>
+                    <p>vb6convert, vb6codegen, vb6compile, and vb6libraries define the conversion and code-generation toolchain.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <div class="section-heading">
+                <p class="eyebrow">Project index</p>
+                <h2>Current projects and their entry points</h2>
+            </div>
+            <div id="project-load-message" class="warning-box" style="display: none;"></div>
+            <div id="project-grid" class="project-grid"></div>
+        </section>
+
+        <section id="roadmap">
+            <div class="section-heading">
+                <p class="eyebrow">Immediate work</p>
+                <h2>What still needs to be built</h2>
+            </div>
+            <div class="roadmap-grid">
+                <div class="roadmap-card">
+                    <h3>Publish the umbrella site</h3>
+                    <p>Keep `docs/` as the canonical landing page for the entire workspace and route visitors to the component projects from there.</p>
+                </div>
+                <div class="roadmap-card">
+                    <h3>Normalize metadata</h3>
+                    <p>Move project status and link data into a small machine-readable source so the hub can stay current without manual page edits.</p>
+                </div>
+                <div class="roadmap-card">
+                    <h3>Unify automation</h3>
+                    <p>Promote build, coverage, and docs generation to root-level workflows so every project feeds the same repo-wide surface.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>VB6 Workspace Hub</p>
+        </div>
+    </footer>
+</body>
+</html>

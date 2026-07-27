@@ -1,0 +1,144 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Visual Basic 6",
+  "scopeName": "source.vb6",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#declarations" },
+    { "include": "#operators" },
+    { "include": "#labels" },
+    { "include": "#identifiers" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.apostrophe.vb6",
+          "match": "'[^\\n\\r]*$"
+        },
+        {
+          "name": "comment.line.rem.vb6",
+          "match": "(?i)\\bRem\\b[^\\n\\r]*$"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.vb6",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.doublequote.vb6",
+              "match": "\"\""
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.vb6",
+          "match": "(?i)\\b&H[0-9A-F]+&?\\b"
+        },
+        {
+          "name": "constant.numeric.octal.vb6",
+          "match": "(?i)\\b&O[0-7]+&?\\b"
+        },
+        {
+          "name": "constant.numeric.decimal.vb6",
+          "match": "(?i)(?<![\\w.])(?:\\d+\\.\\d*|\\d*\\.\\d+|\\d+)(?:[ED][+-]?\\d+)?(?:[%&!#@])?(?![\\w.])"
+        },
+        {
+          "name": "constant.other.datetime.vb6",
+          "match": "#[^#\\r\\n]+#"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.vb6",
+          "match": "(?i)\\b(If|Then|Else|ElseIf|End|For|Each|To|Step|Next|Do|Loop|While|Wend|Until|Select|Case|With|GoTo|GoSub|Return|Resume|Exit|On|Error|Call|Set|Let|RaiseEvent)\\b"
+        },
+        {
+          "name": "keyword.declaration.vb6",
+          "match": "(?i)\\b(Public|Private|Friend|Dim|ReDim|Preserve|Const|Enum|Type|Declare|Function|Sub|Property|Event|Option|Static|As|ByVal|ByRef|Optional|ParamArray|WithEvents|Implements|Attribute)\\b"
+        },
+        {
+          "name": "constant.language.boolean.vb6",
+          "match": "(?i)\\b(True|False|Nothing|Null|Empty|Me)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.vb6",
+          "match": "(?i)\\b(Boolean|Byte|Integer|Long|Single|Double|Currency|Decimal|Date|String|Variant|Object)\\b"
+        }
+      ]
+    },
+    "declarations": {
+      "patterns": [
+        {
+          "name": "entity.name.function.vb6",
+          "match": "(?i)\\b(?:Function|Sub|Property\\s+(?:Get|Let|Set))\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "entity.name.function.vb6"
+            }
+          }
+        },
+        {
+          "name": "entity.name.type.vb6",
+          "match": "(?i)\\b(?:Enum|Type|Class)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "entity.name.type.vb6"
+            }
+          }
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.vb6",
+          "match": "(?i)\\b(And|Or|Not|Xor|Mod|Eqv|Imp|Is|Like|TypeOf|AddressOf|New)\\b"
+        },
+        {
+          "name": "keyword.operator.assignment.vb6",
+          "match": "=|<>|<=|>=|<|>|\\+|-|\\*|/|\\\\|\\^|&"
+        }
+      ]
+    },
+    "labels": {
+      "patterns": [
+        {
+          "name": "entity.name.label.vb6",
+          "match": "^\\s*([A-Za-z_][A-Za-z0-9_]*):",
+          "captures": {
+            "1": {
+              "name": "entity.name.label.vb6"
+            }
+          }
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "name": "variable.other.vb6",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    }
+  }
+}
