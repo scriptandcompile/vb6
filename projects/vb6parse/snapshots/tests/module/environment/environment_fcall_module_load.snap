@@ -783,60 +783,62 @@ cst:
             text: CALLINGCONVENTION_ENUM
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: cc_fastcall
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: CC_CDECL
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: CC_PASCAL
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: CC_MACPASCAL
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: CC_STDCALL
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: CC_FPFASTCALL
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: CC_SYSCALL
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: CC_MPWCDECL
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: CC_MPWPASCAL
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: cc_fastcall
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: CC_CDECL
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: CC_PASCAL
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: CC_MACPASCAL
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: CC_STDCALL
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: CC_FPFASTCALL
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: CC_SYSCALL
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: CC_MPWCDECL
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: CC_MPWPASCAL
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

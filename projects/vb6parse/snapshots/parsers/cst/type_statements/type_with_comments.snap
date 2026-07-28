@@ -1,5 +1,5 @@
 ---
-source: src/parsers/cst/type_statements.rs
+source: projects/vb6parse/src/parsers/cst/type_statements.rs
 expression: tree
 ---
 root:
@@ -17,62 +17,64 @@ root:
           text: Employee
         - kind: Newline
           text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: EndOfLineComment
-          text: "' Employee identification"
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: EmployeeID
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: LongKeyword
-          text: Long
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: FirstName
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: StringKeyword
-          text: String
-        - kind: Whitespace
-          text: "  "
-        - kind: EndOfLineComment
-          text: "' First name"
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: LastName
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: StringKeyword
-          text: String
-        - kind: Whitespace
-          text: "   "
-        - kind: EndOfLineComment
-          text: "' Last name"
-        - kind: Newline
-          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: Whitespace
+              text: "    "
+            - kind: EndOfLineComment
+              text: "' Employee identification"
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: EmployeeID
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: LongKeyword
+              text: Long
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: FirstName
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: StringKeyword
+              text: String
+            - kind: Whitespace
+              text: "  "
+            - kind: EndOfLineComment
+              text: "' First name"
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: LastName
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: StringKeyword
+              text: String
+            - kind: Whitespace
+              text: "   "
+            - kind: EndOfLineComment
+              text: "' Last name"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

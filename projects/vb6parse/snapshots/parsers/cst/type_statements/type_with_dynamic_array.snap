@@ -1,5 +1,5 @@
 ---
-source: src/parsers/cst/type_statements.rs
+source: projects/vb6parse/src/parsers/cst/type_statements.rs
 expression: tree
 ---
 root:
@@ -17,38 +17,40 @@ root:
           text: DynamicBuffer
         - kind: Newline
           text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: Items
-        - kind: LeftParenthesis
-          text: (
-        - kind: RightParenthesis
-          text: )
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: VariantKeyword
-          text: Variant
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: Count
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: LongKeyword
-          text: Long
-        - kind: Newline
-          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: Items
+            - kind: LeftParenthesis
+              text: (
+            - kind: RightParenthesis
+              text: )
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: VariantKeyword
+              text: Variant
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: Count
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: LongKeyword
+              text: Long
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

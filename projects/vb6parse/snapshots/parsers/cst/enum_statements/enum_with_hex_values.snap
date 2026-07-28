@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/parsers/cst/enum_statements.rs
+source: projects/vb6parse/src/parsers/cst/enum_statements.rs
 expression: tree
 ---
 root:
@@ -17,62 +17,64 @@ root:
           text: FileAttributes
         - kind: Newline
           text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: ReadOnly
-        - kind: Whitespace
-          text: " "
-        - kind: EqualityOperator
-          text: "="
-        - kind: Whitespace
-          text: " "
-        - kind: LongLiteral
-          text: "&H1"
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: Hidden
-        - kind: Whitespace
-          text: " "
-        - kind: EqualityOperator
-          text: "="
-        - kind: Whitespace
-          text: " "
-        - kind: LongLiteral
-          text: "&H2"
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: System
-        - kind: Whitespace
-          text: " "
-        - kind: EqualityOperator
-          text: "="
-        - kind: Whitespace
-          text: " "
-        - kind: LongLiteral
-          text: "&H4"
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: Archive
-        - kind: Whitespace
-          text: " "
-        - kind: EqualityOperator
-          text: "="
-        - kind: Whitespace
-          text: " "
-        - kind: LongLiteral
-          text: "&H20"
-        - kind: Newline
-          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: ReadOnly
+            - kind: Whitespace
+              text: " "
+            - kind: EqualityOperator
+              text: "="
+            - kind: Whitespace
+              text: " "
+            - kind: LongLiteral
+              text: "&H1"
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: Hidden
+            - kind: Whitespace
+              text: " "
+            - kind: EqualityOperator
+              text: "="
+            - kind: Whitespace
+              text: " "
+            - kind: LongLiteral
+              text: "&H2"
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: System
+            - kind: Whitespace
+              text: " "
+            - kind: EqualityOperator
+              text: "="
+            - kind: Whitespace
+              text: " "
+            - kind: LongLiteral
+              text: "&H4"
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: Archive
+            - kind: Whitespace
+              text: " "
+            - kind: EqualityOperator
+              text: "="
+            - kind: Whitespace
+              text: " "
+            - kind: LongLiteral
+              text: "&H20"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

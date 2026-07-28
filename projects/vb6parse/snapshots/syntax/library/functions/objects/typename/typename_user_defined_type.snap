@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/functions/objects/typename.rs
+source: projects/vb6parse/src/syntax/library/functions/objects/typename.rs
 expression: tree
 ---
 root:
@@ -17,20 +17,22 @@ root:
           text: MyType
         - kind: Newline
           text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: x
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: IntegerKeyword
-          text: Integer
-        - kind: Newline
-          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: x
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IntegerKeyword
+              text: Integer
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

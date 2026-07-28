@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/class/cdiu_beat_up_editor.rs
 expression: class
 ---
 header:
@@ -1314,248 +1314,250 @@ cst:
             text: EShowHelpCommands
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_COMMAND
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H102&"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_CONTENTS
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H3&"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_CONTEXT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H1"
-          - kind: Whitespace
-            text: "          "
-          - kind: EndOfLineComment
-            text: "'  Display topic in ulTopic"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_CONTEXTPOPUP
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H8&"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_FORCEFILE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H9&"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_HELPONHELP
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H4"
-          - kind: Whitespace
-            text: "       "
-          - kind: EndOfLineComment
-            text: "'  Display help on using help"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_INDEX
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H3"
-          - kind: Whitespace
-            text: "            "
-          - kind: EndOfLineComment
-            text: "'  Display index"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_KEY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H101"
-          - kind: Whitespace
-            text: "            "
-          - kind: EndOfLineComment
-            text: "'  Display topic for keyword in offabData"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_MULTIKEY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H201&"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_PARTIALKEY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H105&"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_QUIT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H2"
-          - kind: Whitespace
-            text: "             "
-          - kind: EndOfLineComment
-            text: "'  Terminate help"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_SETCONTENTS
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H5&"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_SETINDEX
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H5"
-          - kind: Whitespace
-            text: "         "
-          - kind: EndOfLineComment
-            text: "'  Set current Index for multi index help"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_SETWINPOS
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H203&"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "        "
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HELP_FINDER
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&HB"
-          - kind: Whitespace
-            text: "           "
-          - kind: EndOfLineComment
-            text: "' Win95 version of HELP_CONTENTS"
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_COMMAND
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H102&"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_CONTENTS
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H3&"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_CONTEXT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H1"
+              - kind: Whitespace
+                text: "          "
+              - kind: EndOfLineComment
+                text: "'  Display topic in ulTopic"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_CONTEXTPOPUP
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H8&"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_FORCEFILE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H9&"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_HELPONHELP
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H4"
+              - kind: Whitespace
+                text: "       "
+              - kind: EndOfLineComment
+                text: "'  Display help on using help"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_INDEX
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H3"
+              - kind: Whitespace
+                text: "            "
+              - kind: EndOfLineComment
+                text: "'  Display index"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_KEY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H101"
+              - kind: Whitespace
+                text: "            "
+              - kind: EndOfLineComment
+                text: "'  Display topic for keyword in offabData"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_MULTIKEY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H201&"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_PARTIALKEY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H105&"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_QUIT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H2"
+              - kind: Whitespace
+                text: "             "
+              - kind: EndOfLineComment
+                text: "'  Terminate help"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_SETCONTENTS
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H5&"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_SETINDEX
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H5"
+              - kind: Whitespace
+                text: "         "
+              - kind: EndOfLineComment
+                text: "'  Set current Index for multi index help"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_SETWINPOS
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H203&"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "        "
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HELP_FINDER
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&HB"
+              - kind: Whitespace
+                text: "           "
+              - kind: EndOfLineComment
+                text: "' Win95 version of HELP_CONTENTS"
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1578,112 +1580,114 @@ cst:
             text: HELPWININFO
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wStructSize
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: x
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: y
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: dx
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: dy
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wMax
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: rgchMember
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "2"
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wStructSize
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: x
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: y
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: dx
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: dy
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wMax
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: rgchMember
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "2"
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1706,146 +1710,148 @@ cst:
             text: EShowHelpWindowPos
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: SW_HIDE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "0"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: SW_MAXIMIZE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "3"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: SW_MINIMIZE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "6"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: SW_SHOW
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "5"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: SW_SHOWMAXIMIZED
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "3"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: SW_SHOWMINIMIZED
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "2"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: SW_SHOWMINNOACTIVE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "7"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: SW_SHOWNA
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "8"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: SW_SHOWNOACTIVATE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "4"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: SW_SHOWNORMAL
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: SW_HIDE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "0"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: SW_MAXIMIZE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "3"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: SW_MINIMIZE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "6"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: SW_SHOW
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "5"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: SW_SHOWMAXIMIZED
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "3"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: SW_SHOWMINIMIZED
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "2"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: SW_SHOWMINNOACTIVE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "7"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: SW_SHOWNA
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "8"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: SW_SHOWNOACTIVATE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "4"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: SW_SHOWNORMAL
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -2210,62 +2216,64 @@ cst:
             text: RECT
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Left
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Top
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Right
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Bottom
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Left
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Top
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Right
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Bottom
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -2288,34 +2296,36 @@ cst:
             text: POINTAPI
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: x
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: y
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: x
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: y
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

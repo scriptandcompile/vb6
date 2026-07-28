@@ -1,5 +1,5 @@
 ---
-source: src/parsers/cst/enum_statements.rs
+source: projects/vb6parse/src/parsers/cst/enum_statements.rs
 expression: tree
 ---
 root:
@@ -17,6 +17,8 @@ root:
           text: EmptyEnum
         - kind: Newline
           text: "\n"
+        - kind: StatementList
+          children: []
         - kind: EndKeyword
           text: End
         - kind: Whitespace

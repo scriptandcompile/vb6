@@ -1,5 +1,5 @@
 ---
-source: src/parsers/cst/type_statements.rs
+source: projects/vb6parse/src/parsers/cst/type_statements.rs
 expression: tree
 ---
 root:
@@ -17,36 +17,38 @@ root:
           text: NegativeBounds
         - kind: Newline
           text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: Values
-        - kind: LeftParenthesis
-          text: (
-        - kind: SubtractionOperator
-          text: "-"
-        - kind: IntegerLiteral
-          text: "10"
-        - kind: Whitespace
-          text: " "
-        - kind: ToKeyword
-          text: To
-        - kind: Whitespace
-          text: " "
-        - kind: IntegerLiteral
-          text: "10"
-        - kind: RightParenthesis
-          text: )
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: SingleKeyword
-          text: Single
-        - kind: Newline
-          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: Values
+            - kind: LeftParenthesis
+              text: (
+            - kind: SubtractionOperator
+              text: "-"
+            - kind: IntegerLiteral
+              text: "10"
+            - kind: Whitespace
+              text: " "
+            - kind: ToKeyword
+              text: To
+            - kind: Whitespace
+              text: " "
+            - kind: IntegerLiteral
+              text: "10"
+            - kind: RightParenthesis
+              text: )
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: SingleKeyword
+              text: Single
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: src/parsers/cst/type_statements.rs
+source: projects/vb6parse/src/parsers/cst/type_statements.rs
 expression: tree
 ---
 root:
@@ -17,6 +17,8 @@ root:
           text: EmptyType
         - kind: Newline
           text: "\n"
+        - kind: StatementList
+          children: []
         - kind: EndKeyword
           text: End
         - kind: Whitespace

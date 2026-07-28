@@ -230,6 +230,10 @@ impl Parser<'_> {
         // Consume everything until newline (preserving all tokens)
         self.consume_until_after(Token::Newline);
 
+        // Wrap body in StatementList for formatter indent tracking
+        self.builder
+            .start_node(SyntaxKind::StatementList.to_raw());
+
         // Parse type members until "End Type"
         while !self.is_at_end() {
             // Check if we've reached "End Type"
@@ -296,6 +300,8 @@ impl Parser<'_> {
             }
         }
 
+        self.builder.finish_node(); // StatementList
+
         // Consume "End Type" and trailing tokens
         if self.at_token(Token::EndKeyword) {
             // Consume "End"
@@ -332,6 +338,10 @@ impl Parser<'_> {
         self.builder.finish_node();
 
         loop {
+            // Wrap body in StatementList (matching regular parse_compiler_directive)
+            self.builder
+                .start_node(SyntaxKind::StatementList.to_raw());
+
             // Parse body (type members until directive or End Type)
             while !self.is_at_end() {
                 if self.at_token(Token::EndKeyword)
@@ -384,6 +394,8 @@ impl Parser<'_> {
                     }
                 }
             }
+
+            self.builder.finish_node(); // StatementList
 
             if self.at_compiler_directive_keyword(Token::ElseIfKeyword) {
                 self.builder
