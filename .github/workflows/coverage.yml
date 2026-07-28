@@ -1,4 +1,4 @@
-name: Update Coverage
+name: Update VB6Parse Coverage
 
 on:
   push:
@@ -12,6 +12,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 1'
+
+permissions:
+  contents: write
 
 jobs:
   coverage:

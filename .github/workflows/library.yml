@@ -1,4 +1,4 @@
-name: Update Library Documentation
+name: Update VB6Parse Library Documentation
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
       - 'projects/vb6parse/src/syntax/library/**'
       - 'projects/vb6parse/scripts/generate-library-docs.py'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   library:

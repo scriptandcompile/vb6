@@ -1,4 +1,4 @@
-name: Update Benchmarks
+name: Update VB6Parse Benchmarks
 
 on:
   push:
@@ -12,6 +12,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 1'
+
+permissions:
+  contents: write
 
 jobs:
   benchmarks:
