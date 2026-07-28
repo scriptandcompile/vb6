@@ -60,6 +60,16 @@ pub enum SyntaxKind {
     ElseIfClause,
     /// Else clause of an If statement
     ElseClause,
+    /// Compiler directive (`#If` / `#ElseIf` / `#Else` / `#End If`)
+    CompilerDirective,
+    /// `#If` clause
+    CompilerIfClause,
+    /// `#ElseIf` clause
+    CompilerElseIfClause,
+    /// `#Else` clause
+    CompilerElseClause,
+    /// `#End If` clause
+    CompilerEndIfClause,
     /// For statement
     ForStatement,
     /// For Each statement

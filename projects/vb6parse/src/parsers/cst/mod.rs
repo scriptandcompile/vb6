@@ -2253,6 +2253,8 @@ impl<'a> Parser<'a> {
                         self.consume_token();
                     } else if self.is_at_compiler_conditional_property_statement() {
                         self.parse_compiler_conditional_property_statement();
+                    } else if self.at_compiler_directive_keyword(Token::IfKeyword) {
+                        self.parse_compiler_directive();
                     // Try control flow statements
                     } else if self.is_control_flow_keyword() {
                         self.parse_control_flow_statement();
@@ -2978,6 +2980,8 @@ impl<'a> Parser<'a> {
             self.parse_end_statement();
         } else if self.is_at_compiler_conditional_property_statement() {
             self.parse_compiler_conditional_property_statement();
+        } else if self.at_compiler_directive_keyword(Token::IfKeyword) {
+            self.parse_compiler_directive();
         } else if self.at_token(Token::Octothorpe) {
             self.consume_token();
         } else if self.at_token(Token::ColonOperator) {

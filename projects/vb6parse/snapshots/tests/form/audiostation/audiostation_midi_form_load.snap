@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/audiostation.rs
+source: projects/vb6parse/tests/form/audiostation.rs
 expression: form_file
 ---
 form:
@@ -15955,40 +15955,42 @@ cst:
                 text: "\n"
               - kind: Newline
                 text: "\n"
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BinaryExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "1"
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
                       - kind: Whitespace
                         text: " "
-                      - kind: EqualityOperator
-                        text: "="
+                      - kind: BinaryExpression
+                        children:
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                       - kind: Whitespace
                         text: " "
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "0"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EndOfLineComment
-                    text: "' comment out to enable test"
-                  - kind: Newline
-                    text: "\n"
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EndOfLineComment
+                        text: "' comment out to enable test"
+                      - kind: Newline
+                        text: "\n"
                   - kind: StatementList
                     children:
                       - kind: Whitespace
@@ -16041,16 +16043,18 @@ cst:
                                 text: "True"
                           - kind: Newline
                             text: "\n"
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: Whitespace
@@ -24485,40 +24489,42 @@ cst:
                             text: "            "
                           - kind: Newline
                             text: "\n"
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IfStatement
+                          - kind: CompilerDirective
                             children:
-                              - kind: IfKeyword
-                                text: If
-                              - kind: Whitespace
-                                text: " "
-                              - kind: BinaryExpression
+                              - kind: CompilerIfClause
                                 children:
-                                  - kind: NumericLiteralExpression
-                                    children:
-                                      - kind: IntegerLiteral
-                                        text: "1"
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: IfKeyword
+                                    text: If
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: EqualityOperator
-                                    text: "="
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: EqualityOperator
+                                        text: "="
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "0"
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: NumericLiteralExpression
-                                    children:
-                                      - kind: IntegerLiteral
-                                        text: "0"
-                              - kind: Whitespace
-                                text: " "
-                              - kind: ThenKeyword
-                                text: Then
-                              - kind: Whitespace
-                                text: " "
-                              - kind: EndOfLineComment
-                                text: "' comment out to enable test"
-                              - kind: Newline
-                                text: "\n"
+                                  - kind: ThenKeyword
+                                    text: Then
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EndOfLineComment
+                                    text: "' comment out to enable test"
+                                  - kind: Newline
+                                    text: "\n"
                               - kind: StatementList
                                 children:
                                   - kind: Whitespace
@@ -24667,16 +24673,18 @@ cst:
                                                     text: )
                                       - kind: Newline
                                         text: "\n"
-                              - kind: Octothorpe
-                                text: "#"
-                              - kind: EndKeyword
-                                text: End
-                              - kind: Whitespace
-                                text: " "
-                              - kind: IfKeyword
-                                text: If
-                              - kind: Newline
-                                text: "\n"
+                              - kind: CompilerEndIfClause
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: EndKeyword
+                                    text: End
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: IfKeyword
+                                    text: If
+                                  - kind: Newline
+                                    text: "\n"
                           - kind: Whitespace
                             text: "            "
                           - kind: Newline
@@ -26921,40 +26929,42 @@ cst:
                 text: "    "
               - kind: Newline
                 text: "\n"
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BinaryExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "1"
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
                       - kind: Whitespace
                         text: " "
-                      - kind: EqualityOperator
-                        text: "="
+                      - kind: BinaryExpression
+                        children:
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                       - kind: Whitespace
                         text: " "
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "0"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EndOfLineComment
-                    text: "' comment out to enable test"
-                  - kind: Newline
-                    text: "\n"
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EndOfLineComment
+                        text: "' comment out to enable test"
+                      - kind: Newline
+                        text: "\n"
                   - kind: StatementList
                     children:
                       - kind: Whitespace
@@ -27021,16 +27031,18 @@ cst:
                                         text: StreamName
                           - kind: Newline
                             text: "\n"
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: Newline
@@ -35373,40 +35385,42 @@ cst:
                 text: "    "
               - kind: Newline
                 text: "\n"
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BinaryExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "1"
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
                       - kind: Whitespace
                         text: " "
-                      - kind: EqualityOperator
-                        text: "="
+                      - kind: BinaryExpression
+                        children:
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                       - kind: Whitespace
                         text: " "
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "0"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EndOfLineComment
-                    text: "' comment out to enable test"
-                  - kind: Newline
-                    text: "\n"
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EndOfLineComment
+                        text: "' comment out to enable test"
+                      - kind: Newline
+                        text: "\n"
                   - kind: StatementList
                     children:
                       - kind: Whitespace
@@ -35717,16 +35731,18 @@ cst:
                             text: Stop
                           - kind: Newline
                             text: "\n"
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: Newline
@@ -36877,40 +36893,42 @@ cst:
                                 text: "\n"
                               - kind: Newline
                                 text: "\n"
-                              - kind: Octothorpe
-                                text: "#"
-                              - kind: IfStatement
+                              - kind: CompilerDirective
                                 children:
-                                  - kind: IfKeyword
-                                    text: If
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: BinaryExpression
+                                  - kind: CompilerIfClause
                                     children:
-                                      - kind: NumericLiteralExpression
-                                        children:
-                                          - kind: IntegerLiteral
-                                            text: "1"
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IfKeyword
+                                        text: If
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: EqualityOperator
-                                        text: "="
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "1"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: EqualityOperator
+                                            text: "="
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "0"
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: NumericLiteralExpression
-                                        children:
-                                          - kind: IntegerLiteral
-                                            text: "0"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: ThenKeyword
-                                    text: Then
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: EndOfLineComment
-                                    text: "' comment out to enable test"
-                                  - kind: Newline
-                                    text: "\n"
+                                      - kind: ThenKeyword
+                                        text: Then
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: EndOfLineComment
+                                        text: "' comment out to enable test"
+                                      - kind: Newline
+                                        text: "\n"
                                   - kind: StatementList
                                     children:
                                       - kind: Whitespace
@@ -37083,16 +37101,18 @@ cst:
                                             text: If
                                           - kind: Newline
                                             text: "\n"
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: EndKeyword
-                                    text: End
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IfKeyword
-                                    text: If
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: CompilerEndIfClause
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: EndKeyword
+                                        text: End
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IfKeyword
+                                        text: If
+                                      - kind: Newline
+                                        text: "\n"
                               - kind: Whitespace
                                 text: "        "
                               - kind: Newline
@@ -40559,40 +40579,42 @@ cst:
                                                     text: "        "
                                                   - kind: Newline
                                                     text: "\n"
-                                                  - kind: Octothorpe
-                                                    text: "#"
-                                                  - kind: IfStatement
+                                                  - kind: CompilerDirective
                                                     children:
-                                                      - kind: IfKeyword
-                                                        text: If
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: BinaryExpression
+                                                      - kind: CompilerIfClause
                                                         children:
-                                                          - kind: NumericLiteralExpression
-                                                            children:
-                                                              - kind: IntegerLiteral
-                                                                text: "1"
+                                                          - kind: Octothorpe
+                                                            text: "#"
+                                                          - kind: IfKeyword
+                                                            text: If
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: EqualityOperator
-                                                            text: "="
+                                                          - kind: BinaryExpression
+                                                            children:
+                                                              - kind: NumericLiteralExpression
+                                                                children:
+                                                                  - kind: IntegerLiteral
+                                                                    text: "1"
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: EqualityOperator
+                                                                text: "="
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: NumericLiteralExpression
+                                                                children:
+                                                                  - kind: IntegerLiteral
+                                                                    text: "0"
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: NumericLiteralExpression
-                                                            children:
-                                                              - kind: IntegerLiteral
-                                                                text: "0"
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: ThenKeyword
-                                                        text: Then
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: EndOfLineComment
-                                                        text: "' comment out to enable test"
-                                                      - kind: Newline
-                                                        text: "\n"
+                                                          - kind: ThenKeyword
+                                                            text: Then
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: EndOfLineComment
+                                                            text: "' comment out to enable test"
+                                                          - kind: Newline
+                                                            text: "\n"
                                                       - kind: StatementList
                                                         children:
                                                           - kind: IfStatement
@@ -40847,16 +40869,18 @@ cst:
                                                                     text: "' prevent overflow in debug window"
                                                                   - kind: Newline
                                                                     text: "\n"
-                                                      - kind: Octothorpe
-                                                        text: "#"
-                                                      - kind: EndKeyword
-                                                        text: End
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: IfKeyword
-                                                        text: If
-                                                      - kind: Newline
-                                                        text: "\n"
+                                                      - kind: CompilerEndIfClause
+                                                        children:
+                                                          - kind: Octothorpe
+                                                            text: "#"
+                                                          - kind: EndKeyword
+                                                            text: End
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: IfKeyword
+                                                            text: If
+                                                          - kind: Newline
+                                                            text: "\n"
                                                   - kind: Whitespace
                                                     text: "    "
                                                   - kind: Newline
@@ -41281,40 +41305,42 @@ cst:
                                                         text: "\n"
                                                   - kind: Newline
                                                     text: "\n"
-                                                  - kind: Octothorpe
-                                                    text: "#"
-                                                  - kind: IfStatement
+                                                  - kind: CompilerDirective
                                                     children:
-                                                      - kind: IfKeyword
-                                                        text: If
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: BinaryExpression
+                                                      - kind: CompilerIfClause
                                                         children:
-                                                          - kind: NumericLiteralExpression
-                                                            children:
-                                                              - kind: IntegerLiteral
-                                                                text: "1"
+                                                          - kind: Octothorpe
+                                                            text: "#"
+                                                          - kind: IfKeyword
+                                                            text: If
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: EqualityOperator
-                                                            text: "="
+                                                          - kind: BinaryExpression
+                                                            children:
+                                                              - kind: NumericLiteralExpression
+                                                                children:
+                                                                  - kind: IntegerLiteral
+                                                                    text: "1"
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: EqualityOperator
+                                                                text: "="
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: NumericLiteralExpression
+                                                                children:
+                                                                  - kind: IntegerLiteral
+                                                                    text: "0"
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: NumericLiteralExpression
-                                                            children:
-                                                              - kind: IntegerLiteral
-                                                                text: "0"
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: ThenKeyword
-                                                        text: Then
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: EndOfLineComment
-                                                        text: "' comment out to enable test"
-                                                      - kind: Newline
-                                                        text: "\n"
+                                                          - kind: ThenKeyword
+                                                            text: Then
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: EndOfLineComment
+                                                            text: "' comment out to enable test"
+                                                          - kind: Newline
+                                                            text: "\n"
                                                       - kind: StatementList
                                                         children:
                                                           - kind: Whitespace
@@ -41813,16 +41839,18 @@ cst:
                                                                 text: If
                                                               - kind: Newline
                                                                 text: "\n"
-                                                      - kind: Octothorpe
-                                                        text: "#"
-                                                      - kind: EndKeyword
-                                                        text: End
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: IfKeyword
-                                                        text: If
-                                                      - kind: Newline
-                                                        text: "\n"
+                                                      - kind: CompilerEndIfClause
+                                                        children:
+                                                          - kind: Octothorpe
+                                                            text: "#"
+                                                          - kind: EndKeyword
+                                                            text: End
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: IfKeyword
+                                                            text: If
+                                                          - kind: Newline
+                                                            text: "\n"
                                                   - kind: Whitespace
                                                     text: "            "
                                                   - kind: Newline
@@ -42237,40 +42265,42 @@ cst:
                 text: "\n"
               - kind: Newline
                 text: "\n"
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BinaryExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "1"
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
                       - kind: Whitespace
                         text: " "
-                      - kind: EqualityOperator
-                        text: "="
+                      - kind: BinaryExpression
+                        children:
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                       - kind: Whitespace
                         text: " "
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "0"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EndOfLineComment
-                    text: "' comment out to enable test"
-                  - kind: Newline
-                    text: "\n"
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EndOfLineComment
+                        text: "' comment out to enable test"
+                      - kind: Newline
+                        text: "\n"
                   - kind: StatementList
                     children:
                       - kind: Whitespace
@@ -42333,16 +42363,18 @@ cst:
                                         text: )
                           - kind: Newline
                             text: "\n"
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: Whitespace
@@ -48121,40 +48153,42 @@ cst:
                 text: "    "
               - kind: Newline
                 text: "\n"
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BinaryExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "1"
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
                       - kind: Whitespace
                         text: " "
-                      - kind: EqualityOperator
-                        text: "="
+                      - kind: BinaryExpression
+                        children:
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                       - kind: Whitespace
                         text: " "
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "0"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EndOfLineComment
-                    text: "' comment out to enable test"
-                  - kind: Newline
-                    text: "\n"
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EndOfLineComment
+                        text: "' comment out to enable test"
+                      - kind: Newline
+                        text: "\n"
                   - kind: StatementList
                     children:
                       - kind: Whitespace
@@ -48465,16 +48499,18 @@ cst:
                             text: Stop
                           - kind: Newline
                             text: "\n"
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: Newline
@@ -48647,40 +48683,42 @@ cst:
                             text: "\n"
                       - kind: Newline
                         text: "\n"
-                      - kind: Octothorpe
-                        text: "#"
-                      - kind: IfStatement
+                      - kind: CompilerDirective
                         children:
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Whitespace
-                            text: " "
-                          - kind: BinaryExpression
+                          - kind: CompilerIfClause
                             children:
-                              - kind: NumericLiteralExpression
-                                children:
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IfKeyword
+                                text: If
                               - kind: Whitespace
                                 text: " "
-                              - kind: EqualityOperator
-                                text: "="
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "1"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                               - kind: Whitespace
                                 text: " "
-                              - kind: NumericLiteralExpression
-                                children:
-                                  - kind: IntegerLiteral
-                                    text: "0"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ThenKeyword
-                            text: Then
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EndOfLineComment
-                            text: "' comment out to enable test"
-                          - kind: Newline
-                            text: "\n"
+                              - kind: ThenKeyword
+                                text: Then
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EndOfLineComment
+                                text: "' comment out to enable test"
+                              - kind: Newline
+                                text: "\n"
                           - kind: StatementList
                             children:
                               - kind: Whitespace
@@ -48829,16 +48867,18 @@ cst:
                                     text: If
                                   - kind: Newline
                                     text: "\n"
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: EndKeyword
-                            text: End
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Newline
-                            text: "\n"
+                          - kind: CompilerEndIfClause
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: EndKeyword
+                                text: End
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IfKeyword
+                                text: If
+                              - kind: Newline
+                                text: "\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: Newline
@@ -52039,40 +52079,42 @@ cst:
                                         text: "    "
                                       - kind: Newline
                                         text: "\n"
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: IfStatement
+                                      - kind: CompilerDirective
                                         children:
-                                          - kind: IfKeyword
-                                            text: If
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: BinaryExpression
+                                          - kind: CompilerIfClause
                                             children:
-                                              - kind: NumericLiteralExpression
-                                                children:
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                              - kind: Octothorpe
+                                                text: "#"
+                                              - kind: IfKeyword
+                                                text: If
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "1"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: EqualityOperator
+                                                    text: "="
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "0"
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: NumericLiteralExpression
-                                                children:
-                                                  - kind: IntegerLiteral
-                                                    text: "0"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: ThenKeyword
-                                            text: Then
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: EndOfLineComment
-                                            text: "' comment out to enable test"
-                                          - kind: Newline
-                                            text: "\n"
+                                              - kind: ThenKeyword
+                                                text: Then
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: EndOfLineComment
+                                                text: "' comment out to enable test"
+                                              - kind: Newline
+                                                text: "\n"
                                           - kind: StatementList
                                             children:
                                               - kind: IfStatement
@@ -52325,16 +52367,18 @@ cst:
                                                         text: "' prevent overflow in debug window"
                                                       - kind: Newline
                                                         text: "\n"
-                                          - kind: Octothorpe
-                                            text: "#"
-                                          - kind: EndKeyword
-                                            text: End
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IfKeyword
-                                            text: If
-                                          - kind: Newline
-                                            text: "\n"
+                                          - kind: CompilerEndIfClause
+                                            children:
+                                              - kind: Octothorpe
+                                                text: "#"
+                                              - kind: EndKeyword
+                                                text: End
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: IfKeyword
+                                                text: If
+                                              - kind: Newline
+                                                text: "\n"
                                       - kind: Newline
                                         text: "\n"
                                       - kind: Whitespace
@@ -52429,40 +52473,42 @@ cst:
                                             text: "\n"
                                       - kind: Newline
                                         text: "\n"
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: IfStatement
+                                      - kind: CompilerDirective
                                         children:
-                                          - kind: IfKeyword
-                                            text: If
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: BinaryExpression
+                                          - kind: CompilerIfClause
                                             children:
-                                              - kind: NumericLiteralExpression
-                                                children:
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                              - kind: Octothorpe
+                                                text: "#"
+                                              - kind: IfKeyword
+                                                text: If
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "1"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: EqualityOperator
+                                                    text: "="
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "0"
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: NumericLiteralExpression
-                                                children:
-                                                  - kind: IntegerLiteral
-                                                    text: "0"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: ThenKeyword
-                                            text: Then
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: EndOfLineComment
-                                            text: "' comment out to enable test"
-                                          - kind: Newline
-                                            text: "\n"
+                                              - kind: ThenKeyword
+                                                text: Then
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: EndOfLineComment
+                                                text: "' comment out to enable test"
+                                              - kind: Newline
+                                                text: "\n"
                                           - kind: StatementList
                                             children:
                                               - kind: Whitespace
@@ -52941,16 +52987,18 @@ cst:
                                                     text: If
                                                   - kind: Newline
                                                     text: "\n"
-                                          - kind: Octothorpe
-                                            text: "#"
-                                          - kind: EndKeyword
-                                            text: End
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IfKeyword
-                                            text: If
-                                          - kind: Newline
-                                            text: "\n"
+                                          - kind: CompilerEndIfClause
+                                            children:
+                                              - kind: Octothorpe
+                                                text: "#"
+                                              - kind: EndKeyword
+                                                text: End
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: IfKeyword
+                                                text: If
+                                              - kind: Newline
+                                                text: "\n"
                                       - kind: Newline
                                         text: "\n"
                                       - kind: IfStatement
@@ -53113,40 +53161,42 @@ cst:
                     text: "\n"
               - kind: Newline
                 text: "\n"
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BinaryExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "1"
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
                       - kind: Whitespace
                         text: " "
-                      - kind: EqualityOperator
-                        text: "="
+                      - kind: BinaryExpression
+                        children:
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                       - kind: Whitespace
                         text: " "
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "0"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EndOfLineComment
-                    text: "' comment out to enable test"
-                  - kind: Newline
-                    text: "\n"
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EndOfLineComment
+                        text: "' comment out to enable test"
+                      - kind: Newline
+                        text: "\n"
                   - kind: StatementList
                     children:
                       - kind: Whitespace
@@ -53209,16 +53259,18 @@ cst:
                                         text: )
                           - kind: Newline
                             text: "\n"
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: Whitespace
@@ -59781,40 +59833,42 @@ cst:
                 text: "    "
               - kind: Newline
                 text: "\n"
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BinaryExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "1"
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
                       - kind: Whitespace
                         text: " "
-                      - kind: EqualityOperator
-                        text: "="
+                      - kind: BinaryExpression
+                        children:
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                       - kind: Whitespace
                         text: " "
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "0"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EndOfLineComment
-                    text: "' comment out to enable test"
-                  - kind: Newline
-                    text: "\n"
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EndOfLineComment
+                        text: "' comment out to enable test"
+                      - kind: Newline
+                        text: "\n"
                   - kind: StatementList
                     children:
                       - kind: Whitespace
@@ -60125,16 +60179,18 @@ cst:
                             text: Stop
                           - kind: Newline
                             text: "\n"
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: Newline
@@ -60389,40 +60445,42 @@ cst:
                             text: "\n"
                       - kind: Newline
                         text: "\n"
-                      - kind: Octothorpe
-                        text: "#"
-                      - kind: IfStatement
+                      - kind: CompilerDirective
                         children:
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Whitespace
-                            text: " "
-                          - kind: BinaryExpression
+                          - kind: CompilerIfClause
                             children:
-                              - kind: NumericLiteralExpression
-                                children:
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IfKeyword
+                                text: If
                               - kind: Whitespace
                                 text: " "
-                              - kind: EqualityOperator
-                                text: "="
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "1"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                               - kind: Whitespace
                                 text: " "
-                              - kind: NumericLiteralExpression
-                                children:
-                                  - kind: IntegerLiteral
-                                    text: "0"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ThenKeyword
-                            text: Then
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EndOfLineComment
-                            text: "' comment out to enable test"
-                          - kind: Newline
-                            text: "\n"
+                              - kind: ThenKeyword
+                                text: Then
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EndOfLineComment
+                                text: "' comment out to enable test"
+                              - kind: Newline
+                                text: "\n"
                           - kind: StatementList
                             children:
                               - kind: Whitespace
@@ -60571,16 +60629,18 @@ cst:
                                     text: If
                                   - kind: Newline
                                     text: "\n"
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: EndKeyword
-                            text: End
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Newline
-                            text: "\n"
+                          - kind: CompilerEndIfClause
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: EndKeyword
+                                text: End
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IfKeyword
+                                text: If
+                              - kind: Newline
+                                text: "\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: Newline
@@ -63787,40 +63847,42 @@ cst:
                                         text: "    "
                                       - kind: Newline
                                         text: "\n"
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: IfStatement
+                                      - kind: CompilerDirective
                                         children:
-                                          - kind: IfKeyword
-                                            text: If
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: BinaryExpression
+                                          - kind: CompilerIfClause
                                             children:
-                                              - kind: NumericLiteralExpression
-                                                children:
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                              - kind: Octothorpe
+                                                text: "#"
+                                              - kind: IfKeyword
+                                                text: If
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "1"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: EqualityOperator
+                                                    text: "="
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "0"
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: NumericLiteralExpression
-                                                children:
-                                                  - kind: IntegerLiteral
-                                                    text: "0"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: ThenKeyword
-                                            text: Then
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: EndOfLineComment
-                                            text: "' comment out to enable test"
-                                          - kind: Newline
-                                            text: "\n"
+                                              - kind: ThenKeyword
+                                                text: Then
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: EndOfLineComment
+                                                text: "' comment out to enable test"
+                                              - kind: Newline
+                                                text: "\n"
                                           - kind: StatementList
                                             children:
                                               - kind: IfStatement
@@ -64073,16 +64135,18 @@ cst:
                                                         text: "' prevent overflow in debug window"
                                                       - kind: Newline
                                                         text: "\n"
-                                          - kind: Octothorpe
-                                            text: "#"
-                                          - kind: EndKeyword
-                                            text: End
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IfKeyword
-                                            text: If
-                                          - kind: Newline
-                                            text: "\n"
+                                          - kind: CompilerEndIfClause
+                                            children:
+                                              - kind: Octothorpe
+                                                text: "#"
+                                              - kind: EndKeyword
+                                                text: End
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: IfKeyword
+                                                text: If
+                                              - kind: Newline
+                                                text: "\n"
                                       - kind: Newline
                                         text: "\n"
                                       - kind: Whitespace
@@ -64177,40 +64241,42 @@ cst:
                                             text: "\n"
                                       - kind: Newline
                                         text: "\n"
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: IfStatement
+                                      - kind: CompilerDirective
                                         children:
-                                          - kind: IfKeyword
-                                            text: If
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: BinaryExpression
+                                          - kind: CompilerIfClause
                                             children:
-                                              - kind: NumericLiteralExpression
-                                                children:
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                              - kind: Octothorpe
+                                                text: "#"
+                                              - kind: IfKeyword
+                                                text: If
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "1"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: EqualityOperator
+                                                    text: "="
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "0"
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: NumericLiteralExpression
-                                                children:
-                                                  - kind: IntegerLiteral
-                                                    text: "0"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: ThenKeyword
-                                            text: Then
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: EndOfLineComment
-                                            text: "' comment out to enable test"
-                                          - kind: Newline
-                                            text: "\n"
+                                              - kind: ThenKeyword
+                                                text: Then
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: EndOfLineComment
+                                                text: "' comment out to enable test"
+                                              - kind: Newline
+                                                text: "\n"
                                           - kind: StatementList
                                             children:
                                               - kind: Whitespace
@@ -64689,16 +64755,18 @@ cst:
                                                     text: If
                                                   - kind: Newline
                                                     text: "\n"
-                                          - kind: Octothorpe
-                                            text: "#"
-                                          - kind: EndKeyword
-                                            text: End
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IfKeyword
-                                            text: If
-                                          - kind: Newline
-                                            text: "\n"
+                                          - kind: CompilerEndIfClause
+                                            children:
+                                              - kind: Octothorpe
+                                                text: "#"
+                                              - kind: EndKeyword
+                                                text: End
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: IfKeyword
+                                                text: If
+                                              - kind: Newline
+                                                text: "\n"
                                       - kind: Newline
                                         text: "\n"
                                       - kind: IfStatement
@@ -64861,40 +64929,42 @@ cst:
                     text: "\n"
               - kind: Newline
                 text: "\n"
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BinaryExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "1"
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
                       - kind: Whitespace
                         text: " "
-                      - kind: EqualityOperator
-                        text: "="
+                      - kind: BinaryExpression
+                        children:
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                       - kind: Whitespace
                         text: " "
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "0"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EndOfLineComment
-                    text: "' comment out to enable test"
-                  - kind: Newline
-                    text: "\n"
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EndOfLineComment
+                        text: "' comment out to enable test"
+                      - kind: Newline
+                        text: "\n"
                   - kind: StatementList
                     children:
                       - kind: Whitespace
@@ -64957,16 +65027,18 @@ cst:
                                         text: )
                           - kind: Newline
                             text: "\n"
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: Whitespace
@@ -78763,40 +78835,42 @@ cst:
                         text: "    "
                       - kind: Newline
                         text: "\n"
-                      - kind: Octothorpe
-                        text: "#"
-                      - kind: IfStatement
+                      - kind: CompilerDirective
                         children:
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Whitespace
-                            text: " "
-                          - kind: BinaryExpression
+                          - kind: CompilerIfClause
                             children:
-                              - kind: NumericLiteralExpression
-                                children:
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IfKeyword
+                                text: If
                               - kind: Whitespace
                                 text: " "
-                              - kind: EqualityOperator
-                                text: "="
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "1"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                               - kind: Whitespace
                                 text: " "
-                              - kind: NumericLiteralExpression
-                                children:
-                                  - kind: IntegerLiteral
-                                    text: "0"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ThenKeyword
-                            text: Then
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EndOfLineComment
-                            text: "' comment out to enable test"
-                          - kind: Newline
-                            text: "\n"
+                              - kind: ThenKeyword
+                                text: Then
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EndOfLineComment
+                                text: "' comment out to enable test"
+                              - kind: Newline
+                                text: "\n"
                           - kind: StatementList
                             children:
                               - kind: Whitespace
@@ -78859,16 +78933,18 @@ cst:
                                         text: "True"
                                   - kind: Newline
                                     text: "\n"
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: EndKeyword
-                            text: End
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Newline
-                            text: "\n"
+                          - kind: CompilerEndIfClause
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: EndKeyword
+                                text: End
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IfKeyword
+                                text: If
+                              - kind: Newline
+                                text: "\n"
                       - kind: Whitespace
                         text: "    "
                       - kind: Newline
@@ -79695,40 +79771,42 @@ cst:
                         text: "' Statistics"
                       - kind: Newline
                         text: "\n"
-                      - kind: Octothorpe
-                        text: "#"
-                      - kind: IfStatement
+                      - kind: CompilerDirective
                         children:
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Whitespace
-                            text: " "
-                          - kind: BinaryExpression
+                          - kind: CompilerIfClause
                             children:
-                              - kind: NumericLiteralExpression
-                                children:
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IfKeyword
+                                text: If
                               - kind: Whitespace
                                 text: " "
-                              - kind: EqualityOperator
-                                text: "="
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "1"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                               - kind: Whitespace
                                 text: " "
-                              - kind: NumericLiteralExpression
-                                children:
-                                  - kind: IntegerLiteral
-                                    text: "0"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ThenKeyword
-                            text: Then
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EndOfLineComment
-                            text: "' comment out to enable test"
-                          - kind: Newline
-                            text: "\n"
+                              - kind: ThenKeyword
+                                text: Then
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EndOfLineComment
+                                text: "' comment out to enable test"
+                              - kind: Newline
+                                text: "\n"
                           - kind: StatementList
                             children:
                               - kind: Whitespace
@@ -82939,16 +83017,18 @@ cst:
                                     text: If
                                   - kind: Newline
                                     text: "\n"
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: EndKeyword
-                            text: End
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Newline
-                            text: "\n"
+                          - kind: CompilerEndIfClause
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: EndKeyword
+                                text: End
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IfKeyword
+                                text: If
+                              - kind: Newline
+                                text: "\n"
                       - kind: Whitespace
                         text: "                "
                       - kind: Newline
@@ -87067,40 +87147,42 @@ cst:
                 text: "' Statistics"
               - kind: Newline
                 text: "\n"
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BinaryExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "1"
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
                       - kind: Whitespace
                         text: " "
-                      - kind: EqualityOperator
-                        text: "="
+                      - kind: BinaryExpression
+                        children:
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                       - kind: Whitespace
                         text: " "
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "0"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EndOfLineComment
-                    text: "' comment out to enable test"
-                  - kind: Newline
-                    text: "\n"
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EndOfLineComment
+                        text: "' comment out to enable test"
+                      - kind: Newline
+                        text: "\n"
                   - kind: StatementList
                     children:
                       - kind: Whitespace
@@ -90001,16 +90083,18 @@ cst:
                             text: If
                           - kind: Newline
                             text: "\n"
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: LabelStatement

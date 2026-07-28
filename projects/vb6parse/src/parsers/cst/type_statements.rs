@@ -239,8 +239,13 @@ impl Parser<'_> {
                 break;
             }
 
-            if self.at_compiler_directive_keyword(Token::IfKeyword)
-                || self.at_compiler_directive_keyword(Token::ElseIfKeyword)
+            if self.at_compiler_directive_keyword(Token::IfKeyword) {
+                self.parse_type_compiler_directive();
+                continue;
+            }
+
+            // Orphan #ElseIf/#Else/#End If (not inside a #If) — consume as raw tokens
+            if self.at_compiler_directive_keyword(Token::ElseIfKeyword)
                 || self.at_compiler_directive_keyword(Token::ElseKeyword)
                 || self.at_compiler_end_if_directive()
             {
@@ -307,6 +312,109 @@ impl Parser<'_> {
         }
 
         self.builder.finish_node(); // TypeStatement
+    }
+
+    /// Parse a compiler directive block (`#If` … `#End If`) inside a Type body.
+    ///
+    /// Creates a `CompilerDirective` node with `CompilerIfClause`, optional
+    /// `CompilerElseIfClause` / `CompilerElseClause`, and `CompilerEndIfClause`.
+    /// The body between clauses is parsed using the same Type-member logic as
+    /// the main `parse_type_statement` loop.
+    fn parse_type_compiler_directive(&mut self) {
+        self.builder
+            .start_node(SyntaxKind::CompilerDirective.to_raw());
+
+        // CompilerIfClause
+        self.builder
+            .start_node(SyntaxKind::CompilerIfClause.to_raw());
+        self.consume_compiler_directive_prefix();
+        self.consume_until_after(Token::Newline);
+        self.builder.finish_node();
+
+        loop {
+            // Parse body (type members until directive or End Type)
+            while !self.is_at_end() {
+                if self.at_token(Token::EndKeyword)
+                    && self.peek_next_keyword() == Some(Token::TypeKeyword)
+                {
+                    break;
+                }
+                if self.at_compiler_directive_keyword(Token::ElseIfKeyword)
+                    || self.at_compiler_directive_keyword(Token::ElseKeyword)
+                    || self.at_compiler_end_if_directive()
+                {
+                    break;
+                }
+                match self.current_token() {
+                    Some(
+                        Token::Whitespace
+                        | Token::Newline
+                        | Token::EndOfLineComment
+                        | Token::RemComment
+                        | Token::Identifier
+                        | Token::AsKeyword
+                        | Token::LeftParenthesis
+                        | Token::RightParenthesis
+                        | Token::ToKeyword
+                        | Token::IntegerLiteral
+                        | Token::LongLiteral
+                        | Token::Comma
+                        | Token::MultiplicationOperator
+                        | Token::SubtractionOperator
+                        | Token::ByteKeyword
+                        | Token::BooleanKeyword
+                        | Token::IntegerKeyword
+                        | Token::LongKeyword
+                        | Token::CurrencyKeyword
+                        | Token::SingleKeyword
+                        | Token::DoubleKeyword
+                        | Token::DateKeyword
+                        | Token::StringKeyword
+                        | Token::ObjectKeyword
+                        | Token::VariantKeyword,
+                    ) => {
+                        self.consume_token();
+                    }
+                    _ => {
+                        if self.at_keyword() {
+                            self.consume_token();
+                        } else {
+                            self.consume_error(vec!["type member name".to_string()]);
+                        }
+                    }
+                }
+            }
+
+            if self.at_compiler_directive_keyword(Token::ElseIfKeyword) {
+                self.builder
+                    .start_node(SyntaxKind::CompilerElseIfClause.to_raw());
+                self.consume_compiler_directive_prefix();
+                self.consume_until_after(Token::Newline);
+                self.builder.finish_node();
+                continue;
+            }
+
+            if self.at_compiler_directive_keyword(Token::ElseKeyword) {
+                self.builder
+                    .start_node(SyntaxKind::CompilerElseClause.to_raw());
+                self.consume_compiler_directive_prefix();
+                self.consume_until_after(Token::Newline);
+                self.builder.finish_node();
+                continue;
+            }
+
+            if self.at_compiler_end_if_directive() {
+                self.builder
+                    .start_node(SyntaxKind::CompilerEndIfClause.to_raw());
+                self.consume_compiler_directive_prefix();
+                self.consume_until_after(Token::Newline);
+                self.builder.finish_node();
+            }
+
+            break;
+        }
+
+        self.builder.finish_node(); // CompilerDirective
     }
 }
 
