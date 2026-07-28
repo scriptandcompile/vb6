@@ -50,9 +50,6 @@ jobs:
         working-directory: projects/vb6parse
         run: python3 scripts/build-wasm.py --optimize --no-typescript
 
-      - name: Copy WASM output to umbrella docs
-        run: cp -r projects/vb6parse/docs/assets/wasm docs/vb6parse/assets/wasm
-
       - name: Commit and push if changed
         run: |
           git pull --rebase --autostash
