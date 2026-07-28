@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-07-28T16:36:19Z",
+  "last_updated": "2026-07-28T17:53:41Z",
   "snapshots": [
     {
       "timestamp": "2026-07-06T07:06:31Z",
@@ -409,38 +409,72 @@
           "percent": 94.52
         }
       }
+    },
+    {
+      "timestamp": "2026-07-28T17:53:41Z",
+      "commit_sha": "0af2d929ab04547745e3930daaed1445e4010329",
+      "commit_message": "Removed Unknown Token. Made first steps on moving to an error recovery / missing token / expected token system.",
+      "coverage": {
+        "line_coverage": 94.3,
+        "function_coverage": 91.21,
+        "region_coverage": 94.52
+      },
+      "tests": {
+        "total": 5661,
+        "lib_tests": 5533,
+        "doc_tests": 128,
+        "integration_tests": 0,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 98017,
+          "total": 103944,
+          "percent": 94.3
+        },
+        "functions": {
+          "covered": 6310,
+          "total": 6918,
+          "percent": 91.21
+        },
+        "regions": {
+          "covered": 156583,
+          "total": 165659,
+          "percent": 94.52
+        }
+      }
     }
   ],
   "coverage_summary": {
     "line_coverage": {
-      "latest": 94.29,
-      "trend": "degrading",
-      "change_percent": 1.55,
+      "latest": 94.3,
+      "trend": "stable",
+      "change_percent": 0.01,
       "best": 95.87,
       "worst": 94.29,
-      "average": 95.72
+      "average": 95.61
     },
     "function_coverage": {
-      "latest": 91.3,
-      "trend": "degrading",
-      "change_percent": 1.7,
+      "latest": 91.21,
+      "trend": "stable",
+      "change_percent": 0.09,
       "best": 93.0,
-      "worst": 91.3,
-      "average": 92.84
+      "worst": 91.21,
+      "average": 92.72
     },
     "region_coverage": {
       "latest": 94.52,
-      "trend": "degrading",
-      "change_percent": 1.46,
+      "trend": "stable",
+      "change_percent": 0.0,
       "best": 95.99,
       "worst": 94.52,
-      "average": 95.86
+      "average": 95.76
     },
     "test_count": {
       "latest": 5661,
-      "trend": "shrinking",
-      "change_count": -581,
-      "growth_rate": -9.31
+      "trend": "stable",
+      "change_count": 0,
+      "growth_rate": 0.0
     }
   }
 }
