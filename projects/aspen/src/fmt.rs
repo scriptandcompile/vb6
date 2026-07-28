@@ -11,6 +11,8 @@ pub struct FmtCommand {
     pub project_path: PathBuf,
     pub check: bool,
     pub fmt_settings: FmtSettings,
+    pub cli_blank_around: Option<bool>,
+    pub cli_blank_inside: Option<bool>,
 }
 
 pub fn fmt_subcommand(cmd: FmtCommand) -> Result<()> {
@@ -65,12 +67,32 @@ pub fn fmt_subcommand(cmd: FmtCommand) -> Result<()> {
     }
 
     let config = find_config(project_path, &files_to_format);
-    let indent_size = config
-        .and_then(|c| c.fmt)
+    let cfg_fmt = config.and_then(|c| c.fmt);
+
+    let indent_size = cfg_fmt
+        .as_ref()
         .and_then(|f| f.indent_size)
         .unwrap_or(cmd.fmt_settings.indent_size);
 
-    let fmt_settings = FmtSettings { indent_size };
+    let blank_around = cmd
+        .cli_blank_around
+        .or(cfg_fmt
+            .as_ref()
+            .and_then(|f| f.blank_lines_around_directives))
+        .unwrap_or(false);
+
+    let blank_inside = cmd
+        .cli_blank_inside
+        .or(cfg_fmt
+            .as_ref()
+            .and_then(|f| f.blank_lines_inside_directives))
+        .unwrap_or(false);
+
+    let fmt_settings = FmtSettings {
+        indent_size,
+        blank_lines_around_directives: blank_around,
+        blank_lines_inside_directives: blank_inside,
+    };
 
     let results: Vec<(PathBuf, bool)> = files_to_format
         .par_iter()
@@ -225,6 +247,8 @@ struct FmtConfig {
 #[derive(Debug, Clone, serde::Deserialize)]
 struct FmtSection {
     indent_size: Option<usize>,
+    blank_lines_around_directives: Option<bool>,
+    blank_lines_inside_directives: Option<bool>,
 }
 
 fn find_config(project_path: &Path, _files: &[PathBuf]) -> Option<FmtConfig> {
