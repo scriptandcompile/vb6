@@ -280,7 +280,7 @@ def restructure_coverage_html(output_dir):
         r"<div class='source-name-title'><pre>.*?/" + re.escape(project_root.name) + r"/(src/[^<]+)</pre></div>",
         re.IGNORECASE
     )
-    github_url = "https://github.com/scriptandcompile/vb6parse/blob/master/"
+    github_url = "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse/"
     
     def source_title_replacement(match):
         """Replace absolute path with relative path linked to GitHub."""

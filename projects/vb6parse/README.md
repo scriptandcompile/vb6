@@ -6,11 +6,11 @@ A complete, high-performance parser library for Visual Basic 6 code and project 
 [![Documentation](https://docs.rs/vb6parse/badge.svg)](https://docs.rs/vb6parse)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**[Project Documentation & Resources](https://scriptandcompile.github.io/vb6parse/)**  
-**[Interactive Playground](https://scriptandcompile.github.io/vb6parse/playground.html)**  
-**[VB6 Library Reference](https://scriptandcompile.github.io/vb6parse/library/)**  
-**[Code Coverage Report](https://scriptandcompile.github.io/vb6parse/coverage.html)**  
-**[Performance Benchmarks](https://scriptandcompile.github.io/vb6parse/benchmarks.html)**
+**[Project Documentation & Resources](https://scriptandcompile.github.io/vb6/vb6parse/)**  
+**[Interactive Playground](https://scriptandcompile.github.io/vb6/vb6parse/playground.html)**  
+**[VB6 Library Reference](https://scriptandcompile.github.io/vb6/vb6parse/library/)**  
+**[Code Coverage Report](https://scriptandcompile.github.io/vb6/vb6parse/coverage.html)**  
+**[Performance Benchmarks](https://scriptandcompile.github.io/vb6/vb6parse/benchmarks.html)**
 
 ## Overview
 
@@ -33,16 +33,16 @@ Add VB6Parse to your `Cargo.toml`:
 vb6parse = "1.0.1"
 ```
 
-**📖 [Complete Getting Started Tutorial](https://scriptandcompile.github.io/vb6parse/getting-started.html)** - Step-by-step guide with live examples
+**📖 [Complete Getting Started Tutorial](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html)** - Step-by-step guide with live examples
 
 ### Quick Links
 
-- **[Parse a VB6 Module](https://scriptandcompile.github.io/vb6parse/getting-started.html#hello-world)** - First example: parse a simple VB6 module
-- **[Parse VB6 Projects](https://scriptandcompile.github.io/vb6parse/getting-started.html#project-parsing)** - Work with .vbp project files
-- **[Handle Parse Errors](https://scriptandcompile.github.io/vb6parse/getting-started.html#error-handling)** - Graceful error handling
-- **[Tokenize VB6 Code](https://scriptandcompile.github.io/vb6parse/getting-started.html#tokenization)** - Lower-level tokenization
-- **[Navigate the CST](https://scriptandcompile.github.io/vb6parse/getting-started.html#cst-navigation)** - Work with Concrete Syntax Trees
-- **[Parse Forms & Controls](https://scriptandcompile.github.io/vb6parse/getting-started.html#form-parsing)** - Parse VB6 forms
+- **[Parse a VB6 Module](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#hello-world)** - First example: parse a simple VB6 module
+- **[Parse VB6 Projects](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#project-parsing)** - Work with .vbp project files
+- **[Handle Parse Errors](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#error-handling)** - Graceful error handling
+- **[Tokenize VB6 Code](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#tokenization)** - Lower-level tokenization
+- **[Navigate the CST](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#cst-navigation)** - Work with Concrete Syntax Trees
+- **[Parse Forms & Controls](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#form-parsing)** - Parse VB6 forms
 
 ## API Surface
 
@@ -178,7 +178,7 @@ src/
 
 ## Common Tasks
 
-**For basic usage examples, see the [Getting Started Guide](https://scriptandcompile.github.io/vb6parse/getting-started.html).**
+**For basic usage examples, see the [Getting Started Guide](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html).**
 
 The following examples show advanced use cases and patterns:
 
@@ -241,7 +241,7 @@ fn count_identifiers(code: &str, function_name: &str) -> usize {
 
 ### Error Handling
 
-VB6Parse uses a custom `ParseResult<T, E>` type that separates successful results from recoverable errors. See the [Error Handling guide](https://scriptandcompile.github.io/vb6parse/getting-started.html#error-handling) for detailed examples.
+VB6Parse uses a custom `ParseResult<T, E>` type that separates successful results from recoverable errors. See the [Error Handling guide](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#error-handling) for detailed examples.
 
 **Quick Reference:**
 
@@ -378,7 +378,7 @@ if let Some(resource) = resource {
 
 VB6Parse has comprehensive test coverage.
 
-[📊 View Test Coverage Report](https://scriptandcompile.github.io/vb6parse/coverage.html)
+[📊 View Test Coverage Report](https://scriptandcompile.github.io/vb6/vb6parse/coverage.html)
 
 ### Running Tests
 
@@ -414,9 +414,9 @@ cargo insta accept
 **Test data location:** `tests/data/` (git submodules of real VB6 projects)
 
 **See also:**
-- [tests/](tests/) - Test files
+- [tests/](../../test-data/) - Test files
 - [tests/snapshots/](tests/snapshots/) - Snapshot files
-- [📊 View Test Coverage Report](https://scriptandcompile.github.io/vb6parse/coverage.html)
+- [📊 View Test Coverage Report](https://scriptandcompile.github.io/vb6/vb6parse/coverage.html)
 
 ## Benchmarking
 
@@ -440,7 +440,7 @@ cargo bench bulk_parser_load
 
 **See also:** 
 - [benches/](benches/) - Benchmark source code
-- [📈 View Benchmark Results](https://scriptandcompile.github.io/vb6parse/benchmarks.html)
+- [📈 View Benchmark Results](https://scriptandcompile.github.io/vb6/vb6parse/benchmarks.html)
 
 ## Code Coverage
 
@@ -497,11 +497,13 @@ Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) fil
 
 ```bash
 # Clone repository
-git clone https://github.com/scriptandcompile/vb6parse
-cd vb6parse
+git clone https://github.com/scriptandcompile/vb6
 
 # Get test data
 git submodule update --init --recursive
+
+# Move to vb6project
+cd projects/vb6parse
 
 # Run tests
 cargo test
@@ -628,7 +630,7 @@ All examples are located in the [examples/](examples/) directory:
 | [sourcestream.rs](examples/sourcestream.rs) | Work with character streams |
 | [tokenstream.rs](examples/tokenstream.rs) | Tokenize VB6 code |
 
-**Documentation Examples** (used in [Getting Started guide](https://scriptandcompile.github.io/vb6parse/getting-started.html)):
+**Documentation Examples** (used in [Getting Started guide](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html)):
 
 | Example | Description |
 |---------|-------------|
@@ -648,7 +650,7 @@ cargo run --example parse_project
 ## Resources
 
 - **Documentation:** [docs.rs/vb6parse](https://docs.rs/vb6parse)
-- **Repository:** [github.com/scriptandcompile/vb6parse](https://github.com/scriptandcompile/vb6parse)
+- **Repository:** [https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse](https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse)
 - **Crates.io:** [crates.io/crates/vb6parse](https://crates.io/crates/vb6parse)
 - **License:** MIT
 
