@@ -1,6 +1,8 @@
 mod check;
+mod fmt;
 
 use check::check_subcommand;
+use fmt::fmt_subcommand;
 
 use anyhow::Result;
 
@@ -59,6 +61,33 @@ fn main() -> Result<()> {
                         .value_parser(value_parser!(PathBuf)),
                 ),
         )
+        .subcommand(
+            Command::new("fmt")
+                .about("Format VB6 source files")
+                .arg(
+                    Arg::new("check")
+                        .long("check")
+                        .short('c')
+                        .required(false)
+                        .value_parser(value_parser!(bool))
+                        .action(clap::ArgAction::SetTrue)
+                        .help("only check if files are formatted, don't write"),
+                )
+                .arg(
+                    Arg::new("indent-size")
+                        .long("indent-size")
+                        .short('i')
+                        .required(false)
+                        .value_parser(value_parser!(usize))
+                        .default_value("4")
+                        .help("indentation size in spaces"),
+                )
+                .arg(
+                    Arg::new("project path")
+                        .required(false)
+                        .value_parser(value_parser!(PathBuf)),
+                ),
+        )
         .arg_required_else_help(true)
         .get_matches();
 
@@ -86,6 +115,28 @@ fn main() -> Result<()> {
         };
 
         check_subcommand(check_settings)?;
+
+        return Ok(());
+    }
+
+    if let Some(matches) = matches.subcommand_matches("fmt") {
+        let current_dir = current_dir()?;
+
+        let project_path = matches
+            .get_one::<PathBuf>("project path")
+            .unwrap_or(&current_dir)
+            .to_path_buf();
+
+        let check = *matches.get_one::<bool>("check").unwrap_or(&false);
+        let indent_size = *matches.get_one::<usize>("indent-size").unwrap_or(&4);
+
+        let fmt_settings = fmt::FmtSettings {
+            project_path,
+            check,
+            indent_size,
+        };
+
+        fmt_subcommand(fmt_settings)?;
 
         return Ok(());
     }
