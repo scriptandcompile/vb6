@@ -36,9 +36,7 @@ let wasmInitialized = false;
  * }
  */
 export async function initWasm() {
-    const response = await fetch('assets/wasm/vb6parse_bg.wasm');
-    const wasmBytes = await response.arrayBuffer();
-    await init(wasmBytes); // This initializes the wasm module
+    await init();
     wasmInitialized = true;
     return wasmInitialized;
 }
