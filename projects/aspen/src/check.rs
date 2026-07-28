@@ -73,35 +73,26 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
                     check_references: check_settings.check_references,
                 };
 
-                let check_result = match check_project(&check_settings) {
+                match check_project(&check_settings) {
                     Ok(result) => result,
-                    Err(e) => {
-                        let check_result = CheckResults {
-                            project_path: check_settings.project_path.to_str().unwrap().to_string(),
-                            parsing_errors: vec![e],
-                            non_english_files: Vec::new(),
-                            missing_files: Vec::new(),
-                        };
-
-                        return check_result;
-                    }
-                };
-                check_result
+                    Err(e) => CheckResults {
+                        project_path: check_settings.project_path.to_str().unwrap().to_string(),
+                        parsing_errors: vec![e],
+                        non_english_files: Vec::new(),
+                        missing_files: Vec::new(),
+                    },
+                }
             })
             .collect_into_vec(&mut check_summary);
     } else {
         let check_result = match check_project(&check_settings) {
             Ok(result) => result,
-            Err(e) => {
-                let check_result = CheckResults {
-                    project_path: check_settings.project_path.to_str().unwrap().to_string(),
-                    parsing_errors: vec![e],
-                    non_english_files: Vec::new(),
-                    missing_files: Vec::new(),
-                };
-
-                check_result
-            }
+            Err(e) => CheckResults {
+                project_path: check_settings.project_path.to_str().unwrap().to_string(),
+                parsing_errors: vec![e],
+                non_english_files: Vec::new(),
+                missing_files: Vec::new(),
+            },
         };
         check_summary.push(check_result);
     }
