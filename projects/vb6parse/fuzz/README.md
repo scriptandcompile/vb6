@@ -556,7 +556,7 @@ For ad-hoc fuzzing sessions, test in this order:
 - [cargo-fuzz book](https://rust-fuzz.github.io/book/cargo-fuzz.html)
 - [libFuzzer documentation](https://llvm.org/docs/LibFuzzer.html)
 - [Rust Fuzz Book](https://rust-fuzz.github.io/book/)
-- [VB6Parse Repository](https://github.com/scriptandcompile/vb6parse)
+- [VB6Parse Repository](https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse)
 
 ## Contributing
 

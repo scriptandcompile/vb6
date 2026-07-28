@@ -584,7 +584,7 @@ function renderTrendsChart(history, daysRange) {
     }
     
     // GitHub repository URL
-    const githubRepo = 'https://github.com/scriptandcompile/vb6parse';
+    const githubRepo = 'https://github.com/scriptandcompile/vb6';
     
     // Create new chart
     const ctx = canvas.getContext('2d');

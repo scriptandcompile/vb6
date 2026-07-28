@@ -333,7 +333,7 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
             <a href="{base_path}library/index.html">Library Reference</a>
             <a href="{base_path}documentation.html">Documentation</a>
             <a href="https://docs.rs/vb6parse" target="_blank">API Docs</a>
-            <a href="https://github.com/scriptandcompile/vb6parse" target="_blank">GitHub</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse" target="_blank">GitHub</a>
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                 <span class="theme-icon">🌙</span>
             </button>

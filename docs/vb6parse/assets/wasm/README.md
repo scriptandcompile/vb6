@@ -497,8 +497,8 @@ Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) fil
 
 ```bash
 # Clone repository
-git clone https://github.com/scriptandcompile/vb6parse
-cd vb6parse
+git clone https://github.com/scriptandcompile/vb6
+cd projects/vb6parse
 
 # Get test data
 git submodule update --init --recursive
@@ -648,7 +648,7 @@ cargo run --example parse_project
 ## Resources
 
 - **Documentation:** [docs.rs/vb6parse](https://docs.rs/vb6parse)
-- **Repository:** [github.com/scriptandcompile/vb6parse](https://github.com/scriptandcompile/vb6parse)
+- **Repository:** [github.com/scriptandcompile/vb6/tree/master/projects/vb6parse](github.com/scriptandcompile/vb6/tree/master/projects/vb6parse)
 - **Crates.io:** [crates.io/crates/vb6parse](https://crates.io/crates/vb6parse)
 - **License:** MIT
 
