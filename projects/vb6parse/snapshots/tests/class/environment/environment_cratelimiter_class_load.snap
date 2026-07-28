@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -887,30 +887,32 @@ cst:
             text: Long
           - kind: Newline
             text: "\r\n"
-      - kind: Octothorpe
-        text: "#"
-      - kind: IfStatement
+      - kind: CompilerDirective
         children:
-          - kind: IfKeyword
-            text: If
-          - kind: Whitespace
-            text: " "
-          - kind: UnaryExpression
+          - kind: CompilerIfClause
             children:
-              - kind: NotKeyword
-                text: Not
+              - kind: Octothorpe
+                text: "#"
+              - kind: IfKeyword
+                text: If
               - kind: Whitespace
                 text: " "
-              - kind: IdentifierExpression
+              - kind: UnaryExpression
                 children:
-                  - kind: Identifier
-                    text: ImplNoIdeProtection
-          - kind: Whitespace
-            text: " "
-          - kind: ThenKeyword
-            text: Then
-          - kind: Newline
-            text: "\r\n"
+                  - kind: NotKeyword
+                    text: Not
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ImplNoIdeProtection
+              - kind: Whitespace
+                text: " "
+              - kind: ThenKeyword
+                text: Then
+              - kind: Newline
+                text: "\r\n"
           - kind: StatementList
             children:
               - kind: Whitespace
@@ -1105,16 +1107,18 @@ cst:
                     text: Long
                   - kind: Newline
                     text: "\r\n"
-          - kind: Octothorpe
-            text: "#"
-          - kind: EndKeyword
-            text: End
-          - kind: Whitespace
-            text: " "
-          - kind: IfKeyword
-            text: If
-          - kind: Newline
-            text: "\r\n"
+          - kind: CompilerEndIfClause
+            children:
+              - kind: Octothorpe
+                text: "#"
+              - kind: EndKeyword
+                text: End
+              - kind: Whitespace
+                text: " "
+              - kind: IfKeyword
+                text: If
+              - kind: Newline
+                text: "\r\n"
       - kind: DeclareStatement
         children:
           - kind: PrivateKeyword
@@ -3591,24 +3595,26 @@ cst:
                     text: "\r\n"
               - kind: Whitespace
                 text: "    "
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IdentifierExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: Identifier
-                        text: ImplSelfContained
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Newline
-                    text: "\r\n"
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: ImplSelfContained
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Newline
+                        text: "\r\n"
                   - kind: StatementList
                     children:
                       - kind: IfStatement
@@ -3687,16 +3693,18 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "    "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\r\n"
               - kind: IfStatement
                 children:
                   - kind: Whitespace
@@ -4479,24 +4487,26 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "        "
-                      - kind: Octothorpe
-                        text: "#"
-                      - kind: IfStatement
+                      - kind: CompilerDirective
                         children:
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IdentifierExpression
+                          - kind: CompilerIfClause
                             children:
-                              - kind: Identifier
-                                text: ImplSelfContained
-                          - kind: Whitespace
-                            text: " "
-                          - kind: ThenKeyword
-                            text: Then
-                          - kind: Newline
-                            text: "\r\n"
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IfKeyword
+                                text: If
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: ImplSelfContained
+                              - kind: Whitespace
+                                text: " "
+                              - kind: ThenKeyword
+                                text: Then
+                              - kind: Newline
+                                text: "\r\n"
                           - kind: StatementList
                             children:
                               - kind: Whitespace
@@ -4533,16 +4543,18 @@ cst:
                                     text: "\r\n"
                               - kind: Whitespace
                                 text: "        "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: EndKeyword
-                            text: End
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IfKeyword
-                            text: If
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: CompilerEndIfClause
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: EndKeyword
+                                text: End
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IfKeyword
+                                text: If
+                              - kind: Newline
+                                text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword
@@ -4745,30 +4757,32 @@ cst:
             children:
               - kind: Whitespace
                 text: "    "
-              - kind: Octothorpe
-                text: "#"
-              - kind: IfStatement
+              - kind: CompilerDirective
                 children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: UnaryExpression
+                  - kind: CompilerIfClause
                     children:
-                      - kind: NotKeyword
-                        text: Not
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
                       - kind: Whitespace
                         text: " "
-                      - kind: IdentifierExpression
+                      - kind: UnaryExpression
                         children:
-                          - kind: Identifier
-                            text: ImplNoIdeProtection
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Newline
-                    text: "\r\n"
+                          - kind: NotKeyword
+                            text: Not
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ImplNoIdeProtection
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Newline
+                        text: "\r\n"
                   - kind: StatementList
                     children:
                       - kind: Whitespace
@@ -4973,16 +4987,18 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "    "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\r\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
