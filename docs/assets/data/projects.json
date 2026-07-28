@@ -15,6 +15,69 @@
     ]
   },
   {
+    "slug": "aspen",
+    "name": "aspen",
+    "category": "Tooling",
+    "status": "stable",
+    "statusLabel": "Stable",
+    "statusDetail": "Cargo-like VB6 project tooling for VB6 projects.",
+    "summary": "Check, analyze, and manage VB6 projects from the command line.",
+    "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/aspen",
+    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/aspen/README.md",
+    "notes": [
+      "aspen check - stable.",
+      "aspen fmt - stable",
+      "Currently depends on vb6parse and will eventually require vb6semantic"
+    ]
+  },
+  {
+    "slug": "vb6format",
+    "name": "vb6format",
+    "category": "Tooling",
+    "status": "early-development",
+    "statusLabel": "Early development",
+    "statusDetail": "Indention, compiler directives, and line ending formatting complete.",
+    "summary": "Reformat VB6 source files with correct block indentation.",
+    "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format",
+    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format/README.md",
+    "notes": [
+      "Used by the aspen fmt subcommand.",
+      "Indent formatting supported",
+      "Compiler directive formatting supported.",
+      "Line ending detection and formatting supported."
+    ]
+  },
+  {
+    "slug": "vb6grammarfuzz",
+    "name": "vb6grammarfuzz",
+    "category": "Tooling",
+    "status": "support",
+    "statusLabel": "Supporting",
+    "statusDetail": "Grammar fuzzing and parser comparison tooling.",
+    "summary": "Parser exploration and grammar validation utilities.",
+    "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6grammarfuzz",
+    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6grammarfuzz/README.md",
+    "notes": [
+      "Useful for regression discovery and grammar edge cases.",
+      "Includes the external ProLeap parser submodule."
+    ]
+  },
+  {
+    "slug": "vscode-vb6",
+    "name": "vscode-vb6",
+    "category": "Tooling",
+    "status": "support",
+    "statusLabel": "in-development",
+    "statusDetail": "VS Code extension scaffold for the VB6 ecosystem.",
+    "summary": "Editor integration and language tooling for VB6 developers.",
+    "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vscode-vb6",
+    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vscode-vb6/README.md",
+    "notes": [
+      "Should eventually consume the same metadata surface as the hub.",
+      "Good place to surface docs and status from the workspace."
+    ]
+  },
+  {
     "slug": "vb6semantic",
     "name": "vb6semantic",
     "category": "Analysis",
@@ -57,21 +120,6 @@
     "notes": [
       "Shared infrastructure for downstream compiler work.",
       "A good candidate for architecture docs and examples."
-    ]
-  },
-  {
-    "slug": "aspen",
-    "name": "aspen",
-    "category": "Tooling",
-    "status": "stable",
-    "statusLabel": "Stable",
-    "statusDetail": "Cargo-like VB6 project tooling for VB6 projects.",
-    "summary": "Check, analyze, and manage VB6 projects from the command line.",
-    "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/aspen",
-    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/aspen/README.md",
-    "notes": [
-      "aspen check - near completion.",
-      "Currently depends on vb6parse and eventually vb6semantic"
     ]
   },
   {
@@ -147,52 +195,6 @@
     "notes": [
       "Should share runtime semantics with vb6runtime.",
       "Good candidate for executable examples."
-    ]
-  },
-  {
-    "slug": "vb6format",
-    "name": "vb6format",
-    "category": "Tooling",
-    "status": "early-development",
-    "statusLabel": "Early development",
-    "statusDetail": "Line-based indentation engine is functional; more formatting passes planned.",
-    "summary": "Reformat VB6 source files with correct block indentation.",
-    "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format",
-    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format/README.md",
-    "notes": [
-      "Used by the aspen fmt subcommand.",
-      "Line-based keyword analysis with single-line If detection.",
-      "Extensible FmtSettings struct for future formatting rules."
-    ]
-  },
-  {
-    "slug": "vb6grammarfuzz",
-    "name": "vb6grammarfuzz",
-    "category": "Tooling",
-    "status": "support",
-    "statusLabel": "Supporting",
-    "statusDetail": "Grammar fuzzing and parser comparison tooling.",
-    "summary": "Parser exploration and grammar validation utilities.",
-    "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6grammarfuzz",
-    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6grammarfuzz/README.md",
-    "notes": [
-      "Useful for regression discovery and grammar edge cases.",
-      "Includes the external ProLeap parser submodule."
-    ]
-  },
-  {
-    "slug": "vscode-vb6",
-    "name": "vscode-vb6",
-    "category": "Tooling",
-    "status": "support",
-    "statusLabel": "Supporting",
-    "statusDetail": "VS Code extension scaffold for the VB6 ecosystem.",
-    "summary": "Editor integration and language tooling for VB6 developers.",
-    "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vscode-vb6",
-    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vscode-vb6/README.md",
-    "notes": [
-      "Should eventually consume the same metadata surface as the hub.",
-      "Good place to surface docs and status from the workspace."
     ]
   },
   {
