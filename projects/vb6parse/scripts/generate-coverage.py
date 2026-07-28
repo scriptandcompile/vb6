@@ -149,6 +149,8 @@ def run_coverage():
     """Run cargo llvm-cov to generate coverage data."""
     print("Generating coverage data...")
     
+    COVERAGE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    
     try:
         subprocess.run(
             ["cargo", "llvm-cov", "--lib", "--tests", "--json", "--output-path", str(COVERAGE_FILE)],
