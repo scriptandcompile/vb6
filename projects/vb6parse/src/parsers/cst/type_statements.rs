@@ -285,8 +285,7 @@ impl Parser<'_> {
                     if self.at_keyword() {
                         self.consume_token();
                     } else {
-                        // Unknown token in type body, consume it
-                        self.consume_token_as_unknown();
+                        self.consume_error(vec!["type member name".to_string()]);
                     }
                 }
             }

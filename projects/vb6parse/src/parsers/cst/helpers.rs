@@ -4,6 +4,7 @@
 //! including token peeking, consumption, and logical line detection.
 
 use super::Parser;
+use crate::errors::ParserError;
 use crate::language::Token;
 use crate::parsers::SyntaxKind;
 use std::num::NonZeroUsize;
@@ -302,12 +303,45 @@ impl Parser<'_> {
         }
     }
 
-    /// Consume the current token as an Unknown token.
-    pub(crate) fn consume_token_as_unknown(&mut self) {
-        if let Some((text, _)) = self.tokens.get(self.pos) {
-            self.builder.token(SyntaxKind::Unknown.to_raw(), text);
-            self.pos += 1;
+    /// Start an error node. Must be paired with `finish_error_node`.
+    pub(crate) fn start_error_node(&mut self, expected: &[String]) {
+        self.builder.start_node(SyntaxKind::ErrorRecovery.to_raw());
+        let text = expected.join(", ");
+        self.builder.token(SyntaxKind::ErrorExpectedTokens.to_raw(), &text);
+    }
+
+    /// Finish an error node and report the error.
+    pub(crate) fn finish_error_node<E>(&mut self, kind: E)
+    where
+        E: Into<crate::errors::ErrorKind>,
+    {
+        self.builder.finish_node();
+        self.report_error(kind);
+    }
+
+    /// Consume the current token as a single-token error node.
+    /// Reports the error via `report_error` with the given parser error.
+    pub(crate) fn consume_error(&mut self, expected: Vec<String>) {
+        let found = self
+            .current_token()
+            .map_or(Vec::new(), |t| vec![*t]);
+        self.start_error_node(&expected);
+        self.consume_token();
+        self.finish_error_node(ParserError::UnexpectedTokens { expected, found });
+    }
+
+    /// Consume tokens until a newline (or end of input) and wrap them in an Error node.
+    /// Reports the error once via `report_error`, preventing cascading per-token errors.
+    pub(crate) fn consume_error_to_newline(&mut self, expected: Vec<String>) {
+        let mut found: Vec<Token> = Vec::new();
+        self.start_error_node(&expected);
+        while !self.is_at_end() && !self.at_token(Token::Newline) {
+            if let Some((_, token)) = self.tokens.get(self.pos) {
+                found.push(*token);
+            }
+            self.consume_token();
         }
+        self.finish_error_node(ParserError::UnexpectedTokens { expected, found });
     }
 
     /// Consume tokens until reaching the specified token or the end of input.

@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/invalid_syntax/invalid_literals.rs
+source: projects/vb6parse/tests/invalid_syntax/invalid_literals.rs
 expression: tree
 ---
 root:
@@ -67,8 +67,12 @@ root:
                           text: "123.456"
                     - kind: PeriodOperator
                       text: "."
-            - kind: Unknown
-              text: "789"
+            - kind: ErrorRecovery
+              children:
+                - kind: ErrorExpectedTokens
+                  text: statement
+                - kind: IntegerLiteral
+                  text: "789"
             - kind: Newline
               text: "\n"
         - kind: EndKeyword

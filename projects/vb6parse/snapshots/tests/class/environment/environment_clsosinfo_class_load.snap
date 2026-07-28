@@ -18845,36 +18845,32 @@ cst:
                         text: "\r\n"
                       - kind: Whitespace
                         text: "        "
-                      - kind: Unknown
-                        text: CloseHandle
-                      - kind: Whitespace
-                        text: " "
-                      - kind: LabelStatement
+                      - kind: ErrorRecovery
                         children:
+                          - kind: ErrorExpectedTokens
+                            text: statement
+                          - kind: Identifier
+                            text: CloseHandle
+                          - kind: Whitespace
+                            text: " "
                           - kind: Identifier
                             text: hToken
                           - kind: ColonOperator
                             text: ":"
-                      - kind: Whitespace
-                        text: " "
-                      - kind: AssignmentStatement
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: hToken
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: hToken
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NumericLiteralExpression
-                            children:
-                              - kind: IntegerLiteral
-                                text: "0"
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: IntegerLiteral
+                            text: "0"
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword
@@ -21517,36 +21513,32 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "        "
-                      - kind: Unknown
-                        text: CloseHandle
-                      - kind: Whitespace
-                        text: " "
-                      - kind: LabelStatement
+                      - kind: ErrorRecovery
                         children:
+                          - kind: ErrorExpectedTokens
+                            text: statement
+                          - kind: Identifier
+                            text: CloseHandle
+                          - kind: Whitespace
+                            text: " "
                           - kind: Identifier
                             text: hProcessToken
                           - kind: ColonOperator
                             text: ":"
-                      - kind: Whitespace
-                        text: " "
-                      - kind: AssignmentStatement
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: hProcessToken
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: hProcessToken
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NumericLiteralExpression
-                            children:
-                              - kind: IntegerLiteral
-                                text: "0"
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: IntegerLiteral
+                            text: "0"
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword
@@ -24725,36 +24717,32 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "        "
-                      - kind: Unknown
-                        text: CloseHandle
-                      - kind: Whitespace
-                        text: " "
-                      - kind: LabelStatement
+                      - kind: ErrorRecovery
                         children:
+                          - kind: ErrorExpectedTokens
+                            text: statement
+                          - kind: Identifier
+                            text: CloseHandle
+                          - kind: Whitespace
+                            text: " "
                           - kind: Identifier
                             text: hToken
                           - kind: ColonOperator
                             text: ":"
-                      - kind: Whitespace
-                        text: " "
-                      - kind: AssignmentStatement
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: hToken
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: hToken
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NumericLiteralExpression
-                            children:
-                              - kind: IntegerLiteral
-                                text: "0"
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: IntegerLiteral
+                            text: "0"
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword

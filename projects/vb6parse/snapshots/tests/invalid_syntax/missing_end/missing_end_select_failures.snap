@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/invalid_syntax/missing_end.rs
+source: projects/vb6parse/tests/invalid_syntax/missing_end.rs
 expression: failure_messages
 ---
-[]
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub Test()\\n    Select Case x\\n        Case 1\\n            Debug.Print \\\"One\\\"\\n        Case 2\\n            Debug.Print \\\"Two\\\"\\nEnd Sub\\n\", error_offset: 127, line_start: 8, line_end: 9, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [EndKeyword, Whitespace, SubKeyword] }), severity: Error, labels: [], notes: [] }"

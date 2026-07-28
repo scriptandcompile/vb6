@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/environment.rs
+source: projects/vb6parse/tests/module/environment.rs
 expression: module
 ---
 name: ServerMod
@@ -4891,38 +4891,32 @@ cst:
                             children:
                               - kind: Whitespace
                                 text: "            "
-                              - kind: Unknown
-                                text: PopStage
-                              - kind: Whitespace
-                                text: " "
-                              - kind: LabelStatement
+                              - kind: ErrorRecovery
                                 children:
+                                  - kind: ErrorExpectedTokens
+                                    text: statement
+                                  - kind: Identifier
+                                    text: PopStage
+                                  - kind: Whitespace
+                                    text: " "
                                   - kind: Identifier
                                     text: bstack
                                   - kind: ColonOperator
                                     text: ":"
-                              - kind: Whitespace
-                                text: " "
-                              - kind: AssignmentStatement
-                                children:
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: CallEventFromSocketOne
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Identifier
+                                    text: CallEventFromSocketOne
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: BooleanLiteralExpression
-                                    children:
-                                      - kind: FalseKeyword
-                                        text: "False"
-                              - kind: ColonOperator
-                                text: ":"
-                              - kind: GotoStatement
-                                children:
+                                  - kind: FalseKeyword
+                                    text: "False"
+                                  - kind: ColonOperator
+                                    text: ":"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: GotoKeyword

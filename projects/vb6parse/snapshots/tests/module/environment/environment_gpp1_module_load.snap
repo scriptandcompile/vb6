@@ -1325,8 +1325,54 @@ cst:
         text: "\r\n"
       - kind: Whitespace
         text: "          "
-      - kind: Unknown
-        text: (
+      - kind: ErrorRecovery
+        children:
+          - kind: ErrorExpectedTokens
+            text: statement
+          - kind: LeftParenthesis
+            text: (
+          - kind: ByValKeyword
+            text: ByVal
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: lpDriverName
+          - kind: Whitespace
+            text: " "
+          - kind: AsKeyword
+            text: As
+          - kind: Whitespace
+            text: " "
+          - kind: StringKeyword
+            text: String
+          - kind: Comma
+            text: ","
+          - kind: Whitespace
+            text: " "
+          - kind: ByValKeyword
+            text: ByVal
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: lpDeviceName
+          - kind: Whitespace
+            text: " "
+          - kind: AsKeyword
+            text: As
+          - kind: Whitespace
+            text: " "
+          - kind: StringKeyword
+            text: String
+          - kind: Comma
+            text: ","
+          - kind: Whitespace
+            text: " "
+          - kind: Underscore
+            text: _
+      - kind: Newline
+        text: "\r\n"
+      - kind: Whitespace
+        text: "          "
       - kind: CallStatement
         children:
           - kind: ByValKeyword
@@ -1337,72 +1383,6 @@ cst:
             children:
               - kind: Argument
                 children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: Identifier
-                        text: lpDriverName
-              - kind: Whitespace
-                text: " "
-      - kind: CallStatement
-        children:
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ArgumentList
-            children:
-              - kind: Argument
-                children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: StringKeyword
-                        text: String
-              - kind: Comma
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: Argument
-                children:
-                  - kind: ByValKeyword
-                    text: ByVal
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: Identifier
-                        text: lpDeviceName
-              - kind: Whitespace
-                text: " "
-      - kind: CallStatement
-        children:
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ArgumentList
-            children:
-              - kind: Argument
-                children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: StringKeyword
-                        text: String
-              - kind: Comma
-                text: ","
-              - kind: Whitespace
-                text: " "
-              - kind: Underscore
-                text: _
-              - kind: Newline
-                text: "\r\n"
-              - kind: Whitespace
-                text: "          "
-              - kind: Argument
-                children:
-                  - kind: ByValKeyword
-                    text: ByVal
-                  - kind: Whitespace
-                    text: " "
                   - kind: IdentifierExpression
                     children:
                       - kind: Identifier
@@ -1453,26 +1433,22 @@ cst:
                     children:
                       - kind: LongKeyword
                         text: Long
-      - kind: Unknown
-        text: )
-      - kind: Whitespace
-        text: " "
-      - kind: CallStatement
+      - kind: ErrorRecovery
         children:
+          - kind: ErrorExpectedTokens
+            text: statement
+          - kind: RightParenthesis
+            text: )
+          - kind: Whitespace
+            text: " "
           - kind: AsKeyword
             text: As
           - kind: Whitespace
             text: " "
-          - kind: ArgumentList
-            children:
-              - kind: Argument
-                children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: LongKeyword
-                        text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: LongKeyword
+            text: Long
+      - kind: Newline
+        text: "\r\n"
       - kind: Whitespace
         text: "      "
       - kind: DeclareStatement

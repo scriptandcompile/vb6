@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/endless_runner_game_vb6_0.rs
+source: projects/vb6parse/tests/form/endless_runner_game_vb6_0.rs
 expression: form_file
 ---
 form:
@@ -439,28 +439,24 @@ cst:
         text: ElseIf
       - kind: Whitespace
         text: " "
-      - kind: Unknown
-        text: (
-      - kind: Unknown
-        text: "="
-      - kind: Whitespace
-        text: " "
-      - kind: CallStatement
+      - kind: ErrorRecovery
         children:
+          - kind: ErrorExpectedTokens
+            text: statement
+          - kind: LeftParenthesis
+            text: (
+          - kind: EqualityOperator
+            text: "="
+          - kind: Whitespace
+            text: " "
           - kind: TrueKeyword
             text: "True"
-          - kind: ArgumentList
-            children:
-              - kind: Argument
-                children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: RightParenthesis
-                        text: )
-              - kind: Whitespace
-                text: " "
-      - kind: ThenKeyword
-        text: Then
+          - kind: RightParenthesis
+            text: )
+          - kind: Whitespace
+            text: " "
+          - kind: ThenKeyword
+            text: Then
       - kind: Newline
         text: "\r\n"
       - kind: AssignmentStatement
@@ -485,28 +481,24 @@ cst:
         text: ElseIf
       - kind: Whitespace
         text: " "
-      - kind: Unknown
-        text: (
-      - kind: Unknown
-        text: "="
-      - kind: Whitespace
-        text: " "
-      - kind: CallStatement
+      - kind: ErrorRecovery
         children:
+          - kind: ErrorExpectedTokens
+            text: statement
+          - kind: LeftParenthesis
+            text: (
+          - kind: EqualityOperator
+            text: "="
+          - kind: Whitespace
+            text: " "
           - kind: TrueKeyword
             text: "True"
-          - kind: ArgumentList
-            children:
-              - kind: Argument
-                children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: RightParenthesis
-                        text: )
-              - kind: Whitespace
-                text: " "
-      - kind: ThenKeyword
-        text: Then
+          - kind: RightParenthesis
+            text: )
+          - kind: Whitespace
+            text: " "
+          - kind: ThenKeyword
+            text: Then
       - kind: Newline
         text: "\r\n"
       - kind: AssignmentStatement

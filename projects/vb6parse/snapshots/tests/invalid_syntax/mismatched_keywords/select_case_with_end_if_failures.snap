@@ -1,5 +1,6 @@
 ---
-source: vb6parse/tests/invalid_syntax/mismatched_keywords.rs
+source: projects/vb6parse/tests/invalid_syntax/mismatched_keywords.rs
 expression: failure_messages
 ---
-[]
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub Test()\\n    Select Case x\\n        Case 1\\n            Debug.Print \\\"One\\\"\\n        Case 2\\n            Debug.Print \\\"Two\\\"\\n    End If\\nEnd Sub\\n\", error_offset: 130, line_start: 8, line_end: 9, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [EndKeyword, Whitespace, IfKeyword] }), severity: Error, labels: [], notes: [] }"
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub Test()\\n    Select Case x\\n        Case 1\\n            Debug.Print \\\"One\\\"\\n        Case 2\\n            Debug.Print \\\"Two\\\"\\n    End If\\nEnd Sub\\n\", error_offset: 138, line_start: 9, line_end: 10, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [EndKeyword, Whitespace, SubKeyword] }), severity: Error, labels: [], notes: [] }"

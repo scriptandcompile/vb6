@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/invalid_syntax/mismatched_keywords.rs
+source: projects/vb6parse/tests/invalid_syntax/mismatched_keywords.rs
 expression: tree
 ---
 root:
@@ -87,15 +87,23 @@ root:
                           text: "\n"
                     - kind: Whitespace
                       text: "    "
-                    - kind: Unknown
-                      text: Loop
+                    - kind: ErrorRecovery
+                      children:
+                        - kind: ErrorExpectedTokens
+                          text: statement
+                        - kind: LoopKeyword
+                          text: Loop
                     - kind: Newline
                       text: "\n"
-                    - kind: Unknown
-                      text: End
-                    - kind: Whitespace
-                      text: " "
-                    - kind: Unknown
-                      text: Sub
+                    - kind: ErrorRecovery
+                      children:
+                        - kind: ErrorExpectedTokens
+                          text: statement
+                        - kind: EndKeyword
+                          text: End
+                        - kind: Whitespace
+                          text: " "
+                        - kind: SubKeyword
+                          text: Sub
                     - kind: Newline
                       text: "\n"

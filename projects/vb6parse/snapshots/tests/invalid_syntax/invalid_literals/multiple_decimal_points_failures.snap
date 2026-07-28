@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/invalid_syntax/invalid_literals.rs
+source: projects/vb6parse/tests/invalid_syntax/invalid_literals.rs
 expression: failure_messages
 ---
-[]
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub Test()\\n    Dim value As Double\\n    value = 123.456.789\\nEnd Sub\\n\", error_offset: 59, line_start: 4, line_end: 5, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [IntegerLiteral] }), severity: Error, labels: [], notes: [] }"

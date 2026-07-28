@@ -1,5 +1,6 @@
 ---
-source: vb6parse/tests/invalid_syntax/missing_keywords.rs
+source: projects/vb6parse/tests/invalid_syntax/missing_keywords.rs
 expression: failure_messages
 ---
-[]
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub Test()\\n    Select Case x\\n        1\\n            Debug.Print \\\"One\\\"\\n        Case 2\\n            Debug.Print \\\"Two\\\"\\n    End Select\\nEnd Sub\\n\", error_offset: 84, line_start: 6, line_end: 7, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [CaseKeyword, Whitespace, IntegerLiteral] }), severity: Error, labels: [], notes: [] }"
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub Test()\\n    Select Case x\\n        1\\n            Debug.Print \\\"One\\\"\\n        Case 2\\n            Debug.Print \\\"Two\\\"\\n    End Select\\nEnd Sub\\n\", error_offset: 129, line_start: 8, line_end: 9, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [EndKeyword, Whitespace, SelectKeyword] }), severity: Error, labels: [], notes: [] }"

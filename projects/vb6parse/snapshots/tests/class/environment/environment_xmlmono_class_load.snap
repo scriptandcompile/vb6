@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -4442,44 +4442,36 @@ cst:
                     children:
                       - kind: Whitespace
                         text: "   "
-                      - kind: Unknown
-                        text: child
-                      - kind: AssignmentStatement
+                      - kind: ErrorRecovery
                         children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: createTree
+                          - kind: ErrorExpectedTokens
+                            text: statement
+                          - kind: Identifier
+                            text: child
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: createTree
                           - kind: Whitespace
                             text: " "
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: m
-                      - kind: ColonOperator
-                        text: ":"
-                      - kind: Whitespace
-                        text: " "
-                      - kind: AssignmentStatement
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: EndOffChilds
+                          - kind: Identifier
+                            text: m
+                          - kind: ColonOperator
+                            text: ":"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: EndOffChilds
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: BooleanLiteralExpression
-                            children:
-                              - kind: TrueKeyword
-                                text: "True"
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: TrueKeyword
+                            text: "True"
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "   "
                   - kind: EndKeyword
