@@ -124,10 +124,7 @@ pub fn fmt_subcommand(cmd: FmtCommand) -> Result<()> {
     let total = results.len();
 
     if cmd.check {
-        println!(
-            "{} of {} files would be reformatted.",
-            changed_count, total
-        );
+        println!("{} of {} files would be reformatted.", changed_count, total);
         if changed_count > 0 {
             std::process::exit(1);
         }
@@ -145,9 +142,7 @@ fn is_project_file(entry: &Result<walkdir::DirEntry, walkdir::Error>) -> bool {
 }
 
 fn is_source_file(entry: &Result<walkdir::DirEntry, walkdir::Error>) -> bool {
-    entry
-        .as_ref()
-        .is_ok_and(|e| is_source_file_inner(e.path()))
+    entry.as_ref().is_ok_and(|e| is_source_file_inner(e.path()))
 }
 
 fn is_source_file_inner(path: &Path) -> bool {

@@ -2,8 +2,9 @@ use vb6parse::*;
 
 #[test]
 fn endless_runner_game_vb6_0_game_project_load() {
-    let project_file_bytes =
-        include_bytes!("../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/game.vbp");
+    let project_file_bytes = include_bytes!(
+        "../../../../test-data/Endless-runner-Game_VB6.0/Endless runner project files/game.vbp"
+    );
 
     let result = SourceFile::decode_with_replacement("game.vbp", project_file_bytes);
 

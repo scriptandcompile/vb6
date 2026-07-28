@@ -307,7 +307,8 @@ impl Parser<'_> {
     pub(crate) fn start_error_node(&mut self, expected: &[String]) {
         self.builder.start_node(SyntaxKind::ErrorRecovery.to_raw());
         let text = expected.join(", ");
-        self.builder.token(SyntaxKind::ErrorExpectedTokens.to_raw(), &text);
+        self.builder
+            .token(SyntaxKind::ErrorExpectedTokens.to_raw(), &text);
     }
 
     /// Finish an error node and report the error.
@@ -322,9 +323,7 @@ impl Parser<'_> {
     /// Consume the current token as a single-token error node.
     /// Reports the error via `report_error` with the given parser error.
     pub(crate) fn consume_error(&mut self, expected: Vec<String>) {
-        let found = self
-            .current_token()
-            .map_or(Vec::new(), |t| vec![*t]);
+        let found = self.current_token().map_or(Vec::new(), |t| vec![*t]);
         self.start_error_node(&expected);
         self.consume_token();
         self.finish_error_node(ParserError::UnexpectedTokens { expected, found });
