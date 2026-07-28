@@ -532,6 +532,23 @@ impl CstNode {
         })
     }
 
+    /// Check if this tree (or any descendant) contains an `ErrorRecovery` wrapper node.
+    ///
+    /// This is a recursive search through the entire subtree.
+    #[must_use]
+    pub fn has_errors(&self) -> bool {
+        self.find_if(|n| n.kind().is_error_recovery()).is_some()
+    }
+
+    /// Get an iterator over direct children that are `ErrorRecovery` wrapper nodes.
+    ///
+    /// Only immediate children are checked; use `has_errors()` for a recursive search.
+    pub fn error_recovery_children(&self) -> impl Iterator<Item = &CstNode> {
+        self.children()
+            .iter()
+            .filter(|c| c.kind().is_error_recovery())
+    }
+
     /// Find the first descendant node matching a predicate (depth-first search)
     ///
     /// This allows flexible searching with custom logic beyond just matching kinds.
@@ -870,6 +887,14 @@ impl ConcreteSyntaxTree {
     pub fn contains_kind(&self, kind: SyntaxKind) -> bool {
         self.root_child_elements()
             .any(|child| Self::syntax_element_kind(&child) == kind)
+    }
+
+    /// Check if the tree contains any `ErrorRecovery` wrapper nodes.
+    ///
+    /// This is a recursive search through the entire tree.
+    #[must_use]
+    pub fn has_errors(&self) -> bool {
+        self.to_root_node().has_errors()
     }
 
     /// Get the first child node (including tokens)

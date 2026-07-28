@@ -1,7 +1,7 @@
 //! Grammar-based fuzzer for vb6parse.
 //!
 //! Uses an ANTLR4 `.g4` grammar file to generate random VB6 source,
-//! parses it with vb6parse, checks the CST for Unknown tokens, and
+//! parses it with vb6parse, checks the CST for Error nodes, and
 //! minimizes any failing inputs via delta debugging.
 
 mod checker;
@@ -51,13 +51,13 @@ enum Command {
         #[arg(long, default_value_t = 8)]
         max_depth: usize,
     },
-    /// Check a VB6 source file for Unknown tokens in vb6parse's CST.
+    /// Check a VB6 source file for Error nodes in vb6parse's CST.
     Check {
         /// Path to the VB6 source file to check.
         #[arg(short, long)]
         file: PathBuf,
     },
-    /// Reduce a VB6 source file to a minimal input that still triggers Unknown tokens.
+    /// Reduce a VB6 source file to a minimal input that still triggers Error nodes.
     Reduce {
         /// Path to the VB6 source file to reduce.
         #[arg(short, long)]
@@ -132,22 +132,22 @@ fn main() -> Result<()> {
                 return Ok(());
             }
 
-            if result.has_unknown {
+            if result.has_error {
                 println!(
-                    "Found {} Unknown token(s) ({} parse failure(s)):",
-                    result.unknowns.len(),
+                    "Found {} Error node(s) ({} parse failure(s)):",
+                    result.errors.len(),
                     result.failure_count
                 );
-                for (i, u) in result.unknowns.iter().enumerate() {
+                for (i, err) in result.errors.iter().enumerate() {
                     println!(
                         "  [{i}] text={:?}  path={:?}",
-                        truncate(&u.text, 80),
-                        u.path
+                        truncate(&err.text, 80),
+                        err.path
                     );
                 }
             } else {
                 println!(
-                    "No Unknown tokens. {} parse failure(s).",
+                    "No Error nodes. {} parse failure(s).",
                     result.failure_count
                 );
             }
@@ -176,7 +176,7 @@ fn main() -> Result<()> {
                     }
                 }
                 None => {
-                    println!("Source does not trigger Unknown tokens – nothing to reduce.");
+                    println!("Source does not trigger Error nodes – nothing to reduce.");
                 }
             }
         }
@@ -231,11 +231,11 @@ fn main() -> Result<()> {
                     continue;
                 }
 
-                if result.has_unknown {
+                if result.has_error {
                     found += 1;
-                    let unknown_count = result.unknowns.len();
+                    let error_count = result.errors.len();
                     println!(
-                        "[iter {i}] seed={iter_seed}: {unknown_count} Unknown token(s) in {} bytes – reducing...",
+                        "[iter {i}] seed={iter_seed}: {error_count} Error node(s) in {} bytes – reducing...",
                         source.len()
                     );
 
@@ -247,7 +247,7 @@ fn main() -> Result<()> {
                         seen_reduced.insert(reduced.clone());
 
                         // Save reduced version.
-                        let filename = output_dir.join(format!("unknown_seed_{iter_seed}.bas"));
+                        let filename = output_dir.join(format!("error_seed_{iter_seed}.bas"));
                         if let Err(e) = fs::write(&filename, &reduced) {
                             eprintln!("  Warning: could not write {}: {e}", filename.display());
                         } else {
@@ -260,7 +260,7 @@ fn main() -> Result<()> {
 
                         // Save original alongside for context.
                         let orig_filename =
-                            output_dir.join(format!("unknown_seed_{iter_seed}_original.bas"));
+                            output_dir.join(format!("error_seed_{iter_seed}_original.bas"));
                         let _ = fs::write(&orig_filename, &source);
                     }
                 }

@@ -440,7 +440,7 @@ impl ConcreteSyntaxTree {
         }
 
         // Build a raw-kind lookup table so membership checks are O(1).
-        let mut remove_lookup = vec![false; SyntaxKind::Unknown as usize + 1];
+        let mut remove_lookup = vec![false; SyntaxKind::ErrorRecovery as usize + 1];
         for kind in kinds_to_remove {
             remove_lookup[*kind as usize] = true;
         }
@@ -2298,10 +2298,7 @@ impl<'a> Parser<'a> {
                     {
                         self.consume_token();
                     } else {
-                        // This is purely being done this way to make it easier during development.
-                        // In a full implementation, we would have specific parsing functions
-                        // for all VB6 constructs with anything unrecognized being treated as an error node.
-                        self.consume_token_as_unknown();
+                        self.consume_error_to_newline(vec!["statement".to_string()]);
                     }
                 }
             }
@@ -2989,7 +2986,7 @@ impl<'a> Parser<'a> {
             // Consume the colon token and continue parsing the next statement.
             self.consume_token();
         } else {
-            self.consume_token_as_unknown();
+            self.consume_error_to_newline(vec!["statement".to_string()]);
         }
     }
 

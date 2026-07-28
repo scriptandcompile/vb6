@@ -26025,52 +26025,40 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "    "
-                      - kind: Unknown
-                        text: Err
-                      - kind: AssignmentStatement
+                      - kind: ErrorRecovery
                         children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Clear
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: ColonOperator
-                                text: ":"
-                      - kind: Whitespace
-                        text: " "
-                      - kind: AssignmentStatement
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: stringifyCustomType
+                          - kind: ErrorExpectedTokens
+                            text: statement
+                          - kind: Identifier
+                            text: Err
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: Clear
+                          - kind: ColonOperator
+                            text: ":"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: stringifyCustomType
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: BinaryExpression
-                            children:
-                              - kind: StringLiteralExpression
-                                children:
-                                  - kind: StringLiteral
-                                    text: "\"UnknownCustomType:\""
-                              - kind: Whitespace
-                                text: " "
-                              - kind: Ampersand
-                                text: "&"
-                              - kind: Whitespace
-                                text: " "
-                              - kind: IdentifierExpression
-                                children:
-                                  - kind: Identifier
-                                    text: hreftype
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: StringLiteral
+                            text: "\"UnknownCustomType:\""
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Ampersand
+                            text: "&"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: hreftype
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: ExitStatement
                         children:
                           - kind: Whitespace

@@ -649,11 +649,12 @@ pub enum SyntaxKind {
     ExponentiationOperator,
 
     // Error recovery
-    /// Error node for error recovery
-    Error,
-
-    /// Unknown syntax kind
-    Unknown,
+    /// Metadata token for expected token descriptions within error recovery
+    ErrorExpectedTokens,
+    /// Metadata token for missing token descriptions within error recovery
+    ErrorMissingTokens,
+    /// Parent node wrapping recovered tokens during error recovery
+    ErrorRecovery,
 }
 
 impl Display for SyntaxKind {
@@ -865,12 +866,38 @@ impl From<Token> for SyntaxKind {
 
 impl SyntaxKind {
     pub(crate) fn from_raw(raw: rowan::SyntaxKind) -> Self {
-        assert!(raw.0 <= SyntaxKind::Unknown as u16);
+        assert!(raw.0 <= SyntaxKind::ErrorRecovery as u16);
         unsafe { std::mem::transmute::<u16, SyntaxKind>(raw.0) }
     }
 
     /// Convert `SyntaxKind` to rowan's raw `SyntaxKind` (for internal use in builders)
     pub(crate) fn to_raw(self) -> rowan::SyntaxKind {
         rowan::SyntaxKind(self as u16)
+    }
+
+    /// Returns `true` if this is the `ErrorRecovery` wrapper node.
+    ///
+    /// Use this when traversing the CST to identify error-recovery boundaries
+    /// (e.g., counting error nodes, collecting diagnostics, or skipping entire
+    /// recovery subtrees).
+    pub fn is_error_recovery(self) -> bool {
+        self == SyntaxKind::ErrorRecovery
+    }
+
+    /// Returns `true` if this is synthetic metadata within an `ErrorRecovery` node.
+    ///
+    /// Use this in navigation/display code that should skip synthetic children
+    /// (e.g., "give me the *real* tokens under this ErrorRecovery node").
+    pub fn is_error_metadata(self) -> bool {
+        matches!(self, SyntaxKind::ErrorExpectedTokens | SyntaxKind::ErrorMissingTokens)
+    }
+
+    /// Returns `true` if this is any kind used by the error-recovery system.
+    ///
+    /// Shorthand for `is_error_recovery() || is_error_metadata()`.
+    /// Use this when the caller doesn't care about the distinction between
+    /// the wrapper and its synthetic children.
+    pub fn is_recovery_kind(self) -> bool {
+        self.is_error_recovery() || self.is_error_metadata()
     }
 }

@@ -17759,48 +17759,40 @@ cst:
                                     text: If
                                   - kind: Newline
                                     text: "\r\n"
-                              - kind: Unknown
-                                text: Textbox
-                              - kind: AssignmentStatement
+                              - kind: ErrorRecovery
                                 children:
-                                  - kind: MemberAccessExpression
-                                    children:
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: glistN
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: ShowMe
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: ColonOperator
-                                        text: ":"
-                              - kind: Whitespace
-                                text: " "
-                              - kind: AssignmentStatement
-                                children:
-                                  - kind: MemberAccessExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: Callback
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: LastActive
+                                  - kind: ErrorExpectedTokens
+                                    text: statement
+                                  - kind: Identifier
+                                    text: Textbox
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: glistN
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: ShowMe
+                                  - kind: ColonOperator
+                                    text: ":"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Identifier
+                                    text: Callback
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: LastActive
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: ctrlName
-                                  - kind: Newline
-                                    text: "\r\n"
+                                  - kind: Identifier
+                                    text: ctrlName
+                              - kind: Newline
+                                text: "\r\n"
                           - kind: EndKeyword
                             text: End
                           - kind: Whitespace

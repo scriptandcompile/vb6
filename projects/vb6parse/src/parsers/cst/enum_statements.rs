@@ -134,8 +134,7 @@ impl Parser<'_> {
                     self.consume_token();
                 }
                 _ => {
-                    // Unknown token in enum body, consume it
-                    self.consume_token_as_unknown();
+                    self.consume_error(vec!["enum member name".to_string()]);
                 }
             }
         }

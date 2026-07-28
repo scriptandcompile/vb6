@@ -3104,26 +3104,22 @@ cst:
                 text: ":"
               - kind: Whitespace
                 text: " "
-              - kind: Unknown
-                text: m
-              - kind: AssignmentStatement
+              - kind: ErrorRecovery
                 children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: Identifier
-                        text: ShutDown
+                  - kind: ErrorExpectedTokens
+                    text: statement
+                  - kind: Identifier
+                    text: m
+                  - kind: PeriodOperator
+                    text: "."
+                  - kind: Identifier
+                    text: ShutDown
                   - kind: Whitespace
                     text: " "
-                  - kind: NumericLiteralExpression
-                    children:
-                      - kind: IntegerLiteral
-                        text: "2"
-              - kind: ColonOperator
-                text: ":"
-              - kind: SetStatement
-                children:
+                  - kind: IntegerLiteral
+                    text: "2"
+                  - kind: ColonOperator
+                    text: ":"
                   - kind: Whitespace
                     text: " "
                   - kind: SetKeyword
@@ -3140,8 +3136,8 @@ cst:
                     text: " "
                   - kind: NothingKeyword
                     text: Nothing
-                  - kind: Newline
-                    text: "\r\n"
+              - kind: Newline
+                text: "\r\n"
               - kind: Newline
                 text: "\r\n"
               - kind: CallStatement

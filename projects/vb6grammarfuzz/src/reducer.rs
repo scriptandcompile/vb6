@@ -1,18 +1,18 @@
-//! Delta-debugging reducer for minimizing inputs that trigger Unknown tokens.
+//! Delta-debugging reducer for minimizing inputs that trigger Error nodes.
 //!
 //! Implements the classic ddmin algorithm: given source text that produces
-//! Unknown tokens, repeatedly try removing chunks until no further reduction
-//! is possible while the Unknown tokens remain.
+//! Error nodes, repeatedly try removing chunks until no further reduction
+//! is possible while the Error nodes remain.
 
 use crate::checker::check_source;
 
-/// Minimize `source` so that it still triggers at least one Unknown token,
+/// Minimize `source` so that it still triggers at least one Error node,
 /// but is as small as possible.
 ///
-/// Returns `None` if the original source doesn't trigger Unknown tokens.
+/// Returns `None` if the original source doesn't trigger Error nodes.
 pub fn reduce(source: &str) -> Option<String> {
     // Verify the original triggers the bug.
-    if !check_source(source).has_unknown {
+    if !check_source(source).has_error {
         return None;
     }
 
@@ -68,7 +68,7 @@ fn reduce_lines(source: &str) -> String {
 
             let candidate_str = candidate.join("\n");
 
-            if check_source(&candidate_str).has_unknown {
+            if check_source(&candidate_str).has_error {
                 current = candidate;
                 progress = true;
                 // Don't increment i – we removed a chunk so indices shifted.
@@ -101,7 +101,7 @@ fn reduce_lines(source: &str) -> String {
             let mut candidate = current.clone();
             candidate.remove(i);
             let candidate_str = candidate.join("\n");
-            if check_source(&candidate_str).has_unknown {
+            if check_source(&candidate_str).has_error {
                 current = candidate;
                 changed = true;
                 // Don't increment i.
@@ -130,7 +130,7 @@ fn reduce_chars(source: &str) -> String {
             let mut candidate = chars.clone();
             candidate.remove(i);
             let candidate_str: String = candidate.iter().collect();
-            if check_source(&candidate_str).has_unknown {
+            if check_source(&candidate_str).has_error {
                 chars = candidate;
                 changed = true;
                 // Don't increment i.

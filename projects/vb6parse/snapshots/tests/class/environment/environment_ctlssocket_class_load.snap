@@ -12307,8 +12307,12 @@ cst:
                     text: "["
                   - kind: Identifier
                     text: ucsOsvWin8
-                  - kind: Unknown
-                    text: "."
+                  - kind: ErrorRecovery
+                    children:
+                      - kind: ErrorExpectedTokens
+                        text: enum member name
+                      - kind: PeriodOperator
+                        text: "."
                   - kind: IntegerLiteral
                     text: "1"
                   - kind: RightSquareBracket

@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/invalid_syntax/missing_keywords.rs
+source: projects/vb6parse/tests/invalid_syntax/missing_keywords.rs
 expression: failure_messages
 ---
-[]
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub Test()\\n    For i = 1 To 10\\n        Debug.Print i\\nEnd Sub\\n\", error_offset: 61, line_start: 5, line_end: 6, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [EndKeyword, Whitespace, SubKeyword] }), severity: Error, labels: [], notes: [] }"

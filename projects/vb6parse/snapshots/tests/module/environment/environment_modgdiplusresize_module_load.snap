@@ -1383,26 +1383,22 @@ cst:
                         text: "."
                       - kind: Identifier
                         text: IID
-      - kind: Unknown
-        text: )
-      - kind: Whitespace
-        text: " "
-      - kind: CallStatement
+      - kind: ErrorRecovery
         children:
+          - kind: ErrorExpectedTokens
+            text: statement
+          - kind: RightParenthesis
+            text: )
+          - kind: Whitespace
+            text: " "
           - kind: AsKeyword
             text: As
           - kind: Whitespace
             text: " "
-          - kind: ArgumentList
-            children:
-              - kind: Argument
-                children:
-                  - kind: IdentifierExpression
-                    children:
-                      - kind: LongKeyword
-                        text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: LongKeyword
+            text: Long
+      - kind: Newline
+        text: "\r\n"
       - kind: DeclareStatement
         children:
           - kind: PrivateKeyword

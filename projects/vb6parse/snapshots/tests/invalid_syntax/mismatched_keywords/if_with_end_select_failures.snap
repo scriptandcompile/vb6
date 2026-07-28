@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/invalid_syntax/mismatched_keywords.rs
+source: projects/vb6parse/tests/invalid_syntax/mismatched_keywords.rs
 expression: failure_messages
 ---
-[]
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub Test()\\n    If x > 0 Then\\n        Debug.Print \\\"Positive\\\"\\n    End Select\\nEnd Sub\\n\", error_offset: 75, line_start: 5, line_end: 6, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [EndKeyword, Whitespace, SelectKeyword] }), severity: Error, labels: [], notes: [] }"

@@ -22,6 +22,7 @@ pub mod class;
 pub mod form;
 pub mod lexer;
 pub mod module;
+pub mod parser;
 pub mod project;
 pub mod resource;
 pub mod source;
@@ -31,6 +32,7 @@ pub use class::ClassError;
 pub use form::FormError;
 pub use lexer::LexerError;
 pub use module::ModuleError;
+pub use parser::ParserError;
 pub use project::ProjectError;
 pub use resource::ResourceError;
 pub use source::SourceFileError;
@@ -44,6 +46,7 @@ pub use source::SourceFileError;
 /// - `Lexer` - Tokenization and lexical analysis errors  
 /// - `Class` - Class file (.cls) specific parsing errors
 /// - `Module` - Module file (.bas) specific parsing errors
+/// - `Parser` - CST-level parser structural errors
 /// - `Form` - Form file (.frm) validation and parsing errors
 /// - `Project` - Project file (.vbp) parsing errors
 /// - `Resource` - Resource file (.frx) binary data errors
@@ -86,6 +89,10 @@ pub enum ErrorKind {
     /// Module file parsing errors.
     #[error(transparent)]
     Module(#[from] ModuleError),
+
+    /// Parser-level structural errors.
+    #[error(transparent)]
+    Parser(#[from] ParserError),
 
     /// Form file parsing and validation errors.
     #[error(transparent)]

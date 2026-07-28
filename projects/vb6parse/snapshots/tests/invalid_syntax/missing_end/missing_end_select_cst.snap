@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/invalid_syntax/missing_end.rs
+source: projects/vb6parse/tests/invalid_syntax/missing_end.rs
 expression: tree
 ---
 root:
@@ -115,11 +115,15 @@ root:
                                           text: "\"Two\""
                             - kind: Newline
                               text: "\n"
-                        - kind: Unknown
-                          text: End
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Unknown
-                          text: Sub
+                        - kind: ErrorRecovery
+                          children:
+                            - kind: ErrorExpectedTokens
+                              text: statement
+                            - kind: EndKeyword
+                              text: End
+                            - kind: Whitespace
+                              text: " "
+                            - kind: SubKeyword
+                              text: Sub
                         - kind: Newline
                           text: "\n"

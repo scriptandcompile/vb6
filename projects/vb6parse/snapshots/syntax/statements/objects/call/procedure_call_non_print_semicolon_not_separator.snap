@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/statements/objects/call.rs
+source: projects/vb6parse/src/syntax/statements/objects/call.rs
 expression: tree
 ---
 root:
@@ -39,12 +39,16 @@ root:
                           children:
                             - kind: IntegerLiteral
                               text: "1"
-            - kind: Unknown
-              text: ;
-            - kind: Whitespace
-              text: " "
-            - kind: Unknown
-              text: "2"
+            - kind: ErrorRecovery
+              children:
+                - kind: ErrorExpectedTokens
+                  text: statement
+                - kind: Semicolon
+                  text: ;
+                - kind: Whitespace
+                  text: " "
+                - kind: IntegerLiteral
+                  text: "2"
             - kind: Newline
               text: "\n"
         - kind: EndKeyword
