@@ -130,13 +130,13 @@ fn main() -> Result<()> {
         let check = *matches.get_one::<bool>("check").unwrap_or(&false);
         let indent_size = *matches.get_one::<usize>("indent-size").unwrap_or(&4);
 
-        let fmt_settings = fmt::FmtSettings {
+        let cmd = fmt::FmtCommand {
             project_path,
             check,
-            indent_size,
+            fmt_settings: fmt::FmtSettings { indent_size },
         };
 
-        fmt_subcommand(fmt_settings)?;
+        fmt_subcommand(cmd)?;
 
         return Ok(());
     }
