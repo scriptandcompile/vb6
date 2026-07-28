@@ -10,36 +10,58 @@ pub use error::{ConversionError, Result};
 pub use traits::*;
 pub use types::*;
 
-// Language-specific conversion modules (feature-gated)
+// Language-specific conversion modules (feature-gated stubs)
 #[cfg(feature = "rust-code")]
-pub mod rust;
+pub mod rust {
+    //! Rust code generation
+}
 
 #[cfg(feature = "js-code")]
-pub mod javascript;
+pub mod javascript {
+    //! JavaScript / TypeScript code generation
+}
 
 #[cfg(feature = "dart")]
-pub mod dart;
+pub mod dart {
+    //! Dart / Flutter code generation
+}
 
 #[cfg(feature = "html")]
-pub mod html;
+pub mod html {
+    //! HTML output generation
+}
 
 #[cfg(feature = "css")]
-pub mod css;
+pub mod css {
+    //! CSS output generation
+}
 
 #[cfg(feature = "tauri")]
-pub mod tauri;
+pub mod tauri {
+    //! Tauri framework integration
+}
 
 #[cfg(feature = "svelte")]
-pub mod svelte;
+pub mod svelte {
+    //! Svelte framework code generation
+}
 
 #[cfg(feature = "react")]
-pub mod react;
+pub mod react {
+    //! React framework code generation
+}
 
 #[cfg(feature = "vue")]
-pub mod vue;
+pub mod vue {
+    //! Vue framework code generation
+}
 
 #[cfg(feature = "flutter")]
-pub mod flutter;
+pub mod flutter {
+    //! Flutter framework code generation
+}
 
 #[cfg(feature = "test-harness")]
-pub mod testing;
+pub mod testing {
+    //! Test harness generation
+}

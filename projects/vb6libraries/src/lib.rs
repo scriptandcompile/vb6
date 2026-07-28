@@ -46,32 +46,6 @@
 //! - Generate appropriate code for each library
 //! - Handle cross-cutting concerns (libraries affecting backend and frontend)
 
-#[cfg(feature = "win32-core")]
-pub mod win32;
-
-#[cfg(any(
-    feature = "mscomctl",
-    feature = "mscomctl2",
-    feature = "richtextbox",
-    feature = "datagrid",
-    feature = "webview"
-))]
-pub mod ui;
-
-#[cfg(feature = "office-automation")]
-pub mod office;
-
-#[cfg(feature = "database-common")]
-pub mod database;
-
-#[cfg(any(
-    feature = "crystalreports",
-    feature = "devexpress",
-    feature = "infragistics",
-    feature = "componentone"
-))]
-pub mod thirdparty;
-
 /// Library detection and analysis
 pub mod detection {
     use std::collections::HashSet;
