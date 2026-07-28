@@ -871,6 +871,7 @@ impl SyntaxKind {
     }
 
     /// Convert `SyntaxKind` to rowan's raw `SyntaxKind` (for internal use in builders)
+    #[must_use]
     pub(crate) fn to_raw(self) -> rowan::SyntaxKind {
         rowan::SyntaxKind(self as u16)
     }
@@ -880,6 +881,7 @@ impl SyntaxKind {
     /// Use this when traversing the CST to identify error-recovery boundaries
     /// (e.g., counting error nodes, collecting diagnostics, or skipping entire
     /// recovery subtrees).
+    #[must_use]
     pub fn is_error_recovery(self) -> bool {
         self == SyntaxKind::ErrorRecovery
     }
@@ -887,9 +889,13 @@ impl SyntaxKind {
     /// Returns `true` if this is synthetic metadata within an `ErrorRecovery` node.
     ///
     /// Use this in navigation/display code that should skip synthetic children
-    /// (e.g., "give me the *real* tokens under this ErrorRecovery node").
+    /// (e.g., "give me the *real* tokens under this `ErrorRecovery` node").
+    #[must_use]
     pub fn is_error_metadata(self) -> bool {
-        matches!(self, SyntaxKind::ErrorExpectedTokens | SyntaxKind::ErrorMissingTokens)
+        matches!(
+            self,
+            SyntaxKind::ErrorExpectedTokens | SyntaxKind::ErrorMissingTokens
+        )
     }
 
     /// Returns `true` if this is any kind used by the error-recovery system.
@@ -897,6 +903,7 @@ impl SyntaxKind {
     /// Shorthand for `is_error_recovery() || is_error_metadata()`.
     /// Use this when the caller doesn't care about the distinction between
     /// the wrapper and its synthetic children.
+    #[must_use]
     pub fn is_recovery_kind(self) -> bool {
         self.is_error_recovery() || self.is_error_metadata()
     }
