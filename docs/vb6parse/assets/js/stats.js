@@ -2,7 +2,7 @@
 (function() {
     async function loadStats() {
         try {
-            const response = await fetch('../assets/data/stats.json');
+            const response = await fetch('assets/data/stats.json');
             if (!response.ok) {
                 console.log('Stats not available - stats.json not found');
                 return;

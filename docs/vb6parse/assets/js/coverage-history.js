@@ -26,7 +26,7 @@ function formatTrendBadge(trend, changePercent) {
 async function loadCoverageWithHistory() {
     try {
         // Load current coverage
-        const response = await fetch('../assets/data/coverage.json');
+        const response = await fetch('assets/data/coverage.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -35,7 +35,7 @@ async function loadCoverageWithHistory() {
         // Try to load historical data
         let history = null;
         try {
-            const historyResponse = await fetch('../assets/data/coverage-history.json');
+            const historyResponse = await fetch('assets/data/coverage-history.json');
             if (historyResponse.ok) {
                 history = await historyResponse.json();
             }
@@ -234,7 +234,7 @@ function displayFiles(files) {
                 row.className = 'file-row';
                 const displayName = file.name.replace(dir + '/', '');
                 const filePathWithoutExt = file.name.replace(/\.(rs|toml|md|txt|json|yml|yaml)$/, '');
-                const coverageFileUrl = `../assets/coverage/${filePathWithoutExt}.html`;
+                const coverageFileUrl = `assets/coverage/${filePathWithoutExt}.html`;
                 
                 row.innerHTML = `
                     <td class="file-name">
