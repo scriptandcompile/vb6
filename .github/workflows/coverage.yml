@@ -50,12 +50,23 @@ jobs:
       - name: Generate coverage
         run: python3 projects/vb6parse/scripts/generate-coverage.py
 
+      - name: Relocate coverage data
+        run: |
+          mkdir -p docs/vb6parse/assets/data
+          mv docs/assets/data/coverage.json docs/vb6parse/assets/data/
+          mv docs/assets/data/stats.json docs/vb6parse/assets/data/
+          mv docs/assets/data/coverage-history.json docs/vb6parse/assets/data/
+          if [ -d docs/assets/coverage ]; then
+            mkdir -p docs/vb6parse/assets/coverage
+            mv docs/assets/coverage/* docs/vb6parse/assets/coverage/
+          fi
+
       - name: Commit and push if changed
         run: |
           git pull --rebase --autostash
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add docs/assets/data/coverage.json docs/assets/data/stats.json docs/assets/data/coverage-history.json
+          git add docs/vb6parse/assets/data/coverage.json docs/vb6parse/assets/data/stats.json docs/vb6parse/assets/data/coverage-history.json docs/vb6parse/assets/coverage/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

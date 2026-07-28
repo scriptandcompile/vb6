@@ -30,7 +30,7 @@ jobs:
         run: |
           python3 projects/vb6parse/scripts/generate-library-docs.py \
             --src projects/vb6parse/src/syntax/library \
-            --output docs/library \
+            --output docs/vb6parse/library \
             --clean
 
       - name: Commit and push if changed
@@ -38,7 +38,7 @@ jobs:
           git pull --rebase --autostash
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add docs/library/
+          git add docs/vb6parse/library/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

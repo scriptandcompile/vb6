@@ -51,14 +51,14 @@ jobs:
         run: python3 scripts/build-wasm.py --optimize --no-typescript
 
       - name: Copy WASM output to umbrella docs
-        run: cp -r projects/vb6parse/docs/assets/wasm docs/assets/wasm
+        run: cp -r projects/vb6parse/docs/assets/wasm docs/vb6parse/assets/wasm
 
       - name: Commit and push if changed
         run: |
           git pull --rebase --autostash
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add -f docs/assets/wasm/
+          git add -f docs/vb6parse/assets/wasm/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

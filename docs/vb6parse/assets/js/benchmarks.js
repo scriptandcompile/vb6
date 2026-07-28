@@ -107,7 +107,7 @@ function formatTrendBadge(trend) {
 async function loadBenchmarks() {
     try {
         // Load current snapshot
-        const response = await fetch('../assets/data/benchmarks.json');
+        const response = await fetch('assets/data/benchmarks.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -116,7 +116,7 @@ async function loadBenchmarks() {
         // Try to load historical data
         let history = null;
         try {
-            const historyResponse = await fetch('../assets/data/benchmarks-history.json');
+            const historyResponse = await fetch('assets/data/benchmarks-history.json');
             if (historyResponse.ok) {
                 history = await historyResponse.json();
             }
