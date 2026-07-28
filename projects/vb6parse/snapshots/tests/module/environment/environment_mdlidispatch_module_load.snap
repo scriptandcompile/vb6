@@ -351,76 +351,78 @@ cst:
             text: cbnCallTypes
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VbLet
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: DISPATCH_PROPERTYPUT
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VbGet
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: DISPATCH_PROPERTYGET
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VbSet
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: DISPATCH_PROPERTYPUTREF
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VbMethod
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: DISPATCH_METHOD
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VbNext
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: DISPID_NEWENUM
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VbLet
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: DISPATCH_PROPERTYPUT
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VbGet
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: DISPATCH_PROPERTYGET
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VbSet
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: DISPATCH_PROPERTYPUTREF
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VbMethod
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: DISPATCH_METHOD
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VbNext
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: DISPID_NEWENUM
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

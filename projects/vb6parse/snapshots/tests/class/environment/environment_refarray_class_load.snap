@@ -72,34 +72,36 @@ cst:
             text: SAFEARRAYBOUND
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cElements
-          - kind: Whitespace
-            text: "                   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: lLbound
-          - kind: Whitespace
-            text: "                     "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cElements
+              - kind: Whitespace
+                text: "                   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: lLbound
+              - kind: Whitespace
+                text: "                     "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -122,104 +124,106 @@ cst:
             text: SAFEARRAY1D
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cDims
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: fFeatures
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cbElements
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cLocks
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pvData
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: onebound
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "0"
-          - kind: Whitespace
-            text: " "
-          - kind: ToKeyword
-            text: To
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "0"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: SAFEARRAYBOUND
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cDims
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: fFeatures
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cbElements
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cLocks
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pvData
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: onebound
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "0"
+              - kind: Whitespace
+                text: " "
+              - kind: ToKeyword
+                text: To
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "0"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: SAFEARRAYBOUND
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

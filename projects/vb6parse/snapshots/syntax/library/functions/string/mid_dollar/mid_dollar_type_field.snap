@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/string/mid_dollar.rs
+source: projects/vb6parse/src/syntax/library/functions/string/mid_dollar.rs
 expression: tree
 ---
 root:
@@ -17,34 +17,36 @@ root:
           text: Person
         - kind: Newline
           text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: NameKeyword
-          text: Name
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: StringKeyword
-          text: String
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: ID
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: StringKeyword
-          text: String
-        - kind: Newline
-          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: Whitespace
+              text: "    "
+            - kind: NameKeyword
+              text: Name
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: StringKeyword
+              text: String
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: ID
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: StringKeyword
+              text: String
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

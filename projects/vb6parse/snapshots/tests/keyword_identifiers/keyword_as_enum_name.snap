@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/keyword_identifiers.rs
+source: projects/vb6parse/tests/keyword_identifiers.rs
 expression: tree
 ---
 root:
@@ -15,18 +15,20 @@ root:
           text: Random
         - kind: Newline
           text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: Value1
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: Value2
-        - kind: Newline
-          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: Value1
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: Value2
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

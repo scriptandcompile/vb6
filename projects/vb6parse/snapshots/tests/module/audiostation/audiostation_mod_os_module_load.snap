@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/audiostation.rs
+source: projects/vb6parse/tests/module/audiostation.rs
 expression: module_file
 ---
 name: modOS
@@ -115,98 +115,100 @@ cst:
             text: OSVERSIONINFO
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: OSVSize
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: dwVerMajor
-          - kind: Whitespace
-            text: "      "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: dwVerMinor
-          - kind: Whitespace
-            text: "      "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: dwBuildNumber
-          - kind: Whitespace
-            text: "   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: PlatformID
-          - kind: Whitespace
-            text: "      "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: szCSDVersion
-          - kind: Whitespace
-            text: "    "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "128"
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: OSVSize
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: dwVerMajor
+              - kind: Whitespace
+                text: "      "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: dwVerMinor
+              - kind: Whitespace
+                text: "      "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: dwBuildNumber
+              - kind: Whitespace
+                text: "   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: PlatformID
+              - kind: Whitespace
+                text: "      "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: szCSDVersion
+              - kind: Whitespace
+                text: "    "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "128"
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/audiostation.rs
+source: projects/vb6parse/tests/module/audiostation.rs
 expression: module_file
 ---
 name: modEnums
@@ -21,36 +21,38 @@ cst:
             text: enumMidiMediaType
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: LeftSquareBracket
-            text: "["
-          - kind: Identifier
-            text: Midi
-          - kind: RightSquareBracket
-            text: "]"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: LeftSquareBracket
-            text: "["
-          - kind: Identifier
-            text: sID
-          - kind: RightSquareBracket
-            text: "]"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: LeftSquareBracket
-            text: "["
-          - kind: BeepKeyword
-            text: Beep
-          - kind: RightSquareBracket
-            text: "]"
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: LeftSquareBracket
+                text: "["
+              - kind: Identifier
+                text: Midi
+              - kind: RightSquareBracket
+                text: "]"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: LeftSquareBracket
+                text: "["
+              - kind: Identifier
+                text: sID
+              - kind: RightSquareBracket
+                text: "]"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: LeftSquareBracket
+                text: "["
+              - kind: BeepKeyword
+                text: Beep
+              - kind: RightSquareBracket
+                text: "]"
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

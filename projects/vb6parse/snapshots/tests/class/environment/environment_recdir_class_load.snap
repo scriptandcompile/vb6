@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -160,34 +160,36 @@ cst:
             text: FILETIME
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: dwLowDateTime
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: dwHighDateTime
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: dwLowDateTime
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: dwHighDateTime
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -210,118 +212,120 @@ cst:
             text: SYSTEMTIME
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wYear
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wMonth
-          - kind: Whitespace
-            text: "        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wDayOfWeek
-          - kind: Whitespace
-            text: "    "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wDay
-          - kind: Whitespace
-            text: "          "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wHour
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wMinute
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wSecond
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wMilliseconds
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wYear
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wMonth
+              - kind: Whitespace
+                text: "        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wDayOfWeek
+              - kind: Whitespace
+                text: "    "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wDay
+              - kind: Whitespace
+                text: "          "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wHour
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wMinute
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wSecond
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wMilliseconds
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -344,170 +348,172 @@ cst:
             text: WIN32_FIND_DATA
           - kind: Newline
             text: "\r\n"
-          - kind: Identifier
-            text: dwFileAttributes
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Identifier
-            text: ftCreationTime
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: FILETIME
-          - kind: Newline
-            text: "\r\n"
-          - kind: Identifier
-            text: ftLastAccessTime
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: FILETIME
-          - kind: Newline
-            text: "\r\n"
-          - kind: Identifier
-            text: ftLastWriteTime
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: FILETIME
-          - kind: Newline
-            text: "\r\n"
-          - kind: Identifier
-            text: nFileSizeHigh
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Identifier
-            text: nFileSizeLow
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Identifier
-            text: dwReserved0
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Identifier
-            text: dwReserved1
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Identifier
-            text: cFileName
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: MAX_PATH
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "2"
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Newline
-            text: "\r\n"
-          - kind: Identifier
-            text: cAlternate
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "14"
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "2"
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Identifier
+                text: dwFileAttributes
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Identifier
+                text: ftCreationTime
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: FILETIME
+              - kind: Newline
+                text: "\r\n"
+              - kind: Identifier
+                text: ftLastAccessTime
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: FILETIME
+              - kind: Newline
+                text: "\r\n"
+              - kind: Identifier
+                text: ftLastWriteTime
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: FILETIME
+              - kind: Newline
+                text: "\r\n"
+              - kind: Identifier
+                text: nFileSizeHigh
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Identifier
+                text: nFileSizeLow
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Identifier
+                text: dwReserved0
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Identifier
+                text: dwReserved1
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Identifier
+                text: cFileName
+              - kind: LeftParenthesis
+                text: (
+              - kind: Identifier
+                text: MAX_PATH
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "2"
+              - kind: Whitespace
+                text: " "
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Newline
+                text: "\r\n"
+              - kind: Identifier
+                text: cAlternate
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "14"
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "2"
+              - kind: Whitespace
+                text: " "
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

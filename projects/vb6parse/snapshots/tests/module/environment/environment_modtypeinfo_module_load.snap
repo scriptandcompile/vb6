@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/environment.rs
+source: projects/vb6parse/tests/module/environment.rs
 expression: module
 ---
 name: modTypeInfo
@@ -237,42 +237,44 @@ cst:
             text: TPARAMDESC
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pPARAMDESCEX
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' valid if PARAMFLAG_FHASDEFAULT"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wParamFlags
-          - kind: Whitespace
-            text: "             "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Whitespace
-            text: "  "
-          - kind: EndOfLineComment
-            text: "' parameter flags (in,out,...)"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pPARAMDESCEX
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' valid if PARAMFLAG_FHASDEFAULT"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wParamFlags
+              - kind: Whitespace
+                text: "             "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Whitespace
+                text: "  "
+              - kind: EndOfLineComment
+                text: "' parameter flags (in,out,...)"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -301,42 +303,44 @@ cst:
             text: TPARAMDESCEX
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cBytes
-          - kind: Whitespace
-            text: "                  "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' size of structure"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: varDefaultValue
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: VariantKeyword
-            text: Variant
-          - kind: Whitespace
-            text: "  "
-          - kind: EndOfLineComment
-            text: "' default value of parameter"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cBytes
+              - kind: Whitespace
+                text: "                  "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' size of structure"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: varDefaultValue
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: VariantKeyword
+                text: Variant
+              - kind: Whitespace
+                text: "  "
+              - kind: EndOfLineComment
+                text: "' default value of parameter"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -359,54 +363,56 @@ cst:
             text: TTYPEDESC
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pTypeDesc
-          - kind: Whitespace
-            text: "               "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' vt = VT_PTR: points to another TYPEDESC"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "                                        "
-          - kind: EndOfLineComment
-            text: "' vt = VT_CARRAY: points to another TYPEDESC"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "                                        "
-          - kind: EndOfLineComment
-            text: "' vt = VT_USERDEFINED: pTypeDesc is a HREFTYPE instead of a pointer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: vt
-          - kind: Whitespace
-            text: "                      "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Whitespace
-            text: "  "
-          - kind: EndOfLineComment
-            text: "' vartype"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pTypeDesc
+              - kind: Whitespace
+                text: "               "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' vt = VT_PTR: points to another TYPEDESC"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "                                        "
+              - kind: EndOfLineComment
+                text: "' vt = VT_CARRAY: points to another TYPEDESC"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "                                        "
+              - kind: EndOfLineComment
+                text: "' vt = VT_USERDEFINED: pTypeDesc is a HREFTYPE instead of a pointer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: vt
+              - kind: Whitespace
+                text: "                      "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Whitespace
+                text: "  "
+              - kind: EndOfLineComment
+                text: "' vartype"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -429,42 +435,44 @@ cst:
             text: TELEMDESC
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: tdesc
-          - kind: Whitespace
-            text: "                   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: TTYPEDESC
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "' type description"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pdesc
-          - kind: Whitespace
-            text: "                   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: TPARAMDESC
-          - kind: Whitespace
-            text: "   "
-          - kind: EndOfLineComment
-            text: "' parameter description"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: tdesc
+              - kind: Whitespace
+                text: "                   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: TTYPEDESC
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "' type description"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pdesc
+              - kind: Whitespace
+                text: "                   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: TPARAMDESC
+              - kind: Whitespace
+                text: "   "
+              - kind: EndOfLineComment
+                text: "' parameter description"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -489,264 +497,266 @@ cst:
             text: TYPEATTR
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: GUID
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "15"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "                "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: tLCID
-          - kind: Whitespace
-            text: "                   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: dwReserved
-          - kind: Whitespace
-            text: "              "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: memidConstructor
-          - kind: Whitespace
-            text: "        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: memidDestructor
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pstrSchema
-          - kind: Whitespace
-            text: "              "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cbSizeInstance
-          - kind: Whitespace
-            text: "          "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: typekind
-          - kind: Whitespace
-            text: "                "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cFuncs
-          - kind: Whitespace
-            text: "                  "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cVars
-          - kind: Whitespace
-            text: "                   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cImplTypes
-          - kind: Whitespace
-            text: "              "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cbSizeVft
-          - kind: Whitespace
-            text: "               "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cbAlignment
-          - kind: Whitespace
-            text: "             "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wTypeFlags
-          - kind: Whitespace
-            text: "              "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wMajorVerNum
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wMinorVerNum
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: tdescAlias
-          - kind: Whitespace
-            text: "              "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: idldescType
-          - kind: Whitespace
-            text: "             "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: GUID
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "15"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "                "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: tLCID
+              - kind: Whitespace
+                text: "                   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: dwReserved
+              - kind: Whitespace
+                text: "              "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: memidConstructor
+              - kind: Whitespace
+                text: "        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: memidDestructor
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pstrSchema
+              - kind: Whitespace
+                text: "              "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cbSizeInstance
+              - kind: Whitespace
+                text: "          "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: typekind
+              - kind: Whitespace
+                text: "                "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cFuncs
+              - kind: Whitespace
+                text: "                  "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cVars
+              - kind: Whitespace
+                text: "                   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cImplTypes
+              - kind: Whitespace
+                text: "              "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cbSizeVft
+              - kind: Whitespace
+                text: "               "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cbAlignment
+              - kind: Whitespace
+                text: "             "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wTypeFlags
+              - kind: Whitespace
+                text: "              "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wMajorVerNum
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wMinorVerNum
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: tdescAlias
+              - kind: Whitespace
+                text: "              "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: idldescType
+              - kind: Whitespace
+                text: "             "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -771,182 +781,184 @@ cst:
             text: FUNCDESC
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: memid
-          - kind: Whitespace
-            text: "                   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: lprgscode
-          - kind: Whitespace
-            text: "               "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: lprgelemdescParam
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: funcking
-          - kind: Whitespace
-            text: "                "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: invkind
-          - kind: Whitespace
-            text: "                 "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: callconv
-          - kind: Whitespace
-            text: "                "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cParams
-          - kind: Whitespace
-            text: "                 "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cParamsOpt
-          - kind: Whitespace
-            text: "              "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: oVft
-          - kind: Whitespace
-            text: "                    "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cScodes
-          - kind: Whitespace
-            text: "                 "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: elemdesc
-          - kind: Whitespace
-            text: "                "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: TELEMDESC
-          - kind: Whitespace
-            text: " "
-          - kind: EndOfLineComment
-            text: "' Contains the return type of the function"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wFuncFlags
-          - kind: Whitespace
-            text: "              "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Whitespace
-            text: "  "
-          - kind: EndOfLineComment
-            text: "' function flags"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: memid
+              - kind: Whitespace
+                text: "                   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: lprgscode
+              - kind: Whitespace
+                text: "               "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: lprgelemdescParam
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: funcking
+              - kind: Whitespace
+                text: "                "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: invkind
+              - kind: Whitespace
+                text: "                 "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: callconv
+              - kind: Whitespace
+                text: "                "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cParams
+              - kind: Whitespace
+                text: "                 "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cParamsOpt
+              - kind: Whitespace
+                text: "              "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: oVft
+              - kind: Whitespace
+                text: "                    "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cScodes
+              - kind: Whitespace
+                text: "                 "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: elemdesc
+              - kind: Whitespace
+                text: "                "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: TELEMDESC
+              - kind: Whitespace
+                text: " "
+              - kind: EndOfLineComment
+                text: "' Contains the return type of the function"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wFuncFlags
+              - kind: Whitespace
+                text: "              "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Whitespace
+                text: "  "
+              - kind: EndOfLineComment
+                text: "' function flags"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -975,42 +987,44 @@ cst:
             text: TARRAYDESC
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: tdescElem
-          - kind: Whitespace
-            text: "               "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: TTYPEDESC
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "' type description"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cDims
-          - kind: Whitespace
-            text: "                   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Whitespace
-            text: "      "
-          - kind: EndOfLineComment
-            text: "' number of dimensions"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: tdescElem
+              - kind: Whitespace
+                text: "               "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: TTYPEDESC
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "' type description"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cDims
+              - kind: Whitespace
+                text: "                   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Whitespace
+                text: "      "
+              - kind: EndOfLineComment
+                text: "' number of dimensions"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1033,34 +1047,36 @@ cst:
             text: SAFEARRAYBOUND
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cElements
-          - kind: Whitespace
-            text: "               "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: lLBound
-          - kind: Whitespace
-            text: "                 "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cElements
+              - kind: Whitespace
+                text: "               "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: lLBound
+              - kind: Whitespace
+                text: "                 "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1085,54 +1101,56 @@ cst:
             text: VARKIND
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VAR_PERSISTANCE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "0"
-          - kind: Whitespace
-            text: "             "
-          - kind: EndOfLineComment
-            text: "'"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VAR_STATIC
-          - kind: Whitespace
-            text: "                      "
-          - kind: EndOfLineComment
-            text: "'"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VAR_CONST
-          - kind: Whitespace
-            text: "                       "
-          - kind: EndOfLineComment
-            text: "'"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VAR_DISPATCH
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "'"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VAR_PERSISTANCE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "0"
+              - kind: Whitespace
+                text: "             "
+              - kind: EndOfLineComment
+                text: "'"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VAR_STATIC
+              - kind: Whitespace
+                text: "                      "
+              - kind: EndOfLineComment
+                text: "'"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VAR_CONST
+              - kind: Whitespace
+                text: "                       "
+              - kind: EndOfLineComment
+                text: "'"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VAR_DISPATCH
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "'"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1157,120 +1175,122 @@ cst:
             text: VARDESC
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: memid
-          - kind: Whitespace
-            text: "                   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' member ID"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: lpstrSchema
-          - kind: Whitespace
-            text: "             "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "'"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: uInstVal
-          - kind: Whitespace
-            text: "                "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' vkind = VAR_PERINSTANCE: offset of this variable within the instance"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "                                        "
-          - kind: EndOfLineComment
-            text: "' vkind = VAR_CONST: value of it as a variant"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: elemdescVar
-          - kind: Whitespace
-            text: "             "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: TELEMDESC
-          - kind: Whitespace
-            text: " "
-          - kind: EndOfLineComment
-            text: "' variable type"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wVarFlags
-          - kind: Whitespace
-            text: "               "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Whitespace
-            text: "  "
-          - kind: EndOfLineComment
-            text: "' variable flags"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: vkind
-          - kind: Whitespace
-            text: "                   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' variable kind"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: memid
+              - kind: Whitespace
+                text: "                   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' member ID"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: lpstrSchema
+              - kind: Whitespace
+                text: "             "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "'"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: uInstVal
+              - kind: Whitespace
+                text: "                "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' vkind = VAR_PERINSTANCE: offset of this variable within the instance"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "                                        "
+              - kind: EndOfLineComment
+                text: "' vkind = VAR_CONST: value of it as a variant"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: elemdescVar
+              - kind: Whitespace
+                text: "             "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: TELEMDESC
+              - kind: Whitespace
+                text: " "
+              - kind: EndOfLineComment
+                text: "' variable type"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wVarFlags
+              - kind: Whitespace
+                text: "               "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Whitespace
+                text: "  "
+              - kind: EndOfLineComment
+                text: "' variable flags"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: vkind
+              - kind: Whitespace
+                text: "                   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' variable kind"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1299,150 +1319,152 @@ cst:
             text: PARAMFLAGS
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: PARAMFLAG_NONE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H0"
-          - kind: Whitespace
-            text: "            "
-          - kind: EndOfLineComment
-            text: "' ..."
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: PARAMFLAG_FIN
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H1"
-          - kind: Whitespace
-            text: "             "
-          - kind: EndOfLineComment
-            text: "' in"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: PARAMFLAG_FOUT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H2"
-          - kind: Whitespace
-            text: "            "
-          - kind: EndOfLineComment
-            text: "' out"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: PARAMFLAG_FLCID
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H4"
-          - kind: Whitespace
-            text: "           "
-          - kind: EndOfLineComment
-            text: "' lcid"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: PARAMFLAG_FRETVAL
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H8"
-          - kind: Whitespace
-            text: "         "
-          - kind: EndOfLineComment
-            text: "' return value"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: PARAMFLAG_FOPT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H10"
-          - kind: Whitespace
-            text: "           "
-          - kind: EndOfLineComment
-            text: "' optional"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: PARAMFLAG_FHASDEFAULT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H20"
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "' default value"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: PARAMFLAG_FHASCUSTDATA
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H40"
-          - kind: Whitespace
-            text: "   "
-          - kind: EndOfLineComment
-            text: "' custom data"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: PARAMFLAG_NONE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H0"
+              - kind: Whitespace
+                text: "            "
+              - kind: EndOfLineComment
+                text: "' ..."
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: PARAMFLAG_FIN
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H1"
+              - kind: Whitespace
+                text: "             "
+              - kind: EndOfLineComment
+                text: "' in"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: PARAMFLAG_FOUT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H2"
+              - kind: Whitespace
+                text: "            "
+              - kind: EndOfLineComment
+                text: "' out"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: PARAMFLAG_FLCID
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H4"
+              - kind: Whitespace
+                text: "           "
+              - kind: EndOfLineComment
+                text: "' lcid"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: PARAMFLAG_FRETVAL
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H8"
+              - kind: Whitespace
+                text: "         "
+              - kind: EndOfLineComment
+                text: "' return value"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: PARAMFLAG_FOPT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H10"
+              - kind: Whitespace
+                text: "           "
+              - kind: EndOfLineComment
+                text: "' optional"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: PARAMFLAG_FHASDEFAULT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H20"
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "' default value"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: PARAMFLAG_FHASCUSTDATA
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H40"
+              - kind: Whitespace
+                text: "   "
+              - kind: EndOfLineComment
+                text: "' custom data"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1467,48 +1489,50 @@ cst:
             text: fncinf
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: NameKeyword
-            text: name
-          - kind: Whitespace
-            text: "                    "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: addr
-          - kind: Whitespace
-            text: "                    "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: params
-          - kind: Whitespace
-            text: "                  "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: NameKeyword
+                text: name
+              - kind: Whitespace
+                text: "                    "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: addr
+              - kind: Whitespace
+                text: "                    "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: params
+              - kind: Whitespace
+                text: "                  "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1533,52 +1557,54 @@ cst:
             text: enmeinf
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: NameKeyword
-            text: name
-          - kind: Whitespace
-            text: "                    "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: invkind
-          - kind: Whitespace
-            text: "                 "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: invokekind
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: params
-          - kind: Whitespace
-            text: "                  "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: NameKeyword
+                text: name
+              - kind: Whitespace
+                text: "                    "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: invkind
+              - kind: Whitespace
+                text: "                 "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: invokekind
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: params
+              - kind: Whitespace
+                text: "                  "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1623,852 +1649,854 @@ cst:
             text: Varenum
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_EMPTY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 0&
-          - kind: Whitespace
-            text: "                   "
-          - kind: EndOfLineComment
-            text: "'"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_NULL
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 1&
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "' 0"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_I2
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 2&
-          - kind: Whitespace
-            text: "                      "
-          - kind: EndOfLineComment
-            text: "' signed 2 bytes integer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_I4
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 3&
-          - kind: Whitespace
-            text: "                      "
-          - kind: EndOfLineComment
-            text: "' signed 4 bytes integer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_R4
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 4&
-          - kind: Whitespace
-            text: "                      "
-          - kind: EndOfLineComment
-            text: "' 4 bytes float"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_R8
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 5&
-          - kind: Whitespace
-            text: "                      "
-          - kind: EndOfLineComment
-            text: "' 8 bytes float"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_CY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 6&
-          - kind: Whitespace
-            text: "                      "
-          - kind: EndOfLineComment
-            text: "' currency"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_DATE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 7&
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "' date"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_BSTR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 8&
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "' BStr"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_DISPATCH
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 9&
-          - kind: Whitespace
-            text: "                "
-          - kind: EndOfLineComment
-            text: "' IDispatch"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_ERROR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 10&
-          - kind: Whitespace
-            text: "                  "
-          - kind: EndOfLineComment
-            text: "' error value"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_BOOL
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 11&
-          - kind: Whitespace
-            text: "                   "
-          - kind: EndOfLineComment
-            text: "' boolean"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_VARIANT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 12&
-          - kind: Whitespace
-            text: "                "
-          - kind: EndOfLineComment
-            text: "' variant"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_UNKNOWN
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 13&
-          - kind: Whitespace
-            text: "                "
-          - kind: EndOfLineComment
-            text: "' IUnknown"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_DECIMAL
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 14&
-          - kind: Whitespace
-            text: "                "
-          - kind: EndOfLineComment
-            text: "' decimal"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_I1
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 16&
-          - kind: Whitespace
-            text: "                     "
-          - kind: EndOfLineComment
-            text: "' signed byte"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_UI1
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 17&
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "' unsigned byte"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_UI2
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 18&
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "' unsigned 2 bytes integer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_UI4
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 19&
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "' unsigned 4 bytes integer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_I8
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 20&
-          - kind: Whitespace
-            text: "                     "
-          - kind: EndOfLineComment
-            text: "' signed 8 bytes integer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_UI8
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 21&
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "' unsigned 8 bytes integer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_INT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 22&
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "' integer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_UINT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 23&
-          - kind: Whitespace
-            text: "                   "
-          - kind: EndOfLineComment
-            text: "' unsigned integer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_VOID
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 24&
-          - kind: Whitespace
-            text: "                   "
-          - kind: EndOfLineComment
-            text: "' 0"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_HRESULT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 25&
-          - kind: Whitespace
-            text: "                "
-          - kind: EndOfLineComment
-            text: "' HRESULT"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_PTR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 26&
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "' pointer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_SAFEARRAY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 27&
-          - kind: Whitespace
-            text: "              "
-          - kind: EndOfLineComment
-            text: "' safearray"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_CARRAY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 28&
-          - kind: Whitespace
-            text: "                 "
-          - kind: EndOfLineComment
-            text: "' carray"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_USERDEFINED
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 29&
-          - kind: Whitespace
-            text: "            "
-          - kind: EndOfLineComment
-            text: "' userdefined"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_LPSTR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 30&
-          - kind: Whitespace
-            text: "                  "
-          - kind: EndOfLineComment
-            text: "' LPStr"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_LPWSTR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 31&
-          - kind: Whitespace
-            text: "                 "
-          - kind: EndOfLineComment
-            text: "' LPWStr"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_RECORD
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 36&
-          - kind: Whitespace
-            text: "                 "
-          - kind: EndOfLineComment
-            text: "' Record"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_FILETIME
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 64&
-          - kind: Whitespace
-            text: "               "
-          - kind: EndOfLineComment
-            text: "' File Time"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_BLOB
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 65&
-          - kind: Whitespace
-            text: "                   "
-          - kind: EndOfLineComment
-            text: "' Blob"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_STREAM
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 66&
-          - kind: Whitespace
-            text: "                 "
-          - kind: EndOfLineComment
-            text: "' Stream"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_STORAGE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 67&
-          - kind: Whitespace
-            text: "                "
-          - kind: EndOfLineComment
-            text: "' Storage"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_STREAMED_OBJECT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 68&
-          - kind: Whitespace
-            text: "        "
-          - kind: EndOfLineComment
-            text: "' Streamed Obj"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_STORED_OBJECT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 69&
-          - kind: Whitespace
-            text: "          "
-          - kind: EndOfLineComment
-            text: "' Stored Obj"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_BLOB_OBJECT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 70&
-          - kind: Whitespace
-            text: "            "
-          - kind: EndOfLineComment
-            text: "' Blob Obj"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_CF
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 71&
-          - kind: Whitespace
-            text: "                     "
-          - kind: EndOfLineComment
-            text: "' CF"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_CLSID
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: 72&
-          - kind: Whitespace
-            text: "                  "
-          - kind: EndOfLineComment
-            text: "' Class ID"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_BSTR_BLOB
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&HFFF&"
-          - kind: Whitespace
-            text: "           "
-          - kind: EndOfLineComment
-            text: "' BStr Blob"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_VECTOR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H1000&"
-          - kind: Whitespace
-            text: "             "
-          - kind: EndOfLineComment
-            text: "' Vector"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_ARRAY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H2000&"
-          - kind: Whitespace
-            text: "              "
-          - kind: EndOfLineComment
-            text: "' Array"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_BYREF
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H4000&"
-          - kind: Whitespace
-            text: "              "
-          - kind: EndOfLineComment
-            text: "' ByRef"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_RESERVED
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H8000&"
-          - kind: Whitespace
-            text: "           "
-          - kind: EndOfLineComment
-            text: "' Reserved"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: VT_ILLEGAL
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&HFFFF&"
-          - kind: Whitespace
-            text: "            "
-          - kind: EndOfLineComment
-            text: "' illegal"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_EMPTY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 0&
+              - kind: Whitespace
+                text: "                   "
+              - kind: EndOfLineComment
+                text: "'"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_NULL
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 1&
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "' 0"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_I2
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 2&
+              - kind: Whitespace
+                text: "                      "
+              - kind: EndOfLineComment
+                text: "' signed 2 bytes integer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_I4
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 3&
+              - kind: Whitespace
+                text: "                      "
+              - kind: EndOfLineComment
+                text: "' signed 4 bytes integer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_R4
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 4&
+              - kind: Whitespace
+                text: "                      "
+              - kind: EndOfLineComment
+                text: "' 4 bytes float"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_R8
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 5&
+              - kind: Whitespace
+                text: "                      "
+              - kind: EndOfLineComment
+                text: "' 8 bytes float"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_CY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 6&
+              - kind: Whitespace
+                text: "                      "
+              - kind: EndOfLineComment
+                text: "' currency"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_DATE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 7&
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "' date"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_BSTR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 8&
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "' BStr"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_DISPATCH
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 9&
+              - kind: Whitespace
+                text: "                "
+              - kind: EndOfLineComment
+                text: "' IDispatch"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_ERROR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 10&
+              - kind: Whitespace
+                text: "                  "
+              - kind: EndOfLineComment
+                text: "' error value"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_BOOL
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 11&
+              - kind: Whitespace
+                text: "                   "
+              - kind: EndOfLineComment
+                text: "' boolean"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_VARIANT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 12&
+              - kind: Whitespace
+                text: "                "
+              - kind: EndOfLineComment
+                text: "' variant"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_UNKNOWN
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 13&
+              - kind: Whitespace
+                text: "                "
+              - kind: EndOfLineComment
+                text: "' IUnknown"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_DECIMAL
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 14&
+              - kind: Whitespace
+                text: "                "
+              - kind: EndOfLineComment
+                text: "' decimal"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_I1
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 16&
+              - kind: Whitespace
+                text: "                     "
+              - kind: EndOfLineComment
+                text: "' signed byte"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_UI1
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 17&
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "' unsigned byte"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_UI2
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 18&
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "' unsigned 2 bytes integer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_UI4
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 19&
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "' unsigned 4 bytes integer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_I8
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 20&
+              - kind: Whitespace
+                text: "                     "
+              - kind: EndOfLineComment
+                text: "' signed 8 bytes integer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_UI8
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 21&
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "' unsigned 8 bytes integer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_INT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 22&
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "' integer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_UINT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 23&
+              - kind: Whitespace
+                text: "                   "
+              - kind: EndOfLineComment
+                text: "' unsigned integer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_VOID
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 24&
+              - kind: Whitespace
+                text: "                   "
+              - kind: EndOfLineComment
+                text: "' 0"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_HRESULT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 25&
+              - kind: Whitespace
+                text: "                "
+              - kind: EndOfLineComment
+                text: "' HRESULT"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_PTR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 26&
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "' pointer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_SAFEARRAY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 27&
+              - kind: Whitespace
+                text: "              "
+              - kind: EndOfLineComment
+                text: "' safearray"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_CARRAY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 28&
+              - kind: Whitespace
+                text: "                 "
+              - kind: EndOfLineComment
+                text: "' carray"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_USERDEFINED
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 29&
+              - kind: Whitespace
+                text: "            "
+              - kind: EndOfLineComment
+                text: "' userdefined"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_LPSTR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 30&
+              - kind: Whitespace
+                text: "                  "
+              - kind: EndOfLineComment
+                text: "' LPStr"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_LPWSTR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 31&
+              - kind: Whitespace
+                text: "                 "
+              - kind: EndOfLineComment
+                text: "' LPWStr"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_RECORD
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 36&
+              - kind: Whitespace
+                text: "                 "
+              - kind: EndOfLineComment
+                text: "' Record"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_FILETIME
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 64&
+              - kind: Whitespace
+                text: "               "
+              - kind: EndOfLineComment
+                text: "' File Time"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_BLOB
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 65&
+              - kind: Whitespace
+                text: "                   "
+              - kind: EndOfLineComment
+                text: "' Blob"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_STREAM
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 66&
+              - kind: Whitespace
+                text: "                 "
+              - kind: EndOfLineComment
+                text: "' Stream"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_STORAGE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 67&
+              - kind: Whitespace
+                text: "                "
+              - kind: EndOfLineComment
+                text: "' Storage"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_STREAMED_OBJECT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 68&
+              - kind: Whitespace
+                text: "        "
+              - kind: EndOfLineComment
+                text: "' Streamed Obj"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_STORED_OBJECT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 69&
+              - kind: Whitespace
+                text: "          "
+              - kind: EndOfLineComment
+                text: "' Stored Obj"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_BLOB_OBJECT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 70&
+              - kind: Whitespace
+                text: "            "
+              - kind: EndOfLineComment
+                text: "' Blob Obj"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_CF
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 71&
+              - kind: Whitespace
+                text: "                     "
+              - kind: EndOfLineComment
+                text: "' CF"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_CLSID
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: 72&
+              - kind: Whitespace
+                text: "                  "
+              - kind: EndOfLineComment
+                text: "' Class ID"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_BSTR_BLOB
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&HFFF&"
+              - kind: Whitespace
+                text: "           "
+              - kind: EndOfLineComment
+                text: "' BStr Blob"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_VECTOR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H1000&"
+              - kind: Whitespace
+                text: "             "
+              - kind: EndOfLineComment
+                text: "' Vector"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_ARRAY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H2000&"
+              - kind: Whitespace
+                text: "              "
+              - kind: EndOfLineComment
+                text: "' Array"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_BYREF
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H4000&"
+              - kind: Whitespace
+                text: "              "
+              - kind: EndOfLineComment
+                text: "' ByRef"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_RESERVED
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H8000&"
+              - kind: Whitespace
+                text: "           "
+              - kind: EndOfLineComment
+                text: "' Reserved"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: VT_ILLEGAL
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&HFFFF&"
+              - kind: Whitespace
+                text: "            "
+              - kind: EndOfLineComment
+                text: "' illegal"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -2647,62 +2675,64 @@ cst:
             text: invokekind
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: INVOKE_FUNC
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H1"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: INVOKE_PROPERTY_GET
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H2"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: INVOKE_PROPERTY_PUT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H4"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: INVOKE_PROPERTY_PUTREF
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H8"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: INVOKE_FUNC
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H1"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: INVOKE_PROPERTY_GET
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H2"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: INVOKE_PROPERTY_PUT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H4"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: INVOKE_PROPERTY_PUTREF
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H8"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

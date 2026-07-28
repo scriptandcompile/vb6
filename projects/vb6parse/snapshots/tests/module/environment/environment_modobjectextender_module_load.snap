@@ -149,96 +149,98 @@ cst:
             text: EventSink
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pVTable
-          - kind: Whitespace
-            text: "     "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' VTable pointer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pClass
-          - kind: Whitespace
-            text: "      "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' ComShinkEvent pointer"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cRef
-          - kind: Whitespace
-            text: "        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' reference counter"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: IID
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: GUID
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' interface IID"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: hMem
-          - kind: Whitespace
-            text: "        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "' memory address"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pVTable
+              - kind: Whitespace
+                text: "     "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' VTable pointer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pClass
+              - kind: Whitespace
+                text: "      "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' ComShinkEvent pointer"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cRef
+              - kind: Whitespace
+                text: "        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' reference counter"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: IID
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: GUID
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' interface IID"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: hMem
+              - kind: Whitespace
+                text: "        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "' memory address"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -2147,48 +2149,50 @@ cst:
             text: IUnknown100
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: QueryInterface
-          - kind: Whitespace
-            text: "              "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: AddRef
-          - kind: Whitespace
-            text: "                      "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Release
-          - kind: Whitespace
-            text: "                     "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: QueryInterface
+              - kind: Whitespace
+                text: "              "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: AddRef
+              - kind: Whitespace
+                text: "                      "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Release
+              - kind: Whitespace
+                text: "                     "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -2211,76 +2215,78 @@ cst:
             text: IEnum100
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: iunk
-          - kind: Whitespace
-            text: "                        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: IUnknown100
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: NextKeyword
-            text: Next
-          - kind: Whitespace
-            text: "                        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: skip
-          - kind: Whitespace
-            text: "                        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: ResetKeyword
-            text: Reset
-          - kind: Whitespace
-            text: "                       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Clone
-          - kind: Whitespace
-            text: "                       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: iunk
+              - kind: Whitespace
+                text: "                        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: IUnknown100
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: NextKeyword
+                text: Next
+              - kind: Whitespace
+                text: "                        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: skip
+              - kind: Whitespace
+                text: "                        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: ResetKeyword
+                text: Reset
+              - kind: Whitespace
+                text: "                       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Clone
+              - kind: Whitespace
+                text: "                       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

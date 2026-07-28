@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/environment.rs
+source: projects/vb6parse/tests/module/environment.rs
 expression: module
 ---
 name: Module8
@@ -97,62 +97,64 @@ cst:
             text: rndvars
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "     "
-          - kind: Identifier
-            text: lngX
-          - kind: Whitespace
-            text: "   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "     "
-          - kind: Identifier
-            text: lngY
-          - kind: Whitespace
-            text: "   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "     "
-          - kind: Identifier
-            text: lngZ
-          - kind: Whitespace
-            text: "   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "     "
-          - kind: Identifier
-            text: blnInit
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: BooleanKeyword
-            text: Boolean
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "     "
+              - kind: Identifier
+                text: lngX
+              - kind: Whitespace
+                text: "   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "     "
+              - kind: Identifier
+                text: lngY
+              - kind: Whitespace
+                text: "   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "     "
+              - kind: Identifier
+                text: lngZ
+              - kind: Whitespace
+                text: "   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "     "
+              - kind: Identifier
+                text: blnInit
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: BooleanKeyword
+                text: Boolean
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

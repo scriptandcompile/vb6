@@ -1085,52 +1085,54 @@ cst:
             text: TKiller
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: Killer1
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: TMOVE
-          - kind: Whitespace
-            text: " "
-          - kind: EndOfLineComment
-            text: "'killer moves: good moves for better move ordering"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: Killer2
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: TMOVE
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: Killer3
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: TMOVE
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: Killer1
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: TMOVE
+              - kind: Whitespace
+                text: " "
+              - kind: EndOfLineComment
+                text: "'killer moves: good moves for better move ordering"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: Killer2
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: TMOVE
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: Killer3
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: TMOVE
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

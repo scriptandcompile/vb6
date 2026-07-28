@@ -1706,34 +1706,36 @@ cst:
             text: SAFEARRAYBOUND
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cElements
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: lLbound
-          - kind: Whitespace
-            text: "           "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cElements
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: lLbound
+              - kind: Whitespace
+                text: "           "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1756,104 +1758,106 @@ cst:
             text: SAFEARRAY2D
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cDims
-          - kind: Whitespace
-            text: "             "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: fFeatures
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cbElements
-          - kind: Whitespace
-            text: "        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cLocks
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pvData
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Bounds
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "0"
-          - kind: Whitespace
-            text: " "
-          - kind: ToKeyword
-            text: To
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "    "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: SAFEARRAYBOUND
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cDims
+              - kind: Whitespace
+                text: "             "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: fFeatures
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cbElements
+              - kind: Whitespace
+                text: "        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cLocks
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pvData
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Bounds
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "0"
+              - kind: Whitespace
+                text: " "
+              - kind: ToKeyword
+                text: To
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "    "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: SAFEARRAYBOUND
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1876,62 +1880,64 @@ cst:
             text: RGBQUAD
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: rgbBlue
-          - kind: Whitespace
-            text: "           "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: rgbGreen
-          - kind: Whitespace
-            text: "          "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: rgbRed
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: rgbReserved
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: rgbBlue
+              - kind: Whitespace
+                text: "           "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: rgbGreen
+              - kind: Whitespace
+                text: "          "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: rgbRed
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: rgbReserved
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1954,160 +1960,162 @@ cst:
             text: BITMAPINFOHEADER
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biSize
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biWidth
-          - kind: Whitespace
-            text: "           "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biHeight
-          - kind: Whitespace
-            text: "          "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biPlanes
-          - kind: Whitespace
-            text: "          "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biBitCount
-          - kind: Whitespace
-            text: "        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biCompression
-          - kind: Whitespace
-            text: "     "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biSizeImage
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biXPelsPerMeter
-          - kind: Whitespace
-            text: "   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biYPelsPerMeter
-          - kind: Whitespace
-            text: "   "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biClrUsed
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: biClrImportant
-          - kind: Whitespace
-            text: "    "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biSize
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biWidth
+              - kind: Whitespace
+                text: "           "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biHeight
+              - kind: Whitespace
+                text: "          "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biPlanes
+              - kind: Whitespace
+                text: "          "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biBitCount
+              - kind: Whitespace
+                text: "        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biCompression
+              - kind: Whitespace
+                text: "     "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biSizeImage
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biXPelsPerMeter
+              - kind: Whitespace
+                text: "   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biYPelsPerMeter
+              - kind: Whitespace
+                text: "   "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biClrUsed
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: biClrImportant
+              - kind: Whitespace
+                text: "    "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -2130,34 +2138,36 @@ cst:
             text: BITMAPINFO
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: bmiHeader
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: BITMAPINFOHEADER
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: bmiColors
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: RGBQUAD
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: bmiHeader
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: BITMAPINFOHEADER
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: bmiColors
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: RGBQUAD
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3244,78 +3254,80 @@ cst:
             text: QUANTIZATIONTABLE
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Qk
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "63"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Whitespace
-            text: " "
-          - kind: EndOfLineComment
-            text: "'Quantization Values"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FScale
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "63"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: SingleKeyword
-            text: Single
-          - kind: Whitespace
-            text: "  "
-          - kind: EndOfLineComment
-            text: "'Multiplication values to scale and Quantize   FDCT output"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: IScale
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "63"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: SingleKeyword
-            text: Single
-          - kind: Whitespace
-            text: "  "
-          - kind: EndOfLineComment
-            text: "'Multiplication values to scale and DeQuantize IDCT input"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Qk
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "63"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Whitespace
+                text: " "
+              - kind: EndOfLineComment
+                text: "'Quantization Values"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FScale
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "63"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: SingleKeyword
+                text: Single
+              - kind: Whitespace
+                text: "  "
+              - kind: EndOfLineComment
+                text: "'Multiplication values to scale and Quantize   FDCT output"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: IScale
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "63"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: SingleKeyword
+                text: Single
+              - kind: Whitespace
+                text: "  "
+              - kind: EndOfLineComment
+                text: "'Multiplication values to scale and DeQuantize IDCT input"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3338,150 +3350,152 @@ cst:
             text: HUFFMANTABLE
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: BITS
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "15"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "          "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'Number of huffman codes of length i+1"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HUFFVAL
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "255"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "      "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'Huffman symbol values"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: EHUFSI
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "255"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'Huffman code size for symbol i"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: EHUFCO
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "255"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'Huffman code      for symbol i"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: MINCODE
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "15"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: MAXCODE
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "15"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'Largest code value for length i+1"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: BITS
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "15"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "          "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'Number of huffman codes of length i+1"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HUFFVAL
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "255"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "      "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'Huffman symbol values"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: EHUFSI
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "255"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'Huffman code size for symbol i"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: EHUFCO
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "255"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'Huffman code      for symbol i"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: MINCODE
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "15"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: MAXCODE
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "15"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'Largest code value for length i+1"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3504,100 +3518,102 @@ cst:
             text: COMPONENT
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Ci
-          - kind: Whitespace
-            text: "                "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'Component ID                       [0-255]"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Hi
-          - kind: Whitespace
-            text: "                "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'Horizontal Sampling Factor         [1-4]"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Vi
-          - kind: Whitespace
-            text: "                "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'Vertical   Sampling Factor         [1-4]"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Tqi
-          - kind: Whitespace
-            text: "               "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'Quantization Table Select          [0-3]"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Data
-          - kind: LeftParenthesis
-            text: (
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "            "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Whitespace
-            text: " "
-          - kind: EndOfLineComment
-            text: "'DCT Coefficients"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Ci
+              - kind: Whitespace
+                text: "                "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'Component ID                       [0-255]"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Hi
+              - kind: Whitespace
+                text: "                "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'Horizontal Sampling Factor         [1-4]"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Vi
+              - kind: Whitespace
+                text: "                "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'Vertical   Sampling Factor         [1-4]"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Tqi
+              - kind: Whitespace
+                text: "               "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'Quantization Table Select          [0-3]"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Data
+              - kind: LeftParenthesis
+                text: (
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "            "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Whitespace
+                text: " "
+              - kind: EndOfLineComment
+                text: "'DCT Coefficients"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/class/cdiu_beat_up_editor.rs
 expression: class
 ---
 header:
@@ -3320,144 +3320,146 @@ cst:
             text: "'for compression/decompression"
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_OK
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "0"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_STREAM_END
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_NEED_DICT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "2"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_ERRNO
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_STREAM_ERROR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "2"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_DATA_ERROR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "3"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_MEM_ERROR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "4"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_BUF_ERROR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "5"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_VERSION_ERROR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "6"
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_OK
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "0"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_STREAM_END
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_NEED_DICT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "2"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_ERRNO
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_STREAM_ERROR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: IntegerLiteral
+                text: "2"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_DATA_ERROR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: IntegerLiteral
+                text: "3"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_MEM_ERROR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: IntegerLiteral
+                text: "4"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_BUF_ERROR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: IntegerLiteral
+                text: "5"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_VERSION_ERROR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: IntegerLiteral
+                text: "6"
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3482,70 +3484,72 @@ cst:
             text: "'for compression/decompression"
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_NO_COMPRESSION
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "0"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_BEST_SPEED
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'note that levels 2-8 exist, too"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_BEST_COMPRESSION
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "9"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z_DEFAULT_COMPRESSION
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_NO_COMPRESSION
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "0"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_BEST_SPEED
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'note that levels 2-8 exist, too"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_BEST_COMPRESSION
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "9"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z_DEFAULT_COMPRESSION
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

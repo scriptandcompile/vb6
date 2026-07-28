@@ -425,50 +425,52 @@ cst:
             text: DOCINFO
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: cbSize
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: lpszDocName
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: lpszOutput
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "      "
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: cbSize
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: lpszDocName
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: lpszOutput
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "      "
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -2417,422 +2419,424 @@ cst:
             text: DEVMODE
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmDeviceName
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: Whitespace
-            text: " "
-          - kind: ToKeyword
-            text: To
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: CCHDEVICENAME
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmSpecVersion
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmDriverVersion
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmSize
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmDriverExtra
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmFields
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmOrientation
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmPaperSize
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmPaperLength
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmPaperWidth
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmScale
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmCopies
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmDefaultSource
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmPrintQuality
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmColor
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmDuplex
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmYResolution
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmTTOption
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmCollate
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmFormName
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: Whitespace
-            text: " "
-          - kind: ToKeyword
-            text: To
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: CCHFORMNAME
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmUnusedPadding
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmBitsPerPel
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmPelsWidth
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmPelsHeight
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmDisplayFlags
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "          "
-          - kind: Identifier
-            text: dmDisplayFrequency
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "        "
-          - kind: Identifier
-            text: dmPAD
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "26"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "      "
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmDeviceName
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: Whitespace
+                text: " "
+              - kind: ToKeyword
+                text: To
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: CCHDEVICENAME
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmSpecVersion
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmDriverVersion
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmSize
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmDriverExtra
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmFields
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmOrientation
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmPaperSize
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmPaperLength
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmPaperWidth
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmScale
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmCopies
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmDefaultSource
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmPrintQuality
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmColor
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmDuplex
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmYResolution
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmTTOption
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmCollate
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmFormName
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: Whitespace
+                text: " "
+              - kind: ToKeyword
+                text: To
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: CCHFORMNAME
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmUnusedPadding
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmBitsPerPel
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmPelsWidth
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmPelsHeight
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmDisplayFlags
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "          "
+              - kind: Identifier
+                text: dmDisplayFrequency
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "        "
+              - kind: Identifier
+                text: dmPAD
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "26"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "      "
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3003,48 +3007,50 @@ cst:
             text: PRINTER_DEFAULTS
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "        "
-          - kind: Identifier
-            text: pDataType
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "        "
-          - kind: Identifier
-            text: pDevMode
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "        "
-          - kind: Identifier
-            text: DesiredAccess
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "        "
+              - kind: Identifier
+                text: pDataType
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "        "
+              - kind: Identifier
+                text: pDevMode
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "        "
+              - kind: Identifier
+                text: DesiredAccess
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

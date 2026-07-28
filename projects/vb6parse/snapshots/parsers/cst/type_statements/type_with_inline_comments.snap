@@ -1,5 +1,5 @@
 ---
-source: src/parsers/cst/type_statements.rs
+source: projects/vb6parse/src/parsers/cst/type_statements.rs
 expression: tree
 ---
 root:
@@ -17,42 +17,44 @@ root:
           text: Config
         - kind: Newline
           text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: MaxConnections
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: IntegerKeyword
-          text: Integer
-        - kind: Whitespace
-          text: "  "
-        - kind: EndOfLineComment
-          text: "' Maximum allowed connections"
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: TimeoutSeconds
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: LongKeyword
-          text: Long
-        - kind: Whitespace
-          text: "     "
-        - kind: EndOfLineComment
-          text: "' Timeout in seconds"
-        - kind: Newline
-          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: MaxConnections
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IntegerKeyword
+              text: Integer
+            - kind: Whitespace
+              text: "  "
+            - kind: EndOfLineComment
+              text: "' Maximum allowed connections"
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: TimeoutSeconds
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: LongKeyword
+              text: Long
+            - kind: Whitespace
+              text: "     "
+            - kind: EndOfLineComment
+              text: "' Timeout in seconds"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

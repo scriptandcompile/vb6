@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/invalid_syntax/invalid_declarations.rs
+source: projects/vb6parse/tests/invalid_syntax/invalid_declarations.rs
 expression: tree
 ---
 root:
@@ -17,30 +17,32 @@ root:
           text: Point
         - kind: Newline
           text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: LongKeyword
-          text: Long
-        - kind: Newline
-          text: "\n"
-        - kind: Whitespace
-          text: "    "
-        - kind: Identifier
-          text: Y
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: LongKeyword
-          text: Long
-        - kind: Newline
-          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: Whitespace
+              text: "    "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: LongKeyword
+              text: Long
+            - kind: Newline
+              text: "\n"
+            - kind: Whitespace
+              text: "    "
+            - kind: Identifier
+              text: Y
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: LongKeyword
+              text: Long
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

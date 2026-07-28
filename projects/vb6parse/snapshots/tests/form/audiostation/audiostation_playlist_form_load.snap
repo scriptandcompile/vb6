@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/audiostation.rs
+source: projects/vb6parse/tests/form/audiostation.rs
 expression: form_file
 ---
 form:
@@ -730,26 +730,28 @@ cst:
             text: enumFormTypes
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: LeftSquareBracket
-            text: "["
-          - kind: Identifier
-            text: MidiPlayer
-          - kind: RightSquareBracket
-            text: "]"
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: LeftSquareBracket
-            text: "["
-          - kind: Identifier
-            text: Mp3Player
-          - kind: RightSquareBracket
-            text: "]"
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: LeftSquareBracket
+                text: "["
+              - kind: Identifier
+                text: MidiPlayer
+              - kind: RightSquareBracket
+                text: "]"
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: LeftSquareBracket
+                text: "["
+              - kind: Identifier
+                text: Mp3Player
+              - kind: RightSquareBracket
+                text: "]"
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

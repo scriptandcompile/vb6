@@ -654,48 +654,50 @@ cst:
             text: SECURITY_ATTRIBUTES
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: nLength
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: lpSecurityDescriptor
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: bInheritHandle
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: BooleanKeyword
-            text: Boolean
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: nLength
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: lpSecurityDescriptor
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: bInheritHandle
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: BooleanKeyword
+                text: Boolean
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -720,34 +722,36 @@ cst:
             text: FILETIME
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: dwLowDateTime
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "  "
-          - kind: Identifier
-            text: dwHighDateTime
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: dwLowDateTime
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "  "
+              - kind: Identifier
+                text: dwHighDateTime
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3948,62 +3952,64 @@ cst:
             text: ERegistryClassConstants
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HKEY_CLASSES_ROOT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H80000000"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HKEY_CURRENT_USER
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H80000001"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HKEY_LOCAL_MACHINE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H80000002"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: HKEY_USERS
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H80000003"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HKEY_CLASSES_ROOT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H80000000"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HKEY_CURRENT_USER
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H80000001"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HKEY_LOCAL_MACHINE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H80000002"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: HKEY_USERS
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H80000003"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -4028,270 +4034,272 @@ cst:
             text: ERegistryValueTypes
           - kind: Newline
             text: "\r\n"
-          - kind: EndOfLineComment
-            text: "'Predefined Value Types"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_NONE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "0"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "                         "
-          - kind: EndOfLineComment
-            text: "'No value type"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_SZ
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "                           "
-          - kind: EndOfLineComment
-            text: "'Unicode nul terminated string"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_EXPAND_SZ
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "2"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "                    "
-          - kind: EndOfLineComment
-            text: "'Unicode nul terminated string w/enviornment var"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_BINARY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "3"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "                       "
-          - kind: EndOfLineComment
-            text: "'Free form binary"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_DWORD
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "4"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "                        "
-          - kind: EndOfLineComment
-            text: "'32-bit number"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_DWORD_LITTLE_ENDIAN
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "4"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "          "
-          - kind: EndOfLineComment
-            text: "'32-bit number (same as REG_DWORD)"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_DWORD_BIG_ENDIAN
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "5"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "             "
-          - kind: EndOfLineComment
-            text: "'32-bit number"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_LINK
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "6"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "                         "
-          - kind: EndOfLineComment
-            text: "'Symbolic Link (unicode)"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_MULTI_SZ
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "7"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "                     "
-          - kind: EndOfLineComment
-            text: "'Multiple Unicode strings"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_RESOURCE_LIST
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "8"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "                "
-          - kind: EndOfLineComment
-            text: "'Resource list in the resource map"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_FULL_RESOURCE_DESCRIPTOR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "9"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "'Resource list in the hardware description"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: REG_RESOURCE_REQUIREMENTS_LIST
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "10"
-          - kind: RightParenthesis
-            text: )
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: EndOfLineComment
+                text: "'Predefined Value Types"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_NONE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "0"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "                         "
+              - kind: EndOfLineComment
+                text: "'No value type"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_SZ
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "1"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "                           "
+              - kind: EndOfLineComment
+                text: "'Unicode nul terminated string"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_EXPAND_SZ
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "2"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "                    "
+              - kind: EndOfLineComment
+                text: "'Unicode nul terminated string w/enviornment var"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_BINARY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "3"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "                       "
+              - kind: EndOfLineComment
+                text: "'Free form binary"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_DWORD
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "4"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "                        "
+              - kind: EndOfLineComment
+                text: "'32-bit number"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_DWORD_LITTLE_ENDIAN
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "4"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "          "
+              - kind: EndOfLineComment
+                text: "'32-bit number (same as REG_DWORD)"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_DWORD_BIG_ENDIAN
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "5"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "             "
+              - kind: EndOfLineComment
+                text: "'32-bit number"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_LINK
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "6"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "                         "
+              - kind: EndOfLineComment
+                text: "'Symbolic Link (unicode)"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_MULTI_SZ
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "7"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "                     "
+              - kind: EndOfLineComment
+                text: "'Multiple Unicode strings"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_RESOURCE_LIST
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "8"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "                "
+              - kind: EndOfLineComment
+                text: "'Resource list in the resource map"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_FULL_RESOURCE_DESCRIPTOR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "9"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "'Resource list in the hardware description"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: REG_RESOURCE_REQUIREMENTS_LIST
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "10"
+              - kind: RightParenthesis
+                text: )
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

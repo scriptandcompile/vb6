@@ -3733,118 +3733,120 @@ cst:
             text: SHFILEOPSTRUCT
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: hWnd
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wFunc
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pFrom
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pTo
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: fFlags
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: fAborted
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: BooleanKeyword
-            text: Boolean
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: hNameMaps
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: sProgress
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: hWnd
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wFunc
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pFrom
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pTo
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: fFlags
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: fAborted
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: BooleanKeyword
+                text: Boolean
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: hNameMaps
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: sProgress
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3869,130 +3871,132 @@ cst:
             text: SHFILEOPSTRUCTW
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: hWnd
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: wFunc
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pFrom
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: " "
-          - kind: EndOfLineComment
-            text: "'String"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: pTo
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: " "
-          - kind: EndOfLineComment
-            text: "'String"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: fFlags
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: fAborted
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: BooleanKeyword
-            text: Boolean
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: hNameMaps
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: sProgress
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "  "
-          - kind: EndOfLineComment
-            text: "'String"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: hWnd
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: wFunc
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pFrom
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: " "
+              - kind: EndOfLineComment
+                text: "'String"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: pTo
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: " "
+              - kind: EndOfLineComment
+                text: "'String"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: fFlags
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: fAborted
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: BooleanKeyword
+                text: Boolean
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: hNameMaps
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: sProgress
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "  "
+              - kind: EndOfLineComment
+                text: "'String"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -4017,62 +4021,64 @@ cst:
             text: FOACTION
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FO_MOVE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H1"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FO_COPY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H2"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FO_DELETE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H3"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FO_RENAME
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H4"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FO_MOVE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H1"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FO_COPY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H2"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FO_DELETE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H3"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FO_RENAME
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H4"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -4097,216 +4103,218 @@ cst:
             text: FOFACTION
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_ALLOWUNDO
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H40"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_CONFIRMMOUSE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H2"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_FILESONLY
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H80"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_MULTIDESTFILES
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H1"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_NO_CONNECTED_ELEMENTS
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H2000"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_NOCONFIRMATION
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H10"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_NOCONFIRMMKDIR
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H200"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_NOCOPYSECURITYATTRIBS
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H800"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_NOERRORUI
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H400"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_NORECURSION
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H1000"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_RENAMEONCOLLISION
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H8"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_SILENT
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H4"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_SIMPLEPROGRESS
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H100"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_WANTMAPPINGHANDLE
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H20"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: FOF_WANTNUKEWARNING
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H4000"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_ALLOWUNDO
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H40"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_CONFIRMMOUSE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H2"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_FILESONLY
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H80"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_MULTIDESTFILES
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H1"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_NO_CONNECTED_ELEMENTS
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H2000"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_NOCONFIRMATION
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H10"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_NOCONFIRMMKDIR
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H200"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_NOCOPYSECURITYATTRIBS
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H800"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_NOERRORUI
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H400"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_NORECURSION
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H1000"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_RENAMEONCOLLISION
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H8"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_SILENT
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H4"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_SIMPLEPROGRESS
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H100"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_WANTMAPPINGHANDLE
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H20"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: FOF_WANTNUKEWARNING
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: LongLiteral
+                text: "&H4000"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -4329,118 +4337,120 @@ cst:
             text: SYSTEMTIME
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: wYear
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: wMonth
-          - kind: Whitespace
-            text: "        "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: wDayOfWeek
-          - kind: Whitespace
-            text: "    "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: wDay
-          - kind: Whitespace
-            text: "          "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: wHour
-          - kind: Whitespace
-            text: "         "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: wMinute
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: wSecond
-          - kind: Whitespace
-            text: "       "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: wMilliseconds
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: wYear
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: wMonth
+              - kind: Whitespace
+                text: "        "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: wDayOfWeek
+              - kind: Whitespace
+                text: "    "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: wDay
+              - kind: Whitespace
+                text: "          "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: wHour
+              - kind: Whitespace
+                text: "         "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: wMinute
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: wSecond
+              - kind: Whitespace
+                text: "       "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: wMilliseconds
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -4465,120 +4475,122 @@ cst:
             text: TIME_ZONE_INFORMATION
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: Bias
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: StandardName
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "64"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: StandardDate
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: SYSTEMTIME
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: StandardBias
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: DaylightName
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "64"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: DaylightDate
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: SYSTEMTIME
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: Identifier
-            text: DaylightBias
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: Bias
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: StandardName
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "64"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: StandardDate
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: SYSTEMTIME
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: StandardBias
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: DaylightName
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerLiteral
+                text: "64"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: DaylightDate
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: SYSTEMTIME
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: Identifier
+                text: DaylightBias
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

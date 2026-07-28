@@ -90,6 +90,10 @@ impl Parser<'_> {
         // Consume everything until newline (preserving all tokens)
         self.consume_until_after(Token::Newline);
 
+        // Wrap body in StatementList for formatter indent tracking
+        self.builder
+            .start_node(SyntaxKind::StatementList.to_raw());
+
         // Parse enum members until "End Enum"
         while !self.is_at_end() {
             // Check if we've reached "End Enum"
@@ -138,6 +142,8 @@ impl Parser<'_> {
                 }
             }
         }
+
+        self.builder.finish_node(); // StatementList
 
         // Consume "End Enum" and trailing tokens
         if self.at_token(Token::EndKeyword) {

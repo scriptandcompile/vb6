@@ -847,18 +847,20 @@ cst:
                     text: LongPtr
                   - kind: Newline
                     text: "\r\n"
-                  - kind: Whitespace
-                    text: "        "
-                  - kind: LeftSquareBracket
-                    text: "["
-                  - kind: Underscore
-                    text: _
-                  - kind: RightSquareBracket
-                    text: "]"
-                  - kind: Newline
-                    text: "\r\n"
-                  - kind: Whitespace
-                    text: "    "
+                  - kind: StatementList
+                    children:
+                      - kind: Whitespace
+                        text: "        "
+                      - kind: LeftSquareBracket
+                        text: "["
+                      - kind: Underscore
+                        text: _
+                      - kind: RightSquareBracket
+                        text: "]"
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "    "
                   - kind: EndKeyword
                     text: End
                   - kind: Whitespace
@@ -1397,56 +1399,58 @@ cst:
             text: REMOTE_MEMORY
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: memValue
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: VariantKeyword
-            text: Variant
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: remoteVT
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: VariantKeyword
-            text: Variant
-          - kind: Whitespace
-            text: " "
-          - kind: EndOfLineComment
-            text: "'Will be linked to the first 2 bytes of 'memValue' - see 'InitRemoteMemory'"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: isInitialized
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: BooleanKeyword
-            text: Boolean
-          - kind: Whitespace
-            text: " "
-          - kind: EndOfLineComment
-            text: "'In case state is lost"
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: memValue
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: VariantKeyword
+                text: Variant
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: remoteVT
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: VariantKeyword
+                text: Variant
+              - kind: Whitespace
+                text: " "
+              - kind: EndOfLineComment
+                text: "'Will be linked to the first 2 bytes of 'memValue' - see 'InitRemoteMemory'"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: isInitialized
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: BooleanKeyword
+                text: Boolean
+              - kind: Whitespace
+                text: " "
+              - kind: EndOfLineComment
+                text: "'In case state is lost"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1515,34 +1519,36 @@ cst:
             text: SAFEARRAYBOUND
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cElements
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: lLbound
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cElements
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: lLbound
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -1565,124 +1571,40 @@ cst:
             text: SAFEARRAY_1D
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cDims
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: fFeatures
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cbElements
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: cLocks
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: CompilerDirective
+          - kind: StatementList
             children:
-              - kind: CompilerIfClause
-                children:
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: Win64
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Newline
-                    text: "\r\n"
               - kind: Whitespace
-                text: "        "
+                text: "    "
               - kind: Identifier
-                text: dummyPadding
+                text: cDims
               - kind: Whitespace
                 text: " "
               - kind: AsKeyword
                 text: As
               - kind: Whitespace
                 text: " "
-              - kind: LongKeyword
-                text: Long
-              - kind: Newline
-                text: "\r\n"
-              - kind: Whitespace
-                text: "        "
-              - kind: Identifier
-                text: pvData
-              - kind: Whitespace
-                text: " "
-              - kind: AsKeyword
-                text: As
-              - kind: Whitespace
-                text: " "
-              - kind: Identifier
-                text: LongLong
+              - kind: IntegerKeyword
+                text: Integer
               - kind: Newline
                 text: "\r\n"
               - kind: Whitespace
                 text: "    "
-              - kind: CompilerElseClause
-                children:
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: ElseKeyword
-                    text: Else
-                  - kind: Newline
-                    text: "\r\n"
-              - kind: Whitespace
-                text: "        "
               - kind: Identifier
-                text: pvData
+                text: fFeatures
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: cbElements
               - kind: Whitespace
                 text: " "
               - kind: AsKeyword
@@ -1695,32 +1617,122 @@ cst:
                 text: "\r\n"
               - kind: Whitespace
                 text: "    "
-              - kind: CompilerEndIfClause
+              - kind: Identifier
+                text: cLocks
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: CompilerDirective
                 children:
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: rgsabound0
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: SAFEARRAYBOUND
-          - kind: Newline
-            text: "\r\n"
+                  - kind: CompilerIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: Win64
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Newline
+                        text: "\r\n"
+                  - kind: StatementList
+                    children:
+                      - kind: Whitespace
+                        text: "        "
+                      - kind: Identifier
+                        text: dummyPadding
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: LongKeyword
+                        text: Long
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "        "
+                      - kind: Identifier
+                        text: pvData
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: LongLong
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "    "
+                  - kind: CompilerElseClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: ElseKeyword
+                        text: Else
+                      - kind: Newline
+                        text: "\r\n"
+                  - kind: StatementList
+                    children:
+                      - kind: Whitespace
+                        text: "        "
+                      - kind: Identifier
+                        text: pvData
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: LongKeyword
+                        text: Long
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "    "
+                  - kind: CompilerEndIfClause
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: EndKeyword
+                        text: End
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Newline
+                        text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: rgsabound0
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: SAFEARRAYBOUND
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

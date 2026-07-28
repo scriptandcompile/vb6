@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/module/cdiu_beat_up_editor.rs
 expression: module
 ---
 name: cma4
@@ -1245,118 +1245,120 @@ cst:
             text: TLVERTEX
           - kind: Newline
             text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: x
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: SingleKeyword
-            text: Single
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: y
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: SingleKeyword
-            text: Single
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Z
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: SingleKeyword
-            text: Single
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: rhw
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: SingleKeyword
-            text: Single
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: Color
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: specular
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: tu
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: SingleKeyword
-            text: Single
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: Identifier
-            text: tv
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: SingleKeyword
-            text: Single
-          - kind: Newline
-            text: "\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: x
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: SingleKeyword
+                text: Single
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: y
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: SingleKeyword
+                text: Single
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Z
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: SingleKeyword
+                text: Single
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: rhw
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: SingleKeyword
+                text: Single
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: Color
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: specular
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: tu
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: SingleKeyword
+                text: Single
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: Identifier
+                text: tv
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: SingleKeyword
+                text: Single
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

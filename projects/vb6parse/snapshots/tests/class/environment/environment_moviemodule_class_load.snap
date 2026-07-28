@@ -2898,124 +2898,126 @@ cst:
             text: MIXERCAPS
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: wMid
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Whitespace
-            text: "                   "
-          - kind: EndOfLineComment
-            text: "'  manufacturer id"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: wPid
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Whitespace
-            text: "                   "
-          - kind: EndOfLineComment
-            text: "'  product id"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: vDriverVersion
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "            "
-          - kind: EndOfLineComment
-            text: "'  version of the driver"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: szPname
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: MAXPNAMELEN
-          - kind: Whitespace
-            text: "   "
-          - kind: EndOfLineComment
-            text: "'  product name"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: fdwSupport
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "                "
-          - kind: EndOfLineComment
-            text: "'  misc. support bits"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cDestinations
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "             "
-          - kind: EndOfLineComment
-            text: "'  count of destinations"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "      "
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: wMid
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Whitespace
+                text: "                   "
+              - kind: EndOfLineComment
+                text: "'  manufacturer id"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: wPid
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Whitespace
+                text: "                   "
+              - kind: EndOfLineComment
+                text: "'  product id"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: vDriverVersion
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "            "
+              - kind: EndOfLineComment
+                text: "'  version of the driver"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: szPname
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: MAXPNAMELEN
+              - kind: Whitespace
+                text: "   "
+              - kind: EndOfLineComment
+                text: "'  product name"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: fdwSupport
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "                "
+              - kind: EndOfLineComment
+                text: "'  misc. support bits"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cDestinations
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "             "
+              - kind: EndOfLineComment
+                text: "'  count of destinations"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "      "
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3042,228 +3044,230 @@ cst:
             text: MIXERCONTROL
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cbStruct
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "           "
-          - kind: EndOfLineComment
-            text: "'  size in Byte of MIXERCONTROL"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwControlID
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "        "
-          - kind: EndOfLineComment
-            text: "'  unique control id for mixer device"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwControlType
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "      "
-          - kind: EndOfLineComment
-            text: "'  MIXERCONTROL_CONTROLTYPE_xxx"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: fdwControl
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "         "
-          - kind: EndOfLineComment
-            text: "'  MIXERCONTROL_CONTROLF_xxx"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cMultipleItems
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "     "
-          - kind: EndOfLineComment
-            text: "'  if MIXERCONTROL_CONTROLF_MULTIPLE"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "                                    "
-          - kind: EndOfLineComment
-            text: "'  set"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: szShortName
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: MIXER_SHORT_NAME_CHARS
-          - kind: Whitespace
-            text: "  "
-          - kind: EndOfLineComment
-            text: "' short name of"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "                                                         "
-          - kind: EndOfLineComment
-            text: "' control"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: szName
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: MIXER_LONG_NAME_CHARS
-          - kind: Whitespace
-            text: "        "
-          - kind: EndOfLineComment
-            text: "' long name of"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "                                                         "
-          - kind: EndOfLineComment
-            text: "' control"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: lMinimum
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "           "
-          - kind: EndOfLineComment
-            text: "'  Minimum value"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: lMaximum
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "           "
-          - kind: EndOfLineComment
-            text: "'  Maximum value"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: Reserved
-          - kind: LeftParenthesis
-            text: (
-          - kind: IntegerLiteral
-            text: "10"
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "       "
-          - kind: EndOfLineComment
-            text: "'  reserved structure space"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cbStruct
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "           "
+              - kind: EndOfLineComment
+                text: "'  size in Byte of MIXERCONTROL"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwControlID
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "        "
+              - kind: EndOfLineComment
+                text: "'  unique control id for mixer device"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwControlType
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "      "
+              - kind: EndOfLineComment
+                text: "'  MIXERCONTROL_CONTROLTYPE_xxx"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: fdwControl
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "         "
+              - kind: EndOfLineComment
+                text: "'  MIXERCONTROL_CONTROLF_xxx"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cMultipleItems
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "     "
+              - kind: EndOfLineComment
+                text: "'  if MIXERCONTROL_CONTROLF_MULTIPLE"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "                                    "
+              - kind: EndOfLineComment
+                text: "'  set"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: szShortName
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: MIXER_SHORT_NAME_CHARS
+              - kind: Whitespace
+                text: "  "
+              - kind: EndOfLineComment
+                text: "' short name of"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "                                                         "
+              - kind: EndOfLineComment
+                text: "' control"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: szName
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: MIXER_LONG_NAME_CHARS
+              - kind: Whitespace
+                text: "        "
+              - kind: EndOfLineComment
+                text: "' long name of"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "                                                         "
+              - kind: EndOfLineComment
+                text: "' control"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: lMinimum
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "           "
+              - kind: EndOfLineComment
+                text: "'  Minimum value"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: lMaximum
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "           "
+              - kind: EndOfLineComment
+                text: "'  Maximum value"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: Reserved
+              - kind: LeftParenthesis
+                text: (
+              - kind: IntegerLiteral
+                text: "10"
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "       "
+              - kind: EndOfLineComment
+                text: "'  reserved structure space"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3290,116 +3294,118 @@ cst:
             text: MIXERCONTROLDETAILS
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cbStruct
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "       "
-          - kind: EndOfLineComment
-            text: "'  size in Byte of MIXERCONTROLDETAILS"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwControlID
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "    "
-          - kind: EndOfLineComment
-            text: "'  control id to get/set details on"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cChannels
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "      "
-          - kind: EndOfLineComment
-            text: "'  number of channels in paDetails array"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: item
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "           "
-          - kind: EndOfLineComment
-            text: "'  hwndOwner or cMultipleItems"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cbDetails
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "      "
-          - kind: EndOfLineComment
-            text: "'  size of _one_ details_XX struct"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: paDetails
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "      "
-          - kind: EndOfLineComment
-            text: "'  pointer to array of details_XX structs"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "      "
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cbStruct
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "       "
+              - kind: EndOfLineComment
+                text: "'  size in Byte of MIXERCONTROLDETAILS"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwControlID
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "    "
+              - kind: EndOfLineComment
+                text: "'  control id to get/set details on"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cChannels
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "      "
+              - kind: EndOfLineComment
+                text: "'  number of channels in paDetails array"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: item
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "           "
+              - kind: EndOfLineComment
+                text: "'  hwndOwner or cMultipleItems"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cbDetails
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "      "
+              - kind: EndOfLineComment
+                text: "'  size of _one_ details_XX struct"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: paDetails
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "      "
+              - kind: EndOfLineComment
+                text: "'  pointer to array of details_XX structs"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "      "
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3426,26 +3432,28 @@ cst:
             text: MIXERCONTROLDETAILS_UNSIGNED
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwValue
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "        "
-          - kind: EndOfLineComment
-            text: "'  value of the control"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "      "
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwValue
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "        "
+              - kind: EndOfLineComment
+                text: "'  value of the control"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "      "
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3472,330 +3480,332 @@ cst:
             text: MIXERLINE
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cbStruct
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "               "
-          - kind: EndOfLineComment
-            text: "'  size of MIXERLINE structure"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwDestination
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "          "
-          - kind: EndOfLineComment
-            text: "'  zero based destination index"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwSource
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "               "
-          - kind: EndOfLineComment
-            text: "'  zero based source index (if"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "                                        "
-          - kind: EndOfLineComment
-            text: "'  source)"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwLineID
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "               "
-          - kind: EndOfLineComment
-            text: "'  unique line id for mixer device"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: fdwLine
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "                "
-          - kind: EndOfLineComment
-            text: "'  state/information about line"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwUser
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "                 "
-          - kind: EndOfLineComment
-            text: "'  driver specific information"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwComponentType
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "        "
-          - kind: EndOfLineComment
-            text: "'  component type line connects to"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cChannels
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "              "
-          - kind: EndOfLineComment
-            text: "'  number of channels line supports"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cConnections
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "           "
-          - kind: EndOfLineComment
-            text: "'  number of connections (possible)"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cControls
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "              "
-          - kind: EndOfLineComment
-            text: "'  number of controls at this line"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: szShortName
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: MIXER_SHORT_NAME_CHARS
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: szName
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: MIXER_LONG_NAME_CHARS
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwType
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwDeviceID
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: wMid
-          - kind: Whitespace
-            text: "  "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: wPid
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerKeyword
-            text: Integer
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: vDriverVersion
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: szPname
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: MAXPNAMELEN
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "      "
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cbStruct
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "               "
+              - kind: EndOfLineComment
+                text: "'  size of MIXERLINE structure"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwDestination
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "          "
+              - kind: EndOfLineComment
+                text: "'  zero based destination index"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwSource
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "               "
+              - kind: EndOfLineComment
+                text: "'  zero based source index (if"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "                                        "
+              - kind: EndOfLineComment
+                text: "'  source)"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwLineID
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "               "
+              - kind: EndOfLineComment
+                text: "'  unique line id for mixer device"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: fdwLine
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "                "
+              - kind: EndOfLineComment
+                text: "'  state/information about line"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwUser
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "                 "
+              - kind: EndOfLineComment
+                text: "'  driver specific information"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwComponentType
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "        "
+              - kind: EndOfLineComment
+                text: "'  component type line connects to"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cChannels
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "              "
+              - kind: EndOfLineComment
+                text: "'  number of channels line supports"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cConnections
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "           "
+              - kind: EndOfLineComment
+                text: "'  number of connections (possible)"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cControls
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "              "
+              - kind: EndOfLineComment
+                text: "'  number of controls at this line"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: szShortName
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: MIXER_SHORT_NAME_CHARS
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: szName
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: MIXER_LONG_NAME_CHARS
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwType
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwDeviceID
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: wMid
+              - kind: Whitespace
+                text: "  "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: wPid
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: vDriverVersion
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: szPname
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: MAXPNAMELEN
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "      "
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3822,122 +3832,124 @@ cst:
             text: MIXERLINECONTROLS
           - kind: Newline
             text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cbStruct
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "       "
-          - kind: EndOfLineComment
-            text: "'  size in Byte of MIXERLINECONTROLS"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwLineID
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "       "
-          - kind: EndOfLineComment
-            text: "'  line id (from MIXERLINE.dwLineID)"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "                                "
-          - kind: EndOfLineComment
-            text: "'  MIXER_GETLINECONTROLSF_ONEBYID or"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: dwControl
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "      "
-          - kind: EndOfLineComment
-            text: "'  MIXER_GETLINECONTROLSF_ONEBYTYPE"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cControls
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "      "
-          - kind: EndOfLineComment
-            text: "'  count of controls pmxctrl points to"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: cbmxctrl
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "       "
-          - kind: EndOfLineComment
-            text: "'  size in Byte of _one_ MIXERCONTROL"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "         "
-          - kind: Identifier
-            text: pamxctrl
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Whitespace
-            text: "       "
-          - kind: EndOfLineComment
-            text: "'  pointer to first MIXERCONTROL array"
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "      "
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cbStruct
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "       "
+              - kind: EndOfLineComment
+                text: "'  size in Byte of MIXERLINECONTROLS"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwLineID
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "       "
+              - kind: EndOfLineComment
+                text: "'  line id (from MIXERLINE.dwLineID)"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "                                "
+              - kind: EndOfLineComment
+                text: "'  MIXER_GETLINECONTROLSF_ONEBYID or"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: dwControl
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "      "
+              - kind: EndOfLineComment
+                text: "'  MIXER_GETLINECONTROLSF_ONEBYTYPE"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cControls
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "      "
+              - kind: EndOfLineComment
+                text: "'  count of controls pmxctrl points to"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: cbmxctrl
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "       "
+              - kind: EndOfLineComment
+                text: "'  size in Byte of _one_ MIXERCONTROL"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "         "
+              - kind: Identifier
+                text: pamxctrl
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Whitespace
+                text: "       "
+              - kind: EndOfLineComment
+                text: "'  pointer to first MIXERCONTROL array"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "      "
           - kind: EndKeyword
             text: End
           - kind: Whitespace
