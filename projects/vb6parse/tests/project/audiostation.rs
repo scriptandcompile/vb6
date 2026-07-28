@@ -2,7 +2,7 @@ use vb6parse::*;
 
 #[test]
 fn audiostation_project_load() {
-    let file_path = "../../test-data/audiostation/Audiostation/Audiostation.vbp";
+    let file_path = "../../test-data/audiostation/Source/Audiostation.vbp";
     let project_file_bytes = std::fs::read(file_path).expect("Failed to read project file");
 
     let result = SourceFile::decode_with_replacement(file_path, &project_file_bytes);
