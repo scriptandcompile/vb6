@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -1700,10 +1700,6 @@ cst:
                     text: "\r\n"
                   - kind: StatementList
                     children:
-                      - kind: Whitespace
-                        text: "    "
-                      - kind: Newline
-                        text: "\r\n"
                       - kind: OnErrorStatement
                         children:
                           - kind: Whitespace
@@ -1773,7 +1769,7 @@ cst:
                       - kind: Newline
                         text: "\r\n"
                       - kind: Whitespace
-                        text: "   "
+                        text: "    "
                       - kind: AssignmentStatement
                         children:
                           - kind: IdentifierExpression
@@ -1821,7 +1817,7 @@ cst:
                       - kind: Newline
                         text: "\r\n"
                       - kind: Whitespace
-                        text: "   "
+                        text: "    "
                       - kind: AssignmentStatement
                         children:
                           - kind: IdentifierExpression
@@ -1865,7 +1861,7 @@ cst:
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
-                        text: "   "
+                        text: "    "
                       - kind: AssignmentStatement
                         children:
                           - kind: IdentifierExpression
@@ -1926,50 +1922,112 @@ cst:
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: BinaryExpression
+                          - kind: CallExpression
                             children:
-                              - kind: CallExpression
+                              - kind: Identifier
+                                text: CLng
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
                                 children:
-                                  - kind: Identifier
-                                    text: uintnew
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: ArgumentList
+                                  - kind: Argument
                                     children:
-                                      - kind: Argument
+                                      - kind: BinaryExpression
                                         children:
                                           - kind: CallExpression
                                             children:
                                               - kind: Identifier
-                                                text: CCur
+                                                text: uintnew
                                               - kind: LeftParenthesis
                                                 text: (
                                               - kind: ArgumentList
                                                 children:
                                                   - kind: Argument
                                                     children:
-                                                      - kind: IdentifierExpression
+                                                      - kind: CallExpression
                                                         children:
                                                           - kind: Identifier
-                                                            text: timeGetTime
+                                                            text: CCur
+                                                          - kind: LeftParenthesis
+                                                            text: (
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: timeGetTime
+                                                          - kind: RightParenthesis
+                                                            text: )
                                               - kind: RightParenthesis
                                                 text: )
-                                  - kind: RightParenthesis
-                                    text: )
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: AdditionOperator
+                                            text: +
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: myholdtime
+                              - kind: RightParenthesis
+                                text: )
+                          - kind: Newline
+                            text: "\r\n"
+                      - kind: IfStatement
+                        children:
+                          - kind: Whitespace
+                            text: "    "
+                          - kind: IfKeyword
+                            text: If
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Err
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ThenKeyword
+                            text: Then
+                          - kind: Newline
+                            text: "\r\n"
+                          - kind: StatementList
+                            children:
                               - kind: Whitespace
-                                text: " "
-                              - kind: AdditionOperator
-                                text: +
-                              - kind: Whitespace
-                                text: " "
-                              - kind: IdentifierExpression
+                                text: "    "
+                              - kind: AssignmentStatement
                                 children:
-                                  - kind: Identifier
-                                    text: myholdtime
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: myDone
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: EqualityOperator
+                                    text: "="
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: BooleanLiteralExpression
+                                    children:
+                                      - kind: TrueKeyword
+                                        text: "True"
+                                  - kind: Newline
+                                    text: "\r\n"
+                              - kind: Whitespace
+                                text: "    "
+                          - kind: EndKeyword
+                            text: End
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IfKeyword
+                            text: If
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
-                        text: "   "
+                        text: "    "
                       - kind: AssignmentStatement
                         children:
                           - kind: IdentifierExpression
@@ -2019,7 +2077,7 @@ cst:
                       - kind: Newline
                         text: "\r\n"
                       - kind: Whitespace
-                        text: "   "
+                        text: "    "
                       - kind: AssignmentStatement
                         children:
                           - kind: IdentifierExpression
@@ -2174,6 +2232,26 @@ cst:
                                 text: poulos
                               - kind: ColonOperator
                                 text: ":"
+                              - kind: Newline
+                                text: "\r\n"
+                          - kind: Whitespace
+                            text: "    "
+                          - kind: AssignmentStatement
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: myDone
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: BooleanLiteralExpression
+                                children:
+                                  - kind: TrueKeyword
+                                    text: "True"
                               - kind: Newline
                                 text: "\r\n"
                           - kind: Whitespace

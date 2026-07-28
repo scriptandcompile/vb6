@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -836,42 +836,100 @@ cst:
                     text: " "
                   - kind: ThenKeyword
                     text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: Err
-                  - kind: AssignmentStatement
+                  - kind: Newline
+                    text: "\r\n"
+                  - kind: StatementList
                     children:
-                      - kind: IdentifierExpression
+                      - kind: Whitespace
+                        text: "        "
+                      - kind: CallStatement
                         children:
+                          - kind: Identifier
+                            text: Err
                           - kind: PeriodOperator
                             text: "."
                           - kind: Identifier
                             text: Clear
-                      - kind: IdentifierExpression
+                          - kind: Newline
+                            text: "\r\n"
+                      - kind: Whitespace
+                        text: "        "
+                      - kind: AssignmentStatement
                         children:
-                          - kind: ColonOperator
-                            text: ":"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: there
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
+                          - kind: Newline
+                            text: "\r\n"
+                      - kind: Whitespace
+                        text: "        "
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Fields
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: CallExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: LibMemory
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: EmptyArray
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: vbString
+                              - kind: RightParenthesis
+                                text: )
+                          - kind: Newline
+                            text: "\r\n"
+                      - kind: Whitespace
+                        text: "    "
+                  - kind: EndKeyword
+                    text: End
                   - kind: Whitespace
                     text: " "
-                  - kind: AssignmentStatement
-                    children:
-                      - kind: IdentifierExpression
-                        children:
-                          - kind: Identifier
-                            text: there
-                      - kind: Whitespace
-                        text: " "
-                      - kind: EqualityOperator
-                        text: "="
-                      - kind: Whitespace
-                        text: " "
-                      - kind: NumericLiteralExpression
-                        children:
-                          - kind: IntegerLiteral
-                            text: "0"
-                      - kind: Newline
-                        text: "\r\n"
+                  - kind: IfKeyword
+                    text: If
+                  - kind: Newline
+                    text: "\r\n"
               - kind: ReDimStatement
                 children:
                   - kind: Whitespace
@@ -902,12 +960,6 @@ cst:
                     text: )
                   - kind: Newline
                     text: "\r\n"
-              - kind: Whitespace
-                text: "   "
-              - kind: EndOfLineComment
-                text: "' SwapStrings st$,"
-              - kind: Newline
-                text: "\r\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -2223,7 +2275,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: k
+                    text: K
                   - kind: Newline
                     text: "\r\n"
               - kind: SetStatement
@@ -2355,7 +2407,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: k
+                    text: K
                   - kind: Whitespace
                     text: " "
                   - kind: InKeyword
@@ -2385,7 +2437,7 @@ cst:
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: k
+                                text: K
                           - kind: Newline
                             text: "\r\n"
                   - kind: NextKeyword
@@ -2457,7 +2509,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: k
+                    text: K
                   - kind: Newline
                     text: "\r\n"
               - kind: SetStatement
@@ -2641,7 +2693,7 @@ cst:
                               - kind: PeriodOperator
                                 text: "."
                               - kind: Identifier
-                                text: count
+                                text: Count
                           - kind: Whitespace
                             text: " "
                           - kind: MultiplicationOperator
@@ -2655,7 +2707,7 @@ cst:
                               - kind: PeriodOperator
                                 text: "."
                               - kind: Identifier
-                                text: count
+                                text: Count
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
@@ -2693,7 +2745,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: k
+                    text: K
                   - kind: Whitespace
                     text: " "
                   - kind: InKeyword
@@ -2727,7 +2779,7 @@ cst:
                                       - kind: IdentifierExpression
                                         children:
                                           - kind: Identifier
-                                            text: k
+                                            text: K
                               - kind: RightParenthesis
                                 text: )
                           - kind: Whitespace
@@ -3027,7 +3079,7 @@ cst:
                                   - kind: PeriodOperator
                                     text: "."
                                   - kind: Identifier
-                                    text: count
+                                    text: Count
                               - kind: Whitespace
                                 text: " "
                               - kind: SubtractionOperator
@@ -3051,7 +3103,7 @@ cst:
                                       - kind: PeriodOperator
                                         text: "."
                                       - kind: Identifier
-                                        text: Index
+                                        text: index
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
@@ -3323,7 +3375,7 @@ cst:
                                   - kind: PeriodOperator
                                     text: "."
                                   - kind: Identifier
-                                    text: count
+                                    text: Count
                               - kind: Whitespace
                                 text: " "
                               - kind: SubtractionOperator
@@ -3347,7 +3399,7 @@ cst:
                                       - kind: PeriodOperator
                                         text: "."
                                       - kind: Identifier
-                                        text: Index
+                                        text: index
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
@@ -3497,7 +3549,7 @@ cst:
               - kind: Whitespace
                 text: " "
               - kind: Identifier
-                text: A
+                text: a
           - kind: DollarSign
             text: $
           - kind: RightParenthesis
@@ -3511,7 +3563,7 @@ cst:
                   - kind: IdentifierExpression
                     children:
                       - kind: Identifier
-                        text: A
+                        text: a
                       - kind: DollarSign
                         text: $
                   - kind: Whitespace
@@ -3533,7 +3585,7 @@ cst:
                               - kind: IdentifierExpression
                                 children:
                                   - kind: Identifier
-                                    text: A
+                                    text: a
                                   - kind: DollarSign
                                     text: $
                       - kind: RightParenthesis
@@ -3615,7 +3667,7 @@ cst:
                               - kind: IdentifierExpression
                                 children:
                                   - kind: Identifier
-                                    text: A
+                                    text: a
                                   - kind: DollarSign
                                     text: $
                       - kind: RightParenthesis
@@ -3653,7 +3705,7 @@ cst:
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: A
+                                text: a
                               - kind: DollarSign
                                 text: $
                       - kind: Comma
@@ -3693,7 +3745,7 @@ cst:
               - kind: LeftParenthesis
                 text: (
               - kind: Identifier
-                text: A
+                text: a
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -3829,7 +3881,7 @@ cst:
                                       - kind: IdentifierExpression
                                         children:
                                           - kind: Identifier
-                                            text: A
+                                            text: a
                                           - kind: DollarSign
                                             text: $
                               - kind: RightParenthesis
@@ -4114,6 +4166,8 @@ cst:
                     text: "\r\n"
                   - kind: StatementList
                     children:
+                      - kind: Whitespace
+                        text: "    "
                       - kind: AssignmentStatement
                         children:
                           - kind: IdentifierExpression
@@ -4144,14 +4198,10 @@ cst:
                                 text: )
                           - kind: Newline
                             text: "\r\n"
-                      - kind: EndOfLineComment
-                        text: "'Debug.Print fields(i), topname$, GroupName"
-                      - kind: Newline
-                        text: "\r\n"
-                      - kind: Newline
-                        text: "\r\n"
                       - kind: IfStatement
                         children:
+                          - kind: Whitespace
+                            text: "    "
                           - kind: IfKeyword
                             text: If
                           - kind: Whitespace
@@ -4202,6 +4252,8 @@ cst:
                             text: "\r\n"
                           - kind: StatementList
                             children:
+                              - kind: Whitespace
+                                text: "        "
                               - kind: CallStatement
                                 children:
                                   - kind: Identifier
@@ -4285,7 +4337,7 @@ cst:
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
-                                    text: " "
+                                    text: "        "
                                   - kind: IfKeyword
                                     text: If
                                   - kind: Whitespace
@@ -4414,14 +4466,10 @@ cst:
                                         text: Group
                                       - kind: Newline
                                         text: "\r\n"
-                              - kind: EndOfLineComment
-                                text: "' If here$ <> \"\" And Not IamGlobal Then"
-                              - kind: Newline
-                                text: "\r\n"
                               - kind: SetStatement
                                 children:
                                   - kind: Whitespace
-                                    text: " "
+                                    text: "        "
                                   - kind: SetKeyword
                                     text: Set
                                   - kind: Whitespace
@@ -4490,14 +4538,10 @@ cst:
                                     text: )
                                   - kind: Newline
                                     text: "\r\n"
-                              - kind: EndOfLineComment
-                                text: "' Else"
-                              - kind: Newline
-                                text: "\r\n"
                               - kind: SetStatement
                                 children:
                                   - kind: Whitespace
-                                    text: " "
+                                    text: "        "
                                   - kind: SetKeyword
                                     text: Set
                                   - kind: Whitespace
@@ -4569,15 +4613,7 @@ cst:
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
-                                text: " "
-                              - kind: EndOfLineComment
-                                text: "'End If"
-                              - kind: Newline
-                                text: "\r\n"
-                              - kind: Whitespace
-                                text: " "
-                              - kind: Newline
-                                text: "\r\n"
+                                text: "        "
                               - kind: CallStatement
                                 children:
                                   - kind: Identifier
@@ -4598,6 +4634,8 @@ cst:
                                                 text: vv
                                   - kind: Newline
                                     text: "\r\n"
+                              - kind: Whitespace
+                                text: "    "
                           - kind: ElseClause
                             children:
                               - kind: ElseKeyword
@@ -4608,6 +4646,8 @@ cst:
                                 children:
                                   - kind: IfStatement
                                     children:
+                                      - kind: Whitespace
+                                        text: "        "
                                       - kind: IfKeyword
                                         text: If
                                       - kind: Whitespace
@@ -4674,6 +4714,8 @@ cst:
                                         text: "\r\n"
                                       - kind: StatementList
                                         children:
+                                          - kind: Whitespace
+                                            text: "            "
                                           - kind: CallStatement
                                             children:
                                               - kind: Identifier
@@ -4694,6 +4736,8 @@ cst:
                                                             text: s
                                               - kind: Newline
                                                 text: "\r\n"
+                                          - kind: Whitespace
+                                            text: "        "
                                       - kind: ElseClause
                                         children:
                                           - kind: ElseKeyword
@@ -4702,6 +4746,8 @@ cst:
                                             text: "\r\n"
                                           - kind: StatementList
                                             children:
+                                              - kind: Whitespace
+                                                text: "            "
                                               - kind: CallStatement
                                                 children:
                                                   - kind: Identifier
@@ -4748,6 +4794,8 @@ cst:
                                                                     text: s
                                                   - kind: Newline
                                                     text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "        "
                                       - kind: EndKeyword
                                         text: End
                                       - kind: Whitespace
@@ -4756,6 +4804,8 @@ cst:
                                         text: If
                                       - kind: Newline
                                         text: "\r\n"
+                                  - kind: Whitespace
+                                    text: "    "
                           - kind: EndKeyword
                             text: End
                           - kind: Whitespace
@@ -4786,8 +4836,6 @@ cst:
                     text: AllSoros
                   - kind: Newline
                     text: "\r\n"
-              - kind: Newline
-                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -4946,6 +4994,8 @@ cst:
                     text: "\r\n"
                   - kind: StatementList
                     children:
+                      - kind: Whitespace
+                        text: "    "
                       - kind: AssignmentStatement
                         children:
                           - kind: IdentifierExpression
@@ -4978,6 +5028,8 @@ cst:
                             text: "\r\n"
                       - kind: IfStatement
                         children:
+                          - kind: Whitespace
+                            text: "    "
                           - kind: IfKeyword
                             text: If
                           - kind: Whitespace
@@ -5028,6 +5080,8 @@ cst:
                             text: "\r\n"
                           - kind: StatementList
                             children:
+                              - kind: Whitespace
+                                text: "        "
                               - kind: CallStatement
                                 children:
                                   - kind: Identifier
@@ -5134,12 +5188,10 @@ cst:
                                                     text: )
                                   - kind: Newline
                                     text: "\r\n"
-                              - kind: Newline
-                                text: "\r\n"
                               - kind: SetStatement
                                 children:
                                   - kind: Whitespace
-                                    text: " "
+                                    text: "        "
                                   - kind: SetKeyword
                                     text: Set
                                   - kind: Whitespace
@@ -5201,9 +5253,7 @@ cst:
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
-                                text: " "
-                              - kind: Newline
-                                text: "\r\n"
+                                text: "        "
                               - kind: CallStatement
                                 children:
                                   - kind: Identifier
@@ -5224,6 +5274,8 @@ cst:
                                                 text: vv
                                   - kind: Newline
                                     text: "\r\n"
+                              - kind: Whitespace
+                                text: "    "
                           - kind: ElseClause
                             children:
                               - kind: ElseKeyword
@@ -5232,6 +5284,8 @@ cst:
                                 text: "\r\n"
                               - kind: StatementList
                                 children:
+                                  - kind: Whitespace
+                                    text: "        "
                                   - kind: CallStatement
                                     children:
                                       - kind: Identifier
@@ -5290,6 +5344,8 @@ cst:
                                                         text: )
                                       - kind: Newline
                                         text: "\r\n"
+                                  - kind: Whitespace
+                                    text: "    "
                           - kind: EndKeyword
                             text: End
                           - kind: Whitespace
@@ -5309,7 +5365,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: A
+                    text: a
                   - kind: LeftParenthesis
                     text: (
                   - kind: RightParenthesis
@@ -5356,12 +5412,14 @@ cst:
                     text: "\r\n"
                   - kind: StatementList
                     children:
+                      - kind: Whitespace
+                        text: "    "
                       - kind: AssignmentStatement
                         children:
                           - kind: CallExpression
                             children:
                               - kind: Identifier
-                                text: A
+                                text: a
                               - kind: LeftParenthesis
                                 text: (
                               - kind: ArgumentList
@@ -5474,6 +5532,8 @@ cst:
                             text: "\r\n"
                       - kind: IfStatement
                         children:
+                          - kind: Whitespace
+                            text: "    "
                           - kind: IfKeyword
                             text: If
                           - kind: Whitespace
@@ -5493,7 +5553,7 @@ cst:
                                           - kind: CallExpression
                                             children:
                                               - kind: Identifier
-                                                text: A
+                                                text: a
                                               - kind: LeftParenthesis
                                                 text: (
                                               - kind: ArgumentList
@@ -5522,6 +5582,8 @@ cst:
                             children:
                               - kind: ForStatement
                                 children:
+                                  - kind: Whitespace
+                                    text: "        "
                                   - kind: ForKeyword
                                     text: For
                                   - kind: Whitespace
@@ -5559,7 +5621,7 @@ cst:
                                               - kind: CallExpression
                                                 children:
                                                   - kind: Identifier
-                                                    text: A
+                                                    text: a
                                                   - kind: LeftParenthesis
                                                     text: (
                                                   - kind: ArgumentList
@@ -5572,6 +5634,8 @@ cst:
                                     text: "\r\n"
                                   - kind: StatementList
                                     children:
+                                      - kind: Whitespace
+                                        text: "            "
                                       - kind: CallStatement
                                         children:
                                           - kind: Identifier
@@ -5627,7 +5691,7 @@ cst:
                                                                       - kind: CallExpression
                                                                         children:
                                                                           - kind: Identifier
-                                                                            text: A
+                                                                            text: a
                                                                           - kind: LeftParenthesis
                                                                             text: (
                                                                           - kind: ArgumentList
@@ -5656,6 +5720,8 @@ cst:
                                                             text: )
                                           - kind: Newline
                                             text: "\r\n"
+                                      - kind: Whitespace
+                                        text: "        "
                                   - kind: NextKeyword
                                     text: Next
                                   - kind: Whitespace
@@ -5664,6 +5730,8 @@ cst:
                                     text: i
                                   - kind: Newline
                                     text: "\r\n"
+                              - kind: Whitespace
+                                text: "    "
                           - kind: EndKeyword
                             text: End
                           - kind: Whitespace
@@ -5698,8 +5766,6 @@ cst:
                     text: AllSoros
                   - kind: Newline
                     text: "\r\n"
-              - kind: Newline
-                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -6317,7 +6383,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: A
+                    text: a
                   - kind: LeftParenthesis
                     text: (
                   - kind: RightParenthesis
@@ -6364,12 +6430,14 @@ cst:
                     text: "\r\n"
                   - kind: StatementList
                     children:
+                      - kind: Whitespace
+                        text: "    "
                       - kind: AssignmentStatement
                         children:
                           - kind: CallExpression
                             children:
                               - kind: Identifier
-                                text: A
+                                text: a
                               - kind: LeftParenthesis
                                 text: (
                               - kind: ArgumentList
@@ -6482,6 +6550,8 @@ cst:
                             text: "\r\n"
                       - kind: IfStatement
                         children:
+                          - kind: Whitespace
+                            text: "    "
                           - kind: IfKeyword
                             text: If
                           - kind: Whitespace
@@ -6501,7 +6571,7 @@ cst:
                                           - kind: CallExpression
                                             children:
                                               - kind: Identifier
-                                                text: A
+                                                text: a
                                               - kind: LeftParenthesis
                                                 text: (
                                               - kind: ArgumentList
@@ -6530,6 +6600,8 @@ cst:
                             children:
                               - kind: ForStatement
                                 children:
+                                  - kind: Whitespace
+                                    text: "        "
                                   - kind: ForKeyword
                                     text: For
                                   - kind: Whitespace
@@ -6567,7 +6639,7 @@ cst:
                                               - kind: CallExpression
                                                 children:
                                                   - kind: Identifier
-                                                    text: A
+                                                    text: a
                                                   - kind: LeftParenthesis
                                                     text: (
                                                   - kind: ArgumentList
@@ -6580,6 +6652,8 @@ cst:
                                     text: "\r\n"
                                   - kind: StatementList
                                     children:
+                                      - kind: Whitespace
+                                        text: "            "
                                       - kind: CallStatement
                                         children:
                                           - kind: Identifier
@@ -6613,7 +6687,7 @@ cst:
                                                                       - kind: CallExpression
                                                                         children:
                                                                           - kind: Identifier
-                                                                            text: A
+                                                                            text: a
                                                                           - kind: LeftParenthesis
                                                                             text: (
                                                                           - kind: ArgumentList
@@ -6644,6 +6718,8 @@ cst:
                                                         text: )
                                           - kind: Newline
                                             text: "\r\n"
+                                      - kind: Whitespace
+                                        text: "        "
                                   - kind: NextKeyword
                                     text: Next
                                   - kind: Whitespace
@@ -6652,6 +6728,8 @@ cst:
                                     text: i
                                   - kind: Newline
                                     text: "\r\n"
+                              - kind: Whitespace
+                                text: "    "
                           - kind: EndKeyword
                             text: End
                           - kind: Whitespace
@@ -6724,6 +6802,8 @@ cst:
             text: "\r\n"
           - kind: StatementList
             children:
+              - kind: Whitespace
+                text: "    "
               - kind: DimStatement
                 children:
                   - kind: DimKeyword
@@ -6750,6 +6830,8 @@ cst:
                     text: $
                   - kind: Newline
                     text: "\r\n"
+              - kind: Whitespace
+                text: "    "
               - kind: AssignmentStatement
                 children:
                   - kind: IdentifierExpression
@@ -6770,6 +6852,8 @@ cst:
                     text: "\r\n"
               - kind: OnErrorStatement
                 children:
+                  - kind: Whitespace
+                    text: "    "
                   - kind: OnKeyword
                     text: "On"
                   - kind: Whitespace
@@ -6788,6 +6872,8 @@ cst:
                     text: "\r\n"
               - kind: WhileStatement
                 children:
+                  - kind: Whitespace
+                    text: "    "
                   - kind: WhileKeyword
                     text: While
                   - kind: Whitespace
@@ -6814,6 +6900,8 @@ cst:
                     children:
                       - kind: IfStatement
                         children:
+                          - kind: Whitespace
+                            text: "        "
                           - kind: IfKeyword
                             text: If
                           - kind: Whitespace
@@ -6876,6 +6964,8 @@ cst:
                             text: "\r\n"
                           - kind: StatementList
                             children:
+                              - kind: Whitespace
+                                text: "            "
                               - kind: AssignmentStatement
                                 children:
                                   - kind: IdentifierExpression
@@ -6910,6 +7000,8 @@ cst:
                                             text: $
                                   - kind: Newline
                                     text: "\r\n"
+                              - kind: Whitespace
+                                text: "        "
                           - kind: ElseClause
                             children:
                               - kind: ElseKeyword
@@ -6918,6 +7010,8 @@ cst:
                                 text: "\r\n"
                               - kind: StatementList
                                 children:
+                                  - kind: Whitespace
+                                    text: "            "
                                   - kind: AssignmentStatement
                                     children:
                                       - kind: IdentifierExpression
@@ -6952,6 +7046,8 @@ cst:
                                                 text: $
                                       - kind: Newline
                                         text: "\r\n"
+                                  - kind: Whitespace
+                                    text: "        "
                           - kind: EndKeyword
                             text: End
                           - kind: Whitespace
@@ -6960,8 +7056,8 @@ cst:
                             text: If
                           - kind: Newline
                             text: "\r\n"
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "        "
                       - kind: AssignmentStatement
                         children:
                           - kind: IdentifierExpression
@@ -6992,12 +7088,14 @@ cst:
                                     text: "1"
                           - kind: Newline
                             text: "\r\n"
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "    "
                   - kind: WendKeyword
                     text: Wend
                   - kind: Newline
                     text: "\r\n"
+              - kind: Whitespace
+                text: "    "
               - kind: AssignmentStatement
                 children:
                   - kind: IdentifierExpression
@@ -7726,34 +7824,46 @@ cst:
                                             children:
                                               - kind: Argument
                                                 children:
-                                                  - kind: CallExpression
+                                                  - kind: BinaryExpression
                                                     children:
-                                                      - kind: Identifier
-                                                        text: VarPtr
-                                                      - kind: LeftParenthesis
-                                                        text: (
-                                                      - kind: ArgumentList
+                                                      - kind: CallExpression
                                                         children:
-                                                          - kind: Argument
+                                                          - kind: Identifier
+                                                            text: VarPtr
+                                                          - kind: LeftParenthesis
+                                                            text: (
+                                                          - kind: ArgumentList
                                                             children:
-                                                              - kind: CallExpression
+                                                              - kind: Argument
                                                                 children:
-                                                                  - kind: Identifier
-                                                                    text: bank
-                                                                  - kind: LeftParenthesis
-                                                                    text: (
-                                                                  - kind: ArgumentList
+                                                                  - kind: CallExpression
                                                                     children:
-                                                                      - kind: Argument
+                                                                      - kind: Identifier
+                                                                        text: bank
+                                                                      - kind: LeftParenthesis
+                                                                        text: (
+                                                                      - kind: ArgumentList
                                                                         children:
-                                                                          - kind: IdentifierExpression
+                                                                          - kind: Argument
                                                                             children:
-                                                                              - kind: Identifier
-                                                                                text: cursor
-                                                                  - kind: RightParenthesis
-                                                                    text: )
-                                                      - kind: RightParenthesis
-                                                        text: )
+                                                                              - kind: IdentifierExpression
+                                                                                children:
+                                                                                  - kind: Identifier
+                                                                                    text: cursor
+                                                                      - kind: RightParenthesis
+                                                                        text: )
+                                                          - kind: RightParenthesis
+                                                            text: )
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: AdditionOperator
+                                                        text: +
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "8"
                                           - kind: RightParenthesis
                                             text: )
                                       - kind: Newline
@@ -7800,8 +7910,6 @@ cst:
                                             text: "20"
                                       - kind: Newline
                                         text: "\r\n"
-                                  - kind: Newline
-                                    text: "\r\n"
                               - kind: ElseClause
                                 children:
                                   - kind: ElseKeyword
@@ -7906,10 +8014,6 @@ cst:
             children:
               - kind: EndOfLineComment
                 text: "' used in the float mode"
-              - kind: Newline
-                text: "\r\n"
-              - kind: EndOfLineComment
-                text: "'Debug.Print Typename$(item)"
               - kind: Newline
                 text: "\r\n"
               - kind: IfStatement
@@ -8230,40 +8334,78 @@ cst:
                         text: )
                   - kind: Newline
                     text: "\r\n"
-              - kind: ReDimStatement
+              - kind: IfStatement
                 children:
                   - kind: Whitespace
                     text: " "
-                  - kind: ReDimKeyword
-                    text: ReDim
+                  - kind: IfKeyword
+                    text: If
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bank
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: Total
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: Total
+                      - kind: Whitespace
+                        text: " "
+                      - kind: GreaterThanOperator
+                        text: ">"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "0"
                   - kind: Whitespace
                     text: " "
-                  - kind: MultiplicationOperator
-                    text: "*"
+                  - kind: ThenKeyword
+                    text: Then
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "2"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: ReDimStatement
+                    children:
+                      - kind: ReDimKeyword
+                        text: ReDim
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: bank
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: BinaryExpression
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Total
+                              - kind: Whitespace
+                                text: " "
+                              - kind: MultiplicationOperator
+                                text: "*"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "2"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: SubtractionOperator
+                            text: "-"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
+                      - kind: RightParenthesis
+                        text: )
+                      - kind: Newline
+                        text: "\r\n"
               - kind: EndOfLineComment
                 text: "'bank.grouperror = True"
               - kind: Newline
@@ -8475,13 +8617,13 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: LinkRef
+            text: LinkRefPointer
           - kind: ParameterList
             children:
               - kind: LeftParenthesis
                 text: (
               - kind: Identifier
-                text: A
+                text: a
               - kind: Whitespace
                 text: " "
               - kind: AsKeyword
@@ -8535,7 +8677,7 @@ cst:
                                           - kind: IdentifierExpression
                                             children:
                                               - kind: Identifier
-                                                text: A
+                                                text: a
                                   - kind: RightParenthesis
                                     text: )
                               - kind: Whitespace
@@ -8607,7 +8749,7 @@ cst:
                           - kind: Whitespace
                             text: " "
                           - kind: Identifier
-                            text: A
+                            text: a
                           - kind: Newline
                             text: "\r\n"
                       - kind: IfStatement
@@ -8621,7 +8763,315 @@ cst:
                               - kind: IdentifierExpression
                                 children:
                                   - kind: Identifier
-                                    text: A
+                                    text: a
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IsKeyword
+                                text: Is
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: NothingKeyword
+                                    text: Nothing
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ThenKeyword
+                            text: Then
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ExitStatement
+                            children:
+                              - kind: ExitKeyword
+                                text: Exit
+                              - kind: Whitespace
+                                text: " "
+                              - kind: PropertyKeyword
+                                text: Property
+                          - kind: Newline
+                            text: "\r\n"
+                      - kind: EndOfLineComment
+                        text: "'"
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: bank
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: bank
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "1"
+                                                  - kind: RightParenthesis
+                                                    text: )
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: MultiplicationOperator
+                                                text: "*"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "2"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: AdditionOperator
+                                            text: +
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "3"
+                              - kind: RightParenthesis
+                                text: )
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: vbNullString
+                          - kind: Newline
+                            text: "\r\n"
+                      - kind: EndOfLineComment
+                        text: "'mTeam = True"
+                      - kind: Newline
+                        text: "\r\n"
+                  - kind: ElseClause
+                    children:
+                      - kind: ElseKeyword
+                        text: Else
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: StatementList
+                        children:
+                          - kind: EndOfLineComment
+                            text: "' only when is in an array as Float Group"
+                          - kind: Newline
+                            text: "\r\n"
+                          - kind: SetStatement
+                            children:
+                              - kind: SetKeyword
+                                text: Set
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: LinkToGroup
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: a
+                              - kind: Newline
+                                text: "\r\n"
+                  - kind: EndKeyword
+                    text: End
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IfKeyword
+                    text: If
+                  - kind: Newline
+                    text: "\r\n"
+          - kind: EndKeyword
+            text: End
+          - kind: Whitespace
+            text: " "
+          - kind: PropertyKeyword
+            text: Property
+          - kind: Newline
+            text: "\r\n"
+      - kind: PropertyStatement
+        children:
+          - kind: PublicKeyword
+            text: Public
+          - kind: Whitespace
+            text: " "
+          - kind: PropertyKeyword
+            text: Property
+          - kind: Whitespace
+            text: " "
+          - kind: SetKeyword
+            text: Set
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: LinkRef
+          - kind: ParameterList
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: Identifier
+                text: a
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ObjectKeyword
+                text: Object
+              - kind: RightParenthesis
+                text: )
+          - kind: Newline
+            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: IfStatement
+                children:
+                  - kind: IfKeyword
+                    text: If
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: FloatGroup
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ThenKeyword
+                    text: Then
+                  - kind: Newline
+                    text: "\r\n"
+                  - kind: StatementList
+                    children:
+                      - kind: IfStatement
+                        children:
+                          - kind: IfKeyword
+                            text: If
+                          - kind: Whitespace
+                            text: " "
+                          - kind: BinaryExpression
+                            children:
+                              - kind: CallExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Typename
+                                  - kind: LeftParenthesis
+                                    text: (
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: a
+                                  - kind: RightParenthesis
+                                    text: )
+                              - kind: Whitespace
+                                text: " "
+                              - kind: InequalityOperator
+                                text: "<>"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"Group\""
+                          - kind: Whitespace
+                            text: " "
+                          - kind: ThenKeyword
+                            text: Then
+                          - kind: Newline
+                            text: "\r\n"
+                          - kind: StatementList
+                            children:
+                              - kind: ExitStatement
+                                children:
+                                  - kind: ExitKeyword
+                                    text: Exit
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: PropertyKeyword
+                                    text: Property
+                              - kind: Newline
+                                text: "\r\n"
+                          - kind: EndKeyword
+                            text: End
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IfKeyword
+                            text: If
+                          - kind: Newline
+                            text: "\r\n"
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: mTeam
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: BooleanLiteralExpression
+                            children:
+                              - kind: FalseKeyword
+                                text: "False"
+                          - kind: Newline
+                            text: "\r\n"
+                      - kind: SetStatement
+                        children:
+                          - kind: SetKeyword
+                            text: Set
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: LinkToGroup
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: a
+                          - kind: Newline
+                            text: "\r\n"
+                      - kind: IfStatement
+                        children:
+                          - kind: IfKeyword
+                            text: If
+                          - kind: Whitespace
+                            text: " "
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: a
                               - kind: Whitespace
                                 text: " "
                               - kind: IsKeyword
@@ -8765,7 +9215,7 @@ cst:
                               - kind: Whitespace
                                 text: " "
                               - kind: Identifier
-                                text: A
+                                text: a
                               - kind: Newline
                                 text: "\r\n"
                   - kind: EndKeyword
@@ -9243,7 +9693,7 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: LocalList
+            text: localList
           - kind: ParameterList
             children:
               - kind: LeftParenthesis
@@ -9267,7 +9717,7 @@ cst:
                   - kind: IdentifierExpression
                     children:
                       - kind: Identifier
-                        text: LocalList
+                        text: localList
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
@@ -9307,7 +9757,7 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: LocalList
+            text: localList
           - kind: ParameterList
             children:
               - kind: LeftParenthesis
@@ -11015,7 +11465,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: m
+                    text: M
                   - kind: Whitespace
                     text: " "
                   - kind: AsKeyword
@@ -11031,7 +11481,7 @@ cst:
                   - kind: IdentifierExpression
                     children:
                       - kind: Identifier
-                        text: m
+                        text: M
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
@@ -11067,7 +11517,7 @@ cst:
                       - kind: IdentifierExpression
                         children:
                           - kind: Identifier
-                            text: m
+                            text: M
                       - kind: Whitespace
                         text: " "
                       - kind: GreaterThanOperator
@@ -11101,7 +11551,7 @@ cst:
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: m
+                                text: M
                           - kind: Whitespace
                             text: " "
                           - kind: SubtractionOperator

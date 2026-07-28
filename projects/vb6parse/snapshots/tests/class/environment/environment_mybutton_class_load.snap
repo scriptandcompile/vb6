@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -37,8 +37,8 @@ cst:
             text: "\r\n"
       - kind: DimStatement
         children:
-          - kind: DimKeyword
-            text: Dim
+          - kind: PublicKeyword
+            text: Public
           - kind: Whitespace
             text: " "
           - kind: WithEventsKeyword
@@ -308,7 +308,7 @@ cst:
                               - kind: PeriodOperator
                                 text: "."
                               - kind: Identifier
-                                text: backcolor
+                                text: BackColor
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
@@ -560,7 +560,7 @@ cst:
                       - kind: PeriodOperator
                         text: "."
                       - kind: Identifier
-                        text: backcolor
+                        text: BackColor
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
@@ -688,7 +688,7 @@ cst:
                               - kind: PeriodOperator
                                 text: "."
                               - kind: Identifier
-                                text: backcolor
+                                text: BackColor
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
@@ -838,7 +838,7 @@ cst:
               - kind: Whitespace
                 text: " "
               - kind: Identifier
-                text: x
+                text: X
               - kind: Whitespace
                 text: " "
               - kind: AsKeyword
@@ -852,7 +852,7 @@ cst:
               - kind: Whitespace
                 text: " "
               - kind: Identifier
-                text: y
+                text: Y
               - kind: Whitespace
                 text: " "
               - kind: AsKeyword

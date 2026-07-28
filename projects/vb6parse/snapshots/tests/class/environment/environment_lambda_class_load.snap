@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -64,6 +64,24 @@ cst:
             text: Code
           - kind: DollarSign
             text: $
+          - kind: Newline
+            text: "\r\n"
+      - kind: DimStatement
+        children:
+          - kind: PublicKeyword
+            text: Public
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: Pad
+          - kind: Whitespace
+            text: " "
+          - kind: AsKeyword
+            text: As
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: Document
           - kind: Newline
             text: "\r\n"
       - kind: TypeStatement
@@ -1215,7 +1233,7 @@ cst:
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: Identifier
-                                                                text: g
+                                                                text: G
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: AsKeyword
@@ -1235,7 +1253,7 @@ cst:
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: Identifier
-                                                                text: g
+                                                                text: G
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: EqualityOperator
@@ -1267,7 +1285,7 @@ cst:
                                                               - kind: MemberAccessExpression
                                                                 children:
                                                                   - kind: Identifier
-                                                                    text: g
+                                                                    text: G
                                                                   - kind: PeriodOperator
                                                                     text: "."
                                                                   - kind: Identifier
@@ -1313,7 +1331,7 @@ cst:
                                                                       - kind: Whitespace
                                                                         text: " "
                                                                       - kind: Identifier
-                                                                        text: g
+                                                                        text: G
                                                                       - kind: Newline
                                                                         text: "\r\n"
                                                                   - kind: Whitespace
@@ -1343,7 +1361,7 @@ cst:
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                           - kind: Identifier
-                                                                            text: g
+                                                                            text: G
                                                                           - kind: Newline
                                                                             text: "\r\n"
                                                                       - kind: Whitespace
@@ -1453,7 +1471,7 @@ cst:
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: Identifier
-                                                                text: g
+                                                                text: G
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: EqualityOperator

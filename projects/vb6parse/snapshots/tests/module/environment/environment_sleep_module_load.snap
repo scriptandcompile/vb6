@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/environment.rs
+source: projects/vb6parse/tests/module/environment.rs
 expression: module
 ---
 name: Module7
@@ -3378,7 +3378,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: m
+                    text: M
                   - kind: Whitespace
                     text: " "
                   - kind: AsKeyword
@@ -3526,7 +3526,7 @@ cst:
                                               - kind: IdentifierExpression
                                                 children:
                                                   - kind: Identifier
-                                                    text: m
+                                                    text: M
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
@@ -3584,7 +3584,7 @@ cst:
                   - kind: IdentifierExpression
                     children:
                       - kind: Identifier
-                        text: m
+                        text: M
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -4743,16 +4743,8 @@ cst:
             text: "\r\n"
           - kind: StatementList
             children:
-              - kind: Newline
-                text: "\r\n"
               - kind: Whitespace
-                text: "  "
-              - kind: EndOfLineComment
-                text: "'  Debug.Print HeapFree(GetProcessHeap(), 0, Ptr)"
-              - kind: Newline
-                text: "\r\n"
-              - kind: Whitespace
-                text: "        "
+                text: "    "
               - kind: CallStatement
                 children:
                   - kind: Identifier
@@ -4851,6 +4843,24 @@ cst:
                 text: " "
               - kind: LongKeyword
                 text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: ByRefKeyword
+                text: ByRef
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: OldV
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
               - kind: RightParenthesis
                 text: )
           - kind: Newline
@@ -4858,27 +4868,7 @@ cst:
           - kind: StatementList
             children:
               - kind: Whitespace
-                text: "        "
-              - kind: DimStatement
-                children:
-                  - kind: DimKeyword
-                    text: Dim
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: oldV
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: LongKeyword
-                    text: Long
-                  - kind: Newline
-                    text: "\r\n"
-              - kind: Whitespace
-                text: "        "
+                text: "    "
               - kind: CallStatement
                 children:
                   - kind: Identifier
@@ -4916,7 +4906,7 @@ cst:
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
-                text: "        "
+                text: "    "
               - kind: CallStatement
                 children:
                   - kind: Identifier
@@ -4960,7 +4950,7 @@ cst:
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: oldV
+                                text: OldV
                       - kind: Whitespace
                         text: " "
               - kind: EndOfLineComment
@@ -4968,7 +4958,205 @@ cst:
               - kind: Newline
                 text: "\r\n"
               - kind: Whitespace
-                text: "        "
+                text: "    "
+              - kind: CallStatement
+                children:
+                  - kind: Identifier
+                    text: VirtualLock
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Ptr
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: nBytes
+                  - kind: Newline
+                    text: "\r\n"
+          - kind: EndKeyword
+            text: End
+          - kind: Whitespace
+            text: " "
+          - kind: SubKeyword
+            text: Sub
+          - kind: Newline
+            text: "\r\n"
+      - kind: SubStatement
+        children:
+          - kind: PublicKeyword
+            text: Public
+          - kind: Whitespace
+            text: " "
+          - kind: SubKeyword
+            text: Sub
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: SetUpForExecution2
+          - kind: ParameterList
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: Ptr
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: nBytes
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: ByRefKeyword
+                text: ByRef
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: OldV
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: RightParenthesis
+                text: )
+          - kind: Newline
+            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: Whitespace
+                text: "    "
+              - kind: CallStatement
+                children:
+                  - kind: Identifier
+                    text: FlushInstructionCache
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: GetCurrentProcess
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Ptr
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: nBytes
+                  - kind: Newline
+                    text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: CallStatement
+                children:
+                  - kind: Identifier
+                    text: VirtualProtect
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Ptr
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: nBytes
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: PAGE_EXECUTE_READWRITE
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: OldV
+                      - kind: Whitespace
+                        text: " "
+              - kind: EndOfLineComment
+                text: "' PAGE_READWRITE"
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
               - kind: CallStatement
                 children:
                   - kind: Identifier
@@ -5051,6 +5239,24 @@ cst:
                 text: " "
               - kind: LongKeyword
                 text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: OldV
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
               - kind: RightParenthesis
                 text: )
           - kind: Newline
@@ -5058,27 +5264,7 @@ cst:
           - kind: StatementList
             children:
               - kind: Whitespace
-                text: "        "
-              - kind: DimStatement
-                children:
-                  - kind: DimKeyword
-                    text: Dim
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: oldV
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: LongKeyword
-                    text: Long
-                  - kind: Newline
-                    text: "\r\n"
-              - kind: Whitespace
-                text: "       "
+                text: "    "
               - kind: CallStatement
                 children:
                   - kind: Identifier
@@ -5116,11 +5302,11 @@ cst:
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
-                text: "        "
+                text: "    "
               - kind: Newline
                 text: "\r\n"
               - kind: Whitespace
-                text: "        "
+                text: "    "
               - kind: CallStatement
                 children:
                   - kind: Identifier
@@ -5148,7 +5334,7 @@ cst:
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
-                text: "         "
+                text: "    "
               - kind: CallStatement
                 children:
                   - kind: Identifier
@@ -5182,7 +5368,7 @@ cst:
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: PAGE_READWRITE
+                                text: OldV
                       - kind: Comma
                         text: ","
                       - kind: Whitespace
@@ -5192,7 +5378,7 @@ cst:
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: oldV
+                                text: OldV
                       - kind: Whitespace
                         text: " "
               - kind: EndOfLineComment
@@ -5261,20 +5447,10 @@ cst:
             text: "\r\n"
           - kind: StatementList
             children:
-              - kind: Whitespace
-                text: "      "
-              - kind: EndOfLineComment
-                text: "' VirtualUnlock Ptr, nBytes"
-              - kind: Newline
-                text: "\r\n"
-              - kind: Whitespace
-                text: "     "
-              - kind: Newline
-                text: "\r\n"
               - kind: IfStatement
                 children:
                   - kind: Whitespace
-                    text: "      "
+                    text: "    "
                   - kind: IfKeyword
                     text: If
                   - kind: Whitespace
@@ -5364,7 +5540,7 @@ cst:
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
-                        text: "      "
+                        text: "    "
                   - kind: EndKeyword
                     text: End
                   - kind: Whitespace
@@ -5415,6 +5591,8 @@ cst:
             children:
               - kind: OnErrorStatement
                 children:
+                  - kind: Whitespace
+                    text: "    "
                   - kind: OnKeyword
                     text: "On"
                   - kind: Whitespace
@@ -5431,6 +5609,8 @@ cst:
                     text: Next
                   - kind: Newline
                     text: "\r\n"
+              - kind: Whitespace
+                text: "    "
               - kind: DimStatement
                 children:
                   - kind: DimKeyword
@@ -5451,6 +5631,8 @@ cst:
                     text: "\r\n"
               - kind: WithStatement
                 children:
+                  - kind: Whitespace
+                    text: "    "
                   - kind: WithKeyword
                     text: With
                   - kind: Whitespace
@@ -5494,7 +5676,7 @@ cst:
                       - kind: CallStatement
                         children:
                           - kind: Whitespace
-                            text: "            "
+                            text: "        "
                           - kind: CallKeyword
                             text: Call
                           - kind: Whitespace
@@ -5518,7 +5700,7 @@ cst:
                       - kind: IfStatement
                         children:
                           - kind: Whitespace
-                            text: "            "
+                            text: "        "
                           - kind: IfKeyword
                             text: If
                           - kind: Whitespace
@@ -5567,14 +5749,10 @@ cst:
                                     text: "0"
                               - kind: Newline
                                 text: "\r\n"
-                      - kind: Whitespace
-                        text: "            "
-                      - kind: Newline
-                        text: "\r\n"
                       - kind: IfStatement
                         children:
                           - kind: Whitespace
-                            text: "                "
+                            text: "            "
                           - kind: IfKeyword
                             text: If
                           - kind: Whitespace
@@ -5606,7 +5784,7 @@ cst:
                           - kind: StatementList
                             children:
                               - kind: Whitespace
-                                text: "                    "
+                                text: "                "
                               - kind: AssignmentStatement
                                 children:
                                   - kind: IdentifierExpression
@@ -5664,7 +5842,7 @@ cst:
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
-                                    text: "                    "
+                                    text: "                "
                                   - kind: IfKeyword
                                     text: If
                                   - kind: Whitespace
@@ -5694,7 +5872,7 @@ cst:
                                       - kind: SetStatement
                                         children:
                                           - kind: Whitespace
-                                            text: "                    "
+                                            text: "                "
                                           - kind: SetKeyword
                                             text: Set
                                           - kind: Whitespace
@@ -5715,14 +5893,10 @@ cst:
                                             text: Owner
                                           - kind: Newline
                                             text: "\r\n"
-                                      - kind: Whitespace
-                                        text: "                    "
-                                      - kind: Newline
-                                        text: "\r\n"
                                       - kind: IfStatement
                                         children:
                                           - kind: Whitespace
-                                            text: "                     "
+                                            text: "                "
                                           - kind: IfKeyword
                                             text: If
                                           - kind: Whitespace
@@ -5777,10 +5951,6 @@ cst:
                                                     text: "\r\n"
                                                   - kind: StatementList
                                                     children:
-                                                      - kind: Whitespace
-                                                        text: "                        "
-                                                      - kind: Newline
-                                                        text: "\r\n"
                                                       - kind: IfStatement
                                                         children:
                                                           - kind: Whitespace
@@ -5846,10 +6016,6 @@ cst:
                                                               - kind: Newline
                                                                 text: "\r\n"
                                                       - kind: Whitespace
-                                                        text: "                        "
-                                                      - kind: Newline
-                                                        text: "\r\n"
-                                                      - kind: Whitespace
                                                         text: "                    "
                                                   - kind: ElseClause
                                                     children:
@@ -5860,7 +6026,7 @@ cst:
                                                       - kind: StatementList
                                                         children:
                                                           - kind: Whitespace
-                                                            text: "                    "
+                                                            text: "                        "
                                                           - kind: CallStatement
                                                             children:
                                                               - kind: Identifier
@@ -5882,7 +6048,7 @@ cst:
                                                   - kind: Newline
                                                     text: "\r\n"
                                               - kind: Whitespace
-                                                text: "                    "
+                                                text: "                "
                                           - kind: EndKeyword
                                             text: End
                                           - kind: Whitespace
@@ -5892,7 +6058,7 @@ cst:
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: Whitespace
-                                        text: "                    "
+                                        text: "            "
                                   - kind: EndKeyword
                                     text: End
                                   - kind: Whitespace
@@ -5902,7 +6068,7 @@ cst:
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
-                                text: "                 "
+                                text: "        "
                           - kind: EndKeyword
                             text: End
                           - kind: Whitespace
@@ -5912,11 +6078,7 @@ cst:
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
-                        text: "                 "
-                      - kind: Newline
-                        text: "\r\n"
-                      - kind: Whitespace
-                        text: "                 "
+                        text: "    "
                   - kind: EndKeyword
                     text: End
                   - kind: Whitespace
@@ -6359,36 +6521,140 @@ cst:
                                     text: "\r\n"
                                   - kind: StatementList
                                     children:
-                                      - kind: Whitespace
-                                        text: "                "
-                                      - kind: CallStatement
+                                      - kind: IfStatement
                                         children:
-                                          - kind: Identifier
-                                            text: TaskMaster
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: StopProcess
+                                          - kind: Whitespace
+                                            text: "                "
+                                          - kind: IfKeyword
+                                            text: If
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: MemberAccessExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: MusicMaster
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: PlayMusic
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: ThenKeyword
+                                            text: Then
                                           - kind: Newline
                                             text: "\r\n"
-                                      - kind: Whitespace
-                                        text: "                "
-                                      - kind: CallStatement
-                                        children:
-                                          - kind: Identifier
-                                            text: DoEvents
-                                          - kind: Newline
-                                            text: "\r\n"
-                                      - kind: Whitespace
-                                        text: "                "
-                                      - kind: CallStatement
-                                        children:
-                                          - kind: Identifier
-                                            text: TaskMaster
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: StartProcess
+                                          - kind: StatementList
+                                            children:
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: MusicMaster
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: StopProcess
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: TaskMaster
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: StopProcess
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: DoEvents
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: TaskMaster
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: StartProcess
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: MusicMaster
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: StartProcess
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                "
+                                          - kind: ElseClause
+                                            children:
+                                              - kind: ElseKeyword
+                                                text: Else
+                                              - kind: Newline
+                                                text: "\r\n"
+                                              - kind: StatementList
+                                                children:
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: TaskMaster
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: StopProcess
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: DoEvents
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: TaskMaster
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: StartProcess
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                "
+                                          - kind: EndKeyword
+                                            text: End
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: IfKeyword
+                                            text: If
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: Whitespace
@@ -6401,12 +6667,88 @@ cst:
                                         text: "\r\n"
                                       - kind: StatementList
                                         children:
-                                          - kind: Whitespace
-                                            text: "                "
-                                          - kind: CallStatement
+                                          - kind: IfStatement
                                             children:
-                                              - kind: Identifier
-                                                text: DoEvents
+                                              - kind: Whitespace
+                                                text: "                "
+                                              - kind: IfKeyword
+                                                text: If
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: MusicMaster
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: PlayMusic
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ThenKeyword
+                                                text: Then
+                                              - kind: Newline
+                                                text: "\r\n"
+                                              - kind: StatementList
+                                                children:
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: MusicMaster
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: StopProcess
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: DoEvents
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: MusicMaster
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: StartProcess
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                "
+                                              - kind: ElseClause
+                                                children:
+                                                  - kind: ElseKeyword
+                                                    text: Else
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                                  - kind: StatementList
+                                                    children:
+                                                      - kind: Whitespace
+                                                        text: "                    "
+                                                      - kind: CallStatement
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: DoEvents
+                                                          - kind: Newline
+                                                            text: "\r\n"
+                                                      - kind: Whitespace
+                                                        text: "                "
+                                              - kind: EndKeyword
+                                                text: End
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: IfKeyword
+                                                text: If
                                               - kind: Newline
                                                 text: "\r\n"
                                           - kind: Whitespace
@@ -6803,36 +7145,140 @@ cst:
                                     text: "\r\n"
                                   - kind: StatementList
                                     children:
-                                      - kind: Whitespace
-                                        text: "                "
-                                      - kind: CallStatement
+                                      - kind: IfStatement
                                         children:
-                                          - kind: Identifier
-                                            text: TaskMaster
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: StopProcess
+                                          - kind: Whitespace
+                                            text: "                "
+                                          - kind: IfKeyword
+                                            text: If
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: MemberAccessExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: MusicMaster
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: PlayMusic
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: ThenKeyword
+                                            text: Then
                                           - kind: Newline
                                             text: "\r\n"
-                                      - kind: Whitespace
-                                        text: "                "
-                                      - kind: CallStatement
-                                        children:
-                                          - kind: Identifier
-                                            text: DoEvents
-                                          - kind: Newline
-                                            text: "\r\n"
-                                      - kind: Whitespace
-                                        text: "                "
-                                      - kind: CallStatement
-                                        children:
-                                          - kind: Identifier
-                                            text: TaskMaster
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: StartProcess
+                                          - kind: StatementList
+                                            children:
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: MusicMaster
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: StopProcess
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: TaskMaster
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: StopProcess
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: DoEvents
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: TaskMaster
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: StartProcess
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: MusicMaster
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: StartProcess
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                "
+                                          - kind: ElseClause
+                                            children:
+                                              - kind: ElseKeyword
+                                                text: Else
+                                              - kind: Newline
+                                                text: "\r\n"
+                                              - kind: StatementList
+                                                children:
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: TaskMaster
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: StopProcess
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: DoEvents
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: TaskMaster
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: StartProcess
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                "
+                                          - kind: EndKeyword
+                                            text: End
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: IfKeyword
+                                            text: If
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: Whitespace
@@ -6845,12 +7291,88 @@ cst:
                                         text: "\r\n"
                                       - kind: StatementList
                                         children:
-                                          - kind: Whitespace
-                                            text: "                "
-                                          - kind: CallStatement
+                                          - kind: IfStatement
                                             children:
-                                              - kind: Identifier
-                                                text: DoEvents
+                                              - kind: Whitespace
+                                                text: "                "
+                                              - kind: IfKeyword
+                                                text: If
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: MusicMaster
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: PlayMusic
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ThenKeyword
+                                                text: Then
+                                              - kind: Newline
+                                                text: "\r\n"
+                                              - kind: StatementList
+                                                children:
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: MusicMaster
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: StopProcess
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: DoEvents
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                    "
+                                                  - kind: CallStatement
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: MusicMaster
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: StartProcess
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                  - kind: Whitespace
+                                                    text: "                "
+                                              - kind: ElseClause
+                                                children:
+                                                  - kind: ElseKeyword
+                                                    text: Else
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                                  - kind: StatementList
+                                                    children:
+                                                      - kind: Whitespace
+                                                        text: "                    "
+                                                      - kind: CallStatement
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: DoEvents
+                                                          - kind: Newline
+                                                            text: "\r\n"
+                                                      - kind: Whitespace
+                                                        text: "                "
+                                              - kind: EndKeyword
+                                                text: End
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: IfKeyword
+                                                text: If
                                               - kind: Newline
                                                 text: "\r\n"
                                           - kind: Whitespace
@@ -7417,40 +7939,144 @@ cst:
                             text: "\r\n"
                           - kind: StatementList
                             children:
-                              - kind: Whitespace
-                                text: "            "
-                              - kind: CallStatement
+                              - kind: IfStatement
                                 children:
-                                  - kind: Identifier
-                                    text: TaskMaster
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: StopProcess
+                                  - kind: Whitespace
+                                    text: "                "
+                                  - kind: IfKeyword
+                                    text: If
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: MusicMaster
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: PlayMusic
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: ThenKeyword
+                                    text: Then
+                                  - kind: Newline
+                                    text: "\r\n"
+                                  - kind: StatementList
+                                    children:
+                                      - kind: Whitespace
+                                        text: "                    "
+                                      - kind: CallStatement
+                                        children:
+                                          - kind: Identifier
+                                            text: MusicMaster
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: StopProcess
+                                          - kind: Newline
+                                            text: "\r\n"
+                                      - kind: Whitespace
+                                        text: "                    "
+                                      - kind: CallStatement
+                                        children:
+                                          - kind: Identifier
+                                            text: TaskMaster
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: StopProcess
+                                          - kind: Newline
+                                            text: "\r\n"
+                                      - kind: Whitespace
+                                        text: "                    "
+                                      - kind: CallStatement
+                                        children:
+                                          - kind: Identifier
+                                            text: DoEvents
+                                          - kind: Newline
+                                            text: "\r\n"
+                                      - kind: Whitespace
+                                        text: "                    "
+                                      - kind: CallStatement
+                                        children:
+                                          - kind: Identifier
+                                            text: TaskMaster
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: StartProcess
+                                          - kind: Newline
+                                            text: "\r\n"
+                                      - kind: Whitespace
+                                        text: "                    "
+                                      - kind: CallStatement
+                                        children:
+                                          - kind: Identifier
+                                            text: MusicMaster
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: StartProcess
+                                          - kind: Newline
+                                            text: "\r\n"
+                                      - kind: Whitespace
+                                        text: "                "
+                                  - kind: ElseClause
+                                    children:
+                                      - kind: ElseKeyword
+                                        text: Else
+                                      - kind: Newline
+                                        text: "\r\n"
+                                      - kind: StatementList
+                                        children:
+                                          - kind: Whitespace
+                                            text: "                    "
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: TaskMaster
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: StopProcess
+                                              - kind: Newline
+                                                text: "\r\n"
+                                          - kind: Whitespace
+                                            text: "                    "
+                                          - kind: Newline
+                                            text: "\r\n"
+                                          - kind: Whitespace
+                                            text: "                    "
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: DoEvents
+                                              - kind: Newline
+                                                text: "\r\n"
+                                          - kind: Whitespace
+                                            text: "                    "
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: TaskMaster
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: StartProcess
+                                              - kind: Newline
+                                                text: "\r\n"
+                                          - kind: Whitespace
+                                            text: "                "
+                                  - kind: EndKeyword
+                                    text: End
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: IfKeyword
+                                    text: If
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
                                 text: "            "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: DoEvents
-                                  - kind: Newline
-                                    text: "\r\n"
-                              - kind: Whitespace
-                                text: "            "
-                              - kind: CallStatement
-                                children:
-                                  - kind: Identifier
-                                    text: TaskMaster
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: StartProcess
-                                  - kind: Newline
-                                    text: "\r\n"
-                              - kind: Whitespace
-                                text: "        "
                           - kind: ElseClause
                             children:
                               - kind: ElseKeyword
@@ -7459,16 +8085,92 @@ cst:
                                 text: "\r\n"
                               - kind: StatementList
                                 children:
-                                  - kind: Whitespace
-                                    text: "            "
-                                  - kind: CallStatement
+                                  - kind: IfStatement
                                     children:
-                                      - kind: Identifier
-                                        text: DoEvents
+                                      - kind: Whitespace
+                                        text: "                "
+                                      - kind: IfKeyword
+                                        text: If
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MusicMaster
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: PlayMusic
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: ThenKeyword
+                                        text: Then
+                                      - kind: Newline
+                                        text: "\r\n"
+                                      - kind: StatementList
+                                        children:
+                                          - kind: Whitespace
+                                            text: "                    "
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: MusicMaster
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: StopProcess
+                                              - kind: Newline
+                                                text: "\r\n"
+                                          - kind: Whitespace
+                                            text: "                    "
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: DoEvents
+                                              - kind: Newline
+                                                text: "\r\n"
+                                          - kind: Whitespace
+                                            text: "                    "
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: MusicMaster
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: StartProcess
+                                              - kind: Newline
+                                                text: "\r\n"
+                                          - kind: Whitespace
+                                            text: "                "
+                                      - kind: ElseClause
+                                        children:
+                                          - kind: ElseKeyword
+                                            text: Else
+                                          - kind: Newline
+                                            text: "\r\n"
+                                          - kind: StatementList
+                                            children:
+                                              - kind: Whitespace
+                                                text: "                    "
+                                              - kind: CallStatement
+                                                children:
+                                                  - kind: Identifier
+                                                    text: DoEvents
+                                                  - kind: Newline
+                                                    text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "                "
+                                      - kind: EndKeyword
+                                        text: End
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IfKeyword
+                                        text: If
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
-                                    text: "        "
+                                    text: "            "
                           - kind: EndKeyword
                             text: End
                           - kind: Whitespace
@@ -8083,48 +8785,160 @@ cst:
                                                             text: "True"
                                                       - kind: Newline
                                                         text: "\r\n"
-                                                  - kind: Whitespace
-                                                    text: "                            "
-                                                  - kind: CallStatement
+                                                  - kind: IfStatement
                                                     children:
-                                                      - kind: Identifier
-                                                        text: TaskMaster
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: TimerTickNow
+                                                      - kind: Whitespace
+                                                        text: "                            "
+                                                      - kind: IfKeyword
+                                                        text: If
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: MemberAccessExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: MusicMaster
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: PlayMusic
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: ThenKeyword
+                                                        text: Then
                                                       - kind: Newline
                                                         text: "\r\n"
-                                                  - kind: Whitespace
-                                                    text: "                            "
-                                                  - kind: CallStatement
-                                                    children:
-                                                      - kind: Identifier
-                                                        text: TaskMaster
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: StopProcess
-                                                      - kind: Newline
-                                                        text: "\r\n"
-                                                  - kind: Whitespace
-                                                    text: "                            "
-                                                  - kind: CallStatement
-                                                    children:
-                                                      - kind: Identifier
-                                                        text: DoEvents
-                                                      - kind: Newline
-                                                        text: "\r\n"
-                                                  - kind: Whitespace
-                                                    text: "                            "
-                                                  - kind: CallStatement
-                                                    children:
-                                                      - kind: Identifier
-                                                        text: TaskMaster
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: StartProcess
+                                                      - kind: StatementList
+                                                        children:
+                                                          - kind: Whitespace
+                                                            text: "                                "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: TaskMaster
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: TimerTickNow
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                                "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: MusicMaster
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: StopProcess
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                                "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: TaskMaster
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: StopProcess
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                                "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: DoEvents
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                                "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: TaskMaster
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: StartProcess
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                                "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: MusicMaster
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: StartProcess
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                            "
+                                                      - kind: ElseClause
+                                                        children:
+                                                          - kind: ElseKeyword
+                                                            text: Else
+                                                          - kind: Newline
+                                                            text: "\r\n"
+                                                          - kind: StatementList
+                                                            children:
+                                                              - kind: Whitespace
+                                                                text: "                                "
+                                                              - kind: CallStatement
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: TaskMaster
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: TimerTickNow
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
+                                                              - kind: Whitespace
+                                                                text: "                                "
+                                                              - kind: CallStatement
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: TaskMaster
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: StopProcess
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
+                                                              - kind: Whitespace
+                                                                text: "                                "
+                                                              - kind: CallStatement
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: DoEvents
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
+                                                              - kind: Whitespace
+                                                                text: "                                "
+                                                              - kind: CallStatement
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: TaskMaster
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: StartProcess
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
+                                                              - kind: Whitespace
+                                                                text: "                            "
+                                                      - kind: EndKeyword
+                                                        text: End
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: IfKeyword
+                                                        text: If
                                                       - kind: Newline
                                                         text: "\r\n"
                                                   - kind: Whitespace
@@ -8159,6 +8973,10 @@ cst:
                                                     children:
                                                       - kind: Whitespace
                                                         text: "                            "
+                                                      - kind: Newline
+                                                        text: "\r\n"
+                                                      - kind: Whitespace
+                                                        text: "                            "
                                                       - kind: CallStatement
                                                         children:
                                                           - kind: Identifier
@@ -8175,6 +8993,18 @@ cst:
                                                         children:
                                                           - kind: Identifier
                                                             text: TaskMaster
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: StopProcess
+                                                          - kind: Newline
+                                                            text: "\r\n"
+                                                      - kind: Whitespace
+                                                        text: "                            "
+                                                      - kind: CallStatement
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: MusicMaster
                                                           - kind: PeriodOperator
                                                             text: "."
                                                           - kind: Identifier
@@ -8495,48 +9325,160 @@ cst:
                                                                         text: "True"
                                                                   - kind: Newline
                                                                     text: "\r\n"
-                                                              - kind: Whitespace
-                                                                text: "                                "
-                                                              - kind: CallStatement
+                                                              - kind: IfStatement
                                                                 children:
-                                                                  - kind: Identifier
-                                                                    text: TaskMaster
-                                                                  - kind: PeriodOperator
-                                                                    text: "."
-                                                                  - kind: Identifier
-                                                                    text: TimerTickNow
+                                                                  - kind: Whitespace
+                                                                    text: "                                "
+                                                                  - kind: IfKeyword
+                                                                    text: If
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: MemberAccessExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: MusicMaster
+                                                                      - kind: PeriodOperator
+                                                                        text: "."
+                                                                      - kind: Identifier
+                                                                        text: PlayMusic
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: ThenKeyword
+                                                                    text: Then
                                                                   - kind: Newline
                                                                     text: "\r\n"
-                                                              - kind: Whitespace
-                                                                text: "                                "
-                                                              - kind: CallStatement
-                                                                children:
-                                                                  - kind: Identifier
-                                                                    text: TaskMaster
-                                                                  - kind: PeriodOperator
-                                                                    text: "."
-                                                                  - kind: Identifier
-                                                                    text: StopProcess
-                                                                  - kind: Newline
-                                                                    text: "\r\n"
-                                                              - kind: Whitespace
-                                                                text: "                                "
-                                                              - kind: CallStatement
-                                                                children:
-                                                                  - kind: Identifier
-                                                                    text: DoEvents
-                                                                  - kind: Newline
-                                                                    text: "\r\n"
-                                                              - kind: Whitespace
-                                                                text: "                                "
-                                                              - kind: CallStatement
-                                                                children:
-                                                                  - kind: Identifier
-                                                                    text: TaskMaster
-                                                                  - kind: PeriodOperator
-                                                                    text: "."
-                                                                  - kind: Identifier
-                                                                    text: StartProcess
+                                                                  - kind: StatementList
+                                                                    children:
+                                                                      - kind: Whitespace
+                                                                        text: "                                    "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: TaskMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: TimerTickNow
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                                    "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: MusicMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: StopProcess
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                                    "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: TaskMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: StopProcess
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                                    "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: DoEvents
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                                    "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: TaskMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: StartProcess
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                                    "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: MusicMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: StartProcess
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                                "
+                                                                  - kind: ElseClause
+                                                                    children:
+                                                                      - kind: ElseKeyword
+                                                                        text: Else
+                                                                      - kind: Newline
+                                                                        text: "\r\n"
+                                                                      - kind: StatementList
+                                                                        children:
+                                                                          - kind: Whitespace
+                                                                            text: "                                    "
+                                                                          - kind: CallStatement
+                                                                            children:
+                                                                              - kind: Identifier
+                                                                                text: TaskMaster
+                                                                              - kind: PeriodOperator
+                                                                                text: "."
+                                                                              - kind: Identifier
+                                                                                text: TimerTickNow
+                                                                              - kind: Newline
+                                                                                text: "\r\n"
+                                                                          - kind: Whitespace
+                                                                            text: "                                    "
+                                                                          - kind: CallStatement
+                                                                            children:
+                                                                              - kind: Identifier
+                                                                                text: TaskMaster
+                                                                              - kind: PeriodOperator
+                                                                                text: "."
+                                                                              - kind: Identifier
+                                                                                text: StopProcess
+                                                                              - kind: Newline
+                                                                                text: "\r\n"
+                                                                          - kind: Whitespace
+                                                                            text: "                                    "
+                                                                          - kind: CallStatement
+                                                                            children:
+                                                                              - kind: Identifier
+                                                                                text: DoEvents
+                                                                              - kind: Newline
+                                                                                text: "\r\n"
+                                                                          - kind: Whitespace
+                                                                            text: "                                    "
+                                                                          - kind: CallStatement
+                                                                            children:
+                                                                              - kind: Identifier
+                                                                                text: TaskMaster
+                                                                              - kind: PeriodOperator
+                                                                                text: "."
+                                                                              - kind: Identifier
+                                                                                text: StartProcess
+                                                                              - kind: Newline
+                                                                                text: "\r\n"
+                                                                          - kind: Whitespace
+                                                                            text: "                                "
+                                                                  - kind: EndKeyword
+                                                                    text: End
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: IfKeyword
+                                                                    text: If
                                                                   - kind: Newline
                                                                     text: "\r\n"
                                                               - kind: Whitespace
@@ -8598,6 +9540,18 @@ cst:
                                                                   - kind: CallStatement
                                                                     children:
                                                                       - kind: Identifier
+                                                                        text: MusicMaster
+                                                                      - kind: PeriodOperator
+                                                                        text: "."
+                                                                      - kind: Identifier
+                                                                        text: StopProcess
+                                                                      - kind: Newline
+                                                                        text: "\r\n"
+                                                                  - kind: Whitespace
+                                                                    text: "                                "
+                                                                  - kind: CallStatement
+                                                                    children:
+                                                                      - kind: Identifier
                                                                         text: DoEvents
                                                                       - kind: Newline
                                                                         text: "\r\n"
@@ -8637,6 +9591,18 @@ cst:
                                     children:
                                       - kind: Identifier
                                         text: TaskMaster
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: RestEnd
+                                      - kind: Newline
+                                        text: "\r\n"
+                                  - kind: Whitespace
+                                    text: "                    "
+                                  - kind: CallStatement
+                                    children:
+                                      - kind: Identifier
+                                        text: MusicMaster
                                       - kind: PeriodOperator
                                         text: "."
                                       - kind: Identifier
@@ -9417,48 +10383,160 @@ cst:
                                                             text: "True"
                                                       - kind: Newline
                                                         text: "\r\n"
-                                                  - kind: Whitespace
-                                                    text: "                    "
-                                                  - kind: CallStatement
+                                                  - kind: IfStatement
                                                     children:
-                                                      - kind: Identifier
-                                                        text: TaskMaster
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: TimerTickNow
+                                                      - kind: Whitespace
+                                                        text: "                    "
+                                                      - kind: IfKeyword
+                                                        text: If
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: MemberAccessExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: MusicMaster
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: PlayMusic
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: ThenKeyword
+                                                        text: Then
                                                       - kind: Newline
                                                         text: "\r\n"
-                                                  - kind: Whitespace
-                                                    text: "                    "
-                                                  - kind: CallStatement
-                                                    children:
-                                                      - kind: Identifier
-                                                        text: TaskMaster
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: StopProcess
-                                                      - kind: Newline
-                                                        text: "\r\n"
-                                                  - kind: Whitespace
-                                                    text: "                    "
-                                                  - kind: CallStatement
-                                                    children:
-                                                      - kind: Identifier
-                                                        text: DoEvents
-                                                      - kind: Newline
-                                                        text: "\r\n"
-                                                  - kind: Whitespace
-                                                    text: "                    "
-                                                  - kind: CallStatement
-                                                    children:
-                                                      - kind: Identifier
-                                                        text: TaskMaster
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: StartProcess
+                                                      - kind: StatementList
+                                                        children:
+                                                          - kind: Whitespace
+                                                            text: "                        "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: TaskMaster
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: TimerTickNow
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                        "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: MusicMaster
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: StopProcess
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                        "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: TaskMaster
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: StopProcess
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                        "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: DoEvents
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                        "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: TaskMaster
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: StartProcess
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                        "
+                                                          - kind: CallStatement
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: MusicMaster
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: StartProcess
+                                                              - kind: Newline
+                                                                text: "\r\n"
+                                                          - kind: Whitespace
+                                                            text: "                    "
+                                                      - kind: ElseClause
+                                                        children:
+                                                          - kind: ElseKeyword
+                                                            text: Else
+                                                          - kind: Newline
+                                                            text: "\r\n"
+                                                          - kind: StatementList
+                                                            children:
+                                                              - kind: Whitespace
+                                                                text: "                        "
+                                                              - kind: CallStatement
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: TaskMaster
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: TimerTickNow
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
+                                                              - kind: Whitespace
+                                                                text: "                        "
+                                                              - kind: CallStatement
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: TaskMaster
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: StopProcess
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
+                                                              - kind: Whitespace
+                                                                text: "                        "
+                                                              - kind: CallStatement
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: DoEvents
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
+                                                              - kind: Whitespace
+                                                                text: "                        "
+                                                              - kind: CallStatement
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: TaskMaster
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: StartProcess
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
+                                                              - kind: Whitespace
+                                                                text: "                    "
+                                                      - kind: EndKeyword
+                                                        text: End
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: IfKeyword
+                                                        text: If
                                                       - kind: Newline
                                                         text: "\r\n"
                                                   - kind: Whitespace
@@ -9509,6 +10587,18 @@ cst:
                                                         children:
                                                           - kind: Identifier
                                                             text: TaskMaster
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: StopProcess
+                                                          - kind: Newline
+                                                            text: "\r\n"
+                                                      - kind: Whitespace
+                                                        text: "                    "
+                                                      - kind: CallStatement
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: MusicMaster
                                                           - kind: PeriodOperator
                                                             text: "."
                                                           - kind: Identifier
@@ -10045,48 +11135,160 @@ cst:
                                                                         text: "True"
                                                                   - kind: Newline
                                                                     text: "\r\n"
-                                                              - kind: Whitespace
-                                                                text: "                        "
-                                                              - kind: CallStatement
+                                                              - kind: IfStatement
                                                                 children:
-                                                                  - kind: Identifier
-                                                                    text: TaskMaster
-                                                                  - kind: PeriodOperator
-                                                                    text: "."
-                                                                  - kind: Identifier
-                                                                    text: TimerTickNow
+                                                                  - kind: Whitespace
+                                                                    text: "                        "
+                                                                  - kind: IfKeyword
+                                                                    text: If
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: MemberAccessExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: MusicMaster
+                                                                      - kind: PeriodOperator
+                                                                        text: "."
+                                                                      - kind: Identifier
+                                                                        text: PlayMusic
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: ThenKeyword
+                                                                    text: Then
                                                                   - kind: Newline
                                                                     text: "\r\n"
-                                                              - kind: Whitespace
-                                                                text: "                        "
-                                                              - kind: CallStatement
-                                                                children:
-                                                                  - kind: Identifier
-                                                                    text: TaskMaster
-                                                                  - kind: PeriodOperator
-                                                                    text: "."
-                                                                  - kind: Identifier
-                                                                    text: StopProcess
-                                                                  - kind: Newline
-                                                                    text: "\r\n"
-                                                              - kind: Whitespace
-                                                                text: "                        "
-                                                              - kind: CallStatement
-                                                                children:
-                                                                  - kind: Identifier
-                                                                    text: DoEvents
-                                                                  - kind: Newline
-                                                                    text: "\r\n"
-                                                              - kind: Whitespace
-                                                                text: "                        "
-                                                              - kind: CallStatement
-                                                                children:
-                                                                  - kind: Identifier
-                                                                    text: TaskMaster
-                                                                  - kind: PeriodOperator
-                                                                    text: "."
-                                                                  - kind: Identifier
-                                                                    text: StartProcess
+                                                                  - kind: StatementList
+                                                                    children:
+                                                                      - kind: Whitespace
+                                                                        text: "                            "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: TaskMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: TimerTickNow
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                            "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: MusicMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: StopProcess
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                            "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: TaskMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: StopProcess
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                            "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: DoEvents
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                            "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: TaskMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: StartProcess
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                            "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: MusicMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: StartProcess
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                        "
+                                                                  - kind: ElseClause
+                                                                    children:
+                                                                      - kind: ElseKeyword
+                                                                        text: Else
+                                                                      - kind: Newline
+                                                                        text: "\r\n"
+                                                                      - kind: StatementList
+                                                                        children:
+                                                                          - kind: Whitespace
+                                                                            text: "                            "
+                                                                          - kind: CallStatement
+                                                                            children:
+                                                                              - kind: Identifier
+                                                                                text: TaskMaster
+                                                                              - kind: PeriodOperator
+                                                                                text: "."
+                                                                              - kind: Identifier
+                                                                                text: TimerTickNow
+                                                                              - kind: Newline
+                                                                                text: "\r\n"
+                                                                          - kind: Whitespace
+                                                                            text: "                            "
+                                                                          - kind: CallStatement
+                                                                            children:
+                                                                              - kind: Identifier
+                                                                                text: TaskMaster
+                                                                              - kind: PeriodOperator
+                                                                                text: "."
+                                                                              - kind: Identifier
+                                                                                text: StopProcess
+                                                                              - kind: Newline
+                                                                                text: "\r\n"
+                                                                          - kind: Whitespace
+                                                                            text: "                            "
+                                                                          - kind: CallStatement
+                                                                            children:
+                                                                              - kind: Identifier
+                                                                                text: DoEvents
+                                                                              - kind: Newline
+                                                                                text: "\r\n"
+                                                                          - kind: Whitespace
+                                                                            text: "                            "
+                                                                          - kind: CallStatement
+                                                                            children:
+                                                                              - kind: Identifier
+                                                                                text: TaskMaster
+                                                                              - kind: PeriodOperator
+                                                                                text: "."
+                                                                              - kind: Identifier
+                                                                                text: StartProcess
+                                                                              - kind: Newline
+                                                                                text: "\r\n"
+                                                                          - kind: Whitespace
+                                                                            text: "                        "
+                                                                  - kind: EndKeyword
+                                                                    text: End
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: IfKeyword
+                                                                    text: If
                                                                   - kind: Newline
                                                                     text: "\r\n"
                                                               - kind: Whitespace
@@ -10148,6 +11350,18 @@ cst:
                                                                   - kind: CallStatement
                                                                     children:
                                                                       - kind: Identifier
+                                                                        text: MusicMaster
+                                                                      - kind: PeriodOperator
+                                                                        text: "."
+                                                                      - kind: Identifier
+                                                                        text: StopProcess
+                                                                      - kind: Newline
+                                                                        text: "\r\n"
+                                                                  - kind: Whitespace
+                                                                    text: "                        "
+                                                                  - kind: CallStatement
+                                                                    children:
+                                                                      - kind: Identifier
                                                                         text: DoEvents
                                                                       - kind: Newline
                                                                         text: "\r\n"
@@ -10187,6 +11401,18 @@ cst:
                                     children:
                                       - kind: Identifier
                                         text: TaskMaster
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: RestEnd
+                                      - kind: Newline
+                                        text: "\r\n"
+                                  - kind: Whitespace
+                                    text: "            "
+                                  - kind: CallStatement
+                                    children:
+                                      - kind: Identifier
+                                        text: MusicMaster
                                       - kind: PeriodOperator
                                         text: "."
                                       - kind: Identifier
@@ -10286,7 +11512,7 @@ cst:
                   - kind: MemberAccessExpression
                     children:
                       - kind: Identifier
-                        text: TaskMaster
+                        text: MusicMaster
                       - kind: PeriodOperator
                         text: "."
                       - kind: Identifier
@@ -10299,6 +11525,10 @@ cst:
                     text: "\r\n"
                   - kind: StatementList
                     children:
+                      - kind: EndOfLineComment
+                        text: "' why check again."
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: IfStatement
                         children:
                           - kind: Whitespace
@@ -10393,62 +11623,14 @@ cst:
                                 text: "\r\n"
                       - kind: Whitespace
                         text: "    "
-                      - kind: AssignmentStatement
-                        children:
-                          - kind: MemberAccessExpression
-                            children:
-                              - kind: Identifier
-                                text: TaskMaster
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: OnlyMusic
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EqualityOperator
-                            text: "="
-                          - kind: Whitespace
-                            text: " "
-                          - kind: BooleanLiteralExpression
-                            children:
-                              - kind: TrueKeyword
-                                text: "True"
-                          - kind: Newline
-                            text: "\r\n"
-                      - kind: Whitespace
-                        text: "    "
                       - kind: CallStatement
                         children:
                           - kind: Identifier
-                            text: TaskMaster
+                            text: MusicMaster
                           - kind: PeriodOperator
                             text: "."
                           - kind: Identifier
                             text: TimerTick
-                          - kind: Newline
-                            text: "\r\n"
-                      - kind: Whitespace
-                        text: "    "
-                      - kind: AssignmentStatement
-                        children:
-                          - kind: MemberAccessExpression
-                            children:
-                              - kind: Identifier
-                                text: TaskMaster
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: OnlyMusic
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EqualityOperator
-                            text: "="
-                          - kind: Whitespace
-                            text: " "
-                          - kind: BooleanLiteralExpression
-                            children:
-                              - kind: FalseKeyword
-                                text: "False"
                           - kind: Newline
                             text: "\r\n"
                   - kind: EndKeyword
@@ -10864,6 +12046,18 @@ cst:
                                                                       - kind: CallStatement
                                                                         children:
                                                                           - kind: Identifier
+                                                                            text: MusicMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: rest
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                            "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
                                                                             text: UpdateWindow
                                                                           - kind: Whitespace
                                                                             text: " "
@@ -10895,6 +12089,18 @@ cst:
                                                                         children:
                                                                           - kind: Identifier
                                                                             text: TaskMaster
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: RestEnd
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
+                                                                      - kind: Whitespace
+                                                                        text: "                            "
+                                                                      - kind: CallStatement
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: MusicMaster
                                                                           - kind: PeriodOperator
                                                                             text: "."
                                                                           - kind: Identifier
@@ -11672,6 +12878,18 @@ cst:
                                                       - kind: CallStatement
                                                         children:
                                                           - kind: Identifier
+                                                            text: MusicMaster
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: rest
+                                                          - kind: Newline
+                                                            text: "\r\n"
+                                                      - kind: Whitespace
+                                                        text: "                "
+                                                      - kind: CallStatement
+                                                        children:
+                                                          - kind: Identifier
                                                             text: DoEvents
                                                           - kind: Newline
                                                             text: "\r\n"
@@ -11681,6 +12899,18 @@ cst:
                                                         children:
                                                           - kind: Identifier
                                                             text: TaskMaster
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: RestEnd
+                                                          - kind: Newline
+                                                            text: "\r\n"
+                                                      - kind: Whitespace
+                                                        text: "                "
+                                                      - kind: CallStatement
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: MusicMaster
                                                           - kind: PeriodOperator
                                                             text: "."
                                                           - kind: Identifier
@@ -11948,7 +13178,7 @@ cst:
               - kind: Whitespace
                 text: " "
               - kind: Identifier
-                text: A
+                text: a
               - kind: Whitespace
                 text: " "
               - kind: AsKeyword
@@ -12064,7 +13294,7 @@ cst:
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: A
+                                text: a
                           - kind: Whitespace
                             text: " "
                           - kind: GreaterThanOperator
@@ -12212,7 +13442,7 @@ cst:
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: A
+                                text: a
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
@@ -12224,7 +13454,7 @@ cst:
                               - kind: IdentifierExpression
                                 children:
                                   - kind: Identifier
-                                    text: A
+                                    text: a
                               - kind: Whitespace
                                 text: " "
                               - kind: BackwardSlashOperator
@@ -12266,7 +13496,7 @@ cst:
               - kind: LeftParenthesis
                 text: (
               - kind: Identifier
-                text: A
+                text: a
               - kind: Whitespace
                 text: " "
               - kind: AsKeyword
@@ -12346,7 +13576,7 @@ cst:
                       - kind: IdentifierExpression
                         children:
                           - kind: Identifier
-                            text: A
+                            text: a
                       - kind: Whitespace
                         text: " "
                       - kind: GreaterThanOperator
@@ -12450,7 +13680,7 @@ cst:
                           - kind: PeriodOperator
                             text: "."
                           - kind: Identifier
-                            text: count
+                            text: Count
                       - kind: Whitespace
                         text: " "
                       - kind: LessThanOperator
@@ -14244,7 +15474,7 @@ cst:
                           - kind: PeriodOperator
                             text: "."
                           - kind: Identifier
-                            text: count
+                            text: Count
                       - kind: Whitespace
                         text: " "
                       - kind: LessThanOperator

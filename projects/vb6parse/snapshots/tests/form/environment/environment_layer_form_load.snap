@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/environment.rs
+source: projects/vb6parse/tests/form/environment.rs
 expression: form_file
 ---
 form:
@@ -758,6 +758,12 @@ cst:
                     text: " "
                   - kind: NextKeyword
                     text: Next
+                  - kind: Newline
+                    text: "\r\n"
+              - kind: CallStatement
+                children:
+                  - kind: Identifier
+                    text: DestroyToolTip
                   - kind: Newline
                     text: "\r\n"
               - kind: SetStatement
@@ -1845,7 +1851,7 @@ cst:
                               - kind: PeriodOperator
                                 text: "."
                               - kind: Identifier
-                                text: top
+                                text: Top
                       - kind: Comma
                         text: ","
                       - kind: Whitespace
@@ -2047,7 +2053,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: R
+                    text: r
                   - kind: Ampersand
                     text: "&"
                   - kind: Comma
@@ -2055,7 +2061,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: k
+                    text: K
                   - kind: Ampersand
                     text: "&"
                   - kind: Newline
@@ -2067,7 +2073,7 @@ cst:
                   - kind: IdentifierExpression
                     children:
                       - kind: Identifier
-                        text: R
+                        text: r
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
@@ -2111,7 +2117,7 @@ cst:
                   - kind: IdentifierExpression
                     children:
                       - kind: Identifier
-                        text: R
+                        text: r
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
@@ -2163,7 +2169,7 @@ cst:
                                                           - kind: IdentifierExpression
                                                             children:
                                                               - kind: Identifier
-                                                                text: R
+                                                                text: r
                                                   - kind: RightParenthesis
                                                     text: )
                                           - kind: Comma
@@ -2209,7 +2215,7 @@ cst:
                               - kind: IdentifierExpression
                                 children:
                                   - kind: Identifier
-                                    text: R
+                                    text: r
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
