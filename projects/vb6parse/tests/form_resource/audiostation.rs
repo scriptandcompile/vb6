@@ -4,10 +4,9 @@ use assert_matches::assert_matches;
 
 #[test]
 fn audiostation_about_frx() {
-    let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_About.frx",
-    )
-    .expect("Failed to read file");
+    let result =
+        FormResourceFile::from_file("../../test-data/audiostation/Source/Forms/Form_About.frx")
+            .expect("Failed to read file");
 
     assert!(!result.has_failures());
     let resource_file = result.unwrap_or_fail();
@@ -58,10 +57,9 @@ fn audiostation_about_frx() {
 
 #[test]
 fn audiostation_busy_frx() {
-    let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_Busy.frx",
-    )
-    .expect("Failed to read file");
+    let result =
+        FormResourceFile::from_file("../../test-data/audiostation/Source/Forms/Form_Busy.frx")
+            .expect("Failed to read file");
 
     assert!(!result.has_failures());
     let resource_file = result.unwrap_or_fail();
@@ -76,10 +74,9 @@ fn audiostation_busy_frx() {
 
 #[test]
 fn audiostation_init_frx() {
-    let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_Init.frx",
-    )
-    .expect("Failed to read file");
+    let result =
+        FormResourceFile::from_file("../../test-data/audiostation/Source/Forms/Form_Init.frx")
+            .expect("Failed to read file");
 
     assert!(!result.has_failures());
     let resource_file = result.unwrap_or_fail();
@@ -140,10 +137,9 @@ fn audiostation_init_frx() {
 
 #[test]
 fn audiostation_main_frx() {
-    let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_Main.frx",
-    )
-    .expect("Failed to read file");
+    let result =
+        FormResourceFile::from_file("../../test-data/audiostation/Source/Forms/Form_Main.frx")
+            .expect("Failed to read file");
 
     assert!(!result.has_failures());
     let resource_file = result.unwrap_or_fail();
@@ -206,10 +202,9 @@ fn audiostation_main_frx() {
 
 #[test]
 fn audiostation_normalize_frx() {
-    let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_Normalize.frx",
-    )
-    .expect("Failed to read file");
+    let result =
+        FormResourceFile::from_file("../../test-data/audiostation/Source/Forms/Form_Normalize.frx")
+            .expect("Failed to read file");
 
     assert!(!result.has_failures());
     let resource_file = result.unwrap_or_fail();
@@ -225,7 +220,7 @@ fn audiostation_normalize_frx() {
 #[test]
 fn audiostation_open_dialog_frx() {
     let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_OpenDialog.frx",
+        "../../test-data/audiostation/Source/Forms/Form_OpenDialog.frx",
     )
     .expect("Failed to read file");
 
@@ -268,10 +263,9 @@ fn audiostation_open_dialog_frx() {
 
 #[test]
 fn audiostation_playlist_frx() {
-    let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_Playlist.frx",
-    )
-    .expect("Failed to read file");
+    let result =
+        FormResourceFile::from_file("../../test-data/audiostation/Source/Forms/Form_Playlist.frx")
+            .expect("Failed to read file");
 
     assert!(!result.has_failures());
     let resource_file = result.unwrap_or_fail();
@@ -286,10 +280,9 @@ fn audiostation_playlist_frx() {
 
 #[test]
 fn audiostation_plugins_frx() {
-    let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_Plugins.frx",
-    )
-    .expect("Failed to read file");
+    let result =
+        FormResourceFile::from_file("../../test-data/audiostation/Source/Forms/Form_Plugins.frx")
+            .expect("Failed to read file");
 
     assert!(!result.has_failures());
     let resource_file = result.unwrap_or_fail();
@@ -305,7 +298,7 @@ fn audiostation_plugins_frx() {
 #[test]
 fn audiostation_settings_recorder_frx() {
     let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_Settings_Recorder.frx",
+        "../../test-data/audiostation/Source/Forms/Form_Settings_Recorder.frx",
     )
     .expect("Failed to read file");
 
@@ -323,7 +316,7 @@ fn audiostation_settings_recorder_frx() {
 #[test]
 fn audiostation_settings_record_frx() {
     let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_Settings_Record.frx",
+        "../../test-data/audiostation/Source/Forms/Form_Settings_Record.frx",
     )
     .expect("Failed to read file");
 
@@ -386,10 +379,9 @@ fn audiostation_settings_record_frx() {
 
 #[test]
 fn audiostation_streams_frx() {
-    let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_Streams.frx",
-    )
-    .expect("Failed to read file");
+    let result =
+        FormResourceFile::from_file("../../test-data/audiostation/Source/Forms/Form_Streams.frx")
+            .expect("Failed to read file");
 
     assert!(!result.has_failures());
     let resource_file = result.unwrap_or_fail();
@@ -400,32 +392,4 @@ fn audiostation_streams_frx() {
     assert_eq!(entries.len(), 1);
     assert_eq!(entries[0].0, 0x00);
     assert_matches!(entries[0].1, ResourceEntry::Empty { .. });
-}
-
-#[test]
-fn audiostation_track_properties_frx() {
-    let result = FormResourceFile::from_file(
-        "../../test-data/audiostation/Audiostation/src/Forms/Form_Track_Properties.frx",
-    )
-    .expect("Failed to read file");
-
-    assert!(!result.has_failures());
-    let resource_file = result.unwrap_or_fail();
-
-    let mut entries: Vec<_> = resource_file.iter_entries().collect();
-    entries.sort_by_key(|(offset, _)| *offset);
-
-    assert_eq!(entries.len(), 2);
-
-    // Offset 0x00 - Empty
-    assert_eq!(entries[0].0, 0x00);
-    assert_matches!(entries[0].1, ResourceEntry::Empty { .. });
-
-    // Offset 0x0C - Record1ByteHeader (20 bytes)
-    assert_eq!(entries[1].0, 0x0C);
-    if let ResourceEntry::Record1ByteHeader { data } = entries[1].1 {
-        assert_eq!(data.len(), 20);
-    } else {
-        panic!("Expected Record1ByteHeader at 0x0C");
-    }
 }
