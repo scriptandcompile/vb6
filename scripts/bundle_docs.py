@@ -55,6 +55,7 @@ MARKDOWN_FILES = [
     "projects/vb6convert/README.md",
     "projects/vb6interpret/README.md",
     "projects/vb6libraries/README.md",
+    "projects/vb6format/README.md",
     "projects/vb6runtime/README.md",
     
     # Design documents

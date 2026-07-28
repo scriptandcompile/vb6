@@ -150,6 +150,22 @@ PROJECTS = [
         ]
     },
     {
+        "slug": "vb6format",
+        "name": "vb6format",
+        "category": "Tooling",
+        "status": "early-development",
+        "statusLabel": "Early development",
+        "statusDetail": "Line-based indentation engine is functional; more formatting passes planned.",
+        "summary": "Reformat VB6 source files with correct block indentation.",
+        "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format",
+        "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format/README.md",
+        "notes": [
+            "Used by the aspen fmt subcommand.",
+            "Line-based keyword analysis with single-line If detection.",
+            "Extensible FmtSettings struct for future formatting rules."
+        ]
+    },
+    {
         "slug": "vb6grammarfuzz",
         "name": "vb6grammarfuzz",
         "category": "Tooling",
