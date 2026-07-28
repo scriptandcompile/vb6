@@ -20,7 +20,7 @@ PROJECTS = [
     "category": "Tooling",
     "status": "stable",
     "statusLabel": "Stable",
-    "statusDetail": "Cargo-like VB6 project tooling for VB6 projects.",
+    "statusDetail": "Cargo-like tooling for VB6 projects.",
     "summary": "Check, analyze, and manage VB6 projects from the command line.",
     "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/aspen",
     "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/aspen/README.md",
@@ -28,6 +28,21 @@ PROJECTS = [
       "aspen check - stable.",
       "aspen fmt - stable",
       "Currently depends on vb6parse and will eventually require vb6semantic"
+    ]
+  },
+    {
+    "slug": "vb6grammarfuzz",
+    "name": "vb6grammarfuzz",
+    "category": "Tooling",
+    "status": "stable",
+    "statusLabel": "Stable",
+    "statusDetail": "Grammar fuzzing and parser comparison tooling.",
+    "summary": "Parser exploration and grammar validation utilities.",
+    "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6grammarfuzz",
+    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6grammarfuzz/README.md",
+    "notes": [
+      "Useful for regression discovery and grammar edge cases.",
+      "Includes the external ProLeap parser submodule."
     ]
   },
   {
@@ -45,21 +60,6 @@ PROJECTS = [
       "Indent formatting supported",
       "Compiler directive formatting supported.",
       "Line ending detection and formatting supported."
-    ]
-  },
-  {
-    "slug": "vb6grammarfuzz",
-    "name": "vb6grammarfuzz",
-    "category": "Tooling",
-    "status": "stable",
-    "statusLabel": "Stable",
-    "statusDetail": "Grammar fuzzing and parser comparison tooling.",
-    "summary": "Parser exploration and grammar validation utilities.",
-    "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6grammarfuzz",
-    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6grammarfuzz/README.md",
-    "notes": [
-      "Useful for regression discovery and grammar edge cases.",
-      "Includes the external ProLeap parser submodule."
     ]
   },
   {
