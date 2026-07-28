@@ -83,6 +83,22 @@ fn main() -> Result<()> {
                         .help("indentation size in spaces"),
                 )
                 .arg(
+                    Arg::new("blank-lines-around-directives")
+                        .long("blank-lines-around-directives")
+                        .required(false)
+                        .value_parser(value_parser!(bool))
+                        .action(clap::ArgAction::SetTrue)
+                        .help("insert blank line before #If and after #End If"),
+                )
+                .arg(
+                    Arg::new("blank-lines-inside-directives")
+                        .long("blank-lines-inside-directives")
+                        .required(false)
+                        .value_parser(value_parser!(bool))
+                        .action(clap::ArgAction::SetTrue)
+                        .help("insert blank lines between #If/#ElseIf/#Else/#End If and their bodies"),
+                )
+                .arg(
                     Arg::new("project path")
                         .required(false)
                         .value_parser(value_parser!(PathBuf)),
@@ -129,11 +145,18 @@ fn main() -> Result<()> {
 
         let check = *matches.get_one::<bool>("check").unwrap_or(&false);
         let indent_size = *matches.get_one::<usize>("indent-size").unwrap_or(&4);
+        let cli_blank_around = matches.get_one::<bool>("blank-lines-around-directives").copied();
+        let cli_blank_inside = matches.get_one::<bool>("blank-lines-inside-directives").copied();
 
         let cmd = fmt::FmtCommand {
             project_path,
             check,
-            fmt_settings: fmt::FmtSettings { indent_size },
+            fmt_settings: fmt::FmtSettings {
+                indent_size,
+                ..Default::default()
+            },
+            cli_blank_around,
+            cli_blank_inside,
         };
 
         fmt_subcommand(cmd)?;

@@ -25,6 +25,33 @@ checked. Defaults to the current directory.
 | `--class` | `-c` | Skip checking classes |
 | `--reference` | `-r` | Skip checking references |
 
+### `fmt`
+
+Reformat VB6 source files (`.bas`, `.cls`, `.frm`) with correct block indentation.
+
+```
+aspen fmt [OPTIONS] [project path]
+```
+
+If `[project path]` is a directory, Aspen recursively discovers VB6 source files
+or `.vbp` project files. Defaults to the current directory.
+
+| Flag | Description |
+|------|-------------|
+| `--check` | Only check formatting; exit 1 if any file would change |
+| `--indent-size` | Spaces per indent level (default: 4) |
+| `--blank-lines-around-directives` | Insert blank line before `#If` and after `#End If` |
+| `--blank-lines-inside-directives` | Insert blank lines between `#If`/`#ElseIf`/`#Else`/`#End If` and their bodies |
+
+Settings can also be specified in `.aspen.toml`:
+
+```toml
+[fmt]
+indent_size = 4
+blank_lines_around_directives = true
+blank_lines_inside_directives = false
+```
+
 ### Examples
 
 ```sh
@@ -36,6 +63,15 @@ aspen check path/to/project.vbp
 
 # Check a directory, skipping form validation
 aspen check --form path/to/projects/
+
+# Format a single file
+aspen fmt path/to/source.bas
+
+# Check if files are formatted without writing
+aspen fmt --check path/to/project.vbp
+
+# Format with 2-space indentation and blank lines around directives
+aspen fmt --indent-size 2 --blank-lines-around-directives
 ```
 
 ## Installation
