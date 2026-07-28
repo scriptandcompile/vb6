@@ -2,7 +2,8 @@ use vb6parse::*;
 
 #[test]
 fn discrete_probability_detector_dpd_project_load() {
-    let project_file_bytes = include_bytes!("../../../../test-data/Discrete-Probability-Detector-in-VB6/DPD.vbp");
+    let project_file_bytes =
+        include_bytes!("../../../../test-data/Discrete-Probability-Detector-in-VB6/DPD.vbp");
 
     let result = SourceFile::decode_with_replacement("DPD.vbp", project_file_bytes);
 

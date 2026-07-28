@@ -65,7 +65,8 @@ fn environment_colordialog_form_load() {
 
 #[test]
 fn environment_fileselectordialog_form_load() {
-    let form_file_bytes = include_bytes!("../../../../test-data/Environment/FileSelectorDialog.frm");
+    let form_file_bytes =
+        include_bytes!("../../../../test-data/Environment/FileSelectorDialog.frm");
 
     let source_file =
         SourceFile::decode_with_replacement("FileSelectorDialog.frm", form_file_bytes);

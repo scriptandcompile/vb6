@@ -8,7 +8,7 @@ use anyhow::Result;
 
 use std::{env::current_dir, path::PathBuf};
 
-use clap::{command, value_parser, Arg, Command};
+use clap::{Arg, Command, command, value_parser};
 
 fn main() -> Result<()> {
     let matches = command!()
@@ -96,7 +96,9 @@ fn main() -> Result<()> {
                         .required(false)
                         .value_parser(value_parser!(bool))
                         .action(clap::ArgAction::SetTrue)
-                        .help("insert blank lines between #If/#ElseIf/#Else/#End If and their bodies"),
+                        .help(
+                            "insert blank lines between #If/#ElseIf/#Else/#End If and their bodies",
+                        ),
                 )
                 .arg(
                     Arg::new("project path")
@@ -145,8 +147,12 @@ fn main() -> Result<()> {
 
         let check = *matches.get_one::<bool>("check").unwrap_or(&false);
         let indent_size = *matches.get_one::<usize>("indent-size").unwrap_or(&4);
-        let cli_blank_around = matches.get_one::<bool>("blank-lines-around-directives").copied();
-        let cli_blank_inside = matches.get_one::<bool>("blank-lines-inside-directives").copied();
+        let cli_blank_around = matches
+            .get_one::<bool>("blank-lines-around-directives")
+            .copied();
+        let cli_blank_inside = matches
+            .get_one::<bool>("blank-lines-inside-directives")
+            .copied();
 
         let cmd = fmt::FmtCommand {
             project_path,

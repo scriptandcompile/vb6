@@ -146,10 +146,7 @@ fn main() -> Result<()> {
                     );
                 }
             } else {
-                println!(
-                    "No Error nodes. {} parse failure(s).",
-                    result.failure_count
-                );
+                println!("No Error nodes. {} parse failure(s).", result.failure_count);
             }
         }
 

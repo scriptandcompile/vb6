@@ -6,8 +6,9 @@ use vb6parse::*;
 // boundary bug in the error reporting when handling multi-byte UTF-8 characters.
 #[test]
 fn bitrate_calculator_project_load() {
-    let project_file_bytes =
-        include_bytes!("../../../../test-data/Bitrate-calculator/Windows/Source-code/BitrateCalc.vbp");
+    let project_file_bytes = include_bytes!(
+        "../../../../test-data/Bitrate-calculator/Windows/Source-code/BitrateCalc.vbp"
+    );
 
     let result = SourceFile::decode_with_replacement("BitrateCalc.vbp", project_file_bytes);
 
