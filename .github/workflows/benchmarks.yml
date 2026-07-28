@@ -45,12 +45,6 @@ jobs:
       - name: Generate benchmarks
         run: python3 projects/vb6parse/scripts/generate-benchmarks.py
 
-      - name: Relocate benchmark data
-        run: |
-          mkdir -p docs/vb6parse/assets/data
-          mv docs/assets/data/benchmarks.json docs/vb6parse/assets/data/
-          mv docs/assets/data/benchmarks-history.json docs/vb6parse/assets/data/
-
       - name: Commit and push if changed
         run: |
           git pull --rebase --autostash

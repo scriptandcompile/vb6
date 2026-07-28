@@ -12,8 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 # Configuration
-HISTORY_FILE = Path("docs/assets/data/benchmarks-history.json")
-SNAPSHOT_FILE = Path("docs/assets/data/benchmarks.json")
+HISTORY_FILE = Path("docs/vb6parse/assets/data/benchmarks-history.json")
+SNAPSHOT_FILE = Path("docs/vb6parse/assets/data/benchmarks.json")
 RETENTION_DAYS_FULL = 30
 RETENTION_DAYS_WEEKLY = 180
 RETENTION_DAYS_MONTHLY = 365

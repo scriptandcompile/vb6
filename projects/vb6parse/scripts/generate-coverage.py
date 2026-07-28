@@ -13,9 +13,9 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 # Configuration
-HISTORY_FILE = Path("docs/assets/data/coverage-history.json")
-COVERAGE_FILE = Path("docs/assets/data/coverage.json")
-STATS_FILE = Path("docs/assets/data/stats.json")
+HISTORY_FILE = Path("docs/vb6parse/assets/data/coverage-history.json")
+COVERAGE_FILE = Path("docs/vb6parse/assets/data/coverage.json")
+STATS_FILE = Path("docs/vb6parse/assets/data/stats.json")
 RETENTION_DAYS_FULL = 30
 RETENTION_DAYS_WEEKLY = 180
 RETENTION_DAYS_MONTHLY = 365
@@ -163,7 +163,7 @@ def generate_html_coverage():
     """Generate HTML coverage reports using llvm-cov."""
     print("Generating HTML coverage reports...")
     
-    output_dir = Path('docs/assets/coverage')
+    output_dir = Path('docs/vb6parse/assets/coverage')
     output_dir.mkdir(parents=True, exist_ok=True)
     
     try:

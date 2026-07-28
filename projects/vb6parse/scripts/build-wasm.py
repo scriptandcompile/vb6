@@ -158,7 +158,8 @@ def main():
     # Determine project root (parent of scripts directory)
     script_dir = Path(__file__).parent.resolve()
     project_root = script_dir.parent
-    output_dir = project_root / "docs" / "assets" / "wasm"
+    workspace_root = project_root.parent.parent
+    output_dir = workspace_root / "docs" / "vb6parse" / "assets" / "wasm"
     
     print("=" * 60)
     print("VB6Parse WASM Build Script")
