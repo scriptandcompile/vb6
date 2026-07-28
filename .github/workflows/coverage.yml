@@ -59,6 +59,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Update coverage data [skip ci]"
+            git commit -m "Update coverage data"
             git push
           fi
