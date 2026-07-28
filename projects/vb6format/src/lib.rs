@@ -1,7 +1,5 @@
 mod cst_formatter;
-mod directives;
 pub mod settings;
-mod type_enum;
 
 pub use settings::FmtSettings;
 
@@ -22,8 +20,36 @@ pub fn fmt_source(source: &str, settings: &FmtSettings) -> Result<String> {
         formatter.walk_node(&root);
     }
 
-    directives::post_process_directives(&mut output, settings, line_ending);
-    type_enum::post_process_type_enum(&mut output, settings, line_ending);
+    deduplicate_blank_lines(&mut output, line_ending);
 
     Ok(output)
+}
+
+fn deduplicate_blank_lines(output: &mut String, le: &str) {
+    let lines: Vec<&str> = if le == "\r\n" {
+        output.split("\r\n").collect()
+    } else {
+        output.split('\n').collect()
+    };
+
+    let mut result = String::with_capacity(output.len());
+    let mut prev_blank = false;
+
+    for (i, line) in lines.iter().enumerate() {
+        let is_trailing = line.is_empty() && i == lines.len() - 1;
+        if is_trailing {
+            break;
+        }
+        if line.is_empty() {
+            if !prev_blank {
+                result.push_str(le);
+                prev_blank = true;
+            }
+        } else {
+            result.push_str(line);
+            result.push_str(le);
+            prev_blank = false;
+        }
+    }
+    *output = result;
 }
