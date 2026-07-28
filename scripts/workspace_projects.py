@@ -63,15 +63,15 @@ PROJECTS = [
         "slug": "aspen",
         "name": "aspen",
         "category": "Tooling",
-        "status": "needs-update",
-        "statusLabel": "Needs update",
-        "statusDetail": "Cargo-like VB6 project tooling needs refresh against vb6parse.",
+        "status": "stable",
+        "statusLabel": "Stable",
+        "statusDetail": "Cargo-like VB6 project tooling for VB6 projects.",
         "summary": "Check, analyze, and manage VB6 projects from the command line.",
         "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/aspen",
         "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/aspen/README.md",
         "notes": [
-            "Should be aligned with the latest parser APIs.",
-            "Natural place for unified workspace commands."
+            "aspen check - near completion.",
+            "Currently depends on vb6parse and eventually vb6semantic"
         ]
     },
     {
