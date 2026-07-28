@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-07-28T22:50:30Z",
+  "last_updated": "2026-07-28T23:15:00Z",
   "snapshots": [
     {
       "timestamp": "2026-07-06T07:06:31Z",
@@ -579,16 +579,50 @@
           "percent": 94.29
         }
       }
+    },
+    {
+      "timestamp": "2026-07-28T23:15:00Z",
+      "commit_sha": "d60900642f5422ae05f163de3e3eacb5df988a30",
+      "commit_message": "no longer using post processing line by line to handle indenting and compiler directives. now using statement block and cst walking.",
+      "coverage": {
+        "line_coverage": 94.06,
+        "function_coverage": 90.95,
+        "region_coverage": 94.29
+      },
+      "tests": {
+        "total": 5661,
+        "lib_tests": 5533,
+        "doc_tests": 128,
+        "integration_tests": 0,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 98298,
+          "total": 104502,
+          "percent": 94.06
+        },
+        "functions": {
+          "covered": 6321,
+          "total": 6950,
+          "percent": 90.95
+        },
+        "regions": {
+          "covered": 157013,
+          "total": 166523,
+          "percent": 94.29
+        }
+      }
     }
   ],
   "coverage_summary": {
     "line_coverage": {
       "latest": 94.06,
       "trend": "stable",
-      "change_percent": 0.01,
+      "change_percent": 0.0,
       "best": 95.87,
       "worst": 94.02,
-      "average": 95.26
+      "average": 95.19
     },
     "function_coverage": {
       "latest": 90.95,
@@ -596,15 +630,15 @@
       "change_percent": 0.0,
       "best": 93.0,
       "worst": 90.84,
-      "average": 92.31
+      "average": 92.24
     },
     "region_coverage": {
       "latest": 94.29,
       "trend": "stable",
-      "change_percent": 0.01,
+      "change_percent": 0.0,
       "best": 95.99,
       "worst": 94.22,
-      "average": 95.42
+      "average": 95.36
     },
     "test_count": {
       "latest": 5661,
