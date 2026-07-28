@@ -1,4 +1,4 @@
-name: Build WASM for Playground
+name: Build VB6Parse Playground WASM
 
 on:
   push:
@@ -10,6 +10,9 @@ on:
       - 'projects/vb6parse/benches/**'
       - 'projects/vb6parse/examples/**'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   wasm:
