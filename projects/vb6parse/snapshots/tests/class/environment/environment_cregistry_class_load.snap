@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -3909,7 +3909,7 @@ cst:
               - kind: Whitespace
                 text: " "
               - kind: Identifier
-                text: nsize
+                text: nSize
               - kind: Whitespace
                 text: " "
               - kind: AsKeyword
@@ -7084,6 +7084,14 @@ cst:
                                 text: (
                               - kind: Identifier
                                 text: cdata
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IntegerLiteral
+                                text: "1"
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
@@ -16309,7 +16317,7 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: Temp
+            text: temp
           - kind: ParameterList
             children:
               - kind: LeftParenthesis

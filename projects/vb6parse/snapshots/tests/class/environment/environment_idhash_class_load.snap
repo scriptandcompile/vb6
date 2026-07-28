@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -249,7 +249,7 @@ cst:
               - kind: Whitespace
                 text: " "
               - kind: Identifier
-                text: Addr
+                text: addr
               - kind: Whitespace
                 text: " "
               - kind: AsKeyword
@@ -263,7 +263,7 @@ cst:
               - kind: Whitespace
                 text: " "
               - kind: Identifier
-                text: retval
+                text: RetVal
               - kind: Whitespace
                 text: " "
               - kind: AsKeyword
@@ -323,7 +323,7 @@ cst:
           - kind: Whitespace
             text: " "
           - kind: Identifier
-            text: index
+            text: Index
           - kind: Whitespace
             text: " "
           - kind: AsKeyword
@@ -3324,6 +3324,8 @@ cst:
                     text: Long
                   - kind: Newline
                     text: "\r\n"
+              - kind: Newline
+                text: "\r\n"
               - kind: AssignmentStatement
                 children:
                   - kind: IdentifierExpression
@@ -3653,7 +3655,7 @@ cst:
                                                   - kind: IdentifierExpression
                                                     children:
                                                       - kind: Identifier
-                                                        text: index
+                                                        text: Index
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
@@ -3777,7 +3779,7 @@ cst:
                                                           - kind: IdentifierExpression
                                                             children:
                                                               - kind: Identifier
-                                                                text: index
+                                                                text: Index
                                                           - kind: Whitespace
                                                             text: " "
                                                           - kind: EqualityOperator
@@ -3909,7 +3911,7 @@ cst:
                                                               - kind: IdentifierExpression
                                                                 children:
                                                                   - kind: Identifier
-                                                                    text: index
+                                                                    text: Index
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: EqualityOperator
@@ -4038,6 +4040,8 @@ cst:
                     text: If
                   - kind: Newline
                     text: "\r\n"
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -4471,7 +4475,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: a
+                    text: A
                   - kind: Whitespace
                     text: " "
                   - kind: AsKeyword
@@ -4487,7 +4491,7 @@ cst:
                   - kind: IdentifierExpression
                     children:
                       - kind: Identifier
-                        text: a
+                        text: A
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
@@ -4541,7 +4545,7 @@ cst:
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: a
+                                text: A
                   - kind: Newline
                     text: "\r\n"
               - kind: WithStatement
@@ -4563,7 +4567,7 @@ cst:
                               - kind: IdentifierExpression
                                 children:
                                   - kind: Identifier
-                                    text: a
+                                    text: A
                       - kind: RightParenthesis
                         text: )
                   - kind: Newline
@@ -4723,7 +4727,7 @@ cst:
                   - kind: Whitespace
                     text: " "
                   - kind: Identifier
-                    text: a
+                    text: A
                   - kind: Whitespace
                     text: " "
                   - kind: AsKeyword
@@ -4739,7 +4743,7 @@ cst:
                   - kind: IdentifierExpression
                     children:
                       - kind: Identifier
-                        text: a
+                        text: A
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
@@ -4793,7 +4797,7 @@ cst:
                           - kind: IdentifierExpression
                             children:
                               - kind: Identifier
-                                text: a
+                                text: A
                   - kind: Newline
                     text: "\r\n"
               - kind: WithStatement
@@ -4815,7 +4819,7 @@ cst:
                               - kind: IdentifierExpression
                                 children:
                                   - kind: Identifier
-                                    text: a
+                                    text: A
                       - kind: RightParenthesis
                         text: )
                   - kind: Newline
@@ -5009,7 +5013,7 @@ cst:
               - kind: Whitespace
                 text: " "
               - kind: Identifier
-                text: a
+                text: A
               - kind: RightParenthesis
                 text: )
           - kind: Newline
@@ -5111,7 +5115,7 @@ cst:
                               - kind: IdentifierExpression
                                 children:
                                   - kind: Identifier
-                                    text: a
+                                    text: A
                               - kind: Whitespace
                                 text: " "
                               - kind: AdditionOperator
@@ -5161,7 +5165,7 @@ cst:
                               - kind: IdentifierExpression
                                 children:
                                   - kind: Identifier
-                                    text: a
+                                    text: A
                               - kind: Whitespace
                                 text: " "
                               - kind: AdditionOperator
@@ -5193,7 +5197,7 @@ cst:
                                           - kind: IdentifierExpression
                                             children:
                                               - kind: Identifier
-                                                text: a
+                                                text: A
                                   - kind: RightParenthesis
                                     text: )
                               - kind: PeriodOperator
@@ -5241,7 +5245,7 @@ cst:
                                   - kind: IdentifierExpression
                                     children:
                                       - kind: Identifier
-                                        text: a
+                                        text: A
                           - kind: RightParenthesis
                             text: )
                       - kind: PeriodOperator
@@ -5377,7 +5381,7 @@ cst:
               - kind: LeftParenthesis
                 text: (
               - kind: Identifier
-                text: a
+                text: A
           - kind: DollarSign
             text: $
           - kind: RightParenthesis
@@ -5411,7 +5415,7 @@ cst:
                               - kind: IdentifierExpression
                                 children:
                                   - kind: Identifier
-                                    text: a
+                                    text: A
                                   - kind: DollarSign
                                     text: $
                       - kind: RightParenthesis
@@ -5475,7 +5479,7 @@ cst:
               - kind: LeftParenthesis
                 text: (
               - kind: Identifier
-                text: a
+                text: A
           - kind: DollarSign
             text: $
           - kind: RightParenthesis
@@ -5724,10 +5728,6 @@ cst:
                         text: )
                   - kind: Newline
                     text: "\r\n"
-              - kind: Whitespace
-                text: " "
-              - kind: Newline
-                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

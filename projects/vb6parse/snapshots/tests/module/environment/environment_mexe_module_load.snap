@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/environment.rs
+source: projects/vb6parse/tests/module/environment.rs
 expression: module
 ---
 name: Module1
@@ -1587,6 +1587,28 @@ cst:
             text: StdPicture
           - kind: Newline
             text: "\r\n"
+      - kind: DimStatement
+        children:
+          - kind: DimKeyword
+            text: Dim
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: mcIEFeatures
+          - kind: Whitespace
+            text: " "
+          - kind: AsKeyword
+            text: As
+          - kind: Whitespace
+            text: " "
+          - kind: NewKeyword
+            text: New
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: cIEFeatures
+          - kind: Newline
+            text: "\r\n"
       - kind: FunctionStatement
         children:
           - kind: PublicKeyword
@@ -2783,14 +2805,10 @@ cst:
                     text: With
                   - kind: Whitespace
                     text: " "
-                  - kind: NewExpression
+                  - kind: IdentifierExpression
                     children:
-                      - kind: NewKeyword
-                        text: New
-                      - kind: Whitespace
-                        text: " "
                       - kind: Identifier
-                        text: cIEFeatures
+                        text: mcIEFeatures
                   - kind: Newline
                     text: "\r\n"
                   - kind: StatementList

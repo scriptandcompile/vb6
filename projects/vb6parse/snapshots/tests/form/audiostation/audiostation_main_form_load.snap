@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/audiostation.rs
+source: projects/vb6parse/tests/form/audiostation.rs
 expression: form_file
 ---
 form:
@@ -340,7 +340,7 @@ form:
                                   index: 15
                               back_style: Opaque
                               border_style: None
-                              caption: Copyright © 2009 - 2024 Sibra-Soft
+                              caption: Copyright © 2009 - 2025 Sibra-Soft
                               data_field: ""
                               data_format: ""
                               data_member: ""
@@ -7947,8 +7947,8 @@ objects:
     version: "1.3"
     unknown1: "0"
     file_name: Comctl32.ocx
-  - uuid: 40f6d89d-d6bf-4ead-b885-e1869bdf4e31
-    version: "41.0"
+  - uuid: 694608c6-ed15-479d-8b33-789c68374392
+    version: "1.0"
     unknown1: "0"
     file_name: AdioLibrary.ocx
   - uuid: 966cf34c-191f-4fb6-bf33-c8db07c6a40d
@@ -17067,7 +17067,7 @@ cst:
                           - kind: StringLiteralExpression
                             children:
                               - kind: StringLiteral
-                                text: "\" Build: \""
+                                text: "\".\""
                       - kind: Whitespace
                         text: " "
                       - kind: Ampersand
@@ -17254,230 +17254,34 @@ cst:
                 text: "' Get the midi volume controller"
               - kind: Newline
                 text: "\n"
-              - kind: IfStatement
-                children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: UnaryExpression
-                    children:
-                      - kind: NotKeyword
-                        text: Not
-                      - kind: Whitespace
-                        text: " "
-                      - kind: BinaryExpression
-                        children:
-                          - kind: CallExpression
-                            children:
-                              - kind: MemberAccessExpression
-                                children:
-                                  - kind: Identifier
-                                    text: modVolume
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: ChannelExists
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: ArgumentList
-                                children:
-                                  - kind: Argument
-                                    children:
-                                      - kind: StringLiteralExpression
-                                        children:
-                                          - kind: StringLiteral
-                                            text: "\"VirtualMIDISynth.exe\""
-                              - kind: RightParenthesis
-                                text: )
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IsKeyword
-                            text: Is
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: NothingKeyword
-                                text: Nothing
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Newline
-                    text: "\n"
-                  - kind: StatementList
-                    children:
-                      - kind: Whitespace
-                        text: "    "
-                      - kind: AssignmentStatement
-                        children:
-                          - kind: IdentifierExpression
-                            children:
-                              - kind: Identifier
-                                text: VolumeChannelId
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EqualityOperator
-                            text: "="
-                          - kind: Whitespace
-                            text: " "
-                          - kind: MemberAccessExpression
-                            children:
-                              - kind: CallExpression
-                                children:
-                                  - kind: MemberAccessExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: modVolume
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: ChannelExists
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: ArgumentList
-                                    children:
-                                      - kind: Argument
-                                        children:
-                                          - kind: StringLiteralExpression
-                                            children:
-                                              - kind: StringLiteral
-                                                text: "\"VirtualMIDISynth.exe\""
-                                  - kind: RightParenthesis
-                                    text: )
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Pid
-                          - kind: Newline
-                            text: "\n"
-                  - kind: ElseClause
-                    children:
-                      - kind: ElseKeyword
-                        text: Else
-                      - kind: Newline
-                        text: "\n"
-                      - kind: StatementList
-                        children:
-                          - kind: IfStatement
-                            children:
-                              - kind: Whitespace
-                                text: "    "
-                              - kind: IfKeyword
-                                text: If
-                              - kind: Whitespace
-                                text: " "
-                              - kind: UnaryExpression
-                                children:
-                                  - kind: NotKeyword
-                                    text: Not
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: BinaryExpression
-                                    children:
-                                      - kind: CallExpression
-                                        children:
-                                          - kind: MemberAccessExpression
-                                            children:
-                                              - kind: Identifier
-                                                text: modVolume
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: ChannelExists
-                                          - kind: LeftParenthesis
-                                            text: (
-                                          - kind: ArgumentList
-                                            children:
-                                              - kind: Argument
-                                                children:
-                                                  - kind: StringLiteralExpression
-                                                    children:
-                                                      - kind: StringLiteral
-                                                        text: "\"Audiostation.exe\""
-                                          - kind: RightParenthesis
-                                            text: )
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: IsKeyword
-                                        text: Is
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: NothingKeyword
-                                            text: Nothing
-                              - kind: Whitespace
-                                text: " "
-                              - kind: ThenKeyword
-                                text: Then
-                              - kind: Newline
-                                text: "\n"
-                              - kind: StatementList
-                                children:
-                                  - kind: Whitespace
-                                    text: "        "
-                                  - kind: AssignmentStatement
-                                    children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: Identifier
-                                            text: VolumeChannelId
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: EqualityOperator
-                                        text: "="
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: MemberAccessExpression
-                                        children:
-                                          - kind: CallExpression
-                                            children:
-                                              - kind: MemberAccessExpression
-                                                children:
-                                                  - kind: Identifier
-                                                    text: modVolume
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: ChannelExists
-                                              - kind: LeftParenthesis
-                                                text: (
-                                              - kind: ArgumentList
-                                                children:
-                                                  - kind: Argument
-                                                    children:
-                                                      - kind: StringLiteralExpression
-                                                        children:
-                                                          - kind: StringLiteral
-                                                            text: "\"Audiostation.exe\""
-                                              - kind: RightParenthesis
-                                                text: )
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: Pid
-                                      - kind: Newline
-                                        text: "\n"
-                                  - kind: Whitespace
-                                    text: "    "
-                              - kind: EndKeyword
-                                text: End
-                              - kind: Whitespace
-                                text: " "
-                              - kind: IfKeyword
-                                text: If
-                              - kind: Newline
-                                text: "\n"
-                  - kind: EndKeyword
-                    text: End
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Newline
-                    text: "\n"
+              - kind: EndOfLineComment
+                text: "'If Not modVolume.ChannelExists(\"VirtualMIDISynth.exe\") Is Nothing Then"
+              - kind: Newline
+                text: "\n"
+              - kind: EndOfLineComment
+                text: "'    VolumeChannelId = modVolume.ChannelExists(\"VirtualMIDISynth.exe\").Pid"
+              - kind: Newline
+                text: "\n"
+              - kind: EndOfLineComment
+                text: "'Else"
+              - kind: Newline
+                text: "\n"
+              - kind: EndOfLineComment
+                text: "'    If Not modVolume.ChannelExists(\"Audiostation.exe\") Is Nothing Then"
+              - kind: Newline
+                text: "\n"
+              - kind: EndOfLineComment
+                text: "'        VolumeChannelId = modVolume.ChannelExists(\"Audiostation.exe\").Pid"
+              - kind: Newline
+                text: "\n"
+              - kind: EndOfLineComment
+                text: "'    End If"
+              - kind: Newline
+                text: "\n"
+              - kind: EndOfLineComment
+                text: "'End If"
+              - kind: Newline
+                text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: AssignmentStatement

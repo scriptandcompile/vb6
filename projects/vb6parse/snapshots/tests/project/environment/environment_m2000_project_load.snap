@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/project/environment.rs
+source: projects/vb6parse/tests/project/environment.rs
 expression: project
 ---
 project_type: OleDll
@@ -7,12 +7,12 @@ references:
   - uuid: 00020430-0000-0000-c000-000000000046
     unknown1: "2.0"
     unknown2: "0"
-    path: "..\\..\\..\\..\\Windows\\SysWOW64\\stdole2.tlb"
+    path: "..\\..\\Windows\\SysWOW64\\stdole2.tlb"
     description: OLE Automation
   - uuid: 3050f1c5-98b5-11cf-bb82-00aa00bdce0b
     unknown1: "4.0"
     unknown2: "0"
-    path: "..\\..\\..\\..\\Windows\\SysWOW64\\mshtml.tlb"
+    path: "..\\..\\Windows\\SysWOW64\\mshtml.tlb"
     description: Microsoft HTML Object Library
   - uuid: 54bc8460-c769-11d2-8350-444553540004
     unknown1: "2.0"
@@ -75,12 +75,16 @@ modules:
     path: EduardoCircle.bas
   - name: mdQRCodegen
     path: mdQRCodegen.bas
-  - name: Module12
-    path: Module12.bas
   - name: LibMemory
     path: LibMemory.bas
   - name: mdTlsThunks
     path: mdTlsThunks.bas
+  - name: Module13
+    path: StringMath.bas
+  - name: modToolTip
+    path: modToolTip.bas
+  - name: ASMOpCodes
+    path: ASMOpCodes.bas
 classes:
   - name: cDIBSection
     path: cDIBSection.cls
@@ -108,8 +112,6 @@ classes:
     path: MyProcess.cls
   - name: RecordMci
     path: RecordMci.cls
-  - name: TaskBase
-    path: TaskBase.cls
   - name: TaskMaster
     path: TaskMaster.cls
   - name: VarItem
@@ -144,8 +146,8 @@ classes:
     path: cJpeg.cls
   - name: Hash
     path: Hash.cls
-  - name: sbHash
-    path: sbHash.cls
+  - name: coHash
+    path: coHash.cls
   - name: mEvent
     path: mEvent.cls
   - name: GuiButton
@@ -162,8 +164,8 @@ classes:
     path: GuiDropDown.cls
   - name: lambda
     path: lambda.cls
-  - name: FastCollection
-    path: FastCollection.cls
+  - name: StructCollection
+    path: StructCollection.cls
   - name: basetask
     path: basetask.cls
   - name: mHandler
@@ -176,8 +178,8 @@ classes:
     path: CallBack2.cls
   - name: ComShinkEvent
     path: ComShinkEvent.cls
-  - name: LongHash
-    path: LongHash.cls
+  - name: LongHash2
+    path: LongHash2.cls
   - name: Constant
     path: constantclass.cls
   - name: idHash
@@ -236,10 +238,6 @@ classes:
     path: HttpsRequest.cls
   - name: cAsyncSocket
     path: cAsyncSocket.cls
-  - name: CodeBlock
-    path: CodeBlock.cls
-  - name: Lexar
-    path: Lexar.cls
   - name: GuiImage
     path: GuiImage.cls
   - name: ExtControl
@@ -258,6 +256,30 @@ classes:
     path: cRateLimiter.cls
   - name: IControlIndex
     path: IControlIndex.cls
+  - name: MATH2
+    path: MATH2.cls
+  - name: BigInteger
+    path: BigInteger.cls
+  - name: tuple
+    path: tuple.cls
+  - name: cBarCode
+    path: cBarCode.cls
+  - name: cOpenGL
+    path: cOpenGL.cls
+  - name: Regex
+    path: ASF_RegexEngine.cls
+  - name: FastCollection
+    path: FastCollection.cls
+  - name: sbHash
+    path: sbHash.cls
+  - name: LongHash
+    path: LongHash.cls
+  - name: TaskBase
+    path: TaskBase.cls
+  - name: x86
+    path: x86.cls
+  - name: ASMToken
+    path: ASMToken.cls
 related_documents: []
 property_pages: []
 designers: []
@@ -282,7 +304,7 @@ user_controls:
   - ctxNineButton.ctl
   - ShapeEx.ctl
   - ucRadialProgress.ctl
-  - ctxWinsock.ctl
+  - ucChartBar.ctl
 user_documents: []
 other_properties:
   MS Transaction Server:
@@ -307,8 +329,8 @@ properties:
   compatibility_mode: NoCompatibility
   version_32_compatibility: ""
   version_info:
-    major: 12
-    minor: 35
+    major: 15
+    minor: 17
     revision: 0
     auto_increment_revision: 0
     company_name: georgekarras.blogspot.com

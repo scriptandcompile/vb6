@@ -481,36 +481,6 @@ fn environment_cninepatch_class_load() {
 }
 
 #[test]
-fn environment_codeblock_class_load() {
-    let class_bytes = include_bytes!("../../../../test-data/Environment/CodeBlock.cls");
-
-    let result = SourceFile::decode_with_replacement("CodeBlock.cls", class_bytes);
-
-    let source_file = match result {
-        Ok(source_file) => source_file,
-        Err(e) => panic!("Failed to decode source file 'CodeBlock.cls': {e:?}"),
-    };
-
-    let (class_file_opt, failures) = ClassFile::parse(&source_file).unpack();
-
-    if !failures.is_empty() {
-        for failure in failures {
-            failure.print();
-        }
-
-        panic!("Class parse had failures");
-    }
-
-    let class = class_file_opt.expect("Class should be present.");
-
-    let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/class/environment");
-    settings.set_prepend_module_to_snapshot(false);
-    let _guard = settings.bind_to_scope();
-    insta::assert_yaml_snapshot!(class);
-}
-
-#[test]
 fn environment_coder_class_load() {
     let class_bytes = include_bytes!("../../../../test-data/Environment/coder.cls");
 
@@ -1727,36 +1697,6 @@ fn environment_lambda_class_load() {
     let source_file = match result {
         Ok(source_file) => source_file,
         Err(e) => panic!("Failed to decode source file 'lambda.cls': {e:?}"),
-    };
-
-    let (class_file_opt, failures) = ClassFile::parse(&source_file).unpack();
-
-    if !failures.is_empty() {
-        for failure in failures {
-            failure.print();
-        }
-
-        panic!("Class parse had failures");
-    }
-
-    let class = class_file_opt.expect("Class should be present.");
-
-    let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/class/environment");
-    settings.set_prepend_module_to_snapshot(false);
-    let _guard = settings.bind_to_scope();
-    insta::assert_yaml_snapshot!(class);
-}
-
-#[test]
-fn environment_lexar_class_load() {
-    let class_bytes = include_bytes!("../../../../test-data/Environment/Lexar.cls");
-
-    let result = SourceFile::decode_with_replacement("Lexar.cls", class_bytes);
-
-    let source_file = match result {
-        Ok(source_file) => source_file,
-        Err(e) => panic!("Failed to decode source file 'Lexar.cls': {e:?}"),
     };
 
     let (class_file_opt, failures) = ClassFile::parse(&source_file).unpack();

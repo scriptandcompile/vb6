@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/environment.rs
+source: projects/vb6parse/tests/form/environment.rs
 expression: form_file
 ---
 form:
@@ -288,6 +288,8 @@ cst:
                                     text: HOOKTEST
                       - kind: Newline
                         text: "\r\n"
+                  - kind: Newline
+                    text: "\r\n"
               - kind: AssignmentStatement
                 children:
                   - kind: IdentifierExpression
@@ -507,7 +509,7 @@ cst:
                                                           - kind: PeriodOperator
                                                             text: "."
                                                           - kind: Identifier
-                                                            text: top
+                                                            text: Top
                                                       - kind: Whitespace
                                                         text: " "
                                                       - kind: DivisionOperator
@@ -806,6 +808,26 @@ cst:
                         text: "\r\n"
                       - kind: StatementList
                         children:
+                          - kind: CallStatement
+                            children:
+                              - kind: Identifier
+                                text: Debug
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: PrintKeyword
+                                text: Print
+                              - kind: Whitespace
+                                text: " "
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: mouse
+                              - kind: Newline
+                                text: "\r\n"
                           - kind: IfStatement
                             children:
                               - kind: IfKeyword
@@ -814,52 +836,94 @@ cst:
                                 text: " "
                               - kind: BinaryExpression
                                 children:
-                                  - kind: MemberAccessExpression
+                                  - kind: IdentifierExpression
                                     children:
-                                      - kind: MeKeyword
-                                        text: Me
-                                      - kind: PeriodOperator
-                                        text: "."
                                       - kind: Identifier
-                                        text: Height
+                                        text: mouse
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: GreaterThanOperator
-                                    text: ">"
+                                  - kind: InequalityOperator
+                                    text: "<>"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: NumericLiteralExpression
                                     children:
                                       - kind: IntegerLiteral
-                                        text: "0"
+                                        text: "2"
                               - kind: Whitespace
                                 text: " "
                               - kind: ThenKeyword
                                 text: Then
-                              - kind: Whitespace
-                                text: " "
-                              - kind: AssignmentStatement
-                                children:
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: Identifier
-                                        text: getout
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: EqualityOperator
-                                    text: "="
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: BooleanLiteralExpression
-                                    children:
-                                      - kind: TrueKeyword
-                                        text: "True"
-                                  - kind: Newline
-                                    text: "\r\n"
-                              - kind: ElseKeyword
-                                text: Else
                               - kind: Newline
                                 text: "\r\n"
+                              - kind: StatementList
+                                children:
+                                  - kind: IfStatement
+                                    children:
+                                      - kind: IfKeyword
+                                        text: If
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: MemberAccessExpression
+                                            children:
+                                              - kind: MeKeyword
+                                                text: Me
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: Height
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: GreaterThanOperator
+                                            text: ">"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "0"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: ThenKeyword
+                                        text: Then
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AssignmentStatement
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: getout
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: EqualityOperator
+                                            text: "="
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: BooleanLiteralExpression
+                                            children:
+                                              - kind: TrueKeyword
+                                                text: "True"
+                                          - kind: Newline
+                                            text: "\r\n"
+                              - kind: EndKeyword
+                                text: End
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IfKeyword
+                                text: If
+                              - kind: Newline
+                                text: "\r\n"
+                  - kind: ElseClause
+                    children:
+                      - kind: ElseKeyword
+                        text: Else
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: StatementList
+                        children: []
                   - kind: EndKeyword
                     text: End
                   - kind: Whitespace
@@ -868,6 +932,8 @@ cst:
                     text: If
                   - kind: Newline
                     text: "\r\n"
+              - kind: Newline
+                text: "\r\n"
               - kind: IfStatement
                 children:
                   - kind: IfKeyword
@@ -910,62 +976,8 @@ cst:
             text: "\r\n"
       - kind: Newline
         text: "\r\n"
-      - kind: SubStatement
-        children:
-          - kind: PrivateKeyword
-            text: Private
-          - kind: Whitespace
-            text: " "
-          - kind: SubKeyword
-            text: Sub
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: Form_Click
-          - kind: ParameterList
-            children:
-              - kind: LeftParenthesis
-                text: (
-              - kind: RightParenthesis
-                text: )
-          - kind: Newline
-            text: "\r\n"
-          - kind: StatementList
-            children:
-              - kind: IfStatement
-                children:
-                  - kind: IfKeyword
-                    text: If
-                  - kind: Whitespace
-                    text: " "
-                  - kind: MemberAccessExpression
-                    children:
-                      - kind: Identifier
-                        text: MediaPlayer1
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: Identifier
-                        text: isMoviePlaying
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ThenKeyword
-                    text: Then
-                  - kind: Whitespace
-                    text: " "
-                  - kind: CallStatement
-                    children:
-                      - kind: Identifier
-                        text: GETLOST
-                      - kind: Newline
-                        text: "\r\n"
-          - kind: EndKeyword
-            text: End
-          - kind: Whitespace
-            text: " "
-          - kind: SubKeyword
-            text: Sub
-          - kind: Newline
-            text: "\r\n"
+      - kind: Newline
+        text: "\r\n"
       - kind: Newline
         text: "\r\n"
       - kind: SubStatement
@@ -1415,7 +1427,7 @@ cst:
                                   - kind: PeriodOperator
                                     text: "."
                                   - kind: Identifier
-                                    text: Enabled
+                                    text: enabled
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
@@ -1493,7 +1505,7 @@ cst:
                                               - kind: PeriodOperator
                                                 text: "."
                                               - kind: Identifier
-                                                text: top
+                                                text: Top
                                   - kind: RightParenthesis
                                     text: )
                               - kind: Newline
@@ -2477,7 +2489,7 @@ cst:
                                                                           - kind: PeriodOperator
                                                                             text: "."
                                                                           - kind: Identifier
-                                                                            text: top
+                                                                            text: Top
                                                                   - kind: Newline
                                                                     text: "\r\n"
                                                               - kind: Whitespace
@@ -2973,7 +2985,7 @@ cst:
                                                           - kind: IdentifierExpression
                                                             children:
                                                               - kind: Identifier
-                                                                text: top
+                                                                text: Top
                                                       - kind: Comma
                                                         text: ","
                                                       - kind: Whitespace
@@ -3423,7 +3435,7 @@ cst:
                                                                           - kind: PeriodOperator
                                                                             text: "."
                                                                           - kind: Identifier
-                                                                            text: top
+                                                                            text: Top
                                                           - kind: Newline
                                                             text: "\r\n"
                                                   - kind: EndKeyword
@@ -3455,7 +3467,7 @@ cst:
                                           - kind: PeriodOperator
                                             text: "."
                                           - kind: Identifier
-                                            text: Enabled
+                                            text: enabled
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
@@ -3611,7 +3623,7 @@ cst:
                       - kind: PeriodOperator
                         text: "."
                       - kind: Identifier
-                        text: Enabled
+                        text: enabled
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
@@ -3655,7 +3667,7 @@ cst:
                       - kind: PeriodOperator
                         text: "."
                       - kind: Identifier
-                        text: Enabled
+                        text: enabled
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
@@ -3698,6 +3710,160 @@ cst:
         text: "\r\n"
       - kind: Newline
         text: "\r\n"
+      - kind: Newline
+        text: "\r\n"
+      - kind: SubStatement
+        children:
+          - kind: PrivateKeyword
+            text: Private
+          - kind: Whitespace
+            text: " "
+          - kind: SubKeyword
+            text: Sub
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: Form_MouseDown
+          - kind: ParameterList
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: Identifier
+                text: Button
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: shift
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: IntegerKeyword
+                text: Integer
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: X
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: SingleKeyword
+                text: Single
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: Y
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: SingleKeyword
+                text: Single
+              - kind: RightParenthesis
+                text: )
+          - kind: Newline
+            text: "\r\n"
+          - kind: StatementList
+            children:
+              - kind: IfStatement
+                children:
+                  - kind: IfKeyword
+                    text: If
+                  - kind: Whitespace
+                    text: " "
+                  - kind: BinaryExpression
+                    children:
+                      - kind: ParenthesizedExpression
+                        children:
+                          - kind: LeftParenthesis
+                            text: (
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Button
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AndKeyword
+                                text: And
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
+                          - kind: RightParenthesis
+                            text: )
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EqualityOperator
+                        text: "="
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ThenKeyword
+                    text: Then
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IfStatement
+                    children:
+                      - kind: IfKeyword
+                        text: If
+                      - kind: Whitespace
+                        text: " "
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: MediaPlayer1
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: isMoviePlaying
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ThenKeyword
+                        text: Then
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: GETLOST
+                      - kind: Newline
+                        text: "\r\n"
+          - kind: EndKeyword
+            text: End
+          - kind: Whitespace
+            text: " "
+          - kind: SubKeyword
+            text: Sub
+          - kind: Newline
+            text: "\r\n"
       - kind: Newline
         text: "\r\n"
       - kind: SubStatement
@@ -3849,7 +4015,7 @@ cst:
                       - kind: PeriodOperator
                         text: "."
                       - kind: Identifier
-                        text: Enabled
+                        text: enabled
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
@@ -3896,6 +4062,28 @@ cst:
                     text: "."
                   - kind: Identifier
                     text: closeMovie
+                  - kind: Newline
+                    text: "\r\n"
+              - kind: AssignmentStatement
+                children:
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MediaPlayer1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: ErrorKeyword
+                        text: Error
+                  - kind: Whitespace
+                    text: " "
+                  - kind: EqualityOperator
+                    text: "="
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Newline
                     text: "\r\n"
               - kind: AssignmentStatement

@@ -692,36 +692,6 @@ fn environment_module10_module_load() {
 }
 
 #[test]
-fn environment_module12_module_load() {
-    let module_bytes = include_bytes!("../../../../test-data/Environment/Module12.bas");
-
-    let result = SourceFile::decode_with_replacement("Module12.bas", module_bytes);
-
-    let source_file = match result {
-        Ok(source_file) => source_file,
-        Err(e) => panic!("Failed to decode source file 'Module12.bas': {e:?}"),
-    };
-
-    let (module_file_opt, failures) = ModuleFile::parse(&source_file).unpack();
-
-    if !failures.is_empty() {
-        for failure in failures {
-            failure.print();
-        }
-
-        panic!("Module parse had failures");
-    }
-
-    let module = module_file_opt.expect("Module should be present.");
-
-    let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/module/environment");
-    settings.set_prepend_module_to_snapshot(false);
-    let _guard = settings.bind_to_scope();
-    insta::assert_yaml_snapshot!(module);
-}
-
-#[test]
 #[ignore = "stack overflow issue"]
 fn environment_mod_util_module_load() {
     let module_bytes = include_bytes!("../../../../test-data/Environment/Mod_Util.bas");

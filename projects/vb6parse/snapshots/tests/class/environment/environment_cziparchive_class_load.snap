@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -106,8 +106,28 @@ cst:
             text: "\"cZipArchive\""
           - kind: Newline
             text: "\r\n"
-      - kind: Newline
-        text: "\r\n"
+      - kind: Octothorpe
+        text: "#"
+      - kind: DimStatement
+        children:
+          - kind: ConstKeyword
+            text: Const
+          - kind: Whitespace
+            text: " "
+          - kind: Identifier
+            text: ZIP_CRYPTO
+          - kind: Whitespace
+            text: " "
+          - kind: EqualityOperator
+            text: "="
+          - kind: Whitespace
+            text: " "
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
+          - kind: Newline
+            text: "\r\n"
       - kind: Octothorpe
         text: "#"
       - kind: DimStatement
@@ -521,7 +541,7 @@ cst:
                       - kind: Whitespace
                         text: " "
                       - kind: Identifier
-                        text: level
+                        text: Level
                       - kind: Whitespace
                         text: " "
                       - kind: AsKeyword
@@ -4767,7 +4787,7 @@ cst:
                       - kind: Whitespace
                         text: " "
                       - kind: Identifier
-                        text: count
+                        text: Count
                       - kind: Whitespace
                         text: " "
                       - kind: AsKeyword
@@ -9329,7 +9349,7 @@ cst:
           - kind: Whitespace
             text: "    "
           - kind: Identifier
-            text: Handle
+            text: handle
           - kind: Whitespace
             text: "              "
           - kind: AsKeyword
@@ -10217,7 +10237,7 @@ cst:
           - kind: Whitespace
             text: "    "
           - kind: Identifier
-            text: Flags
+            text: flags
           - kind: Whitespace
             text: "               "
           - kind: AsKeyword
@@ -10463,7 +10483,7 @@ cst:
           - kind: Whitespace
             text: "    "
           - kind: Identifier
-            text: Flags
+            text: flags
           - kind: Whitespace
             text: "               "
           - kind: AsKeyword
@@ -11183,7 +11203,7 @@ cst:
           - kind: Whitespace
             text: "    "
           - kind: Identifier
-            text: Flags
+            text: flags
           - kind: Whitespace
             text: "               "
           - kind: AsKeyword
@@ -11229,7 +11249,7 @@ cst:
           - kind: Whitespace
             text: "    "
           - kind: Identifier
-            text: level
+            text: Level
           - kind: Whitespace
             text: "               "
           - kind: AsKeyword
@@ -12071,7 +12091,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Flags
+                                                    text: flags
                                       - kind: RightParenthesis
                                         text: )
                                   - kind: Newline
@@ -12389,7 +12409,7 @@ cst:
                           - kind: Whitespace
                             text: " "
                           - kind: Identifier
-                            text: level
+                            text: Level
                           - kind: Whitespace
                             text: " "
                           - kind: AsKeyword
@@ -13313,7 +13333,7 @@ cst:
                                               - kind: PeriodOperator
                                                 text: "."
                                               - kind: Identifier
-                                                text: level
+                                                text: Level
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
@@ -13323,7 +13343,7 @@ cst:
                                           - kind: IdentifierExpression
                                             children:
                                               - kind: Identifier
-                                                text: level
+                                                text: Level
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: Whitespace
@@ -13725,7 +13745,7 @@ cst:
                               - kind: Whitespace
                                 text: " "
                               - kind: Identifier
-                                text: level
+                                text: Level
                               - kind: Whitespace
                                 text: " "
                               - kind: AsKeyword
@@ -14823,7 +14843,7 @@ cst:
                                                                       - kind: PeriodOperator
                                                                         text: "."
                                                                       - kind: Identifier
-                                                                        text: level
+                                                                        text: Level
                                                                   - kind: Whitespace
                                                                     text: " "
                                                                   - kind: GreaterThanOrEqualOperator
@@ -14845,7 +14865,7 @@ cst:
                                                                   - kind: PeriodOperator
                                                                     text: "."
                                                                   - kind: Identifier
-                                                                    text: level
+                                                                    text: Level
                                                           - kind: Comma
                                                             text: ","
                                                           - kind: Whitespace
@@ -14855,7 +14875,7 @@ cst:
                                                               - kind: IdentifierExpression
                                                                 children:
                                                                   - kind: Identifier
-                                                                    text: level
+                                                                    text: Level
                                                       - kind: RightParenthesis
                                                         text: )
                                                   - kind: Newline
@@ -15711,7 +15731,7 @@ cst:
                                                               - kind: PeriodOperator
                                                                 text: "."
                                                               - kind: Identifier
-                                                                text: Flags
+                                                                text: flags
                                                           - kind: Whitespace
                                                             text: " "
                                                           - kind: EqualityOperator
@@ -15817,7 +15837,7 @@ cst:
                                                                   - kind: PeriodOperator
                                                                     text: "."
                                                                   - kind: Identifier
-                                                                    text: Flags
+                                                                    text: flags
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: EqualityOperator
@@ -15963,7 +15983,7 @@ cst:
                                                                       - kind: PeriodOperator
                                                                         text: "."
                                                                       - kind: Identifier
-                                                                        text: Flags
+                                                                        text: flags
                                                                   - kind: Whitespace
                                                                     text: " "
                                                                   - kind: EqualityOperator
@@ -15979,7 +15999,7 @@ cst:
                                                                           - kind: PeriodOperator
                                                                             text: "."
                                                                           - kind: Identifier
-                                                                            text: Flags
+                                                                            text: flags
                                                                       - kind: Whitespace
                                                                         text: " "
                                                                       - kind: OrKeyword
@@ -16041,7 +16061,7 @@ cst:
                                                                               - kind: PeriodOperator
                                                                                 text: "."
                                                                               - kind: Identifier
-                                                                                text: Flags
+                                                                                text: flags
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                           - kind: EqualityOperator
@@ -16057,7 +16077,7 @@ cst:
                                                                                   - kind: PeriodOperator
                                                                                     text: "."
                                                                                   - kind: Identifier
-                                                                                    text: Flags
+                                                                                    text: flags
                                                                               - kind: Whitespace
                                                                                 text: " "
                                                                               - kind: OrKeyword
@@ -19415,7 +19435,7 @@ cst:
                                                                                       - kind: PeriodOperator
                                                                                         text: "."
                                                                                       - kind: Identifier
-                                                                                        text: Flags
+                                                                                        text: flags
                                                                                   - kind: Whitespace
                                                                                     text: " "
                                                                                   - kind: AndKeyword
@@ -19803,7 +19823,7 @@ cst:
                                                                                               - kind: PeriodOperator
                                                                                                 text: "."
                                                                                               - kind: Identifier
-                                                                                                text: Flags
+                                                                                                text: flags
                                                                                           - kind: Whitespace
                                                                                             text: " "
                                                                                           - kind: EqualityOperator
@@ -19821,7 +19841,7 @@ cst:
                                                                                                       - kind: PeriodOperator
                                                                                                         text: "."
                                                                                                       - kind: Identifier
-                                                                                                        text: Flags
+                                                                                                        text: flags
                                                                                                   - kind: Whitespace
                                                                                                     text: " "
                                                                                                   - kind: AndKeyword
@@ -22189,7 +22209,7 @@ cst:
                                                       - kind: PeriodOperator
                                                         text: "."
                                                       - kind: Identifier
-                                                        text: Flags
+                                                        text: flags
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
@@ -22203,7 +22223,7 @@ cst:
                                                       - kind: PeriodOperator
                                                         text: "."
                                                       - kind: Identifier
-                                                        text: Flags
+                                                        text: flags
                                                   - kind: Newline
                                                     text: "\r\n"
                                               - kind: IfStatement
@@ -22229,7 +22249,7 @@ cst:
                                                                   - kind: PeriodOperator
                                                                     text: "."
                                                                   - kind: Identifier
-                                                                    text: Flags
+                                                                    text: flags
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: AndKeyword
@@ -23453,7 +23473,7 @@ cst:
                                                               - kind: PeriodOperator
                                                                 text: "."
                                                               - kind: Identifier
-                                                                text: Flags
+                                                                text: flags
                                                           - kind: Whitespace
                                                             text: " "
                                                           - kind: EqualityOperator
@@ -23465,7 +23485,7 @@ cst:
                                                               - kind: PeriodOperator
                                                                 text: "."
                                                               - kind: Identifier
-                                                                text: Flags
+                                                                text: flags
                                                           - kind: Newline
                                                             text: "\r\n"
                                                       - kind: Whitespace
@@ -24673,7 +24693,7 @@ cst:
                               - kind: Whitespace
                                 text: " "
                               - kind: Identifier
-                                text: level
+                                text: Level
                               - kind: Whitespace
                                 text: " "
                               - kind: AsKeyword
@@ -25283,7 +25303,7 @@ cst:
                                           - kind: PeriodOperator
                                             text: "."
                                           - kind: Identifier
-                                            text: count
+                                            text: Count
                                       - kind: Whitespace
                                         text: " "
                                       - kind: GreaterThanOperator
@@ -25551,7 +25571,7 @@ cst:
                                                           - kind: Argument
                                                             children:
                                                               - kind: Identifier
-                                                                text: level
+                                                                text: Level
                                                               - kind: ColonOperator
                                                                 text: ":"
                                                               - kind: EqualityOperator
@@ -25559,7 +25579,7 @@ cst:
                                                               - kind: IdentifierExpression
                                                                 children:
                                                                   - kind: Identifier
-                                                                    text: level
+                                                                    text: Level
                                                       - kind: RightParenthesis
                                                         text: )
                                                   - kind: Whitespace
@@ -25903,7 +25923,7 @@ cst:
                                                                   - kind: Argument
                                                                     children:
                                                                       - kind: Identifier
-                                                                        text: level
+                                                                        text: Level
                                                                       - kind: ColonOperator
                                                                         text: ":"
                                                                       - kind: EqualityOperator
@@ -25911,7 +25931,7 @@ cst:
                                                                       - kind: IdentifierExpression
                                                                         children:
                                                                           - kind: Identifier
-                                                                            text: level
+                                                                            text: Level
                                                               - kind: RightParenthesis
                                                                 text: )
                                                           - kind: Whitespace
@@ -27689,7 +27709,7 @@ cst:
                                                                           - kind: PeriodOperator
                                                                             text: "."
                                                                           - kind: Identifier
-                                                                            text: Flags
+                                                                            text: flags
                                                                       - kind: Whitespace
                                                                         text: " "
                                                                       - kind: AndKeyword
@@ -28755,7 +28775,7 @@ cst:
                                                               - kind: PeriodOperator
                                                                 text: "."
                                                               - kind: Identifier
-                                                                text: Flags
+                                                                text: flags
                                                           - kind: Whitespace
                                                             text: " "
                                                           - kind: AndKeyword
@@ -36405,7 +36425,7 @@ cst:
                                               - kind: PeriodOperator
                                                 text: "."
                                               - kind: Identifier
-                                                text: Flags
+                                                text: flags
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
@@ -36419,7 +36439,7 @@ cst:
                                               - kind: PeriodOperator
                                                 text: "."
                                               - kind: Identifier
-                                                text: Flags
+                                                text: flags
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: Whitespace
@@ -36459,7 +36479,7 @@ cst:
                                                                       - kind: PeriodOperator
                                                                         text: "."
                                                                       - kind: Identifier
-                                                                        text: Flags
+                                                                        text: flags
                                                                   - kind: Whitespace
                                                                     text: " "
                                                                   - kind: AndKeyword
@@ -37395,7 +37415,7 @@ cst:
                                                                   - kind: PeriodOperator
                                                                     text: "."
                                                                   - kind: Identifier
-                                                                    text: Flags
+                                                                    text: flags
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: AndKeyword
@@ -38143,7 +38163,7 @@ cst:
                                                                           - kind: PeriodOperator
                                                                             text: "."
                                                                           - kind: Identifier
-                                                                            text: Flags
+                                                                            text: flags
                                                                       - kind: Whitespace
                                                                         text: " "
                                                                       - kind: AndKeyword
@@ -42255,7 +42275,7 @@ cst:
                                                                           - kind: PeriodOperator
                                                                             text: "."
                                                                           - kind: Identifier
-                                                                            text: Flags
+                                                                            text: flags
                                                                       - kind: Whitespace
                                                                         text: " "
                                                                       - kind: AndKeyword
@@ -42429,7 +42449,7 @@ cst:
                                                                                           - kind: PeriodOperator
                                                                                             text: "."
                                                                                           - kind: Identifier
-                                                                                            text: Flags
+                                                                                            text: flags
                                                                                       - kind: Whitespace
                                                                                         text: " "
                                                                                       - kind: AndKeyword
@@ -44659,7 +44679,7 @@ cst:
                                                                                           - kind: PeriodOperator
                                                                                             text: "."
                                                                                           - kind: Identifier
-                                                                                            text: Flags
+                                                                                            text: flags
                                                                                       - kind: Whitespace
                                                                                         text: " "
                                                                                       - kind: AndKeyword
@@ -49507,7 +49527,7 @@ cst:
                                       - kind: Whitespace
                                         text: " "
                                       - kind: Identifier
-                                        text: level
+                                        text: Level
                                       - kind: Whitespace
                                         text: " "
                                       - kind: AsKeyword
@@ -49819,7 +49839,7 @@ cst:
                                                   - kind: IdentifierExpression
                                                     children:
                                                       - kind: Identifier
-                                                        text: level
+                                                        text: Level
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: LessThanOrEqualOperator
@@ -49977,7 +49997,7 @@ cst:
                                                       - kind: IdentifierExpression
                                                         children:
                                                           - kind: Identifier
-                                                            text: level
+                                                            text: Level
                                               - kind: RightParenthesis
                                                 text: )
                                           - kind: Newline
@@ -50125,7 +50145,7 @@ cst:
                                                       - kind: IdentifierExpression
                                                         children:
                                                           - kind: Identifier
-                                                            text: level
+                                                            text: Level
                                               - kind: RightParenthesis
                                                 text: )
                                           - kind: Newline
@@ -50975,7 +50995,7 @@ cst:
                                       - kind: Whitespace
                                         text: " "
                                       - kind: Identifier
-                                        text: level
+                                        text: Level
                                       - kind: Whitespace
                                         text: " "
                                       - kind: AsKeyword
@@ -51079,7 +51099,7 @@ cst:
                                                       - kind: IdentifierExpression
                                                         children:
                                                           - kind: Identifier
-                                                            text: level
+                                                            text: Level
                                               - kind: RightParenthesis
                                                 text: )
                                           - kind: Newline
@@ -60913,7 +60933,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -61015,7 +61035,7 @@ cst:
                                                       - kind: PeriodOperator
                                                         text: "."
                                                       - kind: Identifier
-                                                        text: Handle
+                                                        text: handle
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
@@ -61465,7 +61485,7 @@ cst:
                                       - kind: PeriodOperator
                                         text: "."
                                       - kind: Identifier
-                                        text: Handle
+                                        text: handle
                                   - kind: Whitespace
                                     text: " "
                                   - kind: InequalityOperator
@@ -61491,7 +61511,7 @@ cst:
                                       - kind: PeriodOperator
                                         text: "."
                                       - kind: Identifier
-                                        text: Handle
+                                        text: handle
                                   - kind: Whitespace
                                     text: " "
                                   - kind: InequalityOperator
@@ -61533,7 +61553,7 @@ cst:
                                               - kind: PeriodOperator
                                                 text: "."
                                               - kind: Identifier
-                                                text: Handle
+                                                text: handle
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -61549,7 +61569,7 @@ cst:
                                       - kind: PeriodOperator
                                         text: "."
                                       - kind: Identifier
-                                        text: Handle
+                                        text: handle
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
@@ -61973,7 +61993,7 @@ cst:
                                               - kind: PeriodOperator
                                                 text: "."
                                               - kind: Identifier
-                                                text: Handle
+                                                text: handle
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
@@ -62003,7 +62023,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -62145,7 +62165,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -62171,7 +62191,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -62201,7 +62221,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -62319,7 +62339,7 @@ cst:
                                                       - kind: PeriodOperator
                                                         text: "."
                                                       - kind: Identifier
-                                                        text: Handle
+                                                        text: handle
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
@@ -62483,7 +62503,7 @@ cst:
                                                           - kind: PeriodOperator
                                                             text: "."
                                                           - kind: Identifier
-                                                            text: Handle
+                                                            text: handle
                                                   - kind: Comma
                                                     text: ","
                                                   - kind: Whitespace
@@ -63595,7 +63615,7 @@ cst:
                                               - kind: PeriodOperator
                                                 text: "."
                                               - kind: Identifier
-                                                text: Handle
+                                                text: handle
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
@@ -63625,7 +63645,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -63767,7 +63787,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -63793,7 +63813,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -63823,7 +63843,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -63929,7 +63949,7 @@ cst:
                                                       - kind: PeriodOperator
                                                         text: "."
                                                       - kind: Identifier
-                                                        text: Handle
+                                                        text: handle
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
@@ -64093,7 +64113,7 @@ cst:
                                                           - kind: PeriodOperator
                                                             text: "."
                                                           - kind: Identifier
-                                                            text: Handle
+                                                            text: handle
                                                   - kind: Comma
                                                     text: ","
                                                   - kind: Whitespace
@@ -64749,7 +64769,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -64775,7 +64795,7 @@ cst:
                                                   - kind: PeriodOperator
                                                     text: "."
                                                   - kind: Identifier
-                                                    text: Handle
+                                                    text: handle
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
@@ -64879,7 +64899,7 @@ cst:
                                                       - kind: PeriodOperator
                                                         text: "."
                                                       - kind: Identifier
-                                                        text: Handle
+                                                        text: handle
                                               - kind: Comma
                                                 text: ","
                                               - kind: Whitespace
@@ -65635,7 +65655,7 @@ cst:
                                                           - kind: PeriodOperator
                                                             text: "."
                                                           - kind: Identifier
-                                                            text: Handle
+                                                            text: handle
                                               - kind: RightParenthesis
                                                 text: )
                                           - kind: Whitespace
