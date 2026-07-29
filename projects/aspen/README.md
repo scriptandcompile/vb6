@@ -39,6 +39,7 @@ or `.vbp` project files. Defaults to the current directory.
 | Flag | Description |
 |------|-------------|
 | `--check` | Only check formatting; exit 1 if any file would change |
+| `--keyword`, `-K` | Format VB6 keywords with one of: `upper`, `lower`, `camel`, `first` |
 | `--indent-size` | Spaces per indent level (default: 4) |
 | `--blank-lines-around-directives` | Insert blank line before `#If` and after `#End If` |
 | `--blank-lines-inside-directives` | Insert blank lines between `#If`/`#ElseIf`/`#Else`/`#End If` and their bodies |
@@ -47,6 +48,7 @@ Settings can also be specified in `.aspen.toml`:
 
 ```toml
 [fmt]
+keyword_case = "camel" # one of: "upper", "lower", "camel", "first"
 indent_size = 4
 blank_lines_around_directives = true
 blank_lines_inside_directives = false
@@ -69,6 +71,9 @@ aspen fmt path/to/source.bas
 
 # Check if files are formatted without writing
 aspen fmt --check path/to/project.vbp
+
+# Format keywords in uppercase
+aspen fmt --keyword upper
 
 # Format with 2-space indentation and blank lines around directives
 aspen fmt --indent-size 2 --blank-lines-around-directives
