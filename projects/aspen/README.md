@@ -1,8 +1,6 @@
 # Aspen
 
 Aspen is a VB6 analysis tool in the spirit of `cargo check`, `cargo fmt`, etc.
-It recursively discovers and validates VB6 project (`.vbp`) files, checking for
-missing references, parse errors, and non-English source files.
 
 ## Commands
 

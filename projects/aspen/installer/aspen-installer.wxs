@@ -26,9 +26,9 @@
       <Component Id="AspenPs1" Directory="INSTALLFOLDER" Guid="*">
         <File Id="AspenPs1" Source="__PS1_PATH__" KeyPath="yes" />
       </Component>
-      <Component Id="PathEnvironment" Directory="INSTALLFOLDER" Guid="*">
+      <Component Id="PathEnvironment" Directory="INSTALLFOLDER" Guid="*" Win64="yes">
+        <RegistryValue Root="HKLM" Key="Software\ScriptAndCompile\Aspen" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
         <Environment Id="PathEnv" Name="PATH" Action="set" Part="last" System="yes" Value="[INSTALLFOLDER]" />
-        <RegistryValue Root="HKLM" Key="Software\\ScriptAndCompile\\Aspen" Name="PathInstalled" Type="integer" Value="1" KeyPath="yes" />
       </Component>
     </ComponentGroup>
   </Product>
