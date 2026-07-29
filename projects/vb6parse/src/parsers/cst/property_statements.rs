@@ -556,13 +556,13 @@ End Property
 
     #[test]
     fn compiler_conditional_property_consumes_end_if() {
-        let source = r#"
+        let source = r"
 #If DEBUG Then
 Public Property Get TimerEx() As Double
     TimerEx = 1
 End Property
 #End If
-"#;
+";
 
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.cls", source).unpack();
         let cst = cst_opt.expect("CST should be parsed");

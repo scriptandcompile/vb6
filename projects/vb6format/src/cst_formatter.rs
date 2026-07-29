@@ -81,11 +81,11 @@ impl<'a> CstFormatter<'a> {
                     if matches!(
                         child.kind(),
                         SyntaxKind::CompilerElseIfClause | SyntaxKind::CompilerElseClause
-                    ) {
-                        if self.settings.blank_lines_inside_directives && !self.last_was_blank {
-                            self.output.push_str(self.line_ending);
-                            self.last_was_blank = true;
-                        }
+                    ) && self.settings.blank_lines_inside_directives
+                        && !self.last_was_blank
+                    {
+                        self.output.push_str(self.line_ending);
+                        self.last_was_blank = true;
                     }
 
                     let saved = self.indent_level;

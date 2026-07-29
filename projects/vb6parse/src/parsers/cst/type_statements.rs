@@ -231,8 +231,7 @@ impl Parser<'_> {
         self.consume_until_after(Token::Newline);
 
         // Wrap body in StatementList for formatter indent tracking
-        self.builder
-            .start_node(SyntaxKind::StatementList.to_raw());
+        self.builder.start_node(SyntaxKind::StatementList.to_raw());
 
         // Parse type members until "End Type"
         while !self.is_at_end() {
@@ -339,8 +338,7 @@ impl Parser<'_> {
 
         loop {
             // Wrap body in StatementList (matching regular parse_compiler_directive)
-            self.builder
-                .start_node(SyntaxKind::StatementList.to_raw());
+            self.builder.start_node(SyntaxKind::StatementList.to_raw());
 
             // Parse body (type members until directive or End Type)
             while !self.is_at_end() {
@@ -1050,7 +1048,7 @@ End Type
 
     #[test]
     fn type_with_compiler_conditional_members() {
-        let source = r#"
+        let source = r"
 Type UcsExtraData
     Aes As Long
 #If ImplCrypto Then
@@ -1059,7 +1057,7 @@ Type UcsExtraData
 #End If
     Flags As Long
 End Type
-"#;
+";
 
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
         let cst = cst_opt.expect("CST should be parsed");

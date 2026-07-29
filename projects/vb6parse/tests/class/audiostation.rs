@@ -3,8 +3,8 @@ use vb6parse::*;
 #[test]
 fn audiostation_logger_class_load() {
     let file_path = "../../test-data/audiostation/Source/Classes/clsLogger.cls";
-    let class_bytes =
-        std::fs::read(file_path).expect(&format!("Failed to read class file: {file_path}"));
+    let class_bytes = std::fs::read(file_path)
+        .unwrap_or_else(|_| panic!("Failed to read class file: {file_path}"));
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);
 
@@ -35,8 +35,8 @@ fn audiostation_logger_class_load() {
 #[test]
 fn audiostation_sibra_soft_class_load() {
     let file_path = "../../test-data/audiostation/Source/Classes/clsSibraSoft.cls";
-    let class_bytes =
-        std::fs::read(file_path).expect(&format!("Failed to read class file: {file_path}"));
+    let class_bytes = std::fs::read(file_path)
+        .unwrap_or_else(|_| panic!("Failed to read class file: {file_path}"));
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);
 
@@ -67,8 +67,8 @@ fn audiostation_sibra_soft_class_load() {
 #[test]
 fn audiostation_smart_buffer_class_load() {
     let file_path = "../../test-data/audiostation/Source/Classes/clsSmartBuffer.cls";
-    let class_bytes =
-        std::fs::read(file_path).expect(&format!("Failed to read class file: {file_path}"));
+    let class_bytes = std::fs::read(file_path)
+        .unwrap_or_else(|_| panic!("Failed to read class file: {file_path}"));
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);
 
@@ -99,8 +99,8 @@ fn audiostation_smart_buffer_class_load() {
 #[test]
 fn audiostation_string_builder_class_load() {
     let file_path = "../../test-data/audiostation/Source/Classes/clsStringBuilder.cls";
-    let class_bytes =
-        std::fs::read(file_path).expect(&format!("Failed to read class file: {file_path}"));
+    let class_bytes = std::fs::read(file_path)
+        .unwrap_or_else(|_| panic!("Failed to read class file: {file_path}"));
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);
 
@@ -131,8 +131,8 @@ fn audiostation_string_builder_class_load() {
 #[test]
 fn audiostation_volume_channel_class_load() {
     let file_path = "../../test-data/audiostation/Source/Classes/mdlVolumeChannel.cls";
-    let class_bytes =
-        std::fs::read(file_path).expect(&format!("Failed to read class file: {file_path}"));
+    let class_bytes = std::fs::read(file_path)
+        .unwrap_or_else(|_| panic!("Failed to read class file: {file_path}"));
 
     let result = SourceFile::decode_with_replacement(file_path, &class_bytes);
 

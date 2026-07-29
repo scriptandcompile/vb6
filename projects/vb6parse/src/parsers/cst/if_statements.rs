@@ -775,7 +775,7 @@ End Sub
 
     #[test]
     fn compiler_conditional_if_branches_do_not_consume_end_sub() {
-        let source = r#"
+        let source = r"
 Private Sub Test()
 #If ImplUseTls Then
     If Not m_oSocket.Connect(m_uRemote.Host, m_uRemote.Port, UseTls:=pvIsProtocolSecure(m_uRemote.Protocol)) Then
@@ -790,7 +790,7 @@ Private Sub Test()
 EH:
     PrintError FUNC_NAME
 End Sub
-"#;
+";
 
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.cls", source).unpack();
         let cst = cst_opt.expect("CST should be parsed");
