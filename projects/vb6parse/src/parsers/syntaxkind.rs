@@ -917,4 +917,13 @@ impl SyntaxKind {
     pub fn is_recovery_kind(self) -> bool {
         self.is_error_recovery() || self.is_error_metadata()
     }
+
+    /// Returns `true` if this syntax kind is a VB6 keyword token.
+    ///
+    /// Keyword token variants are defined as one contiguous enum range,
+    /// from `ClassKeyword` through `AnyKeyword`.
+    #[must_use]
+    pub fn is_keyword(self) -> bool {
+        self >= SyntaxKind::ClassKeyword && self <= SyntaxKind::AnyKeyword
+    }
 }
