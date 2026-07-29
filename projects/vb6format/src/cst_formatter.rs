@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use vb6parse::parsers::{CstNode, SyntaxKind};
 
 use crate::settings::FmtSettings;
@@ -163,10 +164,46 @@ impl<'a> CstFormatter<'a> {
                     }
                     self.pending_indent = false;
                 }
-                self.output.push_str(token.text());
+                let text = format_token_text(token, self.settings.keyword_case.as_str());
+                self.output.push_str(&text);
                 self.last_was_blank = false;
                 self.line_has_content = true;
             }
         }
     }
+}
+
+fn format_token_text<'a>(token: &'a CstNode, keyword_case: &str) -> Cow<'a, str> {
+    let original = token.text();
+    let Some(canonical_keyword) = keyword_camel_text(token.kind()) else {
+        return Cow::Borrowed(original);
+    };
+
+    match keyword_case {
+        "upper" => Cow::Owned(canonical_keyword.to_ascii_uppercase()),
+        "lower" => Cow::Owned(canonical_keyword.to_ascii_lowercase()),
+        "camel" => Cow::Owned(canonical_keyword),
+        "first" => {
+            let mut chars = canonical_keyword.chars();
+            let Some(first) = chars.next() else {
+                return Cow::Owned(canonical_keyword);
+            };
+            let mut out = String::with_capacity(canonical_keyword.len());
+            out.extend(first.to_uppercase());
+            out.push_str(&chars.as_str().to_ascii_lowercase());
+            Cow::Owned(out)
+        }
+        _ => Cow::Borrowed(original),
+    }
+}
+
+fn keyword_camel_text(kind: SyntaxKind) -> Option<String> {
+    if !kind.is_keyword() {
+        return None;
+    }
+
+    let kind_name = kind.to_string();
+    kind_name
+        .strip_suffix("Keyword")
+        .map(std::string::ToString::to_string)
 }
