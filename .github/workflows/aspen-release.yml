@@ -41,9 +41,16 @@ jobs:
           Compress-Archive -Path dist/aspen-windows/* -DestinationPath dist/aspen-windows.zip -Force
 
       - name: Build MSI installer
+        id: build_msi
         shell: bash
         run: |
           python3 scripts/build_aspen_msi.py --output dist/aspen-windows.msi
+
+      - name: Build MSI installer (diagnostics)
+        if: ${{ failure() && steps.build_msi.outcome == 'failure' }}
+        shell: bash
+        run: |
+          python3 scripts/build_aspen_msi.py --output dist/aspen-windows.msi --diagnostics
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
