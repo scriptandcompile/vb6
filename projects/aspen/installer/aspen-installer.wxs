@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="Aspen" Language="1033" Version="__VERSION__" Manufacturer="ScriptAndCompile" UpgradeCode="535f88d4-8b8f-11f1-a8f6-c3fc43f8662d">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
+    <MediaTemplate EmbedCab="yes" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <UIRef Id="WixUI_InstallDir" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="Aspen" />
+      </Directory>
+    </Directory>
+
+    <Feature Id="MainFeature" Title="Aspen" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <ComponentGroup Id="ProductComponents">
+      <Component Id="AspenExe" Directory="INSTALLFOLDER" Guid="*">
+        <File Id="AspenExe" Source="__BINARY_PATH__" KeyPath="yes" />
+      </Component>
+      <Component Id="AspenCmd" Directory="INSTALLFOLDER" Guid="*">
+        <File Id="AspenCmd" Source="__CMD_PATH__" KeyPath="yes" />
+      </Component>
+      <Component Id="AspenPs1" Directory="INSTALLFOLDER" Guid="*">
+        <File Id="AspenPs1" Source="__PS1_PATH__" KeyPath="yes" />
+      </Component>
+      <Component Id="PathEnvironment" Directory="INSTALLFOLDER" Guid="*">
+        <Environment Id="PathEnv" Name="PATH" Action="set" Part="last" System="yes" Value="[INSTALLFOLDER]" />
+        <RegistryValue Root="HKLM" Key="Software\\ScriptAndCompile\\Aspen" Name="PathInstalled" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Product>
+</Wix>

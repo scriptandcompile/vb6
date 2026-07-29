@@ -1,0 +1,62 @@
+name: Aspen Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'aspen-v*'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install WiX Toolset
+        run: choco install wixtoolset -y
+
+      - name: Build Aspen
+        run: cargo build --release -p aspen
+
+      - name: Package Windows artifact
+        shell: bash
+        run: |
+          python3 scripts/package_aspen_windows.py \
+            --binary target/release/aspen.exe \
+            --output dist/aspen-windows
+
+      - name: Create Windows release archive
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/aspen-windows/* -DestinationPath dist/aspen-windows.zip -Force
+
+      - name: Build MSI installer
+        shell: bash
+        run: |
+          python3 scripts/build_aspen_msi.py --output dist/aspen-windows.msi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aspen-windows
+          path: |
+            dist/aspen-windows.zip
+            dist/aspen-windows.msi
+          if-no-files-found: error
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/aspen-windows.zip
+            dist/aspen-windows.msi
+          draft: false
+          prerelease: false

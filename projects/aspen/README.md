@@ -81,6 +81,8 @@ aspen fmt --indent-size 2 --blank-lines-around-directives
 
 ## Installation
 
+### From source
+
 ```sh
 cargo install --path projects/aspen
 ```
@@ -89,4 +91,28 @@ Or from the workspace root:
 
 ```sh
 cargo build -p aspen
+```
+
+### Windows release artifact
+
+For each new Aspen release, the GitHub Actions workflow builds both a Windows zip archive and an MSI installer and publishes them as release assets. The packaged directory contains:
+
+- `bin/aspen.exe`
+- `bin/aspen.cmd`
+- `bin/aspen.ps1`
+- `README.txt`
+
+To use the zip bundle from a normal Windows terminal, add the `bin` directory to your `PATH` and run `aspen`.
+
+Example:
+
+```powershell
+$aspenDir = "C:\path\to\aspen"
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";$aspenDir\bin", "User")
+```
+
+For the MSI installer, run the downloaded `.msi` file and follow the prompts. The installer adds Aspen to the system `PATH`, so after installation you can run:
+
+```powershell
+aspen --help
 ```
