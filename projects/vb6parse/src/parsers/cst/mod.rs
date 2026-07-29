@@ -3930,13 +3930,13 @@ mod tests {
 
     #[test]
     fn parse_with_member_assignment_with_index_expression() {
-        let source = r#"
+        let source = r"
 Sub Test()
     With mstack
         .item(i - 1) = aa.ObjectRef
     End With
 End Sub
-"#;
+";
         let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
         assert!(
             failures.is_empty(),

@@ -2,7 +2,7 @@ use vb6parse::*;
 
 #[test]
 fn select_case_nested_pre_directive_if() {
-    let source = r#"
+    let source = r"
 Sub Test()
     Select Case x
         Case 1
@@ -17,7 +17,7 @@ Sub Test()
             b = 2
     End Select
 End Sub
-"#;
+";
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
     assert!(
