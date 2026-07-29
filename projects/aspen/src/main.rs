@@ -8,7 +8,7 @@ use anyhow::Result;
 
 use std::{env::current_dir, path::PathBuf};
 
-use clap::{Arg, Command, command, value_parser};
+use clap::{Arg, Command, builder::PossibleValue, command, value_parser};
 
 fn main() -> Result<()> {
     let matches = command!()
@@ -69,9 +69,25 @@ fn main() -> Result<()> {
                         .long("check")
                         .short('c')
                         .required(false)
-                        .value_parser(value_parser!(bool))
                         .action(clap::ArgAction::SetTrue)
                         .help("only check if files are formatted, don't write"),
+                )
+                .arg(
+                    Arg::new("keyword")
+                        .long("keyword")
+                        .short('K')
+                        .required(false)
+                        .value_parser([
+                            PossibleValue::new("upper")
+                                .help("format keywords in uppercase: ELSEIF"),
+                            PossibleValue::new("lower")
+                                .help("format keywords in lowercase: elseif"),
+                            PossibleValue::new("camel")
+                                .help("format keywords in camel case: ElseIf"),
+                            PossibleValue::new("first")
+                                .help("format keywords with the first letter in uppercase: Elseif"),
+                        ])
+                        .help("format keywords in the source files"),
                 )
                 .arg(
                     Arg::new("indent-size")
@@ -79,14 +95,12 @@ fn main() -> Result<()> {
                         .short('i')
                         .required(false)
                         .value_parser(value_parser!(usize))
-                        .default_value("4")
                         .help("indentation size in spaces"),
                 )
                 .arg(
                     Arg::new("blank-lines-around-directives")
                         .long("blank-lines-around-directives")
                         .required(false)
-                        .value_parser(value_parser!(bool))
                         .action(clap::ArgAction::SetTrue)
                         .help("insert blank line before #If and after #End If"),
                 )
@@ -94,7 +108,6 @@ fn main() -> Result<()> {
                     Arg::new("blank-lines-inside-directives")
                         .long("blank-lines-inside-directives")
                         .required(false)
-                        .value_parser(value_parser!(bool))
                         .action(clap::ArgAction::SetTrue)
                         .help(
                             "insert blank lines between #If/#ElseIf/#Else/#End If and their bodies",
@@ -145,24 +158,23 @@ fn main() -> Result<()> {
             .unwrap_or(&current_dir)
             .to_path_buf();
 
-        let check = *matches.get_one::<bool>("check").unwrap_or(&false);
-        let indent_size = *matches.get_one::<usize>("indent-size").unwrap_or(&4);
-        let cli_blank_around = matches
-            .get_one::<bool>("blank-lines-around-directives")
-            .copied();
-        let cli_blank_inside = matches
-            .get_one::<bool>("blank-lines-inside-directives")
-            .copied();
+        let cli_check = matches.get_flag("check");
+        let cli_indent_size = matches.get_one::<usize>("indent-size").copied();
+        let cli_blank_around = matches.get_flag("blank-lines-around-directives");
+        let cli_blank_inside = matches.get_flag("blank-lines-inside-directives");
+        let cli_keyword_case = matches.get_one::<String>("keyword").cloned();
+        let settings = fmt::load_fmt_settings(&project_path);
 
         let cmd = fmt::FmtCommand {
-            project_path,
-            check,
-            fmt_settings: fmt::FmtSettings {
-                indent_size,
-                ..Default::default()
+            cli: fmt::CliSettings {
+                project_path,
+                check: cli_check,
+                keyword_case: cli_keyword_case,
+                indent_size: cli_indent_size,
+                blank_lines_around_directives: cli_blank_around.then_some(true),
+                blank_lines_inside_directives: cli_blank_inside.then_some(true),
             },
-            cli_blank_around,
-            cli_blank_inside,
+            settings,
         };
 
         fmt_subcommand(cmd)?;

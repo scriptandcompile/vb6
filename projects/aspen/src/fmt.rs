@@ -7,16 +7,48 @@ use walkdir::WalkDir;
 
 pub use vb6format::FmtSettings;
 
-pub struct FmtCommand {
+pub struct CliSettings {
     pub project_path: PathBuf,
     pub check: bool,
-    pub fmt_settings: FmtSettings,
-    pub cli_blank_around: Option<bool>,
-    pub cli_blank_inside: Option<bool>,
+    pub keyword_case: Option<String>,
+    pub indent_size: Option<usize>,
+    pub blank_lines_around_directives: Option<bool>,
+    pub blank_lines_inside_directives: Option<bool>,
+}
+
+pub struct FmtCommand {
+    pub cli: CliSettings,
+    pub settings: FmtSettings,
+}
+
+pub fn load_fmt_settings(project_path: &Path) -> FmtSettings {
+    let config = find_config(project_path).and_then(|c| c.fmt);
+
+    let mut settings = FmtSettings::default();
+
+    if let Some(cfg_fmt) = config {
+        if let Some(indent_size) = cfg_fmt.indent_size {
+            settings.indent_size = indent_size;
+        }
+
+        if let Some(keyword_case) = cfg_fmt.keyword_case {
+            settings.keyword_case = keyword_case;
+        }
+
+        if let Some(blank_around) = cfg_fmt.blank_lines_around_directives {
+            settings.blank_lines_around_directives = blank_around;
+        }
+
+        if let Some(blank_inside) = cfg_fmt.blank_lines_inside_directives {
+            settings.blank_lines_inside_directives = blank_inside;
+        }
+    }
+
+    settings
 }
 
 pub fn fmt_subcommand(cmd: FmtCommand) -> Result<()> {
-    let project_path = &cmd.project_path;
+    let project_path = &cmd.cli.project_path;
 
     if !project_path.exists() {
         println!("No project file found at '{:?}'", project_path);
@@ -66,30 +98,27 @@ pub fn fmt_subcommand(cmd: FmtCommand) -> Result<()> {
         return Ok(());
     }
 
-    let config = find_config(project_path, &files_to_format);
-    let cfg_fmt = config.and_then(|c| c.fmt);
+    let indent_size = cmd.cli.indent_size.unwrap_or(cmd.settings.indent_size);
 
-    let indent_size = cfg_fmt
-        .as_ref()
-        .and_then(|f| f.indent_size)
-        .unwrap_or(cmd.fmt_settings.indent_size);
+    let keyword_case = cmd
+        .cli
+        .keyword_case
+        .clone()
+        .unwrap_or_else(|| cmd.settings.keyword_case.clone());
 
     let blank_around = cmd
-        .cli_blank_around
-        .or(cfg_fmt
-            .as_ref()
-            .and_then(|f| f.blank_lines_around_directives))
-        .unwrap_or(false);
+        .cli
+        .blank_lines_around_directives
+        .unwrap_or(cmd.settings.blank_lines_around_directives);
 
     let blank_inside = cmd
-        .cli_blank_inside
-        .or(cfg_fmt
-            .as_ref()
-            .and_then(|f| f.blank_lines_inside_directives))
-        .unwrap_or(false);
+        .cli
+        .blank_lines_inside_directives
+        .unwrap_or(cmd.settings.blank_lines_inside_directives);
 
     let fmt_settings = FmtSettings {
         indent_size,
+        keyword_case,
         blank_lines_around_directives: blank_around,
         blank_lines_inside_directives: blank_inside,
     };
@@ -97,13 +126,13 @@ pub fn fmt_subcommand(cmd: FmtCommand) -> Result<()> {
     let results: Vec<(PathBuf, bool)> = files_to_format
         .par_iter()
         .map(|file| {
-            let result = process_file(file, &fmt_settings, cmd.check);
+            let result = process_file(file, &fmt_settings, cmd.cli.check);
             (file.clone(), result)
         })
         .map(|(file, result)| match result {
             Ok(changed) => {
                 if changed {
-                    if cmd.check {
+                    if cmd.cli.check {
                         println!("Would reformat: {}", file.display());
                     } else {
                         println!("Formatted: {}", file.display());
@@ -123,7 +152,7 @@ pub fn fmt_subcommand(cmd: FmtCommand) -> Result<()> {
     let changed_count = results.iter().filter(|(_, changed)| *changed).count();
     let total = results.len();
 
-    if cmd.check {
+    if cmd.cli.check {
         println!("{} of {} files would be reformatted.", changed_count, total);
         if changed_count > 0 {
             std::process::exit(1);
@@ -242,13 +271,25 @@ struct FmtConfig {
 #[derive(Debug, Clone, serde::Deserialize)]
 struct FmtSection {
     indent_size: Option<usize>,
+    keyword_case: Option<String>,
     blank_lines_around_directives: Option<bool>,
     blank_lines_inside_directives: Option<bool>,
 }
 
-fn find_config(project_path: &Path, _files: &[PathBuf]) -> Option<FmtConfig> {
+fn find_config(project_path: &Path) -> Option<FmtConfig> {
+    let config_root = if project_path.is_dir() {
+        project_path.to_path_buf()
+    } else {
+        project_path
+            .parent()
+            .map(Path::to_path_buf)
+            .unwrap_or_else(|| PathBuf::from("."))
+    };
+
     let config_paths = [
-        project_path.join(".aspen.toml"),
+        config_root.join(".aspenfmt.toml"),
+        config_root.join(".aspen.toml"),
+        PathBuf::from(".aspenfmt.toml"),
         PathBuf::from(".aspen.toml"),
     ];
 
