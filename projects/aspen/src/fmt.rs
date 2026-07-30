@@ -14,6 +14,7 @@ pub struct CliSettings {
     pub indent_size: Option<usize>,
     pub blank_lines_around_directives: Option<bool>,
     pub blank_lines_inside_directives: Option<bool>,
+    pub blank_lines_around_top_level: Option<bool>,
 }
 
 pub struct FmtCommand {
@@ -41,6 +42,10 @@ pub fn load_fmt_settings(project_path: &Path) -> FmtSettings {
 
         if let Some(blank_inside) = cfg_fmt.blank_lines_inside_directives {
             settings.blank_lines_inside_directives = blank_inside;
+        }
+
+        if let Some(blank_around_top_level) = cfg_fmt.blank_lines_around_top_level {
+            settings.blank_lines_around_top_level = blank_around_top_level;
         }
     }
 
@@ -116,11 +121,17 @@ pub fn fmt_subcommand(cmd: FmtCommand) -> Result<()> {
         .blank_lines_inside_directives
         .unwrap_or(cmd.settings.blank_lines_inside_directives);
 
+    let blank_around_top_level = cmd
+        .cli
+        .blank_lines_around_top_level
+        .unwrap_or(cmd.settings.blank_lines_around_top_level);
+
     let fmt_settings = FmtSettings {
         indent_size,
         keyword_case,
         blank_lines_around_directives: blank_around,
         blank_lines_inside_directives: blank_inside,
+        blank_lines_around_top_level: blank_around_top_level,
     };
 
     let results: Vec<(PathBuf, bool)> = files_to_format
@@ -274,6 +285,7 @@ struct FmtSection {
     keyword_case: Option<String>,
     blank_lines_around_directives: Option<bool>,
     blank_lines_inside_directives: Option<bool>,
+    blank_lines_around_top_level: Option<bool>,
 }
 
 fn find_config(project_path: &Path) -> Option<FmtConfig> {

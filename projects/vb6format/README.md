@@ -20,6 +20,7 @@ let formatted = fmt_source(source, &settings)?;
 | `indent_size` | `usize` | `4` | Spaces per indent level |
 | `blank_lines_around_directives` | `bool` | `false` | Insert blank line before `#If` and after `#End If` |
 | `blank_lines_inside_directives` | `bool` | `false` | Insert blank lines between `#If`/`#ElseIf`/`#Else`/`#End If` and their bodies |
+| `blank_lines_around_top_level` | `bool` | `true` | Insert a blank line between procedures and other top-level constructs while keeping preceding comment lines attached to the following construct |
 
 ## Formatting Rules
 
