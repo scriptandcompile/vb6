@@ -91,8 +91,7 @@ impl Parser<'_> {
         self.consume_until_after(Token::Newline);
 
         // Wrap body in StatementList for formatter indent tracking
-        self.builder
-            .start_node(SyntaxKind::StatementList.to_raw());
+        self.builder.start_node(SyntaxKind::StatementList.to_raw());
 
         // Parse enum members until "End Enum"
         while !self.is_at_end() {
