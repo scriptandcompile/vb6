@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-07-29T22:14:03Z",
+  "last_updated": "2026-07-30T20:58:33Z",
   "snapshots": [
     {
       "timestamp": "2026-07-06T07:06:31Z",
@@ -749,32 +749,66 @@
           "percent": 94.27
         }
       }
+    },
+    {
+      "timestamp": "2026-07-30T20:58:33Z",
+      "commit_sha": "3fb9848429c958113a463c344ac5a8bf15911e77",
+      "commit_message": "Added support for blank_lines_around_top_level items. This is not the best way to handle this and the feature is slightly to agressive (it will add a blank around all top level elements, when really we want to keep DECLARE statements all together unless the user breaks them up.",
+      "coverage": {
+        "line_coverage": 94.02,
+        "function_coverage": 90.94,
+        "region_coverage": 94.26
+      },
+      "tests": {
+        "total": 5661,
+        "lib_tests": 5533,
+        "doc_tests": 128,
+        "integration_tests": 0,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 98418,
+          "total": 104681,
+          "percent": 94.02
+        },
+        "functions": {
+          "covered": 6332,
+          "total": 6963,
+          "percent": 90.94
+        },
+        "regions": {
+          "covered": 157230,
+          "total": 166812,
+          "percent": 94.26
+        }
+      }
     }
   ],
   "coverage_summary": {
     "line_coverage": {
-      "latest": 94.03,
+      "latest": 94.02,
       "trend": "stable",
-      "change_percent": 0.0,
+      "change_percent": 0.01,
       "best": 95.87,
       "worst": 94.02,
-      "average": 94.98
+      "average": 94.94
     },
     "function_coverage": {
-      "latest": 90.93,
+      "latest": 90.94,
       "trend": "stable",
-      "change_percent": 0.0,
+      "change_percent": 0.01,
       "best": 93.0,
       "worst": 90.84,
-      "average": 92.0
+      "average": 91.95
     },
     "region_coverage": {
-      "latest": 94.27,
+      "latest": 94.26,
       "trend": "stable",
-      "change_percent": 0.0,
+      "change_percent": 0.01,
       "best": 95.99,
       "worst": 94.22,
-      "average": 95.16
+      "average": 95.12
     },
     "test_count": {
       "latest": 5661,
