@@ -3,6 +3,7 @@ pub struct FmtSettings {
     pub keyword_case: String,
     pub blank_lines_around_directives: bool,
     pub blank_lines_inside_directives: bool,
+    pub blank_lines_around_top_level: bool,
 }
 
 impl Default for FmtSettings {
@@ -12,6 +13,7 @@ impl Default for FmtSettings {
             keyword_case: "camel".to_string(),
             blank_lines_around_directives: false,
             blank_lines_inside_directives: false,
+            blank_lines_around_top_level: true,
         }
     }
 }

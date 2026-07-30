@@ -114,6 +114,15 @@ fn main() -> Result<()> {
                         ),
                 )
                 .arg(
+                    Arg::new("blank-lines-around-top-level")
+                        .long("blank-lines-around-top-level")
+                        .required(false)
+                        .action(clap::ArgAction::SetTrue)
+                        .help(
+                            "insert blank lines between procedures and other top-level constructs",
+                        ),
+                )
+                .arg(
                     Arg::new("project path")
                         .required(false)
                         .value_parser(value_parser!(PathBuf)),
@@ -162,6 +171,7 @@ fn main() -> Result<()> {
         let cli_indent_size = matches.get_one::<usize>("indent-size").copied();
         let cli_blank_around = matches.get_flag("blank-lines-around-directives");
         let cli_blank_inside = matches.get_flag("blank-lines-inside-directives");
+        let cli_blank_around_top_level = matches.get_flag("blank-lines-around-top-level");
         let cli_keyword_case = matches.get_one::<String>("keyword").cloned();
         let settings = fmt::load_fmt_settings(&project_path);
 
@@ -173,6 +183,7 @@ fn main() -> Result<()> {
                 indent_size: cli_indent_size,
                 blank_lines_around_directives: cli_blank_around.then_some(true),
                 blank_lines_inside_directives: cli_blank_inside.then_some(true),
+                blank_lines_around_top_level: cli_blank_around_top_level.then_some(true),
             },
             settings,
         };

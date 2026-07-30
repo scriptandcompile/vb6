@@ -41,6 +41,7 @@ or `.vbp` project files. Defaults to the current directory.
 | `--indent-size` | Spaces per indent level (default: 4) |
 | `--blank-lines-around-directives` | Insert blank line before `#If` and after `#End If` |
 | `--blank-lines-inside-directives` | Insert blank lines between `#If`/`#ElseIf`/`#Else`/`#End If` and their bodies |
+| `--blank-lines-around-top-level` | Insert a blank line between procedures and other top-level constructs while keeping preceding comment lines attached to the following construct |
 
 Settings can also be specified in `.aspen.toml`:
 
@@ -50,6 +51,7 @@ keyword_case = "camel" # one of: "upper", "lower", "camel", "first"
 indent_size = 4
 blank_lines_around_directives = true
 blank_lines_inside_directives = false
+blank_lines_around_top_level = true
 ```
 
 ### Examples
@@ -75,6 +77,9 @@ aspen fmt --keyword upper
 
 # Format with 2-space indentation and blank lines around directives
 aspen fmt --indent-size 2 --blank-lines-around-directives
+
+# Add spacing before procedures and other top-level constructs
+aspen fmt --blank-lines-around-top-level
 ```
 
 ## Installation
