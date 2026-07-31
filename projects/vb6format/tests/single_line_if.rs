@@ -2,5 +2,11 @@ mod common;
 
 #[test]
 fn single_line_if() {
-    common::assert_stable("Sub Foo()\n    If True Then x = 1\nEnd Sub\n");
+    common::assert_stable(
+        "\
+Sub Foo()
+    If True Then x = 1
+End Sub
+",
+    );
 }

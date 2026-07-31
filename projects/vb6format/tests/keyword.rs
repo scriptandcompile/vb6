@@ -10,8 +10,18 @@ fn keyword_case_upper() {
     };
 
     common::assert_fmt_with(
-        "public sub foo()\nif x then\nend if\nend sub\n",
-        "PUBLIC SUB foo()\n    IF x THEN\n    END IF\nEND SUB\n",
+        "\
+public sub foo()
+if x then
+end if
+end sub
+",
+        "\
+PUBLIC SUB foo()
+    IF x THEN
+    END IF
+END SUB
+",
         &settings,
     );
 }
@@ -24,8 +34,18 @@ fn keyword_case_lower() {
     };
 
     common::assert_fmt_with(
-        "PUBLIC SUB Foo()\nIF x THEN\nEND IF\nEND SUB\n",
-        "public sub Foo()\n    if x then\n    end if\nend sub\n",
+        "\
+PUBLIC SUB Foo()
+IF x THEN
+END IF
+END SUB
+",
+        "\
+public sub Foo()
+    if x then
+    end if
+end sub
+",
         &settings,
     );
 }
@@ -38,8 +58,18 @@ fn keyword_case_camel() {
     };
 
     common::assert_fmt_with(
-        "public sub foo()\nelseif x then\nend if\nend sub\n",
-        "Public Sub foo()\n    ElseIf x Then\n    End If\nEnd Sub\n",
+        "\
+public sub foo()
+elseif x then
+end if
+end sub
+",
+        "\
+Public Sub foo()
+    ElseIf x Then
+    End If
+End Sub
+",
         &settings,
     );
 }
@@ -52,8 +82,18 @@ fn keyword_case_first() {
     };
 
     common::assert_fmt_with(
-        "PUBLIC SUB Foo()\nELSEIF x THEN\nEND IF\nEND SUB\n",
-        "Public Sub Foo()\n    Elseif x Then\n    End If\nEnd Sub\n",
+        "\
+PUBLIC SUB Foo()
+ELSEIF x THEN
+END IF
+END SUB
+",
+        "\
+Public Sub Foo()
+    Elseif x Then
+    End If
+End Sub
+",
         &settings,
     );
 }
