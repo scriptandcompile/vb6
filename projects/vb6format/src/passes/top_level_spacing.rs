@@ -30,7 +30,7 @@ impl<'a> TopLevelSpacingPass<'a> {
         let lines: Vec<&str> = normalized.split('\n').collect();
 
         let mut insertion_lines = Vec::new();
-        let mut saw_top_level_block = false;
+        let mut previous_category: Option<TopLevelCategory> = None;
         let mut index = 0;
 
         while index < lines.len() {
@@ -40,15 +40,16 @@ impl<'a> TopLevelSpacingPass<'a> {
                 break;
             }
 
-            if is_top_level_construct_block_start(&lines, index) {
-                if saw_top_level_block {
+            if let Some(current_category) = top_level_construct_block_start_category(&lines, index)
+            {
+                if let Some(previous) = previous_category {
                     let previous_is_blank = index > 0 && is_blank_line(lines[index - 1]);
-                    if !previous_is_blank {
+                    if !previous_is_blank && should_insert_between(previous, current_category) {
                         insertion_lines.push(index);
                     }
                 }
 
-                saw_top_level_block = true;
+                previous_category = Some(current_category);
 
                 let mut block_end = index;
                 if is_comment_line(line) {
@@ -60,7 +61,7 @@ impl<'a> TopLevelSpacingPass<'a> {
                             continue;
                         }
 
-                        if is_top_level_construct_line(candidate) {
+                        if top_level_construct_category(candidate).is_some() {
                             block_end = probe;
                             break;
                         }
@@ -123,14 +124,24 @@ impl FormatPass for TopLevelSpacingPass<'_> {
     }
 }
 
-fn is_top_level_construct_block_start(lines: &[&str], start_index: usize) -> bool {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum TopLevelCategory {
+    Option,
+    Declare,
+    Other,
+}
+
+fn top_level_construct_block_start_category(
+    lines: &[&str],
+    start_index: usize,
+) -> Option<TopLevelCategory> {
     let line = lines[start_index];
-    if is_top_level_construct_line(line) {
-        return true;
+    if let Some(category) = top_level_construct_category(line) {
+        return Some(category);
     }
 
     if !is_comment_line(line) {
-        return false;
+        return None;
     }
 
     let mut probe = start_index + 1;
@@ -141,32 +152,46 @@ fn is_top_level_construct_block_start(lines: &[&str], start_index: usize) -> boo
             continue;
         }
 
-        return is_top_level_construct_line(candidate);
+        return top_level_construct_category(candidate);
     }
 
-    false
+    None
 }
 
-fn is_top_level_construct_line(line: &str) -> bool {
+fn top_level_construct_category(line: &str) -> Option<TopLevelCategory> {
     let trimmed = line.trim();
     if trimmed.is_empty() || trimmed.starts_with('\'') || trimmed.starts_with("REM") {
-        return false;
+        return None;
     }
 
-    let Some(first) = trimmed.split_whitespace().next() else {
-        return false;
-    };
+    let mut words = trimmed.split_whitespace();
+    let first = words.next()?;
 
     match first.to_ascii_lowercase().as_str() {
-        "sub" | "function" | "property" | "declare" | "event" | "enum" | "type" => true,
-        "private" | "public" | "friend" => trimmed.split_whitespace().nth(1).is_some_and(|next| {
-            matches!(
-                next.to_ascii_lowercase().as_str(),
-                "sub" | "function" | "property" | "declare" | "event"
-            )
-        }),
-        _ => false,
+        "option" => Some(TopLevelCategory::Option),
+        "declare" => Some(TopLevelCategory::Declare),
+        "sub" | "function" | "property" | "event" | "enum" | "type" => {
+            Some(TopLevelCategory::Other)
+        }
+        "private" | "public" | "friend" => {
+            let next = words.next()?;
+
+            match next.to_ascii_lowercase().as_str() {
+                "declare" => Some(TopLevelCategory::Declare),
+                "sub" | "function" | "property" | "event" => Some(TopLevelCategory::Other),
+                _ => None,
+            }
+        }
+        _ => None,
     }
+}
+
+fn should_insert_between(previous: TopLevelCategory, current: TopLevelCategory) -> bool {
+    !matches!(
+        (previous, current),
+        (TopLevelCategory::Declare, TopLevelCategory::Declare)
+            | (TopLevelCategory::Option, TopLevelCategory::Option)
+    )
 }
 
 fn is_comment_line(line: &str) -> bool {
