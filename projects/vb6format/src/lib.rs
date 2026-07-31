@@ -8,6 +8,12 @@ pub use settings::FmtSettings;
 use anyhow::Result;
 use vb6parse::ConcreteSyntaxTree;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LineEnding {
+    CrLf,
+    Lf,
+}
+
 pub fn fmt_source(source: &str, settings: &FmtSettings) -> Result<String> {
     let line_ending = cst_formatter::detect_line_ending(source);
 
@@ -23,16 +29,16 @@ pub fn fmt_source(source: &str, settings: &FmtSettings) -> Result<String> {
     }
 
     if settings.blank_lines_around_top_level {
-        insert_blank_lines_around_top_level(&mut output, line_ending);
+        insert_blank_lines_around_top_level(&mut output, &line_ending);
     }
 
-    deduplicate_blank_lines(&mut output, line_ending);
+    deduplicate_blank_lines(&mut output, &line_ending);
 
     Ok(output)
 }
 
-fn insert_blank_lines_around_top_level(output: &mut String, le: &str) {
-    let lines: Vec<&str> = if le == "\r\n" {
+fn insert_blank_lines_around_top_level(output: &mut String, line_ending: &LineEnding) {
+    let lines: Vec<&str> = if matches!(line_ending, LineEnding::CrLf) {
         output.split("\r\n").collect()
     } else {
         output.split('\n').collect()
@@ -91,7 +97,10 @@ fn insert_blank_lines_around_top_level(output: &mut String, le: &str) {
         index += 1;
     }
 
-    *output = rewritten.join(le);
+    *output = rewritten.join(match *line_ending {
+        LineEnding::CrLf => "\r\n",
+        LineEnding::Lf => "\n",
+    });
 }
 
 fn is_top_level_construct_block_start(lines: &[&str], start_index: usize) -> bool {
@@ -149,8 +158,8 @@ fn is_blank_line(line: &str) -> bool {
     line.trim().is_empty()
 }
 
-fn deduplicate_blank_lines(output: &mut String, le: &str) {
-    let lines: Vec<&str> = if le == "\r\n" {
+fn deduplicate_blank_lines(output: &mut String, line_ending: &LineEnding) {
+    let lines: Vec<&str> = if matches!(line_ending, LineEnding::CrLf) {
         output.split("\r\n").collect()
     } else {
         output.split('\n').collect()
@@ -166,12 +175,18 @@ fn deduplicate_blank_lines(output: &mut String, le: &str) {
         }
         if line.is_empty() {
             if !prev_blank {
-                result.push_str(le);
+                result.push_str(match line_ending {
+                    LineEnding::CrLf => "\r\n",
+                    LineEnding::Lf => "\n",
+                });
                 prev_blank = true;
             }
         } else {
             result.push_str(line);
-            result.push_str(le);
+            result.push_str(match line_ending {
+                LineEnding::CrLf => "\r\n",
+                LineEnding::Lf => "\n",
+            });
             prev_blank = false;
         }
     }
