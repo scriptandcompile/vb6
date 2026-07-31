@@ -1,4 +1,6 @@
+pub mod context;
 mod cst_formatter;
+pub mod rewrite;
 pub mod settings;
 
 pub use settings::FmtSettings;
