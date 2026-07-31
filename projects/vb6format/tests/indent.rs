@@ -9,30 +9,59 @@ fn empty_source() {
 
 #[test]
 fn simple_no_indent() {
-    common::assert_stable("Dim x As Integer\nx = 42\n");
+    common::assert_stable(
+        "\
+Dim x As Integer
+x = 42
+",
+    );
 }
 
 #[test]
 fn sub_body_indent() {
     common::assert_fmt(
-        "Public Sub Foo()\nDim x As Integer\nEnd Sub\n",
-        "Public Sub Foo()\n    Dim x As Integer\nEnd Sub\n",
+        "\
+Public Sub Foo()
+Dim x As Integer
+End Sub
+",
+        "\
+Public Sub Foo()
+    Dim x As Integer
+End Sub
+",
     );
 }
 
 #[test]
 fn function_body_indent() {
     common::assert_fmt(
-        "Public Function Add(a, b)\nAdd = a + b\nEnd Function\n",
-        "Public Function Add(a, b)\n    Add = a + b\nEnd Function\n",
+        "\
+Public Function Add(a, b)
+Add = a + b
+End Function
+",
+        "\
+Public Function Add(a, b)
+    Add = a + b
+End Function
+",
     );
 }
 
 #[test]
 fn property_get() {
     common::assert_fmt(
-        "Property Get Name() As String\nName = m_Name\nEnd Property\n",
-        "Property Get Name() As String\n    Name = m_Name\nEnd Property\n",
+        "\
+Property Get Name() As String
+Name = m_Name
+End Property
+",
+        "\
+Property Get Name() As String
+    Name = m_Name
+End Property
+",
     );
 }
 
@@ -48,7 +77,15 @@ Public Sub Outer()
 End Sub
 ";
     common::assert_fmt(
-        "Public Sub Outer()\nDim x As Integer\n\nPublic Sub Inner()\nDim y As Integer\nEnd Sub\nEnd Sub\n",
+        "\
+Public Sub Outer()
+Dim x As Integer
+
+Public Sub Inner()
+Dim y As Integer
+End Sub
+End Sub
+",
         expected,
     );
 }
@@ -60,15 +97,33 @@ fn custom_indent_size() {
         ..FmtSettings::default()
     };
     common::assert_fmt_with(
-        "Sub Foo()\nx = 1\nEnd Sub\n",
-        "Sub Foo()\n  x = 1\nEnd Sub\n",
+        "\
+Sub Foo()
+x = 1
+End Sub
+",
+        "\
+Sub Foo()
+  x = 1
+End Sub
+",
         &settings,
     );
 }
 
 #[test]
 fn idempotent_batch() {
-    let cases = ["", "Dim x As Integer\n", "Sub Foo()\n    x = 1\nEnd Sub\n"];
+    let cases = [
+        "",
+        "\
+Dim x As Integer
+",
+        "\
+Sub Foo()
+    x = 1
+End Sub
+",
+    ];
     for src in &cases {
         common::assert_stable(src);
     }

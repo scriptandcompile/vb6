@@ -1,29 +1,51 @@
-use crate::LineEnding;
+use std::fmt::Display;
 
-pub struct Context {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum LineEnding {
+    CrLf,
+    Lf,
+}
+
+impl Display for LineEnding {
+    #[allow(clippy::write_with_newline)]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LineEnding::CrLf => write!(f, "\r\n"),
+            LineEnding::Lf => write!(f, "\n"),
+        }
+    }
+}
+
+pub(crate) struct Context {
     pub indent_level: usize,
     pub line_ending: LineEnding,
     pub pending_indent: bool,
     pub last_was_blank: bool,
     pub line_has_content: bool,
     pub pending_blank: bool,
+    pub directive_phase: Option<DirectivePhase>,
+    pub compiler_directive_depth: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DirectivePhase {
+    BeforeDirective,
+    BeforeBody,
+    AfterDirective,
 }
 
 impl Context {
-    pub fn new(indent_level: usize, line_ending: LineEnding) -> Self {
+    pub fn new(indent_level: usize) -> Self {
         Self {
             indent_level,
-            line_ending,
+            line_ending: LineEnding::Lf,
             pending_indent: true,
             last_was_blank: true,
             line_has_content: false,
             pending_blank: false,
+            directive_phase: None,
+            compiler_directive_depth: 0,
         }
-    }
-
-    /// Returns the number of spaces for the current indentation level.
-    pub fn get_indent(&self) -> usize {
-        self.indent_level * 4 // Defaulting to 4 as a placeholder until config is integrated
     }
 
     /// Returns the newline character used by the system.
