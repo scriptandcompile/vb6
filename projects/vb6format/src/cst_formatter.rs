@@ -1,42 +1,34 @@
 use std::borrow::Cow;
 use vb6parse::parsers::{CstNode, SyntaxKind};
 
+use crate::LineEnding;
+use crate::context::Context;
 use crate::settings::FmtSettings;
 
-pub(super) fn detect_line_ending(source: &str) -> &'static str {
+pub(super) fn detect_line_ending(source: &str) -> LineEnding {
     if source.contains("\r\n") {
-        "\r\n"
+        LineEnding::CrLf
     } else {
-        "\n"
+        LineEnding::Lf
     }
 }
 
 pub(super) struct CstFormatter<'a> {
     output: &'a mut String,
-    indent_level: usize,
-    pending_indent: bool,
-    line_ending: &'a str,
+    context: Context,
     settings: &'a FmtSettings,
-    last_was_blank: bool,
-    line_has_content: bool,
-    pending_blank: bool,
 }
 
 impl<'a> CstFormatter<'a> {
     pub(super) fn new(
         output: &'a mut String,
-        line_ending: &'a str,
+        line_ending: LineEnding,
         settings: &'a FmtSettings,
     ) -> Self {
         Self {
             output,
-            indent_level: 0,
-            pending_indent: true,
-            line_ending,
+            context: Context::new(0, line_ending),
             settings,
-            last_was_blank: true,
-            line_has_content: false,
-            pending_blank: false,
         }
     }
 
@@ -48,11 +40,11 @@ impl<'a> CstFormatter<'a> {
 
         match node.kind() {
             SyntaxKind::StatementList => {
-                self.indent_level += 1;
+                self.context.indent_level += 1;
                 for child in node.children() {
                     self.walk_node(child);
                 }
-                self.indent_level = self.indent_level.saturating_sub(1);
+                self.context.indent_level = self.context.indent_level.saturating_sub(1);
             }
             SyntaxKind::CompilerDirective => {
                 self.walk_compiler_directive(node);
@@ -66,10 +58,10 @@ impl<'a> CstFormatter<'a> {
     }
 
     fn walk_compiler_directive(&mut self, node: &CstNode) {
-        let base_indent = self.indent_level;
+        let base_indent = self.context.indent_level;
 
-        if self.settings.blank_lines_around_directives && !self.last_was_blank {
-            self.pending_blank = true;
+        if self.settings.blank_lines_around_directives && !self.context.last_was_blank {
+            self.context.pending_blank = true;
         }
 
         for child in node.children() {
@@ -82,34 +74,34 @@ impl<'a> CstFormatter<'a> {
                         child.kind(),
                         SyntaxKind::CompilerElseIfClause | SyntaxKind::CompilerElseClause
                     ) && self.settings.blank_lines_inside_directives
-                        && !self.last_was_blank
+                        && !self.context.last_was_blank
                     {
-                        self.output.push_str(self.line_ending);
-                        self.last_was_blank = true;
+                        self.output.push_str(self.context.line_ending());
+                        self.context.last_was_blank = true;
                     }
 
-                    let saved = self.indent_level;
-                    self.indent_level = base_indent;
+                    let saved = self.context.indent_level;
+                    self.context.indent_level = base_indent;
                     for token in child.children() {
                         self.walk_node(token);
                     }
-                    self.indent_level = saved;
+                    self.context.indent_level = saved;
                 }
                 SyntaxKind::StatementList => {
-                    if self.settings.blank_lines_inside_directives && !self.last_was_blank {
-                        self.output.push_str(self.line_ending);
-                        self.last_was_blank = true;
+                    if self.settings.blank_lines_inside_directives && !self.context.last_was_blank {
+                        self.output.push_str(self.context.line_ending());
+                        self.context.last_was_blank = true;
                     }
 
-                    self.indent_level = base_indent + 1;
+                    self.context.indent_level = base_indent + 1;
                     for stmt in child.children() {
                         self.walk_node(stmt);
                     }
-                    self.indent_level = base_indent;
+                    self.context.indent_level = base_indent;
 
-                    if self.settings.blank_lines_inside_directives && !self.last_was_blank {
-                        self.output.push_str(self.line_ending);
-                        self.last_was_blank = true;
+                    if self.settings.blank_lines_inside_directives && !self.context.last_was_blank {
+                        self.output.push_str(self.context.line_ending());
+                        self.context.last_was_blank = true;
                     }
                 }
                 _ => {
@@ -119,55 +111,55 @@ impl<'a> CstFormatter<'a> {
         }
 
         if self.settings.blank_lines_around_directives {
-            self.pending_blank = true;
+            self.context.pending_blank = true;
         }
     }
 
     fn emit_token(&mut self, token: &CstNode) {
         match token.kind() {
             SyntaxKind::Newline => {
-                if !self.line_has_content {
-                    self.last_was_blank = true;
-                    self.pending_blank = false;
+                if !self.context.line_has_content {
+                    self.context.last_was_blank = true;
+                    self.context.pending_blank = false;
                 }
-                self.output.push_str(self.line_ending);
-                self.pending_indent = true;
-                self.line_has_content = false;
+                self.output.push_str(self.context.line_ending());
+                self.context.pending_indent = true;
+                self.context.line_has_content = false;
             }
             SyntaxKind::Whitespace => {
-                if !self.pending_indent {
+                if !self.context.pending_indent {
                     self.output.push(' ');
                 }
             }
             SyntaxKind::EndOfLineComment | SyntaxKind::RemComment => {
-                if self.pending_indent {
-                    let indent = self.indent_level * self.settings.indent_size;
+                if self.context.pending_indent {
+                    let indent = self.context.indent_level * self.settings.indent_size;
                     for _ in 0..indent {
                         self.output.push(' ');
                     }
-                    self.pending_indent = false;
+                    self.context.pending_indent = false;
                 }
                 self.output.push_str(token.text());
-                self.last_was_blank = false;
-                self.line_has_content = true;
+                self.context.last_was_blank = false;
+                self.context.line_has_content = true;
             }
             SyntaxKind::ErrorExpectedTokens | SyntaxKind::ErrorMissingTokens => {}
             _ => {
-                if self.pending_blank && !self.last_was_blank {
-                    self.output.push_str(self.line_ending);
-                    self.pending_blank = false;
+                if self.context.pending_blank && !self.context.last_was_blank {
+                    self.output.push_str(self.context.line_ending());
+                    self.context.pending_blank = false;
                 }
-                if self.pending_indent {
-                    let indent = self.indent_level * self.settings.indent_size;
+                if self.context.pending_indent {
+                    let indent = self.context.indent_level * self.settings.indent_size;
                     for _ in 0..indent {
                         self.output.push(' ');
                     }
-                    self.pending_indent = false;
+                    self.context.pending_indent = false;
                 }
                 let text = format_token_text(token, self.settings.keyword_case.as_str());
                 self.output.push_str(&text);
-                self.last_was_blank = false;
-                self.line_has_content = true;
+                self.context.last_was_blank = false;
+                self.context.line_has_content = true;
             }
         }
     }
