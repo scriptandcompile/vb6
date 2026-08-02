@@ -6771,22 +6771,24 @@ cst:
                                         text: Then
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Err
-                                      - kind: AssignmentStatement
+                                      - kind: CallStatement
                                         children:
-                                          - kind: IdentifierExpression
+                                          - kind: Identifier
+                                            text: Err
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Clear
+                                          - kind: ArgumentList
                                             children:
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: Clear
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: ColonOperator
-                                                text: ":"
-                                      - kind: Whitespace
-                                        text: " "
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: ColonOperator
+                                                        text: ":"
+                                              - kind: Whitespace
+                                                text: " "
                                       - kind: AssignmentStatement
                                         children:
                                           - kind: IdentifierExpression

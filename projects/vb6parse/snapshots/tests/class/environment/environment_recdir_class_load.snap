@@ -9510,12 +9510,20 @@ cst:
                     text: Then
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: FindClose
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: fhandle
+                  - kind: CallStatement
+                    children:
+                      - kind: Identifier
+                        text: FindClose
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: fhandle
                   - kind: ColonOperator
                     text: ":"
                   - kind: Whitespace
@@ -9822,12 +9830,20 @@ cst:
                     text: Then
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: FindClose
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: fhandle
+                  - kind: CallStatement
+                    children:
+                      - kind: Identifier
+                        text: FindClose
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: fhandle
                   - kind: ColonOperator
                     text: ":"
                   - kind: Whitespace

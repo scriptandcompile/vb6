@@ -119,6 +119,74 @@ End Sub
     insta::assert_yaml_snapshot!(tree);
 }
 
+/// Regression: detector lookahead must stop at top-level colon.
+///
+/// Without this, `ClearMove SearchRoot : IsTBScore = False` can be misclassified
+/// as an assignment statement and recovered as `ErrorRecovery`.
+#[test]
+fn procedure_call_then_assignment_no_recovery() {
+    let source = r"
+Sub Test()
+    ClearMove SearchRoot : IsTBScore = False
+End Sub
+";
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+    assert!(
+        failures.is_empty(),
+        "Expected no parse failures, found: {failures:?}"
+    );
+
+    let cst = cst_opt.expect("CST should be parsed");
+    let tree = cst.to_serializable();
+    let text = format!("{tree:#?}");
+
+    assert!(
+        !text.contains("ErrorRecovery"),
+        "Should not contain ErrorRecovery nodes, found:\n{text}"
+    );
+    assert!(
+        text.contains("CallStatement"),
+        "Expected a CallStatement for the first statement"
+    );
+    assert!(
+        text.contains("AssignmentStatement"),
+        "Expected an AssignmentStatement after ':'"
+    );
+}
+
+/// Regression for a common search-engine pattern with multiple colon-separated
+/// statements on one line.
+#[test]
+fn multi_colon_call_and_assignments_no_recovery() {
+    let source = r"
+Sub Test()
+    MakeMove CurrentMove: Ply = Ply + 1: bCheckBest = False
+End Sub
+";
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+    assert!(
+        failures.is_empty(),
+        "Expected no parse failures, found: {failures:?}"
+    );
+
+    let cst = cst_opt.expect("CST should be parsed");
+    let tree = cst.to_serializable();
+    let text = format!("{tree:#?}");
+
+    assert!(
+        !text.contains("ErrorRecovery"),
+        "Should not contain ErrorRecovery nodes, found:\n{text}"
+    );
+
+    let assignment_count = text.matches("AssignmentStatement").count();
+    assert!(
+        assignment_count >= 2,
+        "Expected at least two AssignmentStatement nodes, found {assignment_count}"
+    );
+}
+
 /// Colon separator with no space around it.
 #[test]
 fn colon_separator_no_spaces() {

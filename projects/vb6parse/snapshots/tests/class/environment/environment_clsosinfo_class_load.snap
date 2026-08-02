@@ -18859,32 +18859,42 @@ cst:
                         text: "\r\n"
                       - kind: Whitespace
                         text: "        "
-                      - kind: ErrorRecovery
+                      - kind: CallStatement
                         children:
-                          - kind: ErrorExpectedTokens
-                            text: statement
                           - kind: Identifier
                             text: CloseHandle
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: hToken
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: hToken
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: hToken
+                      - kind: ColonOperator
+                        text: ":"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: hToken
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "0"
-                      - kind: Newline
-                        text: "\r\n"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword
@@ -18965,12 +18975,20 @@ cst:
                     text: Then
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CloseHandle
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: hToken
+                  - kind: CallStatement
+                    children:
+                      - kind: Identifier
+                        text: CloseHandle
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: hToken
                   - kind: ColonOperator
                     text: ":"
                   - kind: Whitespace
@@ -21339,12 +21357,20 @@ cst:
                                             text: Then
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: FreeSid
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: Identifier
-                                            text: psidAdmin
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: FreeSid
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: psidAdmin
                                           - kind: ColonOperator
                                             text: ":"
                                           - kind: Whitespace
@@ -21385,12 +21411,20 @@ cst:
                                             text: Then
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: FreeSid
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: Identifier
-                                            text: psidPower
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: FreeSid
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: psidPower
                                           - kind: ColonOperator
                                             text: ":"
                                           - kind: Whitespace
@@ -21431,12 +21465,20 @@ cst:
                                             text: Then
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: FreeSid
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: Identifier
-                                            text: psidUser
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: FreeSid
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: psidUser
                                           - kind: ColonOperator
                                             text: ":"
                                           - kind: Whitespace
@@ -21477,12 +21519,20 @@ cst:
                                             text: Then
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: FreeSid
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: Identifier
-                                            text: psidGuest
+                                          - kind: CallStatement
+                                            children:
+                                              - kind: Identifier
+                                                text: FreeSid
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: psidGuest
                                           - kind: ColonOperator
                                             text: ":"
                                           - kind: Whitespace
@@ -21527,32 +21577,42 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "        "
-                      - kind: ErrorRecovery
+                      - kind: CallStatement
                         children:
-                          - kind: ErrorExpectedTokens
-                            text: statement
                           - kind: Identifier
                             text: CloseHandle
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: hProcessToken
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: hProcessToken
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: hProcessToken
+                      - kind: ColonOperator
+                        text: ":"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: hProcessToken
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "0"
-                      - kind: Newline
-                        text: "\r\n"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword
@@ -21633,12 +21693,20 @@ cst:
                     text: Then
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CloseHandle
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: hProcessToken
+                  - kind: CallStatement
+                    children:
+                      - kind: Identifier
+                        text: CloseHandle
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: hProcessToken
                   - kind: ColonOperator
                     text: ":"
                   - kind: Whitespace
@@ -24731,32 +24799,42 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "        "
-                      - kind: ErrorRecovery
+                      - kind: CallStatement
                         children:
-                          - kind: ErrorExpectedTokens
-                            text: statement
                           - kind: Identifier
                             text: CloseHandle
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: hToken
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: hToken
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: hToken
+                      - kind: ColonOperator
+                        text: ":"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: hToken
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "0"
-                      - kind: Newline
-                        text: "\r\n"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword
@@ -24861,12 +24939,20 @@ cst:
                     text: Then
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CloseHandle
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: hToken
+                  - kind: CallStatement
+                    children:
+                      - kind: Identifier
+                        text: CloseHandle
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: hToken
                   - kind: ColonOperator
                     text: ":"
                   - kind: Whitespace
