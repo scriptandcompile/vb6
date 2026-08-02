@@ -12,6 +12,7 @@ use std::iter::IntoIterator;
 
 use crate::errors::{ErrorDetails, Severity};
 use crate::lexer::TokenStream;
+use crate::parsers::cst::RecoveryEvent;
 
 /// Collection of parsing diagnostics, separating errors from warnings.
 ///
@@ -171,6 +172,8 @@ pub struct ParseResult<'a, T> {
     result: Option<T>,
     /// A list of failures encountered during parsing.
     failures: Vec<ErrorDetails<'a>>,
+    /// Recovery events emitted by resilient CST parsing.
+    recovery_events: Vec<RecoveryEvent>,
 }
 
 impl<'a, T> From<ParseResult<'a, T>> for (Option<T>, Vec<ErrorDetails<'a>>) {
@@ -236,7 +239,18 @@ impl<'a, T> ParseResult<'a, T> {
     /// * A new `ParseResult` instance containing the provided result and failures.
     ///
     pub fn new(result: Option<T>, failures: Vec<ErrorDetails<'a>>) -> Self {
-        Self { result, failures }
+        Self {
+            result,
+            failures,
+            recovery_events: Vec::new(),
+        }
+    }
+
+    /// Attaches recovery events to this parse result.
+    #[inline]
+    pub fn with_recovery_events(mut self, recovery_events: Vec<RecoveryEvent>) -> Self {
+        self.recovery_events = recovery_events;
+        self
     }
 
     /// Returns an iterator over the failures in the parse result.
@@ -474,6 +488,24 @@ impl<'a, T> ParseResult<'a, T> {
         (self.result, self.failures)
     }
 
+    /// Unpacks the parse result into result, failures, and recovery events.
+    #[inline]
+    pub fn unpack_with_recovery(self) -> (Option<T>, Vec<ErrorDetails<'a>>, Vec<RecoveryEvent>) {
+        (self.result, self.failures, self.recovery_events)
+    }
+
+    /// Returns an iterator over recovery events.
+    #[inline]
+    pub fn recovery_events(&self) -> impl Iterator<Item = &RecoveryEvent> {
+        self.recovery_events.iter()
+    }
+
+    /// Consumes this parse result and returns recovery events.
+    #[inline]
+    pub fn into_recovery_events(self) -> Vec<RecoveryEvent> {
+        self.recovery_events
+    }
+
     /// Unpacks the parse result into its components with errors and warnings separated.
     ///
     /// # Returns
@@ -658,6 +690,7 @@ impl<'a, T> ParseResult<'a, T> {
         ParseResult {
             result: self.result.map(f),
             failures: self.failures,
+            recovery_events: self.recovery_events,
         }
     }
 
@@ -698,11 +731,13 @@ impl<'a, T> ParseResult<'a, T> {
             Some(value) => {
                 let mut next_result = f(value);
                 next_result.failures.extend(self.failures);
+                next_result.recovery_events.extend(self.recovery_events);
                 next_result
             }
             None => ParseResult {
                 result: None,
                 failures: self.failures,
+                recovery_events: self.recovery_events,
             },
         }
     }
@@ -782,6 +817,7 @@ impl<'a, T> From<(T, ErrorDetails<'a>)> for ParseResult<'a, T> {
         ParseResult {
             result: Some(parse_pair.0),
             failures: vec![parse_pair.1],
+            recovery_events: Vec::new(),
         }
     }
 }
@@ -842,12 +878,14 @@ where
             return ParseResult {
                 result: None,
                 failures: parse_pair.1,
+                recovery_events: Vec::new(),
             };
         }
 
         ParseResult {
             result: Some(collection),
             failures: parse_pair.1,
+            recovery_events: Vec::new(),
         }
     }
 }
@@ -906,6 +944,7 @@ impl<'a> From<(TokenStream<'a>, Vec<ErrorDetails<'a>>)> for ParseResult<'a, Toke
         ParseResult {
             result: Some(parse_pair.0),
             failures: parse_pair.1,
+            recovery_events: Vec::new(),
         }
     }
 }

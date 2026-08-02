@@ -344,10 +344,10 @@ impl ConcreteSyntaxTree {
 
         let mut parser = Parser::new(token_stream);
         parser.set_source_content(contents);
-        let (cst, mut parser_failures) = parser.parse_root();
+        let (cst, mut parser_failures, recovery_events) = parser.parse_root();
         failures.append(&mut parser_failures);
 
-        ParseResult::new(Some(cst), failures)
+        ParseResult::new(Some(cst), failures).with_recovery_events(recovery_events)
     }
 
     /// Get the kind of the root node
@@ -400,6 +400,24 @@ impl ConcreteSyntaxTree {
     #[must_use]
     pub fn to_root_node(&self) -> CstNode {
         CstNode::new(SyntaxKind::Root, self.text(), false, self.children())
+    }
+
+    /// Returns byte ranges for each `ErrorRecovery` node in the CST.
+    #[must_use]
+    pub fn error_recovery_ranges(&self) -> Vec<NodeRange> {
+        let syntax_node = rowan::SyntaxNode::<VB6Language>::new_root(self.root.clone());
+
+        syntax_node
+            .descendants()
+            .filter(|node| node.kind() == SyntaxKind::ErrorRecovery)
+            .map(|node| {
+                let range = node.text_range();
+                NodeRange {
+                    start: range.start().into(),
+                    end: range.end().into(),
+                }
+            })
+            .collect()
     }
 
     /// Create a new CST with specified node kinds removed from the root level.
@@ -630,20 +648,38 @@ enum ControlFlowFrameType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum RecoveryStrategy {
+/// Strategy used by parser recovery when creating `ErrorRecovery` nodes.
+pub enum RecoveryStrategy {
+    /// Recover by consuming exactly one unexpected token.
     SingleToken,
+    /// Recover by consuming tokens until the end of the current line.
     ToNewline,
+    /// Recover from a mismatched `End <block>` terminator.
     ProcedureTerminator,
 }
 
 #[derive(Debug, Clone)]
-#[allow(dead_code)]
-pub(crate) struct RecoveryEvent {
-    id: usize,
-    expected: Vec<String>,
-    found: Vec<Token>,
-    strategy: RecoveryStrategy,
-    span: Span,
+/// A single parser recovery event captured during CST construction.
+pub struct RecoveryEvent {
+    /// Monotonic event id in parse order.
+    pub id: usize,
+    /// Human-readable expectations for this parser location.
+    pub expected: Vec<String>,
+    /// Tokens consumed during recovery.
+    pub found: Vec<Token>,
+    /// Recovery strategy that was used.
+    pub strategy: RecoveryStrategy,
+    /// Span at which recovery started.
+    pub span: Span,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Byte range for a CST node in source content.
+pub struct NodeRange {
+    /// Inclusive start byte offset.
+    pub start: u32,
+    /// Exclusive end byte offset.
+    pub end: u32,
 }
 
 /// Parsing state for control flow statements
@@ -2109,7 +2145,7 @@ impl<'a> Parser<'a> {
     /// This function loops through all tokens and identifies what kind of
     /// VB6 construct to parse based on the current token. As more VB6 syntax
     /// is supported, additional branches can be added to this loop.
-    fn parse_root(mut self) -> (ConcreteSyntaxTree, Vec<ErrorDetails<'a>>) {
+    fn parse_root(mut self) -> (ConcreteSyntaxTree, Vec<ErrorDetails<'a>>, Vec<RecoveryEvent>) {
         self.builder.start_node(SyntaxKind::Root.to_raw());
 
         // Parse VERSION statement (if present)
@@ -2132,7 +2168,7 @@ impl<'a> Parser<'a> {
         self.builder.finish_node(); // Root
 
         let root = self.builder.finish();
-        (ConcreteSyntaxTree::new(root), self.failures)
+        (ConcreteSyntaxTree::new(root), self.failures, self.recovery_events)
     }
 
     #[allow(clippy::too_many_lines)]
