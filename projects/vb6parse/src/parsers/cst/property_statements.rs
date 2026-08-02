@@ -175,20 +175,8 @@ impl Parser<'_> {
     }
 
     fn consume_property_terminator(&mut self) {
-        // Consume "End Property" and trailing tokens
-        if self.at_token(Token::EndKeyword) {
-            // Consume "End"
-            self.consume_token();
-
-            // Consume any whitespace between "End" and "Property"
-            self.consume_whitespace();
-
-            // Consume "Property"
-            self.consume_token();
-
-            // Consume until newline (including it)
-            self.consume_until_after(Token::Newline);
-        }
+        // Consume "End Property" and trailing tokens, or report mismatch as recovery.
+        self.consume_expected_end_keyword_terminator(Token::PropertyKeyword, "Property");
     }
 }
 

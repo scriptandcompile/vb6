@@ -1,5 +1,6 @@
 ---
 source: projects/vb6parse/tests/invalid_syntax/mismatched_keywords.rs
+assertion_line: 129
 expression: failure_messages
 ---
-- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nProperty Let Value(newValue As Integer)\\n    m_value = newValue\\nEnd Function\\n\", error_offset: 76, line_start: 4, line_end: 5, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [EndKeyword, Whitespace, FunctionKeyword] }), severity: Error, labels: [], notes: [] }"
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nProperty Let Value(newValue As Integer)\\n    m_value = newValue\\nEnd Function\\n\", error_offset: 77, line_start: 5, line_end: 5, kind: Parser(UnexpectedTokens { expected: [\"End Property\"], found: [EndKeyword, Whitespace, FunctionKeyword] }), severity: Error, labels: [], notes: [] }"

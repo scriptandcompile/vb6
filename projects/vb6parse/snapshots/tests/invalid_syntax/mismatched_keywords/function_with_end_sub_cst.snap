@@ -1,5 +1,6 @@
 ---
 source: projects/vb6parse/tests/invalid_syntax/mismatched_keywords.rs
+assertion_line: 62
 expression: tree
 ---
 root:
@@ -75,15 +76,15 @@ root:
                           text: "2"
                 - kind: Newline
                   text: "\n"
-            - kind: ErrorRecovery
-              children:
-                - kind: ErrorExpectedTokens
-                  text: statement
-                - kind: EndKeyword
-                  text: End
-                - kind: Whitespace
-                  text: " "
-                - kind: SubKeyword
-                  text: Sub
+        - kind: ErrorRecovery
+          children:
+            - kind: ErrorExpectedTokens
+              text: End Function
+            - kind: EndKeyword
+              text: End
+            - kind: Whitespace
+              text: " "
+            - kind: SubKeyword
+              text: Sub
             - kind: Newline
               text: "\n"

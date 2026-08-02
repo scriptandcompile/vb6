@@ -1,5 +1,6 @@
 ---
 source: projects/vb6parse/tests/invalid_syntax/mismatched_keywords.rs
+assertion_line: 33
 expression: failure_messages
 ---
-- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub TestSub()\\n    Dim x As Integer\\n    x = 10\\nEnd Function\\n\", error_offset: 59, line_start: 5, line_end: 6, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [EndKeyword, Whitespace, FunctionKeyword] }), severity: Error, labels: [], notes: [] }"
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub TestSub()\\n    Dim x As Integer\\n    x = 10\\nEnd Function\\n\", error_offset: 60, line_start: 6, line_end: 6, kind: Parser(UnexpectedTokens { expected: [\"End Sub\"], found: [EndKeyword, Whitespace, FunctionKeyword] }), severity: Error, labels: [], notes: [] }"

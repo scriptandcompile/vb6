@@ -106,20 +106,8 @@ impl Parser<'_> {
                 && parser.peek_next_keyword() == Some(Token::FunctionKeyword)
         });
 
-        // Consume "End Function" and trailing tokens
-        if self.at_token(Token::EndKeyword) {
-            // Consume "End"
-            self.consume_token();
-
-            // Consume any whitespace between "End" and "Function"
-            self.consume_whitespace();
-
-            // Consume "Function"
-            self.consume_token();
-
-            // Consume until newline (including it)
-            self.consume_until_after(Token::Newline);
-        }
+        // Consume "End Function" and trailing tokens, or report mismatch as recovery.
+        self.consume_expected_end_keyword_terminator(Token::FunctionKeyword, "Function");
 
         self.builder.finish_node(); // FunctionStatement
     }

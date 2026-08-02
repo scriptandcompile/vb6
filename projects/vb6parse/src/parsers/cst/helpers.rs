@@ -343,6 +343,48 @@ impl Parser<'_> {
         self.finish_error_node(ParserError::UnexpectedTokens { expected, found });
     }
 
+    /// Consume an `End <keyword>` procedure terminator.
+    ///
+    /// If the keyword after `End` does not match the expected one, the consumed
+    /// line is wrapped in `ErrorRecovery` and reported as an unexpected token error.
+    pub(crate) fn consume_expected_end_keyword_terminator(
+        &mut self,
+        expected_keyword: Token,
+        expected_label: &str,
+    ) {
+        if !self.at_token(Token::EndKeyword) {
+            return;
+        }
+
+        let expected_text = format!("End {expected_label}");
+        let is_match = self.peek_next_keyword() == Some(expected_keyword);
+        let mut found: Vec<Token> = Vec::new();
+
+        if !is_match {
+            self.start_error_node(std::slice::from_ref(&expected_text));
+        }
+
+        while !self.is_at_end() && !self.at_token(Token::Newline) {
+            if !is_match {
+                if let Some((_, token)) = self.tokens.get(self.pos) {
+                    found.push(*token);
+                }
+            }
+            self.consume_token();
+        }
+
+        if self.at_token(Token::Newline) {
+            self.consume_token();
+        }
+
+        if !is_match {
+            self.finish_error_node(ParserError::UnexpectedTokens {
+                expected: vec![expected_text],
+                found,
+            });
+        }
+    }
+
     /// Consume tokens until reaching the specified token or the end of input.
     /// The specified token is NOT consumed.
     ///
