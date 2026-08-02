@@ -210,6 +210,48 @@ Property Get Name() As String
     insta::assert_yaml_snapshot!("missing_end_property_failures", failure_messages);
 }
 
+/// Test missing End Property when another Property declaration starts.
+#[test]
+fn missing_end_property_before_next_property() {
+    let source = r#"
+Property Get Name() As String
+    Name = m_name
+Property Let Name(ByVal value As String)
+    m_name = value
+End Property
+"#;
+
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+    eprintln!("=== Failures for missing_end_property_before_next_property ===");
+    eprintln!("Number of failures: {}", failures.len());
+    for failure in &failures {
+        failure.eprint();
+    }
+    eprintln!("=== End Failures ===");
+
+    let cst = cst_opt.expect("CST should be present even with syntax errors");
+    let tree = cst.to_serializable();
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+
+    insta::assert_yaml_snapshot!("missing_end_property_before_next_property_cst", tree);
+
+    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_property_before_next_property_failures",
+        failures.len(),
+    );
+    insta::assert_yaml_snapshot!(
+        "missing_end_property_before_next_property_failures",
+        failure_messages
+    );
+}
+
 /// Test missing End If statement
 #[test]
 fn missing_end_if() {
@@ -275,6 +317,214 @@ Type Point
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
     assert_failure_count_matches_snapshot("missing_end", "missing_end_type_failures", failures.len());
     insta::assert_yaml_snapshot!("missing_end_type_failures", failure_messages);
+}
+
+/// Test missing End Type when another Type declaration starts.
+#[test]
+fn missing_end_type_before_next_type() {
+    let source = r"
+Type Point
+    X As Long
+    Y As Long
+Type Size
+    Width As Long
+    Height As Long
+End Type
+";
+
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+    eprintln!("=== Failures for missing_end_type_before_next_type ===");
+    eprintln!("Number of failures: {}", failures.len());
+    for failure in &failures {
+        failure.eprint();
+    }
+    eprintln!("=== End Failures ===");
+
+    let cst = cst_opt.expect("CST should be present even with syntax errors");
+    let tree = cst.to_serializable();
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+
+    insta::assert_yaml_snapshot!("missing_end_type_before_next_type_cst", tree);
+
+    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_type_before_next_type_failures",
+        failures.len(),
+    );
+    insta::assert_yaml_snapshot!("missing_end_type_before_next_type_failures", failure_messages);
+}
+
+/// Test missing End Type when a Sub declaration starts next.
+#[test]
+fn missing_end_type_before_next_sub() {
+    let source = r"
+Type Point
+    X As Long
+    Y As Long
+Sub Test()
+    Debug.Print 1
+End Sub
+";
+
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+    eprintln!("=== Failures for missing_end_type_before_next_sub ===");
+    eprintln!("Number of failures: {}", failures.len());
+    for failure in &failures {
+        failure.eprint();
+    }
+    eprintln!("=== End Failures ===");
+
+    let cst = cst_opt.expect("CST should be present even with syntax errors");
+    let tree = cst.to_serializable();
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+
+    insta::assert_yaml_snapshot!("missing_end_type_before_next_sub_cst", tree);
+
+    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_type_before_next_sub_failures",
+        failures.len(),
+    );
+    insta::assert_yaml_snapshot!("missing_end_type_before_next_sub_failures", failure_messages);
+}
+
+/// Test missing End Type when a Function declaration starts next.
+#[test]
+fn missing_end_type_before_next_function() {
+    let source = r"
+Type Point
+    X As Long
+    Y As Long
+Function GetValue() As Long
+    GetValue = 1
+End Function
+";
+
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+    eprintln!("=== Failures for missing_end_type_before_next_function ===");
+    eprintln!("Number of failures: {}", failures.len());
+    for failure in &failures {
+        failure.eprint();
+    }
+    eprintln!("=== End Failures ===");
+
+    let cst = cst_opt.expect("CST should be present even with syntax errors");
+    let tree = cst.to_serializable();
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+
+    insta::assert_yaml_snapshot!("missing_end_type_before_next_function_cst", tree);
+
+    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_type_before_next_function_failures",
+        failures.len(),
+    );
+    insta::assert_yaml_snapshot!(
+        "missing_end_type_before_next_function_failures",
+        failure_messages
+    );
+}
+
+/// Test missing End Sub when a Type declaration starts next.
+#[test]
+fn missing_end_sub_before_next_type() {
+    let source = r"
+Sub Test()
+    Dim x As Long
+    x = 1
+Type Point
+    X As Long
+    Y As Long
+End Type
+";
+
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+    eprintln!("=== Failures for missing_end_sub_before_next_type ===");
+    eprintln!("Number of failures: {}", failures.len());
+    for failure in &failures {
+        failure.eprint();
+    }
+    eprintln!("=== End Failures ===");
+
+    let cst = cst_opt.expect("CST should be present even with syntax errors");
+    let tree = cst.to_serializable();
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+
+    insta::assert_yaml_snapshot!("missing_end_sub_before_next_type_cst", tree);
+
+    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_sub_before_next_type_failures",
+        failures.len(),
+    );
+    insta::assert_yaml_snapshot!("missing_end_sub_before_next_type_failures", failure_messages);
+}
+
+/// Test missing End Function when a Type declaration starts next.
+#[test]
+fn missing_end_function_before_next_type() {
+    let source = r"
+Function GetValue() As Long
+    GetValue = 1
+Type Point
+    X As Long
+    Y As Long
+End Type
+";
+
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+    eprintln!("=== Failures for missing_end_function_before_next_type ===");
+    eprintln!("Number of failures: {}", failures.len());
+    for failure in &failures {
+        failure.eprint();
+    }
+    eprintln!("=== End Failures ===");
+
+    let cst = cst_opt.expect("CST should be present even with syntax errors");
+    let tree = cst.to_serializable();
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+
+    insta::assert_yaml_snapshot!("missing_end_function_before_next_type_cst", tree);
+
+    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_function_before_next_type_failures",
+        failures.len(),
+    );
+    insta::assert_yaml_snapshot!(
+        "missing_end_function_before_next_type_failures",
+        failure_messages
+    );
 }
 
 /// Test missing End Select statement

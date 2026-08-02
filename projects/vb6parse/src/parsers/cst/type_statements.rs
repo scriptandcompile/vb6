@@ -242,6 +242,11 @@ impl Parser<'_> {
                 break;
             }
 
+            // Recover from missing End Type when another top-level component starts.
+            if self.at_component_declaration_start() {
+                break;
+            }
+
             if self.at_compiler_directive_keyword(Token::IfKeyword) {
                 self.parse_type_compiler_directive();
                 continue;
@@ -301,20 +306,8 @@ impl Parser<'_> {
 
         self.builder.finish_node(); // StatementList
 
-        // Consume "End Type" and trailing tokens
-        if self.at_token(Token::EndKeyword) {
-            // Consume "End"
-            self.consume_token();
-
-            // Consume any whitespace between "End" and "Type"
-            self.consume_whitespace();
-
-            // Consume "Type"
-            self.consume_token();
-
-            // Consume until newline (including it)
-            self.consume_until_after(Token::Newline);
-        }
+        // Consume "End Type" and trailing tokens, or report mismatch as recovery.
+        self.consume_expected_end_keyword_terminator(Token::TypeKeyword, "Type");
 
         self.builder.finish_node(); // TypeStatement
     }
@@ -345,6 +338,9 @@ impl Parser<'_> {
                 if self.at_token(Token::EndKeyword)
                     && self.peek_next_keyword() == Some(Token::TypeKeyword)
                 {
+                    break;
+                }
+                if self.at_component_declaration_start() {
                     break;
                 }
                 if self.at_compiler_directive_keyword(Token::ElseIfKeyword)

@@ -1,0 +1,5 @@
+---
+source: projects/vb6parse/tests/invalid_syntax/missing_end.rs
+expression: failure_messages
+---
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nFunction GetValue() As Long\\n    GetValue = 1\\nType Point\\n    X As Long\\n    Y As Long\\nEnd Type\\n\", error_offset: 46, line_start: 4, line_end: 4, kind: Parser(UnexpectedTokens { expected: [\"End Function\"], found: [TypeKeyword] }), severity: Error, labels: [], notes: [] }"

@@ -73,7 +73,7 @@ impl Parser<'_> {
         self.parse_statement_list(|parser| {
             (parser.at_token(Token::EndKeyword)
                 && parser.peek_next_keyword() == Some(Token::PropertyKeyword))
-                || parser.at_procedure_declaration_start()
+                || parser.at_component_declaration_start()
         });
 
         self.consume_property_terminator();
@@ -104,7 +104,7 @@ impl Parser<'_> {
         self.parse_statement_list(|parser| {
             (parser.at_token(Token::EndKeyword)
                 && parser.peek_next_keyword() == Some(Token::PropertyKeyword))
-                || parser.at_procedure_declaration_start()
+                || parser.at_component_declaration_start()
         });
 
         self.consume_property_terminator();
