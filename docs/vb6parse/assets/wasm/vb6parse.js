@@ -1,3 +1,5 @@
+/* @ts-self-types="./vb6parse.d.ts" */
+
 /**
  * Initializes the panic hook for better error messages in the browser console.
  */
