@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/module/cdiu_beat_up_editor.rs
 expression: module
 ---
 name: cma2
@@ -3065,12 +3065,20 @@ cst:
                     text: Then
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CheckDFrame2
-                  - kind: ColonOperator
-                    text: ":"
-                  - kind: Whitespace
-                    text: " "
+                  - kind: CallStatement
+                    children:
+                      - kind: Identifier
+                        text: CheckDFrame2
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: ColonOperator
+                                    text: ":"
+                          - kind: Whitespace
+                            text: " "
                   - kind: AssignmentStatement
                     children:
                       - kind: MemberAccessExpression

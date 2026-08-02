@@ -1365,32 +1365,42 @@ cst:
                 text: ":"
               - kind: Whitespace
                 text: "  "
-              - kind: ErrorRecovery
+              - kind: CallStatement
                 children:
-                  - kind: ErrorExpectedTokens
-                    text: statement
                   - kind: Identifier
                     text: ClearMove
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: PonderMove
-                  - kind: ColonOperator
-                    text: ":"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: pbPondering
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: PonderMove
+              - kind: ColonOperator
+                text: ":"
+              - kind: Whitespace
+                text: " "
+              - kind: AssignmentStatement
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: pbPondering
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: FalseKeyword
-                    text: "False"
-              - kind: Newline
-                text: "\r\n"
+                  - kind: BooleanLiteralExpression
+                    children:
+                      - kind: FalseKeyword
+                        text: "False"
+                  - kind: Newline
+                    text: "\r\n"
               - kind: Whitespace
                 text: "  "
               - kind: Newline

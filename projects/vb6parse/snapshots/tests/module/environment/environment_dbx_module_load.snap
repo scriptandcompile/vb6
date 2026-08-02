@@ -75991,12 +75991,20 @@ cst:
                                                         text: Then
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Identifier
-                                                        text: FilePathNotForUser
-                                                      - kind: ColonOperator
-                                                        text: ":"
-                                                      - kind: Whitespace
-                                                        text: " "
+                                                      - kind: CallStatement
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: FilePathNotForUser
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: ColonOperator
+                                                                        text: ":"
+                                                              - kind: Whitespace
+                                                                text: " "
                                                       - kind: AssignmentStatement
                                                         children:
                                                           - kind: IdentifierExpression
@@ -76057,12 +76065,20 @@ cst:
                                                         text: Then
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Identifier
-                                                        text: KillFile
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: BaseKeyword
-                                                        text: Base
+                                                      - kind: CallStatement
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: KillFile
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: BaseKeyword
+                                                                        text: Base
                                                       - kind: ColonOperator
                                                         text: ":"
                                                       - kind: Whitespace
@@ -76503,12 +76519,20 @@ cst:
                                 text: Then
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: FilePathNotForUser
-                              - kind: ColonOperator
-                                text: ":"
-                              - kind: Whitespace
-                                text: " "
+                              - kind: CallStatement
+                                children:
+                                  - kind: Identifier
+                                    text: FilePathNotForUser
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: ColonOperator
+                                                text: ":"
+                                      - kind: Whitespace
+                                        text: " "
                               - kind: AssignmentStatement
                                 children:
                                   - kind: IdentifierExpression
@@ -86879,30 +86903,36 @@ cst:
                                     text: Then
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Debug
-                                  - kind: AssignmentStatement
+                                  - kind: CallStatement
                                     children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: Print
+                                      - kind: Identifier
+                                        text: Debug
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: PrintKeyword
+                                        text: Print
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: StringLiteralExpression
+                                      - kind: ArgumentList
                                         children:
-                                          - kind: StringLiteral
-                                            text: "\"operator: \""
-                                  - kind: Semicolon
-                                    text: ;
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: r
-                                  - kind: DollarSign
-                                    text: $
+                                          - kind: Argument
+                                            children:
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"operator: \""
+                                          - kind: Semicolon
+                                            text: ;
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: r
+                                                  - kind: DollarSign
+                                                    text: $
                                   - kind: ColonOperator
                                     text: ":"
                                   - kind: Whitespace
@@ -88131,22 +88161,24 @@ cst:
                                     text: Then
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Debug
-                                  - kind: AssignmentStatement
+                                  - kind: CallStatement
                                     children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: Print
+                                      - kind: Identifier
+                                        text: Debug
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: PrintKeyword
+                                        text: Print
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: StringLiteralExpression
+                                      - kind: ArgumentList
                                         children:
-                                          - kind: StringLiteral
-                                            text: "\"Open Parenthesis\""
+                                          - kind: Argument
+                                            children:
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"Open Parenthesis\""
                                   - kind: ColonOperator
                                     text: ":"
                                   - kind: Whitespace
@@ -88359,22 +88391,24 @@ cst:
                                     text: Then
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Debug
-                                  - kind: AssignmentStatement
+                                  - kind: CallStatement
                                     children:
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: Print
+                                      - kind: Identifier
+                                        text: Debug
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: PrintKeyword
+                                        text: Print
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: StringLiteralExpression
+                                      - kind: ArgumentList
                                         children:
-                                          - kind: StringLiteral
-                                            text: "\"Another Item (,)\""
+                                          - kind: Argument
+                                            children:
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"Another Item (,)\""
                                   - kind: ColonOperator
                                     text: ":"
                                   - kind: Whitespace

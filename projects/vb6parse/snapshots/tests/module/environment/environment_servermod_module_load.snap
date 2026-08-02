@@ -2015,32 +2015,42 @@ cst:
                                     text: Then
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: PopStage
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: bstack
+                                  - kind: CallStatement
+                                    children:
+                                      - kind: Identifier
+                                        text: PopStage
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: bstack
                                   - kind: ColonOperator
                                     text: ":"
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: bb
-                                  - kind: AssignmentStatement
+                                  - kind: CallStatement
                                     children:
-                                      - kind: IdentifierExpression
+                                      - kind: Identifier
+                                        text: bb
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: Flush
+                                      - kind: ArgumentList
                                         children:
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: Flush
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: ColonOperator
-                                            text: ":"
-                                  - kind: Whitespace
-                                    text: " "
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: ColonOperator
+                                                    text: ":"
+                                          - kind: Whitespace
+                                            text: " "
                                   - kind: AssignmentStatement
                                     children:
                                       - kind: IdentifierExpression
@@ -4891,32 +4901,44 @@ cst:
                             children:
                               - kind: Whitespace
                                 text: "            "
-                              - kind: ErrorRecovery
+                              - kind: CallStatement
                                 children:
-                                  - kind: ErrorExpectedTokens
-                                    text: statement
                                   - kind: Identifier
                                     text: PopStage
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: bstack
-                                  - kind: ColonOperator
-                                    text: ":"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: CallEventFromSocketOne
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: bstack
+                              - kind: ColonOperator
+                                text: ":"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AssignmentStatement
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: CallEventFromSocketOne
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: FalseKeyword
-                                    text: "False"
-                                  - kind: ColonOperator
-                                    text: ":"
+                                  - kind: BooleanLiteralExpression
+                                    children:
+                                      - kind: FalseKeyword
+                                        text: "False"
+                              - kind: ColonOperator
+                                text: ":"
+                              - kind: GotoStatement
+                                children:
                                   - kind: Whitespace
                                     text: " "
                                   - kind: GotoKeyword

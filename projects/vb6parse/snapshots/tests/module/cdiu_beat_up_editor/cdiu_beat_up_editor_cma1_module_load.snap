@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/module/cdiu_beat_up_editor.rs
 expression: module
 ---
 name: cma1
@@ -18161,22 +18161,38 @@ cst:
                             text: Then
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: PlaySpace
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: CallStatement
+                            children:
+                              - kind: Identifier
+                                text: PlaySpace
+                              - kind: Whitespace
+                                text: " "
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                           - kind: ColonOperator
                             text: ":"
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: FixCombo
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: Whitespace
-                            text: " "
+                          - kind: CallStatement
+                            children:
+                              - kind: Identifier
+                                text: FixCombo
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: ColonOperator
+                                            text: ":"
+                                  - kind: Whitespace
+                                    text: " "
                           - kind: AssignmentStatement
                             children:
                               - kind: CallExpression
