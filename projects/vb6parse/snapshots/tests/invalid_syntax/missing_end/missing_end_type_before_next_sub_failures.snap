@@ -1,0 +1,5 @@
+---
+source: projects/vb6parse/tests/invalid_syntax/missing_end.rs
+expression: failure_messages
+---
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nType Point\\n    X As Long\\n    Y As Long\\nSub Test()\\n    Debug.Print 1\\nEnd Sub\\n\", error_offset: 40, line_start: 5, line_end: 5, kind: Parser(UnexpectedTokens { expected: [\"End Type\"], found: [SubKeyword] }), severity: Error, labels: [], notes: [] }"

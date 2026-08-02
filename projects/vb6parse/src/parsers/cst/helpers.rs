@@ -387,7 +387,7 @@ impl Parser<'_> {
         expected_keyword: Token,
         expected_label: &str,
     ) {
-        if self.at_procedure_declaration_start() {
+        if self.at_component_declaration_start() {
             let expected_text = format!("End {expected_label}");
             self.emit_recovery_error(
                 RecoveryStrategy::ProcedureTerminator,
@@ -437,6 +437,15 @@ impl Parser<'_> {
         );
     }
 
+    /// Check if the parser is at the start of a new top-level component declaration.
+    ///
+    /// This includes procedure declarations (`Sub`/`Function`/`Property`) and
+    /// `Type` declarations. Used to recover from missing terminators by implicitly
+    /// closing the current component when a new one starts.
+    pub(crate) fn at_component_declaration_start(&self) -> bool {
+        self.at_procedure_declaration_start() || self.at_type_declaration_start()
+    }
+
     /// Check if the parser is at the start of a new procedure declaration.
     ///
     /// Used by procedure body parsing to recover from a missing terminator
@@ -465,6 +474,35 @@ impl Parser<'_> {
                     self.peek_next_keyword(),
                     Some(Token::SubKeyword | Token::FunctionKeyword | Token::PropertyKeyword)
                 )
+            }
+            _ => false,
+        }
+    }
+
+    /// Check if the parser is at the start of a `Type` declaration.
+    ///
+    /// To avoid confusing a Type member named `Type` with a new declaration,
+    /// we only treat `Type` as a declaration start when there is no `As` token
+    /// on the same logical line before newline.
+    pub(crate) fn at_type_declaration_start(&self) -> bool {
+        let line_contains_as = || {
+            let mut index = self.pos;
+            while let Some((_, token)) = self.tokens.get(index) {
+                if *token == Token::Newline {
+                    break;
+                }
+                if *token == Token::AsKeyword {
+                    return true;
+                }
+                index += 1;
+            }
+            false
+        };
+
+        match self.current_token() {
+            Some(Token::TypeKeyword) => !line_contains_as(),
+            Some(Token::PublicKeyword | Token::PrivateKeyword) => {
+                self.peek_next_keyword() == Some(Token::TypeKeyword) && !line_contains_as()
             }
             _ => false,
         }

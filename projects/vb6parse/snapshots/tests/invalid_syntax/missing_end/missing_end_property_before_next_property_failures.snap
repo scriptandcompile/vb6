@@ -1,0 +1,5 @@
+---
+source: projects/vb6parse/tests/invalid_syntax/missing_end.rs
+expression: failure_messages
+---
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nProperty Get Name() As String\\n    Name = m_name\\nProperty Let Name(ByVal value As String)\\n    m_name = value\\nEnd Property\\n\", error_offset: 49, line_start: 4, line_end: 4, kind: Parser(UnexpectedTokens { expected: [\"End Property\"], found: [PropertyKeyword] }), severity: Error, labels: [], notes: [] }"
