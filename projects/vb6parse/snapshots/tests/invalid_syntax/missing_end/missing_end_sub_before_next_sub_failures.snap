@@ -1,0 +1,5 @@
+---
+source: projects/vb6parse/tests/invalid_syntax/missing_end.rs
+expression: failure_messages
+---
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub FirstSub()\\n    Dim x As Integer\\n    x = 10\\nPublic Sub SecondSub()\\n    MsgBox \\\"ok\\\"\\nEnd Sub\\n\", error_offset: 48, line_start: 5, line_end: 5, kind: Parser(UnexpectedTokens { expected: [\"End Sub\"], found: [PublicKeyword] }), severity: Error, labels: [], notes: [] }"

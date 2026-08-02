@@ -387,6 +387,20 @@ impl Parser<'_> {
         expected_keyword: Token,
         expected_label: &str,
     ) {
+        if self.at_procedure_declaration_start() {
+            let expected_text = format!("End {expected_label}");
+            self.emit_recovery_error(
+                RecoveryStrategy::ProcedureTerminator,
+                vec![expected_text],
+                |parser, found| {
+                    if let Some(token) = parser.current_token() {
+                        found.push(*token);
+                    }
+                },
+            );
+            return;
+        }
+
         if !self.at_token(Token::EndKeyword) {
             return;
         }
@@ -421,6 +435,39 @@ impl Parser<'_> {
                 }
             },
         );
+    }
+
+    /// Check if the parser is at the start of a new procedure declaration.
+    ///
+    /// Used by procedure body parsing to recover from a missing terminator
+    /// when another procedure begins before `End Sub/Function/Property`.
+    pub(crate) fn at_procedure_declaration_start(&self) -> bool {
+        match self.current_token() {
+            Some(Token::SubKeyword | Token::FunctionKeyword | Token::PropertyKeyword) => true,
+            Some(Token::PublicKeyword | Token::PrivateKeyword | Token::FriendKeyword) => {
+                let next_keywords: Vec<_> = self
+                    .peek_next_count_keywords(NonZeroUsize::new(2).unwrap())
+                    .collect();
+
+                matches!(
+                    next_keywords.as_slice(),
+                    [
+                        Token::SubKeyword | Token::FunctionKeyword | Token::PropertyKeyword,
+                        ..
+                    ] | [
+                        Token::StaticKeyword,
+                        Token::SubKeyword | Token::FunctionKeyword | Token::PropertyKeyword
+                    ]
+                )
+            }
+            Some(Token::StaticKeyword) => {
+                matches!(
+                    self.peek_next_keyword(),
+                    Some(Token::SubKeyword | Token::FunctionKeyword | Token::PropertyKeyword)
+                )
+            }
+            _ => false,
+        }
     }
 
     /// Consume tokens until reaching the specified token or the end of input.

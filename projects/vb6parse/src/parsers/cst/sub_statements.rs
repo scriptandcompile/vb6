@@ -94,8 +94,9 @@ impl Parser<'_> {
 
         // Parse body until "End Sub"
         self.parse_statement_list(|parser| {
-            parser.at_token(Token::EndKeyword)
-                && parser.peek_next_keyword() == Some(Token::SubKeyword)
+            (parser.at_token(Token::EndKeyword)
+                && parser.peek_next_keyword() == Some(Token::SubKeyword))
+                || parser.at_procedure_declaration_start()
         });
 
         // Consume "End Sub" and trailing tokens, or report mismatch as recovery.

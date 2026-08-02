@@ -1,0 +1,5 @@
+---
+source: projects/vb6parse/tests/invalid_syntax/missing_end.rs
+expression: failure_messages
+---
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nFunction FirstFunction(x As Integer) As Integer\\n    FirstFunction = x * 2\\nPublic Function SecondFunction(y As Integer) As Integer\\n    SecondFunction = y + 1\\nEnd Function\\n\", error_offset: 75, line_start: 4, line_end: 4, kind: Parser(UnexpectedTokens { expected: [\"End Function\"], found: [PublicKeyword] }), severity: Error, labels: [], notes: [] }"
