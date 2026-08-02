@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-08-02T04:35:38Z",
+  "last_updated": "2026-08-02T04:51:03Z",
   "snapshots": [
     {
       "timestamp": "2026-07-06T07:06:31Z",
@@ -851,16 +851,50 @@
           "percent": 94.74
         }
       }
+    },
+    {
+      "timestamp": "2026-08-02T04:51:03Z",
+      "commit_sha": "e2dda83676337247805c7ab4240c892bff25f334",
+      "commit_message": "Correctly tracking top level starts where last component doesn't exist.",
+      "coverage": {
+        "line_coverage": 94.29,
+        "function_coverage": 90.94,
+        "region_coverage": 94.74
+      },
+      "tests": {
+        "total": 5662,
+        "lib_tests": 5534,
+        "doc_tests": 128,
+        "integration_tests": 0,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 103966,
+          "total": 110258,
+          "percent": 94.29
+        },
+        "functions": {
+          "covered": 6374,
+          "total": 7009,
+          "percent": 90.94
+        },
+        "regions": {
+          "covered": 173387,
+          "total": 183014,
+          "percent": 94.74
+        }
+      }
     }
   ],
   "coverage_summary": {
     "line_coverage": {
-      "latest": 94.3,
+      "latest": 94.29,
       "trend": "stable",
-      "change_percent": 0.0,
+      "change_percent": 0.01,
       "best": 95.87,
       "worst": 94.02,
-      "average": 94.89
+      "average": 94.86
     },
     "function_coverage": {
       "latest": 90.94,
@@ -868,7 +902,7 @@
       "change_percent": 0.0,
       "best": 93.0,
       "worst": 90.84,
-      "average": 91.87
+      "average": 91.84
     },
     "region_coverage": {
       "latest": 94.74,
@@ -876,7 +910,7 @@
       "change_percent": 0.0,
       "best": 95.99,
       "worst": 94.22,
-      "average": 95.09
+      "average": 95.08
     },
     "test_count": {
       "latest": 5662,
