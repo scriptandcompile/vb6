@@ -1437,22 +1437,24 @@ cst:
                                 text: Then
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: command2
-                              - kind: AssignmentStatement
+                              - kind: CallStatement
                                 children:
-                                  - kind: IdentifierExpression
+                                  - kind: Identifier
+                                    text: command2
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: SetFocus
+                                  - kind: ArgumentList
                                     children:
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: SetFocus
-                                  - kind: IdentifierExpression
-                                    children:
-                                      - kind: ColonOperator
-                                        text: ":"
-                              - kind: Whitespace
-                                text: " "
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: ColonOperator
+                                                text: ":"
+                                      - kind: Whitespace
+                                        text: " "
                               - kind: AssignmentStatement
                                 children:
                                   - kind: IdentifierExpression
@@ -1803,22 +1805,24 @@ cst:
                             text: Then
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: command1
-                          - kind: AssignmentStatement
+                          - kind: CallStatement
                             children:
-                              - kind: IdentifierExpression
+                              - kind: Identifier
+                                text: command1
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: SetFocus
+                              - kind: ArgumentList
                                 children:
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: SetFocus
-                              - kind: IdentifierExpression
-                                children:
-                                  - kind: ColonOperator
-                                    text: ":"
-                          - kind: Whitespace
-                            text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: ColonOperator
+                                            text: ":"
+                                  - kind: Whitespace
+                                    text: " "
                           - kind: AssignmentStatement
                             children:
                               - kind: IdentifierExpression
@@ -10225,36 +10229,46 @@ cst:
                     text: "\r\n"
               - kind: Whitespace
                 text: " "
-              - kind: ErrorRecovery
+              - kind: CallStatement
                 children:
-                  - kind: ErrorExpectedTokens
-                    text: statement
                   - kind: Identifier
                     text: ListPad
                   - kind: PeriodOperator
                     text: "."
                   - kind: Identifier
                     text: WrapAgain
-                  - kind: ColonOperator
-                    text: ":"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: all
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: ColonOperator
+                                text: ":"
+                      - kind: Whitespace
+                        text: " "
+              - kind: AssignmentStatement
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: all
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ListPad
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: DocLines
-              - kind: Newline
-                text: "\r\n"
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: ListPad
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: DocLines
+                  - kind: Newline
+                    text: "\r\n"
               - kind: Newline
                 text: "\r\n"
               - kind: IfStatement

@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -3290,12 +3290,20 @@ cst:
                             text: Then
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: PopStage
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: bstack
+                          - kind: CallStatement
+                            children:
+                              - kind: Identifier
+                                text: PopStage
+                              - kind: Whitespace
+                                text: " "
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: bstack
                           - kind: ColonOperator
                             text: ":"
                           - kind: Whitespace
@@ -5936,32 +5944,42 @@ cst:
                                     text: Then
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: PopStage
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: bstack
+                                  - kind: CallStatement
+                                    children:
+                                      - kind: Identifier
+                                        text: PopStage
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: bstack
                                   - kind: ColonOperator
                                     text: ":"
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: bb
-                                  - kind: AssignmentStatement
+                                  - kind: CallStatement
                                     children:
-                                      - kind: IdentifierExpression
+                                      - kind: Identifier
+                                        text: bb
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: Flush
+                                      - kind: ArgumentList
                                         children:
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: Flush
-                                      - kind: IdentifierExpression
-                                        children:
-                                          - kind: ColonOperator
-                                            text: ":"
-                                  - kind: Whitespace
-                                    text: " "
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: ColonOperator
+                                                    text: ":"
+                                          - kind: Whitespace
+                                            text: " "
                                   - kind: AssignmentStatement
                                     children:
                                       - kind: IdentifierExpression

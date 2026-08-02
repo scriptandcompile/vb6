@@ -407,6 +407,11 @@ impl Parser<'_> {
                     // Reached end of line without finding assignment - this is a procedure call
                     return true;
                 }
+                Token::ColonOperator if paren_depth == 0 => {
+                    // Colon separates statements on the same line in VB6.
+                    // Stop lookahead at the current statement boundary.
+                    return true;
+                }
                 Token::Whitespace => {
                     // Skip whitespace in lookahead analysis.
                     continue;

@@ -23491,32 +23491,42 @@ cst:
                 text: "\r\n"
               - kind: Whitespace
                 text: "  "
-              - kind: ErrorRecovery
+              - kind: CallStatement
                 children:
-                  - kind: ErrorExpectedTokens
-                    text: statement
                   - kind: Identifier
                     text: ClearMove
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: SearchRoot
-                  - kind: ColonOperator
-                    text: ":"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: IsTBScore
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: SearchRoot
+              - kind: ColonOperator
+                text: ":"
+              - kind: Whitespace
+                text: " "
+              - kind: AssignmentStatement
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: IsTBScore
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: FalseKeyword
-                    text: "False"
-              - kind: Newline
-                text: "\r\n"
+                  - kind: BooleanLiteralExpression
+                    children:
+                      - kind: FalseKeyword
+                        text: "False"
+                  - kind: Newline
+                    text: "\r\n"
               - kind: Whitespace
                 text: "  "
               - kind: EndOfLineComment
@@ -25091,68 +25101,94 @@ cst:
                         text: "\r\n"
                       - kind: Whitespace
                         text: "    "
-                      - kind: ErrorRecovery
+                      - kind: CallStatement
                         children:
-                          - kind: ErrorExpectedTokens
-                            text: statement
                           - kind: Identifier
                             text: MakeMove
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CurrentMove
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Ply
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EqualityOperator
-                            text: "="
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Ply
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AdditionOperator
-                            text: +
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: bCheckBest
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: CurrentMove
+                      - kind: ColonOperator
+                        text: ":"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Ply
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: FalseKeyword
-                            text: "False"
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: bLegal
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Ply
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AdditionOperator
+                                text: +
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
+                      - kind: ColonOperator
+                        text: ":"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: bCheckBest
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: FalseKeyword
-                            text: "False"
-                      - kind: Newline
-                        text: "\r\n"
+                          - kind: BooleanLiteralExpression
+                            children:
+                              - kind: FalseKeyword
+                                text: "False"
+                      - kind: ColonOperator
+                        text: ":"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: bLegal
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: BooleanLiteralExpression
+                            children:
+                              - kind: FalseKeyword
+                                text: "False"
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: Newline
@@ -35209,32 +35245,42 @@ cst:
                 text: "\r\n"
               - kind: Whitespace
                 text: "  "
-              - kind: ErrorRecovery
+              - kind: CallStatement
                 children:
-                  - kind: ErrorExpectedTokens
-                    text: statement
                   - kind: Identifier
                     text: ClearMove
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ThreatMove
-                  - kind: ColonOperator
-                    text: ":"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: bTTMoveIsSingular
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ThreatMove
+              - kind: ColonOperator
+                text: ":"
+              - kind: Whitespace
+                text: " "
+              - kind: AssignmentStatement
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: bTTMoveIsSingular
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: FalseKeyword
-                    text: "False"
-              - kind: Newline
-                text: "\r\n"
+                  - kind: BooleanLiteralExpression
+                    children:
+                      - kind: FalseKeyword
+                        text: "False"
+                  - kind: Newline
+                    text: "\r\n"
               - kind: Whitespace
                 text: "  "
               - kind: AssignmentStatement
@@ -36995,46 +37041,62 @@ cst:
                     text: "\r\n"
               - kind: Whitespace
                 text: "  "
-              - kind: ErrorRecovery
+              - kind: CallStatement
                 children:
-                  - kind: ErrorExpectedTokens
-                    text: statement
                   - kind: Identifier
                     text: ClearMove
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ttMove
-                  - kind: ColonOperator
-                    text: ":"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: ttValue
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EqualityOperator
-                    text: "="
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: VALUE_NONE
-                  - kind: ColonOperator
-                    text: ":"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: bTTCapture
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ttMove
+              - kind: ColonOperator
+                text: ":"
+              - kind: Whitespace
+                text: " "
+              - kind: AssignmentStatement
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ttValue
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: FalseKeyword
-                    text: "False"
-              - kind: Newline
-                text: "\r\n"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: VALUE_NONE
+              - kind: ColonOperator
+                text: ":"
+              - kind: Whitespace
+                text: " "
+              - kind: AssignmentStatement
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: bTTCapture
+                  - kind: Whitespace
+                    text: " "
+                  - kind: EqualityOperator
+                    text: "="
+                  - kind: Whitespace
+                    text: " "
+                  - kind: BooleanLiteralExpression
+                    children:
+                      - kind: FalseKeyword
+                        text: "False"
+                  - kind: Newline
+                    text: "\r\n"
               - kind: Whitespace
                 text: "  "
               - kind: Newline
@@ -43267,42 +43329,60 @@ cst:
                                                                 text: ":"
                                                               - kind: Whitespace
                                                                 text: " "
-                                                              - kind: ErrorRecovery
+                                                              - kind: CallStatement
                                                                 children:
-                                                                  - kind: ErrorExpectedTokens
-                                                                    text: statement
                                                                   - kind: Identifier
                                                                     text: ClearMove
                                                                   - kind: Whitespace
                                                                     text: " "
-                                                                  - kind: Identifier
-                                                                    text: CurrentMove
-                                                                  - kind: ColonOperator
-                                                                    text: ":"
-                                                                  - kind: Whitespace
-                                                                    text: " "
-                                                                  - kind: Identifier
-                                                                    text: MovePickerDat
-                                                                  - kind: LeftParenthesis
-                                                                    text: (
-                                                                  - kind: Identifier
-                                                                    text: ss
-                                                                  - kind: RightParenthesis
-                                                                    text: )
-                                                                  - kind: PeriodOperator
-                                                                    text: "."
-                                                                  - kind: Identifier
-                                                                    text: CurrMoveNum
+                                                                  - kind: ArgumentList
+                                                                    children:
+                                                                      - kind: Argument
+                                                                        children:
+                                                                          - kind: IdentifierExpression
+                                                                            children:
+                                                                              - kind: Identifier
+                                                                                text: CurrentMove
+                                                              - kind: ColonOperator
+                                                                text: ":"
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: AssignmentStatement
+                                                                children:
+                                                                  - kind: MemberAccessExpression
+                                                                    children:
+                                                                      - kind: CallExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: MovePickerDat
+                                                                          - kind: LeftParenthesis
+                                                                            text: (
+                                                                          - kind: ArgumentList
+                                                                            children:
+                                                                              - kind: Argument
+                                                                                children:
+                                                                                  - kind: IdentifierExpression
+                                                                                    children:
+                                                                                      - kind: Identifier
+                                                                                        text: ss
+                                                                          - kind: RightParenthesis
+                                                                            text: )
+                                                                      - kind: PeriodOperator
+                                                                        text: "."
+                                                                      - kind: Identifier
+                                                                        text: CurrMoveNum
                                                                   - kind: Whitespace
                                                                     text: " "
                                                                   - kind: EqualityOperator
                                                                     text: "="
                                                                   - kind: Whitespace
                                                                     text: " "
-                                                                  - kind: IntegerLiteral
-                                                                    text: "0"
-                                                              - kind: Newline
-                                                                text: "\r\n"
+                                                                  - kind: NumericLiteralExpression
+                                                                    children:
+                                                                      - kind: IntegerLiteral
+                                                                        text: "0"
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
                                                               - kind: Whitespace
                                                                 text: "          "
                                                               - kind: CallStatement
@@ -46205,40 +46285,54 @@ cst:
                                                             text: "\r\n"
                                                       - kind: Whitespace
                                                         text: "              "
-                                                      - kind: ErrorRecovery
+                                                      - kind: CallStatement
                                                         children:
-                                                          - kind: ErrorExpectedTokens
-                                                            text: statement
                                                           - kind: Identifier
                                                             text: MakeMove
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: Identifier
-                                                            text: CurrentMove
-                                                          - kind: ColonOperator
-                                                            text: ":"
-                                                          - kind: Whitespace
-                                                            text: " "
-                                                          - kind: Identifier
-                                                            text: Ply
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: CurrentMove
+                                                      - kind: ColonOperator
+                                                        text: ":"
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: AssignmentStatement
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: Ply
                                                           - kind: Whitespace
                                                             text: " "
                                                           - kind: EqualityOperator
                                                             text: "="
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: Identifier
-                                                            text: Ply
-                                                          - kind: Whitespace
-                                                            text: " "
-                                                          - kind: AdditionOperator
-                                                            text: +
-                                                          - kind: Whitespace
-                                                            text: " "
-                                                          - kind: IntegerLiteral
-                                                            text: "1"
-                                                      - kind: Newline
-                                                        text: "\r\n"
+                                                          - kind: BinaryExpression
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: Ply
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: AdditionOperator
+                                                                text: +
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: NumericLiteralExpression
+                                                                children:
+                                                                  - kind: IntegerLiteral
+                                                                    text: "1"
+                                                          - kind: Newline
+                                                            text: "\r\n"
                                                       - kind: Whitespace
                                                         text: "              "
                                                       - kind: AssignmentStatement
@@ -48527,40 +48621,54 @@ cst:
                                 text: "\r\n"
                               - kind: Whitespace
                                 text: "      "
-                              - kind: ErrorRecovery
+                              - kind: CallStatement
                                 children:
-                                  - kind: ErrorExpectedTokens
-                                    text: statement
                                   - kind: Identifier
                                     text: MakeMove
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: ttMove
-                                  - kind: ColonOperator
-                                    text: ":"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: Ply
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: ttMove
+                              - kind: ColonOperator
+                                text: ":"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AssignmentStatement
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Ply
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Ply
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: AdditionOperator
-                                    text: +
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
-                              - kind: Newline
-                                text: "\r\n"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Ply
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AdditionOperator
+                                        text: +
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
+                                  - kind: Newline
+                                    text: "\r\n"
                               - kind: Whitespace
                                 text: "      "
                               - kind: AssignmentStatement
@@ -56391,40 +56499,54 @@ cst:
                         text: "\r\n"
                       - kind: Whitespace
                         text: "    "
-                      - kind: ErrorRecovery
+                      - kind: CallStatement
                         children:
-                          - kind: ErrorExpectedTokens
-                            text: statement
                           - kind: Identifier
                             text: MakeMove
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CurrentMove
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Ply
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: CurrentMove
+                      - kind: ColonOperator
+                        text: ":"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Ply
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: Ply
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AdditionOperator
-                            text: +
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
-                      - kind: Newline
-                        text: "\r\n"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Ply
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AdditionOperator
+                                text: +
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: IfStatement
                         children:
                           - kind: Whitespace
@@ -66151,32 +66273,42 @@ cst:
                 text: ":"
               - kind: Whitespace
                 text: " "
-              - kind: ErrorRecovery
+              - kind: CallStatement
                 children:
-                  - kind: ErrorExpectedTokens
-                    text: statement
                   - kind: Identifier
                     text: ClearMove
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: HashMove
-                  - kind: ColonOperator
-                    text: ":"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: bHashBoardDone
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: HashMove
+              - kind: ColonOperator
+                text: ":"
+              - kind: Whitespace
+                text: " "
+              - kind: AssignmentStatement
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: bHashBoardDone
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: FalseKeyword
-                    text: "False"
-              - kind: Newline
-                text: "\r\n"
+                  - kind: BooleanLiteralExpression
+                    children:
+                      - kind: FalseKeyword
+                        text: "False"
+                  - kind: Newline
+                    text: "\r\n"
               - kind: IfStatement
                 children:
                   - kind: Whitespace
@@ -71179,54 +71311,74 @@ cst:
                             text: "\r\n"
                       - kind: Whitespace
                         text: "    "
-                      - kind: ErrorRecovery
+                      - kind: CallStatement
                         children:
-                          - kind: ErrorExpectedTokens
-                            text: statement
                           - kind: Identifier
                             text: MakeMove
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CurrentMove
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Ply
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EqualityOperator
-                            text: "="
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Ply
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AdditionOperator
-                            text: +
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: bLegalMove
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: CurrentMove
+                      - kind: ColonOperator
+                        text: ":"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Ply
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: FalseKeyword
-                            text: "False"
-                      - kind: Newline
-                        text: "\r\n"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Ply
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AdditionOperator
+                                text: +
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
+                      - kind: ColonOperator
+                        text: ":"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AssignmentStatement
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: bLegalMove
+                          - kind: Whitespace
+                            text: " "
+                          - kind: EqualityOperator
+                            text: "="
+                          - kind: Whitespace
+                            text: " "
+                          - kind: BooleanLiteralExpression
+                            children:
+                              - kind: FalseKeyword
+                                text: "False"
+                          - kind: Newline
+                            text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                       - kind: Newline

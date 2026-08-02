@@ -2008,22 +2008,24 @@ cst:
                                         text: Then
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: frmAbout
-                                      - kind: AssignmentStatement
+                                      - kind: CallStatement
                                         children:
-                                          - kind: IdentifierExpression
-                                            children:
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: Show
+                                          - kind: Identifier
+                                            text: frmAbout
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Show
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: NumericLiteralExpression
+                                          - kind: ArgumentList
                                             children:
-                                              - kind: IntegerLiteral
-                                                text: "1"
+                                              - kind: Argument
+                                                children:
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "1"
                                       - kind: ColonOperator
                                         text: ":"
                                       - kind: Whitespace
@@ -2434,22 +2436,24 @@ cst:
                                             text: Then
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: frmAbout
-                                          - kind: AssignmentStatement
+                                          - kind: CallStatement
                                             children:
-                                              - kind: IdentifierExpression
-                                                children:
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: Show
+                                              - kind: Identifier
+                                                text: frmAbout
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: Show
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: NumericLiteralExpression
+                                              - kind: ArgumentList
                                                 children:
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "1"
                                           - kind: ColonOperator
                                             text: ":"
                                           - kind: Whitespace
@@ -3104,10 +3108,8 @@ cst:
                 text: ":"
               - kind: Whitespace
                 text: " "
-              - kind: ErrorRecovery
+              - kind: CallStatement
                 children:
-                  - kind: ErrorExpectedTokens
-                    text: statement
                   - kind: Identifier
                     text: m
                   - kind: PeriodOperator
@@ -3116,10 +3118,18 @@ cst:
                     text: ShutDown
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "2"
-                  - kind: ColonOperator
-                    text: ":"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "2"
+              - kind: ColonOperator
+                text: ":"
+              - kind: SetStatement
+                children:
                   - kind: Whitespace
                     text: " "
                   - kind: SetKeyword
@@ -3136,8 +3146,8 @@ cst:
                     text: " "
                   - kind: NothingKeyword
                     text: Nothing
-              - kind: Newline
-                text: "\r\n"
+                  - kind: Newline
+                    text: "\r\n"
               - kind: Newline
                 text: "\r\n"
               - kind: CallStatement
