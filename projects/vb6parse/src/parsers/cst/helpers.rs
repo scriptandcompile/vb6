@@ -6,6 +6,7 @@
 use super::Parser;
 use crate::errors::ParserError;
 use crate::language::Token;
+use crate::parsers::cst::{RecoveryEvent, RecoveryStrategy};
 use crate::parsers::SyntaxKind;
 use std::num::NonZeroUsize;
 
@@ -311,36 +312,66 @@ impl Parser<'_> {
             .token(SyntaxKind::ErrorExpectedTokens.to_raw(), &text);
     }
 
-    /// Finish an error node and report the error.
-    pub(crate) fn finish_error_node<E>(&mut self, kind: E)
+    fn next_recovery_event_id(&mut self) -> usize {
+        let id = self.next_recovery_event_id;
+        self.next_recovery_event_id += 1;
+        id
+    }
+
+    fn record_recovery_event(
+        &mut self,
+        strategy: RecoveryStrategy,
+        expected: Vec<String>,
+        found: Vec<Token>,
+        span: crate::errors::Span,
+    ) {
+        let event_id = self.next_recovery_event_id();
+        self.recovery_events.push(RecoveryEvent {
+            id: event_id,
+            expected,
+            found,
+            strategy,
+            span,
+        });
+    }
+
+    fn emit_recovery_error<F>(&mut self, strategy: RecoveryStrategy, expected: Vec<String>, mut consume: F)
     where
-        E: Into<crate::errors::ErrorKind>,
+        F: FnMut(&mut Self, &mut Vec<Token>),
     {
+        let span = self.current_span();
+        let mut found: Vec<Token> = Vec::new();
+
+        self.start_error_node(&expected);
+        consume(self, &mut found);
         self.builder.finish_node();
-        self.report_error(kind);
+
+        self.record_recovery_event(strategy, expected.clone(), found.clone(), span);
+        self.report_error(ParserError::UnexpectedTokens { expected, found });
     }
 
     /// Consume the current token as a single-token error node.
     /// Reports the error via `report_error` with the given parser error.
     pub(crate) fn consume_error(&mut self, expected: Vec<String>) {
-        let found = self.current_token().map_or(Vec::new(), |t| vec![*t]);
-        self.start_error_node(&expected);
-        self.consume_token();
-        self.finish_error_node(ParserError::UnexpectedTokens { expected, found });
+        self.emit_recovery_error(RecoveryStrategy::SingleToken, expected, |parser, found| {
+            if let Some(token) = parser.current_token() {
+                found.push(*token);
+            }
+            parser.consume_token();
+        });
     }
 
     /// Consume tokens until a newline (or end of input) and wrap them in an Error node.
     /// Reports the error once via `report_error`, preventing cascading per-token errors.
     pub(crate) fn consume_error_to_newline(&mut self, expected: Vec<String>) {
-        let mut found: Vec<Token> = Vec::new();
-        self.start_error_node(&expected);
-        while !self.is_at_end() && !self.at_token(Token::Newline) {
-            if let Some((_, token)) = self.tokens.get(self.pos) {
-                found.push(*token);
+        self.emit_recovery_error(RecoveryStrategy::ToNewline, expected, |parser, found| {
+            while !parser.is_at_end() && !parser.at_token(Token::Newline) {
+                if let Some((_, token)) = parser.tokens.get(parser.pos) {
+                    found.push(*token);
+                }
+                parser.consume_token();
             }
-            self.consume_token();
-        }
-        self.finish_error_node(ParserError::UnexpectedTokens { expected, found });
+        });
     }
 
     /// Consume an `End <keyword>` procedure terminator.
@@ -358,31 +389,34 @@ impl Parser<'_> {
 
         let expected_text = format!("End {expected_label}");
         let is_match = self.peek_next_keyword() == Some(expected_keyword);
-        let mut found: Vec<Token> = Vec::new();
-
-        if !is_match {
-            self.start_error_node(std::slice::from_ref(&expected_text));
-        }
-
-        while !self.is_at_end() && !self.at_token(Token::Newline) {
-            if !is_match {
-                if let Some((_, token)) = self.tokens.get(self.pos) {
-                    found.push(*token);
-                }
+        if is_match {
+            while !self.is_at_end() && !self.at_token(Token::Newline) {
+                self.consume_token();
             }
-            self.consume_token();
+
+            if self.at_token(Token::Newline) {
+                self.consume_token();
+            }
+
+            return;
         }
 
-        if self.at_token(Token::Newline) {
-            self.consume_token();
-        }
+        self.emit_recovery_error(
+            RecoveryStrategy::ProcedureTerminator,
+            vec![expected_text],
+            |parser, found| {
+                while !parser.is_at_end() && !parser.at_token(Token::Newline) {
+                    if let Some((_, token)) = parser.tokens.get(parser.pos) {
+                        found.push(*token);
+                    }
+                    parser.consume_token();
+                }
 
-        if !is_match {
-            self.finish_error_node(ParserError::UnexpectedTokens {
-                expected: vec![expected_text],
-                found,
-            });
-        }
+                if parser.at_token(Token::Newline) {
+                    parser.consume_token();
+                }
+            },
+        );
     }
 
     /// Consume tokens until reaching the specified token or the end of input.

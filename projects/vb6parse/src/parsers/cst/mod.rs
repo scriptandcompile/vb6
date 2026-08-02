@@ -629,6 +629,23 @@ enum ControlFlowFrameType {
     WithStatement,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum RecoveryStrategy {
+    SingleToken,
+    ToNewline,
+    ProcedureTerminator,
+}
+
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+pub(crate) struct RecoveryEvent {
+    id: usize,
+    expected: Vec<String>,
+    found: Vec<Token>,
+    strategy: RecoveryStrategy,
+    span: Span,
+}
+
 /// Parsing state for control flow statements
 ///
 /// This enum represents the state machine frames for parsing control flow
@@ -813,6 +830,8 @@ pub(crate) struct Parser<'a> {
     pub(crate) source_name: String,
     pub(crate) source_content: &'a str,
     pub(crate) failures: Vec<ErrorDetails<'a>>,
+    pub(crate) recovery_events: Vec<RecoveryEvent>,
+    pub(crate) next_recovery_event_id: usize,
 }
 
 impl<'a> Parser<'a> {
@@ -826,6 +845,8 @@ impl<'a> Parser<'a> {
             source_name,
             source_content: "",
             failures: Vec::new(),
+            recovery_events: Vec::new(),
+            next_recovery_event_id: 1,
         }
     }
 
@@ -843,6 +864,8 @@ impl<'a> Parser<'a> {
             source_name: String::new(),
             source_content: "",
             failures: Vec::new(),
+            recovery_events: Vec::new(),
+            next_recovery_event_id: 1,
         }
     }
 
