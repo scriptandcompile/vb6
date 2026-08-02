@@ -1,5 +1,29 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
 
+fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str, actual: usize) {
+    let primary_path = format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
+    let prefixed_path = format!(
+        "snapshots/tests/invalid_syntax/{snapshot_dir}/invalid_syntax__{snapshot_dir}__{snapshot_name}.snap"
+    );
+    let path = if std::path::Path::new(&primary_path).exists() {
+        primary_path
+    } else {
+        prefixed_path
+    };
+    let content = std::fs::read_to_string(&path)
+        .unwrap_or_else(|err| panic!("Failed to read snapshot file {path}: {err}"));
+    let expected = content
+        .lines()
+        .filter(|line| line.trim_start().starts_with("- "))
+        .count();
+
+    assert_eq!(
+        actual,
+        expected,
+        "Unexpected failure count for snapshot {snapshot_name}"
+    );
+}
+
 /// Test Sub with End Function mismatch
 #[test]
 fn sub_with_end_function() {
@@ -30,6 +54,7 @@ End Function
     insta::assert_yaml_snapshot!("sub_with_end_function_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("mismatched_keywords", "sub_with_end_function_failures", failures.len());
     insta::assert_yaml_snapshot!("sub_with_end_function_failures", failure_messages);
 }
 
@@ -62,6 +87,7 @@ End Sub
     insta::assert_yaml_snapshot!("function_with_end_sub_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("mismatched_keywords", "function_with_end_sub_failures", failures.len());
     insta::assert_yaml_snapshot!("function_with_end_sub_failures", failure_messages);
 }
 
@@ -94,6 +120,7 @@ End Sub
     insta::assert_yaml_snapshot!("property_get_with_end_sub_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("mismatched_keywords", "property_get_with_end_sub_failures", failures.len());
     insta::assert_yaml_snapshot!("property_get_with_end_sub_failures", failure_messages);
 }
 
@@ -126,6 +153,7 @@ End Function
     insta::assert_yaml_snapshot!("property_let_with_end_function_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("mismatched_keywords", "property_let_with_end_function_failures", failures.len());
     insta::assert_yaml_snapshot!("property_let_with_end_function_failures", failure_messages);
 }
 
@@ -160,6 +188,7 @@ End Sub
     insta::assert_yaml_snapshot!("if_with_end_select_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("mismatched_keywords", "if_with_end_select_failures", failures.len());
     insta::assert_yaml_snapshot!("if_with_end_select_failures", failure_messages);
 }
 
@@ -197,6 +226,7 @@ End Sub
     insta::assert_yaml_snapshot!("select_case_with_end_if_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("mismatched_keywords", "select_case_with_end_if_failures", failures.len());
     insta::assert_yaml_snapshot!("select_case_with_end_if_failures", failure_messages);
 }
 
@@ -231,6 +261,7 @@ End Sub
     insta::assert_yaml_snapshot!("for_with_wend_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("mismatched_keywords", "for_with_wend_failures", failures.len());
     insta::assert_yaml_snapshot!("for_with_wend_failures", failure_messages);
 }
 
@@ -265,6 +296,7 @@ End Sub
     insta::assert_yaml_snapshot!("do_while_with_next_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("mismatched_keywords", "do_while_with_next_failures", failures.len());
     insta::assert_yaml_snapshot!("do_while_with_next_failures", failure_messages);
 }
 
@@ -299,6 +331,7 @@ End Sub
     insta::assert_yaml_snapshot!("while_with_loop_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("mismatched_keywords", "while_with_loop_failures", failures.len());
     insta::assert_yaml_snapshot!("while_with_loop_failures", failure_messages);
 }
 
@@ -332,5 +365,6 @@ End Enum
     insta::assert_yaml_snapshot!("type_with_end_enum_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("mismatched_keywords", "type_with_end_enum_failures", failures.len());
     insta::assert_yaml_snapshot!("type_with_end_enum_failures", failure_messages);
 }

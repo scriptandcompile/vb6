@@ -2145,7 +2145,13 @@ impl<'a> Parser<'a> {
     /// This function loops through all tokens and identifies what kind of
     /// VB6 construct to parse based on the current token. As more VB6 syntax
     /// is supported, additional branches can be added to this loop.
-    fn parse_root(mut self) -> (ConcreteSyntaxTree, Vec<ErrorDetails<'a>>, Vec<RecoveryEvent>) {
+    fn parse_root(
+        mut self,
+    ) -> (
+        ConcreteSyntaxTree,
+        Vec<ErrorDetails<'a>>,
+        Vec<RecoveryEvent>,
+    ) {
         self.builder.start_node(SyntaxKind::Root.to_raw());
 
         // Parse VERSION statement (if present)
@@ -2168,7 +2174,11 @@ impl<'a> Parser<'a> {
         self.builder.finish_node(); // Root
 
         let root = self.builder.finish();
-        (ConcreteSyntaxTree::new(root), self.failures, self.recovery_events)
+        (
+            ConcreteSyntaxTree::new(root),
+            self.failures,
+            self.recovery_events,
+        )
     }
 
     #[allow(clippy::too_many_lines)]
@@ -3942,6 +3952,7 @@ mod tests {
     fn parse_empty_stream() {
         let source = "";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         assert_eq!(cst.root_kind(), SyntaxKind::Root);
@@ -3952,6 +3963,7 @@ mod tests {
     fn parse_rem_comment() {
         let source = "REM This is a REM comment\nSub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         assert_eq!(cst.root_kind(), SyntaxKind::Root);
@@ -3969,6 +3981,7 @@ mod tests {
     fn parse_mixed_comments() {
         let source = "' Single quote comment\nREM REM comment\nSub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         assert_eq!(cst.root_kind(), SyntaxKind::Root);
@@ -4021,6 +4034,7 @@ End Sub
     fn cst_with_comments() {
         let source = "' This is a comment\nSub Main()\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         // Now has 3 children: comment token, newline token, SubStatement
@@ -4033,6 +4047,7 @@ End Sub
     fn cst_serializable_tree() {
         let source = "Sub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         // Convert to serializable format
@@ -4055,6 +4070,7 @@ End Sub
     fn cst_serializable_with_insta() {
         let source = "Dim x As Integer\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
         let serializable = cst.to_serializable();
 

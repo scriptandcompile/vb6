@@ -596,6 +596,7 @@ mod tests {
 depreciation = DDB(10000, 1000, 5, 1)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -614,6 +615,7 @@ depreciation = DDB(10000, 1000, 5, 1)
 depreciation = DDB(10000, 1000, 5, 1, 1.5)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -632,6 +634,7 @@ depreciation = DDB(10000, 1000, 5, 1, 1.5)
 depr = DDB(cost, salvage, life, period)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -652,6 +655,7 @@ Function CalculateDepreciation(cost As Double, years As Integer) As Double
 End Function
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -673,6 +677,7 @@ For period = 1 To life
 Next period
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -691,6 +696,7 @@ Next period
 bookValue = cost - DDB(cost, salvage, life, period)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -711,6 +717,7 @@ If DDB(cost, salvage, life, year) > SLN(cost, salvage, life) Then
 End If
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -729,6 +736,7 @@ End If
 schedule(i, 2) = DDB(cost, salvage, life, i)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -747,6 +755,7 @@ schedule(i, 2) = DDB(cost, salvage, life, i)
 formatted = Format(DDB(cost, salvage, life, period), "Currency")
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -765,6 +774,7 @@ formatted = Format(DDB(cost, salvage, life, period), "Currency")
 monthlyDepr = DDB(cost, salvage, lifeYears * 12, month)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -785,6 +795,7 @@ For i = 1 To currentPeriod
 Next i
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -807,6 +818,7 @@ If Err.Number <> 0 Then
 End If
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -830,6 +842,7 @@ Select Case method
 End Select
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -848,6 +861,7 @@ End Select
 Debug.Print "Depreciation: " & DDB(10000, 1000, 5, 1)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -866,6 +880,7 @@ Debug.Print "Depreciation: " & DDB(10000, 1000, 5, 1)
 depr150 = DDB(cost, salvage, life, period, 1.5)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -884,6 +899,7 @@ depr150 = DDB(cost, salvage, life, period, 1.5)
 totalDepr = DDB(asset1Cost, asset1Salvage, life, year) + DDB(asset2Cost, asset2Salvage, life, year)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -902,6 +918,7 @@ totalDepr = DDB(asset1Cost, asset1Salvage, life, year) + DDB(asset2Cost, asset2S
 depr = DDB(cost, cost * 0.1, 5, currentYear - purchaseYear + 1)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -920,6 +937,7 @@ depr = DDB(cost, cost * 0.1, 5, currentYear - purchaseYear + 1)
 taxSavings = DDB(cost, salvage, life, year) * taxRate
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -938,6 +956,7 @@ taxSavings = DDB(cost, salvage, life, year) * taxRate
 MsgBox "Year " & year & " depreciation: " & DDB(cost, salvage, life, year)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -956,6 +975,7 @@ MsgBox "Year " & year & " depreciation: " & DDB(cost, salvage, life, year)
 depr = IIf(useDDB, DDB(cost, salvage, life, year), SLN(cost, salvage, life))
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -974,6 +994,7 @@ depr = IIf(useDDB, DDB(cost, salvage, life, year), SLN(cost, salvage, life))
 rs("Depreciation") = DDB(rs("Cost"), rs("Salvage"), rs("Life"), currentYear)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -992,6 +1013,7 @@ rs("Depreciation") = DDB(rs("Cost"), rs("Salvage"), rs("Life"), currentYear)
 partialDepr = DDB(cost, salvage, life, 1) * (monthsInYear / 12)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1010,6 +1032,7 @@ partialDepr = DDB(cost, salvage, life, 1) * (monthsInYear / 12)
 maxDepr = Application.Max(DDB(cost, salvage, life, year), SLN(cost, salvage, life))
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1030,6 +1053,7 @@ For yr = 1 To assetLife
 Next yr
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1050,6 +1074,7 @@ If cost > salvage And life > 0 Then
 End If
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();

@@ -1,5 +1,29 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
 
+fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str, actual: usize) {
+    let primary_path = format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
+    let prefixed_path = format!(
+        "snapshots/tests/invalid_syntax/{snapshot_dir}/invalid_syntax__{snapshot_dir}__{snapshot_name}.snap"
+    );
+    let path = if std::path::Path::new(&primary_path).exists() {
+        primary_path
+    } else {
+        prefixed_path
+    };
+    let content = std::fs::read_to_string(&path)
+        .unwrap_or_else(|err| panic!("Failed to read snapshot file {path}: {err}"));
+    let expected = content
+        .lines()
+        .filter(|line| line.trim_start().starts_with("- "))
+        .count();
+
+    assert_eq!(
+        actual,
+        expected,
+        "Unexpected failure count for snapshot {snapshot_name}"
+    );
+}
+
 /// Test missing comma between parameters
 #[test]
 fn missing_comma_between_parameters() {
@@ -29,10 +53,8 @@ End Sub
     insta::assert_yaml_snapshot!("missing_comma_between_parameters_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    insta::assert_yaml_snapshot!(
-        "missing_comma_between_parameters_failures",
-        failure_messages
-    );
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "missing_comma_between_parameters_failures", failures.len());
+    insta::assert_yaml_snapshot!("missing_comma_between_parameters_failures", failure_messages);
 }
 
 /// Test trailing comma in parameter list
@@ -64,6 +86,7 @@ End Function
     insta::assert_yaml_snapshot!("trailing_comma_in_parameters_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "trailing_comma_in_parameters_failures", failures.len());
     insta::assert_yaml_snapshot!("trailing_comma_in_parameters_failures", failure_messages);
 }
 
@@ -96,6 +119,7 @@ End Sub
     insta::assert_yaml_snapshot!("missing_parameter_after_comma_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "missing_parameter_after_comma_failures", failures.len());
     insta::assert_yaml_snapshot!("missing_parameter_after_comma_failures", failure_messages);
 }
 
@@ -128,6 +152,7 @@ End Sub
     insta::assert_yaml_snapshot!("duplicate_byval_modifier_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "duplicate_byval_modifier_failures", failures.len());
     insta::assert_yaml_snapshot!("duplicate_byval_modifier_failures", failure_messages);
 }
 
@@ -160,6 +185,7 @@ End Function
     insta::assert_yaml_snapshot!("conflicting_byval_byref_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "conflicting_byval_byref_failures", failures.len());
     insta::assert_yaml_snapshot!("conflicting_byval_byref_failures", failure_messages);
 }
 
@@ -192,6 +218,7 @@ End Sub
     insta::assert_yaml_snapshot!("optional_before_required_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "optional_before_required_failures", failures.len());
     insta::assert_yaml_snapshot!("optional_before_required_failures", failure_messages);
 }
 
@@ -224,6 +251,7 @@ End Sub
     insta::assert_yaml_snapshot!("paramarray_not_last_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "paramarray_not_last_failures", failures.len());
     insta::assert_yaml_snapshot!("paramarray_not_last_failures", failure_messages);
 }
 
@@ -256,6 +284,7 @@ End Sub
     insta::assert_yaml_snapshot!("paramarray_with_byval_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "paramarray_with_byval_failures", failures.len());
     insta::assert_yaml_snapshot!("paramarray_with_byval_failures", failure_messages);
 }
 
@@ -288,6 +317,7 @@ End Function
     insta::assert_yaml_snapshot!("multiple_consecutive_commas_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "multiple_consecutive_commas_failures", failures.len());
     insta::assert_yaml_snapshot!("multiple_consecutive_commas_failures", failure_messages);
 }
 
@@ -320,6 +350,7 @@ End Sub
     insta::assert_yaml_snapshot!("parameter_missing_as_keyword_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "parameter_missing_as_keyword_failures", failures.len());
     insta::assert_yaml_snapshot!("parameter_missing_as_keyword_failures", failure_messages);
 }
 
@@ -352,6 +383,7 @@ End Sub
     insta::assert_yaml_snapshot!("optional_byval_with_default_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "optional_byval_with_default_failures", failures.len());
     insta::assert_yaml_snapshot!("optional_byval_with_default_failures", failure_messages);
 }
 
@@ -384,6 +416,7 @@ End Function
     insta::assert_yaml_snapshot!("duplicate_optional_modifier_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "duplicate_optional_modifier_failures", failures.len());
     insta::assert_yaml_snapshot!("duplicate_optional_modifier_failures", failure_messages);
 }
 
@@ -416,6 +449,7 @@ End Sub
     insta::assert_yaml_snapshot!("paramarray_without_parentheses_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "paramarray_without_parentheses_failures", failures.len());
     insta::assert_yaml_snapshot!("paramarray_without_parentheses_failures", failure_messages);
 }
 
@@ -448,8 +482,6 @@ End Sub
     insta::assert_yaml_snapshot!("parameter_type_character_with_as_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    insta::assert_yaml_snapshot!(
-        "parameter_type_character_with_as_failures",
-        failure_messages
-    );
+    assert_failure_count_matches_snapshot("invalid_parameter_list", "parameter_type_character_with_as_failures", failures.len());
+    insta::assert_yaml_snapshot!("parameter_type_character_with_as_failures", failure_messages);
 }
