@@ -367,15 +367,11 @@ root:
                                       text: FUNC_NAME
                         - kind: Newline
                           text: "\n"
-                    - kind: ErrorRecovery
-                      children:
-                        - kind: ErrorExpectedTokens
-                          text: statement
-                        - kind: EndKeyword
-                          text: End
-                        - kind: Whitespace
-                          text: " "
-                        - kind: SubKeyword
-                          text: Sub
-                    - kind: Newline
-                      text: "\n"
+        - kind: EndKeyword
+          text: End
+        - kind: Whitespace
+          text: " "
+        - kind: SubKeyword
+          text: Sub
+        - kind: Newline
+          text: "\n"

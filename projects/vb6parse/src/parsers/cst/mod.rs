@@ -2702,7 +2702,9 @@ impl<'a> Parser<'a> {
         F: Fn(&Parser) -> bool,
     {
         match context {
-            StatementListContext::TopLevel => stop_conditions(self) || self.is_at_end(),
+            StatementListContext::TopLevel => {
+                stop_conditions(self) || self.at_procedure_block_end() || self.is_at_end()
+            }
             StatementListContext::IfThenBody | StatementListContext::ElseIfBody => {
                 self.at_token(Token::ElseIfKeyword)
                     || self.at_compiler_directive_keyword(Token::ElseIfKeyword)

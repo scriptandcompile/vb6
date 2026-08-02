@@ -98,20 +98,8 @@ impl Parser<'_> {
                 && parser.peek_next_keyword() == Some(Token::SubKeyword)
         });
 
-        // Consume "End Sub" and trailing tokens
-        if self.at_token(Token::EndKeyword) {
-            // Consume "End"
-            self.consume_token();
-
-            // Consume any whitespace between "End" and "Sub"
-            self.consume_whitespace();
-
-            // Consume "Sub"
-            self.consume_token();
-
-            // Consume until newline (including it)
-            self.consume_until_after(Token::Newline);
-        }
+        // Consume "End Sub" and trailing tokens, or report mismatch as recovery.
+        self.consume_expected_end_keyword_terminator(Token::SubKeyword, "Sub");
 
         self.builder.finish_node(); // SubStatement
     }
