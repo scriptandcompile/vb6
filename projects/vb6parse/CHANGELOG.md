@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project (tries!) to adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0]
+
+### Changed
+- Improved resilient CST parsing for malformed line continuations and other recovery-heavy constructs, allowing parsing to continue gracefully on real-world VB6 files such as ExifRead.cls.
+
+### Fixed
+- Reduced spurious parse failures around continuation-heavy statements by tightening recovery behavior and preserving more meaningful syntax structure during error recovery.
+
 ## [1.1.0]
 
 ### Added
