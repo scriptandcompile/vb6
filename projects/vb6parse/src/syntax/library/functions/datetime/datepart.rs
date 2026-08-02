@@ -583,6 +583,7 @@ mod tests {
 year = DatePart("yyyy", Date)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -601,6 +602,7 @@ year = DatePart("yyyy", Date)
 quarter = DatePart("q", currentDate)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -619,6 +621,7 @@ quarter = DatePart("q", currentDate)
 month = DatePart("m", #3/15/2025#)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -637,6 +640,7 @@ month = DatePart("m", #3/15/2025#)
 day = DatePart("d", Date)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -655,6 +659,7 @@ day = DatePart("d", Date)
 dayOfYear = DatePart("y", Date)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -673,6 +678,7 @@ dayOfYear = DatePart("y", Date)
 weekday = DatePart("w", Date)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -691,6 +697,7 @@ weekday = DatePart("w", Date)
 week = DatePart("ww", Date)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -709,6 +716,7 @@ week = DatePart("ww", Date)
 hour = DatePart("h", Now)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -727,6 +735,7 @@ hour = DatePart("h", Now)
 minute = DatePart("n", timestamp)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -745,6 +754,7 @@ minute = DatePart("n", timestamp)
 second = DatePart("s", Now)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -763,6 +773,7 @@ second = DatePart("s", Now)
 weekday = DatePart("w", Date, vbMonday)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -781,6 +792,7 @@ weekday = DatePart("w", Date, vbMonday)
 week = DatePart("ww", Date, vbMonday, vbFirstFourDays)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -801,6 +813,7 @@ Function GetQuarter(d As Date) As Integer
 End Function
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -824,6 +837,7 @@ Select Case DatePart("q", Date)
 End Select
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -844,6 +858,7 @@ If DatePart("h", Now) >= 17 Then
 End If
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -862,6 +877,7 @@ End If
 key = DatePart("yyyy", Date) & "-" & DatePart("m", Date)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -880,6 +896,7 @@ key = DatePart("yyyy", Date) & "-" & DatePart("m", Date)
 endMonth = DatePart("q", Date) * 3
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -900,6 +917,7 @@ For i = 1 To count
 Next i
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -920,6 +938,7 @@ If DatePart("w", Date) = vbSaturday Then
 End If
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -940,6 +959,7 @@ m = DatePart("m", Date)
 d = DatePart("d", Date)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -958,6 +978,7 @@ d = DatePart("d", Date)
 MsgBox "Quarter: " & DatePart("q", Date)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -976,6 +997,7 @@ MsgBox "Quarter: " & DatePart("q", Date)
 formatted = Format(DatePart("m", Date), "00")
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -994,6 +1016,7 @@ formatted = Format(DatePart("m", Date), "00")
 quarterEnd = DateSerial(DatePart("yyyy", Date), DatePart("q", Date) * 3 + 1, 0)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1014,6 +1037,7 @@ interval = "q"
 result = DatePart(interval, Date)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1034,6 +1058,7 @@ If DatePart("h", Now) >= 9 And DatePart("h", Now) < 17 Then
 End If
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 

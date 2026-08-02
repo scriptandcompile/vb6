@@ -123,6 +123,7 @@ mod tests {
         let source =
             "Private myVar As Integer\nPrivate Function GetVar() As Integer\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -137,6 +138,7 @@ mod tests {
     fn public_function() {
         let source = "Public Function Test() As Integer\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -151,6 +153,7 @@ mod tests {
     fn private_function() {
         let source = "Private Function Test() As Integer\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -165,6 +168,7 @@ mod tests {
     fn friend_function() {
         let source = "Friend Function Test() As Integer\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -179,6 +183,7 @@ mod tests {
     fn public_static_function() {
         let source = "Public Static Function Test() As Integer\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -193,6 +198,7 @@ mod tests {
     fn private_static_function() {
         let source = "Private Static Function Test() As Integer\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -207,6 +213,7 @@ mod tests {
     fn friend_static_function() {
         let source = "Friend Static Function Test() As Integer\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -222,6 +229,7 @@ mod tests {
         // Test Private Static Function
         let source = "Private Static Function Calculate(x As Long) As Long\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -237,6 +245,7 @@ mod tests {
         // Test Friend Function
         let source = "Friend Function ProcessData() As String\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -257,6 +266,7 @@ Public Function Test( _
 End Function
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -281,6 +291,7 @@ argGetSwitchArg = ""
 End Function
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -303,6 +314,7 @@ Loop
 End Function
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -329,6 +341,7 @@ Loop
 End Function
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -344,6 +357,7 @@ End Function
         // Test simple function with no parameters
         let source = "Function GetValue() As Integer\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -359,6 +373,7 @@ End Function
         // Test function with return value assignment
         let source = "Function GetValue() As Integer\n    GetValue = 42\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -374,6 +389,7 @@ End Function
         // Test function with Exit Function statement
         let source = "Function IsValid(x As Integer) As Boolean\n    If x < 0 Then\n        Exit Function\n    End If\n    IsValid = True\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -389,6 +405,7 @@ End Function
         // Test function without explicit return type (defaults to Variant)
         let source = "Function GetData()\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -404,6 +421,7 @@ End Function
         // Test function with multiple parameters
         let source = "Function Add(ByVal x As Long, ByVal y As Long) As Long\nEnd Function\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 

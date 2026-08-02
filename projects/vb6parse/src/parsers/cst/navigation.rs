@@ -1081,6 +1081,7 @@ mod tests {
     fn navigation_children() {
         let source = "Attribute VB_Name\nSub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
         let children = cst.children();
 
@@ -1095,6 +1096,7 @@ mod tests {
     fn navigation_children_by_kind() {
         let source = "Dim x\nDim y\nSub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         // Find all DimStatements using iterator
@@ -1117,6 +1119,7 @@ mod tests {
     fn navigation_contains_kind() {
         let source = "Sub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         assert!(cst.contains_kind(SyntaxKind::SubStatement));
@@ -1128,6 +1131,7 @@ mod tests {
     fn navigation_first_and_last_child() {
         let source = "Attribute VB_Name\nDim x\nSub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         let first = cst.first_child().expect("Expected at least one child");
@@ -1142,6 +1146,7 @@ mod tests {
     fn navigation_child_at() {
         let source = "Attribute VB_Name\nDim x\nSub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         let first = cst.child_at(0).expect("Expected child at index 0");
@@ -1161,6 +1166,7 @@ mod tests {
     fn navigation_empty_tree() {
         let source = "";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         // Even empty code has no children now
@@ -1175,6 +1181,7 @@ mod tests {
     fn navigation_with_comments_and_whitespace() {
         let source = "' Comment\n\nSub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
         let children = cst.children();
 
@@ -1204,6 +1211,7 @@ mod tests {
     fn cst_node_basic_navigation() {
         let source = "Sub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
         let root = cst.to_serializable().root;
 
@@ -1221,6 +1229,7 @@ mod tests {
     fn cst_node_filter_by_kind() {
         let source = "Dim x\nDim y\nSub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
         let root = cst.to_serializable().root;
 
@@ -1236,6 +1245,7 @@ mod tests {
     fn cst_node_recursive_find() {
         let source = "Sub Test()\nDim x As Integer\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
         let root = cst.to_serializable().root;
 
@@ -1253,6 +1263,7 @@ mod tests {
     fn cst_node_token_filtering() {
         let source = "Sub Test()\n    Dim x\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
         let root = cst.to_serializable().root;
 
@@ -1278,6 +1289,7 @@ mod tests {
     fn concrete_syntax_tree_recursive_find() {
         let source = "Sub Test()\nDim x As Integer\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         // Find nested DimStatement (not a direct child)
@@ -1298,6 +1310,7 @@ mod tests {
     fn concrete_syntax_tree_token_filtering() {
         let source = "Sub Test()\n    Dim x\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         // The root typically has structural nodes as direct children
@@ -1331,6 +1344,7 @@ mod tests {
     fn cst_node_predicate_search() {
         let source = "Sub Test()\nDim x As Integer\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
         let root = cst.to_serializable().root;
 
@@ -1353,6 +1367,7 @@ mod tests {
     fn concrete_syntax_tree_predicate_search() {
         let source = "Sub Test()\nDim x As Integer\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         // Find first non-token node
@@ -1378,6 +1393,7 @@ mod tests {
     fn cst_node_convenience_checkers() {
         let source = "' Comment\nSub Test()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
         let root = cst.to_serializable().root;
 
@@ -1404,6 +1420,7 @@ mod tests {
     fn cst_node_iterator_traversal() {
         let source = "Sub Test()\nDim x\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
         let root = cst.to_serializable().root;
 
@@ -1429,6 +1446,7 @@ mod tests {
 
         let source = "Sub Test()\nDim x\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("Failed to parse source");
 
         let all_nodes: Vec<_> = cst.descendants().collect();

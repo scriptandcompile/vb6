@@ -478,6 +478,7 @@ mod tests {
     fn call_statement_simple() {
         let source = "Call MySubroutine()\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -493,6 +494,7 @@ mod tests {
     fn call_statement_with_arguments() {
         let source = "Call ProcessData(x, y, z)\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -508,6 +510,7 @@ mod tests {
     fn call_statement_preserves_whitespace() {
         let source = "Call  MyFunction (  arg1 ,  arg2  )\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -523,6 +526,7 @@ mod tests {
     fn call_statement_in_sub() {
         let source = "Sub Main()\nCall DoSomething()\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -538,6 +542,7 @@ mod tests {
     fn call_statement_no_parentheses() {
         let source = "Call MySubroutine\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -553,6 +558,7 @@ mod tests {
     fn multiple_call_statements() {
         let source = "Call First()\nCall Second()\nCall Third()\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -568,6 +574,7 @@ mod tests {
     fn call_statement_with_string_arguments() {
         let source = "Call ShowMessage(\"Hello, World!\")\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -583,6 +590,7 @@ mod tests {
     fn procedure_call_with_byval_arguments() {
         let source = "RtlMoveMemory vtbl, ByVal pEnumerator, 4\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -598,6 +606,7 @@ mod tests {
     fn call_statement_with_byval_arguments() {
         let source = "Call RtlMoveMemory(vtbl, ByVal pEnumerator, 4)\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -613,6 +622,7 @@ mod tests {
     fn call_statement_with_complex_expressions() {
         let source = "Call Calculate(x + y, z * 2, (a - b) / c)\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -630,6 +640,7 @@ mod tests {
     fn procedure_call_no_arguments() {
         let source = "InitializeRandomDNA\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -645,6 +656,7 @@ mod tests {
     fn procedure_call_with_parentheses() {
         let source = "DoSomething()\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -660,6 +672,7 @@ mod tests {
     fn procedure_call_with_arguments_no_parentheses() {
         let source = "MsgBox \"Hello\", vbInformation, \"Title\"\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -675,6 +688,7 @@ mod tests {
     fn procedure_call_with_arguments_with_parentheses() {
         let source = "ProcessData(x, y, z)\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -690,6 +704,7 @@ mod tests {
     fn multiple_procedure_calls_in_sub() {
         let source = "Sub Test()\nInitializeRandomDNA\nGetInitialSize\nGetInitialSpeed\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -705,6 +720,7 @@ mod tests {
     fn procedure_call_preserves_whitespace() {
         let source = "MySub  arg1 ,  arg2\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -721,6 +737,7 @@ mod tests {
         // This should be an assignment, not a procedure call
         let source = "x = 5\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -736,6 +753,7 @@ mod tests {
     fn procedure_call_debug_print_trailing_semicolon() {
         let source = "Sub Test()\n    Debug.Print Hex(i);\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -750,6 +768,7 @@ mod tests {
     fn procedure_call_debug_print_semicolon_separated_arguments() {
         let source = "Sub Test()\n    Debug.Print \"A\"; \"B\"\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -764,6 +783,7 @@ mod tests {
     fn procedure_call_output_object_print_trailing_semicolon() {
         let source = "Sub Test()\n    Printer.Print \"A\";\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -808,6 +828,7 @@ mod tests {
     fn procedure_call_with_named_argument() {
         let source = "Sub Test()\n    pvRecvBody baBuffer, Flush:=True\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -822,6 +843,7 @@ mod tests {
     fn procedure_call_argument_expression_with_top_level_equals_after_comma() {
         let source = "aCopy.Construct ItemLen, CLng(p), , R = 0 And Not mExecBloc\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let debug = format!("{:#?}", cst.to_serializable());

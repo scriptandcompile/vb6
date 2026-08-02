@@ -851,6 +851,7 @@ mod tests {
 fileDate = FileDateTime("C:\data.txt")
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -869,6 +870,7 @@ fileDate = FileDateTime("C:\data.txt")
 fileDate = FileDateTime(filePath)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -887,6 +889,7 @@ fileDate = FileDateTime(filePath)
 isNewer = (FileDateTime(file1) > FileDateTime(file2))
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -905,6 +908,7 @@ isNewer = (FileDateTime(file1) > FileDateTime(file2))
 Debug.Print FileDateTime("C:\temp.dat")
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -925,6 +929,7 @@ Function GetFileAge(path As String) As Long
 End Function
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -943,6 +948,7 @@ End Function
 formatted = Format(FileDateTime(filePath), "yyyy-mm-dd hh:nn:ss")
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -963,6 +969,7 @@ If FileDateTime(sourceFile) > FileDateTime(backupFile) Then
 End If
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -981,6 +988,7 @@ End If
 ageInDays = DateDiff("d", FileDateTime(filePath), Now)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -999,6 +1007,7 @@ ageInDays = DateDiff("d", FileDateTime(filePath), Now)
 msg = "File modified: " & FileDateTime(filePath)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1021,6 +1030,7 @@ If Err.Number <> 0 Then
 End If
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1042,6 +1052,7 @@ Do While fileName <> ""
 Loop
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1060,6 +1071,7 @@ Loop
 info.ModifiedDate = FileDateTime(filePath)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1078,6 +1090,7 @@ info.ModifiedDate = FileDateTime(filePath)
 dates(i) = FileDateTime(files(i))
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1101,6 +1114,7 @@ Select Case DateDiff("d", FileDateTime(filePath), Now)
 End Select
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1119,6 +1133,7 @@ End Select
 MsgBox "Last modified: " & FileDateTime(filePath)
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1140,6 +1155,7 @@ If FileDateTime(fullPath) > newestDate Then
 End If
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1160,6 +1176,7 @@ If FileDateTime(fullPath) >= startDate And FileDateTime(fullPath) <= endDate The
 End If
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1178,6 +1195,7 @@ End If
 Print #reportNum, fileName, FileDateTime(fullPath)
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1196,6 +1214,7 @@ Print #reportNum, fileName, FileDateTime(fullPath)
 configDate = FileDateTime(App.Path & "\config.ini")
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1214,6 +1233,7 @@ configDate = FileDateTime(App.Path & "\config.ini")
 isToday = (Int(FileDateTime(filePath)) = Int(Date))
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1235,6 +1255,7 @@ If files(j).ModifiedDate > files(i).ModifiedDate Then
 End If
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1256,6 +1277,7 @@ For i = 0 To fileCount - 1
 Next i
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1276,6 +1298,7 @@ info = "File: " & filePath & vbCrLf & _
        "Age: " & DateDiff("d", FileDateTime(filePath), Now) & " days"
 "#;
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1296,6 +1319,7 @@ If cache(i).CachedDate = FileDateTime(filePath) Then
 End If
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 
@@ -1314,6 +1338,7 @@ End If
 needsCopy = (FileDateTime(sourceFile) > FileDateTime(destFile))
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
         let tree = cst.to_serializable();
 

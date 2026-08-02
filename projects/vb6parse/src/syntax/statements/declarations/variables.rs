@@ -197,6 +197,7 @@ mod tests {
     fn dim_simple_declaration() {
         let source = "Dim x As Integer\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -213,6 +214,7 @@ mod tests {
     fn dim_private_declaration() {
         let source = "Private m_value As Long\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -229,6 +231,7 @@ mod tests {
     fn dim_public_declaration() {
         let source = "Public g_config As String\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -245,6 +248,7 @@ mod tests {
     fn dim_multiple_variables() {
         let source = "Dim x, y, z As Integer\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -261,6 +265,7 @@ mod tests {
     fn dim_const_declaration() {
         let source = "Const MAX_SIZE = 100\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -277,6 +282,7 @@ mod tests {
     fn dim_private_const() {
         let source = "Private Const MODULE_NAME = \"MyModule\"\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -293,6 +299,7 @@ mod tests {
     fn dim_static_declaration() {
         let source = "Static counter As Long\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -311,6 +318,7 @@ mod tests {
     fn private_variable_simple() {
         let source = "Private m_name As String\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -327,6 +335,7 @@ mod tests {
     fn private_variable_integer() {
         let source = "Private m_count As Integer\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -343,6 +352,7 @@ mod tests {
     fn private_variable_long() {
         let source = "Private m_id As Long\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -359,6 +369,7 @@ mod tests {
     fn private_variable_variant() {
         let source = "Private m_data As Variant\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -375,6 +386,7 @@ mod tests {
     fn private_variable_object() {
         let source = "Private m_connection As ADODB.Connection\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -391,6 +403,7 @@ mod tests {
     fn private_variable_array() {
         let source = "Private m_items() As String\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -407,6 +420,7 @@ mod tests {
     fn private_variable_array_with_bounds() {
         let source = "Private m_matrix(1 To 10, 1 To 10) As Double\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -423,6 +437,7 @@ mod tests {
     fn private_variable_multiple_declarations() {
         let source = "Private m_x, m_y, m_z As Integer\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -439,6 +454,7 @@ mod tests {
     fn private_variable_new_keyword() {
         let source = "Private m_collection As New Collection\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -455,6 +471,7 @@ mod tests {
     fn private_variable_custom_type() {
         let source = "Private m_person As PersonType\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -473,6 +490,7 @@ mod tests {
     fn private_withevents_simple() {
         let source = "Private WithEvents m_button As Button\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -489,6 +507,7 @@ mod tests {
     fn private_withevents_form() {
         let source = "Private WithEvents m_form As Form\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -505,6 +524,7 @@ mod tests {
     fn private_withevents_adodb_connection() {
         let source = "Private WithEvents m_conn As ADODB.Connection\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -521,6 +541,7 @@ mod tests {
     fn private_withevents_custom_class() {
         let source = "Private WithEvents m_worker As WorkerClass\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -537,6 +558,7 @@ mod tests {
     fn private_withevents_preserves_whitespace() {
         let source = "    Private    WithEvents    m_obj    As    MyClass    \n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -553,6 +575,7 @@ mod tests {
     fn private_withevents_multiple_declarations() {
         let source = "Private WithEvents m_btn1 As Button\nPrivate WithEvents m_btn2 As Button\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -578,6 +601,7 @@ Private Sub m_timer_Tick()
 End Sub
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.cls", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -594,6 +618,7 @@ End Sub
     fn private_withevents_mixed_with_regular() {
         let source = "Private m_value As Long\nPrivate WithEvents m_control As Control\nPrivate m_name As String\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -610,6 +635,7 @@ End Sub
     fn private_withevents_excel_application() {
         let source = "Private WithEvents m_excelApp As Excel.Application\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -626,6 +652,7 @@ End Sub
     fn private_withevents_textbox() {
         let source = "Private WithEvents txtInput As TextBox\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -642,6 +669,7 @@ End Sub
     fn private_withevents_combobox() {
         let source = "Private WithEvents cboList As ComboBox\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -658,6 +686,7 @@ End Sub
     fn private_withevents_winsock() {
         let source = "Private WithEvents m_socket As Winsock\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -674,6 +703,7 @@ End Sub
     fn private_withevents_mscomm() {
         let source = "Private WithEvents m_comm As MSComm\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -690,6 +720,7 @@ End Sub
     fn private_withevents_at_module_level() {
         let source = "Private WithEvents m_db As Database\n\nSub Test()\n    Set m_db = OpenDatabase(\"test.mdb\")\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -706,6 +737,7 @@ End Sub
     fn private_variable_no_type() {
         let source = "Private m_temp\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -722,6 +754,7 @@ End Sub
     fn private_variable_boolean() {
         let source = "Private m_isValid As Boolean\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -738,6 +771,7 @@ End Sub
     fn private_variable_byte() {
         let source = "Private m_flags As Byte\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -754,6 +788,7 @@ End Sub
     fn private_variable_currency() {
         let source = "Private m_price As Currency\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -770,6 +805,7 @@ End Sub
     fn private_variable_date() {
         let source = "Private m_startDate As Date\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -786,6 +822,7 @@ End Sub
     fn private_variable_single() {
         let source = "Private m_ratio As Single\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -802,6 +839,7 @@ End Sub
     fn private_variable_double() {
         let source = "Private m_pi As Double\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -820,6 +858,7 @@ End Sub
     fn public_withevents_simple() {
         let source = "Public WithEvents g_app As Application\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -836,6 +875,7 @@ End Sub
     fn public_withevents_form() {
         let source = "Public WithEvents MainForm As Form\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -852,6 +892,7 @@ End Sub
     fn public_withevents_excel_application() {
         let source = "Public WithEvents xlApp As Excel.Application\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -868,6 +909,7 @@ End Sub
     fn public_withevents_adodb_connection() {
         let source = "Public WithEvents dbConn As ADODB.Connection\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -884,6 +926,7 @@ End Sub
     fn public_withevents_custom_class() {
         let source = "Public WithEvents TaskManager As TaskProcessor\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -900,6 +943,7 @@ End Sub
     fn public_withevents_preserves_whitespace() {
         let source = "    Public    WithEvents    g_obj    As    CustomClass    \n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -916,6 +960,7 @@ End Sub
     fn public_withevents_multiple_declarations() {
         let source = "Public WithEvents g_ctrl1 As Control\nPublic WithEvents g_ctrl2 As Control\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -941,6 +986,7 @@ Private Sub g_worker_Complete()
 End Sub
 ";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.cls", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -957,6 +1003,7 @@ End Sub
     fn public_withevents_mixed_with_private() {
         let source = "Private WithEvents m_local As Control\nPublic WithEvents g_shared As Control\nPrivate m_data As String\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -973,6 +1020,7 @@ End Sub
     fn public_withevents_word_application() {
         let source = "Public WithEvents wdApp As Word.Application\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -989,6 +1037,7 @@ End Sub
     fn public_withevents_outlook_application() {
         let source = "Public WithEvents olApp As Outlook.Application\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1005,6 +1054,7 @@ End Sub
     fn public_withevents_chart() {
         let source = "Public WithEvents ChartObject As Chart\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1021,6 +1071,7 @@ End Sub
     fn public_withevents_worksheet() {
         let source = "Public WithEvents ws As Worksheet\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1037,6 +1088,7 @@ End Sub
     fn public_withevents_recordset() {
         let source = "Public WithEvents rs As ADODB.Recordset\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1053,6 +1105,7 @@ End Sub
     fn public_withevents_at_module_level() {
         let source = "Public WithEvents ServerSocket As Winsock\n\nSub Initialize()\n    Set ServerSocket = New Winsock\nEnd Sub\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1069,6 +1122,7 @@ End Sub
     fn public_withevents_commandbutton() {
         let source = "Public WithEvents cmdSubmit As CommandButton\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1085,6 +1139,7 @@ End Sub
     fn public_withevents_listbox() {
         let source = "Public WithEvents lstItems As ListBox\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1101,6 +1156,7 @@ End Sub
     fn public_withevents_timer() {
         let source = "Public WithEvents tmrMain As Timer\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1117,6 +1173,7 @@ End Sub
     fn public_withevents_class_factory() {
         let source = "Public WithEvents Factory As ClassFactory\n";
         let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();

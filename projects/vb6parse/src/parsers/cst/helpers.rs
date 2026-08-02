@@ -6,8 +6,8 @@
 use super::Parser;
 use crate::errors::ParserError;
 use crate::language::Token;
-use crate::parsers::cst::{RecoveryEvent, RecoveryStrategy};
 use crate::parsers::SyntaxKind;
+use crate::parsers::cst::{RecoveryEvent, RecoveryStrategy};
 use std::num::NonZeroUsize;
 
 impl Parser<'_> {
@@ -335,8 +335,12 @@ impl Parser<'_> {
         });
     }
 
-    fn emit_recovery_error<F>(&mut self, strategy: RecoveryStrategy, expected: Vec<String>, mut consume: F)
-    where
+    fn emit_recovery_error<F>(
+        &mut self,
+        strategy: RecoveryStrategy,
+        expected: Vec<String>,
+        mut consume: F,
+    ) where
         F: FnMut(&mut Self, &mut Vec<Token>),
     {
         let span = self.current_span();

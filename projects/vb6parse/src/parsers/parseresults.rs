@@ -248,6 +248,7 @@ impl<'a, T> ParseResult<'a, T> {
 
     /// Attaches recovery events to this parse result.
     #[inline]
+    #[must_use]
     pub fn with_recovery_events(mut self, recovery_events: Vec<RecoveryEvent>) -> Self {
         self.recovery_events = recovery_events;
         self
