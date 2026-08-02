@@ -13,6 +13,37 @@ use crate::parsers::SyntaxKind;
 use std::num::NonZeroUsize;
 
 impl Parser<'_> {
+    pub(crate) fn has_inline_next_before_newline(&self) -> bool {
+        let mut index = self.pos;
+
+        while let Some((_, token)) = self.tokens.get(index) {
+            match token {
+                Token::Newline => return false,
+                Token::NextKeyword => return true,
+                _ => index += 1,
+            }
+        }
+
+        false
+    }
+
+    pub(crate) fn parse_single_line_for_body_until_next(&mut self) {
+        if self.at_token(Token::ColonOperator) {
+            self.consume_token();
+        }
+
+        self.parse_statement_list(|parser| {
+            parser.at_token(Token::NextKeyword) || parser.at_token(Token::Newline)
+        });
+
+        if self.at_token(Token::NextKeyword) {
+            self.consume_token();
+            self.consume_until_after(Token::Newline);
+        } else if self.at_token(Token::Newline) {
+            self.consume_token();
+        }
+    }
+
     /// Parse a For...Next statement.
     ///
     /// VB6 For...Next loop syntax:
@@ -89,14 +120,18 @@ impl Parser<'_> {
                 }
             }
 
-            // Consume newline after For line
-            self.consume_until_after(Token::Newline);
-
-            self.parse_statement_list(|parser| parser.at_token(Token::NextKeyword));
-
-            if self.at_token(Token::NextKeyword) {
-                self.consume_token();
+            if self.has_inline_next_before_newline() {
+                self.parse_single_line_for_body_until_next();
+            } else {
+                // Consume newline after For line
                 self.consume_until_after(Token::Newline);
+
+                self.parse_statement_list(|parser| parser.at_token(Token::NextKeyword));
+
+                if self.at_token(Token::NextKeyword) {
+                    self.consume_token();
+                    self.consume_until_after(Token::Newline);
+                }
             }
 
             self.builder.finish_node(); // ForStatement
@@ -236,6 +271,39 @@ End Sub
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn single_line_for_loop_does_not_capture_following_statements() {
+        let source = r"
+Sub TestSub()
+    For i = 1 To 3: total = total + 1: Next
+    total = total + 1
+End Sub
+";
+
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
+
+        let cst = cst_opt.expect("CST should be parsed");
+        let root = cst.to_serializable().root;
+        let sub_statement = root
+            .first_child_by_kind(SyntaxKind::SubStatement)
+            .expect("expected a SubStatement");
+        let statement_list = sub_statement
+            .first_child_by_kind(SyntaxKind::StatementList)
+            .expect("expected the outer statement list");
+
+        let child_kinds: Vec<_> = statement_list
+            .non_token_children()
+            .map(|node| node.kind())
+            .collect();
+
+        assert_eq!(
+            child_kinds,
+            vec![SyntaxKind::ForStatement, SyntaxKind::AssignmentStatement]
+        );
     }
 
     #[test]

@@ -3436,6 +3436,12 @@ impl<'a> Parser<'a> {
                         }
                     }
 
+                    if self.has_inline_next_before_newline() {
+                        self.parse_single_line_for_body_until_next();
+                        self.builder.finish_node();
+                        return false;
+                    }
+
                     // Consume newline after For line
                     self.consume_until_after(Token::Newline);
                 }
