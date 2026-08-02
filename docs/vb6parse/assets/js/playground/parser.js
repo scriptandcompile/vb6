@@ -165,7 +165,7 @@ function createMockCst(code, fileType) {
  * @property {CstNode[]} [children] - Child nodes
  * 
  * @typedef {Object} ErrorInfo
- * @property {string} kind - Error kind
+ * @property {string} type - Error kind shown in the UI
  * @property {string} message - Error message
  * @property {number} line - Line number
  * @property {number} column - Column number
@@ -175,6 +175,7 @@ function createMockCst(code, fileType) {
  * @property {TokenInfo[]} tokens - All tokens
  * @property {CstNode} cst - Root CST node
  * @property {ErrorInfo[]} errors - Parse errors
+ * @property {ErrorInfo[]} recoveryDiagnostics - Parser recovery diagnostics
  * @property {ErrorInfo[]} warnings - Parse warnings
  * @property {number} parseTimeMs - Parse time in milliseconds
  * @property {Object} stats - Parse statistics

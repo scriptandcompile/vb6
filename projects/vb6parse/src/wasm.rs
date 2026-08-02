@@ -6,6 +6,8 @@
 //! Predominantly, this is designed for the needs of the `VB6Parser` playground.
 //!
 
+use crate::errors::{ErrorDetails, Severity};
+use crate::parsers::cst::{RecoveryEvent, RecoveryStrategy};
 use crate::{Token, TokenStream, parsers, tokenize};
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
@@ -44,12 +46,17 @@ pub struct TokenInfo {
 /// Information about a single error in the source code.
 #[derive(Serialize, Deserialize)]
 pub struct ErrorInfo {
+    /// The diagnostic category shown in the playground UI.
+    #[serde(rename = "type")]
+    pub type_name: String,
     /// The line number where the error occurred.
     /// Lines are 1-indexed.
     pub line: usize,
     /// The column number where the error occurred.
     /// Columns are 1-indexed.
     pub column: usize,
+    /// The byte range of the diagnostic in the source code as [start, end].
+    pub range: [u32; 2],
     /// A descriptive error message.
     pub message: String,
 }
@@ -74,6 +81,8 @@ pub struct PlaygroundOutput {
     pub cst: Option<CstNode>,
     /// A list of errors encountered during parsing or tokenization.
     pub errors: Vec<ErrorInfo>,
+    /// A list of parser recovery diagnostics encountered while building the CST.
+    pub recovery_diagnostics: Vec<ErrorInfo>,
     /// The time taken to parse the source code, in milliseconds.
     pub parse_time_ms: f64,
     /// Statistics about the parse results.
@@ -136,6 +145,88 @@ fn tree_depth(node: &CstNode) -> u32 {
     }
 }
 
+fn byte_offset_to_line_column(source: &str, offset: u32) -> (usize, usize) {
+    let target = usize::try_from(offset)
+        .unwrap_or(source.len())
+        .min(source.len());
+    let mut line = 1usize;
+    let mut line_start = 0usize;
+
+    for (index, ch) in source.char_indices() {
+        if index >= target {
+            break;
+        }
+
+        if ch == '\n' {
+            line += 1;
+            line_start = index + ch.len_utf8();
+        }
+    }
+
+    let column = source[line_start..target].chars().count() + 1;
+    (line, column)
+}
+
+fn diagnostic_range(offset: u32, length: u32) -> [u32; 2] {
+    [offset, offset.saturating_add(length.max(1))]
+}
+
+fn convert_error_details(error: &ErrorDetails<'_>) -> ErrorInfo {
+    let (line, column) = byte_offset_to_line_column(error.source_content, error.error_offset);
+    let type_name = match error.severity {
+        Severity::Note => "Note",
+        Severity::Warning => "Warning",
+        Severity::Error => "Parse Error",
+    }
+    .to_string();
+
+    ErrorInfo {
+        type_name,
+        line,
+        column,
+        range: diagnostic_range(error.error_offset, 1),
+        message: error.kind.to_string(),
+    }
+}
+
+fn recovery_strategy_label(strategy: RecoveryStrategy) -> &'static str {
+    match strategy {
+        RecoveryStrategy::SingleToken => "single token",
+        RecoveryStrategy::ToNewline => "to newline",
+        RecoveryStrategy::ProcedureTerminator => "procedure terminator",
+    }
+}
+
+fn convert_recovery_event(event: &RecoveryEvent, source: &str) -> ErrorInfo {
+    let (line, column) = byte_offset_to_line_column(source, event.span.offset);
+    let expected = if event.expected.is_empty() {
+        "unknown construct".to_string()
+    } else {
+        event.expected.join(", ")
+    };
+    let found = if event.found.is_empty() {
+        "no tokens consumed".to_string()
+    } else {
+        event
+            .found
+            .iter()
+            .map(|token| format!("{token:?}"))
+            .collect::<Vec<_>>()
+            .join(", ")
+    };
+
+    ErrorInfo {
+        type_name: format!("Recovery ({})", recovery_strategy_label(event.strategy)),
+        line,
+        column,
+        range: diagnostic_range(event.span.offset, event.span.length),
+        message: format!(
+            "Recovery event #{}: expected {}, found {}.",
+            event.id, expected, found
+        ),
+    }
+}
+
 /// Parses VB6 code and returns a `PlaygroundOutput` object containing tokens, CST, and errors.
 ///
 /// # Errors
@@ -167,9 +258,22 @@ pub fn parse_vb6_code(
 
     let tokens = produce_tokens(token_stream.clone());
 
-    // Parse CST using the token stream and convert to CstNode
-    let cst = parsers::cst::parse(token_stream.clone());
+    let parse_result = parsers::cst::ConcreteSyntaxTree::from_text("test.bas", code);
+    let (cst_opt, failures, recovery_events) = parse_result.unpack_with_recovery();
+    let Some(cst) = cst_opt else {
+        let message = failures
+            .first()
+            .map(|failure| failure.kind.to_string())
+            .unwrap_or_else(|| "Failed to parse the input code.".to_string());
+        return Err(JsError::new(&message));
+    };
+
     let cst_node = convert_cst_node(&cst.to_root_node());
+    let errors = failures.iter().map(convert_error_details).collect();
+    let recovery_diagnostics = recovery_events
+        .iter()
+        .map(|event| convert_recovery_event(event, code))
+        .collect();
 
     let token_count = u32::try_from(tokens.len())?;
 
@@ -182,7 +286,8 @@ pub fn parse_vb6_code(
     let playground_output = PlaygroundOutput {
         tokens: Some(tokens),
         cst: Some(cst_node),
-        errors: vec![],
+        errors,
+        recovery_diagnostics,
         parse_time_ms: 0.0f64,
         stats: parse_stats,
     };

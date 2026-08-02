@@ -329,6 +329,22 @@ export function renderInfoTab(result) {
         errorsSection?.classList.add('hidden');
     }
 
+    const recoverySection = document.getElementById('info-recovery');
+    const recoveryList = document.getElementById('recovery-list');
+    const recoveryDiagnostics = result.recovery_diagnostics ?? result.recoveryDiagnostics ?? [];
+    if (recoveryDiagnostics.length > 0) {
+        recoverySection?.classList.remove('hidden');
+        if (recoveryList) {
+            recoveryList.innerHTML = '';
+            recoveryDiagnostics.forEach(diagnostic => {
+                const diagnosticElement = createErrorElement(diagnostic);
+                recoveryList.appendChild(diagnosticElement);
+            });
+        }
+    } else {
+        recoverySection?.classList.add('hidden');
+    }
+
     // Render warnings
     const warningsSection = document.getElementById('info-warnings');
     const warningsList = document.getElementById('warnings-list');
@@ -378,11 +394,23 @@ function createErrorElement(error) {
     div.appendChild(header);
     div.appendChild(message);
     
-    // Click to highlight in editor
+    // Click to move the editor cursor to the diagnostic location.
     div.addEventListener('click', () => {
         if (error.range) {
-            // TODO: Calculate line/col from byte offset
-            highlightRange(error.line, error.column, error.line, error.column + 1);
+            document.dispatchEvent(new CustomEvent('highlightAndPositionCursor', {
+                detail: {
+                    startOffset: error.range[0],
+                    endOffset: error.range[1]
+                }
+            }));
+        } else if (error.line && error.column) {
+            document.dispatchEvent(new CustomEvent('highlightInEditor', {
+                detail: {
+                    line: error.line,
+                    column: error.column,
+                    length: 1
+                }
+            }));
         }
     });
     
@@ -523,6 +551,11 @@ export function clearOutput() {
     const infoWarnings = document.getElementById('info-warnings');
     if (infoWarnings) {
         infoWarnings.classList.add('hidden');
+    }
+
+    const infoRecovery = document.getElementById('info-recovery');
+    if (infoRecovery) {
+        infoRecovery.classList.add('hidden');
     }
 
     // Show placeholder
