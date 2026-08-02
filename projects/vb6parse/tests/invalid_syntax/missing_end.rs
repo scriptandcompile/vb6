@@ -64,6 +64,46 @@ Sub TestSub()
     insta::assert_yaml_snapshot!("missing_end_sub_failures", failure_messages);
 }
 
+/// Test missing End Sub when another Sub declaration starts.
+#[test]
+fn missing_end_sub_before_next_sub() {
+    let source = r#"
+Sub FirstSub()
+    Dim x As Integer
+    x = 10
+Public Sub SecondSub()
+    MsgBox "ok"
+End Sub
+"#;
+
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+    eprintln!("=== Failures for missing_end_sub_before_next_sub ===");
+    eprintln!("Number of failures: {}", failures.len());
+    for failure in &failures {
+        failure.eprint();
+    }
+    eprintln!("=== End Failures ===");
+
+    let cst = cst_opt.expect("CST should be present even with syntax errors");
+    let tree = cst.to_serializable();
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+
+    insta::assert_yaml_snapshot!("missing_end_sub_before_next_sub_cst", tree);
+
+    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_sub_before_next_sub_failures",
+        failures.len(),
+    );
+    insta::assert_yaml_snapshot!("missing_end_sub_before_next_sub_failures", failure_messages);
+}
+
 /// Test missing End Function statement
 #[test]
 fn missing_end_function() {
@@ -94,6 +134,48 @@ Function Calculate(x As Integer) As Integer
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
     assert_failure_count_matches_snapshot("missing_end", "missing_end_function_failures", failures.len());
     insta::assert_yaml_snapshot!("missing_end_function_failures", failure_messages);
+}
+
+/// Test missing End Function when another Function declaration starts.
+#[test]
+fn missing_end_function_before_next_function() {
+    let source = r#"
+Function FirstFunction(x As Integer) As Integer
+    FirstFunction = x * 2
+Public Function SecondFunction(y As Integer) As Integer
+    SecondFunction = y + 1
+End Function
+"#;
+
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+
+    eprintln!("=== Failures for missing_end_function_before_next_function ===");
+    eprintln!("Number of failures: {}", failures.len());
+    for failure in &failures {
+        failure.eprint();
+    }
+    eprintln!("=== End Failures ===");
+
+    let cst = cst_opt.expect("CST should be present even with syntax errors");
+    let tree = cst.to_serializable();
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+
+    insta::assert_yaml_snapshot!("missing_end_function_before_next_function_cst", tree);
+
+    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_function_before_next_function_failures",
+        failures.len(),
+    );
+    insta::assert_yaml_snapshot!(
+        "missing_end_function_before_next_function_failures",
+        failure_messages
+    );
 }
 
 /// Test missing End Property statement

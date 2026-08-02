@@ -102,8 +102,9 @@ impl Parser<'_> {
 
         // Parse body until "End Function"
         self.parse_statement_list(|parser| {
-            parser.at_token(Token::EndKeyword)
-                && parser.peek_next_keyword() == Some(Token::FunctionKeyword)
+            (parser.at_token(Token::EndKeyword)
+                && parser.peek_next_keyword() == Some(Token::FunctionKeyword))
+                || parser.at_procedure_declaration_start()
         });
 
         // Consume "End Function" and trailing tokens, or report mismatch as recovery.
