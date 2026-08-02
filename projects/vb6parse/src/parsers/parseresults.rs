@@ -1,9 +1,11 @@
 //! Module for parsing results and error handling in the VB6 parser.
 //! This module defines the `ParseResult` structure, which encapsulates the outcome of parsing operations,
-//! including successful results and any errors encountered during parsing.
+//! including a successful value when available, any diagnostics emitted during parsing, and recovery
+//! metadata for resilient CST parsing.
 //!
-//! The `ParseResult` structure is generic over the type of the successful result and the type of error details,
-//! allowing it to be used flexibly across different parsing scenarios within the VB6 parser.
+//! `ParseResult` is generic over the successful parse value and is designed for partial-success workflows:
+//! parsers may still produce a usable result while reporting errors, warnings, or recovery events when
+//! malformed source is encountered.
 //!
 
 use core::convert::From;
@@ -136,9 +138,13 @@ impl<'a> Diagnostics<'a> {
     }
 }
 
-/// Result of a parsing operation, containing an optional result and a list of failures encountered during parsing.
-/// The result is `Some` if parsing was successful, and `None` if it failed completely.
-/// Failures are collected in a vector, allowing for partial successes with warnings.
+/// Result of a parsing operation, containing an optional parsed value together with diagnostics and,
+/// when relevant, recovery events captured by the resilient CST parser.
+///
+/// The result is `Some` if parsing produced a usable value, and `None` if parsing failed completely.
+/// Failures are collected in a vector so callers can inspect errors, warnings, and partial successes in a
+/// single pass. Recovery events are also preserved for callers that need to understand where the parser
+/// inserted `ErrorRecovery` wrappers while recovering from malformed syntax.
 ///
 /// # Type Parameters
 /// * `'a`: Lifetime parameter for error details.
@@ -247,6 +253,11 @@ impl<'a, T> ParseResult<'a, T> {
     }
 
     /// Attaches recovery events to this parse result.
+    ///
+    /// This is primarily used by the CST parser when it creates `ErrorRecovery` wrappers while
+    /// recovering from malformed input. Callers can inspect those events later with
+    /// [`ParseResult::unpack_with_recovery`], [`ParseResult::recovery_events`], or
+    /// [`ParseResult::into_recovery_events`].
     #[inline]
     #[must_use]
     pub fn with_recovery_events(mut self, recovery_events: Vec<RecoveryEvent>) -> Self {
@@ -489,25 +500,31 @@ impl<'a, T> ParseResult<'a, T> {
         (self.result, self.failures)
     }
 
-    /// Unpacks the parse result into result, failures, and recovery events.
+    /// Unpacks the parse result into its parsed value, failures, and recovery events.
+    ///
+    /// This is useful when callers need both the parse result and the detailed recovery metadata that
+    /// describes where the parser recovered from malformed source.
     #[inline]
     pub fn unpack_with_recovery(self) -> (Option<T>, Vec<ErrorDetails<'a>>, Vec<RecoveryEvent>) {
         (self.result, self.failures, self.recovery_events)
     }
 
-    /// Returns an iterator over recovery events.
+    /// Returns an iterator over the recovery events captured during parsing.
     #[inline]
     pub fn recovery_events(&self) -> impl Iterator<Item = &RecoveryEvent> {
         self.recovery_events.iter()
     }
 
-    /// Consumes this parse result and returns recovery events.
+    /// Consumes this parse result and returns the recovery events captured during parsing.
     #[inline]
     pub fn into_recovery_events(self) -> Vec<RecoveryEvent> {
         self.recovery_events
     }
 
     /// Unpacks the parse result into its components with errors and warnings separated.
+    ///
+    /// This is a convenience method for callers that want a severity-based view of the diagnostics
+    /// without manually filtering the failures vector.
     ///
     /// # Returns
     ///
@@ -523,7 +540,8 @@ impl<'a, T> ParseResult<'a, T> {
 
     /// Returns the diagnostics (errors and warnings) from the parse result.
     ///
-    /// This method categorizes all failures by severity into a Diagnostics struct.
+    /// This method categorizes all failures by severity into a `Diagnostics` struct, making it easier
+    /// to inspect the full diagnostic surface without manually splitting the failures vector.
     ///
     /// # Returns
     ///

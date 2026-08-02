@@ -241,15 +241,15 @@ fn count_identifiers(code: &str, function_name: &str) -> usize {
 
 ### Error Handling
 
-VB6Parse uses a custom `ParseResult<T, E>` type that separates successful results from recoverable errors. See the [Error Handling guide](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#error-handling) for detailed examples.
+VB6Parse uses a custom `ParseResult<T>` type that separates successful results from diagnostics and recovery metadata. See the [Error Handling guide](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#error-handling) for detailed examples.
 
 **Quick Reference:**
 
 ```rust
 let result = ProjectFile::parse(&source);
 
-// Unpack into result and failures
-let (project_opt, failures) = result.unpack();
+// Unpack into result, failures, and recovery events
+let (project_opt, failures, recovery_events) = result.unpack_with_recovery();
 
 // Check for failures
 if result.has_failures() {
@@ -257,6 +257,9 @@ if result.has_failures() {
         eprintln!("Error at line {}: {:?}", failure.error_offset, failure.kind);
     }
 }
+
+// Inspect the full diagnostic view
+let diagnostics = result.diagnostics();
 
 // Convert to Result<T, Vec<ErrorDetails>>
 let std_result = result.ok_or_errors();

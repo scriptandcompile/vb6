@@ -1,12 +1,13 @@
-use vb6parse::{ModuleFile, SourceFile};
+use vb6parse::{ConcreteSyntaxTree, SourceFile};
 
 fn main() {
-    // Malformed VB6 code (missing End Sub, invalid syntax)
+    // Malformed VB6 code: the first procedure ends with End Function instead of End Sub,
+    // which forces the parser to recover before the next Public Sub.
     let bad_code = r#"Attribute VB_Name = "BadModule"
 
 Public Sub BrokenFunction()
-    x = 5 + 
-    ' Missing closing and the expression is incomplete
+    x = 5
+End Function
 
 Public Sub AnotherFunction()
     MsgBox "This one is fine"
@@ -14,18 +15,20 @@ End Sub
 "#;
 
     let source = SourceFile::from_string("BadModule.bas", bad_code);
-    let result = ModuleFile::parse(&source);
-    let (module, failures) = result.unpack();
+    let result = ConcreteSyntaxTree::from_source(&source);
+    let (cst, failures, recovery_events) = result.unpack_with_recovery();
 
-    // We still might get a module!
-    if let Some(module) = module {
-        println!("✓ Parsed module: {}", module.name);
-        println!("  (Despite {} errors)", failures.len());
+    if let Some(cst) = cst {
+        println!("✓ Parsed CST: {:?}", cst.root_kind());
+        println!(
+            "  (Despite {} errors and {} recovery events)",
+            failures.len(),
+            recovery_events.len()
+        );
     } else {
         println!("✗ Parsing completely failed");
     }
 
-    // Always check and handle failures
     if !failures.is_empty() {
         println!("\nParsing Issues:");
         for failure in failures {
@@ -34,8 +37,17 @@ End Sub
                 failure.line_start, failure.line_end, failure.kind
             );
 
-            // Print the error with source context
             failure.print();
+        }
+    }
+
+    if !recovery_events.is_empty() {
+        println!("\nRecovery points:");
+        for event in recovery_events {
+            println!(
+                "  {:?} at offset {} (line {})",
+                event.strategy, event.span.offset, event.span.line_start
+            );
         }
     }
 }
