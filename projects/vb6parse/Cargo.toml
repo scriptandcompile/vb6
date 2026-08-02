@@ -3,7 +3,7 @@ authors = ["ScriptAndCompile"]
 name = "vb6parse"
 homepage = "https://scriptandcompile.github.io/vb6/vb6parse/index.html"
 documentation = "https://docs.rs/vb6parse"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2024"
 license = "MIT"
 description = "vb6parse is a library for parsing and analyzing VB6 code, from projects, to controls, to modules, and forms."
@@ -28,7 +28,7 @@ encoding_rs = "0.8.35"
 either = { version = "1.17.0", features = ["serde"] }
 serde = { version = "1.0.229", features = ["derive"] }
 phf = { version = "0.14.0", features = ["macros"] }
-rowan = "0.16.1"
+rowan = "0.17.0"
 
 # WASM-specific dependencies - only compiled for wasm32 target
 [target.'cfg(target_arch = "wasm32")'.dependencies]
