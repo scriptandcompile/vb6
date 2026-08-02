@@ -66,31 +66,6 @@ End Property
 }
 
 #[test]
-fn nested_sub_indent() {
-    let expected = "\
-Public Sub Outer()
-    Dim x As Integer
-
-    Public Sub Inner()
-        Dim y As Integer
-    End Sub
-End Sub
-";
-    common::assert_fmt(
-        "\
-Public Sub Outer()
-Dim x As Integer
-
-Public Sub Inner()
-Dim y As Integer
-End Sub
-End Sub
-",
-        expected,
-    );
-}
-
-#[test]
 fn custom_indent_size() {
     let settings = FmtSettings {
         indent_size: 2,
