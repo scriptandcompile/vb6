@@ -86,8 +86,19 @@ impl SemanticAnalyzer {
 
         // TODO: Analyze project references and external dependencies
 
-        // Analyze all modules, classes, and forms
-        // This would iterate through the parsed structures
+        for module_reference in project.modules() {
+            self.analyze_module_reference(module_reference)?;
+        }
+
+        for class_reference in project.classes() {
+            self.analyze_class_reference(class_reference)?;
+        }
+
+        for form_file_name in project.forms() {
+            self.analyze_form_path(form_file_name)?;
+        }
+
+        // TODO: Analyze any additional project-level constructs if necessary
 
         // For now, return empty result
         Ok(AnalysisResult {
@@ -95,6 +106,45 @@ impl SemanticAnalyzer {
             errors: self.errors.clone(),
             warnings: self.warnings.clone(),
         })
+    }
+
+    /// Analyze a module reference from the project file reference
+    pub fn analyze_module_reference(
+        &mut self,
+        module_reference: &vb6parse::files::project::ProjectModuleReference,
+    ) -> Result<()> {
+        let source_file =
+            vb6parse::io::SourceFile::from_file(module_reference.path).map_err(|e| {
+                crate::error::SemanticError::FileReadError {
+                    file: module_reference.path.to_string(),
+                    message: e.to_string(),
+                }
+            })?;
+
+        let (module_opt, failures) = vb6parse::files::ModuleFile::parse(&source_file).unpack();
+        if let Some(module) = module_opt {
+            self.analyze_module(&module)?;
+        } else if !failures.is_empty() {
+            let diagnostics = failures
+                .into_iter()
+                .map(|failure| vb6parse::errors::ErrorDetails {
+                    source_name: failure.source_name.clone(),
+                    source_content: Box::leak(failure.source_content.to_string().into_boxed_str()),
+                    error_offset: failure.error_offset,
+                    line_start: failure.line_start,
+                    line_end: failure.line_end,
+                    kind: failure.kind,
+                    severity: failure.severity,
+                    labels: failure.labels,
+                    notes: failure.notes,
+                })
+                .collect();
+            return Err(crate::error::SemanticError::FileParseError {
+                file: module_reference.path.to_string(),
+                diagnostics,
+            });
+        }
+        Ok(())
     }
 
     /// Analyze a module file
@@ -118,6 +168,45 @@ impl SemanticAnalyzer {
         Ok(())
     }
 
+    /// Analyze a class reference from the project file class reference
+    pub fn analyze_class_reference(
+        &mut self,
+        class_reference: &vb6parse::files::project::ProjectClassReference,
+    ) -> Result<()> {
+        let source_file =
+            vb6parse::io::SourceFile::from_file(class_reference.path).map_err(|e| {
+                crate::error::SemanticError::FileReadError {
+                    file: class_reference.path.to_string(),
+                    message: e.to_string(),
+                }
+            })?;
+
+        let (class_opt, failures) = vb6parse::files::ClassFile::parse(&source_file).unpack();
+        if let Some(class) = class_opt {
+            self.analyze_class(&class)?;
+        } else if !failures.is_empty() {
+            let diagnostics = failures
+                .into_iter()
+                .map(|failure| vb6parse::errors::ErrorDetails {
+                    source_name: failure.source_name.clone(),
+                    source_content: Box::leak(failure.source_content.to_string().into_boxed_str()),
+                    error_offset: failure.error_offset,
+                    line_start: failure.line_start,
+                    line_end: failure.line_end,
+                    kind: failure.kind,
+                    severity: failure.severity,
+                    labels: failure.labels,
+                    notes: failure.notes,
+                })
+                .collect();
+            return Err(crate::error::SemanticError::FileParseError {
+                file: class_reference.path.to_string(),
+                diagnostics,
+            });
+        }
+        Ok(())
+    }
+
     /// Analyze a class file
     pub fn analyze_class(&mut self, _class: &vb6parse::files::ClassFile) -> Result<()> {
         self.current_file = Some("class".to_string());
@@ -134,6 +223,42 @@ impl SemanticAnalyzer {
         // - Process implements
 
         self.scope_manager.pop_scope()?;
+        Ok(())
+    }
+
+    /// Analyze a form file by its path
+    pub fn analyze_form_path(&mut self, form_reference_path: &str) -> Result<()> {
+        let source_file =
+            vb6parse::io::SourceFile::from_file(form_reference_path).map_err(|e| {
+                crate::error::SemanticError::FileReadError {
+                    file: form_reference_path.to_string(),
+                    message: e.to_string(),
+                }
+            })?;
+
+        let (form_opt, failures) = vb6parse::files::FormFile::parse(&source_file).unpack();
+        if let Some(form) = form_opt {
+            self.analyze_form(&form)?;
+        } else if !failures.is_empty() {
+            let diagnostics = failures
+                .into_iter()
+                .map(|failure| vb6parse::errors::ErrorDetails {
+                    source_name: failure.source_name.clone(),
+                    source_content: Box::leak(failure.source_content.to_string().into_boxed_str()),
+                    error_offset: failure.error_offset,
+                    line_start: failure.line_start,
+                    line_end: failure.line_end,
+                    kind: failure.kind,
+                    severity: failure.severity,
+                    labels: failure.labels,
+                    notes: failure.notes,
+                })
+                .collect();
+            return Err(crate::error::SemanticError::FileParseError {
+                file: form_reference_path.to_string(),
+                diagnostics,
+            });
+        }
         Ok(())
     }
 
