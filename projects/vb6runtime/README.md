@@ -85,7 +85,38 @@ VB6-exact conversion rules:
 - Variant unwrapping
 - Null propagation
 
-### 4. Standard Library
+### 4. Argument Handling Model
+
+VB6 procedures do not pass arguments as a bare list of values. The runtime should model an invocation as a structured call context so it can preserve semantics for omitted arguments, `ByRef`/`ByVal`, and `ParamArray` handling.
+
+```rust
+pub enum ArgumentPresence {
+    Present(Value),
+    Missing,
+}
+
+pub struct RuntimeArgument {
+    pub presence: ArgumentPresence,
+    pub by_ref: bool,
+}
+
+pub struct CallFrame {
+    pub callee: String,
+    pub args: Vec<RuntimeArgument>,
+    pub named: HashMap<String, RuntimeArgument>,
+}
+```
+
+This model keeps `Value` focused on data representation while letting the runtime distinguish:
+
+- omitted optional arguments
+- `ByRef` versus `ByVal` semantics
+- variable-length argument lists for `ParamArray`
+- VB6-specific cases such as `Empty`, `Null`, and `Missing`
+
+In practice, a call flow should evaluate each argument expression into a `Value`, wrap it in `RuntimeArgument`, bind it to the formal parameter list, and then dispatch to the appropriate procedure implementation.
+
+### 5. Standard Library
 
 Full implementations of VB6 built-in functions:
 
