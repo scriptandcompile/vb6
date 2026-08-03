@@ -33,6 +33,7 @@
 
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+use vb6parse::errors::ErrorDetails;
 
 /// Represents an error that can occur during semantic analysis of VB6 code
 ///
@@ -135,6 +136,24 @@ pub enum SemanticError {
         location: SourceLocation,
     },
 
+    /// Represents a file read error, where a source file could not be read from disk
+    #[error("Failed to read file {file}: {message}")]
+    FileReadError {
+        /// Path of the file that could not be read
+        file: String,
+        /// Read error message
+        message: String,
+    },
+
+    /// Represents a parse error for a source file that could not be parsed successfully
+    #[error("Failed to parse file {file}: {diagnostics:?}")]
+    FileParseError {
+        /// Path of the file that could not be parsed
+        file: String,
+        /// Underlying parser diagnostics
+        diagnostics: Vec<ErrorDetails<'static>>,
+    },
+
     /// Represents a general analysis error that does not fit into other categories
     #[error("Analysis error: {0}")]
     AnalysisError(String),
@@ -159,3 +178,46 @@ impl std::fmt::Display for SourceLocation {
 
 /// Type alias for results returned by semantic analysis functions, using `SemanticError` as the error type
 pub type Result<T> = std::result::Result<T, SemanticError>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn file_read_error_formats_file_and_source() {
+        let error = SemanticError::FileReadError {
+            file: "module.bas".to_string(),
+            message: "permission denied".to_string(),
+        };
+
+        let message = error.to_string();
+        assert!(message.contains("module.bas"));
+        assert!(message.contains("permission denied"));
+    }
+
+    #[test]
+    fn file_parse_error_keeps_parser_diagnostics() {
+        let error = SemanticError::FileParseError {
+            file: "module.bas".to_string(),
+            diagnostics: vec![ErrorDetails {
+                source_name: "module.bas".to_string().into_boxed_str(),
+                source_content: "",
+                error_offset: 0,
+                line_start: 1,
+                line_end: 1,
+                kind: Box::new(vb6parse::errors::ErrorKind::Lexer(
+                    vb6parse::errors::LexerError::UnknownToken {
+                        token: "?".to_string(),
+                    },
+                )),
+                severity: vb6parse::errors::Severity::Error,
+                labels: vec![],
+                notes: vec![],
+            }],
+        };
+
+        let message = error.to_string();
+        assert!(message.contains("module.bas"));
+        assert!(message.contains("ErrorDetails"));
+    }
+}
