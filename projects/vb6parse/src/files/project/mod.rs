@@ -77,6 +77,14 @@ pub struct ProjectFile<'a> {
     user_controls: Vec<&'a str>,
     /// The list of user documents in the project.
     user_documents: Vec<&'a str>,
+    /// Every source-file entry in the order it appeared in the `.vbp` file.
+    ///
+    /// VB6 writes `Module=`, `Class=`, `Form=`, and the other file entries
+    /// interleaved, but the typed vectors above group them by kind. This ordered
+    /// list preserves the original line order for consumers (such as name
+    /// resolution) that need to process files the way the IDE does.
+    #[serde(skip)]
+    file_entries: Vec<ProjectFileEntry<'a>>,
     /// Other properties grouped by section headers.
     #[serde(serialize_with = "serialize_sorted_nested_hashmap")]
     pub other_properties: HashMap<&'a str, HashMap<&'a str, &'a str>>,
@@ -220,6 +228,32 @@ impl Display for ProjectClassReference<'_> {
     }
 }
 
+/// A source-file entry listed in a `.vbp` file, in the order it appeared.
+///
+/// VB6 writes these entries interleaved (for example a `Form=` line can come
+/// between two `Module=` lines), but `ProjectFile` stores each kind in its own
+/// typed vector. This ordered form preserves the original line order so
+/// consumers can process files in the same order the IDE does.
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Hash)]
+pub enum ProjectFileEntry<'a> {
+    /// A `Module=` entry (`.bas`).
+    Module(ProjectModuleReference<'a>),
+    /// A `Class=` entry (`.cls`).
+    Class(ProjectClassReference<'a>),
+    /// A `Form=` entry (`.frm`).
+    Form(&'a str),
+    /// A `UserControl=` entry (`.ctl`).
+    UserControl(&'a str),
+    /// A `UserDocument=` entry (`.do*`).
+    UserDocument(&'a str),
+    /// A `Designer=` entry.
+    Designer(&'a str),
+    /// A `RelatedDoc=` entry.
+    RelatedDoc(&'a str),
+    /// A `PropertyPage=` entry (`.pag`).
+    PropertyPage(&'a str),
+}
+
 /// The result type for parsing a VB6 project file.
 ///
 /// Contains the parsed `ProjectFile` and any `ProjectErrorKind` errors encountered during parsing.
@@ -246,6 +280,7 @@ impl<'a> ProjectFile<'a> {
             user_documents: vec![],
             related_documents: vec![],
             property_pages: vec![],
+            file_entries: vec![],
             other_properties: HashMap::new(),
             properties: ProjectProperties {
                 // We default to using NativeCode because all the possible options
@@ -1035,6 +1070,41 @@ impl<'a> ProjectFile<'a> {
     pub fn project_references_mut(&mut self) -> &mut Vec<ProjectReference<'a>> {
         &mut self.references
     }
+
+    /// Returns an iterator over every source-file entry in `.vbp` line order.
+    ///
+    /// This is the interleaved order of the `Module=`, `Class=`, `Form=`,
+    /// `UserControl=`, `UserDocument=`, `Designer=`, `RelatedDoc=`, and
+    /// `PropertyPage=` lines, as written in the project file.
+    ///
+    /// # Example
+    /// ```rust
+    /// use vb6parse::*;
+    /// use vb6parse::files::project::ProjectFileEntry;
+    ///
+    /// let input = r#"Type=Exe
+    /// Module=Module1; Module1.bas
+    /// Class=Class1; Class1.cls
+    /// Form=Form1.frm
+    /// Module=Module2; Module2.bas
+    /// "#;
+    ///
+    /// let source = SourceFile::decode_with_replacement("project1.vbp", input.as_bytes())
+    ///     .expect("Failed to decode project source code.");
+    /// let result = ProjectFile::parse(&source);
+    /// let (project_opt, failures) = result.unpack();
+    /// assert!(failures.is_empty(), "Parse failures: {failures:?}");
+    /// let project = project_opt.expect("Expected project to be parsed successfully.");
+    ///
+    /// let entries: Vec<_> = project.file_entries().collect();
+    /// assert!(matches!(entries[0], ProjectFileEntry::Module(_)));
+    /// assert!(matches!(entries[1], ProjectFileEntry::Class(_)));
+    /// assert!(matches!(entries[2], ProjectFileEntry::Form(_)));
+    /// assert!(matches!(entries[3], ProjectFileEntry::Module(_)));
+    /// ```
+    pub fn file_entries(&self) -> impl Iterator<Item = &ProjectFileEntry<'a>> {
+        self.file_entries.iter()
+    }
 }
 
 /// Type alias for property handler functions.
@@ -1297,6 +1367,7 @@ fn handle_designer<'a>(
     property_name: &'a str,
 ) {
     if let Some(designer) = parse_path_line(ctx, input, property_name) {
+        project.file_entries.push(ProjectFileEntry::Designer(designer));
         project.designers.push(designer);
     }
 }
@@ -1330,6 +1401,7 @@ fn handle_module<'a>(
     _property_name: &'a str,
 ) {
     if let Some(module) = parse_module(ctx, input) {
+        project.file_entries.push(ProjectFileEntry::Module(module));
         project.modules.push(module);
     }
 }
@@ -1341,6 +1413,7 @@ fn handle_class<'a>(
     _property_name: &'a str,
 ) {
     if let Some(class) = parse_class(ctx, input) {
+        project.file_entries.push(ProjectFileEntry::Class(class));
         project.classes.push(class);
     }
 }
@@ -1352,6 +1425,7 @@ fn handle_form<'a>(
     property_name: &'a str,
 ) {
     if let Some(form) = parse_path_line(ctx, input, property_name) {
+        project.file_entries.push(ProjectFileEntry::Form(form));
         project.forms.push(form);
     }
 }
@@ -1363,6 +1437,9 @@ fn handle_user_control<'a>(
     property_name: &'a str,
 ) {
     if let Some(user_control) = parse_path_line(ctx, input, property_name) {
+        project
+            .file_entries
+            .push(ProjectFileEntry::UserControl(user_control));
         project.user_controls.push(user_control);
     }
 }
@@ -1374,6 +1451,9 @@ fn handle_user_document<'a>(
     property_name: &'a str,
 ) {
     if let Some(user_document) = parse_path_line(ctx, input, property_name) {
+        project
+            .file_entries
+            .push(ProjectFileEntry::UserDocument(user_document));
         project.user_documents.push(user_document);
     }
 }
@@ -1385,6 +1465,9 @@ fn handle_related_doc<'a>(
     property_name: &'a str,
 ) {
     if let Some(related_document) = parse_path_line(ctx, input, property_name) {
+        project
+            .file_entries
+            .push(ProjectFileEntry::RelatedDoc(related_document));
         project.related_documents.push(related_document);
     }
 }
@@ -1396,6 +1479,9 @@ fn handle_property_page<'a>(
     property_name: &'a str,
 ) {
     if let Some(property_page_value) = parse_path_line(ctx, input, property_name) {
+        project
+            .file_entries
+            .push(ProjectFileEntry::PropertyPage(property_page_value));
         project.property_pages.push(property_page_value);
     }
 }

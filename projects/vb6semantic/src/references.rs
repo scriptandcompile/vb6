@@ -214,9 +214,21 @@ impl<'a> ReferenceContext<'a> {
         self.scope_manager
     }
 
-    /// Create a new scope as a child of the current one
+    /// Create a new scope as a child of the current one.
+    ///
+    /// A `ScopeKind::Reference` scope is recorded in the project-wide reference
+    /// search order; all other kinds create a plain child scope.
     pub fn push_scope(&mut self, kind: ScopeKind, name: String) -> usize {
-        self.scope_manager.push_scope(kind, name)
+        match kind {
+            ScopeKind::Reference => self.scope_manager.push_reference_scope(name),
+            _ => self.scope_manager.push_scope(kind, name),
+        }
+    }
+
+    /// Create a new reference-library scope, recording it in the project-wide
+    /// reference search order.
+    pub fn push_reference_scope(&mut self, name: String) -> usize {
+        self.scope_manager.push_reference_scope(name)
     }
 
     /// Pop the current scope, returning to its parent
@@ -347,7 +359,7 @@ impl ReferenceResolver for StaticReferenceResolver {
     }
 
     fn resolve(&mut self, reference: &ReferenceInfo, context: &mut ReferenceContext) -> Result<()> {
-        context.push_scope(ScopeKind::Reference, reference.display_name());
+        context.push_reference_scope(reference.display_name());
         for symbol in &self.symbols {
             context.add_symbol(symbol.clone())?;
         }
@@ -426,7 +438,7 @@ impl ReferenceResolver for ManifestReferenceResolver {
             )));
         };
 
-        context.push_scope(ScopeKind::Reference, reference.display_name());
+        context.push_reference_scope(reference.display_name());
         for spec in specs {
             context.add_symbol(spec.to_symbol(&SourceLocation {
                 file: context.file().to_string(),

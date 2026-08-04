@@ -105,6 +105,17 @@ pub struct ScopeManager {
 
     /// Next scope ID to allocate
     next_scope_id: usize,
+
+    /// Module-level scopes (modules, classes, and forms) in the order they were
+    /// created. This is the order names resolve across modules during the
+    /// project-wide fallback: for projects analyzed through `analyze_project`
+    /// it matches the `.vbp` file entry order.
+    module_scopes: Vec<usize>,
+
+    /// Reference-library scopes in the order they were created (the order of the
+    /// project's `Reference=` lines). Searched after `module_scopes` so that
+    /// project symbols shadow referenced-library symbols.
+    reference_scopes: Vec<usize>,
 }
 
 impl ScopeManager {
@@ -115,6 +126,8 @@ impl ScopeManager {
             current_scope: 0,
             global_scope: 0,
             next_scope_id: 1,
+            module_scopes: Vec::new(),
+            reference_scopes: Vec::new(),
         };
 
         // Create global scope
@@ -133,6 +146,28 @@ impl ScopeManager {
 
     /// Create a new scope as a child of the current scope
     pub fn push_scope(&mut self, kind: ScopeKind, name: String) -> usize {
+        self.create_scope(kind, name)
+    }
+
+    /// Create a new module-level scope (module, class, or form) as a child of the
+    /// current scope, recording it in the project-wide module search order.
+    pub fn push_module_scope(&mut self, kind: ScopeKind, name: String) -> usize {
+        let scope_id = self.create_scope(kind, name);
+        self.module_scopes.push(scope_id);
+        scope_id
+    }
+
+    /// Create a new reference-library scope as a child of the current scope,
+    /// recording it in the project-wide reference search order.
+    pub fn push_reference_scope(&mut self, name: String) -> usize {
+        let scope_id = self.create_scope(ScopeKind::Reference, name);
+        self.reference_scopes.push(scope_id);
+        scope_id
+    }
+
+    /// Allocate a new scope as a child of the current scope without recording it
+    /// in the module or reference search order.
+    fn create_scope(&mut self, kind: ScopeKind, name: String) -> usize {
         let scope_id = self.next_scope_id;
         self.next_scope_id += 1;
 
@@ -224,26 +259,34 @@ impl ScopeManager {
             }
         }
 
-        // VB6 exposes public symbols from every module and every referenced
+        // VB6 exposes Public symbols from every module and every referenced
         // library project-wide. If the lexical chain missed, fall back to the
-        // module globals first and then the reference-library scopes. Scope ids
-        // are allocated in a stable order, so we search in ascending id order
-        // for deterministic results.
-        self.lookup_in_globals(ScopeKind::Global, name)
-            .or_else(|| self.lookup_in_globals(ScopeKind::Reference, name))
-    }
-
-    /// Search all scopes of the given kind for a symbol, in ascending scope-id order
-    fn lookup_in_globals(&self, kind: ScopeKind, name: &str) -> Option<&Symbol> {
-        let mut ids: Vec<usize> = self
-            .scopes
-            .values()
-            .filter(|scope| scope.kind == kind)
-            .map(|scope| scope.id)
-            .collect();
-        ids.sort_unstable();
-        ids.into_iter()
-            .find_map(|scope_id| self.scopes.get(&scope_id)?.symbols.get(name))
+        // module scopes first and then the reference-library scopes. Modules are
+        // searched in creation order (the `.vbp` file order for projects), so
+        // the module listed first wins an ambiguous name, and reference scopes
+        // are searched in `Reference=` line order. Private symbols are only
+        // visible within their own module, so the cross-module pass skips them.
+        for module_scope_id in &self.module_scopes {
+            if let Some(symbol) = self
+                .scopes
+                .get(module_scope_id)
+                .and_then(|scope| scope.symbols.get(name))
+                && self.can_access(symbol)
+            {
+                return Some(symbol);
+            }
+        }
+        for reference_scope_id in &self.reference_scopes {
+            if let Some(symbol) = self
+                .scopes
+                .get(reference_scope_id)
+                .and_then(|scope| scope.symbols.get(name))
+                && self.can_access(symbol)
+            {
+                return Some(symbol);
+            }
+        }
+        None
     }
 
     /// Lookup a symbol in a specific scope (no parent walk)
@@ -307,5 +350,118 @@ impl ScopeManager {
 impl Default for ScopeManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::SourceLocation;
+    use crate::symbols::SymbolKind;
+    use crate::types::{TypeInfo, TypeKind};
+
+    fn symbol(name: &str, visibility: Visibility, scope_id: usize) -> Symbol {
+        Symbol {
+            name: name.to_string(),
+            kind: SymbolKind::Variable,
+            type_info: TypeInfo::new(TypeKind::Long),
+            visibility,
+            location: SourceLocation {
+                file: "test.bas".to_string(),
+                line: 1,
+                column: 1,
+            },
+            scope_id,
+            attributes: HashMap::new(),
+        }
+    }
+
+    #[test]
+    fn lookup_skips_private_symbols_from_other_modules() {
+        let mut manager = ScopeManager::new();
+        let module_a = manager.push_module_scope(ScopeKind::Global, "ModuleA".to_string());
+        manager
+            .add_symbol(symbol("Secret", Visibility::Private, module_a))
+            .unwrap();
+        manager
+            .add_symbol(symbol("Visible", Visibility::Public, module_a))
+            .unwrap();
+        manager.pop_scope().unwrap();
+
+        let _module_b = manager.push_module_scope(ScopeKind::Global, "ModuleB".to_string());
+
+        // From within ModuleB, ModuleA's Private symbol is not visible...
+        assert!(manager.lookup("Secret").is_none());
+        // ...but its Public symbol is.
+        assert!(manager.lookup("Visible").is_some());
+    }
+
+    #[test]
+    fn lookup_finds_private_symbol_in_same_module() {
+        let mut manager = ScopeManager::new();
+        let module_a = manager.push_module_scope(ScopeKind::Global, "ModuleA".to_string());
+        manager
+            .add_symbol(symbol("Secret", Visibility::Private, module_a))
+            .unwrap();
+
+        assert!(manager.lookup("Secret").is_some());
+    }
+
+    #[test]
+    fn lookup_searches_module_scopes_in_push_order() {
+        let mut manager = ScopeManager::new();
+        let first = manager.push_module_scope(ScopeKind::Global, "First".to_string());
+        manager
+            .add_symbol(symbol("Name", Visibility::Public, first))
+            .unwrap();
+        manager.pop_scope().unwrap();
+
+        let second = manager.push_module_scope(ScopeKind::Global, "Second".to_string());
+        manager
+            .add_symbol(symbol("Name", Visibility::Public, second))
+            .unwrap();
+        manager.pop_scope().unwrap();
+
+        // The scope pushed first wins the ambiguous name.
+        let found = manager.lookup("Name").expect("Symbol should resolve");
+        assert_eq!(found.scope_id, first);
+    }
+
+    #[test]
+    fn lookup_prefers_modules_over_references() {
+        let mut manager = ScopeManager::new();
+        let module = manager.push_module_scope(ScopeKind::Global, "Module".to_string());
+        manager
+            .add_symbol(symbol("Name", Visibility::Public, module))
+            .unwrap();
+        manager.pop_scope().unwrap();
+
+        let reference = manager.push_reference_scope("OLE Automation".to_string());
+        manager
+            .add_symbol(symbol("Name", Visibility::Public, reference))
+            .unwrap();
+        manager.pop_scope().unwrap();
+
+        let found = manager.lookup("Name").expect("Symbol should resolve");
+        assert_eq!(found.scope_id, module);
+    }
+
+    #[test]
+    fn lookup_searches_reference_scopes_in_push_order() {
+        let mut manager = ScopeManager::new();
+        let first = manager.push_reference_scope("first".to_string());
+        manager
+            .add_symbol(symbol("Name", Visibility::Public, first))
+            .unwrap();
+        manager.pop_scope().unwrap();
+
+        let second = manager.push_reference_scope("second".to_string());
+        manager
+            .add_symbol(symbol("Name", Visibility::Public, second))
+            .unwrap();
+        manager.pop_scope().unwrap();
+
+        let found = manager.lookup("Name").expect("Symbol should resolve");
+        assert_eq!(found.scope_id, first);
     }
 }
