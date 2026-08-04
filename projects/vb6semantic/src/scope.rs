@@ -84,6 +84,11 @@ pub enum ScopeKind {
 
     /// Enum scope
     Enum,
+
+    /// Scope populated by a resolved project reference (COM library, sub-project,
+    /// or third-party supplied symbol set). Symbols in these scopes are visible
+    /// project-wide, after module globals, during name resolution.
+    Reference,
 }
 
 /// Manages the scope hierarchy and symbol resolution
@@ -219,7 +224,26 @@ impl ScopeManager {
             }
         }
 
-        None
+        // VB6 exposes public symbols from every module and every referenced
+        // library project-wide. If the lexical chain missed, fall back to the
+        // module globals first and then the reference-library scopes. Scope ids
+        // are allocated in a stable order, so we search in ascending id order
+        // for deterministic results.
+        self.lookup_in_globals(ScopeKind::Global, name)
+            .or_else(|| self.lookup_in_globals(ScopeKind::Reference, name))
+    }
+
+    /// Search all scopes of the given kind for a symbol, in ascending scope-id order
+    fn lookup_in_globals(&self, kind: ScopeKind, name: &str) -> Option<&Symbol> {
+        let mut ids: Vec<usize> = self
+            .scopes
+            .values()
+            .filter(|scope| scope.kind == kind)
+            .map(|scope| scope.id)
+            .collect();
+        ids.sort_unstable();
+        ids.into_iter()
+            .find_map(|scope_id| self.scopes.get(&scope_id)?.symbols.get(name))
     }
 
     /// Lookup a symbol in a specific scope (no parent walk)

@@ -39,6 +39,7 @@
 //! ```
 
 use crate::error::{Result, SemanticError, SourceLocation};
+use crate::references::{ReferenceInfo, ReferenceRegistry, ReferenceResolver};
 use crate::scope::{ScopeKind, ScopeManager};
 use crate::symbols::{Symbol, SymbolKind, Visibility};
 use crate::types::{TypeChecker, TypeInfo, TypeKind};
@@ -61,6 +62,15 @@ pub struct SemanticAnalyzer {
     /// Interfaces implemented by the current class
     implements: Vec<String>,
 
+    /// User-modifiable list of reference resolvers
+    references: ReferenceRegistry,
+
+    /// References that were resolved to a symbol set
+    resolved_references: Vec<ReferenceInfo>,
+
+    /// References no registered resolver could handle
+    unresolved_references: Vec<ReferenceInfo>,
+
     /// Collected errors
     errors: Vec<SemanticError>,
 
@@ -76,6 +86,9 @@ impl SemanticAnalyzer {
             type_checker: TypeChecker::new(),
             current_file: None,
             implements: Vec::new(),
+            references: ReferenceRegistry::new(),
+            resolved_references: Vec::new(),
+            unresolved_references: Vec::new(),
             errors: Vec::new(),
             warnings: Vec::new(),
         }
@@ -86,12 +99,16 @@ impl SemanticAnalyzer {
         &mut self,
         project: &vb6parse::files::ProjectFile,
     ) -> Result<AnalysisResult> {
+        self.current_file = Some(project.properties.name.to_string());
+
+        // Resolve project references before analyzing source files so that
+        // reference-library symbols are visible during name resolution.
+        self.resolve_project_references(project)?;
+
         // Create project-level scope
         let _project_scope = self
             .scope_manager
             .push_scope(ScopeKind::Global, project.properties.name.to_string());
-
-        // TODO: Analyze project references and external dependencies
 
         for module_reference in project.modules() {
             self.analyze_module_reference(module_reference)?;
@@ -107,12 +124,70 @@ impl SemanticAnalyzer {
 
         // TODO: Analyze any additional project-level constructs if necessary
 
-        // For now, return empty result
+        self.scope_manager.pop_scope()?;
+
         Ok(AnalysisResult {
             scope_manager: self.scope_manager.clone(),
             errors: self.errors.clone(),
             warnings: self.warnings.clone(),
+            resolved_references: self.resolved_references.clone(),
+            unresolved_references: self.unresolved_references.clone(),
         })
+    }
+
+    /// Register a reference resolver, appending it to the user-modifiable list
+    pub fn register_reference_resolver(&mut self, resolver: Box<dyn ReferenceResolver>) {
+        self.references.register(resolver);
+    }
+
+    /// The list of registered reference resolvers
+    pub fn reference_resolvers(&self) -> &ReferenceRegistry {
+        &self.references
+    }
+
+    /// Mutable access to the reference resolver list
+    pub fn reference_resolvers_mut(&mut self) -> &mut ReferenceRegistry {
+        &mut self.references
+    }
+
+    /// Walk the project's references and let the registered resolvers supply
+    /// symbols for them. References with no resolver handles become warnings rather
+    /// than errors, so projects can be analyzed without every referenced library
+    /// being installed.
+    fn resolve_project_references(&mut self, project: &vb6parse::files::ProjectFile) -> Result<()> {
+        self.resolved_references.clear();
+        self.unresolved_references.clear();
+
+        let file = self
+            .current_file
+            .clone()
+            .unwrap_or_else(|| "<unknown>".to_string());
+
+        for reference in project.references() {
+            let info = ReferenceInfo::from_project_reference(reference);
+            match self
+                .references
+                .resolve(&info, &mut self.scope_manager, &file)
+            {
+                Ok(true) => self.resolved_references.push(info),
+                Ok(false) => {
+                    self.warnings.push(format!(
+                        "Unresolved project reference: {}",
+                        info.display_name()
+                    ));
+                    self.unresolved_references.push(info);
+                }
+                Err(error) => {
+                    self.warnings.push(format!(
+                        "Failed to resolve project reference {}: {error}",
+                        info.display_name()
+                    ));
+                    self.unresolved_references.push(info);
+                }
+            }
+        }
+
+        Ok(())
     }
 
     /// Analyze a module reference from the project file reference
@@ -130,7 +205,7 @@ impl SemanticAnalyzer {
 
         let (module_opt, failures) = vb6parse::files::ModuleFile::parse(&source_file).unpack();
         if let Some(module) = module_opt {
-            self.analyze_module(&module)?;
+            self.analyze_module(&module)?; 
         } else if !failures.is_empty() {
             let diagnostics = failures
                 .into_iter()
@@ -611,7 +686,10 @@ impl SemanticAnalyzer {
         if matches!(
             kind,
             SymbolKind::PropertyGet | SymbolKind::PropertyLet | SymbolKind::PropertySet
-        ) && self.scope_manager.lookup_in_scope(scope_id, &name).is_some()
+        ) && self
+            .scope_manager
+            .lookup_in_scope(scope_id, &name)
+            .is_some()
         {
             if let Some(scope) = self.scope_manager.get_scope_mut(scope_id)
                 && let Some(existing) = scope.symbols.get_mut(&name)
@@ -767,7 +845,10 @@ impl SemanticAnalyzer {
         }
         let type_name = Self::def_type_keyword_name(statement);
         let scope_id = self.scope_manager.current_scope_id();
-        let self_name = self.scope_manager.get_scope(scope_id).map(|s| s.name.clone());
+        let self_name = self
+            .scope_manager
+            .get_scope(scope_id)
+            .map(|s| s.name.clone());
         if let Some(self_name) = self_name
             && let Some(scope) = self.scope_manager.get_scope_mut(scope_id)
             && let Some(symbol) = scope.symbols.get_mut(&self_name)
@@ -785,10 +866,7 @@ impl SemanticAnalyzer {
     }
 
     /// Register a control (and its children) as a symbol in the current form scope
-    fn register_control(
-        &mut self,
-        control: &vb6parse::language::Control,
-    ) -> Result<()> {
+    fn register_control(&mut self, control: &vb6parse::language::Control) -> Result<()> {
         let mut attributes = HashMap::new();
         attributes.insert("control".to_string(), control.kind().to_string());
         if control.index() != 0 {
@@ -1390,6 +1468,12 @@ pub struct AnalysisResult {
 
     /// Warnings generated
     pub warnings: Vec<String>,
+
+    /// References that a registered resolver supplied symbols for
+    pub resolved_references: Vec<ReferenceInfo>,
+
+    /// References no registered resolver could handle
+    pub unresolved_references: Vec<ReferenceInfo>,
 }
 
 impl AnalysisResult {
@@ -1628,8 +1712,7 @@ End Sub
         );
 
         // The module itself
-        let module_symbol =
-            symbol_in_global_scopes(&analyzer, "Module1").expect("Module symbol");
+        let module_symbol = symbol_in_global_scopes(&analyzer, "Module1").expect("Module symbol");
         assert_eq!(module_symbol.kind, SymbolKind::Module);
 
         // Constants
@@ -1652,11 +1735,12 @@ End Sub
         // User-defined type and its members
         let customer = symbol_in_global_scopes(&analyzer, "Customer").expect("Type symbol");
         assert_eq!(customer.kind, SymbolKind::UserType);
-        let name_member = symbol_in_scope_kind(&analyzer, ScopeKind::Type, "Name")
-            .expect("Type member");
+        let name_member =
+            symbol_in_scope_kind(&analyzer, ScopeKind::Type, "Name").expect("Type member");
         assert_eq!(name_member.kind, SymbolKind::TypeMember);
         assert_eq!(name_member.type_info.kind, TypeKind::String);
-        let id_member = symbol_in_scope_kind(&analyzer, ScopeKind::Type, "Id").expect("Type member");
+        let id_member =
+            symbol_in_scope_kind(&analyzer, ScopeKind::Type, "Id").expect("Type member");
         assert_eq!(id_member.type_info.kind, TypeKind::Long);
 
         // Enum and its members
@@ -1669,7 +1753,8 @@ End Sub
             inactive.attributes.get("value").map(String::as_str),
             Some("0")
         );
-        let active = symbol_in_scope_kind(&analyzer, ScopeKind::Enum, "Active").expect("Enum member");
+        let active =
+            symbol_in_scope_kind(&analyzer, ScopeKind::Enum, "Active").expect("Enum member");
         assert_eq!(active.kind, SymbolKind::EnumMember);
 
         // Procedures
@@ -1677,8 +1762,7 @@ End Sub
         assert_eq!(initialize.kind, SymbolKind::SubProcedure);
         assert_eq!(initialize.visibility, Visibility::Private);
 
-        let get_count =
-            symbol_in_global_scopes(&analyzer, "GetCount").expect("Function symbol");
+        let get_count = symbol_in_global_scopes(&analyzer, "GetCount").expect("Function symbol");
         assert_eq!(get_count.kind, SymbolKind::Function);
         assert_eq!(get_count.visibility, Visibility::Public);
         assert!(matches!(
@@ -1839,8 +1923,8 @@ End Sub
         assert_eq!(form_symbol.kind, SymbolKind::Form);
 
         // Controls
-        let command = symbol_in_scope_kind(&analyzer, ScopeKind::Class, "Command1")
-            .expect("Control symbol");
+        let command =
+            symbol_in_scope_kind(&analyzer, ScopeKind::Class, "Command1").expect("Control symbol");
         assert_eq!(command.kind, SymbolKind::Control);
         assert_eq!(
             command.attributes.get("control").map(String::as_str),
@@ -1848,7 +1932,8 @@ End Sub
         );
 
         // Menus (including sub-menus)
-        let menu = symbol_in_scope_kind(&analyzer, ScopeKind::Class, "mnuFile").expect("Menu symbol");
+        let menu =
+            symbol_in_scope_kind(&analyzer, ScopeKind::Class, "mnuFile").expect("Menu symbol");
         assert_eq!(
             menu.attributes.get("menu").map(String::as_str),
             Some("true")
@@ -1861,5 +1946,119 @@ End Sub
         let handler = symbol_in_scope_kind(&analyzer, ScopeKind::Class, "Command1_Click")
             .expect("Handler symbol");
         assert_eq!(handler.kind, SymbolKind::SubProcedure);
+    }
+
+    #[test]
+    fn analyze_project_resolves_references() {
+        let temp_dir = tempdir().expect("Temporary directory should be created");
+        let module_path = temp_dir.path().join("Module1.bas");
+        fs::write(
+            &module_path,
+            r#"Attribute VB_Name = "Module1"
+Option Explicit
+
+Public Function Foo() As Long
+End Function
+"#,
+        )
+        .unwrap();
+
+        let project_source = format!(
+            "Type=Exe\n\
+             Reference=*\\G{{00020430-0000-0000-C000-000000000046}}#2.0#0#C:\\Windows\\System32\\stdole2.tlb#OLE Automation\n\
+             Module=Module1; {}\n",
+            module_path.display()
+        );
+        let source = vb6parse::io::SourceFile::from_string("Project1.vbp", project_source);
+        let (project_opt, failures) = vb6parse::files::ProjectFile::parse(&source).unpack();
+        assert!(failures.is_empty(), "Parse failures: {:?}", failures);
+        let project = project_opt.expect("Project should parse");
+
+        let resolver = crate::references::StaticReferenceResolver::new(
+            "ole-automation",
+            vec!["OLE Automation".to_string()],
+            vec![Symbol {
+                name: "Now".to_string(),
+                kind: SymbolKind::Function,
+                type_info: TypeInfo::new(TypeKind::Date),
+                visibility: Visibility::Public,
+                location: SourceLocation {
+                    file: "<reference>".to_string(),
+                    line: 1,
+                    column: 1,
+                },
+                scope_id: 0,
+                attributes: HashMap::new(),
+            }],
+        );
+
+        let mut analyzer = SemanticAnalyzer::new();
+        analyzer.register_reference_resolver(Box::new(resolver));
+        let result = analyzer
+            .analyze_project(&project)
+            .expect("Analysis should succeed");
+
+        assert!(result.errors.is_empty());
+        assert_eq!(result.warnings.len(), 0);
+        assert_eq!(result.resolved_references.len(), 1);
+        assert_eq!(
+            result.resolved_references[0].display_name(),
+            "OLE Automation"
+        );
+        assert!(result.unresolved_references.is_empty());
+
+        // The reference library symbols are visible through normal lookups
+        let now = analyzer.lookup_symbol("Now").expect("Reference symbol");
+        assert_eq!(now.kind, SymbolKind::Function);
+        assert_eq!(now.type_info.kind, TypeKind::Date);
+
+        // The reference was stored in its own Reference scope
+        assert_eq!(
+            analyzer
+                .scope_manager()
+                .get_scopes_by_kind(ScopeKind::Reference)
+                .len(),
+            1
+        );
+    }
+
+    #[test]
+    fn analyze_project_reports_unresolved_reference_warning() {
+        let temp_dir = tempdir().expect("Temporary directory should be created");
+        let module_path = temp_dir.path().join("Module1.bas");
+        fs::write(
+            &module_path,
+            r#"Attribute VB_Name = "Module1"
+Option Explicit
+"#,
+        )
+        .unwrap();
+
+        let project_source = format!(
+            "Type=Exe\n\
+             Reference=*\\G{{00020430-0000-0000-C000-000000000046}}#2.0#0#C:\\Windows\\System32\\stdole2.tlb#OLE Automation\n\
+             Module=Module1; {}\n",
+            module_path.display()
+        );
+        let source = vb6parse::io::SourceFile::from_string("Project1.vbp", project_source);
+        let (project_opt, failures) = vb6parse::files::ProjectFile::parse(&source).unpack();
+        assert!(failures.is_empty(), "Parse failures: {:?}", failures);
+        let project = project_opt.expect("Project should parse");
+
+        let mut analyzer = SemanticAnalyzer::new();
+        let result = analyzer
+            .analyze_project(&project)
+            .expect("Analysis should succeed");
+
+        // An unhandled reference warns but does not fail the analysis
+        assert!(result.errors.is_empty());
+        assert_eq!(result.warning_count(), 1);
+        assert!(result.warnings[0].contains("Unresolved project reference"));
+        assert!(result.unresolved_references.len() == 1);
+        assert_eq!(
+            result.unresolved_references[0].display_name(),
+            "OLE Automation"
+        );
+        assert!(result.resolved_references.is_empty());
     }
 }

@@ -36,6 +36,7 @@
 
 pub mod analyzer;
 pub mod error;
+pub mod references;
 pub mod resolution;
 pub mod scope;
 pub mod symbols;
@@ -44,6 +45,10 @@ pub mod types;
 // Re-export core types
 pub use analyzer::SemanticAnalyzer;
 pub use error::{Result, SemanticError, SourceLocation};
+pub use references::{
+    ManifestReferenceResolver, ReferenceContext, ReferenceInfo, ReferenceRegistry,
+    ReferenceResolver, StaticReferenceResolver,
+};
 pub use resolution::NameResolver;
 pub use scope::{Scope, ScopeKind, ScopeManager};
 pub use symbols::{Symbol, SymbolKind, SymbolTable, Visibility};
