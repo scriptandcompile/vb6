@@ -110,16 +110,23 @@ impl SemanticAnalyzer {
             .scope_manager
             .push_scope(ScopeKind::Global, project.properties.name.to_string());
 
-        for module_reference in project.modules() {
-            self.analyze_module_reference(module_reference)?;
-        }
-
-        for class_reference in project.classes() {
-            self.analyze_class_reference(class_reference)?;
-        }
-
-        for form_file_name in project.forms() {
-            self.analyze_form_path(form_file_name)?;
+        // Analyze the source files in `.vbp` line order so that cross-module
+        // name resolution matches the order the IDE sees the files in.
+        for entry in project.file_entries() {
+            match entry {
+                vb6parse::files::project::ProjectFileEntry::Module(module_reference) => {
+                    self.analyze_module_reference(module_reference)?;
+                }
+                vb6parse::files::project::ProjectFileEntry::Class(class_reference) => {
+                    self.analyze_class_reference(class_reference)?;
+                }
+                vb6parse::files::project::ProjectFileEntry::Form(form_file_name) => {
+                    self.analyze_form_path(form_file_name)?;
+                }
+                // User controls, user documents, designers, property pages, and
+                // related documents are not analyzed yet.
+                _ => {}
+            }
         }
 
         // TODO: Analyze any additional project-level constructs if necessary
@@ -236,7 +243,7 @@ impl SemanticAnalyzer {
         // Create module scope
         let module_scope = self
             .scope_manager
-            .push_scope(ScopeKind::Global, module.name.clone());
+            .push_module_scope(ScopeKind::Global, module.name.clone());
 
         // Register the module itself as a symbol
         self.register_self_symbol(
@@ -302,7 +309,7 @@ impl SemanticAnalyzer {
         // Create class scope
         let class_scope = self
             .scope_manager
-            .push_scope(ScopeKind::Class, class_name.clone());
+            .push_module_scope(ScopeKind::Class, class_name.clone());
 
         // Register the class itself as a symbol
         self.register_self_symbol(
@@ -365,7 +372,7 @@ impl SemanticAnalyzer {
         // Create form scope (forms are like classes)
         let form_scope = self
             .scope_manager
-            .push_scope(ScopeKind::Class, form_name.clone());
+            .push_module_scope(ScopeKind::Class, form_name.clone());
 
         // Register the form itself as a symbol
         self.register_self_symbol(
@@ -2060,5 +2067,174 @@ Option Explicit
             "OLE Automation"
         );
         assert!(result.resolved_references.is_empty());
+    }
+
+    /// Write a module file to `temp_dir` and return its path.
+    fn write_module(temp_dir: &tempfile::TempDir, name: &str, body: &str) -> String {
+        let path = temp_dir.path().join(format!("{name}.bas"));
+        fs::write(&path, format!("Attribute VB_Name = \"{name}\"\nOption Explicit\n{body}"))
+            .unwrap();
+        path.to_str().unwrap().to_string()
+    }
+
+    /// Write a class file to `temp_dir` and return its path.
+    fn write_class(temp_dir: &tempfile::TempDir, name: &str, body: &str) -> String {
+        let path = temp_dir.path().join(format!("{name}.cls"));
+        fs::write(
+            &path,
+            format!(
+                "VERSION 1.0 CLASS\n\
+                 BEGIN\n\
+                   MultiUse = -1  'True\n\
+                 END\n\
+                 Attribute VB_Name = \"{name}\"\n\
+                 Attribute VB_GlobalNameSpace = False\n\
+                 Attribute VB_Creatable = True\n\
+                 Attribute VB_PredeclaredId = False\n\
+                 Attribute VB_Exposed = False\n\
+                 {body}"
+            ),
+        )
+        .unwrap();
+        path.to_str().unwrap().to_string()
+    }
+
+    /// Build an OLE Automation reference resolver that supplies the given symbols.
+    fn ole_resolver(symbols: Vec<Symbol>) -> crate::references::StaticReferenceResolver {
+        crate::references::StaticReferenceResolver::new(
+            "ole-automation",
+            vec!["OLE Automation".to_string()],
+            symbols,
+        )
+    }
+
+    fn reference_symbol(name: &str, kind: SymbolKind) -> Symbol {
+        Symbol {
+            name: name.to_string(),
+            kind,
+            type_info: TypeInfo::variant(),
+            visibility: Visibility::Public,
+            location: SourceLocation {
+                file: "<reference>".to_string(),
+                line: 1,
+                column: 1,
+            },
+            scope_id: 0,
+            attributes: HashMap::new(),
+        }
+    }
+
+    #[test]
+    fn analyze_project_shadows_reference_symbols_with_module_symbols() {
+        let temp_dir = tempdir().expect("Temporary directory should be created");
+        let module_path = write_module(
+            &temp_dir,
+            "Module1",
+            "\nPublic Function Now() As Date\nEnd Function\n",
+        );
+
+        let project_source = format!(
+            "Type=Exe\n\
+             Reference=*\\G{{00020430-0000-0000-C000-000000000046}}#2.0#0#C:\\Windows\\System32\\stdole2.tlb#OLE Automation\n\
+             Module=Module1; {module_path}\n"
+        );
+        let source = vb6parse::io::SourceFile::from_string("Project1.vbp", project_source);
+        let (project_opt, failures) = vb6parse::files::ProjectFile::parse(&source).unpack();
+        assert!(failures.is_empty(), "Parse failures: {:?}", failures);
+        let project = project_opt.expect("Project should parse");
+
+        let mut analyzer = SemanticAnalyzer::new();
+        analyzer.register_reference_resolver(Box::new(ole_resolver(vec![reference_symbol(
+            "Now",
+            SymbolKind::Constant,
+        )])));
+        analyzer
+            .analyze_project(&project)
+            .expect("Analysis should succeed");
+
+        // The module's Function shadows the library's Constant.
+        let now = analyzer.lookup_symbol("Now").expect("Symbol should resolve");
+        assert_eq!(now.kind, SymbolKind::Function);
+    }
+
+    #[test]
+    fn analyze_project_resolves_names_in_vbp_entry_order() {
+        let temp_dir = tempdir().expect("Temporary directory should be created");
+        // The class is listed BEFORE the module in the .vbp file, so its
+        // declaration must win the ambiguous cross-module name.
+        let class_path = write_class(
+            &temp_dir,
+            "ClassA",
+            "\nPublic Function FindMe() As Long\nEnd Function\n",
+        );
+        let module_path = write_module(
+            &temp_dir,
+            "ModuleB",
+            "\nPublic Sub FindMe()\nEnd Sub\n",
+        );
+
+        let project_source = format!(
+            "Type=Exe\n\
+             Class=ClassA; {class_path}\n\
+             Module=ModuleB; {module_path}\n"
+        );
+        let source = vb6parse::io::SourceFile::from_string("Project1.vbp", project_source);
+        let (project_opt, failures) = vb6parse::files::ProjectFile::parse(&source).unpack();
+        assert!(failures.is_empty(), "Parse failures: {:?}", failures);
+        let project = project_opt.expect("Project should parse");
+
+        let mut analyzer = SemanticAnalyzer::new();
+        analyzer
+            .analyze_project(&project)
+            .expect("Analysis should succeed");
+
+        // ClassA's Function wins over ModuleB's Sub because it appears first.
+        let find_me = analyzer
+            .lookup_symbol("FindMe")
+            .expect("Symbol should resolve");
+        assert_eq!(find_me.kind, SymbolKind::Function);
+
+        // And the symbol lives in ClassA's scope.
+        let class_scopes = analyzer.scope_manager().get_scopes_by_kind(ScopeKind::Class);
+        let class_scope = class_scopes
+            .iter()
+            .find(|scope| scope.name == "ClassA")
+            .expect("ClassA scope");
+        assert_eq!(find_me.scope_id, class_scope.id);
+    }
+
+    #[test]
+    fn analyze_project_hides_private_symbols_from_other_modules() {
+        let temp_dir = tempdir().expect("Temporary directory should be created");
+        let private_path = write_module(
+            &temp_dir,
+            "ModuleA",
+            "\nPrivate Function Secret() As Long\nEnd Function\n",
+        );
+        let public_path = write_module(
+            &temp_dir,
+            "ModuleB",
+            "\nPublic Function Visible() As Long\nEnd Function\n",
+        );
+
+        let project_source = format!(
+            "Type=Exe\n\
+             Module=ModuleA; {private_path}\n\
+             Module=ModuleB; {public_path}\n"
+        );
+        let source = vb6parse::io::SourceFile::from_string("Project1.vbp", project_source);
+        let (project_opt, failures) = vb6parse::files::ProjectFile::parse(&source).unpack();
+        assert!(failures.is_empty(), "Parse failures: {:?}", failures);
+        let project = project_opt.expect("Project should parse");
+
+        let mut analyzer = SemanticAnalyzer::new();
+        analyzer
+            .analyze_project(&project)
+            .expect("Analysis should succeed");
+
+        // ModuleA's Private symbol does not leak into the project namespace...
+        assert!(analyzer.lookup_symbol("Secret").is_none());
+        // ...but its Public symbol is visible.
+        assert!(analyzer.lookup_symbol("Visible").is_some());
     }
 }
