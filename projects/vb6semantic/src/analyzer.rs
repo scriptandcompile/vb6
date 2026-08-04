@@ -369,6 +369,10 @@ impl AnalysisResult {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::symbols::{SymbolKind, Visibility};
+    use crate::types::TypeInfo;
+    use std::{collections::HashMap, fs};
+    use tempfile::tempdir;
 
     #[test]
     fn analyze_empty_project() {
@@ -382,5 +386,128 @@ mod tests {
         assert!(result.is_successful());
         assert_eq!(result.error_count(), 0);
         assert_eq!(result.warning_count(), 0);
+    }
+
+    #[test]
+    fn add_symbol_and_lookup_in_current_scope() {
+        let mut analyzer = SemanticAnalyzer::new();
+        let child_scope_id = analyzer
+            .scope_manager
+            .push_scope(ScopeKind::Procedure, "proc".to_string());
+
+        let symbol = Symbol {
+            name: "counter".to_string(),
+            kind: SymbolKind::Variable,
+            type_info: TypeInfo::integer(),
+            visibility: Visibility::Private,
+            location: SourceLocation {
+                file: "Module1.bas".to_string(),
+                line: 1,
+                column: 1,
+            },
+            scope_id: child_scope_id,
+            attributes: HashMap::new(),
+        };
+
+        analyzer.add_symbol(symbol).expect("Symbol should be added");
+
+        let resolved = analyzer
+            .lookup_symbol("counter")
+            .expect("Symbol should be resolvable");
+        assert_eq!(resolved.name, "counter");
+        assert_eq!(resolved.kind, SymbolKind::Variable);
+    }
+
+    #[test]
+    fn duplicate_symbol_records_an_error() {
+        let mut analyzer = SemanticAnalyzer::new();
+
+        let first = Symbol {
+            name: "value".to_string(),
+            kind: SymbolKind::Variable,
+            type_info: TypeInfo::integer(),
+            visibility: Visibility::Private,
+            location: SourceLocation {
+                file: "Module1.bas".to_string(),
+                line: 1,
+                column: 1,
+            },
+            scope_id: analyzer.scope_manager.global_scope_id(),
+            attributes: HashMap::new(),
+        };
+        let second = Symbol {
+            name: "value".to_string(),
+            kind: SymbolKind::Variable,
+            type_info: TypeInfo::integer(),
+            visibility: Visibility::Private,
+            location: SourceLocation {
+                file: "Module1.bas".to_string(),
+                line: 2,
+                column: 1,
+            },
+            scope_id: analyzer.scope_manager.global_scope_id(),
+            attributes: HashMap::new(),
+        };
+
+        analyzer
+            .add_symbol(first)
+            .expect("First symbol should be added");
+        let duplicate = analyzer.add_symbol(second);
+
+        assert!(duplicate.is_err());
+        assert!(matches!(
+            analyzer.errors().first(),
+            Some(crate::error::SemanticError::DuplicateSymbol { .. })
+        ));
+    }
+
+    #[test]
+    fn analyze_module_reference_reports_missing_files() {
+        let mut analyzer = SemanticAnalyzer::new();
+        let module_reference = vb6parse::files::project::ProjectModuleReference {
+            name: "Missing",
+            path: "/tmp/does-not-exist.bas",
+        };
+
+        let error = analyzer
+            .analyze_module_reference(&module_reference)
+            .expect_err("Missing files should fail analysis");
+
+        assert!(matches!(
+            error,
+            crate::error::SemanticError::FileReadError { .. }
+        ));
+    }
+
+    #[test]
+    fn analyze_module_reference_sets_current_file_for_valid_module() {
+        let temp_dir = tempdir().expect("Temporary directory should be created");
+        let module_path = temp_dir.path().join("Module1.bas");
+        fs::write(
+            &module_path,
+            "Attribute VB_Name = \"Module1\"\nOption Explicit\n",
+        )
+        .unwrap();
+
+        let mut analyzer = SemanticAnalyzer::new();
+        let module_reference = vb6parse::files::project::ProjectModuleReference {
+            name: "Module1",
+            path: module_path
+                .to_str()
+                .expect("Module path should be valid UTF-8"),
+        };
+
+        analyzer
+            .analyze_module_reference(&module_reference)
+            .expect("Valid module should be analyzed");
+
+        assert_eq!(analyzer.current_file.as_deref(), Some("Module1"));
+        assert_eq!(
+            analyzer
+                .scope_manager
+                .get_scopes_by_kind(ScopeKind::Global)
+                .len(),
+            2
+        );
     }
 }
