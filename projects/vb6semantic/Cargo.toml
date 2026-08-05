@@ -9,14 +9,25 @@ description = "Semantic analysis and symbol table construction for VB6 code"
 keywords = ["vb6", "semantic-analysis", "symbol-table", "type-checking"]
 categories = ["development-tools", "parser-implementations"]
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 vb6parse.workspace = true
 thiserror.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 
+# WASM-specific dependencies - only compiled for wasm32 target
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.126"
+serde-wasm-bindgen = "0.6.5"
+
 [dev-dependencies]
 tempfile = "3.0"
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = "0.3.76"
 
 [package.metadata.docs.rs]
 all-features = true
