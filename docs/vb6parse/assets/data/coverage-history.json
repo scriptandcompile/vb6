@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-08-05T08:30:15Z",
+  "last_updated": "2026-08-05T09:09:40Z",
   "snapshots": [
     {
       "timestamp": "2026-08-02T05:53:42Z",
@@ -137,38 +137,72 @@
           "percent": 94.76
         }
       }
+    },
+    {
+      "timestamp": "2026-08-05T09:09:40Z",
+      "commit_sha": "6a40f1a77377bbd056569cb18e4504be401d9148",
+      "commit_message": "First pass in creating VBType, Value, ArrayValue, and VBError structs for the runtime system",
+      "coverage": {
+        "line_coverage": 94.09,
+        "function_coverage": 90.9,
+        "region_coverage": 94.54
+      },
+      "tests": {
+        "total": 5724,
+        "lib_tests": 5595,
+        "doc_tests": 129,
+        "integration_tests": 0,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 106688,
+          "total": 113394,
+          "percent": 94.09
+        },
+        "functions": {
+          "covered": 6655,
+          "total": 7321,
+          "percent": 90.9
+        },
+        "regions": {
+          "covered": 177934,
+          "total": 188205,
+          "percent": 94.54
+        }
+      }
     }
   ],
   "coverage_summary": {
     "line_coverage": {
-      "latest": 94.32,
-      "trend": "stable",
-      "change_percent": 0.04,
+      "latest": 94.09,
+      "trend": "degrading",
+      "change_percent": 0.23,
       "best": 94.32,
-      "worst": 94.28,
-      "average": 94.3
+      "worst": 94.09,
+      "average": 94.25
     },
     "function_coverage": {
-      "latest": 91.24,
-      "trend": "stable",
-      "change_percent": 0.02,
+      "latest": 90.9,
+      "trend": "degrading",
+      "change_percent": 0.34,
       "best": 91.24,
-      "worst": 90.94,
-      "average": 91.08
+      "worst": 90.9,
+      "average": 91.05
     },
     "region_coverage": {
-      "latest": 94.76,
-      "trend": "stable",
-      "change_percent": 0.04,
+      "latest": 94.54,
+      "trend": "degrading",
+      "change_percent": 0.22,
       "best": 94.76,
-      "worst": 94.72,
-      "average": 94.74
+      "worst": 94.54,
+      "average": 94.7
     },
     "test_count": {
-      "latest": 5689,
-      "trend": "stable",
-      "change_count": 1,
-      "growth_rate": 0.02
+      "latest": 5724,
+      "trend": "growing",
+      "change_count": 35,
+      "growth_rate": 0.62
     }
   }
 }
