@@ -56,7 +56,8 @@ pub use references::{
 pub use resolution::NameResolver;
 pub use scope::{Scope, ScopeKind, ScopeManager};
 pub use symbols::{Symbol, SymbolKind, SymbolTable, Visibility};
-pub use types::{TypeChecker, TypeInfo, TypeKind};
+pub use types::{TypeChecker, TypeInfo};
+pub use vb6core::types::VBType;
 
 /// Version of the semantic analysis library
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

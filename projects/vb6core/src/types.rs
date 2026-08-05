@@ -1,9 +1,13 @@
 //! VB6 type system.
 //!
-//! [`VBType`] is the single source of truth for VB6 static types. It mirrors the
-//! types used by `vb6semantic` for type checking and is the type each runtime
-//! [`Value`](crate::value::Value) reports. Keeping the type system here ensures
-//! semantic analysis, code generation, and the interpreter all agree.
+//! [`VBType`] is the single source of truth for VB6 static types, shared by
+//! `vb6semantic` (type checking) and `vb6runtime` (value typing). It covers
+//! the primitive types, complex types (classes, user-defined types, enums,
+//! arrays), value states (`Empty`, `Null`, `Nothing`, `Error`), procedure
+//! types (`Sub`/`Function`), and `Unknown`.
+//!
+//! [`TypeInfo`] wraps a [`VBType`] with the metadata static analysis needs:
+//! `ByRef` references, array dimensions, and class names.
 
 use std::fmt;
 
@@ -49,7 +53,7 @@ pub mod vartype {
     pub const ARRAY: i32 = 8192;
 }
 
-/// The static type of a VB6 value or variable.
+/// The static type of a VB6 value, variable, or procedure.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum VBType {
     // Primitive types
@@ -96,6 +100,15 @@ pub enum VBType {
     /// An error value (from `CVErr`).
     Error,
 
+    // Procedure types
+    /// A `Sub` procedure (no return value).
+    Sub,
+    /// A `Function` procedure with a return type.
+    Function {
+        /// The type the function returns.
+        return_type: Box<TypeInfo>,
+    },
+
     /// An unresolved type, used when analysis cannot determine a type.
     Unknown,
 }
@@ -123,6 +136,8 @@ impl VBType {
             Self::Empty => "Empty".to_string(),
             Self::Null => "Null".to_string(),
             Self::Error => "Error".to_string(),
+            Self::Sub => "Sub".to_string(),
+            Self::Function { return_type } => format!("Function -> {}", return_type.kind),
             Self::Unknown => "Unknown".to_string(),
         }
     }
@@ -148,6 +163,8 @@ impl VBType {
             Self::Empty => EMPTY,
             Self::Null => NULL,
             Self::Error => ERROR,
+            Self::Sub => VARIANT,
+            Self::Function { return_type } => return_type.kind.var_type(),
             Self::Unknown => VARIANT,
         }
     }
@@ -275,6 +292,167 @@ impl From<&VBType> for VBType {
     }
 }
 
+/// Represents the bounds of an array dimension.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ArrayBound {
+    /// Lower bound of the array dimension (optional, defaults to 0).
+    pub lower: Option<i32>,
+    /// Upper bound of the array dimension (optional, defaults to -1 for dynamic arrays).
+    pub upper: Option<i32>,
+}
+
+/// Type information for a VB6 symbol.
+///
+/// Wraps a [`VBType`] with the metadata static analysis needs: whether the
+/// symbol is passed `ByRef`, whether it is an array (plus its dimensions),
+/// and the resolved class name for `Object`/`Class` kinds.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct TypeInfo {
+    /// The kind of type.
+    pub kind: VBType,
+
+    /// Whether this is a reference type (ByRef).
+    pub is_reference: bool,
+
+    /// Whether this is an array.
+    pub is_array: bool,
+
+    /// Array dimensions (if is_array is true).
+    pub array_dimensions: Option<Vec<ArrayBound>>,
+
+    /// For Object and Class types, the class name.
+    pub class_name: Option<String>,
+}
+
+impl TypeInfo {
+    /// Create a new `TypeInfo` with the given kind.
+    pub fn new(kind: VBType) -> Self {
+        Self {
+            kind,
+            is_reference: false,
+            is_array: false,
+            array_dimensions: None,
+            class_name: None,
+        }
+    }
+
+    /// Helper constructor for integer type.
+    pub fn integer() -> Self {
+        Self::new(VBType::Integer)
+    }
+
+    /// Helper constructor for long type.
+    pub fn long() -> Self {
+        Self::new(VBType::Long)
+    }
+
+    /// Helper constructor for string type.
+    pub fn string() -> Self {
+        Self::new(VBType::String)
+    }
+
+    /// Helper constructor for boolean type.
+    pub fn boolean() -> Self {
+        Self::new(VBType::Boolean)
+    }
+
+    /// Helper constructor for variant type.
+    pub fn variant() -> Self {
+        Self::new(VBType::Variant)
+    }
+
+    /// Helper constructor for object type.
+    pub fn object() -> Self {
+        Self::new(VBType::Object)
+    }
+
+    /// Helper constructor for unknown type.
+    pub fn unknown() -> Self {
+        Self::new(VBType::Unknown)
+    }
+
+    /// Check if this type is compatible with another type.
+    pub fn is_compatible_with(&self, other: &TypeInfo) -> bool {
+        // Variant is compatible with everything
+        if matches!(self.kind, VBType::Variant) || matches!(other.kind, VBType::Variant) {
+            return true;
+        }
+
+        // Same types are compatible
+        if self.kind == other.kind {
+            return true;
+        }
+
+        // Numeric types have some compatibility
+        matches!(
+            (&self.kind, &other.kind),
+            (VBType::Integer, VBType::Long)
+                | (VBType::Long, VBType::Integer)
+                | (VBType::Single, VBType::Double)
+                | (VBType::Double, VBType::Single)
+                | (VBType::Object, VBType::Class(_))
+                | (VBType::Class(_), VBType::Object)
+        )
+    }
+
+    /// Check if this type can be assigned to another type.
+    pub fn can_assign_to(&self, other: &TypeInfo) -> bool {
+        // Variant can be assigned to anything
+        if matches!(other.kind, VBType::Variant) {
+            return true;
+        }
+
+        // Same types can be assigned
+        if self.kind == other.kind {
+            return true;
+        }
+
+        // Smaller numeric types can be assigned to larger
+        matches!(
+            (&self.kind, &other.kind),
+            (VBType::Integer, VBType::Long)
+                | (VBType::Integer, VBType::Double)
+                | (VBType::Long, VBType::Double)
+                | (VBType::Single, VBType::Double)
+        )
+    }
+}
+
+impl fmt::Display for TypeInfo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let base = match &self.kind {
+            VBType::Integer => "Integer",
+            VBType::Long => "Long",
+            VBType::Single => "Single",
+            VBType::Double => "Double",
+            VBType::Currency => "Currency",
+            VBType::String => "String",
+            VBType::Boolean => "Boolean",
+            VBType::Byte => "Byte",
+            VBType::Date => "Date",
+            VBType::Variant => "Variant",
+            VBType::Object => "Object",
+            VBType::Class(name) => return write!(f, "{}", name),
+            VBType::UserType(name) => return write!(f, "{}", name),
+            VBType::Enum(name) => return write!(f, "{}", name),
+            VBType::Nothing => "Nothing",
+            VBType::Empty => "Empty",
+            VBType::Null => "Null",
+            VBType::Error => "Error",
+            VBType::Sub => "Sub",
+            VBType::Function { return_type } => return write!(f, "Function -> {}", return_type),
+            VBType::Unknown => "Unknown",
+            VBType::Array(inner) => return write!(f, "{}()", inner),
+        };
+
+        if self.is_array {
+            write!(f, "{}()", base)
+        } else {
+            write!(f, "{}", base)
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -284,6 +462,14 @@ mod tests {
         assert_eq!(VBType::Integer.name(), "Integer");
         assert_eq!(VBType::Array(Box::new(VBType::String)).name(), "String()");
         assert_eq!(VBType::Class("Foo".to_string()).name(), "Foo");
+        assert_eq!(VBType::Sub.name(), "Sub");
+        assert_eq!(
+            VBType::Function {
+                return_type: Box::new(TypeInfo::long()),
+            }
+            .name(),
+            "Function -> Long"
+        );
     }
 
     #[test]
@@ -299,6 +485,13 @@ mod tests {
         assert_eq!(
             VBType::Array(Box::new(VBType::Double)).var_type(),
             8192 + 5
+        );
+        assert_eq!(
+            VBType::Function {
+                return_type: Box::new(TypeInfo::long()),
+            }
+            .var_type(),
+            3
         );
     }
 
@@ -330,5 +523,21 @@ mod tests {
         );
         assert_eq!(VBType::from_var_type(8197), Some(VBType::Array(Box::new(VBType::Double))));
         assert_eq!(VBType::from_var_type(13), None);
+    }
+
+    #[test]
+    fn type_info_display_shows_arrays() {
+        let mut info = TypeInfo::new(VBType::Integer);
+        assert_eq!(info.to_string(), "Integer");
+        info.is_array = true;
+        assert_eq!(info.to_string(), "Integer()");
+        assert_eq!(TypeInfo::string().to_string(), "String");
+    }
+
+    #[test]
+    fn type_info_assignment_rules() {
+        assert!(TypeInfo::integer().can_assign_to(&TypeInfo::long()));
+        assert!(!TypeInfo::string().can_assign_to(&TypeInfo::integer()));
+        assert!(TypeInfo::integer().is_compatible_with(&TypeInfo::long()));
     }
 }

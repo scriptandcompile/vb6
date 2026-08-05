@@ -40,7 +40,7 @@
 //!     vec![Symbol {
 //!         name: "Now".to_string(),
 //!         kind: SymbolKind::Function,
-//!         type_info: TypeInfo::new(vb6semantic::TypeKind::Date),
+//!         type_info: TypeInfo::new(vb6semantic::VBType::Date),
 //!         visibility: Visibility::Public,
 //!         location: vb6semantic::SourceLocation {
 //!             file: "<reference>".to_string(),
@@ -57,7 +57,7 @@
 use crate::error::{Result, SemanticError, SourceLocation};
 use crate::scope::{ScopeKind, ScopeManager};
 use crate::symbols::{Symbol, SymbolKind, Visibility};
-use crate::types::{TypeInfo, TypeKind};
+use crate::types::{TypeInfo, VBType};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
 use std::fmt;
@@ -587,22 +587,22 @@ impl From<ManifestVisibility> for Visibility {
     }
 }
 
-/// Map a manifest type name to a [`TypeKind`]. Unknown names become class types.
-fn type_kind_from_name(name: &str) -> TypeKind {
+/// Map a manifest type name to a [`VBType`]. Unknown names become class types.
+fn type_kind_from_name(name: &str) -> VBType {
     match name.to_ascii_lowercase().as_str() {
-        "integer" => TypeKind::Integer,
-        "long" => TypeKind::Long,
-        "single" => TypeKind::Single,
-        "double" => TypeKind::Double,
-        "currency" => TypeKind::Currency,
-        "string" => TypeKind::String,
-        "boolean" => TypeKind::Boolean,
-        "byte" => TypeKind::Byte,
-        "date" => TypeKind::Date,
-        "variant" => TypeKind::Variant,
-        "object" => TypeKind::Object,
-        "nothing" => TypeKind::Nothing,
-        _ => TypeKind::Class(name.to_string()),
+        "integer" => VBType::Integer,
+        "long" => VBType::Long,
+        "single" => VBType::Single,
+        "double" => VBType::Double,
+        "currency" => VBType::Currency,
+        "string" => VBType::String,
+        "boolean" => VBType::Boolean,
+        "byte" => VBType::Byte,
+        "date" => VBType::Date,
+        "variant" => VBType::Variant,
+        "object" => VBType::Object,
+        "nothing" => VBType::Nothing,
+        _ => VBType::Class(name.to_string()),
     }
 }
 
@@ -623,7 +623,7 @@ mod tests {
         Symbol {
             name: name.to_string(),
             kind: SymbolKind::Constant,
-            type_info: TypeInfo::new(TypeKind::String),
+            type_info: TypeInfo::new(VBType::String),
             visibility: Visibility::Public,
             location: location(),
             scope_id: 0,
@@ -718,11 +718,11 @@ mod tests {
         let scope = &scopes.get_scopes_by_kind(ScopeKind::Reference)[0];
         let now = &scope.symbols["Now"];
         assert_eq!(now.kind, SymbolKind::Function);
-        assert_eq!(now.type_info.kind, TypeKind::Date);
+        assert_eq!(now.type_info.kind, VBType::Date);
         let crlf = &scope.symbols["vbCrLf"];
         assert_eq!(crlf.kind, SymbolKind::Constant);
         let items = &scope.symbols["items"];
         assert!(items.type_info.is_array);
-        assert_eq!(items.type_info.kind, TypeKind::Long);
+        assert_eq!(items.type_info.kind, VBType::Long);
     }
 }

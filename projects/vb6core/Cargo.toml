@@ -4,35 +4,20 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Arthur <scriptandcompile@gmail.com>"]
 license = "MIT"
-description = "Core compiler infrastructure and IR for VB6 compiler and interpreter"
+description = "Shared type system and error model for the VB6 compiler and interpreter"
 repository = "https://github.com/scriptandcompile/vb6"
-keywords = ["vb6", "visual-basic", "compiler", "ir", "intermediate-representation"]
+keywords = ["vb6", "visual-basic", "compiler", "types", "runtime"]
 categories = ["development-tools", "compilers"]
 
 [dependencies]
-vb6parse = { workspace = true }
-vb6semantic = { path = "../vb6semantic" }
-vb6runtime = { path = "../vb6runtime" }
-thiserror = { workspace = true }
 serde = { workspace = true }
-anyhow = { workspace = true }
 
-# For graph-based analyses
-petgraph = "0.6"
-num-complex = "0.4"
-
-# For variant type support
-serde_json = "1.0"
-
-# Optional dependencies for different backends
+# Optional LLVM backend support
 [dependencies.inkwell]
 version = "0.4"
 optional = true
 default-features = false
 features = ["llvm16-0"]
-
-[dev-dependencies]
-criterion = "0.5"
 
 [features]
 default = []

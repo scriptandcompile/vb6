@@ -2,7 +2,7 @@
 //!
 //! This module mirrors the VB6 `Err` object: every error carries a `number`, a
 //! human readable `description`, and optional source/help metadata. Runtime
-//! operations that can fail return a [`VbResult`].
+//! operations that can fail return a [`VBResult`].
 
 use std::fmt;
 
