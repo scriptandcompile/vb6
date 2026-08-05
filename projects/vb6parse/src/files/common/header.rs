@@ -177,6 +177,24 @@ impl Default for FileAttributes {
     }
 }
 
+/// Count the number of line breaks in a string.
+///
+/// Counts each LF as one line break, each CRLF as one line break, and each
+/// lone CR as one line break. This mirrors how the tokenizer produces
+/// `Newline` tokens.
+pub(crate) fn count_line_breaks(s: &str) -> usize {
+    let bytes = s.as_bytes();
+    let mut count = 0;
+    for (index, byte) in bytes.iter().enumerate() {
+        if *byte == b'\n' {
+            count += 1;
+        } else if *byte == b'\r' && bytes.get(index + 1) != Some(&b'\n') {
+            count += 1;
+        }
+    }
+    count
+}
+
 /// Extracts the file format version from a CST.
 ///
 /// Searches for a `VersionStatement` node in the CST and parses the version number.
