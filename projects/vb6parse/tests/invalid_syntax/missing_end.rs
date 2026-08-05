@@ -1,7 +1,8 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
 
 fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str, actual: usize) {
-    let primary_path = format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
+    let primary_path =
+        format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
     let prefixed_path = format!(
         "snapshots/tests/invalid_syntax/{snapshot_dir}/invalid_syntax__{snapshot_dir}__{snapshot_name}.snap"
     );
@@ -18,8 +19,7 @@ fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str
         .count();
 
     assert_eq!(
-        actual,
-        expected,
+        actual, expected,
         "Unexpected failure count for snapshot {snapshot_name}"
     );
 }
@@ -60,7 +60,11 @@ Sub TestSub()
 
     // Snapshot the failures to document current error reporting behavior
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("missing_end", "missing_end_sub_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_sub_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("missing_end_sub_failures", failure_messages);
 }
 
@@ -132,7 +136,11 @@ Function Calculate(x As Integer) As Integer
     insta::assert_yaml_snapshot!("missing_end_function_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("missing_end", "missing_end_function_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_function_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("missing_end_function_failures", failure_messages);
 }
 
@@ -206,7 +214,11 @@ Property Get Name() As String
     insta::assert_yaml_snapshot!("missing_end_property_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("missing_end", "missing_end_property_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_property_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("missing_end_property_failures", failure_messages);
 }
 
@@ -315,7 +327,11 @@ Type Point
     insta::assert_yaml_snapshot!("missing_end_type_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("missing_end", "missing_end_type_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_type_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("missing_end_type_failures", failure_messages);
 }
 
@@ -357,7 +373,10 @@ End Type
         "missing_end_type_before_next_type_failures",
         failures.len(),
     );
-    insta::assert_yaml_snapshot!("missing_end_type_before_next_type_failures", failure_messages);
+    insta::assert_yaml_snapshot!(
+        "missing_end_type_before_next_type_failures",
+        failure_messages
+    );
 }
 
 /// Test missing End Type when a Sub declaration starts next.
@@ -397,7 +416,10 @@ End Sub
         "missing_end_type_before_next_sub_failures",
         failures.len(),
     );
-    insta::assert_yaml_snapshot!("missing_end_type_before_next_sub_failures", failure_messages);
+    insta::assert_yaml_snapshot!(
+        "missing_end_type_before_next_sub_failures",
+        failure_messages
+    );
 }
 
 /// Test missing End Type when a Function declaration starts next.
@@ -481,7 +503,10 @@ End Type
         "missing_end_sub_before_next_type_failures",
         failures.len(),
     );
-    insta::assert_yaml_snapshot!("missing_end_sub_before_next_type_failures", failure_messages);
+    insta::assert_yaml_snapshot!(
+        "missing_end_sub_before_next_type_failures",
+        failure_messages
+    );
 }
 
 /// Test missing End Function when a Type declaration starts next.
@@ -560,7 +585,11 @@ End Sub
     insta::assert_yaml_snapshot!("missing_end_select_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("missing_end", "missing_end_select_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "missing_end_select_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("missing_end_select_failures", failure_messages);
 }
 
@@ -595,6 +624,10 @@ Sub Test()
     insta::assert_yaml_snapshot!("nested_missing_ends_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("missing_end", "nested_missing_ends_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "missing_end",
+        "nested_missing_ends_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("nested_missing_ends_failures", failure_messages);
 }

@@ -13,13 +13,11 @@ use clap::{Arg, Command, builder::PossibleValue, command, value_parser};
 fn main() -> Result<()> {
     let matches = command!()
         .subcommand(
-            Command::new("check")
-                .about("Check the project")
-                .arg(
-                    Arg::new("project path")
-                        .required(false)
-                        .value_parser(value_parser!(PathBuf)),
-                ),
+            Command::new("check").about("Check the project").arg(
+                Arg::new("project path")
+                    .required(false)
+                    .value_parser(value_parser!(PathBuf)),
+            ),
         )
         .subcommand(
             Command::new("fmt")

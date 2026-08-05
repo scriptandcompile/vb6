@@ -6,7 +6,8 @@
 use vb6parse::{ProjectFile, SourceFile};
 
 fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str, actual: usize) {
-    let primary_path = format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
+    let primary_path =
+        format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
     let prefixed_path = format!(
         "snapshots/tests/invalid_syntax/{snapshot_dir}/invalid_syntax__{snapshot_dir}__{snapshot_name}.snap"
     );
@@ -23,8 +24,7 @@ fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str
         .count();
 
     assert_eq!(
-        actual,
-        expected,
+        actual, expected,
         "Unexpected failure count for snapshot {snapshot_name}"
     );
 }
@@ -45,8 +45,12 @@ AutoRefresh=1
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "unterminated_section_header_failures", failures.len());
-    insta::assert_yaml_snapshot!("unterminated_section_header_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "unterminated_section_header_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("unterminated_section_header_failures", failure_messages);
     });
 }
 
@@ -65,8 +69,12 @@ fn missing_property_name() {
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "missing_property_name_failures", failures.len());
-    insta::assert_yaml_snapshot!("missing_property_name_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "missing_property_name_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("missing_property_name_failures", failure_messages);
     });
 }
 
@@ -84,8 +92,12 @@ fn invalid_project_type() {
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "invalid_project_type_failures", failures.len());
-    insta::assert_yaml_snapshot!("invalid_project_type_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "invalid_project_type_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("invalid_project_type_failures", failure_messages);
     });
 }
 
@@ -104,8 +116,15 @@ Reference=*\G{00020430-0000-0000-C000-000000000046#2.0#0#C:\Windows\System32\std
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "reference_compiled_missing_closing_brace_failures", failures.len());
-    insta::assert_yaml_snapshot!("reference_compiled_missing_closing_brace_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "reference_compiled_missing_closing_brace_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!(
+            "reference_compiled_missing_closing_brace_failures",
+            failure_messages
+        );
     });
 }
 
@@ -124,8 +143,12 @@ Reference=*\G{not-a-valid-uuid}#2.0#0#C:\Windows\System32\stdole2.tlb#OLE Automa
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "reference_compiled_invalid_uuid_failures", failures.len());
-    insta::assert_yaml_snapshot!("reference_compiled_invalid_uuid_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "reference_compiled_invalid_uuid_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("reference_compiled_invalid_uuid_failures", failure_messages);
     });
 }
 
@@ -144,8 +167,15 @@ Reference=*\G{00020430-0000-0000-C000-000000000046}#
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "reference_compiled_missing_unknown1_failures", failures.len());
-    insta::assert_yaml_snapshot!("reference_compiled_missing_unknown1_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "reference_compiled_missing_unknown1_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!(
+            "reference_compiled_missing_unknown1_failures",
+            failure_messages
+        );
     });
 }
 
@@ -164,8 +194,12 @@ Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "reference_compiled_missing_path_failures", failures.len());
-    insta::assert_yaml_snapshot!("reference_compiled_missing_path_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "reference_compiled_missing_path_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("reference_compiled_missing_path_failures", failure_messages);
     });
 }
 
@@ -184,8 +218,12 @@ Reference=
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "reference_project_missing_path_failures", failures.len());
-    insta::assert_yaml_snapshot!("reference_project_missing_path_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "reference_project_missing_path_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("reference_project_missing_path_failures", failure_messages);
     });
 }
 
@@ -204,8 +242,12 @@ Reference="C:\InvalidPath\Project.vbp"
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "reference_project_invalid_path_failures", failures.len());
-    insta::assert_yaml_snapshot!("reference_project_invalid_path_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "reference_project_invalid_path_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("reference_project_invalid_path_failures", failure_messages);
     });
 }
 
@@ -224,8 +266,15 @@ Object=00020430-0000-0000-C000-000000000046}#2.0#0; stdole2.tlb
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "object_compiled_missing_opening_brace_failures", failures.len());
-    insta::assert_yaml_snapshot!("object_compiled_missing_opening_brace_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "object_compiled_missing_opening_brace_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!(
+            "object_compiled_missing_opening_brace_failures",
+            failure_messages
+        );
     });
 }
 
@@ -244,8 +293,15 @@ Object={00020430-0000-0000-C000-000000000046#2.0#0; stdole2.tlb
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "object_compiled_missing_closing_brace_failures", failures.len());
-    insta::assert_yaml_snapshot!("object_compiled_missing_closing_brace_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "object_compiled_missing_closing_brace_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!(
+            "object_compiled_missing_closing_brace_failures",
+            failure_messages
+        );
     });
 }
 
@@ -264,8 +320,12 @@ Object={invalid-uuid}#2.0#0; stdole2.tlb
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "object_compiled_invalid_uuid_failures", failures.len());
-    insta::assert_yaml_snapshot!("object_compiled_invalid_uuid_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "object_compiled_invalid_uuid_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("object_compiled_invalid_uuid_failures", failure_messages);
     });
 }
 
@@ -284,8 +344,12 @@ Object={00020430-0000-0000-C000-000000000046}
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "object_compiled_missing_version_failures", failures.len());
-    insta::assert_yaml_snapshot!("object_compiled_missing_version_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "object_compiled_missing_version_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("object_compiled_missing_version_failures", failure_messages);
     });
 }
 
@@ -304,8 +368,12 @@ Object={00020430-0000-0000-C000-000000000046}#invalid#0; stdole2.tlb
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "object_compiled_invalid_version_failures", failures.len());
-    insta::assert_yaml_snapshot!("object_compiled_invalid_version_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "object_compiled_invalid_version_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("object_compiled_invalid_version_failures", failure_messages);
     });
 }
 
@@ -324,8 +392,15 @@ Object={00020430-0000-0000-C000-000000000046}#2.0#0;
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "object_compiled_missing_filename_failures", failures.len());
-    insta::assert_yaml_snapshot!("object_compiled_missing_filename_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "object_compiled_missing_filename_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!(
+            "object_compiled_missing_filename_failures",
+            failure_messages
+        );
     });
 }
 
@@ -344,8 +419,12 @@ Module=Module1;
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "module_missing_filename_failures", failures.len());
-    insta::assert_yaml_snapshot!("module_missing_filename_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "module_missing_filename_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("module_missing_filename_failures", failure_messages);
     });
 }
 
@@ -364,8 +443,12 @@ Class=Class1;
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "class_missing_filename_failures", failures.len());
-    insta::assert_yaml_snapshot!("class_missing_filename_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "class_missing_filename_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("class_missing_filename_failures", failure_messages);
     });
 }
 
@@ -384,8 +467,12 @@ Designer=
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "designer_missing_path_failures", failures.len());
-    insta::assert_yaml_snapshot!("designer_missing_path_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "designer_missing_path_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("designer_missing_path_failures", failure_messages);
     });
 }
 
@@ -404,8 +491,12 @@ Form=
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "form_missing_path_failures", failures.len());
-    insta::assert_yaml_snapshot!("form_missing_path_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "form_missing_path_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("form_missing_path_failures", failure_messages);
     });
 }
 
@@ -424,8 +515,12 @@ UserControl=
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "usercontrol_missing_path_failures", failures.len());
-    insta::assert_yaml_snapshot!("usercontrol_missing_path_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "usercontrol_missing_path_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("usercontrol_missing_path_failures", failure_messages);
     });
 }
 
@@ -444,8 +539,12 @@ Title=MyProject"`
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "parameter_missing_opening_quote_failures", failures.len());
-    insta::assert_yaml_snapshot!("parameter_missing_opening_quote_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "parameter_missing_opening_quote_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("parameter_missing_opening_quote_failures", failure_messages);
     });
 }
 
@@ -464,8 +563,12 @@ Title="MyProject
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "parameter_missing_closing_quote_failures", failures.len());
-    insta::assert_yaml_snapshot!("parameter_missing_closing_quote_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "parameter_missing_closing_quote_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("parameter_missing_closing_quote_failures", failure_messages);
     });
 }
 
@@ -484,8 +587,12 @@ Title=MyProject
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "parameter_missing_both_quotes_failures", failures.len());
-    insta::assert_yaml_snapshot!("parameter_missing_both_quotes_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "parameter_missing_both_quotes_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("parameter_missing_both_quotes_failures", failure_messages);
     });
 }
 
@@ -504,8 +611,12 @@ Retained="5"
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "parameter_invalid_enum_value_failures", failures.len());
-    insta::assert_yaml_snapshot!("parameter_invalid_enum_value_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "parameter_invalid_enum_value_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("parameter_invalid_enum_value_failures", failure_messages);
     });
 }
 
@@ -524,8 +635,12 @@ DllBaseAddress=
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "dllbaseaddress_missing_value_failures", failures.len());
-    insta::assert_yaml_snapshot!("dllbaseaddress_missing_value_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "dllbaseaddress_missing_value_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("dllbaseaddress_missing_value_failures", failure_messages);
     });
 }
 
@@ -544,8 +659,15 @@ DllBaseAddress=11000000
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "dllbaseaddress_missing_hex_prefix_failures", failures.len());
-    insta::assert_yaml_snapshot!("dllbaseaddress_missing_hex_prefix_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "dllbaseaddress_missing_hex_prefix_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!(
+            "dllbaseaddress_missing_hex_prefix_failures",
+            failure_messages
+        );
     });
 }
 
@@ -564,8 +686,12 @@ DllBaseAddress=&hGGGGGGGG
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "dllbaseaddress_invalid_hex_failures", failures.len());
-    insta::assert_yaml_snapshot!("dllbaseaddress_invalid_hex_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "dllbaseaddress_invalid_hex_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("dllbaseaddress_invalid_hex_failures", failure_messages);
     });
 }
 
@@ -584,8 +710,12 @@ DllBaseAddress=&h
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "dllbaseaddress_empty_hex_failures", failures.len());
-    insta::assert_yaml_snapshot!("dllbaseaddress_empty_hex_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "dllbaseaddress_empty_hex_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("dllbaseaddress_empty_hex_failures", failure_messages);
     });
 }
 
@@ -615,7 +745,11 @@ DllBaseAddress=11000000
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
         let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot("invalid_project", "multiple_errors_in_one_file_failures", failures.len());
-    insta::assert_yaml_snapshot!("multiple_errors_in_one_file_failures", failure_messages);
+        assert_failure_count_matches_snapshot(
+            "invalid_project",
+            "multiple_errors_in_one_file_failures",
+            failures.len(),
+        );
+        insta::assert_yaml_snapshot!("multiple_errors_in_one_file_failures", failure_messages);
     });
 }

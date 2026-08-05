@@ -243,17 +243,16 @@ impl SemanticAnalyzer {
         module_reference: &vb6parse::files::project::ProjectModuleReference,
     ) -> Result<()> {
         let module_path = self.resolve_source_path(module_reference.path);
-        let source_file =
-            vb6parse::io::SourceFile::from_file(&module_path).map_err(|e| {
-                crate::error::SemanticError::FileReadError {
-                    file: module_path.display().to_string(),
-                    message: e.to_string(),
-                }
-            })?;
+        let source_file = vb6parse::io::SourceFile::from_file(&module_path).map_err(|e| {
+            crate::error::SemanticError::FileReadError {
+                file: module_path.display().to_string(),
+                message: e.to_string(),
+            }
+        })?;
 
         let (module_opt, failures) = vb6parse::files::ModuleFile::parse(&source_file).unpack();
         if let Some(module) = module_opt {
-            self.analyze_module(&module)?; 
+            self.analyze_module(&module)?;
         } else if !failures.is_empty() {
             let diagnostics = failures
                 .into_iter()
@@ -309,13 +308,12 @@ impl SemanticAnalyzer {
         class_reference: &vb6parse::files::project::ProjectClassReference,
     ) -> Result<()> {
         let class_path = self.resolve_source_path(class_reference.path);
-        let source_file =
-            vb6parse::io::SourceFile::from_file(&class_path).map_err(|e| {
-                crate::error::SemanticError::FileReadError {
-                    file: class_path.display().to_string(),
-                    message: e.to_string(),
-                }
-            })?;
+        let source_file = vb6parse::io::SourceFile::from_file(&class_path).map_err(|e| {
+            crate::error::SemanticError::FileReadError {
+                file: class_path.display().to_string(),
+                message: e.to_string(),
+            }
+        })?;
 
         let (class_opt, failures) = vb6parse::files::ClassFile::parse(&source_file).unpack();
         if let Some(class) = class_opt {
@@ -373,13 +371,12 @@ impl SemanticAnalyzer {
     /// Analyze a form file by its path
     pub fn analyze_form_path(&mut self, form_reference_path: &str) -> Result<()> {
         let form_path = self.resolve_source_path(form_reference_path);
-        let source_file =
-            vb6parse::io::SourceFile::from_file(&form_path).map_err(|e| {
-                crate::error::SemanticError::FileReadError {
-                    file: form_path.display().to_string(),
-                    message: e.to_string(),
-                }
-            })?;
+        let source_file = vb6parse::io::SourceFile::from_file(&form_path).map_err(|e| {
+            crate::error::SemanticError::FileReadError {
+                file: form_path.display().to_string(),
+                message: e.to_string(),
+            }
+        })?;
 
         let (form_opt, failures) = vb6parse::files::FormFile::parse(&source_file).unpack();
         if let Some(form) = form_opt {
@@ -2128,8 +2125,11 @@ Option Explicit
     /// Write a module file to `temp_dir` and return its path.
     fn write_module(temp_dir: &tempfile::TempDir, name: &str, body: &str) -> String {
         let path = temp_dir.path().join(format!("{name}.bas"));
-        fs::write(&path, format!("Attribute VB_Name = \"{name}\"\nOption Explicit\n{body}"))
-            .unwrap();
+        fs::write(
+            &path,
+            format!("Attribute VB_Name = \"{name}\"\nOption Explicit\n{body}"),
+        )
+        .unwrap();
         path.to_str().unwrap().to_string()
     }
 
@@ -2209,7 +2209,9 @@ Option Explicit
             .expect("Analysis should succeed");
 
         // The module's Function shadows the library's Constant.
-        let now = analyzer.lookup_symbol("Now").expect("Symbol should resolve");
+        let now = analyzer
+            .lookup_symbol("Now")
+            .expect("Symbol should resolve");
         assert_eq!(now.kind, SymbolKind::Function);
     }
 
@@ -2260,11 +2262,7 @@ End Function
             "ClassA",
             "\nPublic Function FindMe() As Long\nEnd Function\n",
         );
-        let module_path = write_module(
-            &temp_dir,
-            "ModuleB",
-            "\nPublic Sub FindMe()\nEnd Sub\n",
-        );
+        let module_path = write_module(&temp_dir, "ModuleB", "\nPublic Sub FindMe()\nEnd Sub\n");
 
         let project_source = format!(
             "Type=Exe\n\
@@ -2288,7 +2286,9 @@ End Function
         assert_eq!(find_me.kind, SymbolKind::Function);
 
         // And the symbol lives in ClassA's scope.
-        let class_scopes = analyzer.scope_manager().get_scopes_by_kind(ScopeKind::Class);
+        let class_scopes = analyzer
+            .scope_manager()
+            .get_scopes_by_kind(ScopeKind::Class);
         let class_scope = class_scopes
             .iter()
             .find(|scope| scope.name == "ClassA")

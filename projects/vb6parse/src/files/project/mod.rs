@@ -1367,7 +1367,9 @@ fn handle_designer<'a>(
     property_name: &'a str,
 ) {
     if let Some(designer) = parse_path_line(ctx, input, property_name) {
-        project.file_entries.push(ProjectFileEntry::Designer(designer));
+        project
+            .file_entries
+            .push(ProjectFileEntry::Designer(designer));
         project.designers.push(designer);
     }
 }
