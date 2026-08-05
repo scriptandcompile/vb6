@@ -241,6 +241,91 @@
 //! ## Parsing Notes
 //!
 //! The `Asc` function is not a reserved keyword in VB6. It is parsed as a regular
-//! function call (`CallExpression`). This module exists primarily for documentation
-//! purposes and to provide a comprehensive test suite that validates the parser
-//! correctly handles `Asc` function calls in various contexts.
+//! function call (`CallExpression`).
+//!
+//! ## Encoding Notes
+//!
+//! VB6 stores strings as Unicode internally but `Asc` returns the code of the
+//! first character converted to the system ANSI code page (Windows-1252). ASCII
+//! characters map to themselves; characters representable in Windows-1252 map
+//! to their ANSI byte (e.g. `é` -> 233, `€` -> 128); anything else raises
+//! error 5. `AscW` is the Unicode code-point variant.
+
+use crate::error::{err_number, VBError, VBResult};
+
+/// Returns the Windows-1252 (ANSI) character code of the first character.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `input` is empty
+/// or its first character cannot be represented in Windows-1252.
+pub fn asc(input: &str) -> VBResult<i32> {
+    let first_char = input.chars().next().ok_or_else(|| {
+        VBError::with_description(err_number::INVALID_PROCEDURE_CALL, "String cannot be empty")
+    })?;
+
+    // ASCII characters are identical in Unicode and Windows-1252.
+    if first_char.is_ascii() {
+        return Ok(i32::from(first_char as u16));
+    }
+
+    // Encode the first character to the ANSI code page used by VB6.
+    let mut buf = [0u8; 4];
+    let encoded = first_char.encode_utf8(&mut buf);
+    let (ansi, _, had_errors) = encoding_rs::WINDOWS_1252.encode(encoded);
+    if had_errors {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Character code out of ANSI range",
+        ));
+    }
+
+    Ok(i32::from(ansi[0]))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn returns_ascii_codes() {
+        assert_eq!(asc("A").unwrap(), 65);
+        assert_eq!(asc("a").unwrap(), 97);
+        assert_eq!(asc("0").unwrap(), 48);
+        assert_eq!(asc(" ").unwrap(), 32);
+    }
+
+    #[test]
+    fn uses_first_character_only() {
+        assert_eq!(asc("Apple").unwrap(), 65);
+        assert_eq!(asc("A1").unwrap(), 65);
+    }
+
+    #[test]
+    fn maps_latin_1_to_ansi() {
+        assert_eq!(asc("é").unwrap(), 233);
+        assert_eq!(asc("ñ").unwrap(), 241);
+    }
+
+    #[test]
+    fn maps_beyond_latin_1_via_windows_1252() {
+        assert_eq!(asc("€").unwrap(), 128);
+        assert_eq!(asc("œ").unwrap(), 156);
+    }
+
+    #[test]
+    fn rejects_unrepresentable_characters() {
+        assert_eq!(
+            asc("😀").unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+
+    #[test]
+    fn rejects_empty_string() {
+        assert_eq!(
+            asc("").unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}
