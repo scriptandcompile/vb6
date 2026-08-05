@@ -202,10 +202,7 @@ impl VBType {
 
     /// Whether this is one of the value states (`Empty`, `Null`, `Nothing`, `Error`).
     pub fn is_value_state(&self) -> bool {
-        matches!(
-            self,
-            Self::Empty | Self::Null | Self::Nothing | Self::Error
-        )
+        matches!(self, Self::Empty | Self::Null | Self::Nothing | Self::Error)
     }
 
     /// Whether `self` is assignable to `target` following VB6 widening rules.
@@ -482,10 +479,7 @@ mod tests {
         assert_eq!(VBType::Empty.var_type(), 0);
         assert_eq!(VBType::Null.var_type(), 1);
         assert_eq!(VBType::Class("x".into()).var_type(), 9);
-        assert_eq!(
-            VBType::Array(Box::new(VBType::Double)).var_type(),
-            8192 + 5
-        );
+        assert_eq!(VBType::Array(Box::new(VBType::Double)).var_type(), 8192 + 5);
         assert_eq!(
             VBType::Function {
                 return_type: Box::new(TypeInfo::long()),
@@ -521,7 +515,10 @@ mod tests {
             VBType::from_var_type(8194),
             Some(VBType::Array(Box::new(VBType::Integer)))
         );
-        assert_eq!(VBType::from_var_type(8197), Some(VBType::Array(Box::new(VBType::Double))));
+        assert_eq!(
+            VBType::from_var_type(8197),
+            Some(VBType::Array(Box::new(VBType::Double)))
+        );
         assert_eq!(VBType::from_var_type(13), None);
     }
 
