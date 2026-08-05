@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Semantic - Semantic analysis and symbol table construction for Visual Basic 6 code">
+    <meta name="keywords" content="vb6, semantic analysis, symbol table, visual basic 6, rust, type checking, name resolution">
+    <title>VB6Semantic - Semantic Analysis for Visual Basic 6</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>VB6Semantic</h1>
+            <p class="tagline">Semantic analysis and symbol table construction for Visual Basic 6 code</p>
+            <div class="badges">
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic" target="_blank">
+                    <img src="https://img.shields.io/badge/Workspace-vb6-blue.svg" alt="VB6 Workspace">
+                </a>
+                <a href="https://opensource.org/licenses/MIT" target="_blank">
+                    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+                </a>
+                <a href="https://www.rust-lang.org/" target="_blank">
+                    <img src="https://img.shields.io/badge/Language-Rust-orange.svg" alt="Written in Rust">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <a href="#overview">Overview</a>
+            <a href="#features">Features</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#symbol-kinds">Symbol Kinds</a>
+            <a href="#quick-start">Quick Start</a>
+            <a href="#use-cases">Use Cases</a>
+            <a href="#testing">Testing</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>
+                VB6Semantic is the semantic analysis layer for the VB6 toolchain. It consumes the
+                parsed file objects produced by <a href="https://scriptandcompile.github.io/vb6/vb6parse/">vb6parse</a>
+                (<code>ProjectFile</code>, <code>ModuleFile</code>, <code>ClassFile</code>, <code>FormFile</code>)
+                and turns them into symbol tables, hierarchical scopes, resolved names, and validated types.
+            </p>
+            <p>
+                The analyzer performs type checking, enforces Public/Private/Friend visibility rules,
+                and reports detailed semantic errors and warnings with source locations. Its output is
+                consumed by the conversion, compilation, and interpretation paths, and it provides the
+                symbol information needed for IDE features like code completion, go-to-definition, and
+                find-references.
+            </p>
+            <div class="tip-box">
+                <strong>💡 Position in the Workspace:</strong> vb6parse builds the concrete syntax tree;
+                VB6Semantic sits directly above it and answers the <em>meaning</em> questions — what a name
+                refers to, what type an expression has, and whether an operation is valid.
+            </div>
+        </section>
+
+        <section id="features">
+            <h2>Key Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🏷️ Symbol Tables</h3>
+                    <p>Comprehensive symbol tables for VB6 projects: variables, constants, procedures, properties, classes, controls, enums, and user-defined types</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📂 Scope Management</h3>
+                    <p>Hierarchical scope management (global, module, class, procedure, block) with correct VB6 resolution order</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔍 Name Resolution</h3>
+                    <p>Resolve symbol references with proper scoping and visibility rules, including qualified names and accessibility checks</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✅ Type Checking</h3>
+                    <p>Validate assignments and operations against VB6 type rules, including numeric promotion and Variant compatibility</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔒 Visibility Rules</h3>
+                    <p>Enforce Public/Private/Friend visibility across modules, classes, and projects</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📢 Error Reporting</h3>
+                    <p>Detailed semantic errors and warnings with source locations, error categories, and related context</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <h2>Architecture</h2>
+            <p>
+                VB6Semantic is built as a layered pipeline that transforms parsed VB6 files into a
+                fully-resolved semantic model. Each layer builds on the previous one, giving tools the
+                ability to hook into the analysis at any level.
+            </p>
+            <div class="architecture-diagram">
+                <div class="pipeline-layer">
+                    <div class="layer-title">Public API Layer</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">vb6parse files<br><small>(ProjectFile, ClassFile, ModuleFile, FormFile)</small></div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">SemanticAnalyzer<br><small>(AnalysisResult)</small></div>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div class="pipeline-layer">
+                    <div class="layer-title">Name Resolution & Type Checking</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">NameResolver</div>
+                        <div class="pipeline-box">TypeChecker</div>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div class="pipeline-layer">
+                    <div class="layer-title">Scope Manager</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">ScopeManager<br><small>(Hierarchical Scopes)</small></div>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div class="pipeline-layer">
+                    <div class="layer-title">Symbol Table</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">SymbolTable<br><small>(Symbol, SymbolKind, Visibility)</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="architecture-details" style="margin-top: 2rem;">
+                <h3>Layer Details</h3>
+                <div class="layer-grid">
+                    <div class="layer-card">
+                        <h4>Public API</h4>
+                        <p><strong>Input:</strong> Parsed VB6 file objects</p>
+                        <p><strong>Output:</strong> Analysis result</p>
+                        <p><strong>Purpose:</strong> Single entry point that coordinates symbol building, name resolution, and type checking across an entire project.</p>
+                        <p><strong>Key Types:</strong> <code>SemanticAnalyzer</code>, <code>AnalysisResult</code></p>
+                    </div>
+
+                    <div class="layer-card">
+                        <h4>Name Resolution & Type Checking</h4>
+                        <p><strong>Input:</strong> Scopes with declared symbols</p>
+                        <p><strong>Output:</strong> Resolved references and validated types</p>
+                        <p><strong>Purpose:</strong> Walks the scope chain to resolve references, checks accessibility, and validates assignments and operations against VB6 type rules.</p>
+                        <p><strong>Key Types:</strong> <code>NameResolver</code>, <code>TypeChecker</code>, <code>TypeInfo</code></p>
+                    </div>
+
+                    <div class="layer-card">
+                        <h4>Scope Manager</h4>
+                        <p><strong>Input:</strong> Symbol definitions</p>
+                        <p><strong>Output:</strong> Hierarchical scope tree</p>
+                        <p><strong>Purpose:</strong> Manages parent-child scope relationships (global, class, procedure, block) and drives lookup order.</p>
+                        <p><strong>Key Types:</strong> <code>ScopeManager</code>, <code>Scope</code>, <code>ScopeKind</code></p>
+                    </div>
+
+                    <div class="layer-card">
+                        <h4>Symbol Table</h4>
+                        <p><strong>Input:</strong> Declarations from parsed files</p>
+                        <p><strong>Output:</strong> Queryable symbol store</p>
+                        <p><strong>Purpose:</strong> Stores every symbol with its kind, type, visibility, and source location, providing O(1) lookup within scopes.</p>
+                        <p><strong>Key Types:</strong> <code>SymbolTable</code>, <code>Symbol</code>, <code>SymbolKind</code>, <code>Visibility</code></p>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 Flexibility by Design:</strong> The layers are independently usable.
+                    Need just a symbol index? Query the symbol table. Need scoped resolution? Use the
+                    scope manager. Want a full project check? Use the <code>SemanticAnalyzer</code>.
+                </div>
+            </div>
+        </section>
+
+        <section id="symbol-kinds">
+            <h2>Supported Symbol Kinds</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kind</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>Variable</code></td>
+                        <td>Module and local variables</td>
+                    </tr>
+                    <tr>
+                        <td><code>Constant</code></td>
+                        <td>Constant declarations</td>
+                    </tr>
+                    <tr>
+                        <td><code>SubProcedure</code></td>
+                        <td>Sub procedures</td>
+                    </tr>
+                    <tr>
+                        <td><code>Function</code></td>
+                        <td>Functions</td>
+                    </tr>
+                    <tr>
+                        <td><code>PropertyGet/Let/Set</code></td>
+                        <td>Property accessors</td>
+                    </tr>
+                    <tr>
+                        <td><code>Class</code></td>
+                        <td>Class definitions</td>
+                    </tr>
+                    <tr>
+                        <td><code>Module</code></td>
+                        <td>Module files</td>
+                    </tr>
+                    <tr>
+                        <td><code>Form</code></td>
+                        <td>Form files</td>
+                    </tr>
+                    <tr>
+                        <td><code>Control</code></td>
+                        <td>Form controls</td>
+                    </tr>
+                    <tr>
+                        <td><code>Enum</code></td>
+                        <td>Enumeration types</td>
+                    </tr>
+                    <tr>
+                        <td><code>EnumMember</code></td>
+                        <td>Enumeration values</td>
+                    </tr>
+                    <tr>
+                        <td><code>UserType</code></td>
+                        <td>User-defined types</td>
+                    </tr>
+                    <tr>
+                        <td><code>TypeMember</code></td>
+                        <td>Type fields</td>
+                    </tr>
+                    <tr>
+                        <td><code>Parameter</code></td>
+                        <td>Procedure parameters</td>
+                    </tr>
+                    <tr>
+                        <td><code>Label</code></td>
+                        <td>GoTo labels</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Scope Hierarchy</h3>
+            <pre><code class="language-vbnet">' Global Scope (Project)
+Global Scope (Module/Form)
+  ├─ Class Scope
+  │   ├─ Property Scope
+  │   │   └─ Block Scope
+  │   └─ Procedure Scope
+  │       └─ Block Scope
+  └─ Procedure Scope
+      └─ Block Scope</code></pre>
+
+            <h3>Supported Types</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Types</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Primitive</td>
+                        <td><code>Integer</code>, <code>Long</code>, <code>Byte</code>, <code>Single</code>, <code>Double</code>, <code>Currency</code>, <code>String</code>, <code>Boolean</code>, <code>Date</code></td>
+                    </tr>
+                    <tr>
+                        <td>Complex</td>
+                        <td><code>Variant</code>, <code>Object</code>, <code>Class</code>, <code>UserType</code>, <code>Enum</code></td>
+                    </tr>
+                    <tr>
+                        <td>Special</td>
+                        <td><code>Nothing</code>, <code>Empty</code>, <code>Null</code>, <code>Sub</code>, <code>Function</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="quick-start">
+            <h2>Quick Start</h2>
+
+            <div class="quick-start-cta">
+                <h3 style="margin-top: 0; color: var(--primary-color);">👉 Add VB6Semantic to your analysis pipeline</h3>
+                <p style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-color);">Add it as a workspace dependency and analyze a parsed project in a few lines.</p>
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic/docs/DESIGN.md" style="display: inline-block; background: var(--primary-color); color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: transform 0.2s ease, background 0.2s ease;" target="_blank">
+                    View Design Docs →
+                </a>
+            </div>
+
+            <h3>Analyzing a project</h3>
+            <pre data-lang="rust"><code class="language-rust">use vb6semantic::SemanticAnalyzer;
+use vb6parse::io::SourceFile;
+use vb6parse::files::ProjectFile;
+
+let mut analyzer = SemanticAnalyzer::new();
+let project_source =
+    SourceFile::from_file("MyProject.vbp").expect("Failed to read project file");
+let (project_opt, failures) = ProjectFile::parse(&project_source).unpack();
+if !failures.is_empty() {
+    eprintln!("Failed to parse project file: {:?}", failures);
+    return;
+}
+
+let project = project_opt.expect("Project file should have parsed successfully");
+
+let analysis_result =
+    analyzer.analyze_project(&project).expect("Failed to analyze project");
+println!(
+    "Analysis completed with {} errors and {} warnings",
+    analysis_result.errors.len(),
+    analysis_result.warnings.len()
+);</code></pre>
+
+            <h3>Supported file types</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File Type</th>
+                        <th>Analyzer Entry Point</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>.vbp</code> Project files</td>
+                        <td><code>analyze_project</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>.cls</code> Class modules</td>
+                        <td><code>analyze_class</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>.bas</code> Code modules</td>
+                        <td><code>analyze_module</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>.frm</code> Forms</td>
+                        <td><code>analyze_form</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="use-cases">
+            <h2>Use Cases</h2>
+            <div class="use-case-grid">
+                <div class="use-case-card">
+                    <h4>IDE Support</h4>
+                    <ul>
+                        <li>Code completion (symbol suggestions)</li>
+                        <li>Go to definition</li>
+                        <li>Find references</li>
+                        <li>Rename refactoring</li>
+                        <li>Type information on hover</li>
+                    </ul>
+                </div>
+                <div class="use-case-card">
+                    <h4>Static Analysis</h4>
+                    <ul>
+                        <li>Find unused variables</li>
+                        <li>Detect undefined symbols</li>
+                        <li>Check type safety</li>
+                        <li>Validate visibility rules</li>
+                        <li>Detect dead code</li>
+                    </ul>
+                </div>
+                <div class="use-case-card">
+                    <h4>Code Transformation</h4>
+                    <ul>
+                        <li>Provide symbol information for converters</li>
+                        <li>Enable semantic-aware refactoring</li>
+                        <li>Support automated migration</li>
+                    </ul>
+                </div>
+                <div class="use-case-card">
+                    <h4>Documentation Generation</h4>
+                    <ul>
+                        <li>Extract symbol information</li>
+                        <li>Generate API documentation</li>
+                        <li>Create cross-references</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="testing">
+            <h2>Testing</h2>
+            <p>
+                VB6Semantic ships with unit tests covering symbol table operations, scope management,
+                type checking rules, and name resolution.
+            </p>
+            <pre data-lang="bash"><code class="language-bash"># Run all vb6semantic tests
+cargo test -p vb6semantic
+
+# Run with output
+cargo test -p vb6semantic -- --nocapture
+
+# Test a specific module
+cargo test -p vb6semantic --lib symbols</code></pre>
+        </section>
+
+        <section id="community">
+            <h2>Community & Contributing</h2>
+            <p>
+                VB6Semantic is open source and welcomes contributions! Whether you're reporting bugs,
+                suggesting features, or submitting pull requests, your help is appreciated. Areas that
+                need work include complete analysis passes, additional type checking rules, and more
+                comprehensive tests.
+            </p>
+            <div class="community-links">
+                <a href="https://github.com/scriptandcompile/vb6/issues" class="community-btn" target="_blank">
+                    Report an Issue
+                </a>
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic/docs/SYMBOL_TABLES.md" class="community-btn" target="_blank">
+                    Symbol Table Design
+                </a>
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic" class="community-btn" target="_blank">
+                    View Source
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Semantic is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>
