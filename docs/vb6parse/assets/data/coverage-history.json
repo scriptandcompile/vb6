@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-08-03T00:32:17Z",
+  "last_updated": "2026-08-05T01:27:08Z",
   "snapshots": [
     {
       "timestamp": "2026-08-02T05:53:42Z",
@@ -69,38 +69,72 @@
           "percent": 94.74
         }
       }
+    },
+    {
+      "timestamp": "2026-08-05T01:27:08Z",
+      "commit_sha": "0e6b18abaf1159370fc6f7b1438ee345bcdd09c7",
+      "commit_message": "removed aspen check flags for things to skip since it doesn't make sense when we added semantic checking. Reporting syntax errors improved.",
+      "coverage": {
+        "line_coverage": 94.28,
+        "function_coverage": 91.22,
+        "region_coverage": 94.72
+      },
+      "tests": {
+        "total": 5688,
+        "lib_tests": 5558,
+        "doc_tests": 130,
+        "integration_tests": 0,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 105781,
+          "total": 112193,
+          "percent": 94.28
+        },
+        "functions": {
+          "covered": 6533,
+          "total": 7162,
+          "percent": 91.22
+        },
+        "regions": {
+          "covered": 176317,
+          "total": 186142,
+          "percent": 94.72
+        }
+      }
     }
   ],
   "coverage_summary": {
     "line_coverage": {
-      "latest": 94.29,
+      "latest": 94.28,
       "trend": "stable",
-      "change_percent": 0.0,
+      "change_percent": 0.01,
       "best": 94.29,
-      "worst": 94.29,
+      "worst": 94.28,
       "average": 94.29
     },
     "function_coverage": {
-      "latest": 90.94,
-      "trend": "stable",
-      "change_percent": 0.0,
-      "best": 90.94,
+      "latest": 91.22,
+      "trend": "improving",
+      "change_percent": 0.28,
+      "best": 91.22,
       "worst": 90.94,
-      "average": 90.94
+      "average": 91.03
     },
     "region_coverage": {
-      "latest": 94.74,
+      "latest": 94.72,
       "trend": "stable",
-      "change_percent": 0.0,
+      "change_percent": 0.02,
       "best": 94.74,
-      "worst": 94.74,
-      "average": 94.74
+      "worst": 94.72,
+      "average": 94.73
     },
     "test_count": {
-      "latest": 5662,
-      "trend": "stable",
-      "change_count": 0,
-      "growth_rate": 0.0
+      "latest": 5688,
+      "trend": "growing",
+      "change_count": 26,
+      "growth_rate": 0.46
     }
   }
 }
