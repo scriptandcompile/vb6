@@ -331,6 +331,7 @@ impl Value {
             VBType::Empty => Value::Empty,
             VBType::Null => Value::Null,
             VBType::Error => Value::Error(VBError::new(0)),
+            VBType::Sub | VBType::Function { .. } => Value::Empty,
         }
     }
 

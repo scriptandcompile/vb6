@@ -363,13 +363,13 @@ mod tests {
     use super::*;
     use crate::error::SourceLocation;
     use crate::symbols::SymbolKind;
-    use crate::types::{TypeInfo, TypeKind};
+    use crate::types::{TypeInfo, VBType};
 
     fn symbol(name: &str, visibility: Visibility, scope_id: usize) -> Symbol {
         Symbol {
             name: name.to_string(),
             kind: SymbolKind::Variable,
-            type_info: TypeInfo::new(TypeKind::Long),
+            type_info: TypeInfo::new(VBType::Long),
             visibility,
             location: SourceLocation {
                 file: "test.bas".to_string(),

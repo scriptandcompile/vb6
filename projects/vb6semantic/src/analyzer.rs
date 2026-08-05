@@ -42,7 +42,7 @@ use crate::error::{Result, SemanticError, SourceLocation};
 use crate::references::{ReferenceInfo, ReferenceRegistry, ReferenceResolver};
 use crate::scope::{ScopeKind, ScopeManager};
 use crate::symbols::{Symbol, SymbolKind, Visibility};
-use crate::types::{TypeChecker, TypeInfo, TypeKind};
+use crate::types::{TypeChecker, TypeInfo, VBType};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use vb6parse::parsers::SyntaxKind;
@@ -289,7 +289,7 @@ impl SemanticAnalyzer {
         self.register_self_symbol(
             module.name.clone(),
             SymbolKind::Module,
-            TypeInfo::new(TypeKind::Class(module.name.clone())),
+            TypeInfo::new(VBType::Class(module.name.clone())),
             Visibility::Public,
             module_scope,
         )?;
@@ -355,7 +355,7 @@ impl SemanticAnalyzer {
         self.register_self_symbol(
             class_name.clone(),
             SymbolKind::Class,
-            TypeInfo::new(TypeKind::Class(class_name.clone())),
+            TypeInfo::new(VBType::Class(class_name.clone())),
             Visibility::Public,
             class_scope,
         )?;
@@ -418,7 +418,7 @@ impl SemanticAnalyzer {
         self.register_self_symbol(
             form_name.clone(),
             SymbolKind::Form,
-            TypeInfo::new(TypeKind::Class(form_name.clone())),
+            TypeInfo::new(VBType::Class(form_name.clone())),
             Visibility::Public,
             form_scope,
         )?;
@@ -604,7 +604,7 @@ impl SemanticAnalyzer {
         self.add_symbol(Symbol {
             name: name.clone(),
             kind: SymbolKind::UserType,
-            type_info: TypeInfo::new(TypeKind::UserType(name.clone())),
+            type_info: TypeInfo::new(VBType::UserType(name.clone())),
             visibility,
             location: self.make_location(line, 1),
             scope_id,
@@ -673,7 +673,7 @@ impl SemanticAnalyzer {
         self.add_symbol(Symbol {
             name: name.clone(),
             kind: SymbolKind::Enum,
-            type_info: TypeInfo::new(TypeKind::Enum(name.clone())),
+            type_info: TypeInfo::new(VBType::Enum(name.clone())),
             visibility,
             location: self.make_location(line, 1),
             scope_id,
@@ -738,7 +738,7 @@ impl SemanticAnalyzer {
         self.add_symbol(Symbol {
             name: member_name,
             kind: SymbolKind::EnumMember,
-            type_info: TypeInfo::new(TypeKind::Enum(enum_name)),
+            type_info: TypeInfo::new(VBType::Enum(enum_name)),
             visibility: Visibility::Private,
             location: self.make_location(line, 1),
             scope_id: enum_scope,
@@ -755,11 +755,11 @@ impl SemanticAnalyzer {
         let kind = Self::procedure_symbol_kind(statement);
         let visibility = Self::visibility_from_statement(statement).unwrap_or(Visibility::Public);
         let type_info = match kind {
-            SymbolKind::Function => TypeInfo::new(TypeKind::Function {
+            SymbolKind::Function => TypeInfo::new(VBType::Function {
                 return_type: Box::new(Self::procedure_return_type(statement)),
             }),
             SymbolKind::PropertyGet => Self::procedure_return_type(statement),
-            _ => TypeInfo::new(TypeKind::Sub),
+            _ => TypeInfo::new(VBType::Sub),
         };
 
         let scope_id = self.scope_manager.current_scope_id();
@@ -859,11 +859,11 @@ impl SemanticAnalyzer {
             SymbolKind::SubProcedure
         };
         let type_info = if is_function {
-            TypeInfo::new(TypeKind::Function {
+            TypeInfo::new(VBType::Function {
                 return_type: Box::new(Self::procedure_return_type(statement)),
             })
         } else {
-            TypeInfo::new(TypeKind::Sub)
+            TypeInfo::new(VBType::Sub)
         };
 
         let mut attributes = HashMap::new();
@@ -895,7 +895,7 @@ impl SemanticAnalyzer {
         self.add_symbol(Symbol {
             name,
             kind: SymbolKind::SubProcedure,
-            type_info: TypeInfo::new(TypeKind::Sub),
+            type_info: TypeInfo::new(VBType::Sub),
             visibility: Self::visibility_from_statement(statement).unwrap_or(Visibility::Public),
             location: self.make_location(line, 1),
             scope_id: self.scope_manager.current_scope_id(),
@@ -1072,8 +1072,8 @@ impl SemanticAnalyzer {
             SyntaxKind::DollarSign => TypeInfo::string(),
             SyntaxKind::Percent => TypeInfo::integer(),
             SyntaxKind::Ampersand => TypeInfo::long(),
-            SyntaxKind::ExclamationMark => TypeInfo::new(TypeKind::Single),
-            SyntaxKind::AtSign => TypeInfo::new(TypeKind::Currency),
+            SyntaxKind::ExclamationMark => TypeInfo::new(VBType::Single),
+            SyntaxKind::AtSign => TypeInfo::new(VBType::Currency),
             _ => return None,
         })
     }
@@ -1086,7 +1086,7 @@ impl SemanticAnalyzer {
         match tokens[*index].kind() {
             SyntaxKind::NewKeyword => {
                 *index += 1;
-                TypeInfo::new(TypeKind::Class(Self::join_type_name(tokens, index)))
+                TypeInfo::new(VBType::Class(Self::join_type_name(tokens, index)))
             }
             SyntaxKind::IntegerKeyword => {
                 *index += 1;
@@ -1098,15 +1098,15 @@ impl SemanticAnalyzer {
             }
             SyntaxKind::SingleKeyword => {
                 *index += 1;
-                TypeInfo::new(TypeKind::Single)
+                TypeInfo::new(VBType::Single)
             }
             SyntaxKind::DoubleKeyword => {
                 *index += 1;
-                TypeInfo::new(TypeKind::Double)
+                TypeInfo::new(VBType::Double)
             }
             SyntaxKind::CurrencyKeyword => {
                 *index += 1;
-                TypeInfo::new(TypeKind::Currency)
+                TypeInfo::new(VBType::Currency)
             }
             SyntaxKind::StringKeyword => {
                 *index += 1;
@@ -1118,11 +1118,11 @@ impl SemanticAnalyzer {
             }
             SyntaxKind::ByteKeyword => {
                 *index += 1;
-                TypeInfo::new(TypeKind::Byte)
+                TypeInfo::new(VBType::Byte)
             }
             SyntaxKind::DateKeyword => {
                 *index += 1;
-                TypeInfo::new(TypeKind::Date)
+                TypeInfo::new(VBType::Date)
             }
             SyntaxKind::VariantKeyword => {
                 *index += 1;
@@ -1133,7 +1133,7 @@ impl SemanticAnalyzer {
                 TypeInfo::object()
             }
             SyntaxKind::Identifier => {
-                TypeInfo::new(TypeKind::UserType(Self::join_type_name(tokens, index)))
+                TypeInfo::new(VBType::UserType(Self::join_type_name(tokens, index)))
             }
             _ => TypeInfo::unknown(),
         }
@@ -1786,11 +1786,11 @@ End Sub
         // Variables and arrays
         let counter = symbol_in_global_scopes(&analyzer, "m_counter").expect("Var symbol");
         assert_eq!(counter.kind, SymbolKind::Variable);
-        assert_eq!(counter.type_info.kind, TypeKind::Long);
+        assert_eq!(counter.type_info.kind, VBType::Long);
 
         let g_values = symbol_in_global_scopes(&analyzer, "g_values").expect("Array symbol");
         assert!(g_values.type_info.is_array);
-        assert_eq!(g_values.type_info.kind, TypeKind::Integer);
+        assert_eq!(g_values.type_info.kind, VBType::Integer);
 
         // User-defined type and its members
         let customer = symbol_in_global_scopes(&analyzer, "Customer").expect("Type symbol");
@@ -1798,10 +1798,10 @@ End Sub
         let name_member =
             symbol_in_scope_kind(&analyzer, ScopeKind::Type, "Name").expect("Type member");
         assert_eq!(name_member.kind, SymbolKind::TypeMember);
-        assert_eq!(name_member.type_info.kind, TypeKind::String);
+        assert_eq!(name_member.type_info.kind, VBType::String);
         let id_member =
             symbol_in_scope_kind(&analyzer, ScopeKind::Type, "Id").expect("Type member");
-        assert_eq!(id_member.type_info.kind, TypeKind::Long);
+        assert_eq!(id_member.type_info.kind, VBType::Long);
 
         // Enum and its members
         let status = symbol_in_global_scopes(&analyzer, "Status").expect("Enum symbol");
@@ -1827,19 +1827,19 @@ End Sub
         assert_eq!(get_count.visibility, Visibility::Public);
         assert!(matches!(
             get_count.type_info.kind,
-            TypeKind::Function { ref return_type } if return_type.kind == TypeKind::Long
+            VBType::Function { ref return_type } if return_type.kind == VBType::Long
         ));
 
         // Parameters
         let amount = symbol_in_scope_kind(&analyzer, ScopeKind::Procedure, "amount")
             .expect("Parameter symbol");
         assert_eq!(amount.kind, SymbolKind::Parameter);
-        assert_eq!(amount.type_info.kind, TypeKind::Long);
+        assert_eq!(amount.type_info.kind, VBType::Long);
         assert!(!amount.type_info.is_reference);
         let total = symbol_in_scope_kind(&analyzer, ScopeKind::Procedure, "total")
             .expect("Parameter symbol");
         assert_eq!(total.kind, SymbolKind::Parameter);
-        assert_eq!(total.type_info.kind, TypeKind::Long);
+        assert_eq!(total.type_info.kind, VBType::Long);
         assert!(total.type_info.is_reference);
     }
 
@@ -1907,12 +1907,12 @@ Implements TaskInterface
         let m_value = symbol_in_scope_kind(&analyzer, ScopeKind::Class, "m_value")
             .expect("Class variable symbol");
         assert_eq!(m_value.kind, SymbolKind::Variable);
-        assert_eq!(m_value.type_info.kind, TypeKind::Long);
+        assert_eq!(m_value.type_info.kind, VBType::Long);
 
         // Property Get + Let are merged into a single symbol
         let value = symbol_in_scope_kind(&analyzer, ScopeKind::Class, "Value").expect("Property");
         assert_eq!(value.kind, SymbolKind::PropertyGet);
-        assert_eq!(value.type_info.kind, TypeKind::Long);
+        assert_eq!(value.type_info.kind, VBType::Long);
         assert_eq!(
             value.attributes.get("accessors").map(String::as_str),
             Some("get,let")
@@ -2040,7 +2040,7 @@ End Function
             vec![Symbol {
                 name: "Now".to_string(),
                 kind: SymbolKind::Function,
-                type_info: TypeInfo::new(TypeKind::Date),
+                type_info: TypeInfo::new(VBType::Date),
                 visibility: Visibility::Public,
                 location: SourceLocation {
                     file: "<reference>".to_string(),
@@ -2070,7 +2070,7 @@ End Function
         // The reference library symbols are visible through normal lookups
         let now = analyzer.lookup_symbol("Now").expect("Reference symbol");
         assert_eq!(now.kind, SymbolKind::Function);
-        assert_eq!(now.type_info.kind, TypeKind::Date);
+        assert_eq!(now.type_info.kind, VBType::Date);
 
         // The reference was stored in its own Reference scope
         assert_eq!(
