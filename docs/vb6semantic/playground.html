@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive VB6Semantic Playground - Analyze VB6 code in your browser and inspect scopes, symbols, types, and diagnostics">
+    <meta name="keywords" content="vb6, semantic analysis, symbol table, visual basic 6, playground, scopes, types, type checking">
+    <title>VB6Semantic Playground - Interactive Semantic Analyzer</title>
+
+    <!-- Main site CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Playground-specific CSS -->
+    <link rel="stylesheet" href="assets/css/playground.css">
+
+    <!-- Theme switcher from main site -->
+    <script src="assets/js/theme-switcher.js"></script>
+</head>
+<body>
+    <!-- Compact header for playground -->
+    <header class="playground-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>VB6Semantic Playground</h1>
+                </div>
+                <div class="header-right">
+                    <a href="index.html" class="header-link">← Home</a>
+                    <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic/docs/DESIGN.md" target="_blank" class="header-link">Design Docs</a>
+                    <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic" target="_blank" class="header-link">GitHub</a>
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Toolbar with controls -->
+    <div class="playground-toolbar">
+        <div class="container toolbar-content">
+            <!-- Left side: File type and examples -->
+            <div class="toolbar-left">
+                <label for="file-type">File Type:</label>
+                <select id="file-type" class="file-type-selector">
+                    <option value="module">Module (.bas)</option>
+                    <option value="class">Class (.cls)</option>
+                    <option value="form">Form (.frm)</option>
+                </select>
+
+                <label for="examples">Examples:</label>
+                <select id="examples" class="examples-selector">
+                    <option value="">-- Load Example --</option>
+                    <option value="simple-module">Simple Module</option>
+                    <option value="type-and-enum">Type & Enum Declarations</option>
+                    <option value="class-with-properties">Class with Properties</option>
+                    <option value="form-with-controls">Form with Controls</option>
+                </select>
+            </div>
+
+            <!-- Right side: Actions -->
+            <div class="toolbar-right">
+                <button id="analyze-btn" class="btn btn-primary">
+                    <span class="btn-icon">▶</span> Analyze Code
+                </button>
+                <button id="share-btn" class="btn btn-secondary" title="Share (generates URL with code)">
+                    <span class="btn-icon">🔗</span> Share
+                </button>
+                <button id="clear-btn" class="btn btn-secondary" title="Clear editor">
+                    <span class="btn-icon">🗑</span> Clear
+                </button>
+                <label class="toggle-label">
+                    <input type="checkbox" id="auto-parse" checked>
+                    Auto-analyze
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main playground layout: split panel -->
+    <div class="playground-container">
+        <!-- Left Panel: Code Editor -->
+        <div class="editor-panel">
+            <div class="panel-header">
+                <h3>VB6 Code</h3>
+                <div class="editor-status">
+                    <span id="editor-line-col">Ln 1, Col 1</span>
+                </div>
+            </div>
+            <div id="editor-container" class="editor-container">
+            </div>
+            <div class="panel-footer">
+                <span id="code-stats" class="code-stats">
+                </span>
+            </div>
+        </div>
+
+        <!-- Resizer handle -->
+        <div class="resizer" id="resizer" title="Drag to resize">
+            <div class="resizer-handle"></div>
+        </div>
+
+        <!-- Right Panel: Output -->
+        <div class="output-panel">
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="scopes">
+                    <span class="tab-icon">🗂️</span> Scopes
+                </button>
+                <button class="tab-btn" data-tab="symbols">
+                    <span class="tab-icon">🔎</span> Symbols
+                </button>
+                <button class="tab-btn" data-tab="errors">
+                    <span class="tab-icon">⚠️</span> Errors
+                </button>
+                <button class="tab-btn" data-tab="warnings">
+                    <span class="tab-icon">📢</span> Warnings
+                </button>
+                <button class="tab-btn" data-tab="info">
+                    <span class="tab-icon">ℹ️</span> Info
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Scopes Tab -->
+                <div id="scopes-tab" class="tab-pane active">
+                    <div class="tab-toolbar">
+                        <button id="scopes-expand" class="btn btn-sm">Expand All</button>
+                        <button id="scopes-collapse" class="btn btn-sm">Collapse All</button>
+                        <span class="toggle-label" style="margin-left: auto; color: var(--placeholder-color);">
+                            Click a symbol to jump to its definition
+                        </span>
+                    </div>
+                    <div id="scopes-content" class="scopes-content">
+                        <div class="placeholder">
+                            <p>👈 Enter VB6 code and click Analyze to see scopes and symbols</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Symbols Tab -->
+                <div id="symbols-tab" class="tab-pane">
+                    <div id="symbols-content" class="symbols-content">
+                        <div class="placeholder">
+                            <p>👈 Analyze code to see the symbol table</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Errors Tab -->
+                <div id="errors-tab" class="tab-pane">
+                    <div id="errors-content" class="scopes-content">
+                        <div id="errors-empty" class="placeholder">
+                            <p>✅ No semantic errors found</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warnings Tab -->
+                <div id="warnings-tab" class="tab-pane">
+                    <div id="warnings-content" class="scopes-content">
+                        <div id="warnings-empty" class="placeholder">
+                            <p>✅ No warnings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info/Stats Tab -->
+                <div id="info-tab" class="tab-pane">
+                    <div id="info-content" class="info-content">
+                        <div class="placeholder">
+                            <p>📊 Analyze code to see statistics</p>
+                        </div>
+
+                        <!-- Template for when analyzed (hidden initially) -->
+                        <div id="info-stats" class="info-section hidden">
+                            <h4>Statistics</h4>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-label">Scopes</span>
+                                    <span id="stat-scopes" class="stat-value">--</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Symbols</span>
+                                    <span id="stat-symbols" class="stat-value">--</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Errors</span>
+                                    <span id="stat-errors" class="stat-value">--</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Warnings</span>
+                                    <span id="stat-warnings" class="stat-value">--</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Analysis Time</span>
+                                    <span id="stat-analyze-time" class="stat-value">--</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">File Type</span>
+                                    <span id="stat-file-type" class="stat-value">--</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Lines</span>
+                                    <span id="stat-lines" class="stat-value">--</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Chars</span>
+                                    <span id="stat-chars" class="stat-value">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Initializing WASM module...</p>
+    </div>
+
+    <!-- Error modal -->
+    <div id="error-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Error</h3>
+            <p id="error-message"></p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="playground-footer">
+        <div class="container footer-content">
+            <span class="footer-left">&copy; 2024-2026 VB6Semantic Project | <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic">GitHub</a> | Licensed under MIT</span>
+            <span class="footer-right">Powered by <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic">VB6Semantic</a> | Built with Rust 🦀 and WebAssembly</span>
+        </div>
+    </footer>
+
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+    <!-- Playground JavaScript Modules -->
+    <script type="module" src="assets/js/playground/main.js"></script>
+</body>
+</html>
