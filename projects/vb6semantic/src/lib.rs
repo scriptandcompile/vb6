@@ -42,6 +42,10 @@ pub mod scope;
 pub mod symbols;
 pub mod types;
 
+// wasm module for playground use.
+#[cfg(target_arch = "wasm32")]
+pub mod wasm;
+
 // Re-export core types
 pub use analyzer::SemanticAnalyzer;
 pub use error::{Result, SemanticError, SourceLocation};

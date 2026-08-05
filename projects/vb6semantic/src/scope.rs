@@ -345,6 +345,11 @@ impl ScopeManager {
     pub fn get_scopes_by_kind(&self, kind: ScopeKind) -> Vec<&Scope> {
         self.scopes.values().filter(|s| s.kind == kind).collect()
     }
+
+    /// Get all scopes in the manager
+    pub fn all_scopes(&self) -> Vec<&Scope> {
+        self.scopes.values().collect()
+    }
 }
 
 impl Default for ScopeManager {
@@ -444,6 +449,18 @@ mod tests {
 
         let found = manager.lookup("Name").expect("Symbol should resolve");
         assert_eq!(found.scope_id, module);
+    }
+
+    #[test]
+    fn all_scopes_returns_every_scope() {
+        let mut manager = ScopeManager::new();
+        let first = manager.push_scope(ScopeKind::Class, "First".to_string());
+        let second = manager.push_scope(ScopeKind::Procedure, "Second".to_string());
+
+        let mut ids: Vec<usize> = manager.all_scopes().iter().map(|scope| scope.id).collect();
+        ids.sort_unstable();
+
+        assert_eq!(ids, vec![0, first, second]);
     }
 
     #[test]
