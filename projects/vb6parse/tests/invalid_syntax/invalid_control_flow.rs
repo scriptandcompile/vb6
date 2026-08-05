@@ -1,7 +1,8 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
 
 fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str, actual: usize) {
-    let primary_path = format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
+    let primary_path =
+        format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
     let prefixed_path = format!(
         "snapshots/tests/invalid_syntax/{snapshot_dir}/invalid_syntax__{snapshot_dir}__{snapshot_name}.snap"
     );
@@ -18,8 +19,7 @@ fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str
         .count();
 
     assert_eq!(
-        actual,
-        expected,
+        actual, expected,
         "Unexpected failure count for snapshot {snapshot_name}"
     );
 }
@@ -51,7 +51,11 @@ Exit Sub
     insta::assert_yaml_snapshot!("exit_sub_outside_sub_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "exit_sub_outside_sub_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "exit_sub_outside_sub_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("exit_sub_outside_sub_failures", failure_messages);
 }
 
@@ -84,7 +88,11 @@ End Sub
     insta::assert_yaml_snapshot!("exit_function_outside_function_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "exit_function_outside_function_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "exit_function_outside_function_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("exit_function_outside_function_failures", failure_messages);
 }
 
@@ -118,7 +126,11 @@ End Function
     insta::assert_yaml_snapshot!("exit_property_outside_property_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "exit_property_outside_property_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "exit_property_outside_property_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("exit_property_outside_property_failures", failure_messages);
 }
 
@@ -153,7 +165,11 @@ End Sub
     insta::assert_yaml_snapshot!("exit_for_outside_loop_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "exit_for_outside_loop_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "exit_for_outside_loop_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("exit_for_outside_loop_failures", failure_messages);
 }
 
@@ -188,7 +204,11 @@ End Sub
     insta::assert_yaml_snapshot!("exit_do_outside_loop_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "exit_do_outside_loop_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "exit_do_outside_loop_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("exit_do_outside_loop_failures", failure_messages);
 }
 
@@ -222,7 +242,11 @@ End Sub
     insta::assert_yaml_snapshot!("goto_missing_label_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "goto_missing_label_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "goto_missing_label_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("goto_missing_label_failures", failure_messages);
 }
 
@@ -258,7 +282,11 @@ End Sub
     insta::assert_yaml_snapshot!("gosub_missing_label_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "gosub_missing_label_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "gosub_missing_label_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("gosub_missing_label_failures", failure_messages);
 }
 
@@ -292,7 +320,11 @@ End Sub
     insta::assert_yaml_snapshot!("on_error_missing_destination_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "on_error_missing_destination_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "on_error_missing_destination_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("on_error_missing_destination_failures", failure_messages);
 }
 
@@ -325,7 +357,11 @@ End Sub
     insta::assert_yaml_snapshot!("resume_without_on_error_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "resume_without_on_error_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "resume_without_on_error_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("resume_without_on_error_failures", failure_messages);
 }
 
@@ -362,7 +398,11 @@ End Sub
     insta::assert_yaml_snapshot!("nested_exit_wrong_context_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "nested_exit_wrong_context_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "nested_exit_wrong_context_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("nested_exit_wrong_context_failures", failure_messages);
 }
 
@@ -395,7 +435,11 @@ End Sub
     insta::assert_yaml_snapshot!("return_in_module_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "return_in_module_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "return_in_module_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("return_in_module_failures", failure_messages);
 }
 
@@ -429,7 +473,11 @@ End Sub
     insta::assert_yaml_snapshot!("on_error_goto_missing_target_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "on_error_goto_missing_target_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "on_error_goto_missing_target_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("on_error_goto_missing_target_failures", failure_messages);
 }
 
@@ -462,7 +510,11 @@ End Sub
     insta::assert_yaml_snapshot!("stop_with_arguments_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "stop_with_arguments_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "stop_with_arguments_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("stop_with_arguments_failures", failure_messages);
 }
 
@@ -495,6 +547,10 @@ End Sub
     insta::assert_yaml_snapshot!("resume_invalid_combination_cst", tree);
 
     let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("invalid_control_flow", "resume_invalid_combination_failures", failures.len());
+    assert_failure_count_matches_snapshot(
+        "invalid_control_flow",
+        "resume_invalid_combination_failures",
+        failures.len(),
+    );
     insta::assert_yaml_snapshot!("resume_invalid_combination_failures", failure_messages);
 }

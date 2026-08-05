@@ -16,14 +16,13 @@ fn assert_locations(analyzer: &SemanticAnalyzer, expected: &[(&str, SymbolKind, 
     }
 
     for (name, kind, line) in expected {
-        let found = actual.iter().any(|(n, k, l)| n == name && k == kind && l == line);
+        let found = actual
+            .iter()
+            .any(|(n, k, l)| n == name && k == kind && l == line);
         assert!(
             found,
             "expected symbol {:?} ({:?}) at line {} but got: {:?}",
-            name,
-            kind,
-            line,
-            actual
+            name, kind, line, actual
         );
     }
 }
@@ -56,7 +55,9 @@ End Function
     assert_eq!(module.line_offset, 1);
 
     let mut analyzer = SemanticAnalyzer::new();
-    analyzer.analyze_module(&module).expect("analysis should succeed");
+    analyzer
+        .analyze_module(&module)
+        .expect("analysis should succeed");
 
     assert_locations(
         &analyzer,
@@ -97,7 +98,9 @@ End Function
     assert_eq!(module.line_offset, 0);
 
     let mut analyzer = SemanticAnalyzer::new();
-    analyzer.analyze_module(&module).expect("analysis should succeed");
+    analyzer
+        .analyze_module(&module)
+        .expect("analysis should succeed");
 
     assert_locations(
         &analyzer,
@@ -145,7 +148,9 @@ End Function
     assert_eq!(module.line_offset, 5);
 
     let mut analyzer = SemanticAnalyzer::new();
-    analyzer.analyze_module(&module).expect("analysis should succeed");
+    analyzer
+        .analyze_module(&module)
+        .expect("analysis should succeed");
 
     assert_locations(
         &analyzer,
@@ -201,7 +206,9 @@ End Function
     assert_eq!(class.line_offset, 13);
 
     let mut analyzer = SemanticAnalyzer::new();
-    analyzer.analyze_class(&class).expect("analysis should succeed");
+    analyzer
+        .analyze_class(&class)
+        .expect("analysis should succeed");
 
     assert_locations(
         &analyzer,
@@ -265,7 +272,9 @@ End Sub
     assert_eq!(form.line_offset, 25);
 
     let mut analyzer = SemanticAnalyzer::new();
-    analyzer.analyze_form(&form).expect("analysis should succeed");
+    analyzer
+        .analyze_form(&form)
+        .expect("analysis should succeed");
 
     assert_locations(
         &analyzer,

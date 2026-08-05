@@ -347,10 +347,9 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
                 check_results.warnings.extend(analysis_result.warnings);
             }
             Err(vb6semantic::SemanticError::FileReadError { file, message }) => {
-                check_results.missing_files.push(format!(
-                    "Failed to read {}: {}",
-                    file, message
-                ));
+                check_results
+                    .missing_files
+                    .push(format!("Failed to read {}: {}", file, message));
             }
             Err(error) => {
                 check_results
