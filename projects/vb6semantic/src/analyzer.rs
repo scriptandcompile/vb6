@@ -44,6 +44,7 @@ use crate::scope::{ScopeKind, ScopeManager};
 use crate::symbols::{Symbol, SymbolKind, Visibility};
 use crate::types::{TypeChecker, TypeInfo, TypeKind};
 use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 use vb6parse::parsers::SyntaxKind;
 use vb6parse::parsers::cst::CstNode;
 
@@ -58,6 +59,12 @@ pub struct SemanticAnalyzer {
 
     /// Current file being analyzed
     current_file: Option<String>,
+
+    /// Base directory that source-file paths from the `.vbp` are resolved
+    /// against. VB6 stores paths in a project file relative to that file's
+    /// directory, so callers analyzing a project outside the current working
+    /// directory should set this to the project directory.
+    base_dir: Option<PathBuf>,
 
     /// Interfaces implemented by the current class
     implements: Vec<String>,
@@ -85,12 +92,45 @@ impl SemanticAnalyzer {
             scope_manager: ScopeManager::new(),
             type_checker: TypeChecker::new(),
             current_file: None,
+            base_dir: None,
             implements: Vec::new(),
             references: ReferenceRegistry::new(),
             resolved_references: Vec::new(),
             unresolved_references: Vec::new(),
             errors: Vec::new(),
             warnings: Vec::new(),
+        }
+    }
+
+    /// Set the base directory that source-file paths from the `.vbp` are
+    /// resolved against.
+    ///
+    /// Paths stored in a VB6 project file are relative to the project file's
+    /// directory, so projects analyzed from elsewhere need this set to the
+    /// project directory. Absolute paths are always used as-is.
+    pub fn set_base_dir(&mut self, dir: impl Into<PathBuf>) {
+        self.base_dir = Some(dir.into());
+    }
+
+    /// Set the base directory and return `self` for chaining.
+    pub fn with_base_dir(mut self, dir: impl Into<PathBuf>) -> Self {
+        self.set_base_dir(dir);
+        self
+    }
+
+    /// Resolve a source-file path from the `.vbp` against the base directory.
+    fn resolve_source_path(&self, path: &str) -> PathBuf {
+        match &self.base_dir {
+            Some(base) if !Path::new(path).is_absolute() => {
+                // `.vbp` paths use Windows backslashes even on Linux.
+                let normalized = if cfg!(target_os = "windows") {
+                    path.to_string()
+                } else {
+                    path.replace('\\', "/")
+                };
+                base.join(normalized)
+            }
+            _ => PathBuf::from(path),
         }
     }
 
@@ -202,10 +242,11 @@ impl SemanticAnalyzer {
         &mut self,
         module_reference: &vb6parse::files::project::ProjectModuleReference,
     ) -> Result<()> {
+        let module_path = self.resolve_source_path(module_reference.path);
         let source_file =
-            vb6parse::io::SourceFile::from_file(module_reference.path).map_err(|e| {
+            vb6parse::io::SourceFile::from_file(&module_path).map_err(|e| {
                 crate::error::SemanticError::FileReadError {
-                    file: module_reference.path.to_string(),
+                    file: module_path.display().to_string(),
                     message: e.to_string(),
                 }
             })?;
@@ -229,7 +270,7 @@ impl SemanticAnalyzer {
                 })
                 .collect();
             return Err(crate::error::SemanticError::FileParseError {
-                file: module_reference.path.to_string(),
+                file: module_path.display().to_string(),
                 diagnostics,
             });
         }
@@ -267,10 +308,11 @@ impl SemanticAnalyzer {
         &mut self,
         class_reference: &vb6parse::files::project::ProjectClassReference,
     ) -> Result<()> {
+        let class_path = self.resolve_source_path(class_reference.path);
         let source_file =
-            vb6parse::io::SourceFile::from_file(class_reference.path).map_err(|e| {
+            vb6parse::io::SourceFile::from_file(&class_path).map_err(|e| {
                 crate::error::SemanticError::FileReadError {
-                    file: class_reference.path.to_string(),
+                    file: class_path.display().to_string(),
                     message: e.to_string(),
                 }
             })?;
@@ -294,7 +336,7 @@ impl SemanticAnalyzer {
                 })
                 .collect();
             return Err(crate::error::SemanticError::FileParseError {
-                file: class_reference.path.to_string(),
+                file: class_path.display().to_string(),
                 diagnostics,
             });
         }
@@ -330,10 +372,11 @@ impl SemanticAnalyzer {
 
     /// Analyze a form file by its path
     pub fn analyze_form_path(&mut self, form_reference_path: &str) -> Result<()> {
+        let form_path = self.resolve_source_path(form_reference_path);
         let source_file =
-            vb6parse::io::SourceFile::from_file(form_reference_path).map_err(|e| {
+            vb6parse::io::SourceFile::from_file(&form_path).map_err(|e| {
                 crate::error::SemanticError::FileReadError {
-                    file: form_reference_path.to_string(),
+                    file: form_path.display().to_string(),
                     message: e.to_string(),
                 }
             })?;
@@ -357,7 +400,7 @@ impl SemanticAnalyzer {
                 })
                 .collect();
             return Err(crate::error::SemanticError::FileParseError {
-                file: form_reference_path.to_string(),
+                file: form_path.display().to_string(),
                 diagnostics,
             });
         }
@@ -2155,6 +2198,43 @@ Option Explicit
         // The module's Function shadows the library's Constant.
         let now = analyzer.lookup_symbol("Now").expect("Symbol should resolve");
         assert_eq!(now.kind, SymbolKind::Function);
+    }
+
+    #[test]
+    fn analyze_project_resolves_paths_against_base_dir() {
+        let temp_dir = tempdir().expect("Temporary directory should be created");
+        let module_path = temp_dir.path().join("BaseDirModule.bas");
+        fs::write(
+            &module_path,
+            r#"Attribute VB_Name = "BaseDirModule"
+Option Explicit
+
+Public Function Foo() As Long
+End Function
+"#,
+        )
+        .unwrap();
+
+        // The `.vbp` references the module with a bare relative path, the way
+        // VB6 writes project files.
+        let project_source = "Type=Exe\nModule=BaseDirModule; BaseDirModule.bas\n";
+        let source = vb6parse::io::SourceFile::from_string("Project1.vbp", project_source);
+        let (project_opt, failures) = vb6parse::files::ProjectFile::parse(&source).unpack();
+        assert!(failures.is_empty(), "Parse failures: {:?}", failures);
+        let project = project_opt.expect("Project should parse");
+
+        // Without a base dir the bare relative path cannot be found.
+        let mut analyzer = SemanticAnalyzer::new();
+        assert!(analyzer.analyze_project(&project).is_err());
+
+        // With the base dir set to the project directory it is found.
+        let mut analyzer = SemanticAnalyzer::new();
+        analyzer.set_base_dir(temp_dir.path());
+        let result = analyzer
+            .analyze_project(&project)
+            .expect("Analysis should succeed with base dir");
+        assert!(result.errors.is_empty());
+        assert!(analyzer.lookup_symbol("Foo").is_some());
     }
 
     #[test]

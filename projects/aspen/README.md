@@ -6,22 +6,20 @@ Aspen is a VB6 analysis tool in the spirit of `cargo check`, `cargo fmt`, etc.
 
 ### `check`
 
-Validate one or more VB6 projects.
+Validate one or more VB6 projects with semantic analysis.
 
 ```
-aspen check [OPTIONS] [project path]
+aspen check [project path]
 ```
 
 If `[project path]` is a directory, Aspen recursively searches for `.vbp` files
 and checks each one. If it points to a single `.vbp` file, only that project is
 checked. Defaults to the current directory.
 
-| Flag | Alias | Description |
-|------|-------|-------------|
-| `--form` | `-f` | Skip checking forms |
-| `--module` | `-m` | Skip checking modules |
-| `--class` | `-c` | Skip checking classes |
-| `--reference` | `-r` | Skip checking references |
+Each project's references, missing source files, and syntax are validated, then
+the project is analyzed semantically (symbol tables, name resolution, and
+duplicate definitions). Errors, warnings, and missing files are reported per
+project.
 
 ### `fmt`
 
@@ -62,9 +60,6 @@ aspen check
 
 # Check a specific project
 aspen check path/to/project.vbp
-
-# Check a directory, skipping form validation
-aspen check --form path/to/projects/
 
 # Format a single file
 aspen fmt path/to/source.bas
