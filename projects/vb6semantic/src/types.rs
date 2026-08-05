@@ -6,7 +6,7 @@
 
 pub use vb6core::types::{ArrayBound, TypeInfo, VBType};
 
-use crate::error::{Result, SourceLocation, SemanticError};
+use crate::error::{Result, SemanticError, SourceLocation};
 
 /// Type checker for VB6 code
 pub struct TypeChecker {
@@ -46,8 +46,7 @@ impl TypeChecker {
         _location: &SourceLocation,
     ) -> Result<TypeInfo> {
         // Variant propagates
-        if matches!(left_type.kind, VBType::Variant) || matches!(right_type.kind, VBType::Variant)
-        {
+        if matches!(left_type.kind, VBType::Variant) || matches!(right_type.kind, VBType::Variant) {
             return Ok(TypeInfo::variant());
         }
 
