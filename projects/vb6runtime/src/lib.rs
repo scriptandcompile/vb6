@@ -14,6 +14,7 @@
 #![warn(rust_2018_idioms)]
 
 pub mod array;
+pub mod library;
 pub mod value;
 
 /// Runtime error types, re-exported from [`vb6core`].
