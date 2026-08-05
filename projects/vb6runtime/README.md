@@ -10,18 +10,22 @@ VB6 runtime library providing value system, type conversions, and standard libra
 
 ```
 ┌─────────────────┐         ┌─────────────────┐
-│  vb6interpret  │         │   vb6compile   │
+│  vb6interpret   │         │    vb6compile   │
 └────────┬────────┘         └────────┬────────┘
          │                           │
          └───────────┬───────────────┘
                      │
-              ┌──────▼──────────┐
-              │   vb6runtime   │
-              └──────┬──────────┘
+              ┌──────▼───────┐
+              │  vb6runtime  │
+              └──────┬───────┘
                      │
-              ┌──────▼──────┐
-              │   vb6parse  │
-              └─────────────┘
+              ┌──────▼───────┐
+              │  vb6semantic │
+              └──────────────┘
+                     │
+              ┌──────▼───────┐
+              │   vb6parse   │
+              └──────────────┘
 ```
 
 **Note**: `vb6core` contains the IR and compilation infrastructure, while `vb6runtime` contains the runtime execution infrastructure.
@@ -284,7 +288,7 @@ let value = ctx.get_global("MyVar")?;
 - `thiserror` - Error handling
 - `serde` - Serialization support
 - `num-traits` - Numeric operations
-- `chrono` - Date/time operations
+- `jiff` - Date/time operations
 - `encoding_rs` - String encoding
 
 ## Testing

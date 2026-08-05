@@ -513,7 +513,7 @@ impl Array {
 - **thiserror**: Error handling
 - **serde**: Serialization support
 - **num-traits**: Numeric operations
-- **chrono**: Date/time operations
+- **jiff**: Date/time operations
 - **encoding_rs**: String encoding (Windows-1252)
 
 ## Integration
