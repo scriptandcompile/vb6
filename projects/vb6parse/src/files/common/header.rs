@@ -185,10 +185,8 @@ impl Default for FileAttributes {
 pub(crate) fn count_line_breaks(s: &str) -> usize {
     let bytes = s.as_bytes();
     let mut count = 0;
-    for (index, byte) in bytes.iter().enumerate() {
+    for byte in bytes {
         if *byte == b'\n' {
-            count += 1;
-        } else if *byte == b'\r' && bytes.get(index + 1) != Some(&b'\n') {
             count += 1;
         }
     }
