@@ -16,46 +16,6 @@ fn main() -> Result<()> {
             Command::new("check")
                 .about("Check the project")
                 .arg(
-                    Arg::new("ignore forms")
-                        .short('f')
-                        .long("form")
-                        .alias("forms")
-                        .required(false)
-                        .value_parser(value_parser!(bool))
-                        .action(clap::ArgAction::SetFalse)
-                        .help("skip checking the forms listed in the project"),
-                )
-                .arg(
-                    Arg::new("ignore modules")
-                        .short('m')
-                        .long("module")
-                        .alias("modules")
-                        .required(false)
-                        .value_parser(value_parser!(bool))
-                        .action(clap::ArgAction::SetFalse)
-                        .help("skip checking the modules listed in the project"),
-                )
-                .arg(
-                    Arg::new("ignore classes")
-                        .short('c')
-                        .long("class")
-                        .alias("classes")
-                        .required(false)
-                        .value_parser(value_parser!(bool))
-                        .action(clap::ArgAction::SetFalse)
-                        .help("skip checking the classes listed in the project"),
-                )
-                .arg(
-                    Arg::new("ignore references")
-                        .short('r')
-                        .long("reference")
-                        .alias("references")
-                        .required(false)
-                        .value_parser(value_parser!(bool))
-                        .action(clap::ArgAction::SetFalse)
-                        .help("skip checking the references listed in the project"),
-                )
-                .arg(
                     Arg::new("project path")
                         .required(false)
                         .value_parser(value_parser!(PathBuf)),
@@ -139,20 +99,7 @@ fn main() -> Result<()> {
             .unwrap_or(&current_dir)
             .to_path_buf();
 
-        let check_forms = *matches.get_one::<bool>("ignore forms").unwrap_or(&false);
-        let check_modules = *matches.get_one::<bool>("ignore modules").unwrap_or(&false);
-        let check_classes = *matches.get_one::<bool>("ignore classes").unwrap_or(&false);
-        let check_references = *matches
-            .get_one::<bool>("ignore references")
-            .unwrap_or(&false);
-
-        let check_settings = check::CheckSettings {
-            project_path,
-            check_forms,
-            check_modules,
-            check_classes,
-            check_references,
-        };
+        let check_settings = check::CheckSettings { project_path };
 
         check_subcommand(check_settings)?;
 

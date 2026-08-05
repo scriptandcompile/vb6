@@ -9,11 +9,12 @@ Aspen, a VB6 tool for parsing and analyzing VB6 code, in the spirit of cargo che
 """
 repository.workspace = true
 readme = "README.md"
-keywords = ["vb6", "parser", "analyzer", "vb6parse"]
+keywords = ["vb6", "parser", "analyzer", "vb6parse", "vb6semantic"]
 categories = ["development-tools", "parsing", "parser-implementations"]
 
 [dependencies]
 vb6parse.workspace = true
+vb6semantic.workspace = true
 vb6format.workspace = true
 clap.workspace = true
 walkdir.workspace = true

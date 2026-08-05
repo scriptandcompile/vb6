@@ -43,7 +43,6 @@ use vb6parse::errors::ErrorDetails;
 #[derive(Error, Debug, Clone)]
 pub enum SemanticError {
     /// Represents an undefined symbol error, where a symbol is referenced but not defined
-    #[error("Undefined symbol: {name} at {location}")]
     UndefinedSymbol {
         /// Name of the undefined symbol
         name: String,
@@ -52,9 +51,6 @@ pub enum SemanticError {
     },
 
     /// Represents a duplicate symbol error, where a symbol is defined multiple times
-    #[error(
-        "Symbol already defined: {name} at {location}, previously defined at {previous_location}"
-    )]
     DuplicateSymbol {
         /// Name of the duplicate symbol
         name: String,
@@ -65,7 +61,6 @@ pub enum SemanticError {
     },
 
     /// Represents a type mismatch error, where the expected and found types do not match
-    #[error("Type mismatch: expected {expected}, found {found} at {location}")]
     TypeMismatch {
         /// Expected type
         expected: String,
@@ -76,14 +71,12 @@ pub enum SemanticError {
     },
 
     /// Represents an invalid scope error, where a symbol is defined in an invalid scope
-    #[error("Invalid scope: {message}")]
     InvalidScope {
         /// Message describing the invalid scope error
         message: String,
     },
 
     /// Represents an invalid type error, where a type is not valid in the given context
-    #[error("Invalid type: {message} at {location}")]
     InvalidType {
         /// Message describing the invalid type error
         message: String,
@@ -92,14 +85,12 @@ pub enum SemanticError {
     },
 
     /// Represents a circular dependency error, where symbols depend on each other in a cycle
-    #[error("Circular dependency detected: {message}")]
     CircularDependency {
         /// Message describing the circular dependency error
         message: String,
     },
 
     /// Represents an invalid operation error, where an operation is not valid for the given types
-    #[error("Invalid operation: {message} at {location}")]
     InvalidOperation {
         /// Message describing the invalid operation error
         message: String,
@@ -108,7 +99,6 @@ pub enum SemanticError {
     },
 
     /// Represents an inaccessible symbol error, where a symbol is not accessible due to its visibility
-    #[error("Inaccessible symbol: {name} is {visibility} at {location}")]
     InaccessibleSymbol {
         /// Name of the inaccessible symbol
         name: String,
@@ -119,7 +109,6 @@ pub enum SemanticError {
     },
 
     /// Represents an invalid assignment error, where an assignment is not valid due to type mismatch or other issues
-    #[error("Invalid assignment: {message} at {location}")]
     InvalidAssignment {
         /// Message describing the invalid assignment error
         message: String,
@@ -128,7 +117,6 @@ pub enum SemanticError {
     },
 
     /// Represents a parameter mismatch error, where the provided parameters do not match the expected ones
-    #[error("Parameter mismatch: {message} at {location}")]
     ParameterMismatch {
         /// Message describing the parameter mismatch error
         message: String,
@@ -137,7 +125,6 @@ pub enum SemanticError {
     },
 
     /// Represents a file read error, where a source file could not be read from disk
-    #[error("Failed to read file {file}: {message}")]
     FileReadError {
         /// Path of the file that could not be read
         file: String,
@@ -146,7 +133,6 @@ pub enum SemanticError {
     },
 
     /// Represents a parse error for a source file that could not be parsed successfully
-    #[error("Failed to parse file {file}: {diagnostics:?}")]
     FileParseError {
         /// Path of the file that could not be parsed
         file: String,
@@ -155,8 +141,71 @@ pub enum SemanticError {
     },
 
     /// Represents a general analysis error that does not fit into other categories
-    #[error("Analysis error: {0}")]
     AnalysisError(String),
+}
+
+impl std::fmt::Display for SemanticError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SemanticError::UndefinedSymbol { name, location } => {
+                write!(f, "Undefined symbol: {name} at {location}")
+            }
+            SemanticError::DuplicateSymbol {
+                name,
+                location,
+                previous_location,
+            } => write!(
+                f,
+                "Symbol already defined: {name} at {location}, previously defined at {previous_location}"
+            ),
+            SemanticError::TypeMismatch {
+                expected,
+                found,
+                location,
+            } => write!(
+                f,
+                "Type mismatch: expected {expected}, found {found} at {location}"
+            ),
+            SemanticError::InvalidScope { message } => write!(f, "Invalid scope: {message}"),
+            SemanticError::InvalidType { message, location } => {
+                write!(f, "Invalid type: {message} at {location}")
+            }
+            SemanticError::CircularDependency { message } => {
+                write!(f, "Circular dependency detected: {message}")
+            }
+            SemanticError::InvalidOperation { message, location } => {
+                write!(f, "Invalid operation: {message} at {location}")
+            }
+            SemanticError::InaccessibleSymbol {
+                name,
+                visibility,
+                location,
+            } => write!(
+                f,
+                "Inaccessible symbol: {name} is {visibility} at {location}"
+            ),
+            SemanticError::InvalidAssignment { message, location } => {
+                write!(f, "Invalid assignment: {message} at {location}")
+            }
+            SemanticError::ParameterMismatch { message, location } => {
+                write!(f, "Parameter mismatch: {message} at {location}")
+            }
+            SemanticError::FileReadError { file, message } => {
+                write!(f, "Failed to read file {file}: {message}")
+            }
+            SemanticError::FileParseError { file, diagnostics } => {
+                write!(f, "Failed to parse file {file}")?;
+                for diagnostic in diagnostics {
+                    match diagnostic.print_to_string() {
+                        Ok(text) => write!(f, "\n{text}")?,
+                        Err(_) => write!(f, "\n{diagnostic:?}")?,
+                    }
+                }
+                Ok(())
+            }
+            SemanticError::AnalysisError(message) => write!(f, "Analysis error: {message}"),
+        }
+    }
 }
 
 /// Represents a location in the source code, including file name, line number, and column number
@@ -196,13 +245,13 @@ mod tests {
     }
 
     #[test]
-    fn file_parse_error_keeps_parser_diagnostics() {
+    fn file_parse_error_pretty_prints_source_diagnostics() {
         let error = SemanticError::FileParseError {
             file: "module.bas".to_string(),
             diagnostics: vec![ErrorDetails {
                 source_name: "module.bas".to_string().into_boxed_str(),
-                source_content: "",
-                error_offset: 0,
+                source_content: "Dim x As ?",
+                error_offset: 8,
                 line_start: 1,
                 line_end: 1,
                 kind: Box::new(vb6parse::errors::ErrorKind::Lexer(
@@ -218,6 +267,10 @@ mod tests {
 
         let message = error.to_string();
         assert!(message.contains("module.bas"));
-        assert!(message.contains("ErrorDetails"));
+        assert!(message.contains("error here"));
+        assert!(
+            !message.contains("ErrorDetails {"),
+            "diagnostics should be rendered with the source display, not Debug"
+        );
     }
 }

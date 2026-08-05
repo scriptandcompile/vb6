@@ -4,16 +4,12 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use rayon::prelude::*;
 use vb6parse::files::project::ProjectReference;
-use vb6parse::{ClassFile, FormFile, ModuleFile, ProjectFile, SourceFile};
+use vb6parse::{ProjectFile, SourceFile};
 
 use walkdir::WalkDir;
 
 pub struct CheckSettings {
     pub project_path: PathBuf,
-    pub check_forms: bool,
-    pub check_modules: bool,
-    pub check_classes: bool,
-    pub check_references: bool,
 }
 
 pub struct CheckResults {
@@ -21,6 +17,7 @@ pub struct CheckResults {
     pub parsing_errors: Vec<Error>,
     pub non_english_files: Vec<String>,
     pub missing_files: Vec<String>,
+    pub warnings: Vec<String>,
 }
 
 pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
@@ -60,6 +57,7 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
                             "Failed to load {}",
                             project_path.as_ref().err().unwrap()
                         )],
+                        warnings: Vec::new(),
                     };
 
                     return check_result;
@@ -67,10 +65,6 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
 
                 let check_settings = CheckSettings {
                     project_path: project_path.as_ref().unwrap().path().to_path_buf(),
-                    check_forms: check_settings.check_forms,
-                    check_modules: check_settings.check_modules,
-                    check_classes: check_settings.check_classes,
-                    check_references: check_settings.check_references,
                 };
 
                 match check_project(&check_settings) {
@@ -80,6 +74,7 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
                         parsing_errors: vec![e],
                         non_english_files: Vec::new(),
                         missing_files: Vec::new(),
+                        warnings: Vec::new(),
                     },
                 }
             })
@@ -92,6 +87,7 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
                 parsing_errors: vec![e],
                 non_english_files: Vec::new(),
                 missing_files: Vec::new(),
+                warnings: Vec::new(),
             },
         };
         check_summary.push(check_result);
@@ -110,11 +106,12 @@ fn report_check(check_results: &CheckResults) {
     if check_results.parsing_errors.is_empty()
         && check_results.non_english_files.is_empty()
         && check_results.missing_files.is_empty()
+        && check_results.warnings.is_empty()
     {
         return;
     }
 
-    println!("Errors found in '{}':", check_results.project_path);
+    println!("Issues found in '{}':", check_results.project_path);
     if !check_results.missing_files.is_empty() {
         println!("Missing Files:");
         for missing_file in &check_results.missing_files {
@@ -133,105 +130,37 @@ fn report_check(check_results: &CheckResults) {
             println!("  {}", non_english_file);
         }
     }
+    if !check_results.warnings.is_empty() {
+        println!("Warnings:");
+        for warning in &check_results.warnings {
+            println!("  {}", warning);
+        }
+    }
 }
 
 fn report_single_check_summary(summary: &CheckResults) {
-    // 0, 0, 0
-    if summary.parsing_errors.is_empty()
-        && summary.non_english_files.is_empty()
-        && summary.missing_files.is_empty()
-    {
+    let mut parts = Vec::new();
+
+    if !summary.missing_files.is_empty() {
+        parts.push(format!("{} missing files", summary.missing_files.len()));
+    }
+    if !summary.non_english_files.is_empty() {
+        parts.push(format!(
+            "{} unprocessed non-English files",
+            summary.non_english_files.len()
+        ));
+    }
+    if !summary.parsing_errors.is_empty() {
+        parts.push(format!("{} errors", summary.parsing_errors.len()));
+    }
+    if !summary.warnings.is_empty() {
+        parts.push(format!("{} warnings", summary.warnings.len()));
+    }
+
+    if parts.is_empty() {
         println!("No errors found in {}.", summary.project_path);
-        return;
-    }
-
-    // 0, 0, 1
-    if summary.parsing_errors.is_empty()
-        && summary.non_english_files.is_empty()
-        && !summary.missing_files.is_empty()
-    {
-        println!(
-            "{} missing files in {}.",
-            summary.missing_files.len(),
-            summary.project_path
-        );
-        return;
-    }
-
-    // 0, 1, 0
-    if summary.parsing_errors.is_empty()
-        && !summary.non_english_files.is_empty()
-        && summary.missing_files.is_empty()
-    {
-        println!(
-            "{} unprocessed non-English files found in the project.",
-            summary.non_english_files.len()
-        );
-        return;
-    }
-
-    // 0, 1, 1
-    if summary.parsing_errors.is_empty()
-        && !summary.non_english_files.is_empty()
-        && !summary.missing_files.is_empty()
-    {
-        println!(
-            "{} missing files, {} unprocessed non-English files found in the project.",
-            summary.missing_files.len(),
-            summary.non_english_files.len()
-        );
-        return;
-    }
-
-    // 1, 0, 0
-    if !summary.parsing_errors.is_empty()
-        && summary.non_english_files.is_empty()
-        && summary.missing_files.is_empty()
-    {
-        println!(
-            "{} errors found in the project.",
-            summary.parsing_errors.len()
-        );
-        return;
-    }
-
-    // 1, 0, 1
-    if !summary.parsing_errors.is_empty()
-        && summary.non_english_files.is_empty()
-        && !summary.missing_files.is_empty()
-    {
-        println!(
-            "{} missing files, {} errors found in the project.",
-            summary.missing_files.len(),
-            summary.parsing_errors.len()
-        );
-        return;
-    }
-
-    // 1, 1, 0
-    if !summary.parsing_errors.is_empty()
-        && !summary.non_english_files.is_empty()
-        && summary.missing_files.is_empty()
-    {
-        println!(
-            "{} errors found in project with {} unprocessed non-English files found in the project.",
-            summary.parsing_errors.len(),
-            summary.non_english_files.len()
-        );
-        return;
-    }
-
-    // 1, 1, 1
-    if !summary.parsing_errors.is_empty()
-        && !summary.non_english_files.is_empty()
-        && !summary.missing_files.is_empty()
-    {
-        println!(
-            "{} missing files, {} errors found in project with {} unprocessed non-English files found in the project.",
-            summary.missing_files.len(),
-            summary.parsing_errors.len(),
-            summary.non_english_files.len()
-        );
+    } else {
+        println!("{} found in {}.", parts.join(", "), summary.project_path);
     }
 }
 
@@ -253,72 +182,30 @@ fn report_check_summary(summary: Vec<CheckResults>) {
         .iter()
         .fold(0, |acc, x| acc + x.non_english_files.len());
 
-    // 0, 0, 0
-    if total_error_count == 0 && total_non_english_file_count == 0 && total_missed_file_count == 0 {
+    let total_warning_count = summary.iter().fold(0, |acc, x| acc + x.warnings.len());
+
+    let mut parts = Vec::new();
+
+    if total_missed_file_count != 0 {
+        parts.push(format!("{} missing files", total_missed_file_count));
+    }
+    if total_non_english_file_count != 0 {
+        parts.push(format!(
+            "{} unprocessed non-English files",
+            total_non_english_file_count
+        ));
+    }
+    if total_error_count != 0 {
+        parts.push(format!("{} errors", total_error_count));
+    }
+    if total_warning_count != 0 {
+        parts.push(format!("{} warnings", total_warning_count));
+    }
+
+    if parts.is_empty() {
         println!("No errors found in {} projects.", project_count);
-        return;
-    }
-
-    // 0, 0, 1
-    if total_error_count == 0 && total_non_english_file_count == 0 && total_missed_file_count != 0 {
-        println!(
-            "{} missing files in {} projects",
-            total_non_english_file_count, project_count
-        );
-        return;
-    }
-
-    // 0, 1, 0
-    if total_error_count == 0 && total_non_english_file_count != 0 && total_missed_file_count == 0 {
-        println!(
-            "{} unprocessed non-English files found in {} projects",
-            total_non_english_file_count, project_count
-        );
-        return;
-    }
-
-    // 0, 1, 1
-    if total_error_count == 0 && total_non_english_file_count != 0 && total_missed_file_count != 0 {
-        println!(
-            "{} missing files, {} unprocessed non-English files found in {} projects",
-            total_missed_file_count, total_non_english_file_count, project_count
-        );
-        return;
-    }
-
-    // 1, 0, 0
-    if total_error_count != 0 && total_non_english_file_count == 0 && total_missed_file_count == 0 {
-        println!(
-            "{} errors found in {} projects.",
-            total_error_count, project_count
-        );
-        return;
-    }
-
-    // 1, 0, 1
-    if total_error_count != 0 && total_non_english_file_count == 0 && total_missed_file_count != 0 {
-        println!(
-            "{} missing files, {} errors found in {} projects.",
-            total_missed_file_count, total_error_count, project_count
-        );
-        return;
-    }
-
-    // 1, 1, 0
-    if total_error_count != 0 && total_non_english_file_count != 0 && total_missed_file_count == 0 {
-        println!(
-            "{} errors, {} unprocessed non-English files found in {} projects.",
-            total_error_count, total_non_english_file_count, project_count
-        );
-        return;
-    }
-
-    // 1, 1, 1
-    if total_error_count != 0 && total_non_english_file_count != 0 && total_missed_file_count != 0 {
-        println!(
-            "{} missing files, {} errors, {} unprocessed non-English files found in {} projects.",
-            total_missed_file_count, total_error_count, total_non_english_file_count, project_count
-        );
+    } else {
+        println!("{} found in {} projects.", parts.join(", "), project_count);
     }
 }
 
@@ -350,6 +237,7 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
         parsing_errors: Vec::new(),
         non_english_files: Vec::new(),
         missing_files: Vec::new(),
+        warnings: Vec::new(),
     };
 
     let project_contents = std::fs::read(&check_settings.project_path).unwrap();
@@ -375,9 +263,14 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
     };
 
     for failure in failures {
-        check_results
-            .parsing_errors
-            .push(anyhow::anyhow!("Parse failure: {}", failure));
+        match failure.print_to_string() {
+            Ok(text) => check_results
+                .parsing_errors
+                .push(anyhow::anyhow!("{}", text)),
+            Err(_) => check_results
+                .parsing_errors
+                .push(anyhow::anyhow!("Parse failure: {}", failure)),
+        }
     }
 
     //remove filename from path
@@ -385,134 +278,84 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
         .parent()
         .unwrap();
 
-    if check_settings.check_references {
-        for reference in project.references() {
-            match reference {
-                ProjectReference::SubProject { path } => {
-                    let reference_path = join_parent_project_path(project_directory, path);
-                    if std::fs::metadata(&reference_path).is_err() {
-                        check_results.missing_files.push(format!(
-                            "Sub-Project Reference not found: {}",
-                            reference_path.to_str().unwrap()
-                        ));
-                    }
-                }
-                // this should be unreachable, but if it is reached, we just skip it.
-                _ => continue,
-            }
-        }
-    }
+    let mut source_files_missing = false;
 
-    if check_settings.check_classes {
-        for class_reference in project.classes() {
-            let class_path = join_parent_project_path(project_directory, class_reference.path);
-
-            if std::fs::metadata(&class_path).is_err() {
-                check_results
-                    .missing_files
-                    .push(format!("Class not found: {}", class_path.to_str().unwrap()));
-
-                continue;
-            }
-
-            let file_name = class_path.file_name().unwrap().to_str().unwrap();
-            let class_contents = std::fs::read(&class_path).unwrap();
-            let source_file = match SourceFile::decode_with_replacement(file_name, &class_contents)
-            {
-                Ok(sf) => sf,
-                Err(err) => {
-                    check_results.parsing_errors.push(anyhow::anyhow!(
-                        "Failed to decode class file {}: {}",
-                        file_name,
-                        err
+    for reference in project.references() {
+        match reference {
+            ProjectReference::SubProject { path } => {
+                let reference_path = join_parent_project_path(project_directory, path);
+                if std::fs::metadata(&reference_path).is_err() {
+                    check_results.missing_files.push(format!(
+                        "Sub-Project Reference not found: {}",
+                        reference_path.to_str().unwrap()
                     ));
-                    continue;
                 }
-            };
-
-            let parse_result = ClassFile::parse(&source_file);
-            let (_, failures) = parse_result.unpack();
-
-            for failure in failures {
-                check_results
-                    .parsing_errors
-                    .push(anyhow::anyhow!("Class parse error: {}", failure));
             }
+            // this should be unreachable, but if it is reached, we just skip it.
+            _ => continue,
         }
     }
 
-    if check_settings.check_modules {
-        for module_reference in project.modules() {
-            let module_path = join_parent_project_path(project_directory, module_reference.path);
+    for class_reference in project.classes() {
+        let class_path = join_parent_project_path(project_directory, class_reference.path);
 
-            if std::fs::metadata(&module_path).is_err() {
+        if std::fs::metadata(&class_path).is_err() {
+            source_files_missing = true;
+            check_results
+                .missing_files
+                .push(format!("Class not found: {}", class_path.to_str().unwrap()));
+        }
+    }
+
+    for module_reference in project.modules() {
+        let module_path = join_parent_project_path(project_directory, module_reference.path);
+
+        if std::fs::metadata(&module_path).is_err() {
+            source_files_missing = true;
+            check_results.missing_files.push(format!(
+                "Module not found: {}",
+                module_path.to_str().unwrap()
+            ));
+        }
+    }
+
+    for form_reference in project.forms() {
+        let form_path = join_parent_project_path(project_directory, form_reference);
+
+        if std::fs::metadata(&form_path).is_err() {
+            source_files_missing = true;
+            check_results
+                .missing_files
+                .push(format!("Form not found: {}", form_path.to_str().unwrap()));
+        }
+    }
+
+    // Analyze the project with vb6semantic. This resolves names, builds symbol
+    // tables, and reports semantic errors and warnings across all of the
+    // project's source files.
+    if !source_files_missing {
+        let mut analyzer = vb6semantic::SemanticAnalyzer::new();
+        analyzer.set_base_dir(project_directory);
+
+        match analyzer.analyze_project(&project) {
+            Ok(analysis_result) => {
+                for error in analysis_result.errors {
+                    check_results
+                        .parsing_errors
+                        .push(anyhow::anyhow!("{}", error));
+                }
+                check_results.warnings.extend(analysis_result.warnings);
+            }
+            Err(vb6semantic::SemanticError::FileReadError { file, message }) => {
                 check_results.missing_files.push(format!(
-                    "Module not found: {}",
-                    module_path.to_str().unwrap()
+                    "Failed to read {}: {}",
+                    file, message
                 ));
-
-                continue;
             }
-
-            let file_name = module_path.file_name().unwrap().to_str().unwrap();
-            let module_contents = std::fs::read(&module_path).unwrap();
-            let source_file = match SourceFile::decode_with_replacement(file_name, &module_contents)
-            {
-                Ok(sf) => sf,
-                Err(err) => {
-                    check_results.parsing_errors.push(anyhow::anyhow!(
-                        "Failed to decode module file {}: {}",
-                        file_name,
-                        err
-                    ));
-                    continue;
-                }
-            };
-
-            let parse_result = ModuleFile::parse(&source_file);
-            let (_, failures) = parse_result.unpack();
-
-            for failure in failures {
+            Err(error) => {
                 check_results
                     .parsing_errors
-                    .push(anyhow::anyhow!("Module parse error: {}", failure));
-            }
-        }
-    }
-
-    if check_settings.check_forms {
-        for form_reference in project.forms() {
-            let form_path = join_parent_project_path(project_directory, form_reference);
-
-            if std::fs::metadata(&form_path).is_err() {
-                check_results
-                    .missing_files
-                    .push(format!("Form not found: {}", form_path.to_str().unwrap()));
-
-                continue;
-            }
-
-            let file_name = form_path.file_name().unwrap().to_str().unwrap();
-            let form_contents = std::fs::read(&form_path).unwrap();
-            let source_file = match SourceFile::decode_with_replacement(file_name, &form_contents) {
-                Ok(sf) => sf,
-                Err(err) => {
-                    check_results.parsing_errors.push(anyhow::anyhow!(
-                        "Failed to decode form file {}: {}",
-                        file_name,
-                        err
-                    ));
-                    continue;
-                }
-            };
-
-            let parse_result = FormFile::parse(&source_file);
-            let (_, failures) = parse_result.unpack();
-
-            for failure in failures {
-                check_results
-                    .parsing_errors
-                    .push(anyhow::anyhow!("Form parse error: {}", failure));
+                    .push(anyhow::anyhow!("{}", error));
             }
         }
     }
