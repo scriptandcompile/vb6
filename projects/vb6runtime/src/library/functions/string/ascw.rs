@@ -414,3 +414,59 @@
 //! - Grapheme clusters (like emoji with modifiers) are not handled as single units
 //! - Runtime error occurs with empty strings
 //! - No built-in normalization (characters with multiple representations)
+
+use crate::error::{err_number, VBError, VBResult};
+
+/// Returns the Unicode code point of the first character.
+///
+/// Returns the UTF-16 code unit for the Basic Multilingual Plane (0-65535). For
+/// characters outside the BMP (which VB6 stores as surrogate pairs), the high
+/// surrogate value (0xD800-0xDBFF) is returned, matching VB6 `AscW`.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `input` is empty.
+pub fn ascw(input: &str) -> VBResult<i32> {
+    let first_char = input.chars().next().ok_or_else(|| {
+        VBError::with_description(err_number::INVALID_PROCEDURE_CALL, "String cannot be empty")
+    })?;
+
+    let code = first_char as u32;
+    if code <= 0xFFFF {
+        Ok(code as i32)
+    } else {
+        let high_surrogate = 0xD800 + ((code - 0x10000) >> 10);
+        Ok(high_surrogate as i32)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn returns_ascii_codes() {
+        assert_eq!(ascw("A").unwrap(), 65);
+        assert_eq!(ascw("a").unwrap(), 97);
+    }
+
+    #[test]
+    fn returns_unicode_code_points() {
+        assert_eq!(ascw("€").unwrap(), 8364);
+        assert_eq!(ascw("α").unwrap(), 945);
+        assert_eq!(ascw("中").unwrap(), 20013);
+    }
+
+    #[test]
+    fn non_bmp_returns_high_surrogate() {
+        assert_eq!(ascw("😀").unwrap(), 0xD83D);
+    }
+
+    #[test]
+    fn rejects_empty_string() {
+        assert_eq!(
+            ascw("").unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

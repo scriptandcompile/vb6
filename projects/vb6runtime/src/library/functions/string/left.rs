@@ -552,3 +552,55 @@
 //! - `Len`: Get length of string
 //! - `InStr`: Find position of substring
 //! - `Trim`/`LTrim`/`RTrim`: Remove whitespace
+
+use crate::error::{err_number, VBError, VBResult};
+
+/// Returns the specified number of characters from the left side of the string.
+///
+/// A `length` of 0 returns an empty string; a `length` greater than the number
+/// of characters returns the entire string. Characters are counted as Unicode
+/// scalar values.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
+pub fn left(input: &str, length: i32) -> VBResult<String> {
+    if length < 0 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid length",
+        ));
+    }
+    Ok(input.chars().take(length as usize).collect())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn returns_leftmost_characters() {
+        assert_eq!(left("Hello", 3).unwrap(), "Hel");
+        assert_eq!(left("Hello", 0).unwrap(), "");
+    }
+
+    #[test]
+    fn length_greater_than_string_returns_all() {
+        assert_eq!(left("Hello", 10).unwrap(), "Hello");
+        assert_eq!(left("Hello", 5).unwrap(), "Hello");
+    }
+
+    #[test]
+    fn handles_unicode() {
+        assert_eq!(left("héllo", 2).unwrap(), "hé");
+    }
+
+    #[test]
+    fn rejects_negative_length() {
+        assert_eq!(
+            left("Hello", -1).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

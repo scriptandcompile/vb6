@@ -294,3 +294,78 @@
 //! - Surrogate pairs are complex and require combining two `ChrW` calls
 //! - Not all fonts support all Unicode characters; display depends on available fonts
 //! - Some Unicode features like combining characters may not render correctly in all VB6 controls
+
+use crate::error::{err_number, VBError, VBResult};
+
+/// Returns the Unicode character associated with the specified code.
+///
+/// `charcode` is in the range -32768 to 65535; negative values are treated as
+/// `65536 + charcode`, matching VB6's 16-bit integer behavior. Code 0 returns
+/// the null character (U+0000).
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `charcode` is
+/// outside the range -32768 to 65535, or names a UTF-16 surrogate (which cannot
+/// be represented as a single Rust `char`).
+pub fn chrw(charcode: i32) -> VBResult<String> {
+    if !(-32768..=65535).contains(&charcode) {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Character code out of range",
+        ));
+    }
+
+    let code = if charcode < 0 {
+        charcode + 65536
+    } else {
+        charcode
+    } as u32;
+
+    char::from_u32(code).map(|c| c.to_string()).ok_or_else(|| {
+        VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid Unicode character code",
+        )
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn returns_ascii_characters() {
+        assert_eq!(chrw(65).unwrap(), "A");
+        assert_eq!(chrw(97).unwrap(), "a");
+    }
+
+    #[test]
+    fn returns_unicode_characters() {
+        assert_eq!(chrw(8364).unwrap(), "€");
+        assert_eq!(chrw(20013).unwrap(), "中");
+    }
+
+    #[test]
+    fn negative_values_are_wrapped() {
+        assert_eq!(chrw(-1).unwrap(), "\u{FFFF}");
+        assert_eq!(chrw(-8192).unwrap(), "\u{E000}");
+    }
+
+    #[test]
+    fn code_zero_returns_null_character() {
+        assert_eq!(chrw(0).unwrap(), "\u{0}");
+    }
+
+    #[test]
+    fn rejects_out_of_range() {
+        assert_eq!(
+            chrw(-32769).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+        assert_eq!(
+            chrw(65536).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

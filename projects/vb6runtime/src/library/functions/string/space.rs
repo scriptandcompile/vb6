@@ -643,4 +643,47 @@
 //! - `Tab`: Positions output at specific column in Print # statements
 //! - `LSet`: Left-aligns string within string variable
 //! - `RSet`: Right-aligns string within string variable
-//!
+
+use crate::error::{err_number, VBError, VBResult};
+
+/// Returns a string consisting of the specified number of spaces (ASCII 32).
+///
+/// A `number` of 0 returns an empty string.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `number` is negative.
+pub fn space(number: i32) -> VBResult<String> {
+    if number < 0 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid number",
+        ));
+    }
+    Ok(" ".repeat(number as usize))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn returns_spaces() {
+        assert_eq!(space(3).unwrap(), "   ");
+        assert_eq!(space(1).unwrap(), " ");
+    }
+
+    #[test]
+    fn zero_returns_empty() {
+        assert_eq!(space(0).unwrap(), "");
+    }
+
+    #[test]
+    fn rejects_negative_number() {
+        assert_eq!(
+            space(-1).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

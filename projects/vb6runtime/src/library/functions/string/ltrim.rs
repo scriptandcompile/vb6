@@ -595,3 +595,28 @@
 //! - `Replace`: Replaces occurrences of substring
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
+
+/// Returns the string with leading spaces (ASCII 32) removed.
+///
+/// Only the space character is trimmed, matching VB6; tabs and other
+/// whitespace are preserved.
+pub fn ltrim(input: &str) -> String {
+    input.trim_start_matches(' ').to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn trims_leading_spaces() {
+        assert_eq!(ltrim("  Hello World  "), "Hello World  ");
+        assert_eq!(ltrim("Hello"), "Hello");
+    }
+
+    #[test]
+    fn handles_empty_and_all_spaces() {
+        assert_eq!(ltrim(""), "");
+        assert_eq!(ltrim("   "), "");
+    }
+}

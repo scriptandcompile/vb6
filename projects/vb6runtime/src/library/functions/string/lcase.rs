@@ -528,3 +528,33 @@
 //! - `Trim`/`LTrim`/`RTrim`: Remove whitespace
 //! - `Replace`: Replace substrings (with case-sensitive option)
 //! - `InStr`: Find substring (can be case-insensitive)
+
+/// Returns the string converted to lowercase.
+///
+/// Only uppercase letters are converted; lowercase letters and non-letter
+/// characters are unchanged. Uses full Unicode case mapping.
+pub fn lcase(input: &str) -> String {
+    input.to_lowercase()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn lowercases_letters() {
+        assert_eq!(lcase("Hello World"), "hello world");
+        assert_eq!(lcase("ABC"), "abc");
+    }
+
+    #[test]
+    fn leaves_non_letters_unchanged() {
+        assert_eq!(lcase("123 !@#"), "123 !@#");
+    }
+
+    #[test]
+    fn handles_unicode() {
+        assert_eq!(lcase("HÉLLO"), "héllo");
+        assert_eq!(lcase(""), "");
+    }
+}

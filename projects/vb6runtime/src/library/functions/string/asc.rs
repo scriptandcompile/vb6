@@ -251,7 +251,7 @@
 //! to their ANSI byte (e.g. `é` -> 233, `€` -> 128); anything else raises
 //! error 5. `AscW` is the Unicode code-point variant.
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::VBResult;
 
 /// Returns the Windows-1252 (ANSI) character code of the first character.
 ///
@@ -267,32 +267,13 @@ use crate::error::{err_number, VBError, VBResult};
 /// Returns error 5 (`Invalid procedure call or argument`) when `input` is empty
 /// or its first character cannot be represented in Windows-1252.
 pub fn asc(input: &str) -> VBResult<i32> {
-    let first_char = input.chars().next().ok_or_else(|| {
-        VBError::with_description(err_number::INVALID_PROCEDURE_CALL, "String cannot be empty")
-    })?;
-
-    // ASCII characters are identical in Unicode and Windows-1252.
-    if first_char.is_ascii() {
-        return Ok(i32::from(first_char as u16));
-    }
-
-    // Encode the first character to the ANSI code page used by VB6.
-    let mut buf = [0u8; 4];
-    let encoded = first_char.encode_utf8(&mut buf);
-    let (ansi, _, had_errors) = encoding_rs::WINDOWS_1252.encode(encoded);
-    if had_errors {
-        return Err(VBError::with_description(
-            err_number::INVALID_PROCEDURE_CALL,
-            "Character code out of ANSI range",
-        ));
-    }
-
-    Ok(i32::from(ansi[0]))
+    super::ansi::encode_first_byte(input).map(i32::from)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::error::err_number;
 
     #[test]
     fn returns_ascii_codes() {
