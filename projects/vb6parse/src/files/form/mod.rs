@@ -42,6 +42,14 @@ pub struct FormFile {
     /// Note: This CST excludes nodes that are already extracted into other fields
     #[serde(serialize_with = "serialize_cst")]
     pub cst: ConcreteSyntaxTree,
+    /// The number of lines in the file that are consumed by the form header
+    /// (VERSION, control descriptors, `Attribute` statements) and therefore
+    /// not present in the CST.
+    ///
+    /// Line numbers reported by consumers of the CST (such as semantic
+    /// analyzers) must add this offset to obtain file-absolute line numbers.
+    #[serde(skip)]
+    pub line_offset: usize,
 }
 
 impl Display for FormFile {
@@ -78,7 +86,8 @@ impl FormFile {
         };
 
         let tokens = token_stream.into_tokens();
-        let mut parser = crate::parsers::cst::Parser::new_direct_extraction(tokens, 0);
+        let tokens_len = tokens.len();
+        let mut parser = crate::parsers::cst::Parser::new_direct_extraction(tokens.clone(), 0);
 
         // Parse VERSION directly (no CST overhead)
         let (version_opt, version_failures) = parser.parse_version_direct().unpack();
@@ -108,8 +117,15 @@ impl FormFile {
 
         // Get remaining tokens and build CST only for the code section
         let remaining_tokens = parser.into_tokens();
+        let remaining_count = remaining_tokens.len();
         let remaining_stream = TokenStream::from_tokens(remaining_tokens);
         let cst = parse(remaining_stream);
+
+        let line_offset = tokens
+            .iter()
+            .take(tokens_len - remaining_count)
+            .filter(|(_, token)| *token == crate::language::Token::Newline)
+            .count();
 
         ParseResult::new(
             Some(FormFile {
@@ -118,6 +134,7 @@ impl FormFile {
                 version,
                 attributes,
                 cst,
+                line_offset,
             }),
             all_failures,
         )

@@ -297,7 +297,7 @@ impl SemanticAnalyzer {
 
         // Process module-level declarations
         let root = module.cst.to_root_node();
-        self.process_statements(&root, root.children())?;
+        self.process_statements(&root, root.children(), module.line_offset)?;
 
         self.scope_manager.pop_scope()?;
         Ok(())
@@ -364,7 +364,7 @@ impl SemanticAnalyzer {
 
         // Process class members (methods, properties, events, declarations)
         let root = class.cst.to_root_node();
-        self.process_statements(&root, root.children())?;
+        self.process_statements(&root, root.children(), class.line_offset)?;
 
         self.scope_manager.pop_scope()?;
         Ok(())
@@ -436,7 +436,7 @@ impl SemanticAnalyzer {
 
         // Process the form code section (event handlers, module-level declarations)
         let root = form.cst.to_root_node();
-        self.process_statements(&root, root.children())?;
+        self.process_statements(&root, root.children(), form.line_offset)?;
 
         self.scope_manager.pop_scope()?;
         Ok(())
@@ -511,12 +511,22 @@ impl SemanticAnalyzer {
     }
 
     /// Process a sequence of statements at module/class/form level
-    fn process_statements(&mut self, root: &CstNode, statements: &[CstNode]) -> Result<()> {
+    ///
+    /// `line_offset` is the number of lines consumed by the file header (and
+    /// therefore absent from the CST). It is added to every computed line so
+    /// that reported locations are file-absolute rather than code-section
+    /// relative.
+    fn process_statements(
+        &mut self,
+        root: &CstNode,
+        statements: &[CstNode],
+        line_offset: usize,
+    ) -> Result<()> {
         for statement in statements {
             if statement.is_token() || Self::is_trivia(statement.kind()) {
                 continue;
             }
-            let line = 1 + Self::preceding_newlines(root, statement);
+            let line = 1 + line_offset + Self::preceding_newlines(root, statement);
             self.process_statement(statement, line)?;
         }
         Ok(())
@@ -606,25 +616,50 @@ impl SemanticAnalyzer {
 
         let type_scope = self.scope_manager.push_scope(ScopeKind::Type, name);
         if let Some(list) = statement.first_child_by_kind(SyntaxKind::StatementList) {
-            let member_line = line + Self::preceding_newlines(statement, list);
-            for item in Self::parse_type_members(list) {
-                let mut type_info = item.type_info;
-                if item.is_array {
-                    type_info.is_array = true;
+            let mut line_tokens: Vec<&CstNode> = Vec::new();
+            let mut member_line = line + Self::preceding_newlines(statement, list);
+            for child in list.children() {
+                if child.kind() == SyntaxKind::Newline {
+                    self.register_type_member_line(&line_tokens, member_line, type_scope)?;
+                    line_tokens.clear();
+                    member_line += 1;
+                } else if !Self::is_trivia(child.kind()) {
+                    line_tokens.push(child);
                 }
-                self.add_symbol(Symbol {
-                    name: item.name,
-                    kind: SymbolKind::TypeMember,
-                    type_info,
-                    visibility: Visibility::Private,
-                    location: self.make_location(member_line, 1),
-                    scope_id: type_scope,
-                    attributes: HashMap::new(),
-                })?;
             }
+            self.register_type_member_line(&line_tokens, member_line, type_scope)?;
         }
 
         self.scope_manager.pop_scope()?;
+        Ok(())
+    }
+
+    /// Register all type members parsed from a single line of member tokens
+    fn register_type_member_line(
+        &mut self,
+        tokens: &[&CstNode],
+        line: usize,
+        scope_id: usize,
+    ) -> Result<()> {
+        let mut index = 0;
+        while index < tokens.len() {
+            let Some(item) = Self::parse_single_declarator(tokens, &mut index) else {
+                break;
+            };
+            let mut type_info = item.type_info;
+            if item.is_array {
+                type_info.is_array = true;
+            }
+            self.add_symbol(Symbol {
+                name: item.name,
+                kind: SymbolKind::TypeMember,
+                type_info,
+                visibility: Visibility::Private,
+                location: self.make_location(line, 1),
+                scope_id,
+                attributes: HashMap::new(),
+            })?;
+        }
         Ok(())
     }
 
@@ -651,7 +686,7 @@ impl SemanticAnalyzer {
         let enum_scope = self.scope_manager.push_scope(ScopeKind::Enum, name.clone());
 
         if let Some(list) = statement.first_child_by_kind(SyntaxKind::StatementList) {
-            let member_line = line + Self::preceding_newlines(statement, list);
+            let mut member_line = line + Self::preceding_newlines(statement, list);
             let mut line_tokens: Vec<&CstNode> = Vec::new();
             for child in list.children() {
                 if child.kind() == SyntaxKind::Newline {
@@ -664,6 +699,7 @@ impl SemanticAnalyzer {
                         )?;
                         line_tokens.clear();
                     }
+                    member_line += 1;
                 } else if !Self::is_trivia(child.kind()) {
                     line_tokens.push(child);
                 }
@@ -1142,29 +1178,6 @@ impl SemanticAnalyzer {
         }
 
         Self::parse_comma_separated_declarators(&tokens, &mut i, &mut items);
-        items
-    }
-
-    /// Parse the members of a `Type` statement (newline-separated)
-    fn parse_type_members(list: &CstNode) -> Vec<DeclaredItem> {
-        let mut items = Vec::new();
-        let mut line_tokens: Vec<&CstNode> = Vec::new();
-
-        for child in list.children() {
-            if child.kind() == SyntaxKind::Newline {
-                if !line_tokens.is_empty() {
-                    let mut i = 0;
-                    Self::parse_comma_separated_declarators(&line_tokens, &mut i, &mut items);
-                    line_tokens.clear();
-                }
-            } else if !Self::is_trivia(child.kind()) {
-                line_tokens.push(child);
-            }
-        }
-        if !line_tokens.is_empty() {
-            let mut i = 0;
-            Self::parse_comma_separated_declarators(&line_tokens, &mut i, &mut items);
-        }
         items
     }
 

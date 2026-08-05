@@ -28,6 +28,13 @@ pub struct ModuleFile {
     /// The concrete syntax tree of the module file.
     #[serde(serialize_with = "serialize_cst")]
     pub cst: ConcreteSyntaxTree,
+    /// The number of lines in the file that are consumed by the header
+    /// (e.g. `Attribute` statements) and therefore not present in the CST.
+    ///
+    /// Line numbers reported by consumers of the CST (such as semantic
+    /// analyzers) must add this offset to obtain file-absolute line numbers.
+    #[serde(skip)]
+    pub line_offset: usize,
 }
 
 impl Display for ModuleFile {
@@ -163,10 +170,13 @@ impl ModuleFile {
                     // Filter out nodes that are already extracted to avoid duplication
                     let filtered_cst = cst.without_kinds(&[SyntaxKind::AttributeStatement]);
 
+                    let line_offset = module_line_offset(&cst, &filtered_cst);
+
                     ParseResult::new(
                         Some(ModuleFile {
                             name: vb_name_value.to_string(),
                             cst: filtered_cst,
+                            line_offset,
                         }),
                         ctx.into_errors(),
                     )
@@ -195,10 +205,13 @@ impl ModuleFile {
                     // Filter out nodes that are already extracted to avoid duplication
                     let filtered_cst = cst.without_kinds(&[SyntaxKind::AttributeStatement]);
 
+                    let line_offset = module_line_offset(&cst, &filtered_cst);
+
                     ParseResult::new(
                         Some(ModuleFile {
                             name: vb_name_value.to_string(),
                             cst: filtered_cst,
+                            line_offset,
                         }),
                         ctx.into_errors(),
                     )
@@ -208,4 +221,17 @@ impl ModuleFile {
             }
         }
     }
+}
+
+/// Compute the number of header lines that are not represented in the filtered
+/// CST. The CST is always built from the whole file (tokenization resets to the
+/// file start), so the offset is exactly the number of line breaks inside the
+/// `AttributeStatement` nodes that are filtered out of the CST.
+fn module_line_offset(cst: &ConcreteSyntaxTree, filtered_cst: &ConcreteSyntaxTree) -> usize {
+    use crate::files::common::count_line_breaks;
+
+    let full_newlines = count_line_breaks(cst.to_root_node().text());
+    let filtered_newlines = count_line_breaks(filtered_cst.to_root_node().text());
+
+    full_newlines.saturating_sub(filtered_newlines)
 }

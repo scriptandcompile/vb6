@@ -46,6 +46,14 @@ pub struct ClassFile {
     /// This excludes nodes that are already represented in the header.
     #[serde(serialize_with = "serialize_cst")]
     pub cst: ConcreteSyntaxTree,
+    /// The number of lines in the file that are consumed by the header
+    /// (VERSION, `BEGIN...END` properties, `Attribute` statements) and
+    /// therefore not present in the CST.
+    ///
+    /// Line numbers reported by consumers of the CST (such as semantic
+    /// analyzers) must add this offset to obtain file-absolute line numbers.
+    #[serde(skip)]
+    pub line_offset: usize,
 }
 
 impl Display for ClassFile {
@@ -149,10 +157,19 @@ impl ClassFile {
             SyntaxKind::AttributeStatement,
         ]);
 
+        let line_offset = {
+            use crate::files::common::count_line_breaks;
+
+            let full_newlines = count_line_breaks(cst.to_root_node().text());
+            let filtered_newlines = count_line_breaks(filtered_cst.to_root_node().text());
+            full_newlines.saturating_sub(filtered_newlines)
+        };
+
         ParseResult::new(
             Some(ClassFile {
                 header,
                 cst: filtered_cst,
+                line_offset,
             }),
             ctx.into_errors(),
         )
