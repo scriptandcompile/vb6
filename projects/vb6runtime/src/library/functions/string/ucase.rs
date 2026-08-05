@@ -493,3 +493,33 @@
 //! - Does not handle special Unicode cases (e.g., title case)
 //! - No built-in toggle case functionality
 //! - Cannot convert specific character ranges
+
+/// Returns the string converted to uppercase.
+///
+/// Only lowercase letters are converted; uppercase letters and non-letter
+/// characters are unchanged. Uses full Unicode case mapping.
+pub fn ucase(input: &str) -> String {
+    input.to_uppercase()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn uppercases_letters() {
+        assert_eq!(ucase("Hello World"), "HELLO WORLD");
+        assert_eq!(ucase("abc"), "ABC");
+    }
+
+    #[test]
+    fn leaves_non_letters_unchanged() {
+        assert_eq!(ucase("123 !@#"), "123 !@#");
+    }
+
+    #[test]
+    fn handles_unicode() {
+        assert_eq!(ucase("héllo"), "HÉLLO");
+        assert_eq!(ucase(""), "");
+    }
+}

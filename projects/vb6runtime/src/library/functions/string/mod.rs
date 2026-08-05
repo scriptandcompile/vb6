@@ -1,5 +1,6 @@
 //! VB6 string functions.
 
+pub mod ansi;
 pub mod asc;
 pub mod ascb;
 pub mod ascw;

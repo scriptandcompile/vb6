@@ -711,3 +711,57 @@
 //! - `Len`: Returns the length of a string
 //! - `RTrim`: Removes trailing spaces from a string
 //! - `InStr`: Finds position of substring searching from left to right
+
+use crate::error::{err_number, VBError, VBResult};
+
+/// Returns the specified number of characters from the right side of the string.
+///
+/// A `length` of 0 returns an empty string; a `length` greater than the number
+/// of characters returns the entire string. Characters are counted as Unicode
+/// scalar values.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
+pub fn right(input: &str, length: i32) -> VBResult<String> {
+    if length < 0 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid length",
+        ));
+    }
+
+    let chars: Vec<char> = input.chars().collect();
+    let skip = chars.len().saturating_sub(length as usize);
+    Ok(chars.into_iter().skip(skip).collect())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn returns_rightmost_characters() {
+        assert_eq!(right("Hello", 3).unwrap(), "llo");
+        assert_eq!(right("Hello", 0).unwrap(), "");
+    }
+
+    #[test]
+    fn length_greater_than_string_returns_all() {
+        assert_eq!(right("Hello", 10).unwrap(), "Hello");
+    }
+
+    #[test]
+    fn handles_unicode() {
+        assert_eq!(right("héllo", 2).unwrap(), "lo");
+    }
+
+    #[test]
+    fn rejects_negative_length() {
+        assert_eq!(
+            right("Hello", -1).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

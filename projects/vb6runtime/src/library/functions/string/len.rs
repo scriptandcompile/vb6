@@ -576,3 +576,37 @@
 //! - `InStr`/`InStrRev`: Find substring positions
 //! - `Trim`/`LTrim`/`RTrim`: Remove whitespace
 //! - `String`: Create string of repeated characters
+
+/// Returns the number of characters in the string.
+///
+/// Characters are counted as Unicode scalar values (grapheme-breaking surrogate
+/// pairs each count as one character, unlike VB6 which counts UTF-16 code units).
+///
+/// # Examples
+///
+/// ```
+/// use vb6runtime::library::functions::string::len::len;
+/// assert_eq!(len("Hello"), 5);
+/// assert_eq!(len(""), 0);
+/// ```
+pub fn len(input: &str) -> i32 {
+    input.chars().count() as i32
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn counts_characters() {
+        assert_eq!(len("Hello"), 5);
+        assert_eq!(len(""), 0);
+        assert_eq!(len("A"), 1);
+    }
+
+    #[test]
+    fn counts_unicode_characters() {
+        assert_eq!(len("héllo"), 5);
+        assert_eq!(len("中"), 1);
+    }
+}

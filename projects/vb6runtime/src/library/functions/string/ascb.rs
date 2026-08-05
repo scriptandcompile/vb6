@@ -390,3 +390,52 @@
 //! - Runtime error occurs with empty strings
 //! - Code page dependent for extended ANSI characters (128-255)
 //! - Not suitable for Unicode text processing (use `AscW` instead)
+
+use crate::error::VBResult;
+
+/// Returns the Windows-1252 (ANSI) byte value of the first byte in the string.
+///
+/// Because Windows-1252 is a single-byte code page, this is identical to
+/// [`super::asc::asc`]; it exists to mirror the VB6 API for byte-level code.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `input` is empty
+/// or its first character cannot be represented in Windows-1252.
+pub fn ascb(input: &str) -> VBResult<i32> {
+    super::ansi::encode_first_byte(input).map(i32::from)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn returns_first_byte_of_ascii() {
+        assert_eq!(ascb("A").unwrap(), 65);
+        assert_eq!(ascb("Apple").unwrap(), 65);
+    }
+
+    #[test]
+    fn returns_first_byte_of_ansi_extended() {
+        assert_eq!(ascb("é").unwrap(), 233);
+        assert_eq!(ascb("€").unwrap(), 128);
+    }
+
+    #[test]
+    fn rejects_unrepresentable_characters() {
+        assert_eq!(
+            ascb("😀").unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+
+    #[test]
+    fn rejects_empty_string() {
+        assert_eq!(
+            ascb("").unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

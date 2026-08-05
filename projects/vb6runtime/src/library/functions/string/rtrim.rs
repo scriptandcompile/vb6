@@ -653,3 +653,28 @@
 //! - `Replace`: Replaces occurrences of substring
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
+
+/// Returns the string with trailing spaces (ASCII 32) removed.
+///
+/// Only the space character is trimmed, matching VB6; tabs and other
+/// whitespace are preserved.
+pub fn rtrim(input: &str) -> String {
+    input.trim_end_matches(' ').to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn trims_trailing_spaces() {
+        assert_eq!(rtrim("  Hello World  "), "  Hello World");
+        assert_eq!(rtrim("Hello"), "Hello");
+    }
+
+    #[test]
+    fn handles_empty_and_all_spaces() {
+        assert_eq!(rtrim(""), "");
+        assert_eq!(rtrim("   "), "");
+    }
+}

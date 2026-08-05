@@ -625,3 +625,37 @@
 //! - Returns `Null` for `Null` input (may be unexpected)
 //! - No option to reverse specific character ranges
 //! - Cannot specify custom reversal rules
+
+/// Returns the string with the order of its characters reversed.
+///
+/// Spaces and other characters are reversed like any other character; the case
+/// of each character is preserved.
+pub fn strreverse(input: &str) -> String {
+    input.chars().rev().collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn reverses_characters() {
+        assert_eq!(strreverse("Hello"), "olleH");
+        assert_eq!(strreverse("Hello World"), "dlroW olleH");
+    }
+
+    #[test]
+    fn preserves_case_and_spaces() {
+        assert_eq!(strreverse("AbC 123"), "321 CbA");
+    }
+
+    #[test]
+    fn handles_empty_string() {
+        assert_eq!(strreverse(""), "");
+    }
+
+    #[test]
+    fn handles_unicode() {
+        assert_eq!(strreverse("héllo"), "olléh");
+    }
+}

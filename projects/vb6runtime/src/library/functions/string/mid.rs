@@ -785,3 +785,92 @@
 //! - `Split`: Splits string into array
 //! - `Replace`: Replaces substring occurrences
 //! - `Mid` statement: Replaces characters within string
+
+use crate::error::{err_number, VBError, VBResult};
+
+/// Returns the specified number of characters from a string, starting at `start`.
+///
+/// Positions are 1-based. When `length` is `None` (or extends past the end of
+/// the string), everything from `start` to the end is returned. A `start` past
+/// the end of the string yields an empty string. Characters are counted as
+/// Unicode scalar values.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `start` is less
+/// than 1 or `length` is negative.
+pub fn mid(input: &str, start: i32, length: Option<i32>) -> VBResult<String> {
+    if start < 1 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid start position",
+        ));
+    }
+    if let Some(n) = length {
+        if n < 0 {
+            return Err(VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                "Invalid length",
+            ));
+        }
+    }
+
+    let chars: Vec<char> = input.chars().collect();
+    if start as usize > chars.len() {
+        return Ok(String::new());
+    }
+
+    let skip = (start - 1) as usize;
+    match length {
+        Some(0) => Ok(String::new()),
+        Some(n) => Ok(chars.into_iter().skip(skip).take(n as usize).collect()),
+        None => Ok(chars.into_iter().skip(skip).collect()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn extracts_middle_characters() {
+        assert_eq!(mid("Hello World", 4, Some(5)).unwrap(), "lo Wo");
+    }
+
+    #[test]
+    fn omitting_length_returns_rest() {
+        assert_eq!(mid("Hello World", 7, None).unwrap(), "World");
+    }
+
+    #[test]
+    fn length_beyond_end_is_clamped() {
+        assert_eq!(mid("Hello", 4, Some(10)).unwrap(), "lo");
+    }
+
+    #[test]
+    fn start_beyond_end_returns_empty() {
+        assert_eq!(mid("Hello", 6, None).unwrap(), "");
+    }
+
+    #[test]
+    fn zero_length_returns_empty() {
+        assert_eq!(mid("Hello", 2, Some(0)).unwrap(), "");
+    }
+
+    #[test]
+    fn rejects_invalid_start() {
+        assert_eq!(
+            mid("Hello", 0, None).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+
+    #[test]
+    fn rejects_negative_length() {
+        assert_eq!(
+            mid("Hello", 1, Some(-1)).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}
