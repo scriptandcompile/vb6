@@ -255,6 +255,13 @@ use crate::error::{err_number, VBError, VBResult};
 
 /// Returns the Windows-1252 (ANSI) character code of the first character.
 ///
+/// # Arguments
+/// * `input` - The input string from which to get the character code.
+///
+/// # Returns
+///
+/// The Windows-1252 (ANSI) character code of the first character.
+///
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `input` is empty
