@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Interpret - Execute Visual Basic 6 code directly with REPL, script mode, and project mode">
+    <meta name="keywords" content="vb6, interpreter, visual basic 6, repl, runtime, rust">
+    <title>VB6Interpret - Visual Basic 6 Interpreter</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>VB6Interpret</h1>
+            <p class="tagline">Execute Visual Basic 6 code directly from source with a REPL and project runner</p>
+            <div class="badges">
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret" target="_blank" rel="noreferrer">
+                    <img src="https://img.shields.io/badge/Workspace-vb6-blue.svg" alt="VB6 Workspace">
+                </a>
+                <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noreferrer">
+                    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+                </a>
+                <a href="https://www.rust-lang.org/" target="_blank" rel="noreferrer">
+                    <img src="https://img.shields.io/badge/Language-Rust-orange.svg" alt="Written in Rust">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <a href="#overview">Overview</a>
+            <a href="#features">Features</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#quick-start">Quick Start</a>
+            <a href="#modes">Modes</a>
+            <a href="#limitations">Limitations</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret" target="_blank" rel="noreferrer">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>
+                VB6Interpret executes VB6 programs directly from source instead of compiling them first.
+                It is designed for fast experimentation, debugging workflows, and runtime validation while
+                the broader VB6 toolchain continues to evolve.
+            </p>
+            <p>
+                The interpreter builds on <a href="https://scriptandcompile.github.io/vb6/vb6parse/" target="_blank" rel="noreferrer">vb6parse</a>,
+                <a href="https://scriptandcompile.github.io/vb6/vb6semantic/" target="_blank" rel="noreferrer">vb6semantic</a>,
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank" rel="noreferrer">vb6runtime</a>,
+                and <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6core" target="_blank" rel="noreferrer">vb6core</a>
+                to provide source execution with VB6-compatible semantics.
+            </p>
+            <div class="tip-box">
+                <strong>💡 Best Fit:</strong> Use VB6Interpret when you want quick feedback on behavior,
+                explore legacy code interactively, or test runtime assumptions before conversion or compilation.
+            </div>
+        </section>
+
+        <section id="features">
+            <h2>Key Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>⚡ Direct Execution</h3>
+                    <p>Run VB6 source files and projects without a separate compile stage.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💬 REPL</h3>
+                    <p>Interactive shell for trying statements, expressions, and runtime behavior in real time.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📄 Script Mode</h3>
+                    <p>Execute a single .bas or .cls file for quick tests and utility workflows.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📦 Project Mode</h3>
+                    <p>Run full .vbp projects and follow execution across modules and procedures.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🐞 Debug Workflow</h3>
+                    <p>Step through code, inspect variables, and use breakpoints during execution.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 Trace and Profile</h3>
+                    <p>Inspect execution flow with trace output and profile options for performance analysis.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <h2>Architecture</h2>
+            <p>
+                VB6Interpret layers interpreter-specific execution on top of parsing, semantic analysis,
+                and runtime primitives from the workspace.
+            </p>
+            <div class="architecture-diagram">
+                <div class="pipeline-layer">
+                    <div class="layer-title">CLI / REPL Layer</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">run / debug / repl</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">Session + Command Context</div>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div class="pipeline-layer">
+                    <div class="layer-title">Interpreter Engine</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">Statement Evaluation</div>
+                        <div class="pipeline-box">Expression Evaluation</div>
+                        <div class="pipeline-box">Call Stack + Frames</div>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div class="pipeline-layer">
+                    <div class="layer-title">Workspace Foundations</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">vb6parse<br><small>Source structure</small></div>
+                        <div class="pipeline-box">vb6semantic<br><small>Resolution + types</small></div>
+                        <div class="pipeline-box">vb6runtime/vb6core<br><small>Values + runtime behavior</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="architecture-details" style="margin-top: 2rem;">
+                <h3>Execution Focus</h3>
+                <div class="layer-grid">
+                    <div class="layer-card">
+                        <h4>Interactive Speed</h4>
+                        <p>Prioritizes fast startup and quick feedback loops in REPL and script mode.</p>
+                    </div>
+                    <div class="layer-card">
+                        <h4>Runtime Fidelity</h4>
+                        <p>Targets VB6-like behavior for values, expressions, and control flow semantics.</p>
+                    </div>
+                    <div class="layer-card">
+                        <h4>Debuggability</h4>
+                        <p>Emphasizes observable execution with traces, breakpoints, and state inspection.</p>
+                    </div>
+                    <div class="layer-card">
+                        <h4>Toolchain Integration</h4>
+                        <p>Shares parsing and semantic infrastructure with other workspace projects.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quick-start">
+            <h2>Quick Start</h2>
+
+            <h3>Build</h3>
+            <pre data-lang="bash"><code class="language-bash">cargo build -p vb6interpret</code></pre>
+
+            <h3>Start REPL</h3>
+            <pre data-lang="bash"><code class="language-bash">cargo run -p vb6interpret</code></pre>
+
+            <h3>Run a script</h3>
+            <pre data-lang="bash"><code class="language-bash">cargo run -p vb6interpret -- run script.bas</code></pre>
+
+            <h3>Run a project</h3>
+            <pre data-lang="bash"><code class="language-bash">cargo run -p vb6interpret -- run MyProject.vbp</code></pre>
+
+            <h3>REPL sample</h3>
+            <pre data-lang="vb"><code class="language-vbnet">Dim x As Integer
+x = 42
+Print x
+Print Left$("Hello World", 5)</code></pre>
+        </section>
+
+        <section id="modes">
+            <h2>Execution Modes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mode</th>
+                        <th>Command</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>repl</code></td>
+                        <td><code>vb6interpret</code></td>
+                        <td>Interactive experimentation and quick checks</td>
+                    </tr>
+                    <tr>
+                        <td><code>run</code></td>
+                        <td><code>vb6interpret run target.bas</code></td>
+                        <td>Execute source files or projects normally</td>
+                    </tr>
+                    <tr>
+                        <td><code>debug</code></td>
+                        <td><code>vb6interpret debug target.vbp</code></td>
+                        <td>Step-through execution with inspection tools</td>
+                    </tr>
+                    <tr>
+                        <td><code>check</code></td>
+                        <td><code>vb6interpret check target.bas</code></td>
+                        <td>Validate syntax and analysis readiness without running</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="limitations">
+            <h2>Current Limitations</h2>
+            <ul>
+                <li>Forms and controls execution is planned but not complete.</li>
+                <li>COM object support is not complete.</li>
+                <li>Behavioral parity for all VB6 edge cases is still in progress.</li>
+            </ul>
+            <div class="warning-box">
+                <strong>⚠️ Project status:</strong> VB6Interpret is under active development. Expect capability growth
+                and occasional behavior changes while runtime semantics are refined.
+            </div>
+        </section>
+
+        <section id="community">
+            <h2>Contributing</h2>
+            <p>
+                Contributions are welcome for execution correctness, debugger behavior, compatibility tests,
+                and integration with vb6runtime semantics.
+            </p>
+            <div class="community-links">
+                <a href="https://github.com/scriptandcompile/vb6/issues" class="community-btn" target="_blank" rel="noreferrer">Report an Issue</a>
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret" class="community-btn" target="_blank" rel="noreferrer">View Source</a>
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret/README.md" class="community-btn" target="_blank" rel="noreferrer">CLI Reference</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Interpret is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noreferrer">MIT License</a></p>
+            <p>Built by <a href="https://github.com/scriptandcompile" target="_blank" rel="noreferrer">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>
