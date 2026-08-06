@@ -167,57 +167,16 @@ impl Value {
 - **Variant Boxing**: Use Box to avoid recursive type definition
 - **Object References**: Keep lightweight references, objects stored in RuntimeContext
 
-### 2. Type System (`types.rs`)
+### 2. Shared Type System
+
+`vb6runtime` does not define its own copy of the VB6 type model. It consumes the shared definitions from `vb6core`:
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VBType {
-    Byte,
-    Boolean,
-    Integer,
-    Long,
-    Single,
-    Double,
-    Currency,
-    Date,
-    
-    /// String with optional fixed length
-    String(Option<usize>),
-    
-    /// Variant
-    Variant,
-    
-    /// Object with optional class name
-    Object(Option<String>),
-    
-    /// Array with element type and dimensions
-    Array {
-        element_type: Box<VBType>,
-        dimensions: usize,
-        bounds: Vec<(i32, i32)>,  // (lower, upper) for each dimension
-    },
-    
-    /// User-defined type
-    UserDefined(String),
-}
-
-impl VBType {
-    /// Check if type is numeric
-    pub fn is_numeric(&self) -> bool;
-    
-    /// Check if type can be assigned from another
-    pub fn can_assign_from(&self, other: &VBType) -> bool;
-    
-    /// Get default value for this type
-    pub fn default_value(&self) -> Value;
-    
-    /// Size in bytes (for fixed-size allocations)
-    pub fn size_bytes(&self) -> Option<usize>;
-    
-    /// Check if type is a variant
-    pub fn is_variant(&self) -> bool;
-}
+use vb6core::error::{VBError, VBResult};
+use vb6core::types::{ArrayBound, TypeInfo, VBType};
 ```
+
+The runtime crate contributes the dynamic value layer (`Value`, `ArrayValue`, and conversion semantics) on top of that shared type system.
 
 ### 3. Type Conversion (`conversion.rs`)
 
