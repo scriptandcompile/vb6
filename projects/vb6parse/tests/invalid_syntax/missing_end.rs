@@ -147,13 +147,13 @@ Function Calculate(x As Integer) As Integer
 /// Test missing End Function when another Function declaration starts.
 #[test]
 fn missing_end_function_before_next_function() {
-    let source = r#"
+    let source = r"
 Function FirstFunction(x As Integer) As Integer
     FirstFunction = x * 2
 Public Function SecondFunction(y As Integer) As Integer
     SecondFunction = y + 1
 End Function
-"#;
+";
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
@@ -225,13 +225,13 @@ Property Get Name() As String
 /// Test missing End Property when another Property declaration starts.
 #[test]
 fn missing_end_property_before_next_property() {
-    let source = r#"
+    let source = r"
 Property Get Name() As String
     Name = m_name
 Property Let Name(ByVal value As String)
     m_name = value
 End Property
-"#;
+";
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
