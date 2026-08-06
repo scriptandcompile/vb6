@@ -30,7 +30,7 @@ pub mod types {
 pub use array::{ArrayDimension, ArrayValue};
 pub use error::{VBError, VBResult};
 pub use types::VBType;
-pub use value::{Value, VbObject, CURRENCY_SCALE};
+pub use value::{VBObject, Value, CURRENCY_SCALE};
 
 /// Library version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
