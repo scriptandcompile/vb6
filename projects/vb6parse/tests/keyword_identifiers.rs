@@ -9,8 +9,8 @@ use vb6parse::*;
 #[test]
 fn keyword_as_sub_name() {
     let source = "Sub Text()\nEnd Sub\n";
-    let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-    assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+    assert_eq!(failures.len(), 0, "Expected no parse failures.");
     let cst = cst_opt.expect("CST should be parsed");
     let tree = cst.to_serializable();
 
@@ -24,8 +24,8 @@ fn keyword_as_sub_name() {
 #[test]
 fn keyword_as_function_name() {
     let source = "Function Database() As String\nEnd Function\n";
-    let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-    assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+    assert_eq!(failures.len(), 0, "Expected no parse failures.");
     let cst = cst_opt.expect("CST should be parsed");
     let tree = cst.to_serializable();
 
@@ -39,8 +39,8 @@ fn keyword_as_function_name() {
 #[test]
 fn keyword_as_property_name() {
     let source = "Property Get Binary() As Integer\nEnd Property\n";
-    let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-    assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+    assert_eq!(failures.len(), 0, "Expected no parse failures.");
     let cst = cst_opt.expect("CST should be parsed");
     let tree = cst.to_serializable();
 
@@ -54,8 +54,8 @@ fn keyword_as_property_name() {
 #[test]
 fn keyword_as_variable_in_assignment() {
     let source = "text = \"hello\"\n";
-    let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-    assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+    assert_eq!(failures.len(), 0, "Expected no parse failures.");
     let cst = cst_opt.expect("CST should be parsed");
     let tree = cst.to_serializable();
 
@@ -69,8 +69,8 @@ fn keyword_as_variable_in_assignment() {
 #[test]
 fn keyword_as_property_in_assignment() {
     let source = "obj.text = \"hello\"\n";
-    let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-    assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+    assert_eq!(failures.len(), 0, "Expected no parse failures.");
     let cst = cst_opt.expect("CST should be parsed");
     let tree = cst.to_serializable();
 
@@ -88,8 +88,8 @@ database = "mydb.mdb"
 text = "hello"
 obj.binary = True
 "#;
-    let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-    assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+    assert_eq!(failures.len(), 0, "Expected no parse failures.");
     let cst = cst_opt.expect("CST should be parsed");
     let tree = cst.to_serializable();
 
@@ -103,8 +103,8 @@ obj.binary = True
 #[test]
 fn keyword_as_enum_name() {
     let source = "Enum Random\n    Value1\n    Value2\nEnd Enum\n";
-    let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-    assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+    assert_eq!(failures.len(), 0, "Expected no parse failures.");
     let cst = cst_opt.expect("CST should be parsed");
     let tree = cst.to_serializable();
 
@@ -119,8 +119,8 @@ fn keyword_as_enum_name() {
 fn keyword_after_keyword_converted() {
     // Even when a keyword follows another keyword in procedure definition
     let source = "Sub Output()\nEnd Sub\n";
-    let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-    assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+    let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+    assert_eq!(failures.len(), 0, "Expected no parse failures.");
     let cst = cst_opt.expect("CST should be parsed");
     let tree = cst.to_serializable();
 
