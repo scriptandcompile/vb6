@@ -63,7 +63,7 @@ impl Scope {
 
     /// Iterate over `(name, value)` pairs.
     pub fn iter(&self) -> impl Iterator<Item = (&str, &Value)> {
-        self.vars.iter().map(|(k, v)| (k.as_str(), v))
+        self.vars.iter().map(|(key, value)| (key.as_str(), value))
     }
 
     /// The number of variables in this scope.
