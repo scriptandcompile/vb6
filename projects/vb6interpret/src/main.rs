@@ -2,13 +2,14 @@
 //!
 //! Execute VB6 code directly without compilation.
 
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, Result};
 use clap::{Parser, Subcommand};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use vb6interpret::Interpreter;
+use vb6parse::errors::{ErrorKind, SourceFileError};
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
 use vb6runtime::Value;
@@ -76,9 +77,7 @@ fn main() -> Result<()> {
     match cli.command {
         Some(Commands::Run { path, set, timeout }) => {
             let path = expand_tilde(&path);
-            let source_file = SourceFile::from_file(&path)
-                .map_err(|e| anyhow::anyhow!(e.to_string()))
-                .with_context(|| format!("Failed to read {}", path.display()))?;
+            let source_file = read_source_file(&path)?;
             let module = ModuleFile::parse(&source_file).unwrap_or_fail();
 
             let mut interpreter = Interpreter::new();
@@ -121,9 +120,7 @@ fn main() -> Result<()> {
         }
         Some(Commands::Check { path }) => {
             let path = expand_tilde(&path);
-            let source_file = SourceFile::from_file(&path)
-                .map_err(|e| anyhow::anyhow!(e.to_string()))
-                .with_context(|| format!("Failed to read {}", path.display()))?;
+            let source_file = read_source_file(&path)?;
             let module = ModuleFile::parse(&source_file).unwrap_or_fail();
             if cli.verbose {
                 println!("Parsed {} OK", module.name);
@@ -145,6 +142,116 @@ fn print_output(interpreter: &Interpreter) {
         println!();
     }
     let _ = std::io::stdout().flush();
+}
+
+/// Read a source file, producing an actionable error with a "did you mean"
+/// suggestion when the path does not exist.
+fn read_source_file(path: &Path) -> Result<SourceFile> {
+    match SourceFile::from_file(path) {
+        Ok(source) => Ok(source),
+        Err(e) => match path.try_exists() {
+            // The path exists but could not be read (directory, permissions, ...).
+            Ok(true) => {
+                let reason = match &*e.kind {
+                    ErrorKind::SourceFile(SourceFileError::Malformed { message }) => {
+                        message.as_str()
+                    }
+                    _ => "not a readable file",
+                };
+                Err(anyhow::anyhow!(
+                    "Failed to read {}: {reason}",
+                    path.display()
+                ))
+            }
+            _ => {
+                let mut message = format!("Failed to find file '{}'", path.display());
+                let suggestions = suggest_similar_path(path);
+                if !suggestions.is_empty() {
+                    message.push_str("\nDid you mean:");
+                    for suggestion in &suggestions {
+                        message.push_str(&format!("\n    {}", clean_path(suggestion)));
+                    }
+                }
+                Err(anyhow::anyhow!(message))
+            }
+        },
+    }
+}
+
+/// Candidate paths near `requested` whose names resemble the requested file
+/// name, ranked by closeness.
+fn suggest_similar_path(requested: &Path) -> Vec<PathBuf> {
+    let Some(file_name) = requested.file_name().and_then(|s| s.to_str()) else {
+        return Vec::new();
+    };
+    let dir = match requested.parent() {
+        Some(parent) if !parent.as_os_str().is_empty() => parent.to_path_buf(),
+        _ => PathBuf::from("."),
+    };
+
+    let mut candidates: Vec<(usize, PathBuf)> = Vec::new();
+    scan_dir_for_similar(&dir, file_name, &mut candidates);
+
+    // Nothing in the target directory: look one level down.
+    if candidates.is_empty() && dir.is_dir() {
+        if let Ok(entries) = std::fs::read_dir(&dir) {
+            for entry in entries.flatten() {
+                let sub = entry.path();
+                if sub.is_dir() {
+                    scan_dir_for_similar(&sub, file_name, &mut candidates);
+                }
+            }
+        }
+    }
+
+    candidates.sort_by_key(|(distance, _)| *distance);
+    candidates
+        .into_iter()
+        .take(3)
+        .map(|(_, path)| path)
+        .collect()
+}
+
+/// Collect files in `dir` whose names are within an edit-distance budget of
+/// `file_name`, ranked by distance.
+fn scan_dir_for_similar(dir: &Path, file_name: &str, out: &mut Vec<(usize, PathBuf)>) {
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            continue;
+        }
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        let distance = levenshtein(file_name, &name);
+        if distance <= file_name.len().max(name.len()) / 2 {
+            out.push((distance, path));
+        }
+    }
+}
+
+/// Case-insensitive Levenshtein edit distance.
+fn levenshtein(a: &str, b: &str) -> usize {
+    let a: Vec<char> = a.to_lowercase().chars().collect();
+    let b: Vec<char> = b.to_lowercase().chars().collect();
+    let mut prev: Vec<usize> = (0..=b.len()).collect();
+    for (i, ca) in a.iter().enumerate() {
+        let mut curr = vec![i + 1];
+        for (j, cb) in b.iter().enumerate() {
+            let cost = if ca == cb { 0 } else { 1 };
+            curr.push((prev[j + 1] + 1).min(curr[j] + 1).min(prev[j] + cost));
+        }
+        prev = curr;
+    }
+    prev[b.len()]
+}
+
+/// A path rendered for display, without a leading `./`.
+fn clean_path(path: &Path) -> String {
+    let text = path.display().to_string();
+    text.strip_prefix("./").map(str::to_string).unwrap_or(text)
 }
 
 /// Expand a leading `~`/`~/` into the user's home directory, matching what a
