@@ -1675,6 +1675,7 @@ impl<'a> Parser<'a> {
     ///
     /// This function is used for parsing top-level form elements.
     /// Only `VB.Form` and `VB.MDIForm` are valid top-level types.
+    #[allow(clippy::too_many_arguments)]
     fn build_form_root(
         control_type: &str,
         control_name: String,
