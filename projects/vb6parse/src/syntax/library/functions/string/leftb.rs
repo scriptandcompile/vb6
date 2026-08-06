@@ -158,8 +158,8 @@ Sub Test()
     result = LeftB(data, 4)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -183,8 +183,8 @@ Function IsExecutable(fileName As String) As Boolean
     IsExecutable = (LeftB(fileData, 2) = "MZ")
 End Function
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -204,8 +204,8 @@ Sub ParsePacket(packet As String)
     header = LeftB(packet, 16)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -227,8 +227,8 @@ Sub Test()
     End If
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -248,8 +248,8 @@ Function GetRecordID(record As String) As String
     GetRecordID = LeftB(record, 8)
 End Function
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -271,8 +271,8 @@ Sub Test()
     End If
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -294,8 +294,8 @@ Sub Test()
     bytes = LeftB(jpText, 4)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -315,8 +315,8 @@ Function ValidateMagicBytes(data As String, magic As String) As Boolean
     ValidateMagicBytes = (LeftB(data, LenB(magic)) = magic)
 End Function
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();

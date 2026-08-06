@@ -577,8 +577,8 @@ Sub Test()
     result = Str(123)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -598,8 +598,8 @@ Sub Test()
     s = Str(value)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -618,8 +618,8 @@ Sub Test()
     result = Str(-456)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -638,8 +638,8 @@ Sub Test()
     result = Str(3.14159)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -658,8 +658,8 @@ Sub Test()
     result = LTrim$(Str(value))
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -678,8 +678,8 @@ Sub Test()
     message = "Count:" & Str(count)
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -698,8 +698,8 @@ Sub Test()
     Print #1, Str(value)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -718,8 +718,8 @@ Sub Test()
     Debug.Print Str(x)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -740,8 +740,8 @@ Sub Test()
     End If
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -762,8 +762,8 @@ Sub Test()
     Next i
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -782,8 +782,8 @@ Sub Test()
     arr(i) = Str(values(i))
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -802,8 +802,8 @@ Sub Test()
     Call ProcessString(Str(number))
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -822,8 +822,8 @@ Function GetNumberString() As String
     GetNumberString = Str(value)
 End Function
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -844,8 +844,8 @@ Sub Test()
     End If
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -869,8 +869,8 @@ Sub Test()
     End Select
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -891,8 +891,8 @@ Sub Test()
     End With
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -913,8 +913,8 @@ Sub Test()
     Loop
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -935,8 +935,8 @@ Sub Test()
     Loop
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -958,8 +958,8 @@ Sub Test()
     Wend
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -978,8 +978,8 @@ Sub Test()
     result = IIf(flag, Str(value1), Str(value2))
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -998,8 +998,8 @@ Sub Test()
     result = Str((x + y) * z)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1018,8 +1018,8 @@ Sub Test()
     MsgBox "Value: " & Str(total)
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1038,8 +1038,8 @@ Sub Test()
     obj.Caption = Str(count)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1062,8 +1062,8 @@ Sub Test()
     End If
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1083,8 +1083,8 @@ Sub Test()
     obj.SetValue Str(counter)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1105,8 +1105,8 @@ Sub Test()
     result = Str(amount)
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -1125,8 +1125,8 @@ Sub Test()
     csvLine = LTrim$(Str(id)) & "," & LTrim$(Str(qty)) & "," & LTrim$(Str(price))
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();

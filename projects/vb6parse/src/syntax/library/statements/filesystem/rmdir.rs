@@ -83,8 +83,8 @@ Sub Test()
     RmDir "OldFolder"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -99,8 +99,8 @@ End Sub
     #[test]
     fn rmdir_at_module_level() {
         let source = r#"RmDir "C:\Temp""#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -119,8 +119,8 @@ Sub Test()
     RmDir "C:\Temp\TempFiles"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -141,8 +141,8 @@ Sub Test()
     RmDir folderPath
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -161,8 +161,8 @@ Sub Test()
     RmDir "D:\Archive"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -181,8 +181,8 @@ Sub Test()
     RmDir "SubFolder"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -201,8 +201,8 @@ Sub Test()
     RmDir "..\TempFolder"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -221,8 +221,8 @@ Sub Test()
     RmDir "\\Server\Share\TempFolder"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -243,8 +243,8 @@ Sub Test()
     End If
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -263,8 +263,8 @@ Sub Test()
     If shouldDelete Then RmDir tempPath
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -283,8 +283,8 @@ Sub Test()
     RmDir "C:\Temp" ' Remove temporary directory
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -299,8 +299,8 @@ End Sub
     #[test]
     fn rmdir_preserves_whitespace() {
         let source = r#"    RmDir    "C:\Temp"    "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -324,8 +324,8 @@ Sub CleanupDirectories()
     On Error GoTo 0
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -346,8 +346,8 @@ Sub Test()
     RmDir "C:\Temp\Folder3"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -369,8 +369,8 @@ Sub RemoveTemporaryFolders()
     Next i
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -392,8 +392,8 @@ Sub RemoveNestedDirectories()
     RmDir "C:\Project\Temp"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -414,8 +414,8 @@ Sub Test()
     RmDir basePath & "OldData"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -436,8 +436,8 @@ Sub RemoveDirectoryWithFiles()
     RmDir "C:\Temp\Session"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -456,8 +456,8 @@ Sub Test()
     RmDir GetTempPath()
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -483,8 +483,8 @@ Sub Test()
     End Select
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -509,8 +509,8 @@ Sub Test()
     Loop
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -530,8 +530,8 @@ Sub Test()
     RmDir "C:\OldTemp"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -552,8 +552,8 @@ Sub Test()
     End If
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -573,8 +573,8 @@ Sub Test()
         "C:\VeryLongPathName\SubFolder\TempData"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -594,8 +594,8 @@ Private Sub Class_Terminate()
     RmDir m_tempDirectory
 End Sub
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.cls", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.cls", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -614,8 +614,8 @@ Sub Test()
     RmDir App.Path & "\TempCache"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -638,8 +638,8 @@ Sub RecursiveRemove()
     RmDir "C:\Temp"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -658,8 +658,8 @@ Sub Test()
     RmDir Environ("TEMP") & "\MyApp"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -680,8 +680,8 @@ Sub Test()
     RmDir "C:\TempWork"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -705,8 +705,8 @@ ErrorHandler:
     RemoveDirectory = False
 End Function
 ";
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
@@ -725,8 +725,8 @@ Sub Test()
     RmDir "C:/Temp/Session"
 End Sub
 "#;
-        let (cst_opt, _failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-        assert_eq!(_failures.len(), 0, "Expected no parse failures.");
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
         let cst = cst_opt.expect("CST should be parsed");
 
         let tree = cst.to_serializable();
