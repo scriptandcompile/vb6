@@ -383,6 +383,7 @@ impl Interpreter {
             };
             return Ok(Value::Boolean(result));
         }
+
         let left = lhs.as_i64()?;
         let right = rhs.as_i64()?;
         let result = match op {
@@ -392,6 +393,7 @@ impl Interpreter {
             LogicalOperator::Eqv => !(left ^ right),
             LogicalOperator::Imp => !left | right,
         };
+
         Ok(Value::from_i64(result))
     }
 
