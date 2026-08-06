@@ -912,12 +912,12 @@ mod tests {
 
     #[test]
     fn boolean_conversion() {
-        assert_eq!(Value::empty().as_bool().unwrap(), false);
-        assert_eq!(Value::Long(0).as_bool().unwrap(), false);
-        assert_eq!(Value::Long(5).as_bool().unwrap(), true);
-        assert_eq!(Value::from_string("True").as_bool().unwrap(), true);
-        assert_eq!(Value::from_string("false").as_bool().unwrap(), false);
-        assert_eq!(Value::from_string("1").as_bool().unwrap(), true);
+        assert!(!Value::empty().as_bool().unwrap());
+        assert!(!Value::Long(0).as_bool().unwrap());
+        assert!(Value::Long(5).as_bool().unwrap());
+        assert!(Value::from_string("True").as_bool().unwrap());
+        assert!(!Value::from_string("false").as_bool().unwrap());
+        assert!(Value::from_string("1").as_bool().unwrap());
     }
 
     #[test]
