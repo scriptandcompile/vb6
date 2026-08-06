@@ -57,26 +57,13 @@ pub enum Value {
 }
 ```
 
-### 2. Type System
+### 2. Shared Type System
 
-VB6 type information and rules:
+The runtime crate uses the shared type model from `vb6core` instead of maintaining a second copy of the VB6 type definitions. Runtime code consumes `VBType`, `TypeInfo`, `ArrayBound`, `VBError`, and `VBResult` from `vb6core`, while `vb6runtime` adds the dynamic value layer (`Value`, `ArrayValue`, and conversion behavior):
 
 ```rust
-pub enum VBType {
-    Byte,
-    Boolean,
-    Integer,
-    Long,
-    Single,
-    Double,
-    Currency,
-    Date,
-    String(Option<usize>),  // Fixed-length strings
-    Variant,
-    Object(Option<String>), // Optional class name
-    Array(Box<VBType>, Vec<(i32, i32)>),  // Type + bounds
-    UserDefined(String),
-}
+use vb6core::error::{VBError, VBResult};
+use vb6core::types::{ArrayBound, TypeInfo, VBType};
 ```
 
 ### 3. Type Conversions

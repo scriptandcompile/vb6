@@ -18,14 +18,10 @@ pub mod library;
 pub mod value;
 
 /// Runtime error types, re-exported from [`vb6core`].
-pub mod error {
-    pub use vb6core::error::{default_description, err_number, VBError, VBResult};
-}
+pub use vb6core::error;
 
 /// Type system types, re-exported from [`vb6core`].
-pub mod types {
-    pub use vb6core::types::{vartype, VBType};
-}
+pub use vb6core::types;
 
 pub use array::{ArrayDimension, ArrayValue};
 pub use error::{VBError, VBResult};
