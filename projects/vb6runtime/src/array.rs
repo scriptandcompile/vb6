@@ -244,7 +244,7 @@ mod tests {
         let mut arr = ArrayValue::new_fixed(VBType::Integer, &dims).unwrap();
         for i in 1..=2 {
             for j in 1..=3 {
-                arr.set(&[i, j], Value::Long((i * 10 + j) as i32)).unwrap();
+                arr.set(&[i, j], Value::Long(i * 10 + j)).unwrap();
             }
         }
         assert_eq!(arr.get(&[2, 3]).unwrap(), &Value::Long(23));
