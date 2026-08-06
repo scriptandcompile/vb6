@@ -24,28 +24,28 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
             two_args(name, args)?;
             let arg0 = arg_string(args, 0)?;
             let arg1 = arg_i32(args, 1)?;
-            let s = strfn::left(&arg0, arg1)?;
-            Ok(Value::from_string(s))
+            let result = strfn::left(&arg0, arg1)?;
+            Ok(Value::from_string(result))
         }
         "right" => {
             two_args(name, args)?;
             let arg0 = arg_string(args, 0)?;
             let arg1 = arg_i32(args, 1)?;
-            let s = strfn::right(&arg0, arg1)?;
-            Ok(Value::from_string(s))
+            let result = strfn::right(&arg0, arg1)?;
+            Ok(Value::from_string(result))
         }
         "mid" => {
             expect_args(name, args, 2, 3)?;
-            let length = args.get(2).map(|a| a.as_i32()).transpose()?;
+            let length = args.get(2).map(|arg| arg.as_i32()).transpose()?;
             let arg0 = arg_string(args, 0)?;
             let arg1 = arg_i32(args, 1)?;
-            let s = strfn::mid(&arg0, arg1, length)?;
-            Ok(Value::from_string(s))
+            let result = strfn::mid(&arg0, arg1, length)?;
+            Ok(Value::from_string(result))
         }
         "lcase" | "ucase" | "trim" | "ltrim" | "rtrim" | "strreverse" => {
             one_arg(name, args)?;
             let arg0 = arg_string(args, 0)?;
-            let s = match name.to_lowercase().as_str() {
+            let result = match name.to_lowercase().as_str() {
                 "lcase" => strfn::lcase(&arg0),
                 "ucase" => strfn::ucase(&arg0),
                 "trim" => strfn::trim(&arg0),
@@ -53,32 +53,32 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
                 "rtrim" => strfn::rtrim(&arg0),
                 _ => strfn::strreverse(&arg0),
             };
-            Ok(Value::from_string(s))
+            Ok(Value::from_string(result))
         }
         "asc" | "ascw" | "ascb" => {
             one_arg(name, args)?;
             let arg0 = arg_string(args, 0)?;
-            let v = match name.to_lowercase().as_str() {
+            let result = match name.to_lowercase().as_str() {
                 "asc" => strfn::asc(&arg0)?,
                 "ascw" => strfn::ascw(&arg0)?,
                 _ => strfn::ascb(&arg0)?,
             };
-            Ok(Value::from_long(v))
+            Ok(Value::from_long(result))
         }
         "chr" | "chrw" => {
             one_arg(name, args)?;
             let arg0 = arg_i32(args, 0)?;
-            let s = match name.to_lowercase().as_str() {
+            let result = match name.to_lowercase().as_str() {
                 "chr" => strfn::chr(arg0)?,
                 _ => strfn::chrw(arg0)?,
             };
-            Ok(Value::from_string(s))
+            Ok(Value::from_string(result))
         }
         "space" => {
             one_arg(name, args)?;
             let arg0 = arg_i32(args, 0)?;
-            let s = strfn::space(arg0)?;
-            Ok(Value::from_string(s))
+            let result = strfn::space(arg0)?;
+            Ok(Value::from_string(result))
         }
         "instr" => {
             expect_args(name, args, 2, 4)?;
@@ -109,11 +109,11 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
             let s1 = arg_string(args, s1_idx)?;
             let s2 = arg_string(args, s2_idx)?;
             let compare = cmp_idx
-                .and_then(|i| args.get(i))
-                .map(|a| a.as_i32())
+                .and_then(|index| args.get(index))
+                .map(|arg| arg.as_i32())
                 .transpose()?;
-            let v = strfn::instr(start, &s1, &s2, compare)?;
-            Ok(Value::from_long(v))
+            let result = strfn::instr(start, &s1, &s2, compare)?;
+            Ok(Value::from_long(result))
         }
 
         _ => Err(VBError::with_description(

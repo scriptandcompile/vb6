@@ -12,6 +12,28 @@ use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
 use vb6runtime::Value;
 
+/// Logical/bitwise operators shared by `And`, `Or`, `Xor`, `Eqv`, `Imp`.
+#[derive(Clone, Copy, Debug)]
+enum LogicalOperator {
+    And,
+    Or,
+    Xor,
+    Eqv,
+    Imp,
+}
+
+/// Arithmetic operators shared by `+`, `-`, `*`, `/`, `\`, `Mod`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum ArithmaticOperator {
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+    IntegerDivide,
+    Modulus,
+    Exponent,
+}
+
 impl Interpreter {
     /// Evaluate an expression node to a value.
     pub(crate) fn eval_expr(&mut self, node: &CstNode) -> RunResult<Value> {
@@ -46,9 +68,9 @@ impl Interpreter {
             SyntaxKind::ParenthesizedExpression => {
                 let parts: Vec<&CstNode> = node.significant_children().collect();
                 // [LeftParenthesis, expr, RightParenthesis]
-                if let Some(expr) = parts.into_iter().find(|c| {
+                if let Some(expr) = parts.into_iter().find(|part| {
                     !matches!(
-                        c.kind(),
+                        part.kind(),
                         SyntaxKind::LeftParenthesis | SyntaxKind::RightParenthesis
                     )
                 }) {
@@ -63,6 +85,27 @@ impl Interpreter {
                 VBError::with_description(
                     err_number::INVALID_PROCEDURE_CALL,
                     "Object member access is not supported yet",
+                ),
+            )),
+            SyntaxKind::TypeOfExpression => Err(self.error_at(
+                node,
+                VBError::with_description(
+                    err_number::INVALID_PROCEDURE_CALL,
+                    "TypeOf requires object support, which is not implemented yet",
+                ),
+            )),
+            SyntaxKind::NewExpression => Err(self.error_at(
+                node,
+                VBError::with_description(
+                    err_number::INVALID_PROCEDURE_CALL,
+                    "New object creation is not implemented yet",
+                ),
+            )),
+            SyntaxKind::AddressOfExpression => Err(self.error_at(
+                node,
+                VBError::with_description(
+                    err_number::INVALID_PROCEDURE_CALL,
+                    "AddressOf is not implemented yet",
                 ),
             )),
             other => Err(self.error_at(
@@ -122,16 +165,22 @@ impl Interpreter {
 
         match op.kind() {
             SyntaxKind::AdditionOperator => self.add(lhs, rhs),
-            SyntaxKind::SubtractionOperator => self.arith(lhs, rhs, '-'),
-            SyntaxKind::MultiplicationOperator => self.arith(lhs, rhs, '*'),
-            SyntaxKind::DivisionOperator => self.arith(lhs, rhs, '/'),
-            SyntaxKind::BackwardSlashOperator => self.arith(lhs, rhs, '\\'),
-            SyntaxKind::ModKeyword => self.arith(lhs, rhs, 'M'),
-            SyntaxKind::ExponentiationOperator => self.arith(lhs, rhs, '^'),
+            SyntaxKind::SubtractionOperator => self.arith(lhs, rhs, ArithmaticOperator::Subtract),
+            SyntaxKind::MultiplicationOperator => {
+                self.arith(lhs, rhs, ArithmaticOperator::Multiply)
+            }
+            SyntaxKind::DivisionOperator => self.arith(lhs, rhs, ArithmaticOperator::Divide),
+            SyntaxKind::BackwardSlashOperator => {
+                self.arith(lhs, rhs, ArithmaticOperator::IntegerDivide)
+            }
+            SyntaxKind::ModKeyword => self.arith(lhs, rhs, ArithmaticOperator::Modulus),
+            SyntaxKind::ExponentiationOperator => {
+                self.arith(lhs, rhs, ArithmaticOperator::Exponent)
+            }
             SyntaxKind::Ampersand => {
-                let s = lhs.as_string().map_err(VBError::from)?;
-                let t = rhs.as_string().map_err(VBError::from)?;
-                Ok(Value::from_string(format!("{s}{t}")))
+                let left = lhs.as_string()?;
+                let right = rhs.as_string()?;
+                Ok(Value::from_string(format!("{left}{right}")))
             }
             SyntaxKind::EqualityOperator => Ok(Value::Boolean(lhs == rhs)),
             SyntaxKind::InequalityOperator => Ok(Value::Boolean(lhs != rhs)),
@@ -141,30 +190,24 @@ impl Interpreter {
             SyntaxKind::GreaterThanOrEqualOperator => {
                 compare_ord(lhs, rhs, Ordering::GreaterOrEqual)
             }
-            SyntaxKind::AndKeyword => {
-                let a = lhs.as_bool().map_err(VBError::from)?;
-                let b = rhs.as_bool().map_err(VBError::from)?;
-                Ok(Value::Boolean(a && b))
+            SyntaxKind::AndKeyword => self.bitwise(lhs, rhs, LogicalOperator::And),
+            SyntaxKind::OrKeyword => self.bitwise(lhs, rhs, LogicalOperator::Or),
+            SyntaxKind::XorKeyword => self.bitwise(lhs, rhs, LogicalOperator::Xor),
+            SyntaxKind::EqvKeyword => self.bitwise(lhs, rhs, LogicalOperator::Eqv),
+            SyntaxKind::ImpKeyword => self.bitwise(lhs, rhs, LogicalOperator::Imp),
+            SyntaxKind::IsKeyword => {
+                let result = match (&lhs, &rhs) {
+                    (Value::Nothing, Value::Nothing) => true,
+                    (Value::Nothing, _) | (_, Value::Nothing) => false,
+                    // No object model yet: fall back to value equality.
+                    _ => lhs == rhs,
+                };
+                Ok(Value::Boolean(result))
             }
-            SyntaxKind::OrKeyword => {
-                let a = lhs.as_bool().map_err(VBError::from)?;
-                let b = rhs.as_bool().map_err(VBError::from)?;
-                Ok(Value::Boolean(a || b))
-            }
-            SyntaxKind::XorKeyword => {
-                let a = lhs.as_bool().map_err(VBError::from)?;
-                let b = rhs.as_bool().map_err(VBError::from)?;
-                Ok(Value::Boolean(a != b))
-            }
-            SyntaxKind::EqvKeyword => {
-                let a = lhs.as_bool().map_err(VBError::from)?;
-                let b = rhs.as_bool().map_err(VBError::from)?;
-                Ok(Value::Boolean(a == b))
-            }
-            SyntaxKind::ImpKeyword => {
-                let a = lhs.as_bool().map_err(VBError::from)?;
-                let b = rhs.as_bool().map_err(VBError::from)?;
-                Ok(Value::Boolean(!a || b))
+            SyntaxKind::LikeKeyword => {
+                let text = lhs.as_string()?;
+                let pattern = rhs.as_string()?;
+                Ok(Value::Boolean(like_match(&pattern, &text)))
             }
             other => Err(self.error_at(
                 op,
@@ -181,16 +224,16 @@ impl Interpreter {
         let value = self.eval_expr(operand)?;
         match op.kind() {
             SyntaxKind::SubtractionOperator => {
-                let n = value.as_f64().map_err(VBError::from)?;
-                Ok(Value::from_double(-n))
+                let number = value.as_f64()?;
+                Ok(Value::from_double(-number))
             }
             SyntaxKind::AdditionOperator => {
-                let n = value.as_f64().map_err(VBError::from)?;
-                Ok(Value::from_double(n))
+                let number = value.as_f64()?;
+                Ok(Value::from_double(number))
             }
             SyntaxKind::NotKeyword => {
-                let b = value.as_bool().map_err(VBError::from)?;
-                Ok(Value::Boolean(!b))
+                let boolean = value.as_bool()?;
+                Ok(Value::Boolean(!boolean))
             }
             other => Err(self.error_at(
                 op,
@@ -208,7 +251,7 @@ impl Interpreter {
 
         let argument_list = node
             .significant_children()
-            .find(|c| c.kind() == SyntaxKind::ArgumentList);
+            .find(|child| child.kind() == SyntaxKind::ArgumentList);
         let args = match argument_list {
             Some(list) => self.eval_args(list)?,
             None => Vec::new(),
@@ -216,14 +259,11 @@ impl Interpreter {
 
         // Array indexing: the name resolves to an array variable.
         if let Some(Value::Array(_)) = self.lookup(&name) {
-            let indices: VBResult<Vec<i32>> = args
-                .iter()
-                .map(|a| a.as_i32().map_err(VBError::from))
-                .collect();
-            let indices = indices.map_err(VBError::from)?;
+            let indices: VBResult<Vec<i32>> = args.iter().map(|arg| arg.as_i32()).collect();
+            let indices = indices?;
             let array = self.lookup(&name).ok_or_else(VBError::object_not_set)?;
             if let Value::Array(array) = array {
-                let element = array.get(&indices).map_err(VBError::from)?;
+                let element = array.get(&indices)?;
                 return Ok(element.clone());
             }
         }
@@ -244,7 +284,7 @@ impl Interpreter {
         for argument in node.children_by_kind(SyntaxKind::Argument) {
             if let Some(expr) = argument
                 .significant_children()
-                .find(|c| !matches!(c.kind(), SyntaxKind::Comma))
+                .find(|child| !matches!(child.kind(), SyntaxKind::Comma))
             {
                 values.push(self.eval_expr(expr)?);
             }
@@ -257,76 +297,102 @@ impl Interpreter {
     fn add(&self, lhs: Value, rhs: Value) -> RunResult<Value> {
         match (&lhs, &rhs) {
             (Value::String(_), Value::String(_)) => {
-                let s = lhs.as_string().map_err(VBError::from)?;
-                let t = rhs.as_string().map_err(VBError::from)?;
-                Ok(Value::from_string(format!("{s}{t}")))
+                let left = lhs.as_string()?;
+                let right = rhs.as_string()?;
+                Ok(Value::from_string(format!("{left}{right}")))
             }
             (Value::String(_), _) | (_, Value::String(_)) => {
                 Err(self.error_here(VBError::type_mismatch()))
             }
-            _ => self.arith(lhs, rhs, '+'),
+            _ => self.arith(lhs, rhs, ArithmaticOperator::Add),
         }
     }
 
-    /// Generic arithmetic dispatch on an operator char.
-    pub(crate) fn arith(&self, lhs: Value, rhs: Value, op: char) -> RunResult<Value> {
+    /// Generic arithmetic dispatch on an arithmetic operator.
+    pub(crate) fn arith(&self, lhs: Value, rhs: Value, op: ArithmaticOperator) -> RunResult<Value> {
         // Integer arithmetic when both operands are integral.
-        if op != '/' && op != '^' {
+        if op != ArithmaticOperator::Divide && op != ArithmaticOperator::Exponent {
             let li = lhs.as_i64().ok();
             let ri = rhs.as_i64().ok();
-            if let (Some(a), Some(b)) = (li, ri) {
+            if let (Some(left), Some(right)) = (li, ri) {
                 let result = match op {
-                    '+' => a.checked_add(b),
-                    '-' => a.checked_sub(b),
-                    '*' => a.checked_mul(b),
-                    '\\' => {
-                        if b == 0 {
+                    ArithmaticOperator::Add => left.checked_add(right),
+                    ArithmaticOperator::Subtract => left.checked_sub(right),
+                    ArithmaticOperator::Multiply => left.checked_mul(right),
+                    ArithmaticOperator::IntegerDivide => {
+                        if right == 0 {
                             return Err(self.error_here(VBError::division_by_zero()));
                         }
-                        Some(a.div_euclid(b))
+                        Some(left.div_euclid(right))
                     }
-                    'M' => {
-                        if b == 0 {
+                    ArithmaticOperator::Modulus => {
+                        if right == 0 {
                             return Err(self.error_here(VBError::division_by_zero()));
                         }
-                        Some(a.rem_euclid(b))
+                        Some(left.rem_euclid(right))
                     }
                     _ => None,
                 };
-                if let Some(v) = result {
-                    return Ok(Value::from_i64(v));
+                if let Some(value) = result {
+                    return Ok(Value::from_i64(value));
                 }
             }
         }
 
-        let a = lhs.as_f64().map_err(VBError::from)?;
-        let b = rhs.as_f64().map_err(VBError::from)?;
+        let left = lhs.as_f64()?;
+        let right = rhs.as_f64()?;
         let result = match op {
-            '+' => a + b,
-            '-' => a - b,
-            '*' => a * b,
-            '/' => {
-                if b == 0.0 {
+            ArithmaticOperator::Add => left + right,
+            ArithmaticOperator::Subtract => left - right,
+            ArithmaticOperator::Multiply => left * right,
+            ArithmaticOperator::Divide => {
+                if right == 0.0 {
                     return Err(self.error_here(VBError::division_by_zero()));
                 }
-                a / b
+                left / right
             }
-            '\\' => {
-                if b == 0.0 {
+            ArithmaticOperator::IntegerDivide => {
+                if right == 0.0 {
                     return Err(self.error_here(VBError::division_by_zero()));
                 }
-                (a / b).floor()
+                (left / right).floor()
             }
-            'M' => {
-                if b == 0.0 {
+            ArithmaticOperator::Modulus => {
+                if right == 0.0 {
                     return Err(self.error_here(VBError::division_by_zero()));
                 }
-                a % b
+                left % right
             }
-            '^' => a.powf(b),
-            _ => unreachable!(),
+            ArithmaticOperator::Exponent => left.powf(right),
+            // Add other operators here if needed.
         };
         Ok(Value::from_double(result))
+    }
+
+    /// Logical/bitwise operators. Booleans combine logically and yield a
+    /// Boolean; any other operands combine bitwise over their integral value
+    /// (booleans coerce to -1/0), like VB6.
+    fn bitwise(&self, lhs: Value, rhs: Value, op: LogicalOperator) -> RunResult<Value> {
+        if let (Value::Boolean(left), Value::Boolean(right)) = (&lhs, &rhs) {
+            let result = match op {
+                LogicalOperator::And => *left && *right,
+                LogicalOperator::Or => *left || *right,
+                LogicalOperator::Xor => *left != *right,
+                LogicalOperator::Eqv => *left == *right,
+                LogicalOperator::Imp => !*left || *right,
+            };
+            return Ok(Value::Boolean(result));
+        }
+        let left = lhs.as_i64()?;
+        let right = rhs.as_i64()?;
+        let result = match op {
+            LogicalOperator::And => left & right,
+            LogicalOperator::Or => left | right,
+            LogicalOperator::Xor => left ^ right,
+            LogicalOperator::Eqv => !(left ^ right),
+            LogicalOperator::Imp => !left | right,
+        };
+        Ok(Value::from_i64(result))
     }
 
     /// Look up a variable in the current frame, then in globals.
@@ -358,32 +424,125 @@ enum Ordering {
 
 /// Ordered comparison with VB6 coercion.
 fn compare_ord(lhs: Value, rhs: Value, ord: Ordering) -> RunResult<Value> {
-    let a = match (&lhs, &rhs) {
-        (Value::String(s), Value::String(t)) => compare_strings(s, t),
+    let ordering = match (&lhs, &rhs) {
+        (Value::String(left), Value::String(right)) => compare_strings(left, right),
         _ => match (lhs.as_f64(), rhs.as_f64()) {
-            (Ok(a), Ok(b)) => a.partial_cmp(&b),
+            (Ok(left), Ok(right)) => left.partial_cmp(&right),
             _ => {
                 return Err(RunError::new(VBError::type_mismatch()));
             }
         },
     };
-    let result = match (a, ord) {
-        (Some(std::cmp::Ordering::Less), Ordering::Less) => true,
-        (Some(std::cmp::Ordering::Greater), Ordering::Greater) => true,
-        (Some(std::cmp::Ordering::Less), Ordering::LessOrEqual) => true,
-        (Some(std::cmp::Ordering::Equal), Ordering::LessOrEqual) => true,
-        (Some(std::cmp::Ordering::Greater), Ordering::GreaterOrEqual) => true,
-        (Some(std::cmp::Ordering::Equal), Ordering::GreaterOrEqual) => true,
-        _ => false,
-    };
+    let result = matches!(
+        (ordering, ord),
+        (Some(std::cmp::Ordering::Less), Ordering::Less)
+            | (Some(std::cmp::Ordering::Less), Ordering::LessOrEqual)
+            | (Some(std::cmp::Ordering::Equal), Ordering::LessOrEqual)
+            | (Some(std::cmp::Ordering::Greater), Ordering::Greater)
+            | (Some(std::cmp::Ordering::Greater), Ordering::GreaterOrEqual)
+            | (Some(std::cmp::Ordering::Equal), Ordering::GreaterOrEqual)
+    );
     Ok(Value::Boolean(result))
 }
 
 /// Case-insensitive string comparison (VB6 default `Option Compare`).
-fn compare_strings(a: &str, b: &str) -> Option<std::cmp::Ordering> {
-    let la = a.to_lowercase();
-    let lb = b.to_lowercase();
-    Some(la.cmp(&lb))
+fn compare_strings(left: &str, right: &str) -> Option<std::cmp::Ordering> {
+    let left_lower = left.to_lowercase();
+    let right_lower = right.to_lowercase();
+    Some(left_lower.cmp(&right_lower))
+}
+
+/// VB6 `Like` pattern match, case-insensitive (the interpreter's default
+/// `Option Compare`). Supports `?`, `*`, `#`, and `[charlist]` / `[!charlist]`
+/// classes with `a-z` ranges. A literal `[`, `?`, `*`, or `#` is matched by
+/// enclosing it in brackets (e.g. `[[]`, `[?]`).
+fn like_match(pattern: &str, text: &str) -> bool {
+    let pat: Vec<char> = pattern.chars().collect();
+    let txt: Vec<char> = text.chars().collect();
+    let mut memo = vec![vec![None; txt.len() + 1]; pat.len() + 1];
+    like_match_at(&pat, &txt, 0, 0, &mut memo)
+}
+
+/// Memoized recursion over pattern position `pat_idx` and text position
+/// `text_idx`.
+fn like_match_at(
+    pat: &[char],
+    txt: &[char],
+    pat_idx: usize,
+    text_idx: usize,
+    memo: &mut Vec<Vec<Option<bool>>>,
+) -> bool {
+    if let Some(cached) = memo[pat_idx][text_idx] {
+        return cached;
+    }
+    let result = if pat_idx == pat.len() {
+        text_idx == txt.len()
+    } else if pat[pat_idx] == '*' {
+        // Match zero or more characters.
+        (like_match_at(pat, txt, pat_idx + 1, text_idx, memo))
+            || (text_idx < txt.len() && like_match_at(pat, txt, pat_idx, text_idx + 1, memo))
+    } else if pat[pat_idx] == '[' {
+        let closed = pat[pat_idx + 1..].iter().position(|&ch| ch == ']');
+        match closed {
+            Some(close) if text_idx < txt.len() => {
+                let (matched, next) = match_class(pat, pat_idx, pat_idx + 1 + close, txt[text_idx]);
+                matched && like_match_at(pat, txt, next, text_idx + 1, memo)
+            }
+            // No closing bracket: treat `[` as a literal character.
+            _ => {
+                text_idx < txt.len()
+                    && pat[pat_idx] == txt[text_idx]
+                    && like_match_at(pat, txt, pat_idx + 1, text_idx + 1, memo)
+            }
+        }
+    } else if text_idx < txt.len() {
+        let ok = match pat[pat_idx] {
+            '?' => true,
+            '#' => txt[text_idx].is_ascii_digit(),
+            ch => chars_equal(ch, txt[text_idx]),
+        };
+        ok && like_match_at(pat, txt, pat_idx + 1, text_idx + 1, memo)
+    } else {
+        false
+    };
+    memo[pat_idx][text_idx] = Some(result);
+    result
+}
+
+/// Match a single character against a `[charlist]` class spanning
+/// `pat[open]..=pat[close]`. Returns whether it matched and the pattern index
+/// just past the closing `]`.
+fn match_class(pat: &[char], open: usize, close: usize, ch: char) -> (bool, usize) {
+    let mut index = open + 1;
+    let negate = index < close && pat[index] == '!';
+    if negate {
+        index += 1;
+    }
+    let mut matched = false;
+    while index < close {
+        // `x-y` range.
+        if index + 2 < close && pat[index + 1] == '-' {
+            matched |= between_chars(pat[index], ch, pat[index + 2]);
+            index += 3;
+        } else {
+            matched |= chars_equal(pat[index], ch);
+            index += 1;
+        }
+    }
+    (if negate { !matched } else { matched }, close + 1)
+}
+
+/// Case-insensitive character equality.
+fn chars_equal(left: char, right: char) -> bool {
+    left.to_lowercase().eq(right.to_lowercase())
+}
+
+/// Whether `lo <= ch <= hi`, case-insensitively.
+fn between_chars(lo: char, ch: char, hi: char) -> bool {
+    let lo = lo.to_lowercase().next().unwrap_or(lo);
+    let ch = ch.to_lowercase().next().unwrap_or(ch);
+    let hi = hi.to_lowercase().next().unwrap_or(hi);
+    lo <= ch && ch <= hi
 }
 
 /// Parse a literal token's text into a runtime value.
@@ -396,12 +555,16 @@ pub(crate) fn literal_value(text: &str, kind: SyntaxKind) -> Option<Value> {
 
     match kind {
         SyntaxKind::StringLiteral => {
-            let inner = raw.strip_prefix('"').and_then(|s| s.strip_suffix('"'))?;
+            let inner = raw
+                .strip_prefix('"')
+                .and_then(|rest| rest.strip_suffix('"'))?;
             let unescaped = inner.replace("\"\"", "\"");
             Some(Value::from_string(unescaped))
         }
         SyntaxKind::DateLiteral => {
-            let inner = raw.strip_prefix('#').and_then(|s| s.strip_suffix('#'))?;
+            let inner = raw
+                .strip_prefix('#')
+                .and_then(|rest| rest.strip_suffix('#'))?;
             Value::from_string(inner)
                 .as_date_serial()
                 .ok()
@@ -412,20 +575,20 @@ pub(crate) fn literal_value(text: &str, kind: SyntaxKind) -> Option<Value> {
         SyntaxKind::IntegerLiteral => parse_integer(raw),
         SyntaxKind::LongLiteral => parse_long(raw),
         SyntaxKind::SingleLiteral => {
-            let s = strip_suffix(raw);
-            s.parse::<f32>().ok().map(Value::from_single)
+            let text = strip_suffix(raw);
+            text.parse::<f32>().ok().map(Value::from_single)
         }
         SyntaxKind::DoubleLiteral => {
-            let s = strip_suffix(raw);
-            s.parse::<f64>().ok().map(Value::from_double)
+            let text = strip_suffix(raw);
+            text.parse::<f64>().ok().map(Value::from_double)
         }
         SyntaxKind::CurrencyLiteral => {
-            let s = strip_suffix(raw);
-            s.parse::<f64>().ok().map(Value::from_currency)
+            let text = strip_suffix(raw);
+            text.parse::<f64>().ok().map(Value::from_currency)
         }
         SyntaxKind::DecimalLiteral => {
-            let s = strip_suffix(raw);
-            s.parse::<f64>().ok().map(Value::from_double)
+            let text = strip_suffix(raw);
+            text.parse::<f64>().ok().map(Value::from_double)
         }
         _ => None,
     }
@@ -441,29 +604,29 @@ fn strip_suffix(raw: &str) -> &str {
 
 /// Parse an integer literal into Integer (i16) or Long (i32) semantics.
 fn parse_integer(raw: &str) -> Option<Value> {
-    let s = strip_suffix(raw);
-    let upper = s.to_ascii_uppercase();
+    let text = strip_suffix(raw);
+    let upper = text.to_ascii_uppercase();
     if let Some(digits) = upper.strip_prefix("&H") {
         return radix_value(digits, 16);
     }
     if let Some(digits) = upper.strip_prefix("&O") {
         return radix_value(digits, 8);
     }
-    let value = s.parse::<i64>().ok()?;
+    let value = text.parse::<i64>().ok()?;
     Some(Value::from_i64(value))
 }
 
 /// Parse a `LongLiteral` (always a Long).
 fn parse_long(raw: &str) -> Option<Value> {
-    let s = strip_suffix(raw);
-    let upper = s.to_ascii_uppercase();
+    let text = strip_suffix(raw);
+    let upper = text.to_ascii_uppercase();
     if let Some(digits) = upper.strip_prefix("&H") {
         return radix_value(digits, 16);
     }
     if let Some(digits) = upper.strip_prefix("&O") {
         return radix_value(digits, 8);
     }
-    s.parse::<i32>().ok().map(Value::Long)
+    text.parse::<i32>().ok().map(Value::Long)
 }
 
 /// Parse a radix-prefixed literal, honoring VB6's wrap of 32-bit values.

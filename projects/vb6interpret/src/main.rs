@@ -233,19 +233,19 @@ fn scan_dir_for_similar(dir: &Path, file_name: &str, out: &mut Vec<(usize, PathB
 }
 
 /// Case-insensitive Levenshtein edit distance.
-fn levenshtein(a: &str, b: &str) -> usize {
-    let a: Vec<char> = a.to_lowercase().chars().collect();
-    let b: Vec<char> = b.to_lowercase().chars().collect();
-    let mut prev: Vec<usize> = (0..=b.len()).collect();
-    for (i, ca) in a.iter().enumerate() {
+fn levenshtein(left: &str, right: &str) -> usize {
+    let left: Vec<char> = left.to_lowercase().chars().collect();
+    let right: Vec<char> = right.to_lowercase().chars().collect();
+    let mut prev: Vec<usize> = (0..=right.len()).collect();
+    for (i, left_char) in left.iter().enumerate() {
         let mut curr = vec![i + 1];
-        for (j, cb) in b.iter().enumerate() {
-            let cost = if ca == cb { 0 } else { 1 };
+        for (j, right_char) in right.iter().enumerate() {
+            let cost = if left_char == right_char { 0 } else { 1 };
             curr.push((prev[j + 1] + 1).min(curr[j] + 1).min(prev[j] + cost));
         }
         prev = curr;
     }
-    prev[b.len()]
+    prev[right.len()]
 }
 
 /// A path rendered for display, without a leading `./`.
@@ -258,13 +258,13 @@ fn clean_path(path: &Path) -> String {
 /// shell would do for unquoted paths. Bash does not expand `~` inside double
 /// quotes, so CLI users often pass it through literally.
 fn expand_tilde(path: &Path) -> PathBuf {
-    let s = path.to_string_lossy();
+    let text = path.to_string_lossy();
     let home = std::env::var_os("HOME");
-    match s.strip_prefix("~/") {
+    match text.strip_prefix("~/") {
         Some(rest) => home
             .map(|h| PathBuf::from(h).join(rest))
             .unwrap_or_else(|| path.to_path_buf()),
-        None if s == "~" => home
+        None if text == "~" => home
             .map(PathBuf::from)
             .unwrap_or_else(|| path.to_path_buf()),
         None => path.to_path_buf(),

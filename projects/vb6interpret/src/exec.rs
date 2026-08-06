@@ -11,6 +11,7 @@ use vb6parse::parsers::SyntaxKind;
 use vb6runtime::{ArrayValue, Value};
 
 use crate::error::{RunError, RunResult};
+use crate::eval::ArithmaticOperator;
 use crate::interpreter::{Flow, Interpreter};
 use crate::program::{identifier_name, is_identifier_like, is_statement_kind, type_from_keyword};
 
@@ -115,66 +116,69 @@ impl Interpreter {
             .first()
             .is_some_and(|c| c.kind() == SyntaxKind::ConstKeyword);
 
-        let mut i = if is_const { 1 } else { 1 }; // skip Dim/Const keyword
+        let mut index = 1; //if is_const { 1 } else { 1 }; // skip Dim/Const keyword
+
         let mut first = true;
-        while i < significant.len() {
+        while index < significant.len() {
             if !first {
                 // Skip separator commas between declarations.
-                if significant[i].kind() == SyntaxKind::Comma {
-                    i += 1;
+                if significant[index].kind() == SyntaxKind::Comma {
+                    index += 1;
                 }
             }
             first = false;
 
-            if i >= significant.len() || !is_identifier_like(significant[i]) {
+            if index >= significant.len() || !is_identifier_like(significant[index]) {
                 break;
             }
-            let name = significant[i].text().trim().to_string();
-            i += 1;
+            let name = significant[index].text().trim().to_string();
+            index += 1;
 
             // Optional array bounds: `name ( ... )`.
             let mut bounds: Vec<vb6runtime::ArrayDimension> = Vec::new();
-            if i < significant.len() && significant[i].kind() == SyntaxKind::LeftParenthesis {
-                i += 1;
-                while i < significant.len() && significant[i].kind() != SyntaxKind::RightParenthesis
+            if index < significant.len() && significant[index].kind() == SyntaxKind::LeftParenthesis
+            {
+                index += 1;
+                while index < significant.len()
+                    && significant[index].kind() != SyntaxKind::RightParenthesis
                 {
                     let mut dim_parts = Vec::new();
-                    while i < significant.len()
-                        && significant[i].kind() != SyntaxKind::Comma
-                        && significant[i].kind() != SyntaxKind::RightParenthesis
+                    while index < significant.len()
+                        && significant[index].kind() != SyntaxKind::Comma
+                        && significant[index].kind() != SyntaxKind::RightParenthesis
                     {
-                        dim_parts.push(significant[i]);
-                        i += 1;
+                        dim_parts.push(significant[index]);
+                        index += 1;
                     }
                     bounds.push(self.parse_dimension(&dim_parts)?);
-                    if i < significant.len() && significant[i].kind() == SyntaxKind::Comma {
-                        i += 1;
+                    if index < significant.len() && significant[index].kind() == SyntaxKind::Comma {
+                        index += 1;
                     }
                 }
-                if i < significant.len() {
-                    i += 1; // RightParenthesis
+                if index < significant.len() {
+                    index += 1; // RightParenthesis
                 }
             }
 
             // Optional `As <type>`.
             let mut ty = vb6core::types::VBType::Variant;
-            if i < significant.len() && significant[i].kind() == SyntaxKind::AsKeyword {
-                i += 1;
-                if i < significant.len() {
-                    if let Some(t) = type_from_keyword(significant[i]) {
-                        ty = t;
+            if index < significant.len() && significant[index].kind() == SyntaxKind::AsKeyword {
+                index += 1;
+                if index < significant.len() {
+                    if let Some(parsed) = type_from_keyword(significant[index]) {
+                        ty = parsed;
                     }
-                    i += 1;
+                    index += 1;
                 }
             }
 
             if is_const {
                 // `Const name [As type] = value`
-                let eq = significant[i..]
+                let eq = significant[index..]
                     .iter()
                     .position(|c| c.kind() == SyntaxKind::EqualityOperator);
                 if let Some(eq) = eq {
-                    let value_idx = i + eq + 1;
+                    let value_idx = index + eq + 1;
                     if let Some(value_node) = significant.get(value_idx) {
                         let value = self.eval_expr(value_node)?;
                         let value = coerce(value, &ty);
@@ -190,8 +194,8 @@ impl Interpreter {
                 self.declare_in(&name, value);
             }
 
-            if i < significant.len() && significant[i].kind() == SyntaxKind::Comma {
-                i += 1;
+            if index < significant.len() && significant[index].kind() == SyntaxKind::Comma {
+                index += 1;
             }
         }
         Ok(())
@@ -200,42 +204,44 @@ impl Interpreter {
     /// `ReDim name(bounds) [As type]`, rebuilding the array.
     fn exec_redim(&mut self, node: &CstNode) -> RunResult<()> {
         let significant: Vec<&CstNode> = node.significant_children().collect();
-        let mut i = 0;
+        let mut index = 0;
         if significant
             .first()
             .is_some_and(|c| c.kind() == SyntaxKind::ReDimKeyword)
         {
-            i = 1;
+            index = 1;
         }
-        if i >= significant.len() || !is_identifier_like(significant[i]) {
+        if index >= significant.len() || !is_identifier_like(significant[index]) {
             return Ok(());
         }
-        let name = significant[i].text().trim().to_string();
-        i += 1;
+        let name = significant[index].text().trim().to_string();
+        index += 1;
 
         let mut bounds: Vec<vb6runtime::ArrayDimension> = Vec::new();
-        if i < significant.len() && significant[i].kind() == SyntaxKind::LeftParenthesis {
-            i += 1;
-            while i < significant.len() && significant[i].kind() != SyntaxKind::RightParenthesis {
-                if significant[i].kind() == SyntaxKind::PreserveKeyword {
-                    i += 1;
+        if index < significant.len() && significant[index].kind() == SyntaxKind::LeftParenthesis {
+            index += 1;
+            while index < significant.len()
+                && significant[index].kind() != SyntaxKind::RightParenthesis
+            {
+                if significant[index].kind() == SyntaxKind::PreserveKeyword {
+                    index += 1;
                     continue;
                 }
                 let mut dim_parts = Vec::new();
-                while i < significant.len()
-                    && significant[i].kind() != SyntaxKind::Comma
-                    && significant[i].kind() != SyntaxKind::RightParenthesis
+                while index < significant.len()
+                    && significant[index].kind() != SyntaxKind::Comma
+                    && significant[index].kind() != SyntaxKind::RightParenthesis
                 {
-                    dim_parts.push(significant[i]);
-                    i += 1;
+                    dim_parts.push(significant[index]);
+                    index += 1;
                 }
                 bounds.push(self.parse_dimension(&dim_parts)?);
-                if i < significant.len() && significant[i].kind() == SyntaxKind::Comma {
-                    i += 1;
+                if index < significant.len() && significant[index].kind() == SyntaxKind::Comma {
+                    index += 1;
                 }
             }
-            if i < significant.len() {
-                i += 1; // RightParenthesis
+            if index < significant.len() {
+                index += 1; // RightParenthesis
             }
         }
 
@@ -245,11 +251,11 @@ impl Interpreter {
             .and_then(|v| v.as_array().ok())
             .map(|a| a.element_type().clone())
             .unwrap_or(vb6core::types::VBType::Variant);
-        if i < significant.len() && significant[i].kind() == SyntaxKind::AsKeyword {
-            i += 1;
-            if i < significant.len() {
-                if let Some(t) = type_from_keyword(significant[i]) {
-                    ty = t;
+        if index < significant.len() && significant[index].kind() == SyntaxKind::AsKeyword {
+            index += 1;
+            if index < significant.len() {
+                if let Some(parsed) = type_from_keyword(significant[index]) {
+                    ty = parsed;
                 }
             }
         }
@@ -264,21 +270,24 @@ impl Interpreter {
         if parts.is_empty() {
             return Err(self.error_here(VBError::invalid_procedure_call()));
         }
-        if let Some(to_index) = parts.iter().position(|c| c.kind() == SyntaxKind::ToKeyword) {
+        if let Some(to_index) = parts
+            .iter()
+            .position(|part| part.kind() == SyntaxKind::ToKeyword)
+        {
             let lower = parts[..to_index]
                 .last()
                 .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
             let upper = parts[to_index + 1..]
                 .first()
                 .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
-            let lo = self.eval_expr(lower)?.as_i32().map_err(VBError::from)?;
-            let hi = self.eval_expr(upper)?.as_i32().map_err(VBError::from)?;
+            let lo = self.eval_expr(lower)?.as_i32()?;
+            let hi = self.eval_expr(upper)?.as_i32()?;
             Ok(vb6runtime::ArrayDimension::new(lo, hi))
         } else {
             let upper = parts
                 .last()
                 .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
-            let hi = self.eval_expr(upper)?.as_i32().map_err(VBError::from)?;
+            let hi = self.eval_expr(upper)?.as_i32()?;
             // A single bound uses 0-based indexing (`Dim a(5)` -> 0 To 5).
             Ok(vb6runtime::ArrayDimension::new(0, hi))
         }
@@ -357,16 +366,15 @@ impl Interpreter {
                 };
                 let indices: Vec<i32> = args
                     .iter()
-                    .map(|a| a.as_i32().map_err(VBError::from))
-                    .collect::<VBResult<_>>()
-                    .map_err(VBError::from)?;
+                    .map(|arg| arg.as_i32())
+                    .collect::<VBResult<_>>()?;
 
                 let existing = self
                     .lookup(&name)
                     .cloned()
                     .ok_or_else(|| self.error_here(VBError::subscript_out_of_range()))?;
                 if let Value::Array(mut array) = existing {
-                    array.set(&indices, value).map_err(VBError::from)?;
+                    array.set(&indices, value)?;
                     self.set_variable(&name, Value::Array(array));
                     Ok(())
                 } else {
@@ -393,7 +401,7 @@ impl Interpreter {
             .rev()
             .find(|c| c.is_significant())
             .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
-        let cond_true = self.eval_expr(cond)?.as_bool().map_err(VBError::from)?;
+        let cond_true = self.eval_expr(cond)?.as_bool()?;
 
         let is_block = node
             .first_child_by_kind(SyntaxKind::StatementList)
@@ -450,10 +458,7 @@ impl Interpreter {
                                 .ok_or_else(|| {
                                     self.error_here(VBError::invalid_procedure_call())
                                 })?;
-                            let elseif_true = self
-                                .eval_expr(elseif_cond)?
-                                .as_bool()
-                                .map_err(VBError::from)?;
+                            let elseif_true = self.eval_expr(elseif_cond)?.as_bool()?;
                             if elseif_true {
                                 let flow = self.exec_body_of(child, cur_line)?;
                                 if flow != Flow::Next {
@@ -536,7 +541,7 @@ impl Interpreter {
 
         let start = self.eval_expr(start_node)?;
         let end = self.eval_expr(end_node)?;
-        let step_f = step.as_f64().map_err(VBError::from)?;
+        let step_f = step.as_f64()?;
         if step_f == 0.0 {
             return Err(self.error_here(VBError::invalid_procedure_call()));
         }
@@ -557,22 +562,26 @@ impl Interpreter {
         let mut counter = start;
         loop {
             self.step()?;
-            let c = counter.as_f64().map_err(VBError::from)?;
-            let e = end.as_f64().map_err(VBError::from)?;
-            let done = if step_f >= 0.0 { c > e } else { c < e };
+            let current = counter.as_f64()?;
+            let end_value = end.as_f64()?;
+            let done = if step_f >= 0.0 {
+                current > end_value
+            } else {
+                current < end_value
+            };
             if done {
                 break;
             }
             self.set_variable(&name, counter.clone());
             if let Some(idx) = body_index {
-                let flow = self.exec_statements(&children[idx], body_line)?;
+                let flow = self.exec_statements(children[idx], body_line)?;
                 match flow {
                     Flow::Next => {}
                     Flow::BreakLoop => break,
                     Flow::Return | Flow::Terminate => return Ok(flow),
                 }
             }
-            counter = self.arith(counter, step.clone(), '+')?;
+            counter = self.arith(counter, step.clone(), ArithmaticOperator::Add)?;
         }
         self.set_variable(&name, counter);
         Ok(Flow::Next)
@@ -598,19 +607,19 @@ impl Interpreter {
 
         let do_index = significant
             .iter()
-            .position(|c| c.kind() == SyntaxKind::DoKeyword)
+            .position(|part| part.kind() == SyntaxKind::DoKeyword)
             .unwrap_or(0);
         let loop_index = significant
             .iter()
-            .position(|c| c.kind() == SyntaxKind::LoopKeyword);
+            .position(|part| part.kind() == SyntaxKind::LoopKeyword);
 
         // Pre-test: `Do While cond` / `Do Until cond`.
         let mut pre_test: Option<(bool, &CstNode)> = None;
-        for c in &significant[do_index + 1..] {
-            match c.kind() {
+        for part in &significant[do_index + 1..] {
+            match part.kind() {
                 SyntaxKind::WhileKeyword | SyntaxKind::UntilKeyword => {
-                    if let Some(next) = c.next_significant(significant.as_slice()) {
-                        let invert = c.kind() == SyntaxKind::UntilKeyword;
+                    if let Some(next) = part.next_significant(significant.as_slice()) {
+                        let invert = part.kind() == SyntaxKind::UntilKeyword;
                         pre_test = Some((invert, next));
                     }
                     break;
@@ -624,11 +633,11 @@ impl Interpreter {
         let mut post_test: Option<(bool, &CstNode)> = None;
         if let Some(li) = loop_index {
             let after: Vec<&CstNode> = significant[li + 1..].to_vec();
-            for c in &after {
-                match c.kind() {
+            for part in &after {
+                match part.kind() {
                     SyntaxKind::WhileKeyword | SyntaxKind::UntilKeyword => {
-                        if let Some(next) = c.next_significant(&after) {
-                            let invert = c.kind() == SyntaxKind::UntilKeyword;
+                        if let Some(next) = part.next_significant(&after) {
+                            let invert = part.kind() == SyntaxKind::UntilKeyword;
                             post_test = Some((invert, next));
                         }
                         break;
@@ -641,13 +650,13 @@ impl Interpreter {
         loop {
             self.step()?;
             if let Some((invert, cond)) = pre_test {
-                let b = self.eval_expr(cond)?.as_bool().map_err(VBError::from)?;
-                if b == invert {
+                let condition = self.eval_expr(cond)?.as_bool()?;
+                if condition == invert {
                     break;
                 }
             }
             if let Some(idx) = body_index {
-                let flow = self.exec_statements(&children[idx], body_line)?;
+                let flow = self.exec_statements(children[idx], body_line)?;
                 match flow {
                     Flow::Next => {}
                     Flow::BreakLoop => break,
@@ -655,7 +664,7 @@ impl Interpreter {
                 }
             }
             if let Some((invert, cond)) = post_test {
-                let b = self.eval_expr(cond)?.as_bool().map_err(VBError::from)?;
+                let b = self.eval_expr(cond)?.as_bool()?;
                 if b == invert {
                     break;
                 }
@@ -690,12 +699,12 @@ impl Interpreter {
 
         loop {
             self.step()?;
-            let b = self.eval_expr(cond)?.as_bool().map_err(VBError::from)?;
+            let b = self.eval_expr(cond)?.as_bool()?;
             if !b {
                 break;
             }
             if let Some(idx) = body_index {
-                let flow = self.exec_statements(&children[idx], body_line)?;
+                let flow = self.exec_statements(children[idx], body_line)?;
                 match flow {
                     Flow::Next => {}
                     Flow::BreakLoop => break,
@@ -759,46 +768,46 @@ impl Interpreter {
             spec.push(c);
         }
 
-        let mut i = 0;
-        while i < spec.len() {
-            match spec[i].kind() {
-                SyntaxKind::Comma => i += 1,
+        let mut index = 0;
+        while index < spec.len() {
+            match spec[index].kind() {
+                SyntaxKind::Comma => index += 1,
                 SyntaxKind::IsKeyword => {
                     let op = spec
-                        .get(i + 1)
+                        .get(index + 1)
                         .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
                     let value_node = spec
-                        .get(i + 2)
+                        .get(index + 2)
                         .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
                     let value = self.eval_case_value(value_node)?;
                     let matched = self.apply_compare(selector, op.kind(), &value)?;
                     if matched {
                         return Ok(true);
                     }
-                    i += 3;
+                    index += 3;
                 }
                 SyntaxKind::ToKeyword => {
                     // Range: `low To high`.
-                    let low = self.eval_case_value(spec[i - 1])?;
-                    let high = self.eval_case_value(spec[i + 1])?;
+                    let low = self.eval_case_value(spec[index - 1])?;
+                    let high = self.eval_case_value(spec[index + 1])?;
                     if self.in_range(selector, &low, &high)? {
                         return Ok(true);
                     }
-                    i += 2;
+                    index += 2;
                 }
                 _ => {
-                    let value = self.eval_case_value(spec[i])?;
+                    let value = self.eval_case_value(spec[index])?;
                     let mut matched = selector == &value;
                     // A trailing `To` opens a range.
-                    if i + 1 < spec.len() && spec[i + 1].kind() == SyntaxKind::ToKeyword {
-                        let high = self.eval_case_value(spec[i + 2])?;
+                    if index + 1 < spec.len() && spec[index + 1].kind() == SyntaxKind::ToKeyword {
+                        let high = self.eval_case_value(spec[index + 2])?;
                         matched = self.in_range(selector, &value, &high)?;
-                        i += 2;
+                        index += 2;
                     }
                     if matched {
                         return Ok(true);
                     }
-                    i += 1;
+                    index += 1;
                 }
             }
         }
@@ -817,9 +826,9 @@ impl Interpreter {
 
     /// `low <= selector <= high` (numeric or string range).
     fn in_range(&mut self, selector: &Value, low: &Value, high: &Value) -> RunResult<bool> {
-        let s = selector.as_f64().map_err(VBError::from)?;
-        let lo = low.as_f64().map_err(VBError::from)?;
-        let hi = high.as_f64().map_err(VBError::from)?;
+        let s = selector.as_f64()?;
+        let lo = low.as_f64()?;
+        let hi = high.as_f64()?;
         Ok(s >= lo && s <= hi)
     }
 
@@ -830,8 +839,8 @@ impl Interpreter {
         op: SyntaxKind,
         value: &Value,
     ) -> RunResult<bool> {
-        let a = selector.as_f64().map_err(VBError::from)?;
-        let b = value.as_f64().map_err(VBError::from)?;
+        let a = selector.as_f64()?;
+        let b = value.as_f64()?;
         Ok(match op {
             SyntaxKind::EqualityOperator => a == b,
             SyntaxKind::InequalityOperator => a != b,
@@ -877,7 +886,7 @@ impl Interpreter {
         match name.to_lowercase().as_str() {
             "msgbox" => {
                 if let Some(first) = args.first() {
-                    let text = first.as_string().map_err(VBError::from)?;
+                    let text = first.as_string()?;
                     self.emit(text, true);
                 }
                 Ok(Flow::Next)
@@ -923,7 +932,7 @@ impl Interpreter {
                     SyntaxKind::Argument => {
                         if let Some(expr) = child.first_non_whitespace_child() {
                             let value = self.eval_expr(expr)?;
-                            let text = value.as_string().map_err(VBError::from)?;
+                            let text = value.as_string()?;
                             self.current_output.push_str(&text);
                         }
                     }

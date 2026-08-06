@@ -206,3 +206,42 @@ fn print_separators() {
     let out = run("    Debug.Print \"a\"; \"b\"\n    Debug.Print \"c\"\n    Debug.Print \"x\";\n    Debug.Print \"y\"\n");
     assert_eq!(out, vec!["ab", "c", "xy"]);
 }
+
+#[test]
+fn like_operator() {
+    let out = run("    Debug.Print \"Hello\" Like \"H*\"\n\
+         Debug.Print \"hello\" Like \"H*\"\n\
+         Debug.Print \"abc123\" Like \"???###\"\n\
+         Debug.Print \"cat\" Like \"[a-d]at\"\n\
+         Debug.Print \"eat\" Like \"[!a-d]at\"\n\
+         Debug.Print \"x?y\" Like \"x[?]y\"\n\
+         Debug.Print \"[a\" Like \"[[]a\"\n\
+         Debug.Print \"hello\" Like \"h[eo]l?o\"\n");
+    assert_eq!(
+        out,
+        vec!["True", "True", "True", "True", "True", "True", "True", "True"]
+    );
+}
+
+#[test]
+fn is_operator() {
+    let out = run("    Dim v As Variant\n\
+         Debug.Print v Is Nothing\n\
+         v = Nothing\n\
+         Debug.Print v Is Nothing\n\
+         Dim w As Variant\n\
+         w = \"x\"\n\
+         Debug.Print w Is Nothing\n");
+    assert_eq!(out, vec!["False", "True", "False"]);
+}
+
+#[test]
+fn bitwise_logical_operators() {
+    let out = run("    Debug.Print 5 And 3\n\
+         Debug.Print 5 Or 2\n\
+         Debug.Print 5 Xor 1\n\
+         Debug.Print 5 Eqv 3\n\
+         Debug.Print True And False\n\
+         Debug.Print True Imp False\n");
+    assert_eq!(out, vec!["1", "7", "4", "-7", "False", "False"]);
+}
