@@ -585,7 +585,7 @@
 /// # Examples
 ///
 /// ```
-/// use vb6runtime::library::functions::string::len::len;
+/// use vb6runtime::library::functions::string::len;
 /// assert_eq!(len("Hello"), 5);
 /// assert_eq!(len(""), 0);
 /// ```
