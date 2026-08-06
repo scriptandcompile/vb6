@@ -21,7 +21,7 @@ pub const CURRENCY_SCALE: i64 = 10_000;
 /// `Variant` value. The trait requires `Debug` so that [`Value`] can derive
 /// `Debug`, and `clone_box` so that [`Value::clone`] works without requiring
 /// the concrete type to be known.
-pub trait VbObject: fmt::Debug + Send + Sync {
+pub trait VBObject: fmt::Debug + Send + Sync {
     /// The VB6 type name of the object (e.g. `"Collection"`).
     fn type_name(&self) -> &str;
 
@@ -29,7 +29,7 @@ pub trait VbObject: fmt::Debug + Send + Sync {
     fn as_any(&self) -> &dyn std::any::Any;
 
     /// Clone this object as a boxed trait object.
-    fn clone_box(&self) -> Box<dyn VbObject>;
+    fn clone_box(&self) -> Box<dyn VBObject>;
 }
 
 /// A VB6 runtime value.
@@ -62,7 +62,7 @@ pub enum Value {
     /// An error value (from `CVErr`).
     Error(VBError),
     /// An object reference.
-    Object(Box<dyn VbObject>),
+    Object(Box<dyn VBObject>),
     /// An array value.
     Array(ArrayValue),
 }
@@ -101,8 +101,8 @@ impl PartialEq for Value {
             (Value::Date(a), Value::Date(b)) => a == b,
             (Value::Array(a), Value::Array(b)) => a == b,
             (Value::Object(a), Value::Object(b)) => std::ptr::eq(
-                a.as_ref() as *const dyn VbObject as *const (),
-                b.as_ref() as *const dyn VbObject as *const (),
+                a.as_ref() as *const dyn VBObject as *const (),
+                b.as_ref() as *const dyn VBObject as *const (),
             ),
             // Numeric cross-type comparison with VB6 coercion.
             (Value::Currency(a), Value::Currency(b)) => a == b,
@@ -201,7 +201,7 @@ impl Value {
     }
 
     /// Create an object reference value.
-    pub fn from_object(o: Box<dyn VbObject>) -> Self {
+    pub fn from_object(o: Box<dyn VBObject>) -> Self {
         Value::Object(o)
     }
 
@@ -510,7 +510,7 @@ impl Value {
     }
 
     /// Borrow this value as an object, or error 424 on type mismatch.
-    pub fn as_object(&self) -> VBResult<&dyn VbObject> {
+    pub fn as_object(&self) -> VBResult<&dyn VBObject> {
         match self {
             Value::Object(o) => Ok(o.as_ref()),
             _ => Err(VBError::object_required()),
@@ -802,14 +802,14 @@ mod tests {
     #[derive(Debug)]
     struct TestObject(&'static str);
 
-    impl VbObject for TestObject {
+    impl VBObject for TestObject {
         fn type_name(&self) -> &str {
             self.0
         }
         fn as_any(&self) -> &dyn std::any::Any {
             self
         }
-        fn clone_box(&self) -> Box<dyn VbObject> {
+        fn clone_box(&self) -> Box<dyn VBObject> {
             Box::new(TestObject(self.0))
         }
     }
