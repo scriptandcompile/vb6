@@ -240,3 +240,63 @@
 //! - Character interpretation depends on system code page for values 128-255
 //! - Does not validate that the resulting character is printable
 //! - No direct support for multi-byte Unicode characters
+
+use crate::error::{err_number, VBError, VBResult};
+use crate::value::Value;
+
+/// Returns the character associated with the specified Windows-1252 (ANSI) code.
+///
+/// `charcode` must be in the range 0-255. Code 0 returns the null character
+/// (U+0000, `vbNullChar`); codes 128-255 are decoded as Windows-1252.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `charcode` is
+/// outside the range 0-255.
+pub fn chrb_dollar(charcode: i32) -> VBResult<Value> {
+    if !(0..=255).contains(&charcode) {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Character code out of range",
+        ));
+    }
+    let character = super::ansi::decode_byte(charcode as u8);
+    let result = Value::String(character);
+
+    Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn returns_ascii_characters() {
+        assert_eq!(chrb_dollar(65).unwrap().as_string().unwrap(), "A");
+        assert_eq!(chrb_dollar(97).unwrap().as_string().unwrap(), "a");
+        assert_eq!(chrb_dollar(34).unwrap().as_string().unwrap(), "\"");
+    }
+
+    #[test]
+    fn returns_ansi_extended_characters() {
+        assert_eq!(chrb_dollar(128).unwrap().as_string().unwrap(), "€");
+        assert_eq!(chrb_dollar(233).unwrap().as_string().unwrap(), "é");
+    }
+
+    #[test]
+    fn code_zero_returns_null_character() {
+        assert_eq!(chrb_dollar(0).unwrap().as_string().unwrap(), "\u{0}");
+    }
+
+    #[test]
+    fn rejects_out_of_range() {
+        assert_eq!(
+            chrb_dollar(-1).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+        assert_eq!(
+            chrb_dollar(256).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}
