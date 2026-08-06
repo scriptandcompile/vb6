@@ -1,6 +1,6 @@
 //! VB6 runtime values.
 //!
-//! [`Value`] is the dynamic counterpart of [`VBType`](crate::types::VBType) and
+//! [`Value`] is the dynamic counterpart of `VBType` and
 //! the representation of a VB6 `Variant`: it can hold `Empty`, `Null`, any
 //! primitive, an object reference, an error, or an array. Conversions follow
 //! VB6 semantics (banker's rounding, `Null` propagation as error 94, overflow

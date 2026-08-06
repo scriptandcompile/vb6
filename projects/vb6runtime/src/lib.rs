@@ -5,7 +5,7 @@
 //! - [`VBType`] - the single source of truth for VB6 static types
 //! - [`Value`] - runtime values with VB6-exact conversion semantics
 //! - [`ArrayValue`] - VB6 arrays with arbitrary bounds
-//! - [`VbError`] - runtime errors mirroring the `Err` object
+//! - [`VBError`] - runtime errors mirroring the `Err` object
 //!
 //! The standard library function implementations live under `library::` and are
 //! added incrementally, using [`Value`] and [`VBType`] as their foundations.
