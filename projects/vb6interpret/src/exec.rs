@@ -946,9 +946,11 @@ impl Interpreter {
                 Some(SyntaxKind::Comma | SyntaxKind::Semicolon)
             );
         }
+
         if !trailing_separator {
             self.output.push(std::mem::take(&mut self.current_output));
         }
+
         Ok(())
     }
 
