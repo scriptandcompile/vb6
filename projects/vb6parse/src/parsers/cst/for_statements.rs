@@ -297,7 +297,7 @@ End Sub
 
         let child_kinds: Vec<_> = statement_list
             .non_token_children()
-            .map(|node| node.kind())
+            .map(super::super::navigation::CstNode::kind)
             .collect();
 
         assert_eq!(
