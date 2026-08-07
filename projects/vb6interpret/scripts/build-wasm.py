@@ -85,6 +85,7 @@ def optimize_wasm(wasm_opt: str | None, wasm_file: Path) -> None:
             wasm_opt,
             "-Oz",
             "--enable-bulk-memory",
+            "--enable-nontrapping-float-to-int",
             "-o",
             str(wasm_file),
             str(backup_file),
