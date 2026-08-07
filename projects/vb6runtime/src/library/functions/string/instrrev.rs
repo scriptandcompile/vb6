@@ -610,7 +610,13 @@ mod tests {
             VBLong::from(14)
         );
         assert_eq!(
-            instrrev(&VBString::from("Hello World"), &VBString::from("o"), None, None).unwrap(),
+            instrrev(
+                &VBString::from("Hello World"),
+                &VBString::from("o"),
+                None,
+                None
+            )
+            .unwrap(),
             VBLong::from(8)
         );
     }
@@ -717,7 +723,13 @@ mod tests {
             VBLong::from(1)
         );
         assert_eq!(
-            instrrev(&VBString::from("Hello"), &VBString::from("hello"), None, None).unwrap(),
+            instrrev(
+                &VBString::from("Hello"),
+                &VBString::from("hello"),
+                None,
+                None
+            )
+            .unwrap(),
             VBLong::from(0)
         );
     }

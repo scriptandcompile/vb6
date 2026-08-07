@@ -129,6 +129,19 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
             let result = strfn::instrrev(&s1, &s2, start.as_ref(), compare.as_ref())?;
             Ok(Value::from(result))
         }
+        "format" => {
+            expect_args(name, args, 1, 4)?;
+            let format = args.get(1).map(VBString::try_from).transpose()?;
+            let firstdayofweek = args.get(2).map(VBLong::try_from).transpose()?;
+            let firstweekofyear = args.get(3).map(VBLong::try_from).transpose()?;
+            let result = strfn::format_dollar(
+                &args[0],
+                format.as_ref(),
+                firstdayofweek.as_ref(),
+                firstweekofyear.as_ref(),
+            )?;
+            Ok(Value::from(result))
+        }
 
         _ => Err(VBError::with_description(
             35,

@@ -963,7 +963,7 @@ fn pad2(v: i64) -> String {
 }
 
 /// Convert an OLE automation date serial to a civil datetime.
-fn date_serial_to_datetime(serial: f64) -> Option<jiff::civil::DateTime> {
+pub(crate) fn date_serial_to_datetime(serial: f64) -> Option<jiff::civil::DateTime> {
     use jiff::civil::{Date, DateTime};
     use jiff::Span;
 
