@@ -54,7 +54,7 @@ pub mod instr;
 pub use instr::instr;
 
 pub mod instrrev;
-//pub use instrrev::instrrev;
+pub use instrrev::instrrev;
 
 pub mod lcase;
 pub use lcase::lcase;

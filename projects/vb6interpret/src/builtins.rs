@@ -120,6 +120,15 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
             let result = strfn::instr(start.as_ref(), &s1, &s2, compare.as_ref())?;
             Ok(Value::from(result))
         }
+        "instrrev" => {
+            expect_args(name, args, 2, 4)?;
+            let s1 = arg_string(args, 0)?;
+            let s2 = arg_string(args, 1)?;
+            let start = args.get(2).map(VBLong::try_from).transpose()?;
+            let compare = args.get(3).map(VBLong::try_from).transpose()?;
+            let result = strfn::instrrev(&s1, &s2, start.as_ref(), compare.as_ref())?;
+            Ok(Value::from(result))
+        }
 
         _ => Err(VBError::with_description(
             35,
