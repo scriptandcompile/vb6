@@ -508,7 +508,10 @@
 //! - `Like`: Pattern matching with wildcards
 //! - `StrComp`: Compare two strings
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
 
 /// Returns the 1-based position of the first occurrence of `string2` within
 /// `string1`, searching from `start`.
@@ -523,26 +526,26 @@ use crate::error::{err_number, VBError, VBResult};
 /// Returns error 5 (`Invalid procedure call or argument`) when `start` is less
 /// than 1.
 pub fn instr(
-    start: Option<i32>,
-    string1: &str,
-    string2: &str,
-    compare: Option<i32>,
-) -> VBResult<i32> {
-    let start = start.unwrap_or(1);
+    start: Option<&VBLong>,
+    string1: &VBString,
+    string2: &VBString,
+    compare: Option<&VBLong>,
+) -> VBResult<VBLong> {
+    let start = start.map_or(1, |value| value.as_i32());
     if start < 1 {
         return Err(VBError::with_description(
             err_number::INVALID_PROCEDURE_CALL,
             "Invalid start position",
         ));
     }
-    if string1.is_empty() {
-        return Ok(0);
+    if string1.as_str().is_empty() {
+        return Ok(VBLong::from(0));
     }
-    if string2.is_empty() {
-        return Ok(start);
+    if string2.as_str().is_empty() {
+        return Ok(VBLong::from(start));
     }
 
-    let text_compare = compare == Some(1);
+    let text_compare = compare.is_some_and(|value| value.as_i32() == 1);
     let char_eq = |a: char, b: char| {
         if text_compare {
             a.to_lowercase().eq(b.to_lowercase())
@@ -551,8 +554,8 @@ pub fn instr(
         }
     };
 
-    let chars1: Vec<char> = string1.chars().collect();
-    let chars2: Vec<char> = string2.chars().collect();
+    let chars1: Vec<char> = string1.as_str().chars().collect();
+    let chars2: Vec<char> = string2.as_str().chars().collect();
     let start0 = (start - 1) as usize;
 
     for i in start0..chars1.len() {
@@ -564,60 +567,139 @@ pub fn instr(
             .enumerate()
             .all(|(j, &c)| char_eq(chars1[i + j], c));
         if matches {
-            return Ok((i + 1) as i32);
+            return Ok(VBLong::from((i + 1) as i32));
         }
     }
-    Ok(0)
+    Ok(VBLong::from(0))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::error::err_number;
+    use crate::{error::err_number, value::VBString};
 
     #[test]
     fn finds_first_occurrence() {
-        assert_eq!(instr(None, "Hello World", "World", None).unwrap(), 7);
-        assert_eq!(instr(None, "Hello Hello", "Hello", None).unwrap(), 1);
+        assert_eq!(
+            instr(
+                None,
+                &VBString::from("Hello World"),
+                &VBString::from("World"),
+                None
+            )
+            .unwrap(),
+            VBLong::from(7)
+        );
+        assert_eq!(
+            instr(
+                None,
+                &VBString::from("Hello Hello"),
+                &VBString::from("Hello"),
+                None
+            )
+            .unwrap(),
+            VBLong::from(1)
+        );
     }
 
     #[test]
     fn respects_start_position() {
-        assert_eq!(instr(Some(2), "Hello Hello", "Hello", None).unwrap(), 7);
+        assert_eq!(
+            instr(
+                Some(&VBLong::from(2)),
+                &VBString::from("Hello Hello"),
+                &VBString::from("Hello"),
+                None
+            )
+            .unwrap(),
+            VBLong::from(7)
+        );
     }
 
     #[test]
     fn missing_substring_returns_zero() {
-        assert_eq!(instr(None, "Hello", "xyz", None).unwrap(), 0);
+        assert_eq!(
+            instr(None, &VBString::from("Hello"), &VBString::from("xyz"), None).unwrap(),
+            VBLong::from(0)
+        );
     }
 
     #[test]
     fn empty_string1_returns_zero() {
-        assert_eq!(instr(None, "", "x", None).unwrap(), 0);
+        assert_eq!(
+            instr(None, &VBString::from(""), &VBString::from("x"), None).unwrap(),
+            VBLong::from(0)
+        );
     }
 
     #[test]
     fn empty_string2_returns_start() {
-        assert_eq!(instr(None, "Hello", "", None).unwrap(), 1);
-        assert_eq!(instr(Some(3), "Hello", "", None).unwrap(), 3);
+        assert_eq!(
+            instr(None, &VBString::from("Hello"), &VBString::from(""), None).unwrap(),
+            VBLong::from(1)
+        );
+        assert_eq!(
+            instr(
+                Some(&VBLong::from(3)),
+                &VBString::from("Hello"),
+                &VBString::from(""),
+                None
+            )
+            .unwrap(),
+            VBLong::from(3)
+        );
     }
 
     #[test]
     fn start_beyond_string_returns_zero() {
-        assert_eq!(instr(Some(10), "Hello", "o", None).unwrap(), 0);
+        assert_eq!(
+            instr(
+                Some(&VBLong::from(10)),
+                &VBString::from("Hello"),
+                &VBString::from("o"),
+                None
+            )
+            .unwrap(),
+            VBLong::from(0)
+        );
     }
 
     #[test]
     fn rejects_invalid_start() {
         assert_eq!(
-            instr(Some(0), "Hello", "o", None).unwrap_err().number,
+            instr(
+                Some(&VBLong::from(0)),
+                &VBString::from("Hello"),
+                &VBString::from("o"),
+                None
+            )
+            .unwrap_err()
+            .number,
             err_number::INVALID_PROCEDURE_CALL
         );
     }
 
     #[test]
     fn text_compare_ignores_case() {
-        assert_eq!(instr(None, "Hello", "HELLO", Some(1)).unwrap(), 1);
-        assert_eq!(instr(None, "Hello", "hello", None).unwrap(), 0);
+        assert_eq!(
+            instr(
+                None,
+                &VBString::from("Hello"),
+                &VBString::from("HELLO"),
+                Some(&VBLong::from(1))
+            )
+            .unwrap(),
+            VBLong::from(1)
+        );
+        assert_eq!(
+            instr(
+                None,
+                &VBString::from("Hello"),
+                &VBString::from("hello"),
+                None
+            )
+            .unwrap(),
+            VBLong::from(0)
+        );
     }
 }

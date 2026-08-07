@@ -36,7 +36,10 @@ pub(crate) fn is_identifier_like(node: &CstNode) -> bool {
     }
     let mut chars = text.chars();
     let first_ok = matches!(chars.next(), Some(c) if c.is_ascii_alphabetic() || c == '_');
-    first_ok && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
+    first_ok
+        && chars.all(|c| {
+            c.is_ascii_alphanumeric() || c == '_' || matches!(c, '$' | '%' | '&' | '!' | '#' | '@')
+        })
 }
 
 /// The identifier name of a node: its first identifier-like significant child

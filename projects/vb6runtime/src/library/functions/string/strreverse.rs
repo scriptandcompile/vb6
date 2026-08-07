@@ -626,12 +626,16 @@
 //! - No option to reverse specific character ranges
 //! - Cannot specify custom reversal rules
 
+use crate::{error::VBResult, value::VBString};
+
 /// Returns the string with the order of its characters reversed.
 ///
 /// Spaces and other characters are reversed like any other character; the case
 /// of each character is preserved.
-pub fn strreverse(input: &str) -> String {
-    input.chars().rev().collect()
+pub fn strreverse(input: &VBString) -> VBResult<VBString> {
+    Ok(VBString::from(
+        input.as_str().chars().rev().collect::<String>(),
+    ))
 }
 
 #[cfg(test)]
@@ -640,22 +644,34 @@ mod tests {
 
     #[test]
     fn reverses_characters() {
-        assert_eq!(strreverse("Hello"), "olleH");
-        assert_eq!(strreverse("Hello World"), "dlroW olleH");
+        assert_eq!(
+            strreverse(&VBString::from("Hello")).unwrap(),
+            VBString::from("olleH")
+        );
+        assert_eq!(
+            strreverse(&VBString::from("Hello World")).unwrap(),
+            VBString::from("dlroW olleH")
+        );
     }
 
     #[test]
     fn preserves_case_and_spaces() {
-        assert_eq!(strreverse("AbC 123"), "321 CbA");
+        assert_eq!(
+            strreverse(&VBString::from("AbC 123")).unwrap(),
+            VBString::from("321 CbA")
+        );
     }
 
     #[test]
     fn handles_empty_string() {
-        assert_eq!(strreverse(""), "");
+        assert_eq!(strreverse(&VBString::from("")).unwrap(), VBString::from(""));
     }
 
     #[test]
     fn handles_unicode() {
-        assert_eq!(strreverse("héllo"), "olléh");
+        assert_eq!(
+            strreverse(&VBString::from("héllo")).unwrap(),
+            VBString::from("olléh")
+        );
     }
 }

@@ -644,7 +644,10 @@
 //! - `LSet`: Left-aligns string within string variable
 //! - `RSet`: Right-aligns string within string variable
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
 
 /// Returns a string consisting of the specified number of spaces (ASCII 32).
 ///
@@ -653,36 +656,37 @@ use crate::error::{err_number, VBError, VBResult};
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `number` is negative.
-pub fn space(number: i32) -> VBResult<String> {
+pub fn space(number: &VBLong) -> VBResult<VBString> {
+    let number = number.as_i32();
     if number < 0 {
         return Err(VBError::with_description(
             err_number::INVALID_PROCEDURE_CALL,
             "Invalid number",
         ));
     }
-    Ok(" ".repeat(number as usize))
+    Ok(VBString::from(" ".repeat(number as usize)))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::error::err_number;
+    use crate::{error::err_number, value::VBLong};
 
     #[test]
     fn returns_spaces() {
-        assert_eq!(space(3).unwrap(), "   ");
-        assert_eq!(space(1).unwrap(), " ");
+        assert_eq!(space(&VBLong::from(3)).unwrap(), VBString::from("   "));
+        assert_eq!(space(&VBLong::from(1)).unwrap(), VBString::from(" "));
     }
 
     #[test]
     fn zero_returns_empty() {
-        assert_eq!(space(0).unwrap(), "");
+        assert_eq!(space(&VBLong::from(0)).unwrap(), VBString::from(""));
     }
 
     #[test]
     fn rejects_negative_number() {
         assert_eq!(
-            space(-1).unwrap_err().number,
+            space(&VBLong::from(-1)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
     }

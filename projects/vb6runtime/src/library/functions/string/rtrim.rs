@@ -654,12 +654,16 @@
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
 
+use crate::{error::VBResult, value::VBString};
+
 /// Returns the string with trailing spaces (ASCII 32) removed.
 ///
 /// Only the space character is trimmed, matching VB6; tabs and other
 /// whitespace are preserved.
-pub fn rtrim(input: &str) -> String {
-    input.trim_end_matches(' ').to_string()
+pub fn rtrim(input: &VBString) -> VBResult<VBString> {
+    Ok(VBString::from(
+        input.as_str().trim_end_matches(' ').to_string(),
+    ))
 }
 
 #[cfg(test)]
@@ -668,13 +672,19 @@ mod tests {
 
     #[test]
     fn trims_trailing_spaces() {
-        assert_eq!(rtrim("  Hello World  "), "  Hello World");
-        assert_eq!(rtrim("Hello"), "Hello");
+        assert_eq!(
+            rtrim(&VBString::from("  Hello World  ")).unwrap(),
+            VBString::from("  Hello World")
+        );
+        assert_eq!(
+            rtrim(&VBString::from("Hello")).unwrap(),
+            VBString::from("Hello")
+        );
     }
 
     #[test]
     fn handles_empty_and_all_spaces() {
-        assert_eq!(rtrim(""), "");
-        assert_eq!(rtrim("   "), "");
+        assert_eq!(rtrim(&VBString::from("")).unwrap(), VBString::from(""));
+        assert_eq!(rtrim(&VBString::from("   ")).unwrap(), VBString::from(""));
     }
 }

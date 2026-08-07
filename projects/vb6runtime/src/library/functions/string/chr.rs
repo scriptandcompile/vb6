@@ -414,7 +414,10 @@
 //! - `AscW`: Returns the Unicode character code
 //! - `AscB`: Returns the byte value
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
 
 /// Returns the character associated with the specified Windows-1252 (ANSI) code.
 ///
@@ -425,46 +428,48 @@ use crate::error::{err_number, VBError, VBResult};
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `charcode` is
 /// outside the range 0-255.
-pub fn chr(charcode: i32) -> VBResult<String> {
+pub fn chr(charcode: &VBLong) -> VBResult<VBString> {
+    let charcode = charcode.as_i32();
     if !(0..=255).contains(&charcode) {
         return Err(VBError::with_description(
             err_number::INVALID_PROCEDURE_CALL,
             "Character code out of range",
         ));
     }
-    Ok(super::ansi::decode_byte(charcode as u8))
+    Ok(VBString::from(super::ansi::decode_byte(charcode as u8)))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::value::VBLong;
 
     #[test]
     fn returns_ascii_characters() {
-        assert_eq!(chr(65).unwrap(), "A");
-        assert_eq!(chr(97).unwrap(), "a");
-        assert_eq!(chr(34).unwrap(), "\"");
+        assert_eq!(chr(&VBLong::from(65)).unwrap(), VBString::from("A"));
+        assert_eq!(chr(&VBLong::from(97)).unwrap(), VBString::from("a"));
+        assert_eq!(chr(&VBLong::from(34)).unwrap(), VBString::from("\""));
     }
 
     #[test]
     fn returns_ansi_extended_characters() {
-        assert_eq!(chr(128).unwrap(), "€");
-        assert_eq!(chr(233).unwrap(), "é");
+        assert_eq!(chr(&VBLong::from(128)).unwrap(), VBString::from("€"));
+        assert_eq!(chr(&VBLong::from(233)).unwrap(), VBString::from("é"));
     }
 
     #[test]
     fn code_zero_returns_null_character() {
-        assert_eq!(chr(0).unwrap(), "\u{0}");
+        assert_eq!(chr(&VBLong::from(0)).unwrap(), VBString::from("\u{0}"));
     }
 
     #[test]
     fn rejects_out_of_range() {
         assert_eq!(
-            chr(-1).unwrap_err().number,
+            chr(&VBLong::from(-1)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
         assert_eq!(
-            chr(256).unwrap_err().number,
+            chr(&VBLong::from(256)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
     }

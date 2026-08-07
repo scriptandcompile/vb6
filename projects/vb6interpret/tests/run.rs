@@ -59,6 +59,15 @@ fn string_functions() {
 }
 
 #[test]
+fn string_function_suffix_variants() {
+    let out = run("    Debug.Print Chr$(65) & Chr$(66)\n\
+         Debug.Print ChrB$(65) & ChrB$(66)\n\
+         Debug.Print ChrW$(65) & ChrW$(66)\n\
+         Debug.Print Trim$(\"  hi  \")\n");
+    assert_eq!(out, vec!["AB", "AB", "AB", "hi"]);
+}
+
+#[test]
 fn if_elseif_else_block() {
     let out = run("    Dim n As Integer\n\
          n = 7\n\

@@ -251,7 +251,10 @@
 //! to their ANSI byte (e.g. `é` -> 233, `€` -> 128); anything else raises
 //! error 5. `AscW` is the Unicode code-point variant.
 
-use crate::error::VBResult;
+use crate::{
+    error::VBResult,
+    value::{VBLong, VBString},
+};
 
 /// Returns the Windows-1252 (ANSI) character code of the first character.
 ///
@@ -266,45 +269,50 @@ use crate::error::VBResult;
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `input` is empty
 /// or its first character cannot be represented in Windows-1252.
-pub fn asc(input: &str) -> VBResult<i32> {
-    super::ansi::encode_first_byte(input).map(i32::from)
+pub fn asc(input: &VBString) -> VBResult<VBLong> {
+    Ok(VBLong::from(
+        super::ansi::encode_first_byte(input.as_str()).map(i32::from)?,
+    ))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::error::err_number;
+    use crate::{
+        error::err_number,
+        value::{VBLong, VBString},
+    };
 
     #[test]
     fn returns_ascii_codes() {
-        assert_eq!(asc("A").unwrap(), 65);
-        assert_eq!(asc("a").unwrap(), 97);
-        assert_eq!(asc("0").unwrap(), 48);
-        assert_eq!(asc(" ").unwrap(), 32);
+        assert_eq!(asc(&VBString::from("A")).unwrap(), VBLong::from(65));
+        assert_eq!(asc(&VBString::from("a")).unwrap(), VBLong::from(97));
+        assert_eq!(asc(&VBString::from("0")).unwrap(), VBLong::from(48));
+        assert_eq!(asc(&VBString::from(" ")).unwrap(), VBLong::from(32));
     }
 
     #[test]
     fn uses_first_character_only() {
-        assert_eq!(asc("Apple").unwrap(), 65);
-        assert_eq!(asc("A1").unwrap(), 65);
+        assert_eq!(asc(&VBString::from("Apple")).unwrap(), VBLong::from(65));
+        assert_eq!(asc(&VBString::from("A1")).unwrap(), VBLong::from(65));
     }
 
     #[test]
     fn maps_latin_1_to_ansi() {
-        assert_eq!(asc("é").unwrap(), 233);
-        assert_eq!(asc("ñ").unwrap(), 241);
+        assert_eq!(asc(&VBString::from("é")).unwrap(), VBLong::from(233));
+        assert_eq!(asc(&VBString::from("ñ")).unwrap(), VBLong::from(241));
     }
 
     #[test]
     fn maps_beyond_latin_1_via_windows_1252() {
-        assert_eq!(asc("€").unwrap(), 128);
-        assert_eq!(asc("œ").unwrap(), 156);
+        assert_eq!(asc(&VBString::from("€")).unwrap(), VBLong::from(128));
+        assert_eq!(asc(&VBString::from("œ")).unwrap(), VBLong::from(156));
     }
 
     #[test]
     fn rejects_unrepresentable_characters() {
         assert_eq!(
-            asc("😀").unwrap_err().number,
+            asc(&VBString::from("😀")).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
     }
@@ -312,7 +320,7 @@ mod tests {
     #[test]
     fn rejects_empty_string() {
         assert_eq!(
-            asc("").unwrap_err().number,
+            asc(&VBString::from("")).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
     }
