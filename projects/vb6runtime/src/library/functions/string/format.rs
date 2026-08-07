@@ -601,3 +601,31 @@
 //! - `FormatDateTime`: Formats a date/time value
 //! - `Str`: Converts number to string
 //! - `CStr`: Converts expression to string
+
+use crate::{
+    error::VBResult,
+    value::{VBLong, VBString, Value},
+};
+
+use super::format_dollar::format_dollar;
+
+/// Returns a `Variant` of subtype `String` containing the formatted
+/// representation of `expression`, formatted according to the instructions in
+/// `format`.
+///
+/// `Format` is the Variant-returning counterpart of `Format$`; the two accept
+/// the same arguments and produce the same formatted text. A `Null` expression
+/// always yields the empty string.
+///
+/// # Errors
+///
+/// Returns error 13 (`Type mismatch`) when the expression cannot be coerced to
+/// the type implied by the format string.
+pub fn format(
+    expression: &Value,
+    format: Option<&VBString>,
+    firstdayofweek: Option<&VBLong>,
+    firstweekofyear: Option<&VBLong>,
+) -> VBResult<VBString> {
+    format_dollar(expression, format, firstdayofweek, firstweekofyear)
+}

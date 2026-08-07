@@ -24,21 +24,21 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
             let result = strfn::len(&input)?;
             Ok(Value::from(result))
         }
-        "left" => {
+        "left" | "left$" => {
             two_args(name, args)?;
             let input = VBString::try_from(&args[0])?;
             let length = VBLong::try_from(&args[1])?;
             let result = strfn::left(&input, &length)?;
             Ok(Value::from(result))
         }
-        "right" => {
+        "right" | "right$" => {
             two_args(name, args)?;
             let input = VBString::try_from(&args[0])?;
             let length = VBLong::try_from(&args[1])?;
             let result = strfn::right(&input, &length)?;
             Ok(Value::from(result))
         }
-        "mid" => {
+        "mid" | "mid$" => {
             expect_args(name, args, 2, 3)?;
             let input = VBString::try_from(&args[0])?;
             let start = VBLong::try_from(&args[1])?;
@@ -46,10 +46,14 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
             let result = strfn::mid(&input, &start, length.as_ref())?;
             Ok(Value::from(result))
         }
-        "lcase" | "ucase" | "trim" | "ltrim" | "rtrim" | "strreverse" => {
+        "lcase" | "lcase$" | "ucase" | "ucase$" | "trim" | "trim$" | "ltrim" | "ltrim$"
+        | "rtrim" | "rtrim$" | "strreverse" => {
             one_arg(name, args)?;
             let arg0 = VBString::try_from(&args[0])?;
-            let result = match normalized_name.as_str() {
+            let key = normalized_name
+                .strip_suffix('$')
+                .unwrap_or(&normalized_name);
+            let result = match key {
                 "lcase" => strfn::lcase(&arg0)?,
                 "ucase" => strfn::ucase(&arg0)?,
                 "trim" => strfn::trim(&arg0)?,
@@ -69,17 +73,20 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
             };
             Ok(Value::from(result))
         }
-        "chr" | "chrw" | "chrb" => {
+        "chr" | "chr$" | "chrw" | "chrw$" | "chrb" | "chrb$" => {
             one_arg(name, args)?;
             let arg0 = arg_long(args, 0)?;
-            let result = match normalized_name.as_str() {
+            let key = normalized_name
+                .strip_suffix('$')
+                .unwrap_or(&normalized_name);
+            let result = match key {
                 "chr" => strfn::chr(&arg0)?,
                 "chrb" => chrb_dollar(&arg0)?,
                 _ => strfn::chrw(&arg0)?,
             };
             Ok(Value::from(result))
         }
-        "space" => {
+        "space" | "space$" => {
             one_arg(name, args)?;
             let arg0 = arg_long(args, 0)?;
             let result = strfn::space(&arg0)?;
@@ -129,17 +136,26 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
             let result = strfn::instrrev(&s1, &s2, start.as_ref(), compare.as_ref())?;
             Ok(Value::from(result))
         }
-        "format" => {
+        "format" | "format$" => {
             expect_args(name, args, 1, 4)?;
             let format = args.get(1).map(VBString::try_from).transpose()?;
             let firstdayofweek = args.get(2).map(VBLong::try_from).transpose()?;
             let firstweekofyear = args.get(3).map(VBLong::try_from).transpose()?;
-            let result = strfn::format_dollar(
-                &args[0],
-                format.as_ref(),
-                firstdayofweek.as_ref(),
-                firstweekofyear.as_ref(),
-            )?;
+            let result = if normalized_name == "format$" {
+                strfn::format_dollar(
+                    &args[0],
+                    format.as_ref(),
+                    firstdayofweek.as_ref(),
+                    firstweekofyear.as_ref(),
+                )?
+            } else {
+                strfn::format(
+                    &args[0],
+                    format.as_ref(),
+                    firstdayofweek.as_ref(),
+                    firstweekofyear.as_ref(),
+                )?
+            };
             Ok(Value::from(result))
         }
 
@@ -183,12 +199,48 @@ fn two_args(name: &str, args: &[Value]) -> VBResult<()> {
 fn builtin_name(name: &str) -> String {
     let trimmed = name.trim();
     trimmed
-        .strip_suffix('$')
-        .or_else(|| trimmed.strip_suffix('%'))
+        .strip_suffix('%')
         .or_else(|| trimmed.strip_suffix('&'))
         .or_else(|| trimmed.strip_suffix('!'))
         .or_else(|| trimmed.strip_suffix('#'))
         .or_else(|| trimmed.strip_suffix('@'))
         .unwrap_or(trimmed)
         .to_lowercase()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn builtin_name_preserves_dollar_suffix() {
+        assert_eq!(builtin_name("Format$"), "format$");
+        assert_eq!(builtin_name("format"), "format");
+        assert_eq!(builtin_name("Left$"), "left$");
+        assert_eq!(builtin_name("Left"), "left");
+        assert_eq!(builtin_name("ChrW%"), "chrw");
+    }
+
+    #[test]
+    fn format_and_format_dollar_dispatch() {
+        let args = vec![
+            Value::Double(1234.5),
+            Value::from(VBString::from("#,##0.00")),
+        ];
+        let result = call_builtin("Format$", &args).unwrap();
+        assert_eq!(result.as_string().unwrap(), "1,234.50");
+        let result = call_builtin("Format", &args).unwrap();
+        assert_eq!(result.as_string().unwrap(), "1,234.50");
+    }
+
+    #[test]
+    fn dollar_variants_share_string_implementations() {
+        let result =
+            call_builtin("Left$", &[Value::from_string("abcdef"), Value::Long(3)]).unwrap();
+        assert_eq!(result.as_string().unwrap(), "abc");
+        let result = call_builtin("LCase$", &[Value::from_string("ABC")]).unwrap();
+        assert_eq!(result.as_string().unwrap(), "abc");
+        let result = call_builtin("Chr$", &[Value::Long(65)]).unwrap();
+        assert_eq!(result.as_string().unwrap(), "A");
+    }
 }
