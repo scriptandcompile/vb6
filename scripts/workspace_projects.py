@@ -191,10 +191,10 @@ PROJECTS = [
     "statusDetail": "Interpreter behavior and runtime model are still being shaped.",
     "summary": "Execute VB6 projects directly without compiling first.",
     "repoUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret",
-    "docsUrl": "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret/README.md",
+    "docsUrl": "https://scriptandcompile.github.io/vb6/vb6interpret/",
     "notes": [
-      "Should share runtime semantics with vb6runtime.",
-      "Good candidate for executable examples."
+      "Basic .bas processing, string handling, and Debug.Print",
+      "Now, with a playground!"
     ]
   },
   {
