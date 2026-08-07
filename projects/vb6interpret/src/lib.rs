@@ -3,6 +3,9 @@
 //! A tree-walking interpreter that executes VB6 `.bas` modules directly from
 //! the `vb6parse` concrete syntax tree, using `vb6runtime` values.
 
+#[cfg(target_arch = "wasm32")]
+pub mod wasm;
+
 pub mod builtins;
 pub mod error;
 pub mod eval;

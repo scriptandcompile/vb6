@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive VB6Interpret Playground - run VB6 modules directly in your browser">
+    <meta name="keywords" content="vb6, interpreter, playground, runtime, visual basic 6, webassembly">
+    <title>VB6Interpret Playground - Browser Module Runner</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/playground.css">
+    <script src="assets/js/theme-switcher.js"></script>
+</head>
+<body>
+    <header class="playground-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>VB6Interpret Playground</h1>
+                </div>
+                <div class="header-right">
+                    <a href="index.html" class="header-link">← Home</a>
+                    <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret" target="_blank" rel="noreferrer" class="header-link">GitHub</a>
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="playground-toolbar">
+        <div class="container toolbar-content">
+            <div class="toolbar-left">
+                <label for="file-type">File Type:</label>
+                <select id="file-type" class="file-type-selector" disabled>
+                    <option value="module" selected>Module (.bas)</option>
+                </select>
+                <label for="examples">Examples:</label>
+                <select id="examples" class="examples-selector">
+                    <option value="">-- Load Example --</option>
+                    <option value="hello-world">Hello World</option>
+                    <option value="simple-math">Simple Math</option>
+                    <option value="branching">Branching</option>
+                    <option value="looping">Looping</option>
+                </select>
+            </div>
+            <div class="toolbar-right">
+                <button id="run-btn" class="btn btn-primary">
+                    <span class="btn-icon">▶</span> Run Module
+                </button>
+                <button id="share-btn" class="btn btn-secondary">
+                    <span class="btn-icon">🔗</span> Share
+                </button>
+                <button id="clear-btn" class="btn btn-secondary">
+                    <span class="btn-icon">🗑</span> Clear
+                </button>
+                <label class="toggle-label status-label">
+                    <span id="wasm-status">Initializing WebAssembly...</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="playground-container">
+        <div class="editor-panel">
+            <div class="panel-header">
+                <h3>VB6 Code</h3>
+                <div class="editor-status">
+                    <span id="editor-line-col">Ln 1, Col 1</span>
+                </div>
+            </div>
+            <div class="editor-container">
+                <div id="editor-container" class="code-editor"></div>
+            </div>
+            <div class="panel-footer">
+                <span id="editor-stats" class="code-stats">0 lines</span>
+            </div>
+        </div>
+
+        <div class="resizer" id="resizer" title="Drag to resize">
+            <div class="resizer-handle"></div>
+        </div>
+
+        <div class="output-panel">
+            <div class="panel-header">
+                <h3>Execution</h3>
+                <div class="editor-status">
+                    <span id="run-status">Idle</span>
+                </div>
+            </div>
+
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="output">
+                    <span class="tab-icon">▶</span> Output
+                </button>
+                <button class="tab-btn" data-tab="errors">
+                    <span class="tab-icon">⚠</span> Errors
+                </button>
+                <button class="tab-btn" data-tab="info">
+                    <span class="tab-icon">ℹ</span> Info
+                </button>
+            </div>
+
+            <div class="tab-content">
+                <div id="output-tab" class="tab-pane active">
+                    <div class="tab-toolbar">
+                        <span class="toggle-label helper-text">Captured `Debug.Print` output from the current module run.</span>
+                    </div>
+                    <div class="output-scroll">
+                        <div id="stdout" class="output-box">Run a module to see Debug.Print output.</div>
+                    </div>
+                </div>
+
+                <div id="errors-tab" class="tab-pane">
+                    <div class="tab-toolbar">
+                        <span class="toggle-label helper-text">Parse and runtime failures appear here.</span>
+                    </div>
+                    <div class="output-scroll">
+                        <div id="error-box" class="error-box empty">No runtime or parse errors.</div>
+                    </div>
+                </div>
+
+                <div id="info-tab" class="tab-pane">
+                    <div class="output-scroll info-content">
+                        <div class="info-section">
+                            <h4>Statistics</h4>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-label">Steps</span>
+                                    <span id="stat-steps" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Terminated</span>
+                                    <span id="stat-terminated" class="stat-value">No</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Output Lines</span>
+                                    <span id="stat-lines" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Mode</span>
+                                    <span class="stat-value">Module</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-section notes-section">
+                            <h4>Current Scope</h4>
+                            <p>This playground currently executes a single VB6 module in-browser. Project loading, forms, and debugger controls are still CLI-only.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="playground-footer">
+        <div class="container footer-content">
+            <span class="footer-left">© 2024-2026 VB6Interpret Project | <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret">GitHub</a> | Licensed under MIT</span>
+            <span class="footer-right">Powered by <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret">VB6Interpret</a> | Built with Rust and WebAssembly</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+    <script type="module" src="assets/js/playground/main.js"></script>
+</body>
+</html>
