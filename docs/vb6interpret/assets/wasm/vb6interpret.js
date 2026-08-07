@@ -1,4 +1,53 @@
 /**
+ * Build a full statement-boundary execution trace that the browser can use
+ * for true resume-from-current-state stepping.
+ * @param {string} code
+ * @returns {any}
+ */
+export function build_debug_trace(code) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(code, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.build_debug_trace(retptr, ptr0, len0);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Execute a single VB6 module up to `pause_after_steps` statements and return
+ * a snapshot suitable for debugger-style stepping.
+ * @param {string} code
+ * @param {number} pause_after_steps
+ * @returns {any}
+ */
+export function debug_vb6_code(code, pause_after_steps) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(code, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.debug_vb6_code(retptr, ptr0, len0, pause_after_steps);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
  * Initializes the panic hook for better error messages in the browser console.
  */
 export function init_panic_hook() {

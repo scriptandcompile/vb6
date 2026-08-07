@@ -83,9 +83,22 @@
 
         <div class="output-panel">
             <div class="panel-header">
-                <h3>Execution</h3>
-                <div class="editor-status">
-                    <span id="run-status">Idle</span>
+                <div class="panel-header-main">
+                    <h3>Execution</h3>
+                    <div class="editor-status">
+                        <span id="run-status">Idle</span>
+                    </div>
+                </div>
+                <div class="panel-actions">
+                    <button id="panel-run-btn" class="btn btn-primary btn-sm">
+                        <span class="btn-icon">▶</span> Run
+                    </button>
+                    <button id="step-btn" class="btn btn-secondary btn-sm">
+                        <span class="btn-icon">⤼</span> Step
+                    </button>
+                    <button id="reset-btn" class="btn btn-secondary btn-sm" disabled>
+                        <span class="btn-icon">↺</span> Reset
+                    </button>
                 </div>
             </div>
 
@@ -95,6 +108,9 @@
                 </button>
                 <button class="tab-btn" data-tab="errors">
                     <span class="tab-icon">⚠</span> Errors
+                </button>
+                <button class="tab-btn" data-tab="debug">
+                    <span class="tab-icon">🪲</span> Debug
                 </button>
                 <button class="tab-btn" data-tab="info">
                     <span class="tab-icon">ℹ</span> Info
@@ -117,6 +133,45 @@
                     </div>
                     <div class="output-scroll">
                         <div id="error-box" class="error-box empty">No runtime or parse errors.</div>
+                    </div>
+                </div>
+
+                <div id="debug-tab" class="tab-pane">
+                    <div class="tab-toolbar">
+                        <span class="toggle-label helper-text">Interpreter state after the most recent run or step.</span>
+                    </div>
+                    <div class="output-scroll info-content">
+                        <div class="info-section">
+                            <h4>Execution State</h4>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-label">Current Steps</span>
+                                    <span id="debug-steps" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Current Position</span>
+                                    <span id="debug-position" class="stat-value">Line 1</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Current Procedure</span>
+                                    <span id="debug-procedure" class="stat-value">Module</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Stack Depth</span>
+                                    <span id="debug-stack-depth" class="stat-value">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-section">
+                            <h4>Globals</h4>
+                            <div id="debug-globals" class="debug-scope-box">No globals yet.</div>
+                        </div>
+
+                        <div class="info-section">
+                            <h4>Locals</h4>
+                            <div id="debug-locals" class="debug-scope-box">No active local scope.</div>
+                        </div>
                     </div>
                 </div>
 
