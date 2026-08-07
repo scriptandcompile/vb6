@@ -494,12 +494,14 @@
 //! - No built-in toggle case functionality
 //! - Cannot convert specific character ranges
 
+use crate::{error::VBResult, value::VBString};
+
 /// Returns the string converted to uppercase.
 ///
 /// Only lowercase letters are converted; uppercase letters and non-letter
 /// characters are unchanged. Uses full Unicode case mapping.
-pub fn ucase(input: &str) -> String {
-    input.to_uppercase()
+pub fn ucase(input: &VBString) -> VBResult<VBString> {
+    Ok(VBString::from(input.as_str().to_uppercase()))
 }
 
 #[cfg(test)]
@@ -508,18 +510,30 @@ mod tests {
 
     #[test]
     fn uppercases_letters() {
-        assert_eq!(ucase("Hello World"), "HELLO WORLD");
-        assert_eq!(ucase("abc"), "ABC");
+        assert_eq!(
+            ucase(&VBString::from("Hello World")).unwrap(),
+            VBString::from("HELLO WORLD")
+        );
+        assert_eq!(
+            ucase(&VBString::from("abc")).unwrap(),
+            VBString::from("ABC")
+        );
     }
 
     #[test]
     fn leaves_non_letters_unchanged() {
-        assert_eq!(ucase("123 !@#"), "123 !@#");
+        assert_eq!(
+            ucase(&VBString::from("123 !@#")).unwrap(),
+            VBString::from("123 !@#")
+        );
     }
 
     #[test]
     fn handles_unicode() {
-        assert_eq!(ucase("héllo"), "HÉLLO");
-        assert_eq!(ucase(""), "");
+        assert_eq!(
+            ucase(&VBString::from("héllo")).unwrap(),
+            VBString::from("HÉLLO")
+        );
+        assert_eq!(ucase(&VBString::from("")).unwrap(), VBString::from(""));
     }
 }

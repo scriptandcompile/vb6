@@ -577,6 +577,11 @@
 //! - `Trim`/`LTrim`/`RTrim`: Remove whitespace
 //! - `String`: Create string of repeated characters
 
+use crate::{
+    error::VBResult,
+    value::{VBLong, VBString},
+};
+
 /// Returns the number of characters in the string.
 ///
 /// Characters are counted as Unicode scalar values (grapheme-breaking surrogate
@@ -586,11 +591,12 @@
 ///
 /// ```
 /// use vb6runtime::library::functions::string::len;
-/// assert_eq!(len("Hello"), 5);
-/// assert_eq!(len(""), 0);
+/// use vb6runtime::value::{VBLong, VBString};
+/// assert_eq!(len(&VBString::from("Hello")).unwrap(), VBLong::from(5));
+/// assert_eq!(len(&VBString::from("")).unwrap(), VBLong::from(0));
 /// ```
-pub fn len(input: &str) -> i32 {
-    input.chars().count() as i32
+pub fn len(input: &VBString) -> VBResult<VBLong> {
+    Ok(VBLong::from(input.as_str().chars().count() as i32))
 }
 
 #[cfg(test)]
@@ -599,14 +605,14 @@ mod tests {
 
     #[test]
     fn counts_characters() {
-        assert_eq!(len("Hello"), 5);
-        assert_eq!(len(""), 0);
-        assert_eq!(len("A"), 1);
+        assert_eq!(len(&VBString::from("Hello")).unwrap(), VBLong::from(5));
+        assert_eq!(len(&VBString::from("")), Ok(VBLong::from(0)));
+        assert_eq!(len(&VBString::from("A")).unwrap(), VBLong::from(1));
     }
 
     #[test]
     fn counts_unicode_characters() {
-        assert_eq!(len("héllo"), 5);
-        assert_eq!(len("中"), 1);
+        assert_eq!(len(&VBString::from("héllo")).unwrap(), VBLong::from(5));
+        assert_eq!(len(&VBString::from("中")).unwrap(), VBLong::from(1));
     }
 }

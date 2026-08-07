@@ -712,7 +712,10 @@
 //! - `RTrim`: Removes trailing spaces from a string
 //! - `InStr`: Finds position of substring searching from left to right
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
 
 /// Returns the specified number of characters from the right side of the string.
 ///
@@ -723,7 +726,8 @@ use crate::error::{err_number, VBError, VBResult};
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
-pub fn right(input: &str, length: i32) -> VBResult<String> {
+pub fn right(input: &VBString, length: &VBLong) -> VBResult<VBString> {
+    let length = length.as_i32();
     if length < 0 {
         return Err(VBError::with_description(
             err_number::INVALID_PROCEDURE_CALL,
@@ -731,9 +735,11 @@ pub fn right(input: &str, length: i32) -> VBResult<String> {
         ));
     }
 
-    let chars: Vec<char> = input.chars().collect();
+    let chars: Vec<char> = input.as_str().chars().collect();
     let skip = chars.len().saturating_sub(length as usize);
-    Ok(chars.into_iter().skip(skip).collect())
+    Ok(VBString::from(
+        chars.into_iter().skip(skip).collect::<String>(),
+    ))
 }
 
 #[cfg(test)]
@@ -743,24 +749,38 @@ mod tests {
 
     #[test]
     fn returns_rightmost_characters() {
-        assert_eq!(right("Hello", 3).unwrap(), "llo");
-        assert_eq!(right("Hello", 0).unwrap(), "");
+        assert_eq!(
+            right(&VBString::from("Hello"), &VBLong::from(3)).unwrap(),
+            VBString::from("llo")
+        );
+        assert_eq!(
+            right(&VBString::from("Hello"), &VBLong::from(0)).unwrap(),
+            VBString::from("")
+        );
     }
 
     #[test]
     fn length_greater_than_string_returns_all() {
-        assert_eq!(right("Hello", 10).unwrap(), "Hello");
+        assert_eq!(
+            right(&VBString::from("Hello"), &VBLong::from(10)).unwrap(),
+            VBString::from("Hello")
+        );
     }
 
     #[test]
     fn handles_unicode() {
-        assert_eq!(right("héllo", 2).unwrap(), "lo");
+        assert_eq!(
+            right(&VBString::from("héllo"), &VBLong::from(2)).unwrap(),
+            VBString::from("lo")
+        );
     }
 
     #[test]
     fn rejects_negative_length() {
         assert_eq!(
-            right("Hello", -1).unwrap_err().number,
+            right(&VBString::from("Hello"), &VBLong::from(-1))
+                .unwrap_err()
+                .number,
             err_number::INVALID_PROCEDURE_CALL
         );
     }

@@ -391,7 +391,10 @@
 //! - Code page dependent for extended ANSI characters (128-255)
 //! - Not suitable for Unicode text processing (use `AscW` instead)
 
-use crate::error::VBResult;
+use crate::{
+    error::VBResult,
+    value::{VBLong, VBString},
+};
 
 /// Returns the Windows-1252 (ANSI) byte value of the first byte in the string.
 ///
@@ -402,31 +405,33 @@ use crate::error::VBResult;
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `input` is empty
 /// or its first character cannot be represented in Windows-1252.
-pub fn ascb(input: &str) -> VBResult<i32> {
-    super::ansi::encode_first_byte(input).map(i32::from)
+pub fn ascb(input: &VBString) -> VBResult<VBLong> {
+    Ok(VBLong::from(
+        super::ansi::encode_first_byte(input.as_str()).map(i32::from)?,
+    ))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::error::err_number;
+    use crate::{error::err_number, value::VBString};
 
     #[test]
     fn returns_first_byte_of_ascii() {
-        assert_eq!(ascb("A").unwrap(), 65);
-        assert_eq!(ascb("Apple").unwrap(), 65);
+        assert_eq!(ascb(&VBString::from("A")).unwrap(), VBLong::from(65));
+        assert_eq!(ascb(&VBString::from("Apple")).unwrap(), VBLong::from(65));
     }
 
     #[test]
     fn returns_first_byte_of_ansi_extended() {
-        assert_eq!(ascb("é").unwrap(), 233);
-        assert_eq!(ascb("€").unwrap(), 128);
+        assert_eq!(ascb(&VBString::from("é")).unwrap(), VBLong::from(233));
+        assert_eq!(ascb(&VBString::from("€")).unwrap(), VBLong::from(128));
     }
 
     #[test]
     fn rejects_unrepresentable_characters() {
         assert_eq!(
-            ascb("😀").unwrap_err().number,
+            ascb(&VBString::from("😀")).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
     }
@@ -434,7 +439,7 @@ mod tests {
     #[test]
     fn rejects_empty_string() {
         assert_eq!(
-            ascb("").unwrap_err().number,
+            ascb(&VBString::from("")).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
     }

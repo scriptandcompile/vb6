@@ -721,12 +721,14 @@
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
 
+use crate::{error::VBResult, value::VBString};
+
 /// Returns the string with leading and trailing spaces (ASCII 32) removed.
 ///
 /// Only the space character is trimmed, matching VB6; tabs and other
 /// whitespace are preserved.
-pub fn trim(input: &str) -> String {
-    input.trim_matches(' ').to_string()
+pub fn trim(input: &VBString) -> VBResult<VBString> {
+    Ok(VBString::from(input.as_str().trim_matches(' ').to_string()))
 }
 
 #[cfg(test)]
@@ -735,19 +737,31 @@ mod tests {
 
     #[test]
     fn trims_both_ends() {
-        assert_eq!(trim("  Hello World  "), "Hello World");
-        assert_eq!(trim("Hello"), "Hello");
+        assert_eq!(
+            trim(&VBString::from("  Hello World  ")).unwrap(),
+            VBString::from("Hello World")
+        );
+        assert_eq!(
+            trim(&VBString::from("Hello")).unwrap(),
+            VBString::from("Hello")
+        );
     }
 
     #[test]
     fn handles_empty_and_all_spaces() {
-        assert_eq!(trim(""), "");
-        assert_eq!(trim("   "), "");
+        assert_eq!(trim(&VBString::from("")).unwrap(), VBString::from(""));
+        assert_eq!(trim(&VBString::from("   ")).unwrap(), VBString::from(""));
     }
 
     #[test]
     fn preserves_inner_and_other_whitespace() {
-        assert_eq!(trim("  a b  "), "a b");
-        assert_eq!(trim("\tHello\t"), "\tHello\t");
+        assert_eq!(
+            trim(&VBString::from("  a b  ")).unwrap(),
+            VBString::from("a b")
+        );
+        assert_eq!(
+            trim(&VBString::from("\tHello\t")).unwrap(),
+            VBString::from("\tHello\t")
+        );
     }
 }

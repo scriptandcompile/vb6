@@ -6,6 +6,8 @@
 
 use vb6core::error::{VBError, VBResult};
 use vb6runtime::library::functions::string as strfn;
+use vb6runtime::library::functions::string::chrb_dollar::chrb_dollar;
+use vb6runtime::value::{VBLong, VBString};
 use vb6runtime::Value;
 
 /// Dispatch a builtin function call by name.
@@ -13,88 +15,91 @@ use vb6runtime::Value;
 /// Returns error 35 with a descriptive message when the function is not
 /// implemented by `vb6runtime` yet.
 pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
-    match name.to_lowercase().as_str() {
+    let normalized_name = builtin_name(name);
+    match normalized_name.as_str() {
         // ---- String functions (delegated to vb6runtime) ----
         "len" => {
             one_arg(name, args)?;
-            let arg0 = arg_string(args, 0)?;
-            Ok(Value::from_long(strfn::len(&arg0)))
+            let input = VBString::try_from(&args[0])?;
+            let result = strfn::len(&input)?;
+            Ok(Value::from(result))
         }
         "left" => {
             two_args(name, args)?;
-            let arg0 = arg_string(args, 0)?;
-            let arg1 = arg_i32(args, 1)?;
-            let result = strfn::left(&arg0, arg1)?;
-            Ok(Value::from_string(result))
+            let input = VBString::try_from(&args[0])?;
+            let length = VBLong::try_from(&args[1])?;
+            let result = strfn::left(&input, &length)?;
+            Ok(Value::from(result))
         }
         "right" => {
             two_args(name, args)?;
-            let arg0 = arg_string(args, 0)?;
-            let arg1 = arg_i32(args, 1)?;
-            let result = strfn::right(&arg0, arg1)?;
-            Ok(Value::from_string(result))
+            let input = VBString::try_from(&args[0])?;
+            let length = VBLong::try_from(&args[1])?;
+            let result = strfn::right(&input, &length)?;
+            Ok(Value::from(result))
         }
         "mid" => {
             expect_args(name, args, 2, 3)?;
-            let length = args.get(2).map(|arg| arg.as_i32()).transpose()?;
-            let arg0 = arg_string(args, 0)?;
-            let arg1 = arg_i32(args, 1)?;
-            let result = strfn::mid(&arg0, arg1, length)?;
-            Ok(Value::from_string(result))
+            let input = VBString::try_from(&args[0])?;
+            let start = VBLong::try_from(&args[1])?;
+            let length = args.get(2).map(VBLong::try_from).transpose()?;
+            let result = strfn::mid(&input, &start, length.as_ref())?;
+            Ok(Value::from(result))
         }
         "lcase" | "ucase" | "trim" | "ltrim" | "rtrim" | "strreverse" => {
             one_arg(name, args)?;
-            let arg0 = arg_string(args, 0)?;
-            let result = match name.to_lowercase().as_str() {
-                "lcase" => strfn::lcase(&arg0),
-                "ucase" => strfn::ucase(&arg0),
-                "trim" => strfn::trim(&arg0),
-                "ltrim" => strfn::ltrim(&arg0),
-                "rtrim" => strfn::rtrim(&arg0),
-                _ => strfn::strreverse(&arg0),
+            let arg0 = VBString::try_from(&args[0])?;
+            let result = match normalized_name.as_str() {
+                "lcase" => strfn::lcase(&arg0)?,
+                "ucase" => strfn::ucase(&arg0)?,
+                "trim" => strfn::trim(&arg0)?,
+                "ltrim" => strfn::ltrim(&arg0)?,
+                "rtrim" => strfn::rtrim(&arg0)?,
+                _ => strfn::strreverse(&arg0)?,
             };
-            Ok(Value::from_string(result))
+            Ok(result.into())
         }
         "asc" | "ascw" | "ascb" => {
             one_arg(name, args)?;
             let arg0 = arg_string(args, 0)?;
-            let result = match name.to_lowercase().as_str() {
+            let result = match normalized_name.as_str() {
                 "asc" => strfn::asc(&arg0)?,
                 "ascw" => strfn::ascw(&arg0)?,
                 _ => strfn::ascb(&arg0)?,
             };
-            Ok(Value::from_long(result))
+            Ok(Value::from(result))
         }
-        "chr" | "chrw" => {
+        "chr" | "chrw" | "chrb" => {
             one_arg(name, args)?;
-            let arg0 = arg_i32(args, 0)?;
-            let result = match name.to_lowercase().as_str() {
-                "chr" => strfn::chr(arg0)?,
-                _ => strfn::chrw(arg0)?,
+            let arg0 = arg_long(args, 0)?;
+            let result = match normalized_name.as_str() {
+                "chr" => strfn::chr(&arg0)?,
+                "chrb" => chrb_dollar(&arg0)?,
+                _ => strfn::chrw(&arg0)?,
             };
-            Ok(Value::from_string(result))
+            Ok(Value::from(result))
         }
         "space" => {
             one_arg(name, args)?;
-            let arg0 = arg_i32(args, 0)?;
-            let result = strfn::space(arg0)?;
-            Ok(Value::from_string(result))
+            let arg0 = arg_long(args, 0)?;
+            let result = strfn::space(&arg0)?;
+            Ok(Value::from(result))
         }
         "instr" => {
             expect_args(name, args, 2, 4)?;
-            let start: Option<i32>;
+            let start: Option<VBLong>;
             let s1_idx;
             let s2_idx;
             let cmp_idx: Option<usize>;
             match args.len() {
                 4 => {
-                    start = Some(args[0].as_i32()?);
+                    start = Some(VBLong::try_from(&args[0])?);
                     s1_idx = 1;
                     s2_idx = 2;
                     cmp_idx = Some(3);
                 }
                 3 => {
-                    start = Some(args[0].as_i32()?);
+                    start = Some(VBLong::try_from(&args[0])?);
                     s1_idx = 1;
                     s2_idx = 2;
                     cmp_idx = None;
@@ -110,10 +115,10 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
             let s2 = arg_string(args, s2_idx)?;
             let compare = cmp_idx
                 .and_then(|index| args.get(index))
-                .map(|arg| arg.as_i32())
+                .map(VBLong::try_from)
                 .transpose()?;
-            let result = strfn::instr(start, &s1, &s2, compare)?;
-            Ok(Value::from_long(result))
+            let result = strfn::instr(start.as_ref(), &s1, &s2, compare.as_ref())?;
+            Ok(Value::from(result))
         }
 
         _ => Err(VBError::with_description(
@@ -125,14 +130,16 @@ pub(crate) fn call_builtin(name: &str, args: &[Value]) -> VBResult<Value> {
 
 // ---- Argument helpers ----
 
-fn arg_string(args: &[Value], index: usize) -> VBResult<String> {
+fn arg_string(args: &[Value], index: usize) -> VBResult<VBString> {
     args.get(index)
-        .ok_or_else(|| VBError::new(450))?
-        .as_string()
+        .ok_or_else(|| VBError::new(450))
+        .and_then(VBString::try_from)
 }
 
-fn arg_i32(args: &[Value], index: usize) -> VBResult<i32> {
-    args.get(index).ok_or_else(|| VBError::new(450))?.as_i32()
+fn arg_long(args: &[Value], index: usize) -> VBResult<VBLong> {
+    args.get(index)
+        .ok_or_else(|| VBError::new(450))
+        .and_then(VBLong::try_from)
 }
 
 fn expect_args(name: &str, args: &[Value], min: usize, max: usize) -> VBResult<()> {
@@ -149,4 +156,17 @@ fn one_arg(name: &str, args: &[Value]) -> VBResult<()> {
 
 fn two_args(name: &str, args: &[Value]) -> VBResult<()> {
     expect_args(name, args, 2, 2)
+}
+
+fn builtin_name(name: &str) -> String {
+    let trimmed = name.trim();
+    trimmed
+        .strip_suffix('$')
+        .or_else(|| trimmed.strip_suffix('%'))
+        .or_else(|| trimmed.strip_suffix('&'))
+        .or_else(|| trimmed.strip_suffix('!'))
+        .or_else(|| trimmed.strip_suffix('#'))
+        .or_else(|| trimmed.strip_suffix('@'))
+        .unwrap_or(trimmed)
+        .to_lowercase()
 }

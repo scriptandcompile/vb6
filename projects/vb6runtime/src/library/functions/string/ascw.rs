@@ -415,7 +415,10 @@
 //! - Runtime error occurs with empty strings
 //! - No built-in normalization (characters with multiple representations)
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
 
 /// Returns the Unicode code point of the first character.
 ///
@@ -426,46 +429,47 @@ use crate::error::{err_number, VBError, VBResult};
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `input` is empty.
-pub fn ascw(input: &str) -> VBResult<i32> {
-    let first_char = input.chars().next().ok_or_else(|| {
+pub fn ascw(input: &VBString) -> VBResult<VBLong> {
+    let first_char = input.as_str().chars().next().ok_or_else(|| {
         VBError::with_description(err_number::INVALID_PROCEDURE_CALL, "String cannot be empty")
     })?;
 
     let code = first_char as u32;
     if code <= 0xFFFF {
-        Ok(code as i32)
+        Ok(VBLong::from(code as i32))
     } else {
         let high_surrogate = 0xD800 + ((code - 0x10000) >> 10);
-        Ok(high_surrogate as i32)
+        Ok(VBLong::from(high_surrogate as i32))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::value::VBString;
 
     #[test]
     fn returns_ascii_codes() {
-        assert_eq!(ascw("A").unwrap(), 65);
-        assert_eq!(ascw("a").unwrap(), 97);
+        assert_eq!(ascw(&VBString::from("A")).unwrap(), VBLong::from(65));
+        assert_eq!(ascw(&VBString::from("a")).unwrap(), VBLong::from(97));
     }
 
     #[test]
     fn returns_unicode_code_points() {
-        assert_eq!(ascw("€").unwrap(), 8364);
-        assert_eq!(ascw("α").unwrap(), 945);
-        assert_eq!(ascw("中").unwrap(), 20013);
+        assert_eq!(ascw(&VBString::from("€")).unwrap(), VBLong::from(8364));
+        assert_eq!(ascw(&VBString::from("α")).unwrap(), VBLong::from(945));
+        assert_eq!(ascw(&VBString::from("中")).unwrap(), VBLong::from(20013));
     }
 
     #[test]
     fn non_bmp_returns_high_surrogate() {
-        assert_eq!(ascw("😀").unwrap(), 0xD83D);
+        assert_eq!(ascw(&VBString::from("😀")).unwrap(), VBLong::from(0xD83D));
     }
 
     #[test]
     fn rejects_empty_string() {
         assert_eq!(
-            ascw("").unwrap_err().number,
+            ascw(&VBString::from("")).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
     }

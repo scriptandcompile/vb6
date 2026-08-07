@@ -32,6 +32,251 @@ pub trait VBObject: fmt::Debug + Send + Sync {
     fn clone_box(&self) -> Box<dyn VBObject>;
 }
 
+/// A runtime-safe string wrapper that preserves VB6 coercion semantics.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VBString(String);
+
+impl VBString {
+    /// Access the wrapped string contents.
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+
+    /// Consume the wrapper and return the underlying string.
+    pub fn into_inner(self) -> String {
+        self.0
+    }
+}
+
+impl From<String> for VBString {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
+impl From<&str> for VBString {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+
+impl From<VBString> for Value {
+    fn from(value: VBString) -> Self {
+        Value::from_string(value.0)
+    }
+}
+
+impl TryFrom<&Value> for VBString {
+    type Error = VBError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        Ok(Self(value.as_string()?))
+    }
+}
+
+impl TryFrom<Value> for VBString {
+    type Error = VBError;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        Self::try_from(&value)
+    }
+}
+
+/// A runtime-safe byte wrapper that preserves VB6 coercion semantics.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct VBByte(u8);
+
+impl VBByte {
+    /// Access the wrapped byte value.
+    pub fn as_u8(self) -> u8 {
+        self.0
+    }
+}
+
+impl From<u8> for VBByte {
+    fn from(value: u8) -> Self {
+        Self(value)
+    }
+}
+
+impl From<VBByte> for Value {
+    fn from(value: VBByte) -> Self {
+        Value::from_byte(value.0)
+    }
+}
+
+impl TryFrom<&Value> for VBByte {
+    type Error = VBError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        Ok(Self(value.as_byte()?))
+    }
+}
+
+impl TryFrom<Value> for VBByte {
+    type Error = VBError;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        Self::try_from(&value)
+    }
+}
+
+/// A runtime-safe long wrapper that preserves VB6 coercion semantics.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct VBLong(i32);
+
+impl VBLong {
+    /// Access the wrapped long value.
+    pub fn as_i32(self) -> i32 {
+        self.0
+    }
+}
+
+impl From<i32> for VBLong {
+    fn from(value: i32) -> Self {
+        Self(value)
+    }
+}
+
+impl From<VBLong> for Value {
+    fn from(value: VBLong) -> Self {
+        Value::from_long(value.0)
+    }
+}
+
+impl TryFrom<&Value> for VBLong {
+    type Error = VBError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        Ok(Self(value.as_i32()?))
+    }
+}
+
+impl TryFrom<Value> for VBLong {
+    type Error = VBError;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        Self::try_from(&value)
+    }
+}
+
+/// A runtime-safe integer wrapper that preserves VB6 coercion semantics.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct VBInteger(i16);
+
+impl VBInteger {
+    /// Access the wrapped integer value.
+    pub fn as_i16(self) -> i16 {
+        self.0
+    }
+}
+
+impl From<i16> for VBInteger {
+    fn from(value: i16) -> Self {
+        Self(value)
+    }
+}
+
+impl From<VBInteger> for Value {
+    fn from(value: VBInteger) -> Self {
+        Value::from_integer(value.0)
+    }
+}
+
+impl TryFrom<&Value> for VBInteger {
+    type Error = VBError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        Ok(Self(value.as_i16()?))
+    }
+}
+
+impl TryFrom<Value> for VBInteger {
+    type Error = VBError;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        Self::try_from(&value)
+    }
+}
+
+/// A runtime-safe boolean wrapper that preserves VB6 coercion semantics.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct VBBoolean(bool);
+
+impl VBBoolean {
+    /// Access the wrapped boolean value.
+    pub fn as_bool(self) -> bool {
+        self.0
+    }
+}
+
+impl From<bool> for VBBoolean {
+    fn from(value: bool) -> Self {
+        Self(value)
+    }
+}
+
+impl From<VBBoolean> for Value {
+    fn from(value: VBBoolean) -> Self {
+        Value::from_bool(value.0)
+    }
+}
+
+impl TryFrom<&Value> for VBBoolean {
+    type Error = VBError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        Ok(Self(value.as_bool()?))
+    }
+}
+
+impl TryFrom<Value> for VBBoolean {
+    type Error = VBError;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        Self::try_from(&value)
+    }
+}
+
+/// A runtime-safe date wrapper that preserves VB6 coercion semantics.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct VBDate(f64);
+
+impl VBDate {
+    /// Access the wrapped date serial value.
+    pub fn as_f64(self) -> f64 {
+        self.0
+    }
+}
+
+impl From<f64> for VBDate {
+    fn from(value: f64) -> Self {
+        Self(value)
+    }
+}
+
+impl From<VBDate> for Value {
+    fn from(value: VBDate) -> Self {
+        Value::from_date_serial(value.0)
+    }
+}
+
+impl TryFrom<&Value> for VBDate {
+    type Error = VBError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        Ok(Self(value.as_date_serial()?))
+    }
+}
+
+impl TryFrom<Value> for VBDate {
+    type Error = VBError;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        Self::try_from(&value)
+    }
+}
+
 /// A VB6 runtime value.
 #[derive(Debug)]
 pub enum Value {
@@ -587,6 +832,59 @@ impl fmt::Display for Value {
                 Err(_) => write!(f, "{other:?}"),
             },
         }
+    }
+}
+
+#[cfg(test)]
+mod wrapper_tests {
+    use super::{VBBoolean, VBByte, VBDate, VBInteger, VBLong, VBString, Value};
+
+    #[test]
+    fn vbstring_round_trips_through_variant() {
+        let value = Value::from_string("Hello");
+        let typed = VBString::try_from(&value).unwrap();
+        assert_eq!(typed.as_str(), "Hello");
+        assert_eq!(Value::from(typed), value);
+    }
+
+    #[test]
+    fn vblong_round_trips_through_variant() {
+        let value = Value::from_long(42);
+        let typed = VBLong::try_from(&value).unwrap();
+        assert_eq!(typed.as_i32(), 42);
+        assert_eq!(Value::from(typed), value);
+    }
+
+    #[test]
+    fn vbbyte_round_trips_through_variant() {
+        let value = Value::from_byte(7);
+        let typed = VBByte::try_from(&value).unwrap();
+        assert_eq!(typed.as_u8(), 7);
+        assert_eq!(Value::from(typed), value);
+    }
+
+    #[test]
+    fn vbinteger_round_trips_through_variant() {
+        let value = Value::from_integer(7);
+        let typed = VBInteger::try_from(&value).unwrap();
+        assert_eq!(typed.as_i16(), 7);
+        assert_eq!(Value::from(typed), value);
+    }
+
+    #[test]
+    fn vbboolean_round_trips_through_variant() {
+        let value = Value::from_bool(true);
+        let typed = VBBoolean::try_from(&value).unwrap();
+        assert!(typed.as_bool());
+        assert_eq!(Value::from(typed), value);
+    }
+
+    #[test]
+    fn vbdate_round_trips_through_variant() {
+        let value = Value::from_date_serial(42.5);
+        let typed = VBDate::try_from(&value).unwrap();
+        assert_eq!(typed.as_f64(), 42.5);
+        assert_eq!(Value::from(typed), value);
     }
 }
 
