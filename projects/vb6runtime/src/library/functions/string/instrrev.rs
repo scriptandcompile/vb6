@@ -31,7 +31,7 @@
 //! - If stringmatch is `Null`: Returns `Null`
 //! - If stringmatch is not found: Returns 0
 //! - If stringmatch is found within stringcheck: Returns position where match begins
-//! - If start is greater than length of stringcheck: Search begins at the last character position
+//! - If start is greater than length of stringcheck: Returns 0
 //!
 //! ## Remarks
 //!
@@ -520,3 +520,205 @@
 //! - `Replace`: Find and replace text
 //! - `Split`: Split string into array
 //! - `StrReverse`: Reverse a string
+
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
+
+/// Returns the 1-based position of the last occurrence of `stringmatch` within
+/// `stringcheck`, searching backward from `start`.
+///
+/// `start` defaults to -1, meaning the search begins at the last character
+/// position. An empty `stringcheck` yields 0; an empty `stringmatch` yields
+/// `start`; a missing substring yields 0. When `start` is greater than the
+/// length of `stringcheck`, the result is 0. When `compare` is `Some(1)`
+/// (`vbTextCompare`) the search is case-insensitive; all other values
+/// (including `None`) use binary (case-sensitive) comparison.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `start` is 0 or
+/// less than -1.
+pub fn instrrev(
+    stringcheck: &VBString,
+    stringmatch: &VBString,
+    start: Option<&VBLong>,
+    compare: Option<&VBLong>,
+) -> VBResult<VBLong> {
+    let len = stringcheck.as_str().chars().count() as i32;
+    let mut start = start.map_or(-1, |value| value.as_i32());
+    if start == 0 || start < -1 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid start position",
+        ));
+    }
+    if start == -1 {
+        start = len;
+    }
+    if len == 0 || start > len {
+        return Ok(VBLong::from(0));
+    }
+    if stringmatch.as_str().is_empty() {
+        return Ok(VBLong::from(start));
+    }
+
+    let text_compare = compare.is_some_and(|value| value.as_i32() == 1);
+    let char_eq = |a: char, b: char| {
+        if text_compare {
+            a.to_lowercase().eq(b.to_lowercase())
+        } else {
+            a == b
+        }
+    };
+
+    let chars1: Vec<char> = stringcheck.as_str().chars().collect();
+    let chars2: Vec<char> = stringmatch.as_str().chars().collect();
+    let start0 = start as usize;
+
+    if chars2.len() > start0 {
+        return Ok(VBLong::from(0));
+    }
+    for i in (0..=start0 - chars2.len()).rev() {
+        let matches = chars2
+            .iter()
+            .enumerate()
+            .all(|(j, &c)| char_eq(chars1[i + j], c));
+        if matches {
+            return Ok(VBLong::from((i + 1) as i32));
+        }
+    }
+    Ok(VBLong::from(0))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{error::err_number, value::VBString};
+
+    #[test]
+    fn finds_last_occurrence() {
+        assert_eq!(
+            instrrev(
+                &VBString::from("apple,banana,apple,orange"),
+                &VBString::from("apple"),
+                None,
+                None
+            )
+            .unwrap(),
+            VBLong::from(14)
+        );
+        assert_eq!(
+            instrrev(&VBString::from("Hello World"), &VBString::from("o"), None, None).unwrap(),
+            VBLong::from(8)
+        );
+    }
+
+    #[test]
+    fn respects_start_position() {
+        assert_eq!(
+            instrrev(
+                &VBString::from("one,two,three,four"),
+                &VBString::from(","),
+                Some(&VBLong::from(10)),
+                None
+            )
+            .unwrap(),
+            VBLong::from(8)
+        );
+        assert_eq!(
+            instrrev(
+                &VBString::from("the quick brown fox jumps over the lazy dog"),
+                &VBString::from("the"),
+                Some(&VBLong::from(16)),
+                None
+            )
+            .unwrap(),
+            VBLong::from(1)
+        );
+    }
+
+    #[test]
+    fn missing_substring_returns_zero() {
+        assert_eq!(
+            instrrev(&VBString::from("Hello"), &VBString::from("xyz"), None, None).unwrap(),
+            VBLong::from(0)
+        );
+    }
+
+    #[test]
+    fn empty_stringcheck_returns_zero() {
+        assert_eq!(
+            instrrev(&VBString::from(""), &VBString::from("x"), None, None).unwrap(),
+            VBLong::from(0)
+        );
+    }
+
+    #[test]
+    fn empty_stringmatch_returns_start() {
+        assert_eq!(
+            instrrev(&VBString::from("Hello"), &VBString::from(""), None, None).unwrap(),
+            VBLong::from(5)
+        );
+        assert_eq!(
+            instrrev(
+                &VBString::from("Hello"),
+                &VBString::from(""),
+                Some(&VBLong::from(3)),
+                None
+            )
+            .unwrap(),
+            VBLong::from(3)
+        );
+    }
+
+    #[test]
+    fn start_beyond_string_returns_zero() {
+        assert_eq!(
+            instrrev(
+                &VBString::from("Hello"),
+                &VBString::from("o"),
+                Some(&VBLong::from(10)),
+                None
+            )
+            .unwrap(),
+            VBLong::from(0)
+        );
+    }
+
+    #[test]
+    fn rejects_invalid_start() {
+        for start in [0, -2, -100] {
+            assert_eq!(
+                instrrev(
+                    &VBString::from("Hello"),
+                    &VBString::from("o"),
+                    Some(&VBLong::from(start)),
+                    None
+                )
+                .unwrap_err()
+                .number,
+                err_number::INVALID_PROCEDURE_CALL
+            );
+        }
+    }
+
+    #[test]
+    fn text_compare_ignores_case() {
+        assert_eq!(
+            instrrev(
+                &VBString::from("Hello"),
+                &VBString::from("HELLO"),
+                None,
+                Some(&VBLong::from(1))
+            )
+            .unwrap(),
+            VBLong::from(1)
+        );
+        assert_eq!(
+            instrrev(&VBString::from("Hello"), &VBString::from("hello"), None, None).unwrap(),
+            VBLong::from(0)
+        );
+    }
+}
