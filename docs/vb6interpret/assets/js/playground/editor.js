@@ -1,5 +1,6 @@
 let editor = null;
 let themeObserver = null;
+let executionLineDecorations = [];
 
 export async function initEditor(containerId, initialValue = "") {
     return new Promise((resolve, reject) => {
@@ -192,6 +193,8 @@ export function clearEditor() {
     if (editor) {
         editor.setValue("");
     }
+
+    clearExecutionHighlight();
 }
 
 export function focusEditor() {
@@ -200,4 +203,40 @@ export function focusEditor() {
 
 export function getEditor() {
     return editor;
+}
+
+export function highlightExecutionLine(lineNumber) {
+    if (!editor || !Number.isInteger(lineNumber) || lineNumber < 1) {
+        clearExecutionHighlight();
+        return;
+    }
+
+    const model = editor.getModel();
+    if (!model || lineNumber > model.getLineCount()) {
+        clearExecutionHighlight();
+        return;
+    }
+
+    executionLineDecorations = editor.deltaDecorations(executionLineDecorations, [
+        {
+            range: new monaco.Range(lineNumber, 1, lineNumber, 1),
+            options: {
+                isWholeLine: true,
+                className: "execution-line-highlight",
+                glyphMarginClassName: "execution-line-glyph",
+                linesDecorationsClassName: "execution-line-decoration",
+                stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+            },
+        },
+    ]);
+
+    editor.revealLineInCenterIfOutsideViewport(lineNumber);
+}
+
+export function clearExecutionHighlight() {
+    if (!editor) {
+        return;
+    }
+
+    executionLineDecorations = editor.deltaDecorations(executionLineDecorations, []);
 }

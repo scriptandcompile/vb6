@@ -163,6 +163,21 @@ body {
     box-sizing: border-box;
 }
 
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.btn-primary:disabled,
+.btn-primary:disabled:hover {
+    background-color: var(--primary-color);
+}
+
+.btn-secondary:disabled,
+.btn-secondary:disabled:hover {
+    background-color: #6c757d;
+}
+
 .btn-primary {
     background-color: var(--primary-color);
     color: white;
@@ -262,6 +277,19 @@ body {
     font-weight: 600;
 }
 
+.panel-header-main,
+.panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    height: 32px;
+}
+
 .panel-footer {
     display: flex;
     justify-content: space-between;
@@ -298,6 +326,31 @@ body {
     background: transparent;
     color: inherit;
     font: 0.95rem/1.6 "Courier New", monospace;
+}
+
+.execution-line-highlight {
+    background: rgba(255, 208, 0, 0.18);
+    border-top: 1px solid rgba(255, 208, 0, 0.45);
+    border-bottom: 1px solid rgba(255, 208, 0, 0.45);
+}
+
+.execution-line-decoration {
+    border-left: 3px solid rgba(255, 208, 0, 0.85);
+}
+
+.execution-line-glyph {
+    background: rgba(255, 208, 0, 0.9);
+    border-radius: 50%;
+    margin-left: 5px;
+    width: 8px !important;
+    height: 8px !important;
+    margin-top: 6px;
+}
+
+[data-theme="dark"] .execution-line-highlight {
+    background: rgba(255, 208, 0, 0.12);
+    border-top-color: rgba(255, 208, 0, 0.35);
+    border-bottom-color: rgba(255, 208, 0, 0.35);
 }
 
 .tab-nav {
@@ -409,6 +462,17 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+.debug-scope-box {
+    background-color: var(--toolbar-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 14px;
+    color: var(--text-color);
+    white-space: pre-wrap;
+    font-family: "Courier New", monospace;
+    font-size: 0.92rem;
 }
 
 .info-section {
@@ -537,6 +601,18 @@ body {
 
     .tab-toolbar {
         padding: 10px 14px;
+    }
+
+    .panel-header {
+        height: auto;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .panel-header-main,
+    .panel-actions {
+        width: 100%;
+        justify-content: space-between;
     }
 
     .output-scroll {

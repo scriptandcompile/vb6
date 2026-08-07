@@ -43,6 +43,28 @@ pub(crate) enum Flow {
     Terminate,
 }
 
+/// A formatted debug snapshot of a variable at a statement boundary.
+#[derive(Debug, Clone)]
+pub struct DebugVariable {
+    pub name: String,
+    pub type_name: String,
+    pub value: String,
+}
+
+/// A debugger-oriented snapshot captured at a statement boundary.
+#[derive(Debug, Clone)]
+pub struct DebugSnapshot {
+    pub steps: u64,
+    pub current_line: usize,
+    pub current_procedure: Option<String>,
+    pub stack_depth: usize,
+    pub globals: Vec<DebugVariable>,
+    pub locals: Vec<DebugVariable>,
+    pub output_lines: Vec<String>,
+    pub output_text: String,
+    pub terminated: bool,
+}
+
 /// The VB6 interpreter.
 #[derive(Debug)]
 pub struct Interpreter {
@@ -55,6 +77,9 @@ pub struct Interpreter {
     pub(crate) current_output: String,
     /// The module name from `Attribute VB_Name`.
     pub(crate) module_name: String,
+    /// Number of leading source lines omitted from the CST, such as VB6
+    /// header attributes.
+    pub(crate) source_line_offset: usize,
     /// Total statement budget; aborts with an error when exhausted.
     pub(crate) step_limit: u64,
     /// Statements executed so far.
@@ -63,6 +88,13 @@ pub struct Interpreter {
     pub(crate) terminated: bool,
     /// 1-based line of the statement currently executing.
     pub(crate) current_stmt_line: usize,
+    /// Optional debugger pause budget. When set, execution pauses before the
+    /// next statement once `steps` reaches the configured value.
+    pub(crate) pause_after_steps: Option<u64>,
+    /// Whether execution should record statement-boundary snapshots.
+    pub(crate) record_debug_snapshots: bool,
+    /// Statement-boundary snapshots captured during the current run.
+    pub(crate) debug_snapshots: Vec<DebugSnapshot>,
 }
 
 impl Default for Interpreter {
@@ -81,10 +113,14 @@ impl Interpreter {
             output: Vec::new(),
             current_output: String::new(),
             module_name: String::new(),
+            source_line_offset: 0,
             step_limit: DEFAULT_STEP_LIMIT,
             steps: 0,
             terminated: false,
             current_stmt_line: 1,
+            pause_after_steps: None,
+            record_debug_snapshots: false,
+            debug_snapshots: Vec::new(),
         }
     }
 
@@ -98,8 +134,24 @@ impl Interpreter {
     /// Reset all runtime state (globals, frames, output, program).
     pub fn clear(&mut self) {
         let step_limit = self.step_limit;
+        let pause_after_steps = self.pause_after_steps;
+        let record_debug_snapshots = self.record_debug_snapshots;
         *self = Self::new();
         self.step_limit = step_limit;
+        self.pause_after_steps = pause_after_steps;
+        self.record_debug_snapshots = record_debug_snapshots;
+    }
+
+    /// Pause execution before the next statement once this many statements
+    /// have completed.
+    pub fn set_pause_after_steps(&mut self, pause_after_steps: Option<u64>) {
+        self.pause_after_steps = pause_after_steps;
+    }
+
+    /// Enable or disable statement-boundary snapshot recording.
+    pub fn set_record_debug_snapshots(&mut self, enabled: bool) {
+        self.record_debug_snapshots = enabled;
+        self.debug_snapshots.clear();
     }
 
     /// Execute a VB6 module from source text.
@@ -115,6 +167,7 @@ impl Interpreter {
         let root = module.cst.to_root_node();
         let program = crate::program::build_program(&root, &module.name);
         self.module_name = module.name.clone();
+        self.source_line_offset = module.line_offset;
         self.procedures = program.procedures;
 
         // Module-level statements (Dim/Const/Option/...) execute first.
@@ -177,6 +230,61 @@ impl Interpreter {
         self.steps
     }
 
+    /// The line of the statement about to execute, or the most recently
+    /// executed line after completion.
+    pub fn current_line(&self) -> usize {
+        self.current_stmt_line + self.source_line_offset
+    }
+
+    /// The currently executing procedure, when inside a procedure body.
+    pub fn current_procedure(&self) -> Option<&str> {
+        self.frames.last().map(|frame| frame.name.as_str())
+    }
+
+    /// The current frame locals, when inside a procedure body.
+    pub fn current_locals(&self) -> Option<&Scope> {
+        self.frames.last().map(|frame| &frame.locals)
+    }
+
+    /// Recorded statement-boundary snapshots for the current run.
+    pub fn debug_snapshots(&self) -> &[DebugSnapshot] {
+        &self.debug_snapshots
+    }
+
+    /// Capture the current interpreter state as a debugger snapshot.
+    pub fn capture_debug_snapshot(&mut self) {
+        let current_procedure = self.current_procedure().map(str::to_string);
+        let globals = scope_to_debug_variables(&self.globals);
+        let locals = self
+            .current_locals()
+            .map(scope_to_debug_variables)
+            .unwrap_or_default();
+
+        let snapshot = DebugSnapshot {
+            steps: self.steps,
+            current_line: self.current_line(),
+            current_procedure,
+            stack_depth: self.frames.len(),
+            globals,
+            locals,
+            output_lines: self.output().to_vec(),
+            output_text: self.output_text(),
+            terminated: self.is_terminated(),
+        };
+
+        let should_push = self.debug_snapshots.last().is_none_or(|last| {
+            last.steps != snapshot.steps
+                || last.current_line != snapshot.current_line
+                || last.current_procedure != snapshot.current_procedure
+                || last.output_text != snapshot.output_text
+                || last.terminated != snapshot.terminated
+        });
+
+        if should_push {
+            self.debug_snapshots.push(snapshot);
+        }
+    }
+
     /// The name of the currently executing procedure (empty at module level).
     pub(crate) fn current_procedure_name(&self) -> String {
         self.frames
@@ -187,6 +295,19 @@ impl Interpreter {
 
     /// Charge one step against the execution budget.
     pub(crate) fn step(&mut self) -> RunResult<()> {
+        if self.record_debug_snapshots {
+            self.capture_debug_snapshot();
+        }
+
+        if self
+            .pause_after_steps
+            .is_some_and(|pause_after_steps| self.steps >= pause_after_steps)
+        {
+            return Err(RunError::debug_pause()
+                .at_line(self.current_stmt_line)
+                .in_procedure(&self.current_procedure_name()));
+        }
+
         self.steps += 1;
         if self.steps > self.step_limit {
             return Err(RunError::err_number(28).at_line(self.current_stmt_line));
@@ -282,4 +403,17 @@ impl Interpreter {
         self.frames.push(frame);
         Ok(())
     }
+}
+
+fn scope_to_debug_variables(scope: &Scope) -> Vec<DebugVariable> {
+    let mut variables: Vec<DebugVariable> = scope
+        .iter()
+        .map(|(name, value)| DebugVariable {
+            name: name.to_string(),
+            type_name: value.type_of().to_string(),
+            value: format!("{value}"),
+        })
+        .collect();
+    variables.sort_by(|left, right| left.name.cmp(&right.name));
+    variables
 }

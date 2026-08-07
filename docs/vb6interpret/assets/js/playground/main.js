@@ -1,4 +1,4 @@
-import init, { interpret_vb6_code, init_panic_hook } from "../../wasm/vb6interpret.js";
+import init, { build_debug_trace, interpret_vb6_code, init_panic_hook } from "../../wasm/vb6interpret.js";
 import { getDefaultExample, getExample } from "./examples.js";
 import * as Editor from "./editor.js";
 
@@ -7,12 +7,20 @@ const state = {
     activeTab: "output",
     isResizing: false,
     initialCode: "",
+    debugTrace: null,
+    debugTraceIndex: -1,
+    lastDebugSource: "",
+    hasExecutionState: false,
+    sessionComplete: false,
 };
 
 const elements = {
     fileType: document.getElementById("file-type"),
     examples: document.getElementById("examples"),
     runButton: document.getElementById("run-btn"),
+    panelRunButton: document.getElementById("panel-run-btn"),
+    stepButton: document.getElementById("step-btn"),
+    resetButton: document.getElementById("reset-btn"),
     shareButton: document.getElementById("share-btn"),
     clearButton: document.getElementById("clear-btn"),
     stdout: document.getElementById("stdout"),
@@ -25,6 +33,12 @@ const elements = {
     resizer: document.getElementById("resizer"),
     editorPanel: document.querySelector(".editor-panel"),
     outputPanel: document.querySelector(".output-panel"),
+    debugSteps: document.getElementById("debug-steps"),
+    debugPosition: document.getElementById("debug-position"),
+    debugProcedure: document.getElementById("debug-procedure"),
+    debugStackDepth: document.getElementById("debug-stack-depth"),
+    debugGlobals: document.getElementById("debug-globals"),
+    debugLocals: document.getElementById("debug-locals"),
     tabButtons: Array.from(document.querySelectorAll(".tab-btn")),
     tabPanes: Array.from(document.querySelectorAll(".tab-pane")),
 };
@@ -40,6 +54,7 @@ async function initPlayground() {
         state.wasmReady = true;
         elements.wasmStatus.textContent = "WebAssembly ready";
         setStatus("Ready", "success");
+        syncExecutionControls();
     } catch (error) {
         console.error("Failed to initialize wasm", error);
         elements.wasmStatus.textContent = "WebAssembly failed to load";
@@ -50,6 +65,8 @@ async function initPlayground() {
 
 function bindEvents() {
     document.addEventListener("editorContentChanged", () => {
+        resetDebugProgress();
+        Editor.clearExecutionHighlight();
         saveToLocalStorage();
     });
 
@@ -65,6 +82,9 @@ function bindEvents() {
     });
 
     elements.runButton.addEventListener("click", runModule);
+    elements.panelRunButton.addEventListener("click", runModule);
+    elements.stepButton.addEventListener("click", stepModule);
+    elements.resetButton.addEventListener("click", resetExecutionSession);
     elements.shareButton.addEventListener("click", shareCode);
     elements.clearButton.addEventListener("click", clearEditor);
 
@@ -114,13 +134,26 @@ async function runModule() {
         return;
     }
 
+    const canResume = state.debugTrace && state.lastDebugSource === Editor.getEditorContent();
     setStatus("Running", "pending");
+    state.hasExecutionState = true;
 
     try {
-        const result = interpret_vb6_code(Editor.getEditorContent());
+        const result = canResume
+            ? state.debugTrace.snapshots[state.debugTrace.snapshots.length - 1]
+            : interpret_vb6_code(Editor.getEditorContent());
+
+        if (canResume) {
+            state.debugTraceIndex = state.debugTrace.snapshots.length - 1;
+        } else {
+            resetDebugProgress();
+        }
+
+        updateSessionCompletion(result);
         renderOutput(result);
     } catch (error) {
         console.error("Interpreter execution failed", error);
+        updateSessionCompletion({ paused: false });
         renderOutput({
             successful: false,
             output_text: "",
@@ -132,20 +165,166 @@ async function runModule() {
     }
 }
 
+async function stepModule() {
+    if (!state.wasmReady) {
+        renderError({ message: "WebAssembly is not ready yet." });
+        return;
+    }
+
+    const source = Editor.getEditorContent();
+    if (!source.trim()) {
+        renderOutput({
+            successful: false,
+            output_text: "",
+            output_lines: [],
+            steps: 0,
+            terminated: false,
+            paused: false,
+            error: { message: "Enter a VB6 module before stepping it." },
+            debug: emptyDebugState(),
+        });
+        return;
+    }
+
+    if (!state.debugTrace || state.lastDebugSource !== source) {
+        setStatus("Preparing debug session", "pending");
+        state.hasExecutionState = true;
+        try {
+            state.debugTrace = build_debug_trace(source);
+            state.lastDebugSource = source;
+            state.debugTraceIndex = -1;
+        } catch (error) {
+            console.error("Failed to create debug trace", error);
+            renderOutput({
+                successful: false,
+                output_text: "",
+                output_lines: [],
+                steps: 0,
+                terminated: false,
+                paused: false,
+                error: { message: error.message ?? "Failed to create debug trace." },
+                debug: emptyDebugState(),
+            });
+            return;
+        }
+    }
+
+    if (!state.debugTrace.snapshots || state.debugTrace.snapshots.length === 0) {
+        renderOutput({
+            successful: false,
+            output_text: "",
+            output_lines: [],
+            steps: 0,
+            terminated: false,
+            paused: false,
+            error: state.debugTrace.error ?? { message: "No debug trace available." },
+            debug: emptyDebugState(),
+        });
+        setActiveTab("errors");
+        return;
+    }
+
+    if (state.debugTraceIndex < state.debugTrace.snapshots.length - 1) {
+        state.debugTraceIndex += 1;
+    }
+
+    setStatus(`Stepping (${state.debugTraceIndex + 1})`, "pending");
+
+    try {
+        const result = state.debugTrace.snapshots[state.debugTraceIndex];
+        updateSessionCompletion(result);
+        renderOutput(result);
+        setActiveTab("debug");
+    } catch (error) {
+        console.error("Interpreter stepping failed", error);
+        updateSessionCompletion({ paused: false });
+        renderOutput({
+            successful: false,
+            output_text: "",
+            output_lines: [],
+            steps: 0,
+            terminated: false,
+            paused: false,
+            error: { message: error.message ?? "Stepping failed." },
+            debug: emptyDebugState(),
+        });
+    }
+}
+
 function renderOutput(result) {
+    syncExecutionControls();
     elements.stdout.textContent = result.output_text || "No output.";
     elements.steps.textContent = String(result.steps ?? 0);
     elements.terminated.textContent = result.terminated ? "Yes" : "No";
     elements.lines.textContent = String(result.output_lines?.length ?? 0);
+    renderDebugState(
+        result.debug ?? emptyDebugState(),
+        Boolean(result.debug?.current_line) && Boolean(result.paused || result.error || (result.steps ?? 0) > 0),
+    );
 
-    if (result.error) {
+    if (result.error && !result.error.is_debug_pause) {
         renderError(result.error);
         setStatus("Error", "error");
+    } else if (result.paused) {
+        elements.errorBox.textContent = "Paused before the next statement.";
+        elements.errorBox.className = "error-box empty";
+        setStatus("Paused", "pending");
     } else {
         elements.errorBox.textContent = "No runtime or parse errors.";
         elements.errorBox.className = "error-box empty";
         setStatus("Completed", "success");
     }
+}
+
+function updateSessionCompletion(result) {
+    state.sessionComplete = !result?.paused;
+}
+
+function syncExecutionControls() {
+    const resetEnabled = state.hasExecutionState;
+    const runEnabled = !state.sessionComplete;
+    const stepEnabled = !state.sessionComplete;
+
+    elements.resetButton.disabled = !resetEnabled;
+    elements.runButton.disabled = !runEnabled;
+    elements.panelRunButton.disabled = !runEnabled;
+    elements.stepButton.disabled = !stepEnabled;
+}
+
+function renderDebugState(debug, highlightLine = false) {
+    elements.debugSteps.textContent = String(debug.current_steps ?? 0);
+    elements.debugPosition.textContent = `Line ${debug.current_line ?? 1}`;
+    elements.debugProcedure.textContent = debug.current_procedure || "Module";
+    elements.debugStackDepth.textContent = String(debug.stack_depth ?? 0);
+    elements.debugGlobals.textContent = formatScope(debug.globals, "No globals yet.");
+    elements.debugLocals.textContent = formatScope(debug.locals, "No active local scope.");
+
+    if (highlightLine) {
+        Editor.highlightExecutionLine(debug.current_line);
+    } else {
+        Editor.clearExecutionHighlight();
+    }
+}
+
+function formatScope(variables, emptyLabel) {
+    if (!variables || variables.length === 0) {
+        return emptyLabel;
+    }
+
+    return variables
+        .map((variable) => `${variable.name} As ${variable.type_name} = ${variable.value}`)
+        .join("\n");
+}
+
+function emptyDebugState() {
+    return {
+        current_steps: 0,
+        current_line: 1,
+        current_procedure: null,
+        stack_depth: 0,
+        globals: [],
+        locals: [],
+    };
 }
 
 function renderError(error) {
@@ -191,14 +370,31 @@ async function shareCode() {
 
 function clearEditor() {
     Editor.clearEditor();
+    resetExecutionSession();
     saveToLocalStorage();
+}
+
+function resetDebugProgress() {
+    state.debugTrace = null;
+    state.debugTraceIndex = -1;
+    state.lastDebugSource = Editor.getEditorContent();
+}
+
+function resetExecutionSession() {
+    resetDebugProgress();
+    state.hasExecutionState = false;
+    state.sessionComplete = false;
+    Editor.clearExecutionHighlight();
+    syncExecutionControls();
     renderOutput({
         successful: true,
         output_text: "Run a module to see Debug.Print output.",
         output_lines: [],
         steps: 0,
         terminated: false,
+        paused: false,
         error: null,
+        debug: emptyDebugState(),
     });
     setStatus("Idle", "pending");
 }
