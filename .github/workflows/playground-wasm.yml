@@ -6,7 +6,7 @@ on:
       - master
       - main
     paths:
-      - '.github/workflows/wasm.yml'
+      - '.github/workflows/playground-wasm.yml'
       - '.github/workflows/wasm-semantic.yml'
       - 'projects/vb6parse/**'
       - 'projects/vb6semantic/**'
@@ -33,7 +33,7 @@ jobs:
         with:
           filters: |
             parse:
-              - '.github/workflows/wasm.yml'
+              - '.github/workflows/playground-wasm.yml'
               - '.github/workflows/wasm-semantic.yml'
               - 'projects/vb6parse/**'
               - '!projects/vb6parse/tests/**'
@@ -44,14 +44,14 @@ jobs:
               - '!projects/vb6parse/CONTRIBUTING.md'
               - '!projects/vb6parse/docs/**'
             semantic:
-              - '.github/workflows/wasm.yml'
+              - '.github/workflows/playground-wasm.yml'
               - '.github/workflows/wasm-semantic.yml'
               - 'projects/vb6semantic/**'
               - '!projects/vb6semantic/README.md'
               - '!projects/vb6semantic/LICENSE'
               - '!projects/vb6semantic/docs/**'
             interpret:
-              - '.github/workflows/wasm.yml'
+              - '.github/workflows/playground-wasm.yml'
               - '.github/workflows/wasm-semantic.yml'
               - 'projects/vb6interpret/**'
               - '!projects/vb6interpret/README.md'
