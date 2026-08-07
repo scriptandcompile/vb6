@@ -36,7 +36,7 @@ pub mod format;
 //pub use format::format;
 
 pub mod format_dollar;
-//pub use format_dollar::format_dollar;
+pub use format_dollar::format_dollar;
 
 pub mod formatcurrency;
 //pub use formatcurrency::formatcurrency;
