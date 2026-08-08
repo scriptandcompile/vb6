@@ -237,3 +237,133 @@
 //! - Limited to VB6's internal string representation
 //! - May produce unexpected results with emoji or complex Unicode
 //! - Cannot modify the original string (read-only operation)
+
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
+
+/// Number of bytes used to encode one character in this runtime's UTF-16 model.
+const BYTES_PER_CHAR: i32 = 2;
+
+/// Converts a 1-based byte position to a 0-based character index.
+fn byte_start_to_char_index(start: i32) -> usize {
+    (start - 1) as usize / BYTES_PER_CHAR as usize
+}
+
+/// Returns the characters of `input` starting at the character containing
+/// byte `start` and spanning at most `length` bytes.
+///
+/// `start` is a 1-based byte position; the containing character is selected, so
+/// the result always begins on a character boundary. When `length` is omitted
+/// the remainder of the string is returned. A `length` of 0 yields an empty
+/// string and a `start` beyond the byte length yields an empty string. The `$`
+/// suffix indicates this function returns a `String` type (not `Variant`).
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `start` is less
+/// than 1 or `length` is negative.
+pub fn midb_dollar(
+    input: &VBString,
+    start: &VBLong,
+    length: Option<&VBLong>,
+) -> VBResult<VBString> {
+    let start = start.as_i32();
+    if start < 1 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid start position",
+        ));
+    }
+    let n = match length {
+        Some(n) => {
+            let n = n.as_i32();
+            if n < 0 {
+                return Err(VBError::with_description(
+                    err_number::INVALID_PROCEDURE_CALL,
+                    "Invalid length",
+                ));
+            }
+            n / BYTES_PER_CHAR
+        }
+        None => i32::MAX,
+    };
+
+    let chars: Vec<char> = input.as_str().chars().collect();
+    let skip = byte_start_to_char_index(start);
+    if skip >= chars.len() {
+        return Ok(VBString::from(String::new()));
+    }
+    Ok(VBString::from(
+        chars
+            .into_iter()
+            .skip(skip)
+            .take(n as usize)
+            .collect::<String>(),
+    ))
+}
+
+/// Returns the characters of `input` starting at the character containing
+/// byte `start` and spanning at most `length` bytes.
+///
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn extracts_from_byte_position() {
+        assert_eq!(
+            midb_dollar(&VBString::from("ABCDE"), &VBLong::from(3), None).unwrap(),
+            VBString::from("BCDE")
+        );
+        assert_eq!(
+            midb_dollar(&VBString::from("ABCDE"), &VBLong::from(5), Some(&VBLong::from(4)))
+                .unwrap(),
+            VBString::from("CD")
+        );
+    }
+
+    #[test]
+    fn even_byte_start_selects_character_boundary() {
+        assert_eq!(
+            midb_dollar(&VBString::from("ABCDE"), &VBLong::from(2), None).unwrap(),
+            VBString::from("ABCDE")
+        );
+    }
+
+    #[test]
+    fn zero_length_returns_empty() {
+        assert_eq!(
+            midb_dollar(&VBString::from("ABCDE"), &VBLong::from(3), Some(&VBLong::from(0)))
+                .unwrap(),
+            VBString::from("")
+        );
+    }
+
+    #[test]
+    fn start_beyond_end_returns_empty() {
+        assert_eq!(
+            midb_dollar(&VBString::from("ABCDE"), &VBLong::from(99), None).unwrap(),
+            VBString::from("")
+        );
+    }
+
+    #[test]
+    fn rejects_bad_start_and_length() {
+        assert_eq!(
+            midb_dollar(&VBString::from("ABC"), &VBLong::from(0), None)
+                .unwrap_err()
+                .number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+        assert_eq!(
+            midb_dollar(&VBString::from("ABC"), &VBLong::from(1), Some(&VBLong::from(-2)))
+                .unwrap_err()
+                .number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

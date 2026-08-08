@@ -294,6 +294,7 @@ pub fn format_dollar(
         };
         return Ok(VBString::from(result));
     };
+
     let fmt_str = fmt.as_str();
     if fmt_str.trim().is_empty() {
         return Ok(VBString::from(expression.as_string()?));
@@ -303,15 +304,18 @@ pub fn format_dollar(
         let value = expression.as_f64()?;
         return Ok(VBString::from(format_named_numeric(name, value)?));
     }
+
     if let Some(name) = named_date_format_name(fmt_str) {
         let serial = expression.as_date_serial()?;
         let parts = date_parts(serial).ok_or_else(VBError::type_mismatch)?;
         return Ok(VBString::from(format_named_date(name, &parts)));
     }
+
     if has_string_placeholder(fmt_str) {
         let input = expression.as_string()?;
         return Ok(VBString::from(format_string_custom(&input, fmt_str)));
     }
+
     if has_date_letters(fmt_str) {
         let serial = expression.as_date_serial()?;
         return Ok(VBString::from(format_date_custom(
@@ -321,6 +325,7 @@ pub fn format_dollar(
             first_week_of_year,
         )?));
     }
+
     let value = expression.as_f64()?;
     Ok(VBString::from(format_number_custom(value, fmt_str)?))
 }
@@ -376,7 +381,7 @@ fn named_date_format_name(fmt: &str) -> Option<&'static str> {
 }
 
 /// Formats `parts` using one of the named date/time formats.
-fn format_named_date(name: &str, parts: &DateParts) -> String {
+pub(crate) fn format_named_date(name: &str, parts: &DateParts) -> String {
     match name {
         "general date" => general_date_string(parts),
         "long date" => format!(
@@ -907,6 +912,140 @@ fn format_number_custom(value: f64, format: &str) -> VBResult<String> {
     Ok(out)
 }
 
+/// The `FormatNumber`/`FormatCurrency`/`FormatPercent` wrapper family.
+///
+/// A negative result is prefixed with `-` (or wrapped in parentheses when
+/// `parens` is true) before `prefix`. A true `leading` control keeps the `0`
+/// for fractional magnitudes in `(0, 1)`; when false it is suppressed.
+pub(crate) fn format_style_number(
+    value: f64,
+    decimals: usize,
+    group: bool,
+    leading: bool,
+    parens: bool,
+    prefix: &str,
+    suffix: &str,
+) -> String {
+    let decimals = decimals.min(30);
+    let negative = value < 0.0;
+    let abs = value.abs();
+    let factor = 10.0f64.powi(decimals as i32);
+    let scaled = round_half_away(abs * factor);
+    let scaled_i = scaled as i128;
+    let factor_i = 10i128.pow(decimals as u32);
+    let int_val = scaled_i / factor_i;
+    let frac_val = (scaled_i % factor_i).unsigned_abs();
+
+    let mut int_str = int_val.to_string();
+    if !leading && int_val == 0 {
+        int_str.clear();
+    }
+    if group {
+        int_str = group_thousands(&int_str);
+    }
+    let frac_str = if decimals > 0 {
+        format!(".{:0>width$}", frac_val, width = decimals)
+    } else {
+        String::new()
+    };
+    let body = format!("{prefix}{int_str}{frac_str}{suffix}");
+    if negative && parens {
+        format!("({body})")
+    } else if negative {
+        format!("-{body}")
+    } else {
+        body
+    }
+}
+
+/// The style used by the `FormatNumber`/`FormatCurrency`/`FormatPercent` family.
+#[derive(Clone, Copy)]
+pub(crate) enum NumericStyle {
+    Number,
+    Currency,
+    Percent,
+}
+
+impl NumericStyle {
+    fn prefix(self) -> &'static str {
+        match self {
+            NumericStyle::Currency => "$",
+            _ => "",
+        }
+    }
+
+    fn suffix(self) -> &'static str {
+        match self {
+            NumericStyle::Percent => "%",
+            _ => "",
+        }
+    }
+
+    /// The multiplier applied before formatting.
+    fn scale(self) -> f64 {
+        match self {
+            NumericStyle::Percent => 100.0,
+            _ => 1.0,
+        }
+    }
+}
+
+/// Resolves a tristate argument (`vbTrue` -1, `vbFalse` 0, `vbUseDefault` -2)
+/// against the locale default `default`.
+fn tristate(v: Option<&VBLong>, default: bool) -> bool {
+    match v.map(|x| x.as_i32()) {
+        None | Some(-2) => default,
+        Some(-1) => true,
+        _ => false,
+    }
+}
+
+/// Backs the `FormatNumber`, `FormatCurrency`, and `FormatPercent` wrappers.
+///
+/// `numdigitsafterdecimal` of -1 (the default) selects the locale's two-digit
+/// grouping; negative values below -1 are treated as an invalid argument.
+/// Tristate arguments default to the locale behavior (grouping and leading
+/// zero on, parentheses off). A `Null` `expression` propagates as `Null`.
+pub(crate) fn format_number_family(
+    expression: &VBVariant,
+    numdigitsafterdecimal: Option<&VBLong>,
+    includeleadingdigit: Option<&VBLong>,
+    useparensfornegativenumbers: Option<&VBLong>,
+    groupdigits: Option<&VBLong>,
+    style: NumericStyle,
+) -> VBResult<VBVariant> {
+    if expression.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    let value = expression.as_f64()?;
+    let digits = match numdigitsafterdecimal {
+        None => 2,
+        Some(v) => {
+            let n = v.as_i32();
+            if n == -1 {
+                2
+            } else if n < 0 {
+                return Err(VBError::invalid_procedure_call());
+            } else {
+                n
+            }
+        }
+    };
+    let leading = tristate(includeleadingdigit, true);
+    let parens = tristate(useparensfornegativenumbers, false);
+    let grouped = tristate(groupdigits, true);
+    let result = format_style_number(
+        value * style.scale(),
+        digits as usize,
+        grouped,
+        leading,
+        parens,
+        style.prefix(),
+        style.suffix(),
+    );
+    Ok(VBVariant::from_string(result))
+}
+
 /// The `General Number` named format.
 fn general_number(value: f64) -> String {
     if value.is_finite() && value == value.trunc() && value.abs() < 1.0e15 {
@@ -946,7 +1085,7 @@ const MONTH_NAMES: [&str; 12] = [
 ];
 
 /// The decomposed civil date/time components of an OLE automation serial.
-struct DateParts {
+pub(crate) struct DateParts {
     year: i16,
     month: u8,
     day: u8,
@@ -959,7 +1098,7 @@ struct DateParts {
     day_of_year: i16,
 }
 
-fn date_parts(serial: f64) -> Option<DateParts> {
+pub(crate) fn date_parts(serial: f64) -> Option<DateParts> {
     let dt = crate::value::date_serial_to_datetime(serial)?;
     Some(DateParts {
         year: dt.year(),
@@ -1217,7 +1356,10 @@ mod tests {
         assert_eq!(fmt_opt(VBVariant::Double(1234.5), None), "1234.5");
         assert_eq!(fmt_opt(VBVariant::from_string("hello"), None), "hello");
         assert_eq!(fmt_opt(VBVariant::Boolean(true), None), "True");
-        assert_eq!(fmt_opt(VBVariant::from_date_serial(45_662.0), None), "1/5/2025");
+        assert_eq!(
+            fmt_opt(VBVariant::from_date_serial(45_662.0), None),
+            "1/5/2025"
+        );
     }
 
     #[test]
@@ -1234,7 +1376,10 @@ mod tests {
         assert_eq!(fmt(VBVariant::Double(1234.5), "Fixed"), "1234.50");
         assert_eq!(fmt(VBVariant::Double(1234.5), "Standard"), "1,234.50");
         assert_eq!(fmt(VBVariant::Double(0.075), "Percent"), "7.50%");
-        assert_eq!(fmt(VBVariant::Double(12_345_678.0), "Scientific"), "1.23E+07");
+        assert_eq!(
+            fmt(VBVariant::Double(12_345_678.0), "Scientific"),
+            "1.23E+07"
+        );
         assert_eq!(fmt(VBVariant::Double(5.0), "Yes/No"), "Yes");
         assert_eq!(fmt(VBVariant::Double(0.0), "Yes/No"), "No");
         assert_eq!(fmt(VBVariant::Double(5.0), "True/False"), "True");
@@ -1292,15 +1437,24 @@ mod tests {
             "3:45:30 PM"
         );
         assert_eq!(
-            fmt(VBVariant::from_date_serial(45_662.656_597_222), "Medium Time"),
+            fmt(
+                VBVariant::from_date_serial(45_662.656_597_222),
+                "Medium Time"
+            ),
             "03:45 PM"
         );
         assert_eq!(
-            fmt(VBVariant::from_date_serial(45_662.656_597_222), "Short Time"),
+            fmt(
+                VBVariant::from_date_serial(45_662.656_597_222),
+                "Short Time"
+            ),
             "15:45"
         );
         assert_eq!(
-            fmt(VBVariant::from_date_serial(45_662.656_597_222), "General Date"),
+            fmt(
+                VBVariant::from_date_serial(45_662.656_597_222),
+                "General Date"
+            ),
             "1/5/2025 3:45:30 PM"
         );
     }
@@ -1338,11 +1492,17 @@ mod tests {
             "15:45:30"
         );
         assert_eq!(
-            fmt(VBVariant::from_date_serial(45_662.656_597_222), "mm/dd/yyyy"),
+            fmt(
+                VBVariant::from_date_serial(45_662.656_597_222),
+                "mm/dd/yyyy"
+            ),
             "01/05/2025"
         );
         assert_eq!(
-            fmt(VBVariant::from_date_serial(45_662.656_597_222), "h:mm AM/PM"),
+            fmt(
+                VBVariant::from_date_serial(45_662.656_597_222),
+                "h:mm AM/PM"
+            ),
             "3:45 PM"
         );
     }
@@ -1353,7 +1513,10 @@ mod tests {
             fmt(VBVariant::from_date_serial(45_662.656_597_222), "hh:mm"),
             "15:45"
         );
-        assert_eq!(fmt(VBVariant::from_date_serial(45_662.656_597_222), "mm"), "01");
+        assert_eq!(
+            fmt(VBVariant::from_date_serial(45_662.656_597_222), "mm"),
+            "01"
+        );
     }
 
     #[test]
@@ -1364,7 +1527,10 @@ mod tests {
             fmt(VBVariant::from_string("5551234567"), "(@@@) @@@-@@@@"),
             "(555) 123-4567"
         );
-        assert_eq!(fmt(VBVariant::from_string("hello"), "@@@@@@@@@@"), "     hello");
+        assert_eq!(
+            fmt(VBVariant::from_string("hello"), "@@@@@@@@@@"),
+            "     hello"
+        );
     }
 
     #[test]

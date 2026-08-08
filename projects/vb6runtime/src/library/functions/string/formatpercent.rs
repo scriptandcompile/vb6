@@ -394,3 +394,74 @@
 //! - `Format` - General-purpose formatting function
 //! - `CDbl` - Converts to Double for percentage calculations
 //! - `Round` - Rounds numbers before percentage formatting
+
+use crate::{
+    error::VBResult,
+    value::{VBLong, VBVariant},
+};
+
+/// Returns an expression formatted as a percentage.
+///
+/// The value is multiplied by 100 and suffixed with `%`, using the locale's
+/// grouping and two-digit decimals by default. `numdigitsafterdecimal` of -1
+/// (the default) selects the locale setting; `includeleadingdigit` controls
+/// the leading zero for fractional values, `useparensfornegativenumbers` wraps
+/// negative results in parentheses, and `groupdigits` enables thousands
+/// grouping. A `Null` `expression` propagates as `Null`.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when
+/// `numdigitsafterdecimal` is less than -1.
+pub fn formatpercent(
+    expression: &VBVariant,
+    numdigitsafterdecimal: Option<&VBLong>,
+    includeleadingdigit: Option<&VBLong>,
+    useparensfornegativenumbers: Option<&VBLong>,
+    groupdigits: Option<&VBLong>,
+) -> VBResult<VBVariant> {
+    super::format_dollar::format_number_family(
+        expression,
+        numdigitsafterdecimal,
+        includeleadingdigit,
+        useparensfornegativenumbers,
+        groupdigits,
+        super::format_dollar::NumericStyle::Percent,
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_percent_format() {
+        assert_eq!(
+            formatpercent(&VBVariant::from_double(0.5), None, None, None, None).unwrap(),
+            VBVariant::from_string("50.00%")
+        );
+    }
+
+    #[test]
+    fn zero_decimals_rounds_percent() {
+        assert_eq!(
+            formatpercent(
+                &VBVariant::from_double(0.125),
+                Some(&VBLong::from(0)),
+                None,
+                None,
+                None,
+            )
+            .unwrap(),
+            VBVariant::from_string("13%")
+        );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(
+            formatpercent(&VBVariant::Null, None, None, None, None).unwrap(),
+            VBVariant::Null
+        );
+    }
+}

@@ -573,3 +573,104 @@
 //! - `Int`: Return integer portion of a number
 //! - `CDbl`: Convert expression to Double
 //! - `IsNumeric`: Check if expression can be converted to numeric
+
+use crate::{
+    error::VBResult,
+    value::{VBLong, VBVariant},
+};
+
+/// Returns an expression formatted as a number.
+///
+/// The result uses the locale's grouping and two-digit decimals by default.
+/// `numdigitsafterdecimal` of -1 (the default) selects the locale setting;
+/// `includeleadingdigit` (`vbTrue`/`vbFalse`/`vbUseDefault`) controls the
+/// leading zero for fractional values, `useparensfornegativenumbers` wraps
+/// negative results in parentheses, and `groupdigits` enables thousands
+/// grouping. A `Null` `expression` propagates as `Null`.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when
+/// `numdigitsafterdecimal` is less than -1.
+pub fn formatnumber(
+    expression: &VBVariant,
+    numdigitsafterdecimal: Option<&VBLong>,
+    includeleadingdigit: Option<&VBLong>,
+    useparensfornegativenumbers: Option<&VBLong>,
+    groupdigits: Option<&VBLong>,
+) -> VBResult<VBVariant> {
+    super::format_dollar::format_number_family(
+        expression,
+        numdigitsafterdecimal,
+        includeleadingdigit,
+        useparensfornegativenumbers,
+        groupdigits,
+        super::format_dollar::NumericStyle::Number,
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_format_groups_and_shows_two_decimals() {
+        assert_eq!(
+            formatnumber(&VBVariant::from_double(1234.5), None, None, None, None).unwrap(),
+            VBVariant::from_string("1,234.50")
+        );
+    }
+
+    #[test]
+    fn zero_decimals_rounds() {
+        assert_eq!(
+            formatnumber(
+                &VBVariant::from_double(1234.5678),
+                Some(&VBLong::from(0)),
+                None,
+                None,
+                None,
+            )
+            .unwrap(),
+            VBVariant::from_string("1,235")
+        );
+    }
+
+    #[test]
+    fn suppresses_leading_zero() {
+        assert_eq!(
+            formatnumber(
+                &VBVariant::from_double(0.5),
+                Some(&VBLong::from(2)),
+                Some(&VBLong::from(0)),
+                None,
+                None,
+            )
+            .unwrap(),
+            VBVariant::from_string(".50")
+        );
+    }
+
+    #[test]
+    fn uses_parentheses_for_negatives() {
+        assert_eq!(
+            formatnumber(
+                &VBVariant::from_double(-1234.5),
+                None,
+                None,
+                Some(&VBLong::from(-1)),
+                None,
+            )
+            .unwrap(),
+            VBVariant::from_string("(1,234.50)")
+        );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(
+            formatnumber(&VBVariant::Null, None, None, None, None).unwrap(),
+            VBVariant::Null
+        );
+    }
+}

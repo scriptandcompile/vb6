@@ -200,6 +200,129 @@ pub(crate) fn call_builtin(name: &str, args: &[VBVariant]) -> VBResult<VBVariant
             };
             Ok(result)
         }
+        "lenb" => {
+            one_arg(name, args)?;
+            let input = VBString::try_from(&args[0])?;
+            let result = strfn::lenb(&input)?;
+            Ok(VBVariant::from(result))
+        }
+        "leftb" => {
+            two_args(name, args)?;
+            let length = VBLong::try_from(&args[1])?;
+            strfn::leftb(&args[0], &length)
+        }
+        "leftb$" => {
+            two_args(name, args)?;
+            let input = arg_string(args, 0)?;
+            let length = VBLong::try_from(&args[1])?;
+            strfn::leftb_dollar(&input, &length).map(VBVariant::from)
+        }
+        "rightb" => {
+            two_args(name, args)?;
+            let length = VBLong::try_from(&args[1])?;
+            strfn::rightb(&args[0], &length)
+        }
+        "rightb$" => {
+            two_args(name, args)?;
+            let input = arg_string(args, 0)?;
+            let length = VBLong::try_from(&args[1])?;
+            strfn::rightb_dollar(&input, &length).map(VBVariant::from)
+        }
+        "midb" => {
+            expect_args(name, args, 2, 3)?;
+            let start = VBLong::try_from(&args[1])?;
+            let length = args.get(2).map(VBLong::try_from).transpose()?;
+            strfn::midb(&args[0], &start, length.as_ref())
+        }
+        "midb$" => {
+            expect_args(name, args, 2, 3)?;
+            let input = arg_string(args, 0)?;
+            let start = VBLong::try_from(&args[1])?;
+            let length = args.get(2).map(VBLong::try_from).transpose()?;
+            strfn::midb_dollar(&input, &start, length.as_ref()).map(VBVariant::from)
+        }
+        "str" | "str$" => {
+            one_arg(name, args)?;
+            if normalized_name == "str$" {
+                strfn::str_dollar(&args[0]).map(VBVariant::from)
+            } else {
+                strfn::str(&args[0])
+            }
+        }
+        "string" => {
+            two_args(name, args)?;
+            let number = VBLong::try_from(&args[0])?;
+            strfn::string_function(&number, &args[1])
+        }
+        "string$" => {
+            two_args(name, args)?;
+            let number = VBLong::try_from(&args[0])?;
+            strfn::string_dollar(&number, &args[1]).map(VBVariant::from)
+        }
+        "strcomp" => {
+            expect_args(name, args, 2, 3)?;
+            let s1 = arg_string(args, 0)?;
+            let s2 = arg_string(args, 1)?;
+            let compare = args.get(2).map(VBLong::try_from).transpose()?;
+            let result = strfn::strcomp(&s1, &s2, compare.as_ref())?;
+            Ok(VBVariant::from(result))
+        }
+        "strconv" => {
+            expect_args(name, args, 2, 3)?;
+            let conversion = VBLong::try_from(&args[1])?;
+            let lcid = args.get(2).map(VBLong::try_from).transpose()?;
+            strfn::strconv(&args[0], &conversion, lcid.as_ref())
+        }
+        "strconv$" => {
+            expect_args(name, args, 2, 3)?;
+            let input = arg_string(args, 0)?;
+            let conversion = VBLong::try_from(&args[1])?;
+            let lcid = args.get(2).map(VBLong::try_from).transpose()?;
+            strfn::strconv_dollar(&input, &conversion, lcid.as_ref()).map(VBVariant::from)
+        }
+        "replace" => {
+            expect_args(name, args, 3, 6)?;
+            let start = args.get(3).map(VBLong::try_from).transpose()?;
+            let count = args.get(4).map(VBLong::try_from).transpose()?;
+            let compare = args.get(5).map(VBLong::try_from).transpose()?;
+            strfn::replace(
+                &args[0],
+                &args[1],
+                &args[2],
+                start.as_ref(),
+                count.as_ref(),
+                compare.as_ref(),
+            )
+        }
+        "formatnumber" => {
+            expect_args(name, args, 1, 5)?;
+            let digits = args.get(1).map(VBLong::try_from).transpose()?;
+            let leading = args.get(2).map(VBLong::try_from).transpose()?;
+            let parens = args.get(3).map(VBLong::try_from).transpose()?;
+            let group = args.get(4).map(VBLong::try_from).transpose()?;
+            strfn::formatnumber(&args[0], digits.as_ref(), leading.as_ref(), parens.as_ref(), group.as_ref())
+        }
+        "formatcurrency" => {
+            expect_args(name, args, 1, 5)?;
+            let digits = args.get(1).map(VBLong::try_from).transpose()?;
+            let leading = args.get(2).map(VBLong::try_from).transpose()?;
+            let parens = args.get(3).map(VBLong::try_from).transpose()?;
+            let group = args.get(4).map(VBLong::try_from).transpose()?;
+            strfn::formatcurrency(&args[0], digits.as_ref(), leading.as_ref(), parens.as_ref(), group.as_ref())
+        }
+        "formatpercent" => {
+            expect_args(name, args, 1, 5)?;
+            let digits = args.get(1).map(VBLong::try_from).transpose()?;
+            let leading = args.get(2).map(VBLong::try_from).transpose()?;
+            let parens = args.get(3).map(VBLong::try_from).transpose()?;
+            let group = args.get(4).map(VBLong::try_from).transpose()?;
+            strfn::formatpercent(&args[0], digits.as_ref(), leading.as_ref(), parens.as_ref(), group.as_ref())
+        }
+        "formatdatetime" => {
+            expect_args(name, args, 1, 2)?;
+            let namedformat = args.get(1).map(VBLong::try_from).transpose()?;
+            strfn::formatdatetime(&args[0], namedformat.as_ref())
+        }
 
         _ => Err(VBError::with_description(
             35,

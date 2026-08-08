@@ -585,3 +585,82 @@
 //! - `FormatDateTime`: Format date/time values
 //! - `CCur`: Convert expression to `Currency` type
 //! - `CDbl`: Convert expression to `Double` type
+
+use crate::{
+    error::VBResult,
+    value::{VBLong, VBVariant},
+};
+
+/// Returns an expression formatted as a currency value.
+///
+/// The result is prefixed with the `$` symbol and uses the locale's grouping
+/// and two-digit decimals by default. `numdigitsafterdecimal` of -1 (the
+/// default) selects the locale setting; `includeleadingdigit` controls the
+/// leading zero for fractional values, `useparensfornegativenumbers` wraps
+/// negative results in parentheses, and `groupdigits` enables thousands
+/// grouping. A `Null` `expression` propagates as `Null`.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when
+/// `numdigitsafterdecimal` is less than -1.
+pub fn formatcurrency(
+    expression: &VBVariant,
+    numdigitsafterdecimal: Option<&VBLong>,
+    includeleadingdigit: Option<&VBLong>,
+    useparensfornegativenumbers: Option<&VBLong>,
+    groupdigits: Option<&VBLong>,
+) -> VBResult<VBVariant> {
+    super::format_dollar::format_number_family(
+        expression,
+        numdigitsafterdecimal,
+        includeleadingdigit,
+        useparensfornegativenumbers,
+        groupdigits,
+        super::format_dollar::NumericStyle::Currency,
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_currency_format() {
+        assert_eq!(
+            formatcurrency(&VBVariant::from_double(1234.5), None, None, None, None).unwrap(),
+            VBVariant::from_string("$1,234.50")
+        );
+    }
+
+    #[test]
+    fn negative_with_parentheses() {
+        assert_eq!(
+            formatcurrency(
+                &VBVariant::from_double(-1.0),
+                Some(&VBLong::from(2)),
+                None,
+                Some(&VBLong::from(-1)),
+                None,
+            )
+            .unwrap(),
+            VBVariant::from_string("($1.00)")
+        );
+    }
+
+    #[test]
+    fn negative_without_parentheses_puts_minus_before_symbol() {
+        assert_eq!(
+            formatcurrency(&VBVariant::from_double(-1.0), None, None, None, None).unwrap(),
+            VBVariant::from_string("-$1.00")
+        );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(
+            formatcurrency(&VBVariant::Null, None, None, None, None).unwrap(),
+            VBVariant::Null
+        );
+    }
+}

@@ -39,16 +39,16 @@ pub mod format_dollar;
 pub use format_dollar::format_dollar;
 
 pub mod formatcurrency;
-//pub use formatcurrency::formatcurrency;
+pub use formatcurrency::formatcurrency;
 
 pub mod formatdatetime;
-//pub use formatdatetime::formatdatetime;
+pub use formatdatetime::formatdatetime;
 
 pub mod formatnumber;
-//pub use formatnumber::formatnumber;
+pub use formatnumber::formatnumber;
 
 pub mod formatpercent;
-//pub use formatpercent::formatpercent;
+pub use formatpercent::formatpercent;
 
 pub mod instr;
 pub use instr::instr;
@@ -69,16 +69,16 @@ pub mod left_dollar;
 pub use left_dollar::left_dollar;
 
 pub mod leftb;
-//pub use leftb::leftb;
+pub use leftb::leftb;
 
 pub mod leftb_dollar;
-//pub use leftb_dollar::leftb_dollar;
+pub use leftb_dollar::leftb_dollar;
 
 pub mod len;
 pub use len::len;
 
 pub mod lenb;
-//pub use lenb::lenb;
+pub use lenb::lenb;
 
 pub mod ltrim;
 pub use ltrim::ltrim;
@@ -93,13 +93,13 @@ pub mod mid_dollar;
 pub use mid_dollar::mid_dollar;
 
 pub mod midb;
-//pub use midb::midb;
+pub use midb::midb;
 
 pub mod midb_dollar;
-//pub use midb_dollar::midb_dollar;
+pub use midb_dollar::midb_dollar;
 
 pub mod replace;
-//pub use replace::replace;
+pub use replace::replace;
 
 pub mod right;
 pub use right::right;
@@ -108,10 +108,10 @@ pub mod right_dollar;
 pub use right_dollar::right_dollar;
 
 pub mod rightb;
-//pub use rightb::rightb;
+pub use rightb::rightb;
 
 pub mod rightb_dollar;
-//pub use rightb_dollar::rightb_dollar;
+pub use rightb_dollar::rightb_dollar;
 
 pub mod rtrim;
 pub use rtrim::rtrim;
@@ -126,19 +126,25 @@ pub mod space_dollar;
 pub use space_dollar::space_dollar;
 
 pub mod str;
-//pub use str::str;
+pub use str::str;
 
 pub mod str_dollar;
-//pub use str_dollar::str_dollar;
+pub use str_dollar::str_dollar;
 
 pub mod strcomp;
-//pub use strcomp::strcomp;
+pub use strcomp::strcomp;
 
 pub mod strconv;
-//pub use strconv::strconv;
+pub use strconv::strconv;
+
+pub mod strconv_dollar;
+pub use strconv_dollar::strconv_dollar;
+
+pub mod string_dollar;
+pub use string_dollar::string_dollar;
 
 pub mod string_function;
-//pub use string_function::string_function;
+pub use string_function::string_function;
 
 pub mod strreverse;
 pub use strreverse::strreverse;

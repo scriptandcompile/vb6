@@ -575,80 +575,110 @@
 //! - Cannot specify different characters at different positions
 
 use crate::{
-    error::VBResult,
-    value::{VBLong, VBVariant},
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString, VBVariant},
 };
-
-use super::string_dollar;
+/// Resolves `character` to a single repeating `char` for the `String` function.
+///
+/// A string argument contributes only its first character; a numeric argument is
+/// interpreted as a Windows-1252 (ANSI) character code in the range 0-255.
+fn repeat_char(number: i32, character: &VBVariant) -> VBResult<String> {
+    if number < 0 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid number",
+        ));
+    }
+    let c = match character {
+        VBVariant::Null => return Err(VBError::invalid_use_of_null()),
+        VBVariant::String(s) => match s.chars().next() {
+            Some(c) => c,
+            None => return Ok(String::new()),
+        },
+        _ => {
+            let code = character.as_i32()?;
+            if !(0..=255).contains(&code) {
+                return Err(VBError::with_description(
+                    err_number::INVALID_PROCEDURE_CALL,
+                    "Character code out of range",
+                ));
+            }
+            super::ansi::decode_byte(code as u8).chars().next().unwrap()
+        }
+    };
+    Ok(c.to_string().repeat(number as usize))
+}
 
 /// Returns a string consisting of `number` repetitions of the first character
 /// of `character`.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
 ///
-/// `String` is the Variant-returning counterpart of `String$`; a `Null`
-/// `character` propagates as `Null`.
+/// `character` may be a string (only its first character is used) or a numeric
+/// character code in the range 0-255. `number` of 0 yields an empty string.
 ///
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `number` is
-/// negative or the character code is out of range.
-pub fn string_function(number: &VBLong, character: &VBVariant) -> VBResult<VBVariant> {
-    if character.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    string_dollar(number, character).map(VBVariant::from)
+/// negative or the character code is out of range, and error 94 when
+/// `character` is `Null`.
+pub fn string_dollar(number: &VBLong, character: &VBVariant) -> VBResult<VBString> {
+    Ok(VBString::from(repeat_char(number.as_i32(), character)?))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::error::err_number;
+    use crate::value::VBString;
 
     #[test]
     fn repeats_first_character_of_string() {
         assert_eq!(
-            string_function(&VBLong::from(5), &VBVariant::from_string("A")).unwrap(),
-            VBVariant::from_string("AAAAA")
+            string_dollar(&VBLong::from(5), &VBVariant::from_string("A")).unwrap(),
+            VBString::from("AAAAA")
         );
         assert_eq!(
-            string_function(&VBLong::from(3), &VBVariant::from_string("Hello")).unwrap(),
-            VBVariant::from_string("HHH")
+            string_dollar(&VBLong::from(3), &VBVariant::from_string("Hello")).unwrap(),
+            VBString::from("HHH")
         );
     }
 
     #[test]
     fn numeric_character_is_an_ansi_code() {
         assert_eq!(
-            string_function(&VBLong::from(3), &VBVariant::Long(42)).unwrap(),
-            VBVariant::from_string("***")
+            string_dollar(&VBLong::from(4), &VBVariant::Long(61)).unwrap(),
+            VBString::from("====")
         );
     }
 
     #[test]
     fn zero_number_returns_empty() {
         assert_eq!(
-            string_function(&VBLong::from(0), &VBVariant::from_string("A")).unwrap(),
-            VBVariant::from_string("")
+            string_dollar(&VBLong::from(0), &VBVariant::from_string("A")).unwrap(),
+            VBString::from("")
         );
     }
 
     #[test]
     fn propagates_null_character() {
         assert_eq!(
-            string_function(&VBLong::from(5), &VBVariant::Null).unwrap(),
-            VBVariant::Null
+            string_dollar(&VBLong::from(5), &VBVariant::Null)
+                .unwrap_err()
+                .number,
+            err_number::INVALID_USE_OF_NULL
         );
     }
 
     #[test]
     fn rejects_negative_number_and_out_of_range_code() {
         assert_eq!(
-            string_function(&VBLong::from(-1), &VBVariant::from_string("A"))
+            string_dollar(&VBLong::from(-1), &VBVariant::from_string("A"))
                 .unwrap_err()
                 .number,
             err_number::INVALID_PROCEDURE_CALL
         );
         assert_eq!(
-            string_function(&VBLong::from(1), &VBVariant::Long(300))
+            string_dollar(&VBLong::from(1), &VBVariant::Long(300))
                 .unwrap_err()
                 .number,
             err_number::INVALID_PROCEDURE_CALL

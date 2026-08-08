@@ -146,3 +146,37 @@
 //! - `Left`: Character-based left extraction
 //! - `Right`: Character-based right extraction
 //! - `Mid`: Character-based middle extraction
+
+
+use crate::{
+    error::VBResult,
+    value::{VBLong, VBVariant},
+};
+
+use super::leftb_dollar::leftb_dollar;
+
+/// `LeftB` is the Variant-returning counterpart of `LeftB$`; a `Null` input
+/// propagates as `Null`.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
+pub fn leftb(input: &VBVariant, length: &VBLong) -> VBResult<VBVariant> {
+    if input.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    leftb_dollar(&input.as_vbstring()?, length).map(VBVariant::from)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(
+            leftb(&VBVariant::Null, &VBLong::from(2)).unwrap(),
+            VBVariant::Null
+        );
+    }
+}

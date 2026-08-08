@@ -648,3 +648,260 @@
 //! - `Right`: Returns specified number of characters from right
 //! - `LCase`: Converts string to lowercase
 //! - `UCase`: Converts string to uppercase
+
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBVariant},
+};
+
+/// Returns a string in which `find` has been replaced with `replace` within
+/// `expression`, searching from `start` and performing at most `count`
+/// substitutions.
+///
+/// Positions are 1-based characters. When `start` is omitted, 1 is assumed; the
+/// portion of `expression` before `start` is not included in the result. `count`
+/// of -1 (the default) replaces every occurrence, `count` of 0 returns the
+/// substring from `start` unchanged. `compare` selects binary (0, default) or
+/// case-insensitive text (1) matching.
+///
+/// Returns an empty string when `expression` is empty or when `start` is past
+/// the end of `expression`. An empty `find` returns the substring from `start`
+/// unchanged.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `start` is less
+/// than 1 or `count` is less than -1, and error 94 (`Invalid use of Null`) when
+/// any of the three required arguments is `Null`.
+pub fn replace(
+    expression: &VBVariant,
+    find: &VBVariant,
+    replace: &VBVariant,
+    start: Option<&VBLong>,
+    count: Option<&VBLong>,
+    compare: Option<&VBLong>,
+) -> VBResult<VBVariant> {
+    let start = start.map(|s| s.as_i32()).unwrap_or(1);
+    if start < 1 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid start",
+        ));
+    }
+    let count = count.map(|c| c.as_i32()).unwrap_or(-1);
+    if count < -1 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid count",
+        ));
+    }
+    let compare = compare.map(|c| c.as_i32()).unwrap_or(0);
+
+    let expression = expression.as_vbstring()?;
+    let find = find.as_vbstring()?;
+    let replace = replace.as_vbstring()?;
+
+    let chars: Vec<char> = expression.as_str().chars().collect();
+    if chars.is_empty() {
+        return Ok(VBVariant::from_string(""));
+    }
+    let start_idx = (start - 1) as usize;
+    if start_idx >= chars.len() {
+        return Ok(VBVariant::from_string(""));
+    }
+    let tail: Vec<char> = chars[start_idx..].to_vec();
+    let find_chars: Vec<char> = find.as_str().chars().collect();
+    if find_chars.is_empty() {
+        return Ok(VBVariant::from_string(tail.iter().collect::<String>()));
+    }
+    if count == 0 {
+        return Ok(VBVariant::from_string(tail.iter().collect::<String>()));
+    }
+
+    let needle: Vec<char> = if compare == 1 {
+        find_chars.iter().flat_map(|c| c.to_lowercase()).collect()
+    } else {
+        find_chars.clone()
+    };
+
+    let mut out = String::new();
+    let mut i = 0;
+    let mut made = 0;
+    while i < tail.len() {
+        let window: Vec<char> = if compare == 1 {
+            tail[i..].iter().flat_map(|c| c.to_lowercase()).collect()
+        } else {
+            tail[i..].to_vec()
+        };
+        if (count < 0 || made < count) && window.starts_with(&needle) {
+            out.push_str(replace.as_str());
+            i += find_chars.len();
+            made += 1;
+        } else {
+            out.push(tail[i]);
+            i += 1;
+        }
+    }
+    Ok(VBVariant::from_string(out))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn vb(s: &str) -> VBVariant {
+        VBVariant::from_string(s)
+    }
+
+    #[test]
+    fn replaces_all_occurrences_by_default() {
+        assert_eq!(
+            replace(&vb("Hello World"), &vb("o"), &vb("0"), None, None, None).unwrap(),
+            vb("Hell0 W0rld")
+        );
+    }
+
+    #[test]
+    fn removes_substring_when_replace_is_empty() {
+        assert_eq!(
+            replace(
+                &vb("Remove   extra   spaces"),
+                &vb("   "),
+                &vb(" "),
+                None,
+                None,
+                None
+            )
+            .unwrap(),
+            vb("Remove extra spaces")
+        );
+    }
+
+    #[test]
+    fn limits_replacements_with_count() {
+        assert_eq!(
+            replace(
+                &vb("one, two, three, four"),
+                &vb(", "),
+                &vb(" | "),
+                None,
+                Some(&VBLong::from(2)),
+                None,
+            )
+            .unwrap(),
+            vb("one | two | three, four")
+        );
+    }
+
+    #[test]
+    fn text_compare_is_case_insensitive() {
+        assert_eq!(
+            replace(
+                &vb("Hello VB6"),
+                &vb("hello"),
+                &vb("Hi"),
+                None,
+                None,
+                Some(&VBLong::from(1)),
+            )
+            .unwrap(),
+            vb("Hi VB6")
+        );
+    }
+
+    #[test]
+    fn start_skips_prefix_and_trims_result() {
+        assert_eq!(
+            replace(
+                &vb("abcabcabc"),
+                &vb("b"),
+                &vb("X"),
+                Some(&VBLong::from(2)),
+                None,
+                None,
+            )
+            .unwrap(),
+            vb("XcaXcaXc")
+        );
+    }
+
+    #[test]
+    fn count_zero_returns_tail_unchanged() {
+        assert_eq!(
+            replace(
+                &vb("abc"),
+                &vb("b"),
+                &vb("X"),
+                None,
+                Some(&VBLong::from(0)),
+                None,
+            )
+            .unwrap(),
+            vb("abc")
+        );
+    }
+
+    #[test]
+    fn empty_find_returns_expression() {
+        assert_eq!(
+            replace(&vb("abc"), &vb(""), &vb("X"), None, None, None).unwrap(),
+            vb("abc")
+        );
+    }
+
+    #[test]
+    fn start_beyond_end_returns_empty() {
+        assert_eq!(
+            replace(
+                &vb("abc"),
+                &vb("b"),
+                &vb("X"),
+                Some(&VBLong::from(99)),
+                None,
+                None,
+            )
+            .unwrap(),
+            vb("")
+        );
+    }
+
+    #[test]
+    fn rejects_invalid_start_and_count() {
+        assert_eq!(
+            replace(
+                &vb("abc"),
+                &vb("b"),
+                &vb("X"),
+                Some(&VBLong::from(0)),
+                None,
+                None
+            )
+            .unwrap_err()
+            .number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+        assert_eq!(
+            replace(
+                &vb("abc"),
+                &vb("b"),
+                &vb("X"),
+                None,
+                Some(&VBLong::from(-2)),
+                None,
+            )
+            .unwrap_err()
+            .number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+
+    #[test]
+    fn null_arguments_error() {
+        assert_eq!(
+            replace(&VBVariant::Null, &vb("b"), &vb("X"), None, None, None)
+                .unwrap_err()
+                .number,
+            err_number::INVALID_USE_OF_NULL
+        );
+    }
+}

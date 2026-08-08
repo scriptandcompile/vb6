@@ -52,3 +52,45 @@
 //! Dim bufferSize As Long
 //! bufferSize = LenB(buffer)  ' Returns 200 bytes
 //! ```
+
+use crate::{
+    error::VBResult,
+    value::{VBLong, VBString},
+};
+
+/// Returns the number of bytes used to represent the string in memory.
+///
+/// This runtime models a VB6 string as a sequence of Unicode scalar values in
+/// memory, with each character occupying 2 bytes (matching VB6's UCS-2/UTF-16
+/// storage for the BMP). `LenB` therefore returns `2 * Len`. As with `Len`,
+/// surrogate pairs count as a single character.
+///
+/// # Examples
+///
+/// ```
+/// use vb6runtime::library::functions::string::lenb;
+/// use vb6runtime::value::{VBLong, VBString};
+/// assert_eq!(lenb(&VBString::from("Hello")).unwrap(), VBLong::from(10));
+/// assert_eq!(lenb(&VBString::from("")).unwrap(), VBLong::from(0));
+/// ```
+pub fn lenb(input: &VBString) -> VBResult<VBLong> {
+    Ok(VBLong::from(input.as_str().chars().count() as i32 * 2))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn counts_bytes() {
+        assert_eq!(lenb(&VBString::from("Hello")).unwrap(), VBLong::from(10));
+        assert_eq!(lenb(&VBString::from("")), Ok(VBLong::from(0)));
+        assert_eq!(lenb(&VBString::from("A")).unwrap(), VBLong::from(2));
+    }
+
+    #[test]
+    fn is_twice_character_length() {
+        assert_eq!(lenb(&VBString::from("héllo")).unwrap(), VBLong::from(10));
+        assert_eq!(lenb(&VBString::from("中")).unwrap(), VBLong::from(2));
+    }
+}
