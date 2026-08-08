@@ -1,3 +1,4 @@
+use crate::Token;
 use crate::parsers::SyntaxKind;
 
 use crate::parsers::cst::Parser;
@@ -64,7 +65,65 @@ impl Parser<'_> {
     //
     // [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/print-statement)
     pub(crate) fn parse_print_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::PrintStatement);
+        self.parsing_header = false;
+
+        self.builder.start_node(SyntaxKind::PrintStatement.to_raw());
+
+        // Consume any leading whitespace and the Print keyword.
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        if self.at_token(Token::Octothorpe) {
+            // `Print #filenumber, outputlist`: file output, keep the existing
+            // flat token structure.
+            self.consume_until_after(Token::Newline);
+        } else if self.at_token(Token::Newline) || self.is_at_end() {
+            // Bare `Print` with no output list.
+            self.consume_until_after(Token::Newline);
+        } else {
+            // Bare `Print [outputlist]`: parse the output list as expressions
+            // so the interpreter can evaluate them. (Real VB6 requires an
+            // object qualifier for `Print` in a standard module; this is a
+            // console-output extension shared by the interpreter and compiler.)
+            self.parse_print_output_list();
+            self.consume_whitespace();
+            self.consume_until_after(Token::Newline);
+        }
+
+        self.builder.finish_node();
+    }
+
+    /// Parse the output list of a bare `Print` statement, mirroring
+    /// `parse_unparenthesized_arguments` with semicolon separators enabled.
+    fn parse_print_output_list(&mut self) {
+        self.builder.start_node(SyntaxKind::ArgumentList.to_raw());
+
+        loop {
+            if self.at_token(Token::Newline) || self.is_at_end() {
+                break;
+            }
+
+            self.builder.start_node(SyntaxKind::Argument.to_raw());
+
+            // Empty arguments (an immediate separator) print nothing.
+            if !self.at_token(Token::Comma) && !self.at_token(Token::Semicolon) {
+                self.parse_expression();
+            }
+
+            self.builder.finish_node();
+
+            self.consume_whitespace();
+
+            if self.at_token(Token::Comma) || self.at_token(Token::Semicolon) {
+                self.consume_token();
+                self.consume_whitespace();
+            } else {
+                break;
+            }
+        }
+
+        self.builder.finish_node();
     }
 }
 
