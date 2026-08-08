@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-08-08T02:07:56Z",
+  "last_updated": "2026-08-08T02:36:13Z",
   "snapshots": [
     {
       "timestamp": "2026-08-02T05:53:42Z",
@@ -307,38 +307,72 @@
           "percent": 93.99
         }
       }
+    },
+    {
+      "timestamp": "2026-08-08T02:36:13Z",
+      "commit_sha": "776ba43517f008a0f6d51d4d8ecf2fe46e8e4f41",
+      "commit_message": "Added harness project for vb6harness for testing and conformance.",
+      "coverage": {
+        "line_coverage": 93.33,
+        "function_coverage": 89.87,
+        "region_coverage": 93.69
+      },
+      "tests": {
+        "total": 5836,
+        "lib_tests": 5707,
+        "doc_tests": 129,
+        "integration_tests": 0,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 110069,
+          "total": 117938,
+          "percent": 93.33
+        },
+        "functions": {
+          "covered": 7035,
+          "total": 7828,
+          "percent": 89.87
+        },
+        "regions": {
+          "covered": 183841,
+          "total": 196216,
+          "percent": 93.69
+        }
+      }
     }
   ],
   "coverage_summary": {
     "line_coverage": {
-      "latest": 93.62,
-      "trend": "stable",
-      "change_percent": 0.02,
+      "latest": 93.33,
+      "trend": "degrading",
+      "change_percent": 0.29,
       "best": 94.32,
-      "worst": 93.62,
-      "average": 94.03
+      "worst": 93.33,
+      "average": 93.96
     },
     "function_coverage": {
-      "latest": 90.3,
-      "trend": "stable",
-      "change_percent": 0.0,
+      "latest": 89.87,
+      "trend": "degrading",
+      "change_percent": 0.43,
       "best": 91.24,
-      "worst": 90.3,
-      "average": 90.8
+      "worst": 89.87,
+      "average": 90.71
     },
     "region_coverage": {
-      "latest": 93.99,
-      "trend": "stable",
-      "change_percent": 0.0,
+      "latest": 93.69,
+      "trend": "degrading",
+      "change_percent": 0.3,
       "best": 94.76,
-      "worst": 93.99,
-      "average": 94.45
+      "worst": 93.69,
+      "average": 94.38
     },
     "test_count": {
       "latest": 5836,
-      "trend": "growing",
-      "change_count": 23,
-      "growth_rate": 0.4
+      "trend": "stable",
+      "change_count": 0,
+      "growth_rate": 0.0
     }
   }
 }
