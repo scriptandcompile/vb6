@@ -354,3 +354,144 @@
 //! - Does not handle advanced Unicode normalization or case folding
 //! - For true Unicode case folding, more sophisticated methods may be needed
 //! - Some special characters (like German ß) may not convert in all locales
+
+use super::lcase;
+use crate::{error::VBResult, value::VBString};
+
+/// Converts all uppercase letters in a string to lowercase.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
+/// Only uppercase ASCII letters A-Z are converted; all other characters remain unchanged.
+///
+/// # Arguments
+///
+/// * `s: &str` — The input string. If empty, an empty string is returned.
+#[inline]
+pub fn lcase_dollar(input: &VBString) -> VBResult<VBString> {
+    lcase(input)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_basic_conversions() {
+        assert_eq!(
+            lcase_dollar(&VBString::from("HELLO")).unwrap(),
+            VBString::from("hello")
+        );
+        assert_eq!(
+            lcase_dollar(&VBString::from("Hello World")).unwrap(),
+            VBString::from("hello world")
+        );
+        assert_eq!(
+            lcase_dollar(&VBString::from("VB6 Programming")).unwrap(),
+            VBString::from("vb6 programming")
+        );
+    }
+
+    #[test]
+    fn test_numbers_and_punctuation_unchanged() {
+        assert_eq!(
+            lcase_dollar(&VBString::from("ABC123!@#")).unwrap(),
+            VBString::from("abc123!@#")
+        );
+        assert_eq!(
+            lcase_dollar(&VBString::from("Hello 456 World")).unwrap(),
+            VBString::from("hello 456 world")
+        );
+    }
+
+    #[test]
+    fn test_empty_string_returns_empty() {
+        assert_eq!(
+            lcase_dollar(&VBString::from("")).unwrap(),
+            VBString::from("")
+        );
+    }
+
+    #[test]
+    fn test_already_lowercase_unchanged() {
+        assert_eq!(
+            lcase_dollar(&VBString::from("already lowercase")).unwrap(),
+            VBString::from("already lowercase")
+        );
+    }
+
+    #[test]
+    fn test_mixed_case() {
+        assert_eq!(
+            lcase_dollar(&VBString::from("Hello123WORLD")).unwrap(),
+            VBString::from("hello123world")
+        );
+    }
+
+    #[test]
+    fn test_single_character_uppercase() {
+        assert_eq!(
+            lcase_dollar(&VBString::from("A")).unwrap(),
+            VBString::from("a")
+        );
+        assert_eq!(
+            lcase_dollar(&VBString::from("Z")).unwrap(),
+            VBString::from("z")
+        );
+    }
+
+    #[test]
+    fn test_single_character_non_alpha() {
+        assert_eq!(
+            lcase_dollar(&VBString::from("5")).unwrap(),
+            VBString::from("5")
+        );
+        assert_eq!(
+            lcase_dollar(&VBString::from("!")).unwrap(),
+            VBString::from("!")
+        );
+        assert_eq!(
+            lcase_dollar(&VBString::from(" ")).unwrap(),
+            VBString::from(" ")
+        );
+    }
+
+    #[test]
+    fn test_special_characters_unchanged() {
+        assert_eq!(
+            lcase_dollar(&VBString::from("@#$%^&*()")).unwrap(),
+            VBString::from("@#$%^&*()")
+        );
+    }
+
+    #[test]
+    fn test_whitespace_preserved() {
+        assert_eq!(
+            lcase_dollar(&VBString::from("  HELLO   WORLD  ")).unwrap(),
+            VBString::from("  hello   world  ")
+        );
+        assert_eq!(
+            lcase_dollar(&VBString::from("\tTAB\nNEWLINE")).unwrap(),
+            VBString::from("\ttab\nnewline")
+        );
+    }
+
+    #[test]
+    fn test_unicode_non_ascii_unchanged() {
+        // Extended Unicode characters are not converted (VB6 behavior)
+        assert_eq!(
+            lcase_dollar(&VBString::from("café")).unwrap(),
+            VBString::from("café")
+        );
+        assert_eq!(
+            lcase_dollar(&VBString::from("über")).unwrap(),
+            VBString::from("über")
+        );
+    }
+
+    #[test]
+    fn test_alternate_case_string() {
+        assert_eq!(
+            lcase_dollar(&VBString::from("aBcDeFgHiJkLmNoPqRsTuVwXyZ")).unwrap(),
+            VBString::from("abcdefghijklmnopqrstuvwxyz")
+        );
+    }
+}
