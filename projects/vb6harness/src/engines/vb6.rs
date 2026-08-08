@@ -100,11 +100,19 @@ impl Engine for Vb6Engine {
             )));
         }
 
-        // Run the produced executable from the build directory.
+        // Run the produced executable from the build directory. On non-Windows
+        // hosts the PE binary must be executed through a Wine prefix.
         let exe = dir.join("test.exe");
         let run_duration = timeout.max(Duration::from_secs(30));
-        let mut run = Command::new(&exe);
-        run.current_dir(&dir);
+        let mut run = if cfg!(windows) {
+            let mut command = Command::new(&exe);
+            command.current_dir(&dir);
+            command
+        } else {
+            let mut command = Command::new("wine");
+            command.arg(&exe).current_dir(&dir);
+            command
+        };
         let exit = run_with_timeout(&mut run, run_duration)?;
         if exit != Some(0) {
             return Err(anyhow!(

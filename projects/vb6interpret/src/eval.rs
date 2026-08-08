@@ -313,32 +313,34 @@ impl Interpreter {
         // Integer arithmetic when both operands are integral types. (This
         // must not fire for Singles/Doubles/Currency, which hold fractional
         // values that `as_i64` would silently round.)
-        if op != ArithmaticOperator::Divide && op != ArithmaticOperator::Exponent {
-            if lhs.is_integral() && rhs.is_integral() {
-                let li = lhs.as_i64().ok();
-                let ri = rhs.as_i64().ok();
-                if let (Some(left), Some(right)) = (li, ri) {
-                    let result = match op {
-                        ArithmaticOperator::Add => left.checked_add(right),
-                        ArithmaticOperator::Subtract => left.checked_sub(right),
-                        ArithmaticOperator::Multiply => left.checked_mul(right),
-                        ArithmaticOperator::IntegerDivide => {
-                            if right == 0 {
-                                return Err(self.error_here(VBError::division_by_zero()));
-                            }
-                            Some(left.div_euclid(right))
+        if op != ArithmaticOperator::Divide
+            && op != ArithmaticOperator::Exponent
+            && lhs.is_integral()
+            && rhs.is_integral()
+        {
+            let li = lhs.as_i64().ok();
+            let ri = rhs.as_i64().ok();
+            if let (Some(left), Some(right)) = (li, ri) {
+                let result = match op {
+                    ArithmaticOperator::Add => left.checked_add(right),
+                    ArithmaticOperator::Subtract => left.checked_sub(right),
+                    ArithmaticOperator::Multiply => left.checked_mul(right),
+                    ArithmaticOperator::IntegerDivide => {
+                        if right == 0 {
+                            return Err(self.error_here(VBError::division_by_zero()));
                         }
-                        ArithmaticOperator::Modulus => {
-                            if right == 0 {
-                                return Err(self.error_here(VBError::division_by_zero()));
-                            }
-                            Some(left.rem_euclid(right))
-                        }
-                        _ => None,
-                    };
-                    if let Some(value) = result {
-                        return Ok(Value::from_i64(value));
+                        Some(left.div_euclid(right))
                     }
+                    ArithmaticOperator::Modulus => {
+                        if right == 0 {
+                            return Err(self.error_here(VBError::division_by_zero()));
+                        }
+                        Some(left.rem_euclid(right))
+                    }
+                    _ => None,
+                };
+                if let Some(value) = result {
+                    return Ok(Value::from_i64(value));
                 }
             }
         }

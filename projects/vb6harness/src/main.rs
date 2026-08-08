@@ -215,7 +215,9 @@ fn workspace_root() -> PathBuf {
     let manifest = Path::new(env!("CARGO_MANIFEST_DIR"));
     manifest
         .ancestors()
-        .find(|dir| dir.join("Cargo.toml").is_file() && dir.join("tests").join("harness").is_dir())
+        .find(|dir| {
+            dir.join("Cargo.toml").is_file() && dir.join("projects").join("vb6harness").is_dir()
+        })
         .map(Path::to_path_buf)
         .unwrap_or_else(|| manifest.to_path_buf())
 }
