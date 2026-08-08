@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/graphics/spc.rs
+source: projects/vb6parse/src/syntax/library/functions/graphics/spc.rs
+assertion_line: 1111
 expression: tree
 ---
 root:
@@ -115,76 +116,132 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: Format
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: lineNum
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"000\""
-                - kind: RightParenthesis
-                  text: )
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: Spc
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "5"
-                - kind: RightParenthesis
-                  text: )
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: desc
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: Spc
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "30"
-                - kind: Whitespace
-                  text: " "
-                - kind: SubtractionOperator
-                  text: "-"
-                - kind: Whitespace
-                  text: " "
-                - kind: LenKeyword
-                  text: Len
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: desc
-                - kind: RightParenthesis
-                  text: )
-                - kind: RightParenthesis
-                  text: )
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"$100.00\""
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: Format
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: lineNum
+                                - kind: Comma
+                                  text: ","
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Argument
+                                  children:
+                                    - kind: StringLiteralExpression
+                                      children:
+                                        - kind: StringLiteral
+                                          text: "\"000\""
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: Spc
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: NumericLiteralExpression
+                                      children:
+                                        - kind: IntegerLiteral
+                                          text: "5"
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: desc
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: Spc
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: BinaryExpression
+                                      children:
+                                        - kind: NumericLiteralExpression
+                                          children:
+                                            - kind: IntegerLiteral
+                                              text: "30"
+                                        - kind: Whitespace
+                                          text: " "
+                                        - kind: SubtractionOperator
+                                          text: "-"
+                                        - kind: Whitespace
+                                          text: " "
+                                        - kind: CallExpression
+                                          children:
+                                            - kind: LenKeyword
+                                              text: Len
+                                            - kind: LeftParenthesis
+                                              text: (
+                                            - kind: ArgumentList
+                                              children:
+                                                - kind: Argument
+                                                  children:
+                                                    - kind: IdentifierExpression
+                                                      children:
+                                                        - kind: Identifier
+                                                          text: desc
+                                            - kind: RightParenthesis
+                                              text: )
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"$100.00\""
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

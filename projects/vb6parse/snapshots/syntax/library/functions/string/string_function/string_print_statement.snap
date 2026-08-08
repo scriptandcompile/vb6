@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/string/string_function.rs
+source: projects/vb6parse/src/syntax/library/functions/string/string_function.rs
+assertion_line: 1173
 expression: tree
 ---
 root:
@@ -35,26 +36,44 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: StringKeyword
-                  text: String
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "80"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"-\""
-                - kind: RightParenthesis
-                  text: )
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: StringKeyword
+                              text: String
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: NumericLiteralExpression
+                                      children:
+                                        - kind: IntegerLiteral
+                                          text: "80"
+                                - kind: Comma
+                                  text: ","
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Argument
+                                  children:
+                                    - kind: StringLiteralExpression
+                                      children:
+                                        - kind: StringLiteral
+                                          text: "\"-\""
+                            - kind: RightParenthesis
+                              text: )
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

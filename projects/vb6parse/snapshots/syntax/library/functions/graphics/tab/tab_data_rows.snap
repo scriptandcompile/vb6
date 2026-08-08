@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/graphics/tab.rs
+source: projects/vb6parse/src/syntax/library/functions/graphics/tab.rs
+assertion_line: 311
 expression: tree
 ---
 root:
@@ -69,68 +70,124 @@ root:
                           text: Print
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: Tab
-                        - kind: LeftParenthesis
-                          text: (
-                        - kind: IntegerLiteral
-                          text: "1"
-                        - kind: RightParenthesis
-                          text: )
-                        - kind: Semicolon
-                          text: ;
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: i
-                        - kind: Semicolon
-                          text: ;
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: Tab
-                        - kind: LeftParenthesis
-                          text: (
-                        - kind: IntegerLiteral
-                          text: "10"
-                        - kind: RightParenthesis
-                          text: )
-                        - kind: Semicolon
-                          text: ;
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: names
-                        - kind: LeftParenthesis
-                          text: (
-                        - kind: Identifier
-                          text: i
-                        - kind: RightParenthesis
-                          text: )
-                        - kind: Semicolon
-                          text: ;
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: Tab
-                        - kind: LeftParenthesis
-                          text: (
-                        - kind: IntegerLiteral
-                          text: "30"
-                        - kind: RightParenthesis
-                          text: )
-                        - kind: Semicolon
-                          text: ;
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: scores
-                        - kind: LeftParenthesis
-                          text: (
-                        - kind: Identifier
-                          text: i
-                        - kind: RightParenthesis
-                          text: )
+                        - kind: ArgumentList
+                          children:
+                            - kind: Argument
+                              children:
+                                - kind: CallExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: Tab
+                                    - kind: LeftParenthesis
+                                      text: (
+                                    - kind: ArgumentList
+                                      children:
+                                        - kind: Argument
+                                          children:
+                                            - kind: NumericLiteralExpression
+                                              children:
+                                                - kind: IntegerLiteral
+                                                  text: "1"
+                                    - kind: RightParenthesis
+                                      text: )
+                            - kind: Semicolon
+                              text: ;
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Argument
+                              children:
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: i
+                            - kind: Semicolon
+                              text: ;
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Argument
+                              children:
+                                - kind: CallExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: Tab
+                                    - kind: LeftParenthesis
+                                      text: (
+                                    - kind: ArgumentList
+                                      children:
+                                        - kind: Argument
+                                          children:
+                                            - kind: NumericLiteralExpression
+                                              children:
+                                                - kind: IntegerLiteral
+                                                  text: "10"
+                                    - kind: RightParenthesis
+                                      text: )
+                            - kind: Semicolon
+                              text: ;
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Argument
+                              children:
+                                - kind: CallExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: names
+                                    - kind: LeftParenthesis
+                                      text: (
+                                    - kind: ArgumentList
+                                      children:
+                                        - kind: Argument
+                                          children:
+                                            - kind: IdentifierExpression
+                                              children:
+                                                - kind: Identifier
+                                                  text: i
+                                    - kind: RightParenthesis
+                                      text: )
+                            - kind: Semicolon
+                              text: ;
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Argument
+                              children:
+                                - kind: CallExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: Tab
+                                    - kind: LeftParenthesis
+                                      text: (
+                                    - kind: ArgumentList
+                                      children:
+                                        - kind: Argument
+                                          children:
+                                            - kind: NumericLiteralExpression
+                                              children:
+                                                - kind: IntegerLiteral
+                                                  text: "30"
+                                    - kind: RightParenthesis
+                                      text: )
+                            - kind: Semicolon
+                              text: ;
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Argument
+                              children:
+                                - kind: CallExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: scores
+                                    - kind: LeftParenthesis
+                                      text: (
+                                    - kind: ArgumentList
+                                      children:
+                                        - kind: Argument
+                                          children:
+                                            - kind: IdentifierExpression
+                                              children:
+                                                - kind: Identifier
+                                                  text: i
+                                    - kind: RightParenthesis
+                                      text: )
                         - kind: Newline
                           text: "\n"
                     - kind: Whitespace

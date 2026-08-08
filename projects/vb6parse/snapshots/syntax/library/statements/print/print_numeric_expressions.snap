@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/statements/file_operations/print.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/print.rs
+assertion_line: 373
 expression: tree
 ---
 root:
@@ -35,28 +36,46 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: IntegerLiteral
-                  text: "42"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: SingleLiteral
-                  text: "3.14"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: SubtractionOperator
-                  text: "-"
-                - kind: IntegerLiteral
-                  text: "100"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "42"
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: SingleLiteral
+                              text: "3.14"
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: UnaryExpression
+                          children:
+                            - kind: SubtractionOperator
+                              text: "-"
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "100"
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

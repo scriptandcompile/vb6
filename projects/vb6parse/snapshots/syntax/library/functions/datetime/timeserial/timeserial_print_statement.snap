@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/datetime/timeserial.rs
+source: projects/vb6parse/src/syntax/library/functions/datetime/timeserial.rs
+assertion_line: 874
 expression: tree
 ---
 root:
@@ -35,32 +36,54 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: TimeSerial
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "10"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "15"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "30"
-                - kind: RightParenthesis
-                  text: )
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: TimeSerial
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: NumericLiteralExpression
+                                      children:
+                                        - kind: IntegerLiteral
+                                          text: "10"
+                                - kind: Comma
+                                  text: ","
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Argument
+                                  children:
+                                    - kind: NumericLiteralExpression
+                                      children:
+                                        - kind: IntegerLiteral
+                                          text: "15"
+                                - kind: Comma
+                                  text: ","
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Argument
+                                  children:
+                                    - kind: NumericLiteralExpression
+                                      children:
+                                        - kind: IntegerLiteral
+                                          text: "30"
+                            - kind: RightParenthesis
+                              text: )
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

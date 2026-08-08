@@ -75,8 +75,21 @@ impl Parser<'_> {
         self.consume_whitespace();
 
         if self.at_token(Token::Octothorpe) {
-            // `Print #filenumber, outputlist`: file output, keep the existing
-            // flat token structure.
+            // `Print #filenumber, outputlist`: file output. Parse the file
+            // number and the output list structurally so the interpreter can
+            // evaluate it (it treats every `Print` as console output).
+            self.consume_token();
+            self.consume_whitespace();
+            if !self.at_token(Token::Newline) && !self.at_token(Token::Comma) && !self.is_at_end() {
+                self.parse_expression();
+                self.consume_whitespace();
+            }
+            if self.at_token(Token::Comma) {
+                self.consume_token();
+                self.consume_whitespace();
+                self.parse_print_output_list();
+            }
+            self.consume_whitespace();
             self.consume_until_after(Token::Newline);
         } else if self.at_token(Token::Newline) || self.is_at_end() {
             // Bare `Print` with no output list.

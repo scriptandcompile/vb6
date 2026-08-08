@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/datetime/date.rs
+source: projects/vb6parse/src/syntax/library/functions/datetime/date.rs
+assertion_line: 915
 expression: tree
 ---
 root:
@@ -15,25 +16,39 @@ root:
           text: " "
         - kind: Octothorpe
           text: "#"
-        - kind: IntegerLiteral
-          text: "1"
+        - kind: NumericLiteralExpression
+          children:
+            - kind: IntegerLiteral
+              text: "1"
         - kind: Comma
           text: ","
         - kind: Whitespace
           text: " "
-        - kind: DateKeyword
-          text: Date
-        - kind: LeftParenthesis
-          text: (
-        - kind: RightParenthesis
-          text: )
-        - kind: Whitespace
-          text: " "
-        - kind: Ampersand
-          text: "&"
-        - kind: Whitespace
-          text: " "
-        - kind: StringLiteral
-          text: "\" - Log entry\""
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: BinaryExpression
+                  children:
+                    - kind: CallExpression
+                      children:
+                        - kind: DateKeyword
+                          text: Date
+                        - kind: LeftParenthesis
+                          text: (
+                        - kind: ArgumentList
+                          children: []
+                        - kind: RightParenthesis
+                          text: )
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Ampersand
+                      text: "&"
+                    - kind: Whitespace
+                      text: " "
+                    - kind: StringLiteralExpression
+                      children:
+                        - kind: StringLiteral
+                          text: "\" - Log entry\""
         - kind: Newline
           text: "\n"

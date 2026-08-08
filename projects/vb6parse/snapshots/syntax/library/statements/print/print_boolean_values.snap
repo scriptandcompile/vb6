@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/statements/file_operations/print.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/print.rs
+assertion_line: 393
 expression: tree
 ---
 root:
@@ -35,20 +36,32 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: TrueKeyword
-                  text: "True"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: FalseKeyword
-                  text: "False"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: BooleanLiteralExpression
+                          children:
+                            - kind: TrueKeyword
+                              text: "True"
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: BooleanLiteralExpression
+                          children:
+                            - kind: FalseKeyword
+                              text: "False"
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

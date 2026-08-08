@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/graphics/tab.rs
+source: projects/vb6parse/src/syntax/library/functions/graphics/tab.rs
+assertion_line: 395
 expression: tree
 ---
 root:
@@ -33,14 +34,24 @@ root:
                   text: Print
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: Tab
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"Default zone\""
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: Tab
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Default zone\""
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

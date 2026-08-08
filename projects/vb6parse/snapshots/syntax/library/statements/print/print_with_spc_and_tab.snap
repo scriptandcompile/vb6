@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/statements/file_operations/print.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/print.rs
+assertion_line: 413
 expression: tree
 ---
 root:
@@ -35,44 +36,76 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: Spc
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "10"
-                - kind: RightParenthesis
-                  text: )
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"Text\""
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: Tab
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "20"
-                - kind: RightParenthesis
-                  text: )
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"More\""
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: Spc
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: NumericLiteralExpression
+                                      children:
+                                        - kind: IntegerLiteral
+                                          text: "10"
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Text\""
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: Tab
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: NumericLiteralExpression
+                                      children:
+                                        - kind: IntegerLiteral
+                                          text: "20"
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"More\""
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

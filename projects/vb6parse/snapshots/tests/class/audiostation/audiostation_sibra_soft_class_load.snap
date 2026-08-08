@@ -1,5 +1,6 @@
 ---
 source: projects/vb6parse/tests/class/audiostation.rs
+assertion_line: 64
 expression: class
 ---
 header:
@@ -3592,14 +3593,22 @@ cst:
                     text: " "
                   - kind: Octothorpe
                     text: "#"
-                  - kind: Identifier
-                    text: iFileNo
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: iFileNo
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Contents
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Contents
                   - kind: Newline
                     text: "\n"
               - kind: CloseStatement

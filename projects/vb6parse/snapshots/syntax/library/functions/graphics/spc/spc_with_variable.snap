@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/graphics/spc.rs
+source: projects/vb6parse/src/syntax/library/functions/graphics/spc.rs
+assertion_line: 555
 expression: tree
 ---
 root:
@@ -75,32 +76,54 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"Data\""
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: Spc
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: spaces
-                - kind: RightParenthesis
-                  text: )
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"Value\""
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Data\""
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: Spc
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: spaces
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Value\""
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

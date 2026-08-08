@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/statements/file_operations/print.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/print.rs
+assertion_line: 269
 expression: tree
 ---
 root:
@@ -35,32 +36,54 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: Format$
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: Now
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"yyyy-mm-dd\""
-                - kind: RightParenthesis
-                  text: )
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: totalAmount
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: Format$
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: Now
+                                - kind: Comma
+                                  text: ","
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Argument
+                                  children:
+                                    - kind: StringLiteralExpression
+                                      children:
+                                        - kind: StringLiteral
+                                          text: "\"yyyy-mm-dd\""
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: totalAmount
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

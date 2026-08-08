@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/financial/syd.rs
+source: projects/vb6parse/src/syntax/library/functions/financial/syd.rs
+assertion_line: 1153
 expression: tree
 ---
 root:
@@ -35,38 +36,64 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: SYD
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: cost
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: salvage
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: life
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: period
-                - kind: RightParenthesis
-                  text: )
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: SYD
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: cost
+                                - kind: Comma
+                                  text: ","
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: salvage
+                                - kind: Comma
+                                  text: ","
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: life
+                                - kind: Comma
+                                  text: ","
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: period
+                            - kind: RightParenthesis
+                              text: )
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

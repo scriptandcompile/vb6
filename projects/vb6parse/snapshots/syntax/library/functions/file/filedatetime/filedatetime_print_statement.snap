@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/file/filedatetime.rs
+source: projects/vb6parse/src/syntax/library/functions/file/filedatetime.rs
+assertion_line: 1208
 expression: tree
 ---
 root:
@@ -15,25 +16,43 @@ root:
           text: " "
         - kind: Octothorpe
           text: "#"
-        - kind: Identifier
-          text: reportNum
+        - kind: IdentifierExpression
+          children:
+            - kind: Identifier
+              text: reportNum
         - kind: Comma
           text: ","
         - kind: Whitespace
           text: " "
-        - kind: Identifier
-          text: fileName
-        - kind: Comma
-          text: ","
-        - kind: Whitespace
-          text: " "
-        - kind: Identifier
-          text: FileDateTime
-        - kind: LeftParenthesis
-          text: (
-        - kind: Identifier
-          text: fullPath
-        - kind: RightParenthesis
-          text: )
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: fileName
+            - kind: Comma
+              text: ","
+            - kind: Whitespace
+              text: " "
+            - kind: Argument
+              children:
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: FileDateTime
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: fullPath
+                    - kind: RightParenthesis
+                      text: )
         - kind: Newline
           text: "\n"
