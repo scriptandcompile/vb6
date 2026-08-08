@@ -393,3 +393,59 @@
 //! - Cannot be used directly in `Print` statements like `Spc()`
 //! - Floating-point parameters are rounded (may be unexpected)
 //! - Maximum string length limited by VB6 string constraints (~2 GB)
+
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
+
+/// Returns a string consisting of the specified number of spaces.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `number` is negative.
+pub fn space_dollar(number: &VBLong) -> VBResult<VBString> {
+    let number = number.as_i32();
+    if number < 0 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid number",
+        ));
+    }
+    Ok(VBString::from(" ".repeat(number as usize)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn returns_spaces() {
+        assert_eq!(
+            space_dollar(&VBLong::from(3)).unwrap(),
+            VBString::from("   ")
+        );
+        assert_eq!(
+            space_dollar(&VBLong::from(1)).unwrap(),
+            VBString::from(" ")
+        );
+    }
+
+    #[test]
+    fn zero_returns_empty() {
+        assert_eq!(
+            space_dollar(&VBLong::from(0)).unwrap(),
+            VBString::from("")
+        );
+    }
+
+    #[test]
+    fn rejects_negative() {
+        assert_eq!(
+            space_dollar(&VBLong::from(-1)).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

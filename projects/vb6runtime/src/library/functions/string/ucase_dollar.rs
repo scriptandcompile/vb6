@@ -327,3 +327,54 @@
 //! - Does not handle advanced Unicode normalization or case folding
 //! - For true Unicode case folding, more sophisticated methods may be needed
 //! - Some special characters may not convert in all locales
+
+use crate::{error::VBResult, value::VBString};
+
+/// Converts all lowercase letters in a string to uppercase.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
+/// Only lowercase letters are converted; uppercase letters and non-letter
+/// characters are unchanged. Uses full Unicode case mapping.
+///
+/// # Arguments
+///
+/// * `input` — The input string. If empty, an empty string is returned.
+pub fn ucase_dollar(input: &VBString) -> VBResult<VBString> {
+    Ok(VBString::from(input.as_str().to_uppercase()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn uppercases_letters() {
+        assert_eq!(
+            ucase_dollar(&VBString::from("Hello World")).unwrap(),
+            VBString::from("HELLO WORLD")
+        );
+        assert_eq!(
+            ucase_dollar(&VBString::from("abc")).unwrap(),
+            VBString::from("ABC")
+        );
+    }
+
+    #[test]
+    fn leaves_non_letters_unchanged() {
+        assert_eq!(
+            ucase_dollar(&VBString::from("123 !@#")).unwrap(),
+            VBString::from("123 !@#")
+        );
+    }
+
+    #[test]
+    fn handles_unicode() {
+        assert_eq!(
+            ucase_dollar(&VBString::from("héllo")).unwrap(),
+            VBString::from("HÉLLO")
+        );
+        assert_eq!(
+            ucase_dollar(&VBString::from("")).unwrap(),
+            VBString::from("")
+        );
+    }
+}

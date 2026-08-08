@@ -195,3 +195,74 @@
 //! - No built-in support for Unicode surrogate pairs
 //! - Length parameter cannot be an expression that evaluates to `Null`
 //! - Returns `Null` if the string argument is `Null`
+
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
+
+/// Returns the specified number of characters from the left side of the string.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
+///
+/// A `length` of 0 returns an empty string; a `length` greater than the number
+/// of characters returns the entire string. Characters are counted as Unicode
+/// scalar values.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
+pub fn left_dollar(input: &VBString, length: &VBLong) -> VBResult<VBString> {
+    let length = length.as_i32();
+    if length < 0 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid length",
+        ));
+    }
+    Ok(VBString::from(
+        input
+            .as_str()
+            .chars()
+            .take(length as usize)
+            .collect::<String>(),
+    ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn returns_leftmost_characters() {
+        assert_eq!(
+            left_dollar(&VBString::from("Hello"), &VBLong::from(3)).unwrap(),
+            VBString::from("Hel")
+        );
+        assert_eq!(
+            left_dollar(&VBString::from("Hello"), &VBLong::from(0)).unwrap(),
+            VBString::from("")
+        );
+    }
+
+    #[test]
+    fn length_beyond_string_returns_whole() {
+        assert_eq!(
+            left_dollar(&VBString::from("Hello"), &VBLong::from(99)).unwrap(),
+            VBString::from("Hello")
+        );
+    }
+
+    #[test]
+    fn handles_unicode() {
+        assert_eq!(
+            left_dollar(&VBString::from("héllo"), &VBLong::from(2)).unwrap(),
+            VBString::from("hé")
+        );
+    }
+
+    #[test]
+    fn negative_length_errors() {
+        let err = left_dollar(&VBString::from("Hello"), &VBLong::from(-1)).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+}

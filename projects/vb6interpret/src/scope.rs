@@ -2,18 +2,18 @@
 //!
 //! VB6 identifiers are case-insensitive, so names are normalized to lowercase
 //! before being stored. A [`Scope`] maps a normalized name to a runtime
-//! [`Value`].
+//! [`VBVariant`].
 
 use std::collections::HashMap;
 
 use vb6core::types::VBType;
-use vb6runtime::Value;
+use vb6runtime::VBVariant;
 
 /// A collection of variables (a single procedure's locals, or the module's
 /// globals).
 #[derive(Debug, Clone, Default)]
 pub struct Scope {
-    vars: HashMap<String, Value>,
+    vars: HashMap<String, VBVariant>,
 }
 
 /// Normalize an identifier for case-insensitive lookup.
@@ -28,13 +28,13 @@ impl Scope {
     }
 
     /// Declare a variable with an initial value.
-    pub fn declare(&mut self, name: &str, value: Value) {
+    pub fn declare(&mut self, name: &str, value: VBVariant) {
         self.vars.insert(normalize(name), value);
     }
 
     /// Declare a variable with the default value for its static type.
     pub fn declare_with_type(&mut self, name: &str, ty: &VBType) {
-        let value = Value::default_for_type(ty);
+        let value = VBVariant::default_for_type(ty);
         self.vars.insert(normalize(name), value);
     }
 
@@ -44,14 +44,14 @@ impl Scope {
     }
 
     /// Look up a variable's value.
-    pub fn get(&self, name: &str) -> Option<&Value> {
+    pub fn get(&self, name: &str) -> Option<&VBVariant> {
         self.vars.get(&normalize(name))
     }
 
     /// Write a variable's value, if it is already declared.
     ///
     /// Returns `false` when the variable does not exist in this scope.
-    pub fn set(&mut self, name: &str, value: Value) -> bool {
+    pub fn set(&mut self, name: &str, value: VBVariant) -> bool {
         match self.vars.get_mut(&normalize(name)) {
             Some(slot) => {
                 *slot = value;
@@ -62,7 +62,7 @@ impl Scope {
     }
 
     /// Iterate over `(name, value)` pairs.
-    pub fn iter(&self) -> impl Iterator<Item = (&str, &Value)> {
+    pub fn iter(&self) -> impl Iterator<Item = (&str, &VBVariant)> {
         self.vars.iter().map(|(key, value)| (key.as_str(), value))
     }
 

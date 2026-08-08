@@ -296,9 +296,11 @@
 //! - Some Unicode features like combining characters may not render correctly in all VB6 controls
 
 use crate::{
-    error::{err_number, VBError, VBResult},
-    value::{VBLong, VBString},
+    error::VBResult,
+    value::VBVariant,
 };
+
+use super::chrw_dollar::chrw_dollar;
 
 /// Returns the Unicode character associated with the specified code.
 ///
@@ -306,76 +308,84 @@ use crate::{
 /// `65536 + charcode`, matching VB6's 16-bit integer behavior. Code 0 returns
 /// the null character (U+0000).
 ///
+/// `ChrW` is the Variant-returning counterpart of `ChrW$`; a `Null` charcode
+/// propagates as `Null`.
+///
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `charcode` is
 /// outside the range -32768 to 65535, or names a UTF-16 surrogate (which cannot
 /// be represented as a single Rust `char`).
-pub fn chrw(charcode: &VBLong) -> VBResult<VBString> {
-    let charcode = charcode.as_i32();
-    if !(-32768..=65535).contains(&charcode) {
-        return Err(VBError::with_description(
-            err_number::INVALID_PROCEDURE_CALL,
-            "Character code out of range",
-        ));
+pub fn chrw(charcode: &VBVariant) -> VBResult<VBVariant> {
+    if charcode.is_null() {
+        return Ok(VBVariant::Null);
     }
-
-    let code = if charcode < 0 {
-        charcode + 65536
-    } else {
-        charcode
-    } as u32;
-
-    char::from_u32(code)
-        .map(|c| VBString::from(c.to_string()))
-        .ok_or_else(|| {
-            VBError::with_description(
-                err_number::INVALID_PROCEDURE_CALL,
-                "Invalid Unicode character code",
-            )
-        })
+    chrw_dollar(&charcode.as_vblong()?).map(VBVariant::from)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::value::VBLong;
+    use crate::error::err_number;
 
     #[test]
     fn returns_ascii_characters() {
-        assert_eq!(chrw(&VBLong::from(65)).unwrap(), VBString::from("A"));
-        assert_eq!(chrw(&VBLong::from(97)).unwrap(), VBString::from("a"));
+        assert_eq!(
+            chrw(&VBVariant::from_integer(65)).unwrap(),
+            VBVariant::from_string("A")
+        );
+        assert_eq!(
+            chrw(&VBVariant::from_integer(97)).unwrap(),
+            VBVariant::from_string("a")
+        );
     }
 
     #[test]
     fn returns_unicode_characters() {
-        assert_eq!(chrw(&VBLong::from(8364)).unwrap(), VBString::from("€"));
-        assert_eq!(chrw(&VBLong::from(20013)).unwrap(), VBString::from("中"));
+        assert_eq!(
+            chrw(&VBVariant::from_integer(8364)).unwrap(),
+            VBVariant::from_string("€")
+        );
+        assert_eq!(
+            chrw(&VBVariant::from_integer(20013)).unwrap(),
+            VBVariant::from_string("中")
+        );
     }
 
     #[test]
     fn negative_values_are_wrapped() {
-        assert_eq!(chrw(&VBLong::from(-1)).unwrap(), VBString::from("\u{FFFF}"));
         assert_eq!(
-            chrw(&VBLong::from(-8192)).unwrap(),
-            VBString::from("\u{E000}")
+            chrw(&VBVariant::from_integer(-1)).unwrap(),
+            VBVariant::from_string("\u{FFFF}")
+        );
+        assert_eq!(
+            chrw(&VBVariant::from_integer(-8192)).unwrap(),
+            VBVariant::from_string("\u{E000}")
         );
     }
 
     #[test]
     fn code_zero_returns_null_character() {
-        assert_eq!(chrw(&VBLong::from(0)).unwrap(), VBString::from("\u{0}"));
+        assert_eq!(
+            chrw(&VBVariant::from_integer(0)).unwrap(),
+            VBVariant::from_string("\u{0}")
+        );
     }
 
     #[test]
     fn rejects_out_of_range() {
         assert_eq!(
-            chrw(&VBLong::from(-32769)).unwrap_err().number,
+            chrw(&VBVariant::from_long(-32769)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
         assert_eq!(
-            chrw(&VBLong::from(65536)).unwrap_err().number,
+            chrw(&VBVariant::from_long(65536)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(chrw(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 }

@@ -713,9 +713,11 @@
 //! - `InStr`: Finds position of substring searching from left to right
 
 use crate::{
-    error::{err_number, VBError, VBResult},
-    value::{VBLong, VBString},
+    error::VBResult,
+    value::{VBLong, VBVariant},
 };
+
+use super::right_dollar::right_dollar;
 
 /// Returns the specified number of characters from the right side of the string.
 ///
@@ -723,23 +725,17 @@ use crate::{
 /// of characters returns the entire string. Characters are counted as Unicode
 /// scalar values.
 ///
+/// `Right` is the Variant-returning counterpart of `Right$`; a `Null` input
+/// propagates as `Null`.
+///
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
-pub fn right(input: &VBString, length: &VBLong) -> VBResult<VBString> {
-    let length = length.as_i32();
-    if length < 0 {
-        return Err(VBError::with_description(
-            err_number::INVALID_PROCEDURE_CALL,
-            "Invalid length",
-        ));
+pub fn right(input: &VBVariant, length: &VBLong) -> VBResult<VBVariant> {
+    if input.is_null() {
+        return Ok(VBVariant::Null);
     }
-
-    let chars: Vec<char> = input.as_str().chars().collect();
-    let skip = chars.len().saturating_sub(length as usize);
-    Ok(VBString::from(
-        chars.into_iter().skip(skip).collect::<String>(),
-    ))
+    right_dollar(&input.as_vbstring()?, length).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -750,38 +746,46 @@ mod tests {
     #[test]
     fn returns_rightmost_characters() {
         assert_eq!(
-            right(&VBString::from("Hello"), &VBLong::from(3)).unwrap(),
-            VBString::from("llo")
+            right(&VBVariant::from_string("Hello"), &VBLong::from(3)).unwrap(),
+            VBVariant::from_string("llo")
         );
         assert_eq!(
-            right(&VBString::from("Hello"), &VBLong::from(0)).unwrap(),
-            VBString::from("")
+            right(&VBVariant::from_string("Hello"), &VBLong::from(0)).unwrap(),
+            VBVariant::from_string("")
         );
     }
 
     #[test]
     fn length_greater_than_string_returns_all() {
         assert_eq!(
-            right(&VBString::from("Hello"), &VBLong::from(10)).unwrap(),
-            VBString::from("Hello")
+            right(&VBVariant::from_string("Hello"), &VBLong::from(10)).unwrap(),
+            VBVariant::from_string("Hello")
         );
     }
 
     #[test]
     fn handles_unicode() {
         assert_eq!(
-            right(&VBString::from("héllo"), &VBLong::from(2)).unwrap(),
-            VBString::from("lo")
+            right(&VBVariant::from_string("héllo"), &VBLong::from(2)).unwrap(),
+            VBVariant::from_string("lo")
         );
     }
 
     #[test]
     fn rejects_negative_length() {
         assert_eq!(
-            right(&VBString::from("Hello"), &VBLong::from(-1))
+            right(&VBVariant::from_string("Hello"), &VBLong::from(-1))
                 .unwrap_err()
                 .number,
             err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(
+            right(&VBVariant::Null, &VBLong::from(3)).unwrap(),
+            VBVariant::Null
         );
     }
 }

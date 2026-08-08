@@ -347,3 +347,78 @@
 //! - Works with characters, not bytes (use `RightB$` for byte-level operations)
 //! - No Unicode-specific version (VB6 uses UCS-2 internally)
 //! - Cannot extract from right based on delimiter (must calculate length manually)
+
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
+
+/// Returns the specified number of characters from the right side of the string.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
+///
+/// A `length` of 0 returns an empty string; a `length` greater than the number
+/// of characters returns the entire string. Characters are counted as Unicode
+/// scalar values.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
+pub fn right_dollar(input: &VBString, length: &VBLong) -> VBResult<VBString> {
+    let length = length.as_i32();
+    if length < 0 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid length",
+        ));
+    }
+
+    let chars: Vec<char> = input.as_str().chars().collect();
+    let skip = chars.len().saturating_sub(length as usize);
+    Ok(VBString::from(
+        chars.into_iter().skip(skip).collect::<String>(),
+    ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn returns_rightmost_characters() {
+        assert_eq!(
+            right_dollar(&VBString::from("Hello"), &VBLong::from(3)).unwrap(),
+            VBString::from("llo")
+        );
+        assert_eq!(
+            right_dollar(&VBString::from("Hello"), &VBLong::from(0)).unwrap(),
+            VBString::from("")
+        );
+    }
+
+    #[test]
+    fn length_greater_than_string_returns_all() {
+        assert_eq!(
+            right_dollar(&VBString::from("Hello"), &VBLong::from(10)).unwrap(),
+            VBString::from("Hello")
+        );
+    }
+
+    #[test]
+    fn handles_unicode() {
+        assert_eq!(
+            right_dollar(&VBString::from("héllo"), &VBLong::from(2)).unwrap(),
+            VBString::from("lo")
+        );
+    }
+
+    #[test]
+    fn rejects_negative_length() {
+        assert_eq!(
+            right_dollar(&VBString::from("Hello"), &VBLong::from(-1))
+                .unwrap_err()
+                .number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

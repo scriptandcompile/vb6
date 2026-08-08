@@ -1,7 +1,7 @@
 //! Expression evaluation over the CST.
 //!
 //! Expressions are evaluated directly against the tree produced by
-//! `vb6parse`, producing [`Value`]s from `vb6runtime`.
+//! `vb6parse`, producing [`VBVariant`]s from `vb6runtime`.
 
 use crate::builtins;
 use crate::error::{RunError, RunResult};
@@ -10,7 +10,7 @@ use crate::scope::normalize;
 use vb6core::error::{err_number, VBError, VBResult};
 use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
-use vb6runtime::Value;
+use vb6runtime::VBVariant;
 
 /// Logical/bitwise operators shared by `And`, `Or`, `Xor`, `Eqv`, `Imp`.
 #[derive(Clone, Copy, Debug)]
@@ -36,7 +36,7 @@ pub(crate) enum ArithmaticOperator {
 
 impl Interpreter {
     /// Evaluate an expression node to a value.
-    pub(crate) fn eval_expr(&mut self, node: &CstNode) -> RunResult<Value> {
+    pub(crate) fn eval_expr(&mut self, node: &CstNode) -> RunResult<VBVariant> {
         match node.kind() {
             SyntaxKind::LiteralExpression
             | SyntaxKind::NumericLiteralExpression
@@ -120,7 +120,7 @@ impl Interpreter {
 
     /// Evaluate a literal node (also usable for bare literal tokens, as found
     /// in `Case` clauses and `ReDim` bounds).
-    pub(crate) fn eval_literal(&self, node: &CstNode) -> RunResult<Value> {
+    pub(crate) fn eval_literal(&self, node: &CstNode) -> RunResult<VBVariant> {
         if let Some(token) = node.first_child() {
             return literal_value(token.text(), token.kind())
                 .ok_or_else(|| self.error_at(node, VBError::type_mismatch()));
@@ -130,15 +130,15 @@ impl Interpreter {
     }
 
     /// Evaluate an identifier reference.
-    fn eval_identifier(&mut self, node: &CstNode) -> RunResult<Value> {
+    fn eval_identifier(&mut self, node: &CstNode) -> RunResult<VBVariant> {
         let name = crate::program::identifier_name(node);
 
         match name.to_lowercase().as_str() {
-            "true" => return Ok(Value::Boolean(true)),
-            "false" => return Ok(Value::Boolean(false)),
-            "nothing" => return Ok(Value::Nothing),
-            "null" => return Ok(Value::Null),
-            "empty" => return Ok(Value::Empty),
+            "true" => return Ok(VBVariant::Boolean(true)),
+            "false" => return Ok(VBVariant::Boolean(false)),
+            "nothing" => return Ok(VBVariant::Nothing),
+            "null" => return Ok(VBVariant::Null),
+            "empty" => return Ok(VBVariant::Empty),
             "me" => {
                 return Err(self.error_at(
                     node,
@@ -154,12 +154,12 @@ impl Interpreter {
         match self.lookup(&name) {
             Some(value) => Ok(value.clone()),
             // Undeclared references read as Empty (VB6 without Option Explicit).
-            None => Ok(Value::Empty),
+            None => Ok(VBVariant::Empty),
         }
     }
 
     /// Evaluate a binary operation. `op` is the operator token node.
-    fn eval_binary(&mut self, left: &CstNode, op: &CstNode, right: &CstNode) -> RunResult<Value> {
+    fn eval_binary(&mut self, left: &CstNode, op: &CstNode, right: &CstNode) -> RunResult<VBVariant> {
         let lhs = self.eval_expr(left)?;
         let rhs = self.eval_expr(right)?;
 
@@ -180,10 +180,10 @@ impl Interpreter {
             SyntaxKind::Ampersand => {
                 let left = lhs.as_string()?;
                 let right = rhs.as_string()?;
-                Ok(Value::from_string(format!("{left}{right}")))
+                Ok(VBVariant::from_string(format!("{left}{right}")))
             }
-            SyntaxKind::EqualityOperator => Ok(Value::Boolean(lhs == rhs)),
-            SyntaxKind::InequalityOperator => Ok(Value::Boolean(lhs != rhs)),
+            SyntaxKind::EqualityOperator => Ok(VBVariant::Boolean(lhs == rhs)),
+            SyntaxKind::InequalityOperator => Ok(VBVariant::Boolean(lhs != rhs)),
             SyntaxKind::LessThanOperator => compare_ord(lhs, rhs, Ordering::Less),
             SyntaxKind::LessThanOrEqualOperator => compare_ord(lhs, rhs, Ordering::LessOrEqual),
             SyntaxKind::GreaterThanOperator => compare_ord(lhs, rhs, Ordering::Greater),
@@ -197,17 +197,17 @@ impl Interpreter {
             SyntaxKind::ImpKeyword => self.bitwise(lhs, rhs, LogicalOperator::Imp),
             SyntaxKind::IsKeyword => {
                 let result = match (&lhs, &rhs) {
-                    (Value::Nothing, Value::Nothing) => true,
-                    (Value::Nothing, _) | (_, Value::Nothing) => false,
+                    (VBVariant::Nothing, VBVariant::Nothing) => true,
+                    (VBVariant::Nothing, _) | (_, VBVariant::Nothing) => false,
                     // No object model yet: fall back to value equality.
                     _ => lhs == rhs,
                 };
-                Ok(Value::Boolean(result))
+                Ok(VBVariant::Boolean(result))
             }
             SyntaxKind::LikeKeyword => {
                 let text = lhs.as_string()?;
                 let pattern = rhs.as_string()?;
-                Ok(Value::Boolean(like_match(&pattern, &text)))
+                Ok(VBVariant::Boolean(like_match(&pattern, &text)))
             }
             other => Err(self.error_at(
                 op,
@@ -220,20 +220,20 @@ impl Interpreter {
     }
 
     /// Evaluate a unary operation. `op` is the operator token node.
-    fn eval_unary(&mut self, op: &CstNode, operand: &CstNode) -> RunResult<Value> {
+    fn eval_unary(&mut self, op: &CstNode, operand: &CstNode) -> RunResult<VBVariant> {
         let value = self.eval_expr(operand)?;
         match op.kind() {
             SyntaxKind::SubtractionOperator => {
                 let number = value.as_f64()?;
-                Ok(Value::from_double(-number))
+                Ok(VBVariant::from_double(-number))
             }
             SyntaxKind::AdditionOperator => {
                 let number = value.as_f64()?;
-                Ok(Value::from_double(number))
+                Ok(VBVariant::from_double(number))
             }
             SyntaxKind::NotKeyword => {
                 let boolean = value.as_bool()?;
-                Ok(Value::Boolean(!boolean))
+                Ok(VBVariant::Boolean(!boolean))
             }
             other => Err(self.error_at(
                 op,
@@ -246,7 +246,7 @@ impl Interpreter {
     }
 
     /// Evaluate a call expression: array indexing, user function, or builtin.
-    fn eval_call(&mut self, node: &CstNode) -> RunResult<Value> {
+    fn eval_call(&mut self, node: &CstNode) -> RunResult<VBVariant> {
         let name = crate::program::identifier_name(node);
 
         let argument_list = node
@@ -258,11 +258,11 @@ impl Interpreter {
         };
 
         // Array indexing: the name resolves to an array variable.
-        if let Some(Value::Array(_)) = self.lookup(&name) {
+        if let Some(VBVariant::Array(_)) = self.lookup(&name) {
             let indices: VBResult<Vec<i32>> = args.iter().map(|arg| arg.as_i32()).collect();
             let indices = indices?;
             let array = self.lookup(&name).ok_or_else(VBError::object_not_set)?;
-            if let Value::Array(array) = array {
+            if let VBVariant::Array(array) = array {
                 let element = array.get(&indices)?;
                 return Ok(element.clone());
             }
@@ -279,7 +279,7 @@ impl Interpreter {
     }
 
     /// Evaluate an `ArgumentList` into positional argument values.
-    pub(crate) fn eval_args(&mut self, node: &CstNode) -> RunResult<Vec<Value>> {
+    pub(crate) fn eval_args(&mut self, node: &CstNode) -> RunResult<Vec<VBVariant>> {
         let mut values = Vec::new();
         for argument in node.children_by_kind(SyntaxKind::Argument) {
             if let Some(expr) = argument
@@ -294,14 +294,14 @@ impl Interpreter {
 
     /// `+` operator: numeric addition, or string concatenation when both
     /// operands are strings.
-    fn add(&self, lhs: Value, rhs: Value) -> RunResult<Value> {
+    fn add(&self, lhs: VBVariant, rhs: VBVariant) -> RunResult<VBVariant> {
         match (&lhs, &rhs) {
-            (Value::String(_), Value::String(_)) => {
+            (VBVariant::String(_), VBVariant::String(_)) => {
                 let left = lhs.as_string()?;
                 let right = rhs.as_string()?;
-                Ok(Value::from_string(format!("{left}{right}")))
+                Ok(VBVariant::from_string(format!("{left}{right}")))
             }
-            (Value::String(_), _) | (_, Value::String(_)) => {
+            (VBVariant::String(_), _) | (_, VBVariant::String(_)) => {
                 Err(self.error_here(VBError::type_mismatch()))
             }
             _ => self.arith(lhs, rhs, ArithmaticOperator::Add),
@@ -309,7 +309,7 @@ impl Interpreter {
     }
 
     /// Generic arithmetic dispatch on an arithmetic operator.
-    pub(crate) fn arith(&self, lhs: Value, rhs: Value, op: ArithmaticOperator) -> RunResult<Value> {
+    pub(crate) fn arith(&self, lhs: VBVariant, rhs: VBVariant, op: ArithmaticOperator) -> RunResult<VBVariant> {
         // Integer arithmetic when both operands are integral types. (This
         // must not fire for Singles/Doubles/Currency, which hold fractional
         // values that `as_i64` would silently round.)
@@ -340,7 +340,7 @@ impl Interpreter {
                     _ => None,
                 };
                 if let Some(value) = result {
-                    return Ok(Value::from_i64(value));
+                    return Ok(VBVariant::from_i64(value));
                 }
             }
         }
@@ -372,14 +372,14 @@ impl Interpreter {
             ArithmaticOperator::Exponent => left.powf(right),
             // Add other operators here if needed.
         };
-        Ok(Value::from_double(result))
+        Ok(VBVariant::from_double(result))
     }
 
     /// Logical/bitwise operators. Booleans combine logically and yield a
     /// Boolean; any other operands combine bitwise over their integral value
     /// (booleans coerce to -1/0), like VB6.
-    fn bitwise(&self, lhs: Value, rhs: Value, op: LogicalOperator) -> RunResult<Value> {
-        if let (Value::Boolean(left), Value::Boolean(right)) = (&lhs, &rhs) {
+    fn bitwise(&self, lhs: VBVariant, rhs: VBVariant, op: LogicalOperator) -> RunResult<VBVariant> {
+        if let (VBVariant::Boolean(left), VBVariant::Boolean(right)) = (&lhs, &rhs) {
             let result = match op {
                 LogicalOperator::And => *left && *right,
                 LogicalOperator::Or => *left || *right,
@@ -387,7 +387,7 @@ impl Interpreter {
                 LogicalOperator::Eqv => *left == *right,
                 LogicalOperator::Imp => !*left || *right,
             };
-            return Ok(Value::Boolean(result));
+            return Ok(VBVariant::Boolean(result));
         }
 
         let left = lhs.as_i64()?;
@@ -400,11 +400,11 @@ impl Interpreter {
             LogicalOperator::Imp => !left | right,
         };
 
-        Ok(Value::from_i64(result))
+        Ok(VBVariant::from_i64(result))
     }
 
     /// Look up a variable in the current frame, then in globals.
-    pub(crate) fn lookup(&self, name: &str) -> Option<&Value> {
+    pub(crate) fn lookup(&self, name: &str) -> Option<&VBVariant> {
         let key = normalize(name);
         if let Some(frame) = self.frames.last() {
             if let Some(value) = frame.locals.get(&key) {
@@ -431,9 +431,9 @@ enum Ordering {
 }
 
 /// Ordered comparison with VB6 coercion.
-fn compare_ord(lhs: Value, rhs: Value, ord: Ordering) -> RunResult<Value> {
+fn compare_ord(lhs: VBVariant, rhs: VBVariant, ord: Ordering) -> RunResult<VBVariant> {
     let ordering = match (&lhs, &rhs) {
-        (Value::String(left), Value::String(right)) => compare_strings(left, right),
+        (VBVariant::String(left), VBVariant::String(right)) => compare_strings(left, right),
         _ => match (lhs.as_f64(), rhs.as_f64()) {
             (Ok(left), Ok(right)) => left.partial_cmp(&right),
             _ => {
@@ -450,7 +450,7 @@ fn compare_ord(lhs: Value, rhs: Value, ord: Ordering) -> RunResult<Value> {
             | (Some(std::cmp::Ordering::Greater), Ordering::GreaterOrEqual)
             | (Some(std::cmp::Ordering::Equal), Ordering::GreaterOrEqual)
     );
-    Ok(Value::Boolean(result))
+    Ok(VBVariant::Boolean(result))
 }
 
 /// Case-insensitive string comparison (VB6 default `Option Compare`).
@@ -558,7 +558,7 @@ fn between_chars(lo: char, ch: char, hi: char) -> bool {
 /// Handles the raw literal token kinds (`IntegerLiteral`, `StringLiteral`, ...)
 /// and suffix characters (`%` Integer, `&` Long, `!` Single, `#` Double, `@`
 /// Currency).
-pub(crate) fn literal_value(text: &str, kind: SyntaxKind) -> Option<Value> {
+pub(crate) fn literal_value(text: &str, kind: SyntaxKind) -> Option<VBVariant> {
     let raw = text.trim();
 
     match kind {
@@ -567,36 +567,36 @@ pub(crate) fn literal_value(text: &str, kind: SyntaxKind) -> Option<Value> {
                 .strip_prefix('"')
                 .and_then(|rest| rest.strip_suffix('"'))?;
             let unescaped = inner.replace("\"\"", "\"");
-            Some(Value::from_string(unescaped))
+            Some(VBVariant::from_string(unescaped))
         }
         SyntaxKind::DateLiteral => {
             let inner = raw
                 .strip_prefix('#')
                 .and_then(|rest| rest.strip_suffix('#'))?;
-            Value::from_string(inner)
+            VBVariant::from_string(inner)
                 .as_date_serial()
                 .ok()
-                .map(Value::Date)
+                .map(VBVariant::Date)
         }
-        SyntaxKind::TrueKeyword => Some(Value::Boolean(true)),
-        SyntaxKind::FalseKeyword => Some(Value::Boolean(false)),
+        SyntaxKind::TrueKeyword => Some(VBVariant::Boolean(true)),
+        SyntaxKind::FalseKeyword => Some(VBVariant::Boolean(false)),
         SyntaxKind::IntegerLiteral => parse_integer(raw),
         SyntaxKind::LongLiteral => parse_long(raw),
         SyntaxKind::SingleLiteral => {
             let text = strip_suffix(raw);
-            text.parse::<f32>().ok().map(Value::from_single)
+            text.parse::<f32>().ok().map(VBVariant::from_single)
         }
         SyntaxKind::DoubleLiteral => {
             let text = strip_suffix(raw);
-            text.parse::<f64>().ok().map(Value::from_double)
+            text.parse::<f64>().ok().map(VBVariant::from_double)
         }
         SyntaxKind::CurrencyLiteral => {
             let text = strip_suffix(raw);
-            text.parse::<f64>().ok().map(Value::from_currency)
+            text.parse::<f64>().ok().map(VBVariant::from_currency)
         }
         SyntaxKind::DecimalLiteral => {
             let text = strip_suffix(raw);
-            text.parse::<f64>().ok().map(Value::from_double)
+            text.parse::<f64>().ok().map(VBVariant::from_double)
         }
         _ => None,
     }
@@ -611,7 +611,7 @@ fn strip_suffix(raw: &str) -> &str {
 }
 
 /// Parse an integer literal into Integer (i16) or Long (i32) semantics.
-fn parse_integer(raw: &str) -> Option<Value> {
+fn parse_integer(raw: &str) -> Option<VBVariant> {
     let text = strip_suffix(raw);
     let upper = text.to_ascii_uppercase();
     if let Some(digits) = upper.strip_prefix("&H") {
@@ -621,11 +621,11 @@ fn parse_integer(raw: &str) -> Option<Value> {
         return radix_value(digits, 8);
     }
     let value = text.parse::<i64>().ok()?;
-    Some(Value::from_i64(value))
+    Some(VBVariant::from_i64(value))
 }
 
 /// Parse a `LongLiteral` (always a Long).
-fn parse_long(raw: &str) -> Option<Value> {
+fn parse_long(raw: &str) -> Option<VBVariant> {
     let text = strip_suffix(raw);
     let upper = text.to_ascii_uppercase();
     if let Some(digits) = upper.strip_prefix("&H") {
@@ -634,21 +634,21 @@ fn parse_long(raw: &str) -> Option<Value> {
     if let Some(digits) = upper.strip_prefix("&O") {
         return radix_value(digits, 8);
     }
-    text.parse::<i32>().ok().map(Value::Long)
+    text.parse::<i32>().ok().map(VBVariant::Long)
 }
 
 /// Parse a radix-prefixed literal, honoring VB6's wrap of 32-bit values.
-fn radix_value(digits: &str, radix: u32) -> Option<Value> {
+fn radix_value(digits: &str, radix: u32) -> Option<VBVariant> {
     let digits = digits.trim().trim_end_matches('%').trim_end_matches('&');
     if digits.is_empty() {
         return None;
     }
     if let Ok(v) = i64::from_str_radix(digits, radix) {
-        return Some(Value::from_i64(v));
+        return Some(VBVariant::from_i64(v));
     }
     // `&HFFFFFFFF` wraps to -1 Long in VB6.
     if let Ok(v) = u32::from_str_radix(digits, radix) {
-        return Some(Value::Long(v as i32));
+        return Some(VBVariant::Long(v as i32));
     }
     None
 }
