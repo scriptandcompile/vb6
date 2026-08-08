@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-08-07T03:28:35Z",
+  "last_updated": "2026-08-08T02:07:56Z",
   "snapshots": [
     {
       "timestamp": "2026-08-02T05:53:42Z",
@@ -273,24 +273,58 @@
           "percent": 93.99
         }
       }
+    },
+    {
+      "timestamp": "2026-08-08T02:07:56Z",
+      "commit_sha": "afd09ef6c3693da5275d7b7e2c4fbec87b01146b",
+      "commit_message": "Setup and created the test harness which should help compare and correct between interpreter/vb6 compiler/compiler.",
+      "coverage": {
+        "line_coverage": 93.62,
+        "function_coverage": 90.3,
+        "region_coverage": 93.99
+      },
+      "tests": {
+        "total": 5836,
+        "lib_tests": 5707,
+        "doc_tests": 129,
+        "integration_tests": 0,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 109831,
+          "total": 117316,
+          "percent": 93.62
+        },
+        "functions": {
+          "covered": 7008,
+          "total": 7761,
+          "percent": 90.3
+        },
+        "regions": {
+          "covered": 183436,
+          "total": 195157,
+          "percent": 93.99
+        }
+      }
     }
   ],
   "coverage_summary": {
     "line_coverage": {
-      "latest": 93.64,
+      "latest": 93.62,
       "trend": "stable",
-      "change_percent": 0.01,
+      "change_percent": 0.02,
       "best": 94.32,
-      "worst": 93.63,
-      "average": 94.09
+      "worst": 93.62,
+      "average": 94.03
     },
     "function_coverage": {
       "latest": 90.3,
       "trend": "stable",
-      "change_percent": 0.02,
+      "change_percent": 0.0,
       "best": 91.24,
       "worst": 90.3,
-      "average": 90.87
+      "average": 90.8
     },
     "region_coverage": {
       "latest": 93.99,
@@ -298,13 +332,13 @@
       "change_percent": 0.0,
       "best": 94.76,
       "worst": 93.99,
-      "average": 94.51
+      "average": 94.45
     },
     "test_count": {
-      "latest": 5813,
+      "latest": 5836,
       "trend": "growing",
-      "change_count": 10,
-      "growth_rate": 0.17
+      "change_count": 23,
+      "growth_rate": 0.4
     }
   }
 }
