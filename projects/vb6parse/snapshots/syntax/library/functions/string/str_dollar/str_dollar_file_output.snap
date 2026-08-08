@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/string/str_dollar.rs
+source: projects/vb6parse/src/syntax/library/functions/string/str_dollar.rs
+assertion_line: 657
 expression: tree
 ---
 root:
@@ -59,26 +60,46 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: Identifier
-                  text: fileNum
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: fileNum
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: LTrim$
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: Str$
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: id
-                - kind: RightParenthesis
-                  text: )
-                - kind: RightParenthesis
-                  text: )
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: LTrim$
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: CallExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: Str$
+                                        - kind: LeftParenthesis
+                                          text: (
+                                        - kind: ArgumentList
+                                          children:
+                                            - kind: Argument
+                                              children:
+                                                - kind: IdentifierExpression
+                                                  children:
+                                                    - kind: Identifier
+                                                      text: id
+                                        - kind: RightParenthesis
+                                          text: )
+                            - kind: RightParenthesis
+                              text: )
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

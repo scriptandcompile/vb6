@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/statements/file_operations/reset.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/reset.rs
+assertion_line: 229
 expression: tree
 ---
 root:
@@ -65,14 +66,22 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"data\""
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"data\""
                 - kind: Newline
                   text: "\n"
             - kind: CloseStatement

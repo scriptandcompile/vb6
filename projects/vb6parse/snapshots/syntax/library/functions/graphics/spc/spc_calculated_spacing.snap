@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/graphics/spc.rs
+source: projects/vb6parse/src/syntax/library/functions/graphics/spc.rs
+assertion_line: 669
 expression: tree
 ---
 root:
@@ -71,46 +72,78 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: NameKeyword
-                  text: name
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: Spc
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "20"
-                - kind: Whitespace
-                  text: " "
-                - kind: SubtractionOperator
-                  text: "-"
-                - kind: Whitespace
-                  text: " "
-                - kind: LenKeyword
-                  text: Len
-                - kind: LeftParenthesis
-                  text: (
-                - kind: NameKeyword
-                  text: name
-                - kind: RightParenthesis
-                  text: )
-                - kind: RightParenthesis
-                  text: )
-                - kind: Semicolon
-                  text: ;
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"Age\""
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: NameKeyword
+                              text: name
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: Spc
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: BinaryExpression
+                                      children:
+                                        - kind: NumericLiteralExpression
+                                          children:
+                                            - kind: IntegerLiteral
+                                              text: "20"
+                                        - kind: Whitespace
+                                          text: " "
+                                        - kind: SubtractionOperator
+                                          text: "-"
+                                        - kind: Whitespace
+                                          text: " "
+                                        - kind: CallExpression
+                                          children:
+                                            - kind: LenKeyword
+                                              text: Len
+                                            - kind: LeftParenthesis
+                                              text: (
+                                            - kind: ArgumentList
+                                              children:
+                                                - kind: Argument
+                                                  children:
+                                                    - kind: IdentifierExpression
+                                                      children:
+                                                        - kind: NameKeyword
+                                                          text: name
+                                            - kind: RightParenthesis
+                                              text: )
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Semicolon
+                      text: ;
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Age\""
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

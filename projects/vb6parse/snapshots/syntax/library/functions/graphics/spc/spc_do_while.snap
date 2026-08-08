@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/graphics/spc.rs
+source: projects/vb6parse/src/syntax/library/functions/graphics/spc.rs
+assertion_line: 811
 expression: tree
 ---
 root:
@@ -67,40 +68,66 @@ root:
                           text: " "
                         - kind: Octothorpe
                           text: "#"
-                        - kind: IntegerLiteral
-                          text: "1"
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "1"
                         - kind: Comma
                           text: ","
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: i
-                        - kind: Semicolon
-                          text: ;
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: Spc
-                        - kind: LeftParenthesis
-                          text: (
-                        - kind: IntegerLiteral
-                          text: "5"
-                        - kind: RightParenthesis
-                          text: )
-                        - kind: Semicolon
-                          text: ;
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: i
-                        - kind: Whitespace
-                          text: " "
-                        - kind: MultiplicationOperator
-                          text: "*"
-                        - kind: Whitespace
-                          text: " "
-                        - kind: IntegerLiteral
-                          text: "2"
+                        - kind: ArgumentList
+                          children:
+                            - kind: Argument
+                              children:
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: i
+                            - kind: Semicolon
+                              text: ;
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Argument
+                              children:
+                                - kind: CallExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: Spc
+                                    - kind: LeftParenthesis
+                                      text: (
+                                    - kind: ArgumentList
+                                      children:
+                                        - kind: Argument
+                                          children:
+                                            - kind: NumericLiteralExpression
+                                              children:
+                                                - kind: IntegerLiteral
+                                                  text: "5"
+                                    - kind: RightParenthesis
+                                      text: )
+                            - kind: Semicolon
+                              text: ;
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Argument
+                              children:
+                                - kind: BinaryExpression
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: i
+                                    - kind: Whitespace
+                                      text: " "
+                                    - kind: MultiplicationOperator
+                                      text: "*"
+                                    - kind: Whitespace
+                                      text: " "
+                                    - kind: NumericLiteralExpression
+                                      children:
+                                        - kind: IntegerLiteral
+                                          text: "2"
                         - kind: Newline
                           text: "\n"
                     - kind: Whitespace

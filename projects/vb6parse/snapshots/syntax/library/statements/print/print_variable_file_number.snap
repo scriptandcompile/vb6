@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/statements/file_operations/print.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/print.rs
+assertion_line: 249
 expression: tree
 ---
 root:
@@ -75,14 +76,22 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: Identifier
-                  text: fileNum
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: fileNum
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: data
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: data
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

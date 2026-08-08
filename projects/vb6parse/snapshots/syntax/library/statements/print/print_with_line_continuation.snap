@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/statements/file_operations/print.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/print.rs
+assertion_line: 353
 expression: tree
 ---
 root:
@@ -35,8 +36,10 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
@@ -47,20 +50,30 @@ root:
                   text: "\n"
                 - kind: Whitespace
                   text: "        "
-                - kind: StringLiteral
-                  text: "\"Line 1\""
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Underscore
-                  text: _
-                - kind: Newline
-                  text: "\n"
-                - kind: Whitespace
-                  text: "        "
-                - kind: StringLiteral
-                  text: "\"Line 2\""
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Line 1\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Underscore
+                      text: _
+                    - kind: Newline
+                      text: "\n"
+                    - kind: Whitespace
+                      text: "        "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Line 2\""
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

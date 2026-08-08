@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/statements/file_operations/print.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/print.rs
+assertion_line: 435
 expression: tree
 ---
 root:
@@ -35,14 +36,22 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"First\""
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"First\""
                 - kind: Newline
                   text: "\n"
             - kind: PrintStatement
@@ -55,14 +64,22 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "2"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "2"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"Second\""
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Second\""
                 - kind: Newline
                   text: "\n"
             - kind: PrintStatement
@@ -75,14 +92,22 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "3"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "3"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"Third\""
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Third\""
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

@@ -1,5 +1,6 @@
 ---
 source: projects/vb6parse/tests/module/chess_brain_vb.rs
+assertion_line: 282
 expression: module
 ---
 name: basHash
@@ -22663,26 +22664,40 @@ cst:
                             text: " "
                           - kind: Octothorpe
                             text: "#"
-                          - kind: Identifier
-                            text: lLOCK_FILEHANDLE
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: lLOCK_FILEHANDLE
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: StringLiteral
-                            text: "\"Temporary lock file. Main thread started:\""
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Ampersand
-                            text: "&"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Now
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: RightParenthesis
-                            text: )
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: StringLiteralExpression
+                                        children:
+                                          - kind: StringLiteral
+                                            text: "\"Temporary lock file. Main thread started:\""
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Ampersand
+                                        text: "&"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Now
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children: []
+                                          - kind: RightParenthesis
+                                            text: )
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -23319,14 +23334,22 @@ cst:
                             text: " "
                           - kind: Octothorpe
                             text: "#"
-                          - kind: Identifier
-                            text: lLOCK_FILEHANDLE3
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: lLOCK_FILEHANDLE3
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: isLine
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: isLine
                           - kind: Newline
                             text: "\r\n"
                       - kind: CloseStatement

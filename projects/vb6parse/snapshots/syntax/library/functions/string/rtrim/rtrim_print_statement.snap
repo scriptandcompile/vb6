@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/string/rtrim.rs
+source: projects/vb6parse/src/syntax/library/functions/string/rtrim.rs
+assertion_line: 796
 expression: tree
 ---
 root:
@@ -17,20 +18,34 @@ root:
           text: " "
         - kind: Octothorpe
           text: "#"
-        - kind: IntegerLiteral
-          text: "1"
+        - kind: NumericLiteralExpression
+          children:
+            - kind: IntegerLiteral
+              text: "1"
         - kind: Comma
           text: ","
         - kind: Whitespace
           text: " "
-        - kind: Identifier
-          text: RTrim
-        - kind: LeftParenthesis
-          text: (
-        - kind: LineKeyword
-          text: line
-        - kind: RightParenthesis
-          text: )
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: RTrim
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: LineKeyword
+                                  text: line
+                    - kind: RightParenthesis
+                      text: )
         - kind: Newline
           text: "\n"
     - kind: Whitespace

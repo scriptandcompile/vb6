@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/datetime/date_dollar.rs
+source: projects/vb6parse/src/syntax/library/functions/datetime/date_dollar.rs
+assertion_line: 410
 expression: tree
 ---
 root:
@@ -89,14 +90,22 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: logEntry
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: logEntry
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

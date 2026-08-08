@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/math/atn.rs
+source: projects/vb6parse/src/syntax/library/functions/math/atn.rs
+assertion_line: 481
 expression: tree
 ---
 root:
@@ -77,8 +78,14 @@ root:
                           text: Print
                         - kind: Whitespace
                           text: " "
-                        - kind: StringLiteral
-                          text: "\"Angle > 45 degrees\""
+                        - kind: ArgumentList
+                          children:
+                            - kind: Argument
+                              children:
+                                - kind: StringLiteralExpression
+                                  children:
+                                    - kind: StringLiteral
+                                      text: "\"Angle > 45 degrees\""
                         - kind: Newline
                           text: "\n"
                     - kind: Whitespace

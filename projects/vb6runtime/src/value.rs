@@ -512,6 +512,16 @@ impl Value {
         matches!(self, Value::Nothing)
     }
 
+    /// Whether this value is of an integral type (Byte, Integer, Long, Boolean,
+    /// or Empty, which coerces to 0 in arithmetic). Singles, Doubles, Currency,
+    /// and Dates are not integral even though they may hold whole numbers.
+    pub fn is_integral(&self) -> bool {
+        matches!(
+            self,
+            Value::Byte(_) | Value::Integer(_) | Value::Long(_) | Value::Boolean(_) | Value::Empty
+        )
+    }
+
     /// Whether this value is numeric (`IsNumeric` semantics: excludes Boolean
     /// and Date).
     pub fn is_numeric(&self) -> bool {

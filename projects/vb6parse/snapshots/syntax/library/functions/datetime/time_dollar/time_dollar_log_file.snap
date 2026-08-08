@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/functions/datetime/time_dollar.rs
+source: projects/vb6parse/src/syntax/library/functions/datetime/time_dollar.rs
+assertion_line: 784
 expression: tree
 ---
 root:
@@ -111,30 +112,46 @@ root:
                   text: " "
                 - kind: Octothorpe
                   text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: timeStamp
-                - kind: Whitespace
-                  text: " "
-                - kind: Ampersand
-                  text: "&"
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\" - \""
-                - kind: Whitespace
-                  text: " "
-                - kind: Ampersand
-                  text: "&"
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: message
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: BinaryExpression
+                          children:
+                            - kind: BinaryExpression
+                              children:
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: timeStamp
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Ampersand
+                                  text: "&"
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: StringLiteralExpression
+                                  children:
+                                    - kind: StringLiteral
+                                      text: "\" - \""
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Ampersand
+                              text: "&"
+                            - kind: Whitespace
+                              text: " "
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: message
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword
