@@ -60,6 +60,7 @@ pub fn discover(
         if !entry.file_type().is_file() {
             continue;
         }
+
         let path = entry.path();
         if path
             .extension()
@@ -67,17 +68,20 @@ pub fn discover(
         {
             continue;
         }
-        if let Some(filter) = test_filter {
-            if !path.to_string_lossy().contains(filter) {
-                continue;
-            }
+
+        if let Some(filter) = test_filter
+            && !path.to_string_lossy().contains(filter)
+        {
+            continue;
         }
+
         let meta = read_meta(path)?;
-        if let Some(category) = category_filter {
-            if meta.category != category {
-                continue;
-            }
+        if let Some(category) = category_filter
+            && meta.category != category
+        {
+            continue;
         }
+
         let stem = path
             .file_stem()
             .and_then(|s| s.to_str())
