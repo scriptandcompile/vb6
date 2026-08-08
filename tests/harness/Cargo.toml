@@ -1,0 +1,15 @@
+[package]
+name = "vb6harness"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Differential test harness for the VB6 interpreter and compiler"
+repository = "https://github.com/scriptandcompile/vb6"
+keywords = ["vb6", "visual-basic", "test", "harness", "interpreter"]
+categories = ["development-tools", "compilers"]
+
+[dependencies]
+vb6interpret = { path = "../../projects/vb6interpret" }
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["env"] }
+walkdir = { workspace = true }
