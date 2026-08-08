@@ -572,3 +572,95 @@
 //! - `DateDiff`: Calculate difference between dates
 //! - `CDate`: Convert expression to Date type
 //! - `IsDate`: Check if expression can be converted to Date
+
+use crate::{
+    error::{VBError, VBResult},
+    value::{VBLong, VBVariant},
+};
+
+/// Returns a date/time value expressed as a string in the named format.
+///
+/// `namedformat` selects the output style: `vbGeneralDate` (0, default),
+/// `vbLongDate` (1), `vbShortDate` (2), `vbLongTime` (3), or `vbShortTime` (4).
+/// The general date form collapses to the date alone at midnight and to the
+/// time alone when there is no date part. A `Null` `expression` propagates as
+/// `Null`.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `namedformat` is
+/// outside the range 0-4, and error 13 (`Type mismatch`) when `expression` is
+/// not a valid date/time value.
+pub fn formatdatetime(expression: &VBVariant, namedformat: Option<&VBLong>) -> VBResult<VBVariant> {
+    if expression.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    let serial = expression.as_date_serial()?;
+    let parts = super::format_dollar::date_parts(serial).ok_or_else(VBError::type_mismatch)?;
+    let name = match namedformat.map(|v| v.as_i32()).unwrap_or(0) {
+        0 => {
+            if serial > 0.0 && serial < 1.0 {
+                "long time"
+            } else {
+                "general date"
+            }
+        }
+        1 => "long date",
+        2 => "short date",
+        3 => "long time",
+        4 => "short time",
+        _ => return Err(VBError::invalid_procedure_call()),
+    };
+    Ok(VBVariant::from_string(
+        super::format_dollar::format_named_date(name, &parts),
+    ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::value::VBVariant;
+
+    fn date() -> VBVariant {
+        VBVariant::from_date_serial(47067.0)
+    }
+
+    #[test]
+    fn general_date_format() {
+        assert_eq!(
+            formatdatetime(&date(), None).unwrap(),
+            VBVariant::from_string("11/10/2028")
+        );
+    }
+
+    #[test]
+    fn long_and_short_date() {
+        assert_eq!(
+            formatdatetime(&date(), Some(&VBLong::from(1))).unwrap(),
+            VBVariant::from_string("Friday, November 10, 2028")
+        );
+        assert_eq!(
+            formatdatetime(&date(), Some(&VBLong::from(2))).unwrap(),
+            VBVariant::from_string("11/10/2028")
+        );
+    }
+
+    #[test]
+    fn time_only_value_uses_long_time() {
+        assert_eq!(
+            formatdatetime(&VBVariant::from_double(0.5), Some(&VBLong::from(0))).unwrap(),
+            VBVariant::from_string("12:00:00 PM")
+        );
+    }
+
+    #[test]
+    fn invalid_named_format_errors() {
+        let err = formatdatetime(&date(), Some(&VBLong::from(9))).unwrap_err();
+        assert_eq!(err.number, crate::error::err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(formatdatetime(&VBVariant::Null, None).unwrap(), VBVariant::Null);
+    }
+}

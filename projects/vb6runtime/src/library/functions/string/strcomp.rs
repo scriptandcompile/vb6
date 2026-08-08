@@ -728,3 +728,94 @@
 //! - No indication of *where* strings differ, only that they do
 //! - Cannot compare string arrays directly (must loop)
 //! - No natural sort support (e.g., "file2.txt" vs "file10.txt")
+
+use crate::{
+    error::VBResult,
+    value::{VBInteger, VBLong, VBString},
+};
+
+/// Compares two strings and returns the result of the comparison.
+///
+/// Returns `-1` when `string1` is less than `string2`, `0` when they are
+/// equal, and `1` when `string1` is greater than `string2`. Empty strings sort
+/// before any non-empty string.
+///
+/// `compare` selects the comparison mode: `vbBinaryCompare` (0, the default)
+/// compares by character code (case-sensitive); `vbTextCompare` (1) compares
+/// case-insensitively.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `compare` is not
+/// a supported comparison mode.
+pub fn strcomp(
+    string1: &VBString,
+    string2: &VBString,
+    compare: Option<&VBLong>,
+) -> VBResult<VBInteger> {
+    let mode = compare.map(|c| c.as_i32()).unwrap_or(0);
+    let ordering = if mode == 1 {
+        string1
+            .as_str()
+            .to_lowercase()
+            .cmp(&string2.as_str().to_lowercase())
+    } else {
+        string1.as_str().cmp(string2.as_str())
+    };
+    let value = match ordering {
+        std::cmp::Ordering::Less => -1,
+        std::cmp::Ordering::Equal => 0,
+        std::cmp::Ordering::Greater => 1,
+    };
+    Ok(VBInteger::from(value))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn binary_compare_is_case_sensitive() {
+        assert_eq!(
+            strcomp(&VBString::from("ABC"), &VBString::from("abc"), None).unwrap(),
+            VBInteger::from(-1)
+        );
+        assert_eq!(
+            strcomp(&VBString::from("ABC"), &VBString::from("ABC"), None).unwrap(),
+            VBInteger::from(0)
+        );
+        assert_eq!(
+            strcomp(&VBString::from("abc"), &VBString::from("ABC"), None).unwrap(),
+            VBInteger::from(1)
+        );
+    }
+
+    #[test]
+    fn text_compare_is_case_insensitive() {
+        let text = Some(&VBLong::from(1));
+        assert_eq!(
+            strcomp(&VBString::from("ABC"), &VBString::from("abc"), text).unwrap(),
+            VBInteger::from(0)
+        );
+        assert_eq!(
+            strcomp(&VBString::from("ABC"), &VBString::from("ABD"), text).unwrap(),
+            VBInteger::from(-1)
+        );
+        assert_eq!(
+            strcomp(&VBString::from("XYZ"), &VBString::from("ABC"), text).unwrap(),
+            VBInteger::from(1)
+        );
+    }
+
+    #[test]
+    fn empty_strings_sort_first() {
+        assert_eq!(
+            strcomp(&VBString::from(""), &VBString::from("x"), None).unwrap(),
+            VBInteger::from(-1)
+        );
+        assert_eq!(
+            strcomp(&VBString::from(""), &VBString::from(""), None).unwrap(),
+            VBInteger::from(0)
+        );
+    }
+}

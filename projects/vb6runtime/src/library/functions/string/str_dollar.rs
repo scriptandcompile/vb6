@@ -351,3 +351,119 @@
 //! - May produce scientific notation for very large or small numbers
 //! - Floating-point precision artifacts may appear in output
 //! - No locale-specific formatting (always uses invariant format)
+
+use crate::{
+    error::{VBError, VBResult},
+    value::{VBString, VBVariant},
+};
+
+/// Converts a number to a string with a leading space for positive values.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
+///
+/// Positive numbers (and zero) are prefixed with a single space for the sign
+/// position; negative numbers are prefixed with a minus sign. Booleans convert
+/// to `-1`/` 0` (not `True`/`False`). No thousands separators are added and the
+/// decimal point is always `.`, regardless of locale.
+///
+///
+/// # Errors
+///
+/// Returns error 13 (`Type mismatch`) when `number` is a non-numeric string or
+/// an object.
+///
+/// `Str$` raises error 94 when `number` is `Null`; use `Str` for the
+/// Null-propagating variant.
+pub fn str_dollar(number: &VBVariant) -> VBResult<VBString> {
+    let body = match number {
+        VBVariant::Null => return Err(VBError::invalid_use_of_null()),
+        VBVariant::Empty => "0".to_string(),
+        VBVariant::Boolean(b) => {
+            return if *b {
+                Ok(VBString::from("-1"))
+            } else {
+                Ok(VBString::from(" 0"))
+            };
+        }
+        VBVariant::String(_) => number.as_f64()?.to_string(),
+        VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => {
+            return Err(VBError::type_mismatch())
+        }
+        _ => number.as_string()?,
+    };
+
+    if body.starts_with('-') {
+        Ok(VBString::from(body))
+    } else {
+        Ok(VBString::from(format!(" {body}")))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn positive_numbers_have_leading_space() {
+        assert_eq!(
+            str_dollar(&VBVariant::Long(123)).unwrap(),
+            VBString::from(" 123")
+        );
+        assert_eq!(
+            str_dollar(&VBVariant::Long(0)).unwrap(),
+            VBString::from(" 0")
+        );
+        assert_eq!(
+            str_dollar(&VBVariant::Double(3.14159)).unwrap(),
+            VBString::from(" 3.14159")
+        );
+    }
+
+    #[test]
+    fn negative_numbers_have_leading_minus() {
+        assert_eq!(
+            str_dollar(&VBVariant::Long(-456)).unwrap(),
+            VBString::from("-456")
+        );
+    }
+
+    #[test]
+    fn booleans_become_numbers() {
+        assert_eq!(
+            str_dollar(&VBVariant::from_bool(true)).unwrap(),
+            VBString::from("-1")
+        );
+        assert_eq!(
+            str_dollar(&VBVariant::from_bool(false)).unwrap(),
+            VBString::from(" 0")
+        );
+    }
+
+    #[test]
+    fn empty_coerces_to_zero() {
+        assert_eq!(str_dollar(&VBVariant::Empty).unwrap(), VBString::from(" 0"));
+    }
+
+    #[test]
+    fn numeric_strings_are_normalized() {
+        assert_eq!(
+            str_dollar(&VBVariant::from_string("42")).unwrap(),
+            VBString::from(" 42")
+        );
+        assert_eq!(
+            str_dollar(&VBVariant::from_string("-1.5")).unwrap(),
+            VBString::from("-1.5")
+        );
+    }
+
+    #[test]
+    fn non_numeric_string_errors() {
+        let err = str_dollar(&VBVariant::from_string("abc")).unwrap_err();
+        assert_eq!(err.number, crate::error::err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn null_errors() {
+        let err = str_dollar(&VBVariant::Null).unwrap_err();
+        assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
+    }
+}

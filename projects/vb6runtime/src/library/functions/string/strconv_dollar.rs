@@ -1,10 +1,10 @@
-//! VB6 `StrConv` Function
+//! VB6 `StrConv$` Function
 //!
-//! The `StrConv` function converts a string to a specified format.
+//! The `StrConv$` function converts a string to a specified format.
 //!
 //! ## Syntax
 //! ```vb6
-//! StrConv(string, conversion[, LCID])
+//! StrConv$(string, conversion[, LCID])
 //! ```
 //!
 //! ## Parameters
@@ -25,7 +25,7 @@
 //! Returns a `Variant` (String) containing the converted string, or a `Variant` (Byte array) when converting to/from Unicode.
 //!
 //! ## Remarks
-//! The `StrConv` function provides powerful string transformation capabilities:
+//! The `StrConv$` function provides powerful string transformation capabilities:
 //!
 //! - **Case conversion**: `vbUpperCase`, `vbLowerCase`, and `vbProperCase` for text normalization
 //! - **Proper case rules**: `vbProperCase` capitalizes first letter after spaces and certain punctuation
@@ -77,9 +77,9 @@
 //!
 //! text = "Hello World"
 //!
-//! result = StrConv(text, vbUpperCase)    ' "HELLO WORLD"
-//! result = StrConv(text, vbLowerCase)    ' "hello world"
-//! result = StrConv(text, vbProperCase)   ' "Hello World"
+//! result = StrConv$(text, vbUpperCase)    ' "HELLO WORLD"
+//! result = StrConv$(text, vbLowerCase)    ' "hello world"
+//! result = StrConv$(text, vbProperCase)   ' "Hello World"
 //!
 //! text = "the quick brown fox"
 //! result = StrConv(text, vbProperCase)   ' "The Quick Brown Fox"
@@ -94,11 +94,11 @@
 //! text = "Hello"
 //!
 //! ' Convert to Unicode byte array
-//! bytes = StrConv(text, vbUnicode)
+//! bytes = StrConv$(text, vbUnicode)
 //! ' bytes contains: 72, 0, 101, 0, 108, 0, 108, 0, 111, 0
 //!
 //! ' Convert back to string
-//! restored = StrConv(bytes, vbFromUnicode)  ' "Hello"
+//! restored = StrConv$(bytes, vbFromUnicode)  ' "Hello"
 //! ```
 //!
 //! ### Example 3: Combining Conversions
@@ -109,7 +109,7 @@
 //! text = "hello"
 //!
 //! ' Combine uppercase with wide conversion (for DBCS)
-//! result = StrConv(text, vbUpperCase + vbWide)
+//! result = StrConv$(text, vbUpperCase + vbWide)
 //! ```
 //!
 //! ### Example 4: Proper Case Formatting
@@ -118,10 +118,10 @@
 //! Dim formatted As String
 //!
 //! name = "JOHN Q. PUBLIC"
-//! formatted = StrConv(name, vbProperCase)  ' "John Q. Public"
+//! formatted = StrConv$(name, vbProperCase)  ' "John Q. Public"
 //!
 //! name = "o'brien"
-//! formatted = StrConv(name, vbProperCase)  ' "O'brien"
+//! formatted = StrConv$(name, vbProperCase)  ' "O'brien"
 //! ' Note: StrConv doesn't handle special cases like O'Brien
 //! ```
 //!
@@ -131,7 +131,7 @@
 //! ```vb6
 //! Function NormalizeInput(userInput As String) As String
 //!     ' Convert to uppercase for case-insensitive processing
-//!     NormalizeInput = StrConv(Trim$(userInput), vbUpperCase)
+//!     NormalizeInput = StrConv$(Trim$(userInput), vbUpperCase)
 //! End Function
 //! ```
 //!
@@ -139,14 +139,14 @@
 //! ```vb6
 //! Function FormatName(name As String) As String
 //!     ' Convert to proper case for display
-//!     FormatName = StrConv(Trim$(name), vbProperCase)
+//!     FormatName = StrConv$(Trim$(name), vbProperCase)
 //! End Function
 //! ```
 //!
 //! ### Pattern 3: Case-Insensitive Comparison
 //! ```vb6
 //! Function EqualsIgnoreCase(str1 As String, str2 As String) As Boolean
-//!     EqualsIgnoreCase = (StrConv(str1, vbUpperCase) = StrConv(str2, vbUpperCase))
+//!     EqualsIgnoreCase = (StrConv$(str1, vbUpperCase) = StrConv$(str2, vbUpperCase))
 //! End Function
 //! ```
 //!
@@ -156,7 +156,7 @@
 //!     Dim fileNum As Integer
 //!     Dim bytes() As Byte
 //!     
-//!     bytes = StrConv(text, vbUnicode)
+//!     bytes = StrConv$(text, vbUnicode)
 //!     
 //!     fileNum = FreeFile
 //!     Open filename For Binary As #fileNum
@@ -180,7 +180,7 @@
 //!     Get #fileNum, , bytes
 //!     Close #fileNum
 //!     
-//!     ReadUnicodeFile = StrConv(bytes, vbFromUnicode)
+//!     ReadUnicodeFile = StrConv$(bytes, vbFromUnicode)
 //! End Function
 //! ```
 //!
@@ -190,7 +190,7 @@
 //!     Dim i As Integer
 //!     
 //!     For i = LBound(arr) To UBound(arr)
-//!         arr(i) = StrConv(arr(i), vbUpperCase)
+//!         arr(i) = StrConv$(arr(i), vbUpperCase)
 //!     Next i
 //! End Sub
 //! ```
@@ -201,7 +201,7 @@
 //!     Dim result As String
 //!     
 //!     ' Convert to proper case
-//!     result = StrConv(title, vbProperCase)
+//!     result = StrConv$(title, vbProperCase)
 //!     
 //!     ' Handle articles and prepositions (simplified)
 //!     result = Replace(result, " A ", " a ")
@@ -218,7 +218,7 @@
 //! ```vb6
 //! Function NormalizeForDatabase(value As String) As String
 //!     ' Trim and convert to uppercase for storage
-//!     NormalizeForDatabase = StrConv(Trim$(value), vbUpperCase)
+//!     NormalizeForDatabase = StrConv$(Trim$(value), vbUpperCase)
 //! End Function
 //! ```
 //!
@@ -226,7 +226,7 @@
 //! ```vb6
 //! Function MatchesPattern(text As String, pattern As String) As Boolean
 //!     ' Case-insensitive pattern matching
-//!     MatchesPattern = (StrConv(text, vbUpperCase) Like StrConv(pattern, vbUpperCase))
+//!     MatchesPattern = (StrConv$(text, vbUpperCase) Like StrConv$(pattern, vbUpperCase))
 //! End Function
 //! ```
 //!
@@ -237,7 +237,7 @@
 //!     Dim i As Integer
 //!     Dim result As String
 //!     
-//!     bytes = StrConv(text, vbUnicode)
+//!     bytes = StrConv$(text, vbUnicode)
 //!     
 //!     result = ""
 //!     For i = LBound(bytes) To UBound(bytes)
@@ -284,11 +284,11 @@
 //!     ' Apply case conversion
 //!     Select Case m_Mode
 //!         Case UpperCase
-//!             result = StrConv(result, vbUpperCase)
+//!             result = StrConv$(result, vbUpperCase)
 //!         Case LowerCase
-//!             result = StrConv(result, vbLowerCase)
+//!             result = StrConv$(result, vbLowerCase)
 //!         Case ProperCase
-//!             result = StrConv(result, vbProperCase)
+//!             result = StrConv$(result, vbProperCase)
 //!     End Select
 //!     
 //!     Normalize = result
@@ -332,7 +332,7 @@
 //!     Dim existingSize As Long
 //!     Dim newSize As Long
 //!     
-//!     bytes = StrConv(text, vbUnicode)
+//!     bytes = StrConv$(text, vbUnicode)
 //!     fileNum = FreeFile
 //!     
 //!     If appendMode And Dir(filename) <> "" Then
@@ -386,7 +386,7 @@
 //!     Get #fileNum, , bytes
 //!     Close #fileNum
 //!     
-//!     ReadFile = StrConv(bytes, vbFromUnicode)
+//!     ReadFile = StrConv$(bytes, vbFromUnicode)
 //! End Function
 //!
 //! Public Function ReadLines(filename As String) As String()
@@ -413,15 +413,15 @@
 //! Option Explicit
 //!
 //! Public Function ToUpper(text As String) As String
-//!     ToUpper = StrConv(text, vbUpperCase)
+//!     ToUpper = StrConv$(text, vbUpperCase)
 //! End Function
 //!
 //! Public Function ToLower(text As String) As String
-//!     ToLower = StrConv(text, vbLowerCase)
+//!     ToLower = StrConv$(text, vbLowerCase)
 //! End Function
 //!
 //! Public Function ToProper(text As String) As String
-//!     ToProper = StrConv(text, vbProperCase)
+//!     ToProper = StrConv$(text, vbProperCase)
 //! End Function
 //!
 //! Public Function ToTitleCase(text As String) As String
@@ -432,7 +432,7 @@
 //!     Dim lowercaseWords As String
 //!     
 //!     ' Start with proper case
-//!     result = StrConv(text, vbProperCase)
+//!     result = StrConv$(text, vbProperCase)
 //!     
 //!     ' Lowercase certain words (not first word)
 //!     lowercaseWords = " a an the and but or for nor of in on at to from by "
@@ -467,15 +467,15 @@
 //! End Function
 //!
 //! Public Function IsAllUpper(text As String) As Boolean
-//!     IsAllUpper = (text = StrConv(text, vbUpperCase))
+//!     IsAllUpper = (text = StrConv$(text, vbUpperCase))
 //! End Function
 //!
 //! Public Function IsAllLower(text As String) As Boolean
-//!     IsAllLower = (text = StrConv(text, vbLowerCase))
+//!     IsAllLower = (text = StrConv$(text, vbLowerCase))
 //! End Function
 //!
 //! Public Function IsProperCase(text As String) As Boolean
-//!     IsProperCase = (text = StrConv(text, vbProperCase))
+//!     IsProperCase = (text = StrConv$(text, vbProperCase))
 //! End Function
 //! ```
 //!
@@ -486,15 +486,15 @@
 //! Option Explicit
 //!
 //! Public Function EqualsIgnoreCase(str1 As String, str2 As String) As Boolean
-//!     EqualsIgnoreCase = (StrConv(str1, vbUpperCase) = StrConv(str2, vbUpperCase))
+//!     EqualsIgnoreCase = (StrConv$(str1, vbUpperCase) = StrConv$(str2, vbUpperCase))
 //! End Function
 //!
 //! Public Function StartsWithIgnoreCase(text As String, prefix As String) As Boolean
 //!     Dim textUpper As String
 //!     Dim prefixUpper As String
 //!     
-//!     textUpper = StrConv(text, vbUpperCase)
-//!     prefixUpper = StrConv(prefix, vbUpperCase)
+//!     textUpper = StrConv$(text, vbUpperCase)
+//!     prefixUpper = StrConv$(prefix, vbUpperCase)
 //!     
 //!     StartsWithIgnoreCase = (Left$(textUpper, Len(prefixUpper)) = prefixUpper)
 //! End Function
@@ -503,8 +503,8 @@
 //!     Dim textUpper As String
 //!     Dim suffixUpper As String
 //!     
-//!     textUpper = StrConv(text, vbUpperCase)
-//!     suffixUpper = StrConv(suffix, vbUpperCase)
+//!     textUpper = StrConv$(text, vbUpperCase)
+//!     suffixUpper = StrConv$(suffix, vbUpperCase)
 //!     
 //!     EndsWithIgnoreCase = (Right$(textUpper, Len(suffixUpper)) = suffixUpper)
 //! End Function
@@ -513,8 +513,8 @@
 //!     Dim textUpper As String
 //!     Dim searchUpper As String
 //!     
-//!     textUpper = StrConv(text, vbUpperCase)
-//!     searchUpper = StrConv(searchValue, vbUpperCase)
+//!     textUpper = StrConv$(text, vbUpperCase)
+//!     searchUpper = StrConv$(searchValue, vbUpperCase)
 //!     
 //!     ContainsIgnoreCase = (InStr(textUpper, searchUpper) > 0)
 //! End Function
@@ -523,8 +523,8 @@
 //!     Dim textUpper As String
 //!     Dim searchUpper As String
 //!     
-//!     textUpper = StrConv(text, vbUpperCase)
-//!     searchUpper = StrConv(searchValue, vbUpperCase)
+//!     textUpper = StrConv$(text, vbUpperCase)
+//!     searchUpper = StrConv$(searchValue, vbUpperCase)
 //!     
 //!     IndexOfIgnoreCase = InStr(textUpper, searchUpper)
 //! End Function
@@ -539,8 +539,8 @@
 //!     
 //!     result = ""
 //!     lastPos = 1
-//!     textUpper = StrConv(text, vbUpperCase)
-//!     findUpper = StrConv(findText, vbUpperCase)
+//!     textUpper = StrConv$(text, vbUpperCase)
+//!     findUpper = StrConv$(findText, vbUpperCase)
 //!     
 //!     pos = InStr(lastPos, textUpper, findUpper)
 //!     Do While pos > 0
@@ -609,96 +609,104 @@
 //! - No validation of byte array format when using `vbFromUnicode`
 //! - LCID parameter has limited practical use
 
-use super::strconv_dollar;
 use crate::{
-    error::VBResult,
-    value::{VBLong, VBVariant},
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
 };
 
-/// Converts a string to the format specified by `conversion`.
+/// Capitalizes the first letter of every word and lowercases the rest.
 ///
-/// `StrConv` is the Variant-returning counterpart of `StrConv$`; a `Null`
-/// `string` propagates as `Null`.
+/// A word is delimited by any non-letter character (spaces, tabs, punctuation);
+/// spacing and punctuation are preserved unchanged.
+pub(crate) fn proper_case(input: &str) -> String {
+    let mut out = String::new();
+    let mut word_start = true;
+    for c in input.chars() {
+        if c.is_alphabetic() {
+            if word_start {
+                out.extend(c.to_uppercase());
+            } else {
+                out.extend(c.to_lowercase());
+            }
+            word_start = false;
+        } else {
+            out.push(c);
+            word_start = true;
+        }
+    }
+    out
+}
+
+/// Converts a string to the format specified by `conversion`.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
+///
+/// Supported conversions: `vbUpperCase` (1), `vbLowerCase` (2), and
+/// `vbProperCase` (3). Case conversion uses full Unicode case mapping; `lcid`
+/// is accepted for signature compatibility but does not affect the result.
 ///
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `conversion` is
-/// not one of the supported values.
-pub fn strconv(
-    string: &VBVariant,
+/// not one of the supported values, and error 94 (`Invalid use of Null`) when
+/// `string` is `Null`.
+pub fn strconv_dollar(
+    string: &VBString,
     conversion: &VBLong,
-    lcid: Option<&VBLong>,
-) -> VBResult<VBVariant> {
-    if string.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    strconv_dollar(&string.as_vbstring()?, conversion, lcid).map(VBVariant::from)
+    _lcid: Option<&VBLong>,
+) -> VBResult<VBString> {
+    let result = match conversion.as_i32() {
+        1 => string.as_str().to_uppercase(),
+        2 => string.as_str().to_lowercase(),
+        3 => proper_case(string.as_str()),
+        other => {
+            return Err(VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                format!("Unsupported conversion {other}"),
+            ))
+        }
+    };
+    Ok(VBString::from(result))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::error::err_number;
+
+    fn conv(conversion: i32) -> VBLong {
+        VBLong::from(conversion)
+    }
 
     #[test]
     fn upper_and_lower_case() {
         assert_eq!(
-            strconv(
-                &VBVariant::from_string("Hello World"),
-                &VBLong::from(1),
-                None
-            )
-            .unwrap(),
-            VBVariant::from_string("HELLO WORLD")
+            strconv_dollar(&VBString::from("Hello World"), &conv(1), None).unwrap(),
+            VBString::from("HELLO WORLD")
         );
         assert_eq!(
-            strconv(
-                &VBVariant::from_string("Hello World"),
-                &VBLong::from(2),
-                None
-            )
-            .unwrap(),
-            VBVariant::from_string("hello world")
+            strconv_dollar(&VBString::from("Hello World"), &conv(2), None).unwrap(),
+            VBString::from("hello world")
         );
     }
 
     #[test]
     fn proper_case_capitalizes_words() {
         assert_eq!(
-            strconv(
-                &VBVariant::from_string("HELLO MY FRIEND"),
-                &VBLong::from(3),
-                None
-            )
-            .unwrap(),
-            VBVariant::from_string("Hello My Friend")
+            strconv_dollar(&VBString::from("HELLO MY FRIEND"), &conv(3), None).unwrap(),
+            VBString::from("Hello My Friend")
         );
         assert_eq!(
-            strconv(
-                &VBVariant::from_string("hello-world"),
-                &VBLong::from(3),
-                None
-            )
-            .unwrap(),
-            VBVariant::from_string("Hello-World")
+            strconv_dollar(&VBString::from("hello-world"), &conv(3), None).unwrap(),
+            VBString::from("Hello-World")
         );
     }
 
     #[test]
     fn unsupported_conversion_errors() {
         assert_eq!(
-            strconv(&VBVariant::from_string("x"), &VBLong::from(64), None)
+            strconv_dollar(&VBString::from("x"), &conv(64), None)
                 .unwrap_err()
                 .number,
             err_number::INVALID_PROCEDURE_CALL
-        );
-    }
-
-    #[test]
-    fn null_propagation() {
-        assert_eq!(
-            strconv(&VBVariant::Null, &VBLong::from(1), None).unwrap(),
-            VBVariant::Null
         );
     }
 }

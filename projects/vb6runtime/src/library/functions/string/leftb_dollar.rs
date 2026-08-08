@@ -215,3 +215,88 @@
 //! - Not suitable for modern Unicode string processing
 //! - Limited to VB6's internal string representation
 //! - May produce unexpected results with emoji or complex Unicode
+
+use crate::{
+    error::{err_number, VBError, VBResult},
+    value::{VBLong, VBString},
+};
+
+/// Number of bytes used to encode one character in this runtime's UTF-16 model.
+const BYTES_PER_CHAR: i32 = 2;
+
+/// Returns the leftmost characters of `input` whose encoded size, in bytes,
+/// does not exceed `length`.
+///
+/// Each character occupies 2 bytes, so `LeftB` extracts `length / 2`
+/// characters; a trailing partial byte is discarded. A `length` of 0 yields an
+/// empty string and a `length` at least `LenB(input)` yields the whole string.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
+pub fn leftb_dollar(input: &VBString, length: &VBLong) -> VBResult<VBString> {
+    let length = length.as_i32();
+    if length < 0 {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid length",
+        ));
+    }
+    let n = length / BYTES_PER_CHAR;
+    Ok(VBString::from(
+        input
+            .as_str()
+            .chars()
+            .take(n as usize)
+            .collect::<String>(),
+    ))
+}
+
+/// Returns the leftmost characters of `input` whose encoded size, in bytes,
+/// does not exceed `length`.
+///
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn returns_leftmost_bytes() {
+        assert_eq!(
+            leftb_dollar(&VBString::from("ABC"), &VBLong::from(2)).unwrap(),
+            VBString::from("A")
+        );
+        assert_eq!(
+            leftb_dollar(&VBString::from("ABC"), &VBLong::from(4)).unwrap(),
+            VBString::from("AB")
+        );
+        assert_eq!(
+            leftb_dollar(&VBString::from("ABC"), &VBLong::from(0)).unwrap(),
+            VBString::from("")
+        );
+    }
+
+    #[test]
+    fn length_beyond_byte_count_returns_whole() {
+        assert_eq!(
+            leftb_dollar(&VBString::from("ABC"), &VBLong::from(99)).unwrap(),
+            VBString::from("ABC")
+        );
+    }
+
+    #[test]
+    fn partial_byte_is_discarded() {
+        assert_eq!(
+            leftb_dollar(&VBString::from("ABC"), &VBLong::from(3)).unwrap(),
+            VBString::from("A")
+        );
+    }
+
+    #[test]
+    fn negative_length_errors() {
+        let err = leftb_dollar(&VBString::from("ABC"), &VBLong::from(-1)).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+}

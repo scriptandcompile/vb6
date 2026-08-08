@@ -565,3 +565,53 @@
 //! - Null input can cause errors if not handled
 //! - No culture-aware formatting
 //! - Return value length is unpredictable (depends on number magnitude)
+
+use crate::{
+    error::VBResult,
+    value::VBVariant,
+};
+
+use super::str_dollar::str_dollar;
+
+/// Converts a number to its string representation.
+///
+/// Positive numbers (and zero) are prefixed with a single space for the sign
+/// position; negative numbers are prefixed with a minus sign. Booleans convert
+/// to `-1`/` 0`. No thousands separators are added and the decimal point is
+/// always `.`, regardless of locale.
+///
+/// `Str` is the Variant-returning counterpart of `Str$`; a `Null` input
+/// propagates as `Null`.
+///
+/// # Errors
+///
+/// Returns error 13 (`Type mismatch`) when `number` is a non-numeric string or
+/// an object.
+pub fn str(number: &VBVariant) -> VBResult<VBVariant> {
+    if number.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    str_dollar(number).map(VBVariant::from)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn converts_numbers_with_sign_space() {
+        assert_eq!(
+            str(&VBVariant::Long(123)).unwrap(),
+            VBVariant::from_string(" 123")
+        );
+        assert_eq!(
+            str(&VBVariant::Long(-456)).unwrap(),
+            VBVariant::from_string("-456")
+        );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(str(&VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+}
