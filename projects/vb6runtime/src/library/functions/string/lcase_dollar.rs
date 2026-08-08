@@ -355,19 +355,18 @@
 //! - For true Unicode case folding, more sophisticated methods may be needed
 //! - Some special characters (like German ß) may not convert in all locales
 
-use super::lcase;
 use crate::{error::VBResult, value::VBString};
 
 /// Converts all uppercase letters in a string to lowercase.
 /// The `$` suffix indicates this function returns a `String` type (not `Variant`).
-/// Only uppercase ASCII letters A-Z are converted; all other characters remain unchanged.
+/// Only uppercase letters are converted; lowercase letters and non-letter
+/// characters are unchanged. Uses full Unicode case mapping.
 ///
 /// # Arguments
 ///
-/// * `s: &str` — The input string. If empty, an empty string is returned.
-#[inline]
+/// * `input` — The input string. If empty, an empty string is returned.
 pub fn lcase_dollar(input: &VBString) -> VBResult<VBString> {
-    lcase(input)
+    Ok(VBString::from(input.as_str().to_lowercase()))
 }
 
 #[cfg(test)]

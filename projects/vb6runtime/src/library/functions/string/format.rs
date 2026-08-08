@@ -604,7 +604,7 @@
 
 use crate::{
     error::VBResult,
-    value::{VBLong, VBString, Value},
+    value::{VBLong, VBString, VBVariant},
 };
 
 use super::format_dollar::format_dollar;
@@ -622,10 +622,10 @@ use super::format_dollar::format_dollar;
 /// Returns error 13 (`Type mismatch`) when the expression cannot be coerced to
 /// the type implied by the format string.
 pub fn format(
-    expression: &Value,
+    expression: &VBVariant,
     format: Option<&VBString>,
     firstdayofweek: Option<&VBLong>,
     firstweekofyear: Option<&VBLong>,
-) -> VBResult<VBString> {
-    format_dollar(expression, format, firstdayofweek, firstweekofyear)
+) -> VBResult<VBVariant> {
+    format_dollar(expression, format, firstdayofweek, firstweekofyear).map(VBVariant::from)
 }

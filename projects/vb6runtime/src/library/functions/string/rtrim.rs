@@ -654,16 +654,25 @@
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
 
-use crate::{error::VBResult, value::VBString};
+use crate::{
+    error::VBResult,
+    value::VBVariant,
+};
+
+use super::rtrim_dollar::rtrim_dollar;
 
 /// Returns the string with trailing spaces (ASCII 32) removed.
 ///
 /// Only the space character is trimmed, matching VB6; tabs and other
 /// whitespace are preserved.
-pub fn rtrim(input: &VBString) -> VBResult<VBString> {
-    Ok(VBString::from(
-        input.as_str().trim_end_matches(' ').to_string(),
-    ))
+///
+/// `RTrim` is the Variant-returning counterpart of `RTrim$`; a `Null` input
+/// propagates as `Null`.
+pub fn rtrim(input: &VBVariant) -> VBResult<VBVariant> {
+    if input.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    rtrim_dollar(&input.as_vbstring()?).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -673,18 +682,29 @@ mod tests {
     #[test]
     fn trims_trailing_spaces() {
         assert_eq!(
-            rtrim(&VBString::from("  Hello World  ")).unwrap(),
-            VBString::from("  Hello World")
+            rtrim(&VBVariant::from_string("  Hello World  ")).unwrap(),
+            VBVariant::from_string("  Hello World")
         );
         assert_eq!(
-            rtrim(&VBString::from("Hello")).unwrap(),
-            VBString::from("Hello")
+            rtrim(&VBVariant::from_string("Hello")).unwrap(),
+            VBVariant::from_string("Hello")
         );
     }
 
     #[test]
     fn handles_empty_and_all_spaces() {
-        assert_eq!(rtrim(&VBString::from("")).unwrap(), VBString::from(""));
-        assert_eq!(rtrim(&VBString::from("   ")).unwrap(), VBString::from(""));
+        assert_eq!(
+            rtrim(&VBVariant::from_string("")).unwrap(),
+            VBVariant::from_string("")
+        );
+        assert_eq!(
+            rtrim(&VBVariant::from_string("   ")).unwrap(),
+            VBVariant::from_string("")
+        );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(rtrim(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 }

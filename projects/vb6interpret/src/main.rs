@@ -12,7 +12,7 @@ use vb6interpret::Interpreter;
 use vb6parse::errors::{ErrorKind, SourceFileError};
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
-use vb6runtime::Value;
+use vb6runtime::VBVariant;
 
 #[derive(Parser)]
 #[command(name = "vb6-interpret")]
@@ -272,12 +272,12 @@ fn expand_tilde(path: &Path) -> PathBuf {
 }
 
 /// Parse a `--set` value into a runtime value (Long, Double, or String).
-fn parse_value(raw: &str) -> Value {
+fn parse_value(raw: &str) -> VBVariant {
     if let Ok(long) = raw.parse::<i64>() {
-        return Value::from_i64(long);
+        return VBVariant::from_i64(long);
     }
     if let Ok(double) = raw.parse::<f64>() {
-        return Value::from_double(double);
+        return VBVariant::from_double(double);
     }
-    Value::from_string(raw.to_string())
+    VBVariant::from_string(raw.to_string())
 }

@@ -415,62 +415,86 @@
 //! - `AscB`: Returns the byte value
 
 use crate::{
-    error::{err_number, VBError, VBResult},
-    value::{VBLong, VBString},
+    error::VBResult,
+    value::VBVariant,
 };
+
+use super::chr_dollar::chr_dollar;
 
 /// Returns the character associated with the specified Windows-1252 (ANSI) code.
 ///
 /// `charcode` must be in the range 0-255. Code 0 returns the null character
 /// (U+0000, `vbNullChar`); codes 128-255 are decoded as Windows-1252.
 ///
+/// `Chr` is the Variant-returning counterpart of `Chr$`; a `Null` charcode
+/// propagates as `Null`.
+///
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `charcode` is
 /// outside the range 0-255.
-pub fn chr(charcode: &VBLong) -> VBResult<VBString> {
-    let charcode = charcode.as_i32();
-    if !(0..=255).contains(&charcode) {
-        return Err(VBError::with_description(
-            err_number::INVALID_PROCEDURE_CALL,
-            "Character code out of range",
-        ));
+pub fn chr(charcode: &VBVariant) -> VBResult<VBVariant> {
+    if charcode.is_null() {
+        return Ok(VBVariant::Null);
     }
-    Ok(VBString::from(super::ansi::decode_byte(charcode as u8)))
+    chr_dollar(&charcode.as_vblong()?).map(VBVariant::from)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::value::VBLong;
+    use crate::error::err_number;
 
     #[test]
     fn returns_ascii_characters() {
-        assert_eq!(chr(&VBLong::from(65)).unwrap(), VBString::from("A"));
-        assert_eq!(chr(&VBLong::from(97)).unwrap(), VBString::from("a"));
-        assert_eq!(chr(&VBLong::from(34)).unwrap(), VBString::from("\""));
+        assert_eq!(
+            chr(&VBVariant::from_integer(65)).unwrap(),
+            VBVariant::from_string("A")
+        );
+        assert_eq!(
+            chr(&VBVariant::from_integer(97)).unwrap(),
+            VBVariant::from_string("a")
+        );
+        assert_eq!(
+            chr(&VBVariant::from_integer(34)).unwrap(),
+            VBVariant::from_string("\"")
+        );
     }
 
     #[test]
     fn returns_ansi_extended_characters() {
-        assert_eq!(chr(&VBLong::from(128)).unwrap(), VBString::from("€"));
-        assert_eq!(chr(&VBLong::from(233)).unwrap(), VBString::from("é"));
+        assert_eq!(
+            chr(&VBVariant::from_integer(128)).unwrap(),
+            VBVariant::from_string("€")
+        );
+        assert_eq!(
+            chr(&VBVariant::from_integer(233)).unwrap(),
+            VBVariant::from_string("é")
+        );
     }
 
     #[test]
     fn code_zero_returns_null_character() {
-        assert_eq!(chr(&VBLong::from(0)).unwrap(), VBString::from("\u{0}"));
+        assert_eq!(
+            chr(&VBVariant::from_integer(0)).unwrap(),
+            VBVariant::from_string("\u{0}")
+        );
     }
 
     #[test]
     fn rejects_out_of_range() {
         assert_eq!(
-            chr(&VBLong::from(-1)).unwrap_err().number,
+            chr(&VBVariant::from_integer(-1)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
         assert_eq!(
-            chr(&VBLong::from(256)).unwrap_err().number,
+            chr(&VBVariant::from_integer(256)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(chr(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 }

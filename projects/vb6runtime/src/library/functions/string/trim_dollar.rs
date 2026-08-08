@@ -451,3 +451,47 @@
 //! - No option to specify custom characters to remove
 //! - Works with strings only, not byte arrays
 //! - Does not change character case (use with `UCase$` or `LCase$` if needed)
+
+use crate::{error::VBResult, value::VBString};
+
+/// Returns the string with leading and trailing spaces removed.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
+///
+/// Only the space character is trimmed, matching VB6; tabs and other
+/// whitespace are preserved.
+pub fn trim_dollar(input: &VBString) -> VBResult<VBString> {
+    Ok(VBString::from(input.as_str().trim_matches(' ').to_string()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn trims_both_ends() {
+        assert_eq!(
+            trim_dollar(&VBString::from("  Hello World  ")).unwrap(),
+            VBString::from("Hello World")
+        );
+        assert_eq!(
+            trim_dollar(&VBString::from("Hello")).unwrap(),
+            VBString::from("Hello")
+        );
+    }
+
+    #[test]
+    fn does_not_trim_tabs() {
+        assert_eq!(
+            trim_dollar(&VBString::from("\tHello\t")).unwrap(),
+            VBString::from("\tHello\t")
+        );
+    }
+
+    #[test]
+    fn trims_to_empty() {
+        assert_eq!(
+            trim_dollar(&VBString::from("   ")).unwrap(),
+            VBString::from("")
+        );
+    }
+}

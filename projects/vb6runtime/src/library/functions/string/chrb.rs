@@ -320,3 +320,72 @@
 //! - Cannot represent Unicode characters beyond the ANSI range.
 //! - Code page dependent for values 128-255.
 //! - Runtime error if charcode is outside valid range.
+
+use crate::{
+    error::VBResult,
+    value::VBVariant,
+};
+
+use super::chrb_dollar::chrb_dollar;
+
+/// Returns the byte value character for the specified Windows-1252 (ANSI) code.
+///
+/// `charcode` must be in the range 0-255. Code 0 returns the null character
+/// (U+0000).
+///
+/// `ChrB` is the Variant-returning counterpart of `ChrB$`; a `Null` charcode
+/// propagates as `Null`.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `charcode` is
+/// outside the range 0-255.
+pub fn chrb(charcode: &VBVariant) -> VBResult<VBVariant> {
+    if charcode.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    chrb_dollar(&charcode.as_vblong()?).map(VBVariant::from)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn returns_ascii_characters() {
+        assert_eq!(
+            chrb(&VBVariant::from_integer(65)).unwrap(),
+            VBVariant::from_string("A")
+        );
+        assert_eq!(
+            chrb(&VBVariant::from_integer(97)).unwrap(),
+            VBVariant::from_string("a")
+        );
+    }
+
+    #[test]
+    fn code_zero_returns_null_character() {
+        assert_eq!(
+            chrb(&VBVariant::from_integer(0)).unwrap(),
+            VBVariant::from_string("\u{0}")
+        );
+    }
+
+    #[test]
+    fn rejects_out_of_range() {
+        assert_eq!(
+            chrb(&VBVariant::from_integer(-1)).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+        assert_eq!(
+            chrb(&VBVariant::from_integer(256)).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(chrb(&VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+}

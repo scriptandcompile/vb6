@@ -8,7 +8,7 @@
 use vb6core::error::{err_number, VBError, VBResult};
 use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
-use vb6runtime::{ArrayValue, Value};
+use vb6runtime::{ArrayValue, VBVariant};
 
 use crate::error::{RunError, RunResult};
 use crate::eval::ArithmaticOperator;
@@ -188,9 +188,9 @@ impl Interpreter {
             } else if !bounds.is_empty() {
                 let array =
                     ArrayValue::new_fixed(ty.clone(), &bounds).map_err(|e| self.error_here(e))?;
-                self.declare_in(&name, Value::Array(array));
+                self.declare_in(&name, VBVariant::Array(array));
             } else {
-                let value = Value::default_for_type(&ty);
+                let value = VBVariant::default_for_type(&ty);
                 self.declare_in(&name, value);
             }
 
@@ -261,7 +261,7 @@ impl Interpreter {
         }
 
         let array = ArrayValue::new_fixed(ty, &bounds).map_err(|e| self.error_here(e))?;
-        self.set_variable(&name, Value::Array(array));
+        self.set_variable(&name, VBVariant::Array(array));
         Ok(())
     }
 
@@ -299,10 +299,10 @@ impl Interpreter {
             .first_child_by_kind(SyntaxKind::Identifier)
             .map(|t| t.text().trim().to_string())
             .unwrap_or_default();
-        if let Some(Value::Array(array)) = self.lookup(&name) {
+        if let Some(VBVariant::Array(array)) = self.lookup(&name) {
             let element_type = array.element_type().clone();
             let dynamic = ArrayValue::new_dynamic(element_type);
-            self.set_variable(&name, Value::Array(dynamic));
+            self.set_variable(&name, VBVariant::Array(dynamic));
         }
         Ok(())
     }
@@ -333,7 +333,7 @@ impl Interpreter {
     }
 
     /// Write a value into a variable, array element, or function result.
-    pub(crate) fn assign(&mut self, lhs: &CstNode, value: Value) -> RunResult<()> {
+    pub(crate) fn assign(&mut self, lhs: &CstNode, value: VBVariant) -> RunResult<()> {
         match lhs.kind() {
             SyntaxKind::IdentifierExpression => {
                 let name = identifier_name(lhs);
@@ -373,9 +373,9 @@ impl Interpreter {
                     .lookup(&name)
                     .cloned()
                     .ok_or_else(|| self.error_here(VBError::subscript_out_of_range()))?;
-                if let Value::Array(mut array) = existing {
+                if let VBVariant::Array(mut array) = existing {
                     array.set(&indices, value)?;
-                    self.set_variable(&name, Value::Array(array));
+                    self.set_variable(&name, VBVariant::Array(array));
                     Ok(())
                 } else {
                     Err(self.error_here(VBError::type_mismatch()))
@@ -529,7 +529,7 @@ impl Interpreter {
             .get(to_index + 1)
             .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
 
-        let mut step = Value::from_long(1);
+        let mut step = VBVariant::from_long(1);
         if let Some(step_idx) = significant
             .iter()
             .position(|c| c.kind() == SyntaxKind::StepKeyword)
@@ -730,7 +730,7 @@ impl Interpreter {
                     .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
                 self.eval_expr(expr)?
             }
-            None => Value::Empty,
+            None => VBVariant::Empty,
         };
 
         let mut cur_line = line;
@@ -757,7 +757,7 @@ impl Interpreter {
     }
 
     /// Whether a `CaseClause` matches the selector.
-    fn case_clause_matches(&mut self, clause: &CstNode, selector: &Value) -> RunResult<bool> {
+    fn case_clause_matches(&mut self, clause: &CstNode, selector: &VBVariant) -> RunResult<bool> {
         let significant: Vec<&CstNode> = clause.significant_children().collect();
         // Skip the leading CaseKeyword and stop at the body StatementList.
         let mut spec: Vec<&CstNode> = Vec::new();
@@ -816,7 +816,7 @@ impl Interpreter {
 
     /// Evaluate a case value, which may be a bare literal token or an
     /// expression node.
-    fn eval_case_value(&mut self, node: &CstNode) -> RunResult<Value> {
+    fn eval_case_value(&mut self, node: &CstNode) -> RunResult<VBVariant> {
         if is_literal_kind(node.kind()) {
             self.eval_literal(node)
         } else {
@@ -825,7 +825,7 @@ impl Interpreter {
     }
 
     /// `low <= selector <= high` (numeric or string range).
-    fn in_range(&mut self, selector: &Value, low: &Value, high: &Value) -> RunResult<bool> {
+    fn in_range(&mut self, selector: &VBVariant, low: &VBVariant, high: &VBVariant) -> RunResult<bool> {
         let s = selector.as_f64()?;
         let lo = low.as_f64()?;
         let hi = high.as_f64()?;
@@ -835,9 +835,9 @@ impl Interpreter {
     /// Apply a comparison operator between the selector and a case value.
     fn apply_compare(
         &mut self,
-        selector: &Value,
+        selector: &VBVariant,
         op: SyntaxKind,
-        value: &Value,
+        value: &VBVariant,
     ) -> RunResult<bool> {
         let a = selector.as_f64()?;
         let b = value.as_f64()?;
@@ -955,7 +955,7 @@ impl Interpreter {
     }
 
     /// Declare a variable in the current scope (globals at module level).
-    pub(crate) fn declare_in(&mut self, name: &str, value: Value) {
+    pub(crate) fn declare_in(&mut self, name: &str, value: VBVariant) {
         if self.frames.is_empty() {
             self.globals.declare(name, value);
         } else if let Some(frame) = self.frames.last_mut() {
@@ -964,7 +964,7 @@ impl Interpreter {
     }
 
     /// Set a variable, implicit-declaring it in the current scope if needed.
-    pub(crate) fn set_variable(&mut self, name: &str, value: Value) {
+    pub(crate) fn set_variable(&mut self, name: &str, value: VBVariant) {
         if !self.frames.is_empty() {
             if let Some(frame) = self.frames.last_mut() {
                 if frame.locals.set(name, value.clone()) {
@@ -1012,22 +1012,22 @@ fn is_literal_kind(kind: SyntaxKind) -> bool {
 }
 
 /// Coerce a value to a static type following VB6 conversion semantics.
-pub(crate) fn coerce(value: Value, ty: &vb6core::types::VBType) -> Value {
+pub(crate) fn coerce(value: VBVariant, ty: &vb6core::types::VBType) -> VBVariant {
     match ty {
-        vb6core::types::VBType::Byte => value.as_byte().map(Value::Byte).unwrap_or(value),
-        vb6core::types::VBType::Integer => value.as_i16().map(Value::Integer).unwrap_or(value),
-        vb6core::types::VBType::Long => value.as_i32().map(Value::Long).unwrap_or(value),
-        vb6core::types::VBType::Single => value.as_f32().map(Value::Single).unwrap_or(value),
-        vb6core::types::VBType::Double => value.as_f64().map(Value::Double).unwrap_or(value),
+        vb6core::types::VBType::Byte => value.as_byte().map(VBVariant::Byte).unwrap_or(value),
+        vb6core::types::VBType::Integer => value.as_i16().map(VBVariant::Integer).unwrap_or(value),
+        vb6core::types::VBType::Long => value.as_i32().map(VBVariant::Long).unwrap_or(value),
+        vb6core::types::VBType::Single => value.as_f32().map(VBVariant::Single).unwrap_or(value),
+        vb6core::types::VBType::Double => value.as_f64().map(VBVariant::Double).unwrap_or(value),
         vb6core::types::VBType::Currency => value
             .as_currency_scaled()
-            .map(Value::Currency)
+            .map(VBVariant::Currency)
             .unwrap_or(value),
         vb6core::types::VBType::String => {
-            value.as_string().map(Value::from_string).unwrap_or(value)
+            value.as_string().map(VBVariant::from_string).unwrap_or(value)
         }
-        vb6core::types::VBType::Boolean => value.as_bool().map(Value::Boolean).unwrap_or(value),
-        vb6core::types::VBType::Date => value.as_date_serial().map(Value::Date).unwrap_or(value),
+        vb6core::types::VBType::Boolean => value.as_bool().map(VBVariant::Boolean).unwrap_or(value),
+        vb6core::types::VBType::Date => value.as_date_serial().map(VBVariant::Date).unwrap_or(value),
         _ => value,
     }
 }

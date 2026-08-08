@@ -6,7 +6,7 @@
 
 use crate::error::{err_number, VBError, VBResult};
 use crate::types::VBType;
-use crate::value::Value;
+use crate::value::VBVariant;
 
 /// Inclusive bounds of a single array dimension.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -39,7 +39,7 @@ impl ArrayDimension {
 pub struct ArrayValue {
     element_type: VBType,
     dimensions: Vec<ArrayDimension>,
-    data: Vec<Value>,
+    data: Vec<VBVariant>,
 }
 
 impl ArrayValue {
@@ -52,7 +52,7 @@ impl ArrayValue {
                 .checked_mul(dimension.len())
                 .ok_or_else(VBError::out_of_memory)?;
         }
-        let default = Value::default_for_type(&element_type);
+        let default = VBVariant::default_for_type(&element_type);
         Ok(Self {
             element_type,
             dimensions: dimensions.to_vec(),
@@ -72,7 +72,7 @@ impl ArrayValue {
 
     /// Create a one-dimensional array from an existing element buffer
     /// with `1 To data.len()` bounds.
-    pub fn from_vec(element_type: VBType, data: Vec<Value>) -> Self {
+    pub fn from_vec(element_type: VBType, data: Vec<VBVariant>) -> Self {
         let len = data.len() as i32;
         Self {
             element_type,
@@ -128,7 +128,7 @@ impl ArrayValue {
     }
 
     /// Borrow an element by indices (one per dimension, in order).
-    pub fn get(&self, indices: &[i32]) -> VBResult<&Value> {
+    pub fn get(&self, indices: &[i32]) -> VBResult<&VBVariant> {
         let offset = self.offset(indices)?;
         self.data
             .get(offset)
@@ -136,7 +136,7 @@ impl ArrayValue {
     }
 
     /// Mutably borrow an element by indices.
-    pub fn get_mut(&mut self, indices: &[i32]) -> VBResult<&mut Value> {
+    pub fn get_mut(&mut self, indices: &[i32]) -> VBResult<&mut VBVariant> {
         let offset = self.offset(indices)?;
         self.data
             .get_mut(offset)
@@ -144,14 +144,14 @@ impl ArrayValue {
     }
 
     /// Write an element by indices.
-    pub fn set(&mut self, indices: &[i32], value: Value) -> VBResult<()> {
+    pub fn set(&mut self, indices: &[i32], value: VBVariant) -> VBResult<()> {
         let offset = self.offset(indices)?;
         self.data[offset] = value;
         Ok(())
     }
 
     /// The raw element buffer.
-    pub fn as_slice(&self) -> &[Value] {
+    pub fn as_slice(&self) -> &[VBVariant] {
         &self.data
     }
 
@@ -190,7 +190,7 @@ mod tests {
     fn fixed_array_uses_default_values() {
         let arr = ArrayValue::new_fixed(VBType::Integer, &[ArrayDimension::new(1, 3)]).unwrap();
         assert_eq!(arr.len(), 3);
-        assert_eq!(arr.get(&[2]).unwrap(), &Value::Integer(0));
+        assert_eq!(arr.get(&[2]).unwrap(), &VBVariant::Integer(0));
         assert_eq!(arr.lower_bound(0).unwrap(), 1);
         assert_eq!(arr.upper_bound(0).unwrap(), 3);
     }
@@ -200,10 +200,10 @@ mod tests {
         let mut arr = ArrayValue::new_fixed(VBType::String, &[ArrayDimension::new(-2, 0)]).unwrap();
         assert_eq!(arr.lower_bound(0).unwrap(), -2);
         assert_eq!(arr.upper_bound(0).unwrap(), 0);
-        arr.set(&[-2], Value::String("a".into())).unwrap();
-        arr.set(&[0], Value::String("c".into())).unwrap();
-        assert_eq!(arr.get(&[-2]).unwrap(), &Value::String("a".into()));
-        assert_eq!(arr.get(&[0]).unwrap(), &Value::String("c".into()));
+        arr.set(&[-2], VBVariant::String("a".into())).unwrap();
+        arr.set(&[0], VBVariant::String("c".into())).unwrap();
+        assert_eq!(arr.get(&[-2]).unwrap(), &VBVariant::String("a".into()));
+        assert_eq!(arr.get(&[0]).unwrap(), &VBVariant::String("c".into()));
     }
 
     #[test]
@@ -244,10 +244,10 @@ mod tests {
         let mut arr = ArrayValue::new_fixed(VBType::Integer, &dims).unwrap();
         for i in 1..=2 {
             for j in 1..=3 {
-                arr.set(&[i, j], Value::Long(i * 10 + j)).unwrap();
+                arr.set(&[i, j], VBVariant::Long(i * 10 + j)).unwrap();
             }
         }
-        assert_eq!(arr.get(&[2, 3]).unwrap(), &Value::Long(23));
+        assert_eq!(arr.get(&[2, 3]).unwrap(), &VBVariant::Long(23));
         assert_eq!(arr.len(), 6);
     }
 }

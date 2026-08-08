@@ -787,9 +787,11 @@
 //! - `Mid` statement: Replaces characters within string
 
 use crate::{
-    error::{err_number, VBError, VBResult},
-    value::{VBLong, VBString},
+    error::VBResult,
+    value::{VBLong, VBVariant},
 };
+
+use super::mid_dollar::mid_dollar;
 
 /// Returns the specified number of characters from a string, starting at `start`.
 ///
@@ -798,46 +800,18 @@ use crate::{
 /// the end of the string yields an empty string. Characters are counted as
 /// Unicode scalar values.
 ///
+/// `Mid` is the Variant-returning counterpart of `Mid$`; a `Null` input
+/// propagates as `Null`.
+///
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `start` is less
 /// than 1 or `length` is negative.
-pub fn mid(input: &VBString, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBString> {
-    let start = start.as_i32();
-    if start < 1 {
-        return Err(VBError::with_description(
-            err_number::INVALID_PROCEDURE_CALL,
-            "Invalid start position",
-        ));
+pub fn mid(input: &VBVariant, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBVariant> {
+    if input.is_null() {
+        return Ok(VBVariant::Null);
     }
-    if let Some(n) = length {
-        let n = n.as_i32();
-        if n < 0 {
-            return Err(VBError::with_description(
-                err_number::INVALID_PROCEDURE_CALL,
-                "Invalid length",
-            ));
-        }
-    }
-
-    let chars: Vec<char> = input.as_str().chars().collect();
-    if start as usize > chars.len() {
-        return Ok(VBString::from(String::new()));
-    }
-
-    let skip = (start - 1) as usize;
-    let result = match length {
-        Some(n) => {
-            let n = n.as_i32();
-            chars
-                .into_iter()
-                .skip(skip)
-                .take(n as usize)
-                .collect::<String>()
-        }
-        None => chars.into_iter().skip(skip).collect::<String>(),
-    };
-    Ok(VBString::from(result))
+    mid_dollar(&input.as_vbstring()?, start, length).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -849,20 +823,20 @@ mod tests {
     fn extracts_middle_characters() {
         assert_eq!(
             mid(
-                &VBString::from("Hello World"),
+                &VBVariant::from_string("Hello World"),
                 &VBLong::from(4),
                 Some(&VBLong::from(5))
             )
             .unwrap(),
-            VBString::from("lo Wo")
+            VBVariant::from_string("lo Wo")
         );
     }
 
     #[test]
     fn omitting_length_returns_rest() {
         assert_eq!(
-            mid(&VBString::from("Hello World"), &VBLong::from(7), None).unwrap(),
-            VBString::from("World")
+            mid(&VBVariant::from_string("Hello World"), &VBLong::from(7), None).unwrap(),
+            VBVariant::from_string("World")
         );
     }
 
@@ -870,20 +844,20 @@ mod tests {
     fn length_beyond_end_is_clamped() {
         assert_eq!(
             mid(
-                &VBString::from("Hello"),
+                &VBVariant::from_string("Hello"),
                 &VBLong::from(4),
                 Some(&VBLong::from(10))
             )
             .unwrap(),
-            VBString::from("lo")
+            VBVariant::from_string("lo")
         );
     }
 
     #[test]
     fn start_beyond_end_returns_empty() {
         assert_eq!(
-            mid(&VBString::from("Hello"), &VBLong::from(6), None).unwrap(),
-            VBString::from("")
+            mid(&VBVariant::from_string("Hello"), &VBLong::from(6), None).unwrap(),
+            VBVariant::from_string("")
         );
     }
 
@@ -891,19 +865,19 @@ mod tests {
     fn zero_length_returns_empty() {
         assert_eq!(
             mid(
-                &VBString::from("Hello"),
+                &VBVariant::from_string("Hello"),
                 &VBLong::from(2),
                 Some(&VBLong::from(0))
             )
             .unwrap(),
-            VBString::from("")
+            VBVariant::from_string("")
         );
     }
 
     #[test]
     fn rejects_invalid_start() {
         assert_eq!(
-            mid(&VBString::from("Hello"), &VBLong::from(0), None)
+            mid(&VBVariant::from_string("Hello"), &VBLong::from(0), None)
                 .unwrap_err()
                 .number,
             err_number::INVALID_PROCEDURE_CALL
@@ -914,13 +888,21 @@ mod tests {
     fn rejects_negative_length() {
         assert_eq!(
             mid(
-                &VBString::from("Hello"),
+                &VBVariant::from_string("Hello"),
                 &VBLong::from(1),
                 Some(&VBLong::from(-1))
             )
             .unwrap_err()
             .number,
             err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(
+            mid(&VBVariant::Null, &VBLong::from(2), None).unwrap(),
+            VBVariant::Null
         );
     }
 }

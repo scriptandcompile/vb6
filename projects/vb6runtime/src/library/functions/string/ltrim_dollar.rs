@@ -204,3 +204,49 @@
 //! - Cannot remove spaces from the middle of strings
 //! - No option to limit how many spaces are removed
 //! - Does not normalize multiple internal spaces to single spaces
+
+use crate::{error::VBResult, value::VBString};
+
+/// Returns the string with leading spaces removed.
+/// The `$` suffix indicates this function returns a `String` type (not `Variant`).
+///
+/// Only the space character is trimmed, matching VB6; tabs and other
+/// whitespace are preserved.
+pub fn ltrim_dollar(input: &VBString) -> VBResult<VBString> {
+    Ok(VBString::from(
+        input.as_str().trim_start_matches(' ').to_string(),
+    ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn trims_leading_spaces() {
+        assert_eq!(
+            ltrim_dollar(&VBString::from("  Hello World  ")).unwrap(),
+            VBString::from("Hello World  ")
+        );
+        assert_eq!(
+            ltrim_dollar(&VBString::from("Hello")).unwrap(),
+            VBString::from("Hello")
+        );
+    }
+
+    #[test]
+    fn does_not_trim_trailing_or_tabs() {
+        assert_eq!(
+            ltrim_dollar(&VBString::from("\tHello ")).unwrap(),
+            VBString::from("\tHello ")
+        );
+    }
+
+    #[test]
+    fn trims_to_empty() {
+        assert_eq!(
+            ltrim_dollar(&VBString::from("   ")).unwrap(),
+            VBString::from("")
+        );
+    }
+}

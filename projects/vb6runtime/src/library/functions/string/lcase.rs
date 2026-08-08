@@ -529,14 +529,25 @@
 //! - `Replace`: Replace substrings (with case-sensitive option)
 //! - `InStr`: Find substring (can be case-insensitive)
 
-use crate::{error::VBResult, value::VBString};
+use crate::{
+    error::VBResult,
+    value::VBVariant,
+};
+
+use super::lcase_dollar::lcase_dollar;
 
 /// Returns the string converted to lowercase.
 ///
 /// Only uppercase letters are converted; lowercase letters and non-letter
 /// characters are unchanged. Uses full Unicode case mapping.
-pub fn lcase(input: &VBString) -> VBResult<VBString> {
-    Ok(VBString::from(input.as_str().to_lowercase()))
+///
+/// `LCase` is the Variant-returning counterpart of `LCase$`; a `Null` input
+/// propagates as `Null`.
+pub fn lcase(input: &VBVariant) -> VBResult<VBVariant> {
+    if input.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    lcase_dollar(&input.as_vbstring()?).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -546,29 +557,37 @@ mod tests {
     #[test]
     fn lowercases_letters() {
         assert_eq!(
-            lcase(&VBString::from("Hello World")).unwrap(),
-            VBString::from("hello world")
+            lcase(&VBVariant::from_string("Hello World")).unwrap(),
+            VBVariant::from_string("hello world")
         );
         assert_eq!(
-            lcase(&VBString::from("ABC")).unwrap(),
-            VBString::from("abc")
+            lcase(&VBVariant::from_string("ABC")).unwrap(),
+            VBVariant::from_string("abc")
         );
     }
 
     #[test]
     fn leaves_non_letters_unchanged() {
         assert_eq!(
-            lcase(&VBString::from("123 !@#")).unwrap(),
-            VBString::from("123 !@#")
+            lcase(&VBVariant::from_string("123 !@#")).unwrap(),
+            VBVariant::from_string("123 !@#")
         );
     }
 
     #[test]
     fn handles_unicode() {
         assert_eq!(
-            lcase(&VBString::from("HÉLLO")).unwrap(),
-            VBString::from("héllo")
+            lcase(&VBVariant::from_string("HÉLLO")).unwrap(),
+            VBVariant::from_string("héllo")
         );
-        assert_eq!(lcase(&VBString::from("")).unwrap(), VBString::from(""));
+        assert_eq!(
+            lcase(&VBVariant::from_string("")).unwrap(),
+            VBVariant::from_string("")
+        );
+    }
+
+    #[test]
+    fn propagates_null() {
+        assert_eq!(lcase(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 }

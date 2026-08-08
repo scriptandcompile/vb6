@@ -645,26 +645,24 @@
 //! - `RSet`: Right-aligns string within string variable
 
 use crate::{
-    error::{err_number, VBError, VBResult},
-    value::{VBLong, VBString},
+    error::VBResult,
+    value::{VBLong, VBVariant},
 };
+
+use super::space_dollar::space_dollar;
 
 /// Returns a string consisting of the specified number of spaces (ASCII 32).
 ///
 /// A `number` of 0 returns an empty string.
 ///
+/// `Space` is the Variant-returning counterpart of `Space$`; it always yields a
+/// String variant, so `Null` cannot occur.
+///
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `number` is negative.
-pub fn space(number: &VBLong) -> VBResult<VBString> {
-    let number = number.as_i32();
-    if number < 0 {
-        return Err(VBError::with_description(
-            err_number::INVALID_PROCEDURE_CALL,
-            "Invalid number",
-        ));
-    }
-    Ok(VBString::from(" ".repeat(number as usize)))
+pub fn space(number: &VBLong) -> VBResult<VBVariant> {
+    space_dollar(number).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -674,13 +672,16 @@ mod tests {
 
     #[test]
     fn returns_spaces() {
-        assert_eq!(space(&VBLong::from(3)).unwrap(), VBString::from("   "));
-        assert_eq!(space(&VBLong::from(1)).unwrap(), VBString::from(" "));
+        assert_eq!(
+            space(&VBLong::from(3)).unwrap(),
+            VBVariant::from_string("   ")
+        );
+        assert_eq!(space(&VBLong::from(1)).unwrap(), VBVariant::from_string(" "));
     }
 
     #[test]
     fn zero_returns_empty() {
-        assert_eq!(space(&VBLong::from(0)).unwrap(), VBString::from(""));
+        assert_eq!(space(&VBLong::from(0)).unwrap(), VBVariant::from_string(""));
     }
 
     #[test]

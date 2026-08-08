@@ -20,7 +20,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub use error::{RunError, RunResult};
 pub use interpreter::Interpreter;
 pub use scope::Scope;
-pub use vb6runtime::{VBError, Value};
+pub use vb6runtime::{VBError, VBVariant};
 
 /// Execute a VB6 module source string, capturing `Debug.Print` output.
 ///

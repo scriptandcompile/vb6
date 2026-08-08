@@ -243,7 +243,7 @@
 
 use crate::{
     error::{VBError, VBResult},
-    value::{VBLong, VBString, Value},
+    value::{VBLong, VBString, VBVariant},
 };
 
 /// Returns a `String` containing the formatted representation of `expression`
@@ -265,7 +265,7 @@ use crate::{
 /// the type implied by the format string (e.g. a date format applied to a
 /// non-numeric string).
 pub fn format_dollar(
-    expression: &Value,
+    expression: &VBVariant,
     format: Option<&VBString>,
     firstdayofweek: Option<&VBLong>,
     firstweekofyear: Option<&VBLong>,
@@ -1198,13 +1198,13 @@ mod tests {
     use super::*;
     use crate::error::err_number;
 
-    fn fmt(expr: Value, format: &str) -> String {
+    fn fmt(expr: VBVariant, format: &str) -> String {
         format_dollar(&expr, Some(&VBString::from(format)), None, None)
             .unwrap()
             .into_inner()
     }
 
-    fn fmt_opt(expr: Value, format: Option<&str>) -> String {
+    fn fmt_opt(expr: VBVariant, format: Option<&str>) -> String {
         format_dollar(&expr, format.map(VBString::from).as_ref(), None, None)
             .unwrap()
             .into_inner()
@@ -1212,95 +1212,95 @@ mod tests {
 
     #[test]
     fn no_format_converts_like_str() {
-        assert_eq!(fmt_opt(Value::Long(1234), None), "1234");
-        assert_eq!(fmt_opt(Value::Long(-1234), None), "-1234");
-        assert_eq!(fmt_opt(Value::Double(1234.5), None), "1234.5");
-        assert_eq!(fmt_opt(Value::from_string("hello"), None), "hello");
-        assert_eq!(fmt_opt(Value::Boolean(true), None), "True");
-        assert_eq!(fmt_opt(Value::from_date_serial(45_662.0), None), "1/5/2025");
+        assert_eq!(fmt_opt(VBVariant::Long(1234), None), "1234");
+        assert_eq!(fmt_opt(VBVariant::Long(-1234), None), "-1234");
+        assert_eq!(fmt_opt(VBVariant::Double(1234.5), None), "1234.5");
+        assert_eq!(fmt_opt(VBVariant::from_string("hello"), None), "hello");
+        assert_eq!(fmt_opt(VBVariant::Boolean(true), None), "True");
+        assert_eq!(fmt_opt(VBVariant::from_date_serial(45_662.0), None), "1/5/2025");
     }
 
     #[test]
     fn null_returns_empty_string() {
-        assert_eq!(fmt_opt(Value::Null, None), "");
-        assert_eq!(fmt(Value::Null, "0.00"), "");
+        assert_eq!(fmt_opt(VBVariant::Null, None), "");
+        assert_eq!(fmt(VBVariant::Null, "0.00"), "");
     }
 
     #[test]
     fn named_numeric_formats() {
-        assert_eq!(fmt(Value::Double(1234.5), "General Number"), "1234.5");
-        assert_eq!(fmt(Value::Double(1234.5), "Currency"), "$1,234.50");
-        assert_eq!(fmt(Value::Double(-1234.5), "Currency"), "($1,234.50)");
-        assert_eq!(fmt(Value::Double(1234.5), "Fixed"), "1234.50");
-        assert_eq!(fmt(Value::Double(1234.5), "Standard"), "1,234.50");
-        assert_eq!(fmt(Value::Double(0.075), "Percent"), "7.50%");
-        assert_eq!(fmt(Value::Double(12_345_678.0), "Scientific"), "1.23E+07");
-        assert_eq!(fmt(Value::Double(5.0), "Yes/No"), "Yes");
-        assert_eq!(fmt(Value::Double(0.0), "Yes/No"), "No");
-        assert_eq!(fmt(Value::Double(5.0), "True/False"), "True");
-        assert_eq!(fmt(Value::Double(0.0), "On/Off"), "Off");
+        assert_eq!(fmt(VBVariant::Double(1234.5), "General Number"), "1234.5");
+        assert_eq!(fmt(VBVariant::Double(1234.5), "Currency"), "$1,234.50");
+        assert_eq!(fmt(VBVariant::Double(-1234.5), "Currency"), "($1,234.50)");
+        assert_eq!(fmt(VBVariant::Double(1234.5), "Fixed"), "1234.50");
+        assert_eq!(fmt(VBVariant::Double(1234.5), "Standard"), "1,234.50");
+        assert_eq!(fmt(VBVariant::Double(0.075), "Percent"), "7.50%");
+        assert_eq!(fmt(VBVariant::Double(12_345_678.0), "Scientific"), "1.23E+07");
+        assert_eq!(fmt(VBVariant::Double(5.0), "Yes/No"), "Yes");
+        assert_eq!(fmt(VBVariant::Double(0.0), "Yes/No"), "No");
+        assert_eq!(fmt(VBVariant::Double(5.0), "True/False"), "True");
+        assert_eq!(fmt(VBVariant::Double(0.0), "On/Off"), "Off");
     }
 
     #[test]
     fn custom_numeric_formats() {
-        assert_eq!(fmt(Value::Double(1234.5), "0000.00"), "1234.50");
-        assert_eq!(fmt(Value::Long(42), "000000"), "000042");
-        assert_eq!(fmt(Value::Long(7), "00"), "07");
-        assert_eq!(fmt(Value::Double(0.075), "0.00%"), "7.50%");
-        assert_eq!(fmt(Value::Double(12_345_678.0), "0.00E+00"), "1.23E+07");
-        assert_eq!(fmt(Value::Double(0.000_012_3), "0.00E-00"), "1.23E-05");
+        assert_eq!(fmt(VBVariant::Double(1234.5), "0000.00"), "1234.50");
+        assert_eq!(fmt(VBVariant::Long(42), "000000"), "000042");
+        assert_eq!(fmt(VBVariant::Long(7), "00"), "07");
+        assert_eq!(fmt(VBVariant::Double(0.075), "0.00%"), "7.50%");
+        assert_eq!(fmt(VBVariant::Double(12_345_678.0), "0.00E+00"), "1.23E+07");
+        assert_eq!(fmt(VBVariant::Double(0.000_012_3), "0.00E-00"), "1.23E-05");
         assert_eq!(
-            fmt(Value::Double(1234.56), "#,##0.00;(#,##0.00)"),
+            fmt(VBVariant::Double(1234.56), "#,##0.00;(#,##0.00)"),
             "1,234.56"
         );
         assert_eq!(
-            fmt(Value::Double(-1234.56), "#,##0.00;(#,##0.00)"),
+            fmt(VBVariant::Double(-1234.56), "#,##0.00;(#,##0.00)"),
             "(1,234.56)"
         );
     }
 
     #[test]
     fn custom_numeric_sections() {
-        assert_eq!(fmt(Value::Double(1.5), "+0.00;-0.00;Zero"), "+1.50");
-        assert_eq!(fmt(Value::Double(-1.5), "+0.00;-0.00;Zero"), "-1.50");
-        assert_eq!(fmt(Value::Double(0.0), "+0.00;-0.00;Zero"), "Zero");
+        assert_eq!(fmt(VBVariant::Double(1.5), "+0.00;-0.00;Zero"), "+1.50");
+        assert_eq!(fmt(VBVariant::Double(-1.5), "+0.00;-0.00;Zero"), "-1.50");
+        assert_eq!(fmt(VBVariant::Double(0.0), "+0.00;-0.00;Zero"), "Zero");
     }
 
     #[test]
     fn custom_numeric_rounding() {
-        assert_eq!(fmt(Value::Double(2.5), "0"), "3");
-        assert_eq!(fmt(Value::Double(2.4), "0"), "2");
-        assert_eq!(fmt(Value::Double(-2.5), "0.0"), "-2.5");
+        assert_eq!(fmt(VBVariant::Double(2.5), "0"), "3");
+        assert_eq!(fmt(VBVariant::Double(2.4), "0"), "2");
+        assert_eq!(fmt(VBVariant::Double(-2.5), "0.0"), "-2.5");
     }
 
     #[test]
     fn named_date_formats() {
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.0), "Long Date"),
+            fmt(VBVariant::from_date_serial(45_662.0), "Long Date"),
             "Sunday, January 5, 2025"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.0), "Medium Date"),
+            fmt(VBVariant::from_date_serial(45_662.0), "Medium Date"),
             "05-Jan-25"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.0), "Short Date"),
+            fmt(VBVariant::from_date_serial(45_662.0), "Short Date"),
             "1/5/2025"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.656_597_222), "Long Time"),
+            fmt(VBVariant::from_date_serial(45_662.656_597_222), "Long Time"),
             "3:45:30 PM"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.656_597_222), "Medium Time"),
+            fmt(VBVariant::from_date_serial(45_662.656_597_222), "Medium Time"),
             "03:45 PM"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.656_597_222), "Short Time"),
+            fmt(VBVariant::from_date_serial(45_662.656_597_222), "Short Time"),
             "15:45"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.656_597_222), "General Date"),
+            fmt(VBVariant::from_date_serial(45_662.656_597_222), "General Date"),
             "1/5/2025 3:45:30 PM"
         );
     }
@@ -1308,41 +1308,41 @@ mod tests {
     #[test]
     fn custom_date_formats() {
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.0), "yyyy-mm-dd"),
+            fmt(VBVariant::from_date_serial(45_662.0), "yyyy-mm-dd"),
             "2025-01-05"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.0), "dddd, mmmm d, yyyy"),
+            fmt(VBVariant::from_date_serial(45_662.0), "dddd, mmmm d, yyyy"),
             "Sunday, January 5, 2025"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.0), "dd-mmm-yy"),
+            fmt(VBVariant::from_date_serial(45_662.0), "dd-mmm-yy"),
             "05-Jan-25"
         );
         assert_eq!(
             fmt(
-                Value::from_date_serial(45_662.656_597_222),
+                VBVariant::from_date_serial(45_662.656_597_222),
                 "yyyymmdd_hhnnss"
             ),
             "20250105_154530"
         );
         assert_eq!(
             fmt(
-                Value::from_date_serial(45_662.656_597_222),
+                VBVariant::from_date_serial(45_662.656_597_222),
                 "hh:nn:ss AM/PM"
             ),
             "03:45:30 PM"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.656_597_222), "hh:mm:ss"),
+            fmt(VBVariant::from_date_serial(45_662.656_597_222), "hh:mm:ss"),
             "15:45:30"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.656_597_222), "mm/dd/yyyy"),
+            fmt(VBVariant::from_date_serial(45_662.656_597_222), "mm/dd/yyyy"),
             "01/05/2025"
         );
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.656_597_222), "h:mm AM/PM"),
+            fmt(VBVariant::from_date_serial(45_662.656_597_222), "h:mm AM/PM"),
             "3:45 PM"
         );
     }
@@ -1350,28 +1350,28 @@ mod tests {
     #[test]
     fn m_following_h_is_minutes() {
         assert_eq!(
-            fmt(Value::from_date_serial(45_662.656_597_222), "hh:mm"),
+            fmt(VBVariant::from_date_serial(45_662.656_597_222), "hh:mm"),
             "15:45"
         );
-        assert_eq!(fmt(Value::from_date_serial(45_662.656_597_222), "mm"), "01");
+        assert_eq!(fmt(VBVariant::from_date_serial(45_662.656_597_222), "mm"), "01");
     }
 
     #[test]
     fn string_formats() {
-        assert_eq!(fmt(Value::from_string("john doe"), ">"), "JOHN DOE");
-        assert_eq!(fmt(Value::from_string("JOHN DOE"), "<"), "john doe");
+        assert_eq!(fmt(VBVariant::from_string("john doe"), ">"), "JOHN DOE");
+        assert_eq!(fmt(VBVariant::from_string("JOHN DOE"), "<"), "john doe");
         assert_eq!(
-            fmt(Value::from_string("5551234567"), "(@@@) @@@-@@@@"),
+            fmt(VBVariant::from_string("5551234567"), "(@@@) @@@-@@@@"),
             "(555) 123-4567"
         );
-        assert_eq!(fmt(Value::from_string("hello"), "@@@@@@@@@@"), "     hello");
+        assert_eq!(fmt(VBVariant::from_string("hello"), "@@@@@@@@@@"), "     hello");
     }
 
     #[test]
     fn type_mismatch_for_incompatible_values() {
         assert_eq!(
             format_dollar(
-                &Value::from_string("abc"),
+                &VBVariant::from_string("abc"),
                 Some(&VBString::from("Currency")),
                 None,
                 None
@@ -1382,7 +1382,7 @@ mod tests {
         );
         assert_eq!(
             format_dollar(
-                &Value::from_string("abc"),
+                &VBVariant::from_string("abc"),
                 Some(&VBString::from("0.00")),
                 None,
                 None
@@ -1393,7 +1393,7 @@ mod tests {
         );
         assert_eq!(
             format_dollar(
-                &Value::from_string("abc"),
+                &VBVariant::from_string("abc"),
                 Some(&VBString::from("yyyy-mm-dd")),
                 None,
                 None
@@ -1406,6 +1406,6 @@ mod tests {
 
     #[test]
     fn empty_format_behaves_like_no_format() {
-        assert_eq!(fmt(Value::Double(1234.5), ""), "1234.5");
+        assert_eq!(fmt(VBVariant::Double(1234.5), ""), "1234.5");
     }
 }

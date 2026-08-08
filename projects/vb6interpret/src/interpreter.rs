@@ -8,7 +8,7 @@ use std::collections::HashMap;
 
 use vb6core::error::VBError;
 use vb6parse::files::ModuleFile;
-use vb6runtime::Value;
+use vb6runtime::VBVariant;
 
 use crate::error::{RunError, RunResult};
 use crate::program::Procedure;
@@ -27,7 +27,7 @@ pub(crate) struct Frame {
     /// Local variables for this call.
     pub(crate) locals: Scope,
     /// The value written to the function name (the return value).
-    pub(crate) return_value: Option<Value>,
+    pub(crate) return_value: Option<VBVariant>,
 }
 
 /// Control-flow signal produced by statement execution.
@@ -211,12 +211,12 @@ impl Interpreter {
     }
 
     /// Look up a global variable's value.
-    pub fn global(&self, name: &str) -> Option<&Value> {
+    pub fn global(&self, name: &str) -> Option<&VBVariant> {
         self.globals.get(name)
     }
 
     /// Declare or overwrite a global variable before execution.
-    pub fn set_global(&mut self, name: &str, value: Value) {
+    pub fn set_global(&mut self, name: &str, value: VBVariant) {
         self.globals.declare(name, value);
     }
 
@@ -325,7 +325,7 @@ impl Interpreter {
     }
 
     /// Invoke a Sub procedure, returning its control-flow signal.
-    pub(crate) fn call_sub(&mut self, name: &str, args: Vec<Value>) -> RunResult<Flow> {
+    pub(crate) fn call_sub(&mut self, name: &str, args: Vec<VBVariant>) -> RunResult<Flow> {
         let procedure = self.lookup_procedure(name)?;
         let body = procedure.body.clone();
         let body_line = procedure.line + 1;
@@ -343,7 +343,7 @@ impl Interpreter {
     }
 
     /// Invoke a Function procedure, returning its result value.
-    pub(crate) fn call_function(&mut self, name: &str, args: Vec<Value>) -> RunResult<Value> {
+    pub(crate) fn call_function(&mut self, name: &str, args: Vec<VBVariant>) -> RunResult<VBVariant> {
         let procedure = self.lookup_procedure(name)?;
         let return_type = procedure.return_type.clone();
         let body = procedure.body.clone();
@@ -358,9 +358,9 @@ impl Interpreter {
         match result {
             Ok(Flow::Terminate) => {
                 self.terminated = true;
-                Ok(return_value.unwrap_or_else(|| Value::default_for_type(&return_type)))
+                Ok(return_value.unwrap_or_else(|| VBVariant::default_for_type(&return_type)))
             }
-            Ok(_) => Ok(return_value.unwrap_or_else(|| Value::default_for_type(&return_type))),
+            Ok(_) => Ok(return_value.unwrap_or_else(|| VBVariant::default_for_type(&return_type))),
             Err(e) => Err(e),
         }
     }
@@ -378,7 +378,7 @@ impl Interpreter {
     }
 
     /// Push a frame for `procedure`, binding its parameters.
-    fn push_frame(&mut self, procedure: Procedure, args: Vec<Value>) -> RunResult<()> {
+    fn push_frame(&mut self, procedure: Procedure, args: Vec<VBVariant>) -> RunResult<()> {
         let mut frame = Frame {
             name: procedure.name.clone(),
             is_function: procedure.is_function,
@@ -390,7 +390,7 @@ impl Interpreter {
                 Some(value) => crate::exec::coerce(value.clone(), &param.ty),
                 None => {
                     if param.optional {
-                        Value::default_for_type(&param.ty)
+                        VBVariant::default_for_type(&param.ty)
                     } else {
                         return Err(
                             RunError::new(VBError::new(450)).at_line(self.current_stmt_line)

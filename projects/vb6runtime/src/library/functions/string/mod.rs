@@ -19,18 +19,18 @@ pub mod chr;
 pub use chr::chr;
 
 pub mod chr_dollar;
-//pub use chr_dollar::chr_dollar;
+pub use chr_dollar::chr_dollar;
 
 pub mod chrb;
-//pub use chrb::chrb;
+pub use chrb::chrb;
 
 pub mod chrb_dollar;
-//pub use chrb_dollar::chrb_dollar;
+pub use chrb_dollar::chrb_dollar;
 pub mod chrw;
 pub use chrw::chrw;
 
 pub mod chrw_dollar;
-//pub use chrw_dollar::chrw_dollar;
+pub use chrw_dollar::chrw_dollar;
 
 pub mod format;
 pub use format::format;
@@ -60,13 +60,13 @@ pub mod lcase;
 pub use lcase::lcase;
 
 pub mod lcase_dollar;
-//pub use lcase_dollar::lcase_dollar;
+pub use lcase_dollar::lcase_dollar;
 
 pub mod left;
 pub use left::left;
 
 pub mod left_dollar;
-//pub use left_dollar::left_dollar;
+pub use left_dollar::left_dollar;
 
 pub mod leftb;
 //pub use leftb::leftb;
@@ -84,13 +84,13 @@ pub mod ltrim;
 pub use ltrim::ltrim;
 
 pub mod ltrim_dollar;
-//pub use ltrim_dollar::ltrim_dollar;
+pub use ltrim_dollar::ltrim_dollar;
 
 pub mod mid;
 pub use mid::mid;
 
 pub mod mid_dollar;
-//pub use mid_dollar::mid_dollar;
+pub use mid_dollar::mid_dollar;
 
 pub mod midb;
 //pub use midb::midb;
@@ -105,7 +105,7 @@ pub mod right;
 pub use right::right;
 
 pub mod right_dollar;
-//pub use right_dollar::right_dollar;
+pub use right_dollar::right_dollar;
 
 pub mod rightb;
 //pub use rightb::rightb;
@@ -117,13 +117,13 @@ pub mod rtrim;
 pub use rtrim::rtrim;
 
 pub mod rtrim_dollar;
-//pub use rtrim_dollar::rtrim_dollar;
+pub use rtrim_dollar::rtrim_dollar;
 
 pub mod space;
 pub use space::space;
 
 pub mod space_dollar;
-//pub use space_dollar::space_dollar;
+pub use space_dollar::space_dollar;
 
 pub mod str;
 //pub use str::str;
@@ -147,10 +147,10 @@ pub mod trim;
 pub use trim::trim;
 
 pub mod trim_dollar;
-//pub use trim_dollar::trim_dollar;
+pub use trim_dollar::trim_dollar;
 
 pub mod ucase;
 pub use ucase::ucase;
 
 pub mod ucase_dollar;
-//pub use ucase_dollar::ucase_dollar;
+pub use ucase_dollar::ucase_dollar;
