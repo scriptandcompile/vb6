@@ -201,7 +201,6 @@
 //! - Optimized to CPU instructions where possible
 //! - Prefer `Abs` over manual `If`/`Then` checks for performance
 
-
 use crate::{
     error::{VBError, VBResult},
     value::VBVariant,
