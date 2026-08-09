@@ -200,6 +200,106 @@
 //! - No function call overhead in compiled code
 //! - Optimized to CPU instructions where possible
 //! - Prefer `Abs` over manual `If`/`Then` checks for performance
-//!
-//! `Abs` is parsed as a regular function call (`CallExpression`)
-//! This module serves as documentation and reference for the Abs function
+
+
+use crate::{
+    error::{VBError, VBResult},
+    value::VBVariant,
+};
+
+/// Implementation of the Abs function for various numeric types.
+///
+/// # Arguments
+///
+/// * `value` - The numeric value for which to calculate the absolute value.
+///
+/// # Returns
+///
+/// The absolute value of the input.
+/// When the input is a Variant containing Null, the function returns Null.
+pub fn abs(value: VBVariant) -> VBResult<VBVariant> {
+    match value {
+        // VB6: Abs(Null) returns Null.
+        VBVariant::Null => Ok(VBVariant::Null),
+        // VB6: uninitialized Variant (Empty) coerces to 0.
+        VBVariant::Empty => Ok(VBVariant::from_integer(0)),
+        VBVariant::Byte(v) => Ok(VBVariant::from_byte(v)),
+        VBVariant::Integer(v) => v
+            .checked_abs()
+            .map(VBVariant::from_integer)
+            .ok_or_else(VBError::overflow),
+        VBVariant::Long(v) => v
+            .checked_abs()
+            .map(VBVariant::from_long)
+            .ok_or_else(VBError::overflow),
+        VBVariant::Single(v) => Ok(VBVariant::from_single(v.abs())),
+        VBVariant::Double(v) => Ok(VBVariant::from_double(v.abs())),
+        VBVariant::Currency(raw) => raw
+            .checked_abs()
+            .map(VBVariant::from_currency_scaled)
+            .ok_or_else(VBError::overflow),
+        _ => Err(VBError::type_mismatch()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::abs;
+    use crate::{error::err_number, value::VBVariant};
+
+    #[test]
+    fn returns_null_for_null() {
+        assert_eq!(abs(VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn returns_zero_for_empty() {
+        assert_eq!(abs(VBVariant::Empty).unwrap(), VBVariant::from_integer(0));
+    }
+
+    #[test]
+    fn preserves_numeric_types() {
+        assert_eq!(
+            abs(VBVariant::from_byte(5)).unwrap(),
+            VBVariant::from_byte(5)
+        );
+        assert_eq!(
+            abs(VBVariant::from_integer(-123)).unwrap(),
+            VBVariant::from_integer(123)
+        );
+        assert_eq!(
+            abs(VBVariant::from_long(-12345)).unwrap(),
+            VBVariant::from_long(12345)
+        );
+        assert_eq!(
+            abs(VBVariant::from_single(-12.5)).unwrap(),
+            VBVariant::from_single(12.5)
+        );
+        assert_eq!(
+            abs(VBVariant::from_double(-12.5)).unwrap(),
+            VBVariant::from_double(12.5)
+        );
+        assert_eq!(
+            abs(VBVariant::from_currency_scaled(-12_345)).unwrap(),
+            VBVariant::from_currency_scaled(12_345)
+        );
+    }
+
+    #[test]
+    fn overflows_for_min_integer_long_and_currency() {
+        let err = abs(VBVariant::from_integer(i16::MIN)).unwrap_err();
+        assert_eq!(err.number, err_number::OVERFLOW);
+
+        let err = abs(VBVariant::from_long(i32::MIN)).unwrap_err();
+        assert_eq!(err.number, err_number::OVERFLOW);
+
+        let err = abs(VBVariant::from_currency_scaled(i64::MIN)).unwrap_err();
+        assert_eq!(err.number, err_number::OVERFLOW);
+    }
+
+    #[test]
+    fn rejects_non_numeric_values() {
+        let err = abs(VBVariant::from_string("123")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
