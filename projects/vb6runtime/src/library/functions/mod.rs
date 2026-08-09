@@ -4,4 +4,5 @@
 //! datetime, ...). Only categories with at least one implemented function are
 //! declared here.
 
+pub mod math;
 pub mod string;
