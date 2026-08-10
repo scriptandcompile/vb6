@@ -576,7 +576,6 @@
 //! - `Sqr`: Returns the square root (used in inverse sine calculations)
 //! - `Abs`: Returns absolute value (useful for angle normalization)
 
-
 use crate::{error::VBResult, value::VBVariant};
 
 /// Implementation of the sine (Sin) function.
