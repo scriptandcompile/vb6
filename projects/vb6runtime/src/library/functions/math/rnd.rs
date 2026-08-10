@@ -37,7 +37,12 @@
 //! Although the algorithm in use can be obtained from analyzing a string of outputs from the generator and deducing the values of a, c and M.
 //! Microsoft has published their constants on their web site and it turns out that they use an LCPRNG with:
 //!
-//! ```a = 16598013, c = 2820163 and m=2^24 = 16777216```
+//! ```a = 16598013, c = 12820163 and m=2^24 = 16777216```
+//!
+//! The generator is maximal length with period 2^24: every reference to `Rnd`
+//! walks one step through the same list of 16,777,216 values, after which the
+//! list repeats. `Randomize` only moves to a different starting point within
+//! that single sequence. See <https://www.insystem.com/vb6rnd.htm>.
 //!
 //! [Reference](http://www.noesis.net.au/main/Resources/Resources/prng_files/vba_prng.html)
 //!
@@ -685,3 +690,260 @@
 //! - `Randomize`: Initializes the random number generator with a seed
 //! - `Int`: Returns the integer portion of a number (used to convert Rnd to integer range)
 //! - `Timer`: Returns seconds since midnight (often used with Randomize)
+
+use std::sync::atomic::{AtomicU32, Ordering};
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// LCG multiplier `a` = 16,598,013.
+///
+/// VB6 stores this as the 32-bit constant `0x43FD43FD`; only its low 24 bits
+/// (`0xFD43FD` = 16,598,013) affect the result because the generator keeps the
+/// seed modulo 2^24.
+const MULTIPLIER: u32 = 0x43FD_43FD;
+
+/// LCG increment `c` = 12,820,163 (`0xC39EC3`).
+const INCREMENT: u32 = 0x00C3_9EC3;
+
+/// LCG modulus `m` = 2^24 = 16,777,216. The generator has full period `m`.
+pub const MODULUS: u32 = 1 << 24;
+
+/// Bit mask keeping a seed in `[0, MODULUS)`.
+const SEED_MASK: u32 = MODULUS - 1;
+
+/// The initial seed used by the VB6 runtime before any `Randomize` statement.
+pub const DEFAULT_SEED: u32 = 327_680;
+
+/// Process-wide RNG state, shared with the `Randomize` statement.
+///
+/// The stored seed is normally kept in `[0, MODULUS)` by `Rnd`, but VB6's
+/// `Randomize` splices a value into the middle of the seed and can leave the
+/// top byte set, so the full 32-bit value is preserved here. `Rnd` keeps the
+/// sequence 24-bit by masking when it advances. VB6 keeps the sequence's low
+/// byte in the low 8 bits of the stored seed so that consecutive `Randomize`
+/// calls preserve part of the previous seed, which is why re-randomizing with
+/// the same value does not repeat a sequence.
+static SEED: AtomicU32 = AtomicU32::new(DEFAULT_SEED);
+
+/// The current RNG seed.
+pub fn seed() -> u32 {
+    SEED.load(Ordering::Relaxed)
+}
+
+/// Replace the RNG seed.
+///
+/// `Randomize` uses this to reseed the generator. The full value is stored;
+/// `Rnd` masks the seed to 24 bits when it advances, and returns the raw seed
+/// (divided by `MODULUS`) for `Rnd(0)`.
+pub fn set_seed(value: u32) {
+    SEED.store(value, Ordering::Relaxed);
+}
+
+/// Advance the LCG one step: `seed = (seed * a + c) mod 2^24`.
+///
+/// The 32-bit multiplier is applied with wrapping arithmetic; the low 24 bits
+/// of the product match `(seed * 16,598,013) mod 2^24`, exactly as the VB6
+/// runtime computes it.
+fn next_seed(seed: u32) -> u32 {
+    seed.wrapping_mul(MULTIPLIER).wrapping_add(INCREMENT) & SEED_MASK
+}
+
+/// Derive the 24-bit seed from a negative `Single` argument.
+///
+/// VB6 takes the IEEE-754 bit pattern of the `Single`, adds its top byte to
+/// itself, and masks the result to 24 bits. The same negative argument always
+/// produces the same seed, which is what makes `Rnd(negative)` repeatable.
+fn seed_from_negative(value: f32) -> u32 {
+    let bits = value.to_bits() as u64;
+    ((bits + (bits >> 24)) & SEED_MASK as u64) as u32
+}
+
+/// The normalized `Single` value `seed / 2^24`, the raw form of an `Rnd` result.
+fn normalize(seed: u32) -> VBVariant {
+    VBVariant::from_single(seed as f32 / MODULUS as f32)
+}
+
+/// Implementation of the `Rnd` function.
+///
+/// VB6 behavior:
+/// - `Rnd(Null)` returns `Null`
+/// - a missing argument (passed as `Empty`) returns the next value in the
+///   sequence
+/// - `Rnd(x)` with `x < 0` reseeds the generator from `x`, then returns the
+///   next value (the same negative argument always yields the same value)
+/// - `Rnd(0)` returns the most recently generated value without advancing
+/// - `Rnd(x)` with `x > 0` returns the next value in the sequence
+///
+/// The result is a `Single` in `[0, 1)`.
+pub fn rnd(value: VBVariant) -> VBResult<VBVariant> {
+    if value.is_null() {
+        return Ok(VBVariant::Null);
+    }
+
+    let current = seed();
+
+    if value.is_empty() {
+        // An omitted argument behaves like any positive number.
+    } else {
+        let number = value.as_f32()?;
+        if number < 0.0 {
+            let seeded = seed_from_negative(number);
+            let next = next_seed(seeded);
+            set_seed(next);
+            return Ok(normalize(next));
+        }
+        if number == 0.0 {
+            return Ok(normalize(current));
+        }
+    }
+
+    let next = next_seed(current);
+    set_seed(next);
+    Ok(normalize(next))
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Mutex;
+
+    use super::{rnd, set_seed, DEFAULT_SEED, MODULUS};
+    use crate::{error::err_number, value::VBVariant};
+
+    /// Serializes tests that read or write the shared RNG state so that
+    /// parallel test execution cannot interfere with a test's fixed seed.
+    static TEST_LOCK: Mutex<()> = Mutex::new(());
+
+    /// Runs `f` with the generator reset to the initial VB6 seed.
+    fn with_default_seed(f: impl FnOnce()) {
+        let _guard = TEST_LOCK.lock().unwrap();
+        set_seed(DEFAULT_SEED);
+        f();
+    }
+
+    /// The exact `Single` value produced by a given seed, `seed / 2^24`.
+    fn expected(seed: u32) -> VBVariant {
+        VBVariant::from_single(seed as f32 / MODULUS as f32)
+    }
+
+    /// Extract the `Single` payload of an `Rnd` result.
+    fn as_single(value: VBVariant) -> f32 {
+        match value {
+            VBVariant::Single(v) => v,
+            other => panic!("expected Single, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn returns_null_for_null() {
+        assert_eq!(rnd(VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn returns_single_within_range() {
+        with_default_seed(|| {
+            for _ in 0..10_000 {
+                let value = as_single(rnd(VBVariant::Empty).unwrap());
+                assert!((0.0..1.0).contains(&value), "out of range: {value}");
+            }
+        });
+    }
+
+    #[test]
+    fn advances_through_the_default_sequence() {
+        with_default_seed(|| {
+            let first = as_single(rnd(VBVariant::Empty).unwrap());
+            assert_eq!(first, f32::from_bits(0x3F34_9EC3)); // 0.7055475
+
+            let second = as_single(rnd(VBVariant::Empty).unwrap());
+            assert_eq!(second, f32::from_bits(0x3F08_8E7A)); // 0.53342402
+
+            let third = as_single(rnd(VBVariant::Empty).unwrap());
+            assert_eq!(third, f32::from_bits(0x3F14_5B55)); // 0.5795186
+
+            let fourth = as_single(rnd(VBVariant::Empty).unwrap());
+            assert_eq!(fourth, f32::from_bits(0x3E94_4188)); // 0.28956246
+
+            let fifth = as_single(rnd(VBVariant::Empty).unwrap());
+            assert_eq!(fifth, f32::from_bits(0x3E9A_98EE)); // 0.30194801
+        });
+    }
+
+    #[test]
+    fn positive_argument_advances_like_omitted() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        set_seed(DEFAULT_SEED);
+        let via_omitted = as_single(rnd(VBVariant::Empty).unwrap());
+
+        set_seed(DEFAULT_SEED);
+        let via_positive = as_single(rnd(VBVariant::from_single(1.5)).unwrap());
+        assert_eq!(via_positive, via_omitted);
+    }
+
+    #[test]
+    fn zero_returns_last_number_without_advancing() {
+        with_default_seed(|| {
+            let first = rnd(VBVariant::Empty).unwrap();
+            assert_eq!(rnd(VBVariant::from_single(0.0)).unwrap(), first);
+
+            // Repeating Rnd(0) still reports the same value (no advance).
+            assert_eq!(rnd(VBVariant::from_single(0.0)).unwrap(), first);
+
+            // The next call continues where the sequence left off.
+            assert_eq!(rnd(VBVariant::Empty).unwrap(), expected(8_949_370));
+        });
+    }
+
+    #[test]
+    fn zero_at_startup_reports_the_initial_seed() {
+        with_default_seed(|| {
+            // Before any Rnd call the "most recent" value is the initial seed.
+            assert_eq!(
+                rnd(VBVariant::from_single(0.0)).unwrap(),
+                expected(DEFAULT_SEED)
+            );
+        });
+    }
+
+    #[test]
+    fn negative_argument_seeds_the_generator() {
+        with_default_seed(|| {
+            let first = as_single(rnd(VBVariant::from_single(-1.0)).unwrap());
+            assert_eq!(first, f32::from_bits(0x3E65_6218)); // 0.22400701
+
+            let second = as_single(rnd(VBVariant::Empty).unwrap());
+            assert_eq!(second, f32::from_bits(0x3D12_D310)); // 0.035845816
+
+            let third = as_single(rnd(VBVariant::Empty).unwrap());
+            assert_eq!(third, f32::from_bits(0x3DB0_D980)); // 0.08635235
+        });
+    }
+
+    #[test]
+    fn negative_argument_is_repeatable() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        set_seed(DEFAULT_SEED);
+        let first_run = rnd(VBVariant::from_single(-2.0)).unwrap();
+
+        set_seed(DEFAULT_SEED);
+        let second_run = rnd(VBVariant::from_single(-2.0)).unwrap();
+        assert_eq!(first_run, second_run);
+        assert_eq!(first_run, expected(11_967_619));
+    }
+
+    #[test]
+    fn accepts_numeric_strings() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        set_seed(DEFAULT_SEED);
+        let via_string = rnd(VBVariant::from_string("1.5")).unwrap();
+
+        set_seed(DEFAULT_SEED);
+        let via_number = rnd(VBVariant::from_single(1.5)).unwrap();
+        assert_eq!(via_string, via_number);
+    }
+
+    #[test]
+    fn rejects_non_numeric_values() {
+        let err = rnd(VBVariant::from_string("not-a-number")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
