@@ -350,6 +350,12 @@ mod tests {
     use crate::{error::err_number, value::VBVariant};
 
     fn assert_approx_eq(actual: f64, expected: f64) {
+        if (actual == f64::INFINITY && expected == f64::INFINITY)
+            || (actual == f64::NEG_INFINITY && expected == f64::NEG_INFINITY)
+        {
+            return;
+        }
+        
         let diff = (actual - expected).abs();
         assert!(
             diff < 1e-12,
