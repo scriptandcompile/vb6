@@ -323,3 +323,166 @@
 //! - `IIf`: Binary choice based on condition (evaluates both branches)
 //! - `Select Case`: Statement-based multi-way branching
 //! - `Array`: Creates an array that can be indexed (0-based)
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `Choose` function.
+///
+/// VB6 behavior:
+/// - `Choose(Null, ...)` returns `Null`
+/// - the index is coerced with numeric conversion rules and rounded to the
+///   nearest whole number (`CLng` rounding, half rounds to even)
+/// - a rounded index less than 1 or greater than the number of choices
+///   returns `Null`
+/// - otherwise the selected choice is returned unchanged as a `Variant`
+pub fn choose(index: &VBVariant, choices: &[VBVariant]) -> VBResult<VBVariant> {
+    if index.is_null() {
+        return Ok(VBVariant::Null);
+    }
+
+    let position = index.as_i32()?;
+    if !(1..=choices.len() as i32).contains(&position) {
+        return Ok(VBVariant::Null);
+    }
+
+    Ok(choices[position as usize - 1].clone())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::choose;
+    use crate::{error::err_number, value::VBVariant};
+
+    fn choices() -> Vec<VBVariant> {
+        vec![
+            VBVariant::from_string("Speedy"),
+            VBVariant::from_string("United"),
+            VBVariant::from_string("Federal"),
+        ]
+    }
+
+    #[test]
+    fn returns_null_for_null() {
+        assert_eq!(
+            choose(&VBVariant::Null, &choices()).unwrap(),
+            VBVariant::Null
+        );
+    }
+
+    #[test]
+    fn returns_null_for_empty() {
+        assert_eq!(
+            choose(&VBVariant::Empty, &choices()).unwrap(),
+            VBVariant::Null
+        );
+    }
+
+    #[test]
+    fn returns_selected_choice() {
+        assert_eq!(
+            choose(&VBVariant::from_integer(1), &choices()).unwrap(),
+            VBVariant::from_string("Speedy")
+        );
+        assert_eq!(
+            choose(&VBVariant::from_integer(2), &choices()).unwrap(),
+            VBVariant::from_string("United")
+        );
+        assert_eq!(
+            choose(&VBVariant::from_integer(3), &choices()).unwrap(),
+            VBVariant::from_string("Federal")
+        );
+    }
+
+    #[test]
+    fn returns_choice_for_numeric_inputs() {
+        let result = choose(&VBVariant::from_byte(1), &choices()).unwrap();
+        assert_eq!(result, VBVariant::from_string("Speedy"));
+
+        let result = choose(&VBVariant::from_long(-2), &choices()).unwrap();
+        assert_eq!(result, VBVariant::Null);
+
+        let result = choose(&VBVariant::from_long(3), &choices()).unwrap();
+        assert_eq!(result, VBVariant::from_string("Federal"));
+
+        let result = choose(&VBVariant::from_single(2.0), &choices()).unwrap();
+        assert_eq!(result, VBVariant::from_string("United"));
+
+        let result = choose(&VBVariant::from_double(1.0), &choices()).unwrap();
+        assert_eq!(result, VBVariant::from_string("Speedy"));
+
+        let result = choose(&VBVariant::from_currency_scaled(20_000), &choices()).unwrap();
+        assert_eq!(result, VBVariant::from_string("United"));
+    }
+
+    #[test]
+    fn rounds_fractional_index() {
+        let result = choose(&VBVariant::from_double(1.4), &choices()).unwrap();
+        assert_eq!(result, VBVariant::from_string("Speedy"));
+
+        let result = choose(&VBVariant::from_double(1.6), &choices()).unwrap();
+        assert_eq!(result, VBVariant::from_string("United"));
+
+        let result = choose(&VBVariant::from_double(2.5), &choices()).unwrap();
+        assert_eq!(result, VBVariant::from_string("United"));
+    }
+
+    #[test]
+    fn rounds_half_toward_even() {
+        let result = choose(&VBVariant::from_double(1.5), &choices()).unwrap();
+        assert_eq!(result, VBVariant::from_string("United"));
+
+        let result = choose(&VBVariant::from_double(3.5), &choices()).unwrap();
+        assert_eq!(result, VBVariant::Null);
+    }
+
+    #[test]
+    fn returns_null_when_index_out_of_range() {
+        assert_eq!(
+            choose(&VBVariant::from_integer(0), &choices()).unwrap(),
+            VBVariant::Null
+        );
+        assert_eq!(
+            choose(&VBVariant::from_integer(-1), &choices()).unwrap(),
+            VBVariant::Null
+        );
+        assert_eq!(
+            choose(&VBVariant::from_integer(4), &choices()).unwrap(),
+            VBVariant::Null
+        );
+        assert_eq!(
+            choose(&VBVariant::from_integer(100), &choices()).unwrap(),
+            VBVariant::Null
+        );
+    }
+
+    #[test]
+    fn returns_choice_unchanged() {
+        let mixed = vec![
+            VBVariant::from_long(100),
+            VBVariant::from_string("Text"),
+            VBVariant::from_bool(true),
+            VBVariant::from_double(1.5),
+        ];
+
+        assert_eq!(
+            choose(&VBVariant::from_integer(2), &mixed).unwrap(),
+            VBVariant::from_string("Text")
+        );
+        assert_eq!(
+            choose(&VBVariant::from_integer(3), &mixed).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn rejects_non_numeric_index() {
+        let err = choose(&VBVariant::from_string("not-a-number"), &choices()).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn accepts_numeric_string_index() {
+        let result = choose(&VBVariant::from_string("2"), &choices()).unwrap();
+        assert_eq!(result, VBVariant::from_string("United"));
+    }
+}
