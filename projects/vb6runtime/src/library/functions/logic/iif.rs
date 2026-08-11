@@ -280,3 +280,147 @@
 //! - `Choose`: Returns value from list based on numeric index (also evaluates all parts)
 //! - `Switch`: Returns first value whose expression is True (evaluates sequentially)
 //! - `Select Case`: Multi-condition statement with short-circuit evaluation
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `IIf` function.
+///
+/// VB6 behavior:
+/// - the condition is coerced with boolean conversion rules (`CBool`)
+/// - `IIf(Null, ...)` returns `Null`
+/// - a True condition returns `truepart`; otherwise `falsepart` is returned,
+///   unchanged as a `Variant`
+pub fn iif(
+    condition: &VBVariant,
+    truepart: &VBVariant,
+    falsepart: &VBVariant,
+) -> VBResult<VBVariant> {
+    if condition.is_null() {
+        return Ok(VBVariant::Null);
+    }
+
+    Ok(if condition.as_bool()? {
+        truepart.clone()
+    } else {
+        falsepart.clone()
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::iif;
+    use crate::{error::err_number, value::VBVariant};
+
+    fn args() -> (VBVariant, VBVariant) {
+        (VBVariant::from_string("true"), VBVariant::from_string("false"))
+    }
+
+    #[test]
+    fn returns_truepart_for_true_condition() {
+        let (truepart, falsepart) = args();
+        assert_eq!(
+            iif(&VBVariant::from_bool(true), &truepart, &falsepart).unwrap(),
+            VBVariant::from_string("true")
+        );
+    }
+
+    #[test]
+    fn returns_falsepart_for_false_condition() {
+        let (truepart, falsepart) = args();
+        assert_eq!(
+            iif(&VBVariant::from_bool(false), &truepart, &falsepart).unwrap(),
+            VBVariant::from_string("false")
+        );
+    }
+
+    #[test]
+    fn returns_null_for_null_condition() {
+        assert_eq!(
+            iif(&VBVariant::Null, &args().0, &args().1).unwrap(),
+            VBVariant::Null
+        );
+    }
+
+    #[test]
+    fn returns_falsepart_for_empty_condition() {
+        assert_eq!(
+            iif(&VBVariant::Empty, &args().0, &args().1).unwrap(),
+            VBVariant::from_string("false")
+        );
+    }
+
+    #[test]
+    fn coerces_numeric_conditions() {
+        assert_eq!(
+            iif(&VBVariant::from_integer(1), &args().0, &args().1).unwrap(),
+            VBVariant::from_string("true")
+        );
+        assert_eq!(
+            iif(&VBVariant::from_integer(0), &args().0, &args().1).unwrap(),
+            VBVariant::from_string("false")
+        );
+        assert_eq!(
+            iif(&VBVariant::from_integer(-1), &args().0, &args().1).unwrap(),
+            VBVariant::from_string("true")
+        );
+        assert_eq!(
+            iif(&VBVariant::from_double(2.5), &args().0, &args().1).unwrap(),
+            VBVariant::from_string("true")
+        );
+    }
+
+    #[test]
+    fn coerces_string_conditions() {
+        assert_eq!(
+            iif(&VBVariant::from_string("True"), &args().0, &args().1).unwrap(),
+            VBVariant::from_string("true")
+        );
+        assert_eq!(
+            iif(&VBVariant::from_string("false"), &args().0, &args().1).unwrap(),
+            VBVariant::from_string("false")
+        );
+        assert_eq!(
+            iif(&VBVariant::from_string("0"), &args().0, &args().1).unwrap(),
+            VBVariant::from_string("false")
+        );
+        assert_eq!(
+            iif(&VBVariant::from_string("1"), &args().0, &args().1).unwrap(),
+            VBVariant::from_string("true")
+        );
+    }
+
+    #[test]
+    fn returns_part_unchanged() {
+        let truepart = VBVariant::from_long(42);
+        let falsepart = VBVariant::from_bool(false);
+        assert_eq!(
+            iif(&VBVariant::from_bool(true), &truepart, &falsepart).unwrap(),
+            VBVariant::from_long(42)
+        );
+        assert_eq!(
+            iif(&VBVariant::from_bool(false), &truepart, &falsepart).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_null_part_when_selected() {
+        let truepart = VBVariant::Null;
+        let falsepart = VBVariant::from_string("fallback");
+        assert_eq!(
+            iif(&VBVariant::from_bool(true), &truepart, &falsepart).unwrap(),
+            VBVariant::Null
+        );
+    }
+
+    #[test]
+    fn rejects_non_boolean_condition() {
+        let err = iif(
+            &VBVariant::from_string("not-a-number"),
+            &args().0,
+            &args().1,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
