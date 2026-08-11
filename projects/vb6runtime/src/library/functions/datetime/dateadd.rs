@@ -504,3 +504,272 @@
 //! - `Now`: Returns current date and time
 //! - `Date`: Returns current date
 //! - `Time`: Returns current time
+
+use crate::error::{VBError, VBResult};
+use crate::value::{date_serial_to_datetime, VBVariant};
+
+/// Implementation of the `DateAdd` function.
+///
+/// VB6 behavior:
+/// - a `Null` parameter returns `Null`
+/// - month/quarter/year additions clamp to the last day of the target month
+///   (Jan 31 + 1 month = Feb 28/29; Jan 31 + 2 months = Mar 31)
+/// - "y" (day of year) and "w" (weekday) are equivalent to "d" (day)
+/// - fractional month/quarter/year counts are rounded to the nearest integer
+/// - the time portion is preserved for month/quarter/year additions
+/// - results outside the 100-9999 AD range raise error 6 (overflow)
+/// - an unknown interval raises error 5 (invalid procedure call)
+pub fn date_add(
+    interval: &VBVariant,
+    number: &VBVariant,
+    date: &VBVariant,
+) -> VBResult<VBVariant> {
+    if interval.is_null() || number.is_null() || date.is_null() {
+        return Ok(VBVariant::Null);
+    }
+
+    let interval = interval.as_string()?.to_ascii_lowercase();
+    let number = number.as_f64()?;
+    let serial = date.as_date_serial()?;
+
+    let result = match interval.as_str() {
+        "yyyy" => add_months(serial, number * 12.0)?,
+        "q" => add_months(serial, number * 3.0)?,
+        "m" => add_months(serial, number)?,
+        "y" | "d" | "w" => serial + number,
+        "ww" => serial + number * 7.0,
+        "h" => serial + number / 24.0,
+        "n" => serial + number / 1_440.0,
+        "s" => serial + number / 86_400.0,
+        _ => return Err(VBError::invalid_procedure_call()),
+    };
+
+    Ok(VBVariant::from_date_serial(validated(result)?))
+}
+
+/// Add a number of months to a date serial, preserving the time portion and
+/// clamping the day to the last day of the target month.
+fn add_months(serial: f64, months: f64) -> VBResult<f64> {
+    use jiff::civil::Date;
+    use jiff::{SpanRelativeTo, Unit};
+
+    let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
+    let months = months.round() as i64;
+    let total = dt.year() as i64 * 12 + dt.month() as i64 - 1 + months;
+    let year = total.div_euclid(12);
+    let month = total.rem_euclid(12) + 1;
+    let day = (dt.day() as i64).min(days_in_month(year, month)) as i8;
+
+    let date = Date::new(year as i16, month as i8, day).map_err(|_| VBError::overflow())?;
+    let base = Date::new(1899, 12, 30).expect("valid epoch");
+    let days = date
+        .since(base)
+        .map_err(|_| VBError::overflow())?
+        .total((Unit::Day, SpanRelativeTo::days_are_24_hours()))
+        .map_err(|_| VBError::overflow())?;
+    let frac =
+        (dt.hour() as f64 * 3600.0 + dt.minute() as f64 * 60.0 + dt.second() as f64) / 86_400.0;
+    Ok(days + frac)
+}
+
+/// Number of days in `month` of `year` (proleptic Gregorian).
+fn days_in_month(year: i64, month: i64) -> i64 {
+    match month {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 => {
+            let leap = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+            if leap {
+                29
+            } else {
+                28
+            }
+        }
+        _ => 0,
+    }
+}
+
+/// Reject date serials outside the VB6-supported 100-9999 AD range.
+fn validated(serial: f64) -> VBResult<f64> {
+    let dt = date_serial_to_datetime(serial).ok_or_else(VBError::overflow)?;
+    if (100..=9999).contains(&dt.year()) {
+        Ok(serial)
+    } else {
+        Err(VBError::overflow())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::date_add;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn add(interval: &str, number: f64, date: &str) -> f64 {
+        let result = date_add(
+            &VBVariant::from_string(interval),
+            &VBVariant::from_double(number),
+            &VBVariant::from_string(date),
+        )
+        .unwrap();
+        let VBVariant::Date(serial) = result else {
+            panic!("expected a Date variant");
+        };
+        serial
+    }
+
+    fn parts(serial: f64) -> (i16, i8, i8, i8, i8, i8) {
+        let dt = crate::value::date_serial_to_datetime(serial).unwrap();
+        (
+            dt.year(),
+            dt.month(),
+            dt.day(),
+            dt.hour(),
+            dt.minute(),
+            dt.second(),
+        )
+    }
+
+    #[test]
+    fn adds_days() {
+        assert_eq!(parts(add("d", 30.0, "1/15/2025")), (2025, 2, 14, 0, 0, 0));
+    }
+
+    #[test]
+    fn subtracts_days() {
+        assert_eq!(parts(add("d", -7.0, "1/15/2025")), (2025, 1, 8, 0, 0, 0));
+    }
+
+    #[test]
+    fn day_of_year_and_weekday_match_days() {
+        assert_eq!(add("y", 30.0, "1/15/2025"), add("d", 30.0, "1/15/2025"));
+        assert_eq!(add("w", 30.0, "1/15/2025"), add("d", 30.0, "1/15/2025"));
+    }
+
+    #[test]
+    fn adds_weeks() {
+        assert_eq!(parts(add("ww", 1.0, "1/15/2025")), (2025, 1, 22, 0, 0, 0));
+    }
+
+    #[test]
+    fn adds_months() {
+        assert_eq!(parts(add("m", 1.0, "1/15/2025")), (2025, 2, 15, 0, 0, 0));
+        assert_eq!(parts(add("m", 3.0, "1/15/2025")), (2025, 4, 15, 0, 0, 0));
+    }
+
+    #[test]
+    fn adds_quarters() {
+        assert_eq!(parts(add("q", 1.0, "1/15/2025")), (2025, 4, 15, 0, 0, 0));
+        assert_eq!(parts(add("q", -1.0, "1/15/2025")), (2024, 10, 15, 0, 0, 0));
+    }
+
+    #[test]
+    fn adds_years() {
+        assert_eq!(parts(add("yyyy", 1.0, "1/15/2025")), (2026, 1, 15, 0, 0, 0));
+        assert_eq!(parts(add("yyyy", -1.0, "1/15/2025")), (2024, 1, 15, 0, 0, 0));
+    }
+
+    #[test]
+    fn month_end_clamps_to_last_day() {
+        assert_eq!(parts(add("m", 1.0, "1/31/2025")), (2025, 2, 28, 0, 0, 0));
+        assert_eq!(parts(add("m", 2.0, "1/31/2025")), (2025, 3, 31, 0, 0, 0));
+        assert_eq!(parts(add("m", -3.0, "8/31/2025")), (2025, 5, 31, 0, 0, 0));
+    }
+
+    #[test]
+    fn leap_year_additions() {
+        assert_eq!(parts(add("yyyy", 1.0, "2/29/2024")), (2025, 2, 28, 0, 0, 0));
+        assert_eq!(parts(add("yyyy", 4.0, "2/29/2024")), (2028, 2, 29, 0, 0, 0));
+    }
+
+    #[test]
+    fn adds_time_intervals() {
+        assert_eq!(
+            parts(add("h", 6.0, "1/15/2025 12:00 PM")),
+            (2025, 1, 15, 18, 0, 0)
+        );
+        assert_eq!(parts(add("n", 90.0, "1/15/2025")), (2025, 1, 15, 1, 30, 0));
+        assert_eq!(parts(add("s", 3600.0, "1/15/2025")), (2025, 1, 15, 1, 0, 0));
+    }
+
+    #[test]
+    fn time_rolls_over_midnight() {
+        assert_eq!(
+            parts(add("h", 12.0, "1/15/2025 6:00 PM")),
+            (2025, 1, 16, 6, 0, 0)
+        );
+    }
+
+    #[test]
+    fn month_add_preserves_time() {
+        assert_eq!(
+            parts(add("m", 1.0, "1/15/2025 3:30 PM")),
+            (2025, 2, 15, 15, 30, 0)
+        );
+    }
+
+    #[test]
+    fn fractional_months_round() {
+        assert_eq!(parts(add("m", 1.5, "1/15/2025")), (2025, 3, 15, 0, 0, 0));
+    }
+
+    #[test]
+    fn fractional_days_keep_time() {
+        assert_eq!(
+            parts(add("d", 0.5, "1/15/2025 12:00 AM")),
+            (2025, 1, 15, 12, 0, 0)
+        );
+    }
+
+    #[test]
+    fn null_parameter_returns_null() {
+        let result = date_add(
+            &VBVariant::Null,
+            &VBVariant::from_double(1.0),
+            &VBVariant::from_string("1/15/2025"),
+        )
+        .unwrap();
+        assert!(result.is_null());
+        let result = date_add(
+            &VBVariant::from_string("d"),
+            &VBVariant::Null,
+            &VBVariant::from_string("1/15/2025"),
+        )
+        .unwrap();
+        assert!(result.is_null());
+        let result = date_add(
+            &VBVariant::from_string("d"),
+            &VBVariant::from_double(1.0),
+            &VBVariant::Null,
+        )
+        .unwrap();
+        assert!(result.is_null());
+    }
+
+    #[test]
+    fn invalid_interval_is_error_5() {
+        let err = date_add(
+            &VBVariant::from_string("bogus"),
+            &VBVariant::from_double(1.0),
+            &VBVariant::from_string("1/15/2025"),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn out_of_range_result_is_overflow() {
+        let err = date_add(
+            &VBVariant::from_string("yyyy"),
+            &VBVariant::from_double(10_000.0),
+            &VBVariant::from_string("1/15/2025"),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::OVERFLOW);
+    }
+
+    #[test]
+    fn interval_match_is_case_insensitive() {
+        assert_eq!(parts(add("YYYY", 1.0, "1/15/2025")), (2026, 1, 15, 0, 0, 0));
+    }
+}
