@@ -274,3 +274,73 @@
 //! - No time information included (use `Now` or `Time$` for time)
 //! - String comparison of dates is unreliable across locales
 //! - Cannot specify date format (use `Format$` for custom formats)
+
+use crate::error::VBResult;
+use crate::value::{date_serial_to_string, VBString};
+
+/// Implementation of the `Date$` function.
+///
+/// VB6 behavior:
+/// - returns the current system date as a `String`, formatted like the
+///   runtime's `CStr(Date)` (`M/D/YYYY` with no time component)
+/// - never raises an error
+pub fn date_dollar() -> VBResult<VBString> {
+    use jiff::civil::Date;
+    use jiff::{SpanRelativeTo, Unit};
+
+    let today = jiff::Zoned::now().date();
+    let base = Date::new(1899, 12, 30).expect("valid epoch");
+    let serial = today
+        .since(base)
+        .ok()
+        .and_then(|span| {
+            span.total((Unit::Day, SpanRelativeTo::days_are_24_hours()))
+                .ok()
+        })
+        .unwrap_or(0.0);
+    Ok(VBString::from(date_serial_to_string(serial)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::date_dollar;
+    use crate::value::VBVariant;
+
+    fn parse_parts(s: &str) -> (i32, i32, i32) {
+        let mut it = s.split('/');
+        let month = it.next().unwrap().parse().unwrap();
+        let day = it.next().unwrap().parse().unwrap();
+        let year = it.next().unwrap().parse().unwrap();
+        assert!(it.next().is_none(), "unexpected extra parts in {s:?}");
+        (month, day, year)
+    }
+
+    #[test]
+    fn returns_current_date_in_m_d_yyyy() {
+        let result = date_dollar().unwrap();
+        let s = result.as_str();
+        assert_eq!(s.split('/').count(), 3);
+        let (month, day, _year) = parse_parts(s);
+        assert!((1..=12).contains(&month), "bad month in {s:?}");
+        assert!((1..=31).contains(&day), "bad day in {s:?}");
+        assert_eq!(s, s.trim(), "unexpected whitespace in {s:?}");
+    }
+
+    #[test]
+    fn result_round_trips_through_cdate() {
+        let s = date_dollar().unwrap();
+        let variant = VBVariant::from_string(s.into_inner());
+        assert!(variant.as_date_serial().is_ok());
+    }
+
+    #[test]
+    fn matches_system_date() {
+        let before = jiff::Zoned::now().date();
+        let s = date_dollar().unwrap();
+        let after = jiff::Zoned::now().date();
+        let (month, day, year) = parse_parts(s.as_str());
+        let parsed =
+            jiff::civil::Date::new(year as i16, month as i8, day as i8).unwrap();
+        assert!(parsed >= before && parsed <= after);
+    }
+}
