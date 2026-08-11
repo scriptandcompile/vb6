@@ -1161,7 +1161,7 @@ fn format_currency(raw: i64) -> String {
 }
 
 /// Convert a date serial to a `M/D/YYYY` string (with time when non-midnight).
-fn date_serial_to_string(serial: f64) -> String {
+pub(crate) fn date_serial_to_string(serial: f64) -> String {
     let Some(dt) = date_serial_to_datetime(serial) else {
         return format!("{serial}");
     };
