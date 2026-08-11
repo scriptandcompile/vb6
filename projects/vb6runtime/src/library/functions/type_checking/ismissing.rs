@@ -584,3 +584,66 @@
 //! - `IsNull`: Check if `Variant` is `Null`
 //! - `VarType`: Get detailed `Variant` type information
 //! - `TypeName`: Get type name as `String`
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `IsMissing` function.
+///
+/// VB6 behavior:
+/// - returns `True` when the optional `Variant` argument was omitted
+///   (represented by `None`), `False` for any explicitly passed value
+///   (including `Empty`, `Null`, `0`, and `""`)
+/// - never raises an error, regardless of the input
+pub fn is_missing(value: Option<&VBVariant>) -> VBResult<VBVariant> {
+    Ok(VBVariant::from_bool(value.is_none()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_missing;
+    use crate::value::VBVariant;
+
+    #[test]
+    fn returns_true_for_omitted_argument() {
+        assert_eq!(
+            is_missing(None).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_explicit_empty() {
+        assert_eq!(
+            is_missing(Some(&VBVariant::Empty)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_explicit_null() {
+        assert_eq!(
+            is_missing(Some(&VBVariant::Null)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_any_provided_value() {
+        assert_eq!(
+            is_missing(Some(&VBVariant::from_integer(0))).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_missing(Some(&VBVariant::from_string(""))).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_missing(Some(&VBVariant::from_bool(false))).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_missing(Some(&VBVariant::from_double(1.5))).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+}
