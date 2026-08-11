@@ -393,10 +393,6 @@ pub fn rightb_dollar(input: &VBString, length: &VBLong) -> VBResult<VBString> {
     Ok(VBString::from(chars[start..].iter().collect::<String>()))
 }
 
-/// Returns the rightmost characters of `input` whose encoded size, in bytes,
-/// does not exceed `length`.
-///
-
 #[cfg(test)]
 mod tests {
     use super::*;

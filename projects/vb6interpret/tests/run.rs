@@ -68,6 +68,19 @@ fn string_function_suffix_variants() {
 }
 
 #[test]
+fn math_functions() {
+    let out = run("    Debug.Print Abs(-5)\n\
+         Debug.Print Sqr(16)\n\
+         Debug.Print Int(3.7)\n\
+         Debug.Print Fix(-3.7)\n\
+         Debug.Print Sgn(-7)\n\
+         Debug.Print Round(123.456, 2)\n\
+         Debug.Print Exp(0)\n\
+         Debug.Print Log(1)\n");
+    assert_eq!(out, vec!["5", "4", "3", "-3", "-1", "123.46", "1", "0"]);
+}
+
+#[test]
 fn if_elseif_else_block() {
     let out = run("    Dim n As Integer\n\
          n = 7\n\
