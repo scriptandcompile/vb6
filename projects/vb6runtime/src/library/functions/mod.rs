@@ -7,3 +7,4 @@
 pub mod logic;
 pub mod math;
 pub mod string;
+pub mod type_checking;

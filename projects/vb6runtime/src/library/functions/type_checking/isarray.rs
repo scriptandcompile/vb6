@@ -590,3 +590,117 @@
 //! - `TypeName`: Get type name as string
 //! - `IsEmpty`: Check if `Variant` is uninitialized
 //! - `IsNull`: Check if `Variant` is `Null`
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `IsArray` function.
+///
+/// VB6 behavior:
+/// - returns `True` when `value` is an array (fixed-size, dynamic, or held
+///   in a `Variant`), `False` otherwise
+/// - never raises an error, regardless of the input value
+pub fn is_array(value: &VBVariant) -> VBResult<VBVariant> {
+    Ok(VBVariant::from_bool(value.is_array()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_array;
+    use crate::{value::VBVariant, ArrayDimension, VBType};
+
+    #[test]
+    fn returns_true_for_fixed_array() {
+        let value = VBVariant::array_fixed(VBType::Integer, &[ArrayDimension::new(1, 3)]).unwrap();
+        assert_eq!(is_array(&value).unwrap(), VBVariant::from_bool(true));
+    }
+
+    #[test]
+    fn returns_true_for_dynamic_array() {
+        let value = VBVariant::array_dynamic(VBType::Integer);
+        assert_eq!(is_array(&value).unwrap(), VBVariant::from_bool(true));
+    }
+
+    #[test]
+    fn returns_true_for_variant_holding_array() {
+        let array = crate::ArrayValue::from_vec(
+            VBType::Variant,
+            vec![
+                VBVariant::from_integer(1),
+                VBVariant::from_string("two"),
+                VBVariant::from_bool(true),
+            ],
+        );
+        let value = VBVariant::from_array(array);
+        assert_eq!(is_array(&value).unwrap(), VBVariant::from_bool(true));
+    }
+
+    #[test]
+    fn returns_true_for_multidimensional_array() {
+        let value = VBVariant::array_fixed(
+            VBType::Double,
+            &[ArrayDimension::new(1, 2), ArrayDimension::new(1, 3)],
+        )
+        .unwrap();
+        assert_eq!(is_array(&value).unwrap(), VBVariant::from_bool(true));
+    }
+
+    #[test]
+    fn returns_false_for_scalar_numbers() {
+        assert_eq!(
+            is_array(&VBVariant::from_byte(5)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_array(&VBVariant::from_integer(-12)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_array(&VBVariant::from_long(12345)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_array(&VBVariant::from_single(1.5)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_array(&VBVariant::from_double(-2.5)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_array(&VBVariant::from_currency_scaled(-12_345)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_string_and_boolean() {
+        assert_eq!(
+            is_array(&VBVariant::from_string("not an array")).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_array(&VBVariant::from_bool(true)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_special_values() {
+        assert_eq!(
+            is_array(&VBVariant::Empty).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_array(&VBVariant::Null).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_array(&VBVariant::Nothing).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_array(&VBVariant::from_date_serial(42.0)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+}
