@@ -541,3 +541,210 @@
 //! - `Now`: Returns current date and time
 //! - `IsDate`: Tests if a value can be converted to a date
 //! - `CDate`: Converts an expression to a Date
+
+use crate::error::{VBError, VBResult};
+use crate::value::{date_serial_to_datetime, VBVariant};
+
+/// Implementation of the `DateSerial` function.
+///
+/// VB6 behavior:
+/// - two-digit years 0-29 map to 2000-2029 and 30-99 map to 1930-1999
+/// - month values outside 1-12 adjust the year (13 = January of next year)
+/// - day values outside the valid range adjust the month and year, with no
+///   clamping (Feb 29 2025 is March 1 2025; Feb 30 2025 is March 2 2025)
+/// - the time portion is always midnight
+/// - a year outside 100-9999 (after the two-digit mapping) raises error 5
+///   (invalid procedure call); a result outside the supported range raises
+///   error 6 (overflow); non-numeric arguments raise error 13 (type mismatch)
+pub fn date_serial(year: &VBVariant, month: &VBVariant, day: &VBVariant) -> VBResult<VBVariant> {
+    let year = year.as_i32()?;
+    let month = month.as_i32()?;
+    let day = day.as_i32()?;
+
+    let year = if (0..=99).contains(&year) {
+        if year <= 29 {
+            year + 2000
+        } else {
+            year + 1900
+        }
+    } else {
+        year
+    };
+
+    if !(100..=9999).contains(&year) {
+        return Err(VBError::invalid_procedure_call());
+    }
+
+    let total_months = year as i64 * 12 + month as i64 - 1;
+    let y = total_months.div_euclid(12);
+    let m = total_months.rem_euclid(12) + 1;
+
+    let serial = days_from_civil(y, m, 1) as f64 + 25_569.0 + day as f64 - 1.0;
+
+    let dt = date_serial_to_datetime(serial).ok_or_else(VBError::overflow)?;
+    if !(100..=9999).contains(&dt.year()) {
+        return Err(VBError::overflow());
+    }
+
+    Ok(VBVariant::from_date_serial(serial))
+}
+
+/// Days since 1970-01-01 for a proleptic Gregorian date (Howard Hinnant
+/// algorithm). Supports any `i64` year, so month/day rollover outside the
+/// `jiff` year range still computes the correct serial.
+fn days_from_civil(y: i64, m: i64, d: i64) -> i64 {
+    let y = y - if m <= 2 { 1 } else { 0 };
+    let era = y.div_euclid(400);
+    let yoe = y - era * 400;
+    let mp = if m > 2 { m - 3 } else { m + 9 };
+    let doy = (153 * mp + 2) / 5 + d - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    era * 146_097 + doe - 719_468
+}
+
+#[cfg(test)]
+mod tests {
+    use super::date_serial;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn ds(y: i32, m: i32, d: i32) -> f64 {
+        let result = date_serial(
+            &VBVariant::from_long(y),
+            &VBVariant::from_long(m),
+            &VBVariant::from_long(d),
+        )
+        .unwrap();
+        let VBVariant::Date(serial) = result else {
+            panic!("expected a Date variant");
+        };
+        serial
+    }
+
+    fn parts(serial: f64) -> (i16, i8, i8) {
+        let dt = crate::value::date_serial_to_datetime(serial).unwrap();
+        (dt.year(), dt.month(), dt.day())
+    }
+
+    #[test]
+    fn basic_construction() {
+        assert_eq!(parts(ds(2025, 3, 15)), (2025, 3, 15));
+        assert_eq!(parts(ds(1990, 5, 15)), (1990, 5, 15));
+        assert_eq!(parts(ds(1899, 12, 30)), (1899, 12, 30));
+    }
+
+    #[test]
+    fn epoch_serials() {
+        assert_eq!(ds(1899, 12, 30), 0.0);
+        assert_eq!(ds(1899, 12, 31), 1.0);
+        assert_eq!(ds(1900, 1, 1), 2.0);
+    }
+
+    #[test]
+    fn month_rollover() {
+        assert_eq!(parts(ds(2025, 13, 1)), (2026, 1, 1));
+        assert_eq!(parts(ds(2025, 0, 1)), (2024, 12, 1));
+        assert_eq!(parts(ds(2025, -1, 1)), (2024, 11, 1));
+        assert_eq!(parts(ds(2025, 24, 1)), (2026, 12, 1));
+    }
+
+    #[test]
+    fn day_rollover() {
+        assert_eq!(parts(ds(2025, 1, 32)), (2025, 2, 1));
+        assert_eq!(parts(ds(2025, 1, 0)), (2024, 12, 31));
+        assert_eq!(parts(ds(2025, 1, -1)), (2024, 12, 30));
+        assert_eq!(parts(ds(2025, 13, 32)), (2026, 2, 1));
+    }
+
+    #[test]
+    fn no_clamping_for_invalid_days() {
+        assert_eq!(parts(ds(2025, 2, 29)), (2025, 3, 1));
+        assert_eq!(parts(ds(2025, 2, 30)), (2025, 3, 2));
+        assert_eq!(parts(ds(2025, 2, 0)), (2025, 1, 31));
+        assert_eq!(parts(ds(2024, 2, 29)), (2024, 2, 29));
+    }
+
+    #[test]
+    fn two_digit_years() {
+        assert_eq!(parts(ds(25, 1, 1)), (2025, 1, 1));
+        assert_eq!(parts(ds(0, 1, 1)), (2000, 1, 1));
+        assert_eq!(parts(ds(29, 1, 1)), (2029, 1, 1));
+        assert_eq!(parts(ds(30, 1, 1)), (1930, 1, 1));
+        assert_eq!(parts(ds(99, 1, 1)), (1999, 1, 1));
+    }
+
+    #[test]
+    fn midnight_time_portion() {
+        assert_eq!(ds(2025, 3, 15).fract(), 0.0);
+    }
+
+    #[test]
+    fn year_outside_range_is_error_5() {
+        let err = date_serial(
+            &VBVariant::from_long(10_000),
+            &VBVariant::from_long(1),
+            &VBVariant::from_long(1),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        let err = date_serial(
+            &VBVariant::from_long(-1),
+            &VBVariant::from_long(1),
+            &VBVariant::from_long(1),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn result_outside_range_is_overflow() {
+        let err = date_serial(
+            &VBVariant::from_long(100),
+            &VBVariant::from_long(1),
+            &VBVariant::from_long(0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::OVERFLOW);
+        let err = date_serial(
+            &VBVariant::from_long(9999),
+            &VBVariant::from_long(12),
+            &VBVariant::from_long(32),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::OVERFLOW);
+    }
+
+    #[test]
+    fn boundary_rollover_stays_valid() {
+        assert_eq!(parts(ds(9999, 13, 0)), (9999, 12, 31));
+        assert_eq!(parts(ds(100, 1, 1)), (100, 1, 1));
+    }
+
+    #[test]
+    fn non_numeric_argument_is_error_13() {
+        let err = date_serial(
+            &VBVariant::from_string("abc"),
+            &VBVariant::from_long(1),
+            &VBVariant::from_long(1),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn null_argument_is_error_94() {
+        let err = date_serial(
+            &VBVariant::Null,
+            &VBVariant::from_long(1),
+            &VBVariant::from_long(1),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn negative_day_within_year_range() {
+        assert_eq!(parts(ds(2025, 1, -365)), (2024, 1, 1));
+        assert_eq!(parts(ds(2025, 1, -364)), (2024, 1, 2));
+    }
+}
