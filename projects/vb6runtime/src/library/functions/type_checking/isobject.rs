@@ -566,3 +566,133 @@
 //! - `TypeName`: Get type name as string
 //! - `IsNull`: Check if `Variant` is `Null`
 //! - `IsEmpty`: Check if `Variant` is `Empty`
+
+use crate::{error::VBResult, types::VBType, value::VBVariant};
+
+/// Implementation of the `IsObject` function.
+///
+/// VB6 behavior:
+/// - returns `True` when `value` is an object reference (including `Nothing`)
+///   or an array whose element type is an object
+/// - returns `False` for every non-object value
+/// - never raises an error, regardless of the input value
+pub fn is_object(value: &VBVariant) -> VBResult<VBVariant> {
+    let result = match value {
+        VBVariant::Object(_) | VBVariant::Nothing => true,
+        VBVariant::Array(a) => matches!(
+            a.element_type(),
+            VBType::Object | VBType::Class(_) | VBType::Nothing
+        ),
+        _ => false,
+    };
+    Ok(VBVariant::from_bool(result))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_object;
+    use crate::{value::VBVariant, ArrayDimension, VBObject, VBType};
+
+    #[derive(Debug)]
+    struct TestObject(&'static str);
+
+    impl VBObject for TestObject {
+        fn type_name(&self) -> &str {
+            self.0
+        }
+        fn as_any(&self) -> &dyn std::any::Any {
+            self
+        }
+        fn clone_box(&self) -> Box<dyn VBObject> {
+            Box::new(TestObject(self.0))
+        }
+    }
+
+    #[test]
+    fn returns_true_for_object_reference() {
+        assert_eq!(
+            is_object(&VBVariant::from_object(Box::new(TestObject("Test")))).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn returns_true_for_nothing() {
+        assert_eq!(
+            is_object(&VBVariant::Nothing).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn returns_true_for_array_of_objects() {
+        let array = VBVariant::array_fixed(VBType::Object, &[ArrayDimension::new(1, 3)]).unwrap();
+        assert_eq!(is_object(&array).unwrap(), VBVariant::from_bool(true));
+        let array = VBVariant::array_fixed(VBType::Class("Foo".to_string()), &[ArrayDimension::new(1, 2)]).unwrap();
+        assert_eq!(is_object(&array).unwrap(), VBVariant::from_bool(true));
+    }
+
+    #[test]
+    fn returns_false_for_scalar_values() {
+        assert_eq!(
+            is_object(&VBVariant::from_byte(5)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_object(&VBVariant::from_integer(-12)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_object(&VBVariant::from_long(12345)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_object(&VBVariant::from_single(1.5)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_object(&VBVariant::from_double(-2.5)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_object(&VBVariant::from_currency_scaled(-12_345)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_object(&VBVariant::from_string("obj")).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_object(&VBVariant::from_bool(true)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_object(&VBVariant::from_date_serial(45000.5)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_special_values() {
+        assert_eq!(
+            is_object(&VBVariant::Empty).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_object(&VBVariant::Null).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_object(&VBVariant::from_error(crate::error::VBError::new(13))).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_array_of_non_objects() {
+        let array = VBVariant::array_fixed(VBType::Integer, &[ArrayDimension::new(1, 3)]).unwrap();
+        assert_eq!(is_object(&array).unwrap(), VBVariant::from_bool(false));
+        let array = VBVariant::array_fixed(VBType::Variant, &[ArrayDimension::new(1, 2)]).unwrap();
+        assert_eq!(is_object(&array).unwrap(), VBVariant::from_bool(false));
+    }
+}
