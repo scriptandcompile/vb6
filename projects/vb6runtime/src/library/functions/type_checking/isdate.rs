@@ -540,3 +540,159 @@
 //! - `VarType`: Get detailed type information
 //! - `TypeName`: Get type name as `String`
 //! - `Format`: Format date for display
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `IsDate` function.
+///
+/// VB6 behavior:
+/// - returns `True` when `value` is a `Date` or can be converted to a date
+///   by the runtime's `CDate` semantics
+/// - returns `False` for `Empty`, `Null`, `Boolean`, `Nothing`, `Object`,
+///   `Array`, and `Error` values
+/// - never raises an error, regardless of the input value
+pub fn is_date(value: &VBVariant) -> VBResult<VBVariant> {
+    let result = match value {
+        VBVariant::Date(_) => true,
+        VBVariant::Empty
+        | VBVariant::Null
+        | VBVariant::Boolean(_)
+        | VBVariant::Nothing
+        | VBVariant::Object(_)
+        | VBVariant::Array(_)
+        | VBVariant::Error(_) => false,
+        _ => value.as_date_serial().is_ok(),
+    };
+    Ok(VBVariant::from_bool(result))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_date;
+    use crate::{value::VBVariant, ArrayDimension, VBObject, VBType};
+
+    #[derive(Debug)]
+    struct TestObject(&'static str);
+
+    impl VBObject for TestObject {
+        fn type_name(&self) -> &str {
+            self.0
+        }
+        fn as_any(&self) -> &dyn std::any::Any {
+            self
+        }
+        fn clone_box(&self) -> Box<dyn VBObject> {
+            Box::new(TestObject(self.0))
+        }
+    }
+
+    #[test]
+    fn returns_true_for_date_type() {
+        assert_eq!(
+            is_date(&VBVariant::from_date_serial(45000.5)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_date_serial(0.0)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn returns_true_for_valid_date_strings() {
+        assert_eq!(
+            is_date(&VBVariant::from_string("12/25/2025")).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_string("2025-12-25")).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_string("20251225")).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_string("12/25/2025 3:30:00 PM")).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn returns_true_for_numeric_values_and_strings() {
+        assert_eq!(
+            is_date(&VBVariant::from_long(45000)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_double(1.5)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_byte(1)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_string("123")).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_string("45000.5")).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_invalid_date_strings() {
+        assert_eq!(
+            is_date(&VBVariant::from_string("Not a date")).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_string("13/45/2025")).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_string("February 30, 2025")).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_string("12/24")).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_special_values() {
+        assert_eq!(
+            is_date(&VBVariant::Empty).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_date(&VBVariant::Null).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_bool(true)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_bool(false)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_objects_and_arrays() {
+        assert_eq!(
+            is_date(&VBVariant::Nothing).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_date(&VBVariant::from_object(Box::new(TestObject("Test")))).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        let array = VBVariant::array_fixed(VBType::Integer, &[ArrayDimension::new(1, 3)]).unwrap();
+        assert_eq!(is_date(&array).unwrap(), VBVariant::from_bool(false));
+    }
+}
