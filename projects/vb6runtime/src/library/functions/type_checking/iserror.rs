@@ -577,4 +577,114 @@
 //! - `IsNull`: Check if `Variant` is `Null`
 //! - `IsEmpty`: Check if `Variant` is `Empty`
 //! - `VarType`: Get detailed `Variant` type information
-//! - `Err.Raise`: Raise runtime error (preferred modern approach)
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `IsError` function.
+///
+/// VB6 behavior:
+/// - returns `True` only when `value` is an error value (from `CVErr`),
+///   `False` for every other value
+/// - never raises an error, regardless of the input value
+pub fn is_error(value: &VBVariant) -> VBResult<VBVariant> {
+    Ok(VBVariant::from_bool(value.is_error()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_error;
+    use crate::{error::VBError, value::VBVariant, ArrayDimension, VBObject, VBType};
+
+    #[derive(Debug)]
+    struct TestObject(&'static str);
+
+    impl VBObject for TestObject {
+        fn type_name(&self) -> &str {
+            self.0
+        }
+        fn as_any(&self) -> &dyn std::any::Any {
+            self
+        }
+        fn clone_box(&self) -> Box<dyn VBObject> {
+            Box::new(TestObject(self.0))
+        }
+    }
+
+    #[test]
+    fn returns_true_for_error_value() {
+        assert_eq!(
+            is_error(&VBVariant::from_error(VBError::new(13))).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_error(&VBVariant::from_error(VBError::new(450))).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_special_values() {
+        assert_eq!(
+            is_error(&VBVariant::Empty).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_error(&VBVariant::Null).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_error(&VBVariant::Nothing).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_scalar_values() {
+        assert_eq!(
+            is_error(&VBVariant::from_byte(5)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_error(&VBVariant::from_integer(-12)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_error(&VBVariant::from_long(12345)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_error(&VBVariant::from_single(1.5)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_error(&VBVariant::from_double(-2.5)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_error(&VBVariant::from_currency_scaled(-12_345)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_error(&VBVariant::from_string("Error 13")).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_error(&VBVariant::from_bool(true)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_error(&VBVariant::from_date_serial(45000.0)).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_objects_and_arrays() {
+        assert_eq!(
+            is_error(&VBVariant::from_object(Box::new(TestObject("Test")))).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        let array = VBVariant::array_fixed(VBType::Integer, &[ArrayDimension::new(1, 3)]).unwrap();
+        assert_eq!(is_error(&array).unwrap(), VBVariant::from_bool(false));
+    }
+}
