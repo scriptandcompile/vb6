@@ -304,10 +304,6 @@ pub fn midb_dollar(
     ))
 }
 
-/// Returns the characters of `input` starting at the character containing
-/// byte `start` and spanning at most `length` bytes.
-///
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -320,8 +316,12 @@ mod tests {
             VBString::from("BCDE")
         );
         assert_eq!(
-            midb_dollar(&VBString::from("ABCDE"), &VBLong::from(5), Some(&VBLong::from(4)))
-                .unwrap(),
+            midb_dollar(
+                &VBString::from("ABCDE"),
+                &VBLong::from(5),
+                Some(&VBLong::from(4))
+            )
+            .unwrap(),
             VBString::from("CD")
         );
     }
@@ -337,8 +337,12 @@ mod tests {
     #[test]
     fn zero_length_returns_empty() {
         assert_eq!(
-            midb_dollar(&VBString::from("ABCDE"), &VBLong::from(3), Some(&VBLong::from(0)))
-                .unwrap(),
+            midb_dollar(
+                &VBString::from("ABCDE"),
+                &VBLong::from(3),
+                Some(&VBLong::from(0))
+            )
+            .unwrap(),
             VBString::from("")
         );
     }
@@ -360,9 +364,13 @@ mod tests {
             err_number::INVALID_PROCEDURE_CALL
         );
         assert_eq!(
-            midb_dollar(&VBString::from("ABC"), &VBLong::from(1), Some(&VBLong::from(-2)))
-                .unwrap_err()
-                .number,
+            midb_dollar(
+                &VBString::from("ABC"),
+                &VBLong::from(1),
+                Some(&VBLong::from(-2))
+            )
+            .unwrap_err()
+            .number,
             err_number::INVALID_PROCEDURE_CALL
         );
     }

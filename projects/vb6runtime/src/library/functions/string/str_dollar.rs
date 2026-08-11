@@ -413,8 +413,8 @@ mod tests {
             VBString::from(" 0")
         );
         assert_eq!(
-            str_dollar(&VBVariant::Double(3.14159)).unwrap(),
-            VBString::from(" 3.14159")
+            str_dollar(&VBVariant::Double(std::f64::consts::PI)).unwrap(),
+            VBString::from(" 3.141592653589793")
         );
     }
 

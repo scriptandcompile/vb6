@@ -245,17 +245,9 @@ pub fn leftb_dollar(input: &VBString, length: &VBLong) -> VBResult<VBString> {
     }
     let n = length / BYTES_PER_CHAR;
     Ok(VBString::from(
-        input
-            .as_str()
-            .chars()
-            .take(n as usize)
-            .collect::<String>(),
+        input.as_str().chars().take(n as usize).collect::<String>(),
     ))
 }
-
-/// Returns the leftmost characters of `input` whose encoded size, in bytes,
-/// does not exceed `length`.
-///
 
 #[cfg(test)]
 mod tests {
