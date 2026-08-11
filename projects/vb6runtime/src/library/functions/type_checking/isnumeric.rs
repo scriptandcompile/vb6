@@ -640,3 +640,140 @@
 //! - `TypeName`: Get type name as string
 //! - `Val`: Extract numeric value from string (different behavior)
 //! - `CDbl`, `CLng`, `CInt`: Convert to specific numeric types
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `IsNumeric` function.
+///
+/// VB6 behavior:
+/// - returns `True` when `value` can be converted to a number by the
+///   runtime's `CDbl` semantics, which includes numeric types, numeric
+///   strings (including `&H`/`&O` notation), `Empty`, `Boolean`, and `Date`
+/// - returns `False` for `Null`, `Nothing`, `Object`, `Array`, `Error`, and
+///   non-numeric strings
+/// - never raises an error, regardless of the input value
+pub fn is_numeric(value: &VBVariant) -> VBResult<VBVariant> {
+    Ok(VBVariant::from_bool(value.as_f64().is_ok()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_numeric;
+    use crate::{value::VBVariant, ArrayDimension, VBObject, VBType};
+
+    #[derive(Debug)]
+    struct TestObject(&'static str);
+
+    impl VBObject for TestObject {
+        fn type_name(&self) -> &str {
+            self.0
+        }
+        fn as_any(&self) -> &dyn std::any::Any {
+            self
+        }
+        fn clone_box(&self) -> Box<dyn VBObject> {
+            Box::new(TestObject(self.0))
+        }
+    }
+
+    #[test]
+    fn returns_true_for_numeric_types() {
+        assert_eq!(
+            is_numeric(&VBVariant::from_byte(5)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::from_integer(-12)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::from_long(12345)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::from_single(1.5)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::from_double(-2.5)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::from_currency_scaled(-12_345)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn returns_true_for_numeric_strings() {
+        for s in [
+            "123",
+            "-1.5",
+            "45000.5",
+            "1e3",
+            "&H1F",
+            "&O17",
+            "12.5!",
+            "100#",
+        ] {
+            assert_eq!(
+                is_numeric(&VBVariant::from_string(s)).unwrap(),
+                VBVariant::from_bool(true),
+                "expected {s:?} to be numeric"
+            );
+        }
+    }
+
+    #[test]
+    fn returns_true_for_empty_boolean_and_date() {
+        assert_eq!(
+            is_numeric(&VBVariant::Empty).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::from_bool(true)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::from_bool(false)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::from_date_serial(45000.5)).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn returns_false_for_non_numeric_strings() {
+        for s in ["", "abc", "123abc", "12/24", "12:30 PM", "&HZZ"] {
+            assert_eq!(
+                is_numeric(&VBVariant::from_string(s)).unwrap(),
+                VBVariant::from_bool(false),
+                "expected {s:?} to be non-numeric"
+            );
+        }
+    }
+
+    #[test]
+    fn returns_false_for_special_values() {
+        assert_eq!(
+            is_numeric(&VBVariant::Null).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::Nothing).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::from_object(Box::new(TestObject("Test")))).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            is_numeric(&VBVariant::from_error(crate::error::VBError::new(13))).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        let array = VBVariant::array_fixed(VBType::Integer, &[ArrayDimension::new(1, 3)]).unwrap();
+        assert_eq!(is_numeric(&array).unwrap(), VBVariant::from_bool(false));
+    }
+}
