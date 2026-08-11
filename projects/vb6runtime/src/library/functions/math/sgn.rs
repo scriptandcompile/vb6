@@ -703,3 +703,116 @@
 //! - `Round`: Rounds a number to specified decimal places
 //! - `IIf`: Conditional function that can implement sign-based logic
 //!
+
+use crate::{error::VBError, error::VBResult, value::VBVariant};
+
+/// Implementation of the sign (Sgn) function.
+///
+/// VB6 behavior:
+/// - `Sgn(Null)` returns `Null`
+/// - other values are coerced with numeric conversion rules and return `Double`
+pub fn sgn(value: VBVariant) -> VBResult<VBVariant> {
+    if value.is_null() {
+        return Ok(VBVariant::Null);
+    }
+
+    let numeric = value.as_f64()?;
+
+    if numeric == 0.0 {
+        return Ok(VBVariant::from_double(0.0));
+    }
+
+    if numeric.is_nan() {
+        return Err(VBError::overflow());
+    }
+
+    if numeric.is_infinite() && numeric.is_sign_positive() {
+        return Ok(VBVariant::from_double(1.0));
+    }
+
+    if numeric.is_infinite() && numeric.is_sign_negative() {
+        return Ok(VBVariant::from_double(-1.0));
+    }
+
+    Ok(VBVariant::from_double(numeric.signum()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::sgn;
+    use crate::{error::err_number, value::VBVariant};
+
+    fn assert_approx_eq(actual: f64, expected: f64) {
+        if (actual == f64::INFINITY && expected == f64::INFINITY)
+            || (actual == f64::NEG_INFINITY && expected == f64::NEG_INFINITY)
+        {
+            return;
+        }
+        let diff = (actual - expected).abs();
+        assert!(
+            diff < 1e-12,
+            "expected {expected}, got {actual}, diff {diff}"
+        );
+    }
+
+    #[test]
+    fn returns_null_for_null() {
+        assert_eq!(sgn(VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn returns_zero_for_empty() {
+        assert_eq!(sgn(VBVariant::Empty).unwrap(), VBVariant::from_double(0.0));
+    }
+
+    #[test]
+    fn returns_double_for_numeric_inputs() {
+        let result = sgn(VBVariant::from_byte(5)).unwrap();
+        assert_eq!(result, VBVariant::from_double((5.0_f64).signum()));
+
+        let result = sgn(VBVariant::from_integer(-123)).unwrap();
+        assert_eq!(result, VBVariant::from_double((-123.0_f64).signum()));
+
+        let result = sgn(VBVariant::from_long(-12345)).unwrap();
+        assert_eq!(result, VBVariant::from_double((-12345.0_f64).signum()));
+
+        let result = sgn(VBVariant::from_single(-12.5)).unwrap();
+        assert_eq!(result, VBVariant::from_double((-12.5_f64).signum()));
+
+        let result = sgn(VBVariant::from_double(-12.5)).unwrap();
+        assert_eq!(result, VBVariant::from_double((-12.5_f64).signum()));
+
+        let result = sgn(VBVariant::from_currency_scaled(-12_345)).unwrap();
+        assert_eq!(result, VBVariant::from_double((-1.2345_f64).signum()));
+    }
+
+    #[test]
+    fn returns_expected_special_numbers() {
+        let VBVariant::Double(v) = sgn(VBVariant::from_double(0.0)).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 0.0);
+
+        let VBVariant::Double(v) = sgn(VBVariant::from_double(1.0)).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, (1.0_f64).signum());
+
+        let VBVariant::Double(v) = sgn(VBVariant::from_double(-1.0)).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, (-1.0_f64).signum());
+    }
+
+    #[test]
+    fn rejects_non_numeric_values() {
+        let err = sgn(VBVariant::from_string("not-a-number")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn accepts_numeric_strings() {
+        let result = sgn(VBVariant::from_string("1.5")).unwrap();
+        assert_eq!(result, VBVariant::from_double((1.5_f64).signum()));
+    }
+}
