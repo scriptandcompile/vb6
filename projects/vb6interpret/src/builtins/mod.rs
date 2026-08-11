@@ -10,8 +10,10 @@
 //! categories only need a new submodule plus one `register` call in
 //! [`registry`].
 
+mod logic;
 mod math;
 mod string;
+mod type_checking;
 
 /// Build a [`Builtin`] registry entry from an adapter closure.
 ///
@@ -83,8 +85,10 @@ fn registry() -> &'static Registry {
     static REGISTRY: OnceLock<Registry> = OnceLock::new();
     REGISTRY.get_or_init(|| {
         let mut registry = Registry::new();
+        logic::register(&mut registry);
         string::register(&mut registry);
         math::register(&mut registry);
+        type_checking::register(&mut registry);
         registry
     })
 }
@@ -264,5 +268,126 @@ mod tests {
     fn unknown_function_is_error_35() {
         let err = call_builtin("DefinitelyNotAFunction", &[]).unwrap_err();
         assert_eq!(err.number, 35);
+    }
+
+    #[test]
+    fn logic_functions_dispatch() {
+        let result = call_builtin(
+            "IIf",
+            &[
+                VBVariant::from_bool(true),
+                VBVariant::from_string("yes"),
+                VBVariant::from_string("no"),
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_string().unwrap(), "yes");
+
+        let result = call_builtin(
+            "Choose",
+            &[
+                VBVariant::Long(2),
+                VBVariant::from_string("a"),
+                VBVariant::from_string("b"),
+                VBVariant::from_string("c"),
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_string().unwrap(), "b");
+
+        let result = call_builtin(
+            "Switch",
+            &[
+                VBVariant::from_bool(false),
+                VBVariant::from_string("a"),
+                VBVariant::from_bool(true),
+                VBVariant::from_string("b"),
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_string().unwrap(), "b");
+    }
+
+    #[test]
+    fn logic_variadic_functions_validate_arity() {
+        let err = call_builtin("Switch", &[VBVariant::from_bool(true)]).unwrap_err();
+        assert_eq!(
+            err.number,
+            vb6core::error::err_number::WRONG_NUMBER_OF_ARGUMENTS
+        );
+        let err = call_builtin("Choose", &[VBVariant::Long(1)]).unwrap_err();
+        assert_eq!(
+            err.number,
+            vb6core::error::err_number::WRONG_NUMBER_OF_ARGUMENTS
+        );
+    }
+
+    #[test]
+    fn type_checking_functions_dispatch() {
+        assert_eq!(
+            call_builtin("IsEmpty", &[VBVariant::Empty]).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin("IsNull", &[VBVariant::Null]).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin("IsError", &[VBVariant::from_error(vb6core::error::VBError::new(13))])
+                .unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin("IsDate", &[VBVariant::from_string("12/25/2025")]).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin("IsNumeric", &[VBVariant::from_string("123")]).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin(
+                "IsArray",
+                &[VBVariant::array_dynamic(vb6runtime::VBType::Integer)]
+            )
+            .unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn type_checking_returns_false_for_other_values() {
+        assert_eq!(
+            call_builtin("IsEmpty", &[VBVariant::Null]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            call_builtin("IsNull", &[VBVariant::Empty]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            call_builtin("IsDate", &[VBVariant::from_string("not a date")]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            call_builtin("IsNumeric", &[VBVariant::from_string("abc")]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn is_missing_reports_omitted_argument() {
+        assert_eq!(
+            call_builtin("IsMissing", &[]).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin("IsMissing", &[VBVariant::Empty]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            call_builtin("IsMissing", &[VBVariant::Null]).unwrap(),
+            VBVariant::from_bool(false)
+        );
     }
 }
