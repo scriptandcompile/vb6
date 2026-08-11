@@ -572,3 +572,297 @@
 //! - `DateDiff`: Returns the difference between two dates
 //! - `DateSerial`: Creates a date from year, month, and day values
 //! - `Format`: Formats a date as a string (alternative for custom formatting)
+
+use crate::error::{VBError, VBResult};
+use crate::value::{date_serial_to_datetime, VBVariant};
+
+/// Implementation of the `DatePart` function.
+///
+/// VB6 behavior:
+/// - a `Null` date returns `Null`
+/// - "w" (weekday) numbers days relative to `firstdayofweek`
+///   (Sunday = 1 by default; `vbMonday` makes Monday = 1)
+/// - "ww" (week of year) uses `firstdayofweek` and `firstweekofyear`:
+///   `vbFirstJan1` starts week 1 on the week containing Jan 1, `vbFirstFourDays`
+///   starts week 1 on the first week with at least four days in the new year,
+///   and `vbFirstFullWeek` starts week 1 on the first full week (dates before
+///   it are week 0, matching VB6); `vbUseSystem` is treated as Sunday /
+///   `vbFirstJan1`
+/// - an unknown interval raises error 5 (invalid procedure call); a non-date
+///   value raises error 13 (type mismatch)
+pub fn date_part(
+    interval: &VBVariant,
+    date: &VBVariant,
+    first_day_of_week: Option<&VBVariant>,
+    first_week_of_year: Option<&VBVariant>,
+) -> VBResult<VBVariant> {
+    if date.is_null() {
+        return Ok(VBVariant::Null);
+    }
+
+    let fdow = first_day(first_day_of_week)?;
+    let fwoy = match first_week_of_year {
+        None => 1,
+        Some(v) => {
+            let n = v.as_i32()?;
+            if !(0..=3).contains(&n) {
+                return Err(VBError::invalid_procedure_call());
+            }
+            n
+        }
+    };
+
+    let interval = interval.as_string()?.to_ascii_lowercase();
+    let serial = date.as_date_serial()?;
+    let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
+
+    let result = match interval.as_str() {
+        "yyyy" => dt.year() as i32,
+        "q" => (dt.month() as i32 - 1) / 3 + 1,
+        "m" => dt.month() as i32,
+        "y" => dt.date().day_of_year() as i32,
+        "d" => dt.day() as i32,
+        "w" => weekday(&dt, fdow),
+        "ww" => week_of_year(&dt, fdow, fwoy),
+        "h" => dt.hour() as i32,
+        "n" => dt.minute() as i32,
+        "s" => dt.second() as i32,
+        _ => return Err(VBError::invalid_procedure_call()),
+    };
+
+    Ok(VBVariant::from_integer(result as i16))
+}
+
+/// The `firstdayofweek` constant, normalized to a 1=Sunday..7=Saturday offset.
+fn first_day(first_day_of_week: Option<&VBVariant>) -> VBResult<i32> {
+    match first_day_of_week {
+        None => Ok(1),
+        Some(v) => {
+            let n = v.as_i32()?;
+            match n {
+                0 | 1 => Ok(1),
+                2..=7 => Ok(n),
+                _ => Err(VBError::invalid_procedure_call()),
+            }
+        }
+    }
+}
+
+/// Day of the week relative to `fdow` (1 = `fdow` itself .. 7).
+fn weekday(dt: &jiff::civil::DateTime, fdow: i32) -> i32 {
+    let sunday_based = dt.date().weekday().to_sunday_one_offset() as i32 - 1;
+    (sunday_based - (fdow - 1)).rem_euclid(7) + 1
+}
+
+/// Week of the year within the calendar year containing `dt`.
+fn week_of_year(dt: &jiff::civil::DateTime, fdow: i32, fwoy: i32) -> i32 {
+    use jiff::civil::Date;
+
+    let date_serial = day_serial(dt.date());
+    let jan1_serial = day_serial(Date::new(dt.year(), 1, 1).expect("valid january 1"));
+    let t = fdow as i64;
+
+    // The day serial of the week start that contains Jan 1.
+    let prev_fdow = jan1_serial as i64 - (jan1_serial as i64 - t).rem_euclid(7);
+    let week1_start = match fwoy {
+        2 => {
+            let days_in_new_year = 7 - (jan1_serial as i64 - prev_fdow);
+            if days_in_new_year >= 4 {
+                prev_fdow
+            } else {
+                prev_fdow + 7
+            }
+        }
+        3 => {
+            if (jan1_serial as i64 - t).rem_euclid(7) == 0 {
+                jan1_serial as i64
+            } else {
+                prev_fdow + 7
+            }
+        }
+        _ => prev_fdow,
+    };
+
+    (date_serial as i64 - week1_start).div_euclid(7) as i32 + 1
+}
+
+/// The day serial of a civil date (1899-12-30 == 0).
+fn day_serial(date: jiff::civil::Date) -> f64 {
+    use jiff::civil::Date;
+    use jiff::{SpanRelativeTo, Unit};
+
+    let base = Date::new(1899, 12, 30).expect("valid epoch");
+    date.since(base)
+        .ok()
+        .and_then(|span| span.total((Unit::Day, SpanRelativeTo::days_are_24_hours())).ok())
+        .unwrap_or(0.0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::date_part;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn part(interval: &str, date: &str) -> i16 {
+        let result = date_part(
+            &VBVariant::from_string(interval),
+            &VBVariant::from_string(date),
+            None,
+            None,
+        )
+        .unwrap();
+        let VBVariant::Integer(n) = result else {
+            panic!("expected an Integer variant");
+        };
+        n
+    }
+
+    fn part_opts(interval: &str, date: &str, fdow: i32, fwoy: i32) -> i16 {
+        let result = date_part(
+            &VBVariant::from_string(interval),
+            &VBVariant::from_string(date),
+            Some(&VBVariant::from_long(fdow)),
+            Some(&VBVariant::from_long(fwoy)),
+        )
+        .unwrap();
+        let VBVariant::Integer(n) = result else {
+            panic!("expected an Integer variant");
+        };
+        n
+    }
+
+    #[test]
+    fn basic_parts() {
+        assert_eq!(part("yyyy", "3/15/2025 14:30:45"), 2025);
+        assert_eq!(part("q", "3/15/2025"), 1);
+        assert_eq!(part("m", "3/15/2025"), 3);
+        assert_eq!(part("d", "3/15/2025"), 15);
+        assert_eq!(part("h", "3/15/2025 2:30 PM"), 14);
+        assert_eq!(part("n", "3/15/2025 2:30 PM"), 30);
+        assert_eq!(part("s", "3/15/2025 2:30:45 PM"), 45);
+    }
+
+    #[test]
+    fn quarters() {
+        assert_eq!(part("q", "1/15/2025"), 1);
+        assert_eq!(part("q", "4/15/2025"), 2);
+        assert_eq!(part("q", "7/15/2025"), 3);
+        assert_eq!(part("q", "10/15/2025"), 4);
+        assert_eq!(part("q", "12/31/2025"), 4);
+    }
+
+    #[test]
+    fn day_of_year() {
+        assert_eq!(part("y", "1/1/2025"), 1);
+        assert_eq!(part("y", "3/15/2025"), 74);
+        assert_eq!(part("y", "12/31/2025"), 365);
+        assert_eq!(part("y", "12/31/2024"), 366);
+    }
+
+    #[test]
+    fn weekday_defaults_to_sunday_first() {
+        assert_eq!(part("w", "1/1/2025"), 4);
+        assert_eq!(part("w", "1/5/2025"), 1);
+        assert_eq!(part("w", "1/4/2025"), 7);
+    }
+
+    #[test]
+    fn weekday_honors_first_day_of_week() {
+        assert_eq!(part_opts("w", "1/6/2025", 2, 1), 1);
+        assert_eq!(part_opts("w", "1/12/2025", 2, 1), 7);
+        assert_eq!(part_opts("w", "1/5/2025", 0, 1), 1);
+    }
+
+    #[test]
+    fn week_of_year_first_jan_1() {
+        assert_eq!(part("ww", "1/1/2025"), 1);
+        assert_eq!(part("ww", "1/4/2025"), 1);
+        assert_eq!(part("ww", "1/5/2025"), 2);
+        assert_eq!(part("ww", "12/31/2025"), 53);
+    }
+
+    #[test]
+    fn week_of_year_first_four_days() {
+        assert_eq!(part_opts("ww", "1/1/2025", 1, 2), 1);
+        assert_eq!(part_opts("ww", "1/5/2025", 1, 2), 2);
+    }
+
+    #[test]
+    fn week_of_year_iso() {
+        assert_eq!(part_opts("ww", "1/1/2025", 2, 2), 1);
+        assert_eq!(part_opts("ww", "12/29/2025", 2, 2), 53);
+    }
+
+    #[test]
+    fn week_of_year_first_full_week() {
+        assert_eq!(part_opts("ww", "1/1/2025", 1, 3), 0);
+        assert_eq!(part_opts("ww", "1/5/2025", 1, 3), 1);
+        assert_eq!(part_opts("ww", "1/12/2025", 1, 3), 2);
+    }
+
+    #[test]
+    fn midnight_hour_is_zero() {
+        assert_eq!(part("h", "1/15/2025"), 0);
+    }
+
+    #[test]
+    fn null_date_returns_null() {
+        let result = date_part(
+            &VBVariant::from_string("yyyy"),
+            &VBVariant::Null,
+            None,
+            None,
+        )
+        .unwrap();
+        assert!(result.is_null());
+    }
+
+    #[test]
+    fn invalid_interval_is_error_5() {
+        let err = date_part(
+            &VBVariant::from_string("bogus"),
+            &VBVariant::from_string("1/15/2025"),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn non_date_parameter_is_error_13() {
+        let err = date_part(
+            &VBVariant::from_string("yyyy"),
+            &VBVariant::from_string("not a date"),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn invalid_first_day_of_week_is_error_5() {
+        let err = date_part(
+            &VBVariant::from_string("d"),
+            &VBVariant::from_string("1/15/2025"),
+            Some(&VBVariant::from_long(9)),
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn invalid_first_week_of_year_is_error_5() {
+        let err = date_part(
+            &VBVariant::from_string("d"),
+            &VBVariant::from_string("1/15/2025"),
+            None,
+            Some(&VBVariant::from_long(9)),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+}
