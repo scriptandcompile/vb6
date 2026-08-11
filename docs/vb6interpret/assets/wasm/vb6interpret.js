@@ -1,3 +1,5 @@
+/* @ts-self-types="./vb6interpret.d.ts" */
+
 /**
  * Build a full statement-boundary execution trace that the browser can use
  * for true resume-from-current-state stepping.
