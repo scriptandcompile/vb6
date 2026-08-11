@@ -49,7 +49,7 @@ async function initPlayground() {
 
     try {
         await Editor.initEditor("editor-container", state.initialCode);
-        await init();
+        await init(buildWasmUrl());
         init_panic_hook();
         state.wasmReady = true;
         elements.wasmStatus.textContent = "WebAssembly ready";
@@ -61,6 +61,12 @@ async function initPlayground() {
         setStatus("WASM error", "error");
         renderError({ message: `Failed to initialize WASM: ${error.message}` });
     }
+}
+
+function buildWasmUrl() {
+    const wasmUrl = new URL("../../wasm/vb6interpret_bg.wasm", import.meta.url);
+    wasmUrl.searchParams.set("t", String(Date.now()));
+    return wasmUrl.href;
 }
 
 function bindEvents() {
