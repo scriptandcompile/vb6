@@ -470,3 +470,64 @@
 //! - `Format`: Formats a date as a string
 //! - `IsDate`: Tests if a value can be converted to a date
 //! - `CDate`: Converts an expression to a Date
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `Date` function.
+///
+/// VB6 behavior:
+/// - returns the current system date as a `Date` variant with the time
+///   portion set to midnight
+/// - never raises an error
+pub fn date() -> VBResult<VBVariant> {
+    use jiff::civil::Date;
+    use jiff::{SpanRelativeTo, Unit};
+
+    let today = jiff::Zoned::now().date();
+    let base = Date::new(1899, 12, 30).expect("valid epoch");
+    let serial = today
+        .since(base)
+        .ok()
+        .and_then(|span| {
+            span.total((Unit::Day, SpanRelativeTo::days_are_24_hours()))
+                .ok()
+        })
+        .unwrap_or(0.0);
+    Ok(VBVariant::from_date_serial(serial))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::date;
+    use crate::VBVariant;
+
+    #[test]
+    fn returns_date_variant() {
+        let value = date().unwrap();
+        assert_eq!(value.var_type(), 7);
+        assert_eq!(value.type_of(), crate::VBType::Date);
+    }
+
+    #[test]
+    fn time_portion_is_midnight() {
+        let value = date().unwrap();
+        let VBVariant::Date(serial) = value else {
+            panic!("expected a Date variant");
+        };
+        assert_eq!(serial.fract(), 0.0, "time must be midnight");
+    }
+
+    #[test]
+    fn matches_system_date() {
+        let before = jiff::Zoned::now().date();
+        let value = date().unwrap();
+        let after = jiff::Zoned::now().date();
+        let VBVariant::Date(serial) = value else {
+            panic!("expected a Date variant");
+        };
+        let parsed = crate::value::date_serial_to_datetime(serial).expect("valid serial");
+        let parsed = jiff::civil::Date::new(parsed.year(), parsed.month(), parsed.day())
+            .expect("valid civil date");
+        assert!(parsed >= before && parsed <= after);
+    }
+}
