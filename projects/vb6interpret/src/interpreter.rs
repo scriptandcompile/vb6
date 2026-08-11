@@ -285,6 +285,25 @@ impl Interpreter {
         }
     }
 
+    /// Capture the post-run state for the trace's final step.
+    ///
+    /// Drops the capture when it duplicates the previous snapshot in every way
+    /// except the call stack, which happens right after a procedure exits
+    /// normally: the `End Sub` snapshot already represents the finished state.
+    pub fn capture_final_debug_snapshot(&mut self) {
+        let previous = self.debug_snapshots.last().cloned();
+        self.capture_debug_snapshot();
+        if let (Some(before), Some(after)) = (previous, self.debug_snapshots.last()) {
+            if before.steps == after.steps
+                && before.current_line == after.current_line
+                && before.output_text == after.output_text
+                && before.terminated == after.terminated
+            {
+                self.debug_snapshots.pop();
+            }
+        }
+    }
+
     /// The name of the currently executing procedure (empty at module level).
     pub(crate) fn current_procedure_name(&self) -> String {
         self.frames
@@ -329,12 +348,27 @@ impl Interpreter {
         let procedure = self.lookup_procedure(name)?;
         let body = procedure.body.clone();
         let body_line = procedure.line + 1;
+        let entry_line = procedure.line;
+        let end_line = procedure.end_line;
         self.push_frame(procedure, args)?;
+
+        if self.record_debug_snapshots {
+            self.current_stmt_line = entry_line;
+            self.capture_debug_snapshot();
+        }
+
         let result = match body {
             Some(body_node) => self.exec_statements(&body_node, body_line),
             None => Ok(Flow::Next),
         };
+
+        let normal_end = matches!(&result, Ok(Flow::Next));
+        if normal_end && self.record_debug_snapshots {
+            self.current_stmt_line = end_line;
+            self.capture_debug_snapshot();
+        }
         self.frames.pop();
+
         match result {
             Ok(Flow::Terminate) => Ok(Flow::Terminate),
             Ok(_) => Ok(Flow::Next),
@@ -348,13 +382,27 @@ impl Interpreter {
         let return_type = procedure.return_type.clone();
         let body = procedure.body.clone();
         let body_line = procedure.line + 1;
+        let entry_line = procedure.line;
+        let end_line = procedure.end_line;
         self.push_frame(procedure, args)?;
+
+        if self.record_debug_snapshots {
+            self.current_stmt_line = entry_line;
+            self.capture_debug_snapshot();
+        }
+
         let result = match body {
             Some(body_node) => self.exec_statements(&body_node, body_line),
             None => Ok(Flow::Next),
         };
         let return_value = self.frames.last().and_then(|f| f.return_value.clone());
+        let normal_end = matches!(&result, Ok(Flow::Next));
+        if normal_end && self.record_debug_snapshots {
+            self.current_stmt_line = end_line;
+            self.capture_debug_snapshot();
+        }
         self.frames.pop();
+
         match result {
             Ok(Flow::Terminate) => {
                 self.terminated = true;

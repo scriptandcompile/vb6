@@ -120,6 +120,8 @@ pub struct Procedure {
     /// The CST line the procedure declaration starts on (1-based, header
     /// `Attribute` lines stripped).
     pub line: usize,
+    /// The CST line the `End Sub` / `End Function` terminator is on.
+    pub end_line: usize,
 }
 
 impl Procedure {
@@ -239,6 +241,14 @@ pub(crate) fn build_program(root: &CstNode, module_name: &str) -> Program {
                     .first_child_by_kind(SyntaxKind::StatementList)
                     .cloned();
 
+                let end_line = line
+                    + child
+                        .children()
+                        .iter()
+                        .take_while(|c| c.kind() != SyntaxKind::EndKeyword)
+                        .map(crate::exec::count_newlines)
+                        .sum::<usize>();
+
                 if entry.is_none() {
                     entry = Some(key.clone());
                 }
@@ -252,6 +262,7 @@ pub(crate) fn build_program(root: &CstNode, module_name: &str) -> Program {
                         return_type,
                         body,
                         line,
+                        end_line,
                     },
                 );
                 line += crate::exec::count_newlines(child);
