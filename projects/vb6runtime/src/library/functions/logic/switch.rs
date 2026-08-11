@@ -482,3 +482,184 @@
 //! - Less readable than Select Case for complex branching
 //! - No fall-through behavior like some languages' switch statements
 //! - Cannot use ranges directly (must use comparison expressions)
+
+use crate::error::{err_number, VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `Switch` function.
+///
+/// VB6 behavior:
+/// - arguments must come in (expression, value) pairs; an odd count raises
+///   error 450 (`Wrong number of arguments`)
+/// - pairs are scanned left to right and the value of the first pair whose
+///   expression coerces to `True` (`CBool`) is returned unchanged as a
+///   `Variant`
+/// - a `Null` expression returns `Null`
+/// - if no expression is `True`, `Null` is returned
+pub fn switch(arguments: &[VBVariant]) -> VBResult<VBVariant> {
+    if arguments.is_empty() || !arguments.len().is_multiple_of(2) {
+        return Err(VBError::new(err_number::WRONG_NUMBER_OF_ARGUMENTS));
+    }
+
+    for pair in arguments.chunks(2) {
+        let (condition, value) = (&pair[0], &pair[1]);
+        if condition.is_null() {
+            return Ok(VBVariant::Null);
+        }
+        if condition.as_bool()? {
+            return Ok(value.clone());
+        }
+    }
+
+    Ok(VBVariant::Null)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::switch;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn args() -> Vec<VBVariant> {
+        vec![
+            VBVariant::from_bool(false),
+            VBVariant::from_string("no"),
+            VBVariant::from_bool(true),
+            VBVariant::from_string("yes"),
+        ]
+    }
+
+    #[test]
+    fn returns_value_of_first_true_expression() {
+        let result = switch(&args()).unwrap();
+        assert_eq!(result, VBVariant::from_string("yes"));
+    }
+
+    #[test]
+    fn returns_earliest_true_value() {
+        let arguments = vec![
+            VBVariant::from_bool(true),
+            VBVariant::from_string("first"),
+            VBVariant::from_bool(true),
+            VBVariant::from_string("second"),
+        ];
+        let result = switch(&arguments).unwrap();
+        assert_eq!(result, VBVariant::from_string("first"));
+    }
+
+    #[test]
+    fn returns_null_when_no_expression_is_true() {
+        let arguments = vec![
+            VBVariant::from_bool(false),
+            VBVariant::from_string("a"),
+            VBVariant::from_bool(false),
+            VBVariant::from_string("b"),
+        ];
+        assert_eq!(switch(&arguments).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn returns_null_for_null_expression() {
+        let arguments = vec![
+            VBVariant::Null,
+            VBVariant::from_string("a"),
+            VBVariant::from_bool(true),
+            VBVariant::from_string("b"),
+        ];
+        assert_eq!(switch(&arguments).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn returns_null_value_when_selected() {
+        let arguments = vec![
+            VBVariant::from_bool(true),
+            VBVariant::Null,
+            VBVariant::from_bool(false),
+            VBVariant::from_string("b"),
+        ];
+        assert_eq!(switch(&arguments).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn coerces_numeric_expressions() {
+        let arguments = vec![
+            VBVariant::from_integer(0),
+            VBVariant::from_string("zero"),
+            VBVariant::from_integer(-1),
+            VBVariant::from_string("minus-one"),
+        ];
+        let result = switch(&arguments).unwrap();
+        assert_eq!(result, VBVariant::from_string("minus-one"));
+
+        let arguments = vec![
+            VBVariant::from_double(2.5),
+            VBVariant::from_string("nonzero"),
+        ];
+        let result = switch(&arguments).unwrap();
+        assert_eq!(result, VBVariant::from_string("nonzero"));
+    }
+
+    #[test]
+    fn coerces_string_expressions() {
+        let arguments = vec![
+            VBVariant::from_string("false"),
+            VBVariant::from_string("a"),
+            VBVariant::from_string("True"),
+            VBVariant::from_string("b"),
+        ];
+        let result = switch(&arguments).unwrap();
+        assert_eq!(result, VBVariant::from_string("b"));
+    }
+
+    #[test]
+    fn returns_value_unchanged() {
+        let arguments = vec![
+            VBVariant::from_bool(true),
+            VBVariant::from_long(42),
+            VBVariant::from_bool(false),
+            VBVariant::from_bool(true),
+        ];
+        assert_eq!(
+            switch(&arguments).unwrap(),
+            VBVariant::from_long(42)
+        );
+
+        let arguments = vec![
+            VBVariant::from_bool(false),
+            VBVariant::from_double(1.5),
+            VBVariant::from_bool(true),
+            VBVariant::from_bool(true),
+        ];
+        assert_eq!(
+            switch(&arguments).unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn rejects_odd_number_of_arguments() {
+        let arguments = vec![
+            VBVariant::from_bool(true),
+            VBVariant::from_string("a"),
+            VBVariant::from_bool(false),
+        ];
+        let err = switch(&arguments).unwrap_err();
+        assert_eq!(err.number, err_number::WRONG_NUMBER_OF_ARGUMENTS);
+    }
+
+    #[test]
+    fn rejects_no_arguments() {
+        let err = switch(&[]).unwrap_err();
+        assert_eq!(err.number, err_number::WRONG_NUMBER_OF_ARGUMENTS);
+    }
+
+    #[test]
+    fn rejects_non_boolean_expression() {
+        let arguments = vec![
+            VBVariant::from_string("not-a-number"),
+            VBVariant::from_string("a"),
+        ];
+        let err = switch(&arguments).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
