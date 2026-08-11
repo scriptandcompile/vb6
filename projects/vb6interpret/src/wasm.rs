@@ -306,7 +306,7 @@ pub fn build_debug_trace(code: &str) -> Result<JsValue, JsError> {
         Err(error) => Some(convert_run_error(error)),
     };
 
-    interpreter.capture_debug_snapshot();
+    interpreter.capture_final_debug_snapshot();
 
     let last_index = interpreter.debug_snapshots().len().saturating_sub(1);
     let snapshots = interpreter
