@@ -593,3 +593,152 @@
 //! - `Year`, `Month`, `Day`: Extract date components
 //! - `Date`: Returns current system date
 //! - `CVDate`: Converts expression to `Date` (legacy function)
+
+use crate::error::{VBError, VBResult};
+use crate::value::{date_serial_to_datetime, parse_vb_date, VBVariant};
+
+/// Implementation of the `DateValue` function.
+///
+/// VB6 behavior:
+/// - `Null` is returned unchanged
+/// - a string must be recognized as a date (date, or date + time); otherwise
+///   error 13 (type mismatch) is raised — numeric strings are not accepted
+/// - other values (including `Empty` and numerics) are treated as date
+///   serials via `CDate` semantics
+/// - the time portion is stripped, so the result is always midnight
+/// - results outside the supported year range raise error 6 (overflow)
+pub fn date_value(date: &VBVariant) -> VBResult<VBVariant> {
+    match date {
+        VBVariant::Null => Ok(VBVariant::Null),
+        VBVariant::String(s) => {
+            let serial = parse_vb_date(s).ok_or_else(VBError::type_mismatch)?;
+            Ok(VBVariant::from_date_serial(strip_time(serial)?))
+        }
+        _ => {
+            let serial = date.as_date_serial()?;
+            Ok(VBVariant::from_date_serial(strip_time(serial)?))
+        }
+    }
+}
+
+/// Strip the time portion and validate the resulting date serial is within
+/// the supported year range.
+fn strip_time(serial: f64) -> VBResult<f64> {
+    let date = serial.floor();
+    if !date.is_finite() || date.abs() > MAX_SAFE_DAYS {
+        return Err(VBError::overflow());
+    }
+    let dt = date_serial_to_datetime(date).ok_or_else(VBError::overflow)?;
+    if !(100..=9999).contains(&dt.year()) {
+        return Err(VBError::overflow());
+    }
+    Ok(date)
+}
+
+/// `jiff` rejects day spans beyond this magnitude, so guard before converting.
+const MAX_SAFE_DAYS: f64 = 7_304_484.0;
+
+#[cfg(test)]
+mod tests {
+    use super::date_value;
+    use crate::error::err_number;
+    use crate::value::{date_serial_to_datetime, VBVariant};
+
+    fn dv(input: &VBVariant) -> f64 {
+        let result = date_value(input).unwrap();
+        let VBVariant::Date(serial) = result else {
+            panic!("expected a Date variant");
+        };
+        serial
+    }
+
+    fn parts(serial: f64) -> (i16, i8, i8) {
+        let dt = date_serial_to_datetime(serial).unwrap();
+        (dt.year(), dt.month(), dt.day())
+    }
+
+    #[test]
+    fn parses_numeric_date() {
+        assert_eq!(parts(dv(&VBVariant::from_string("12/25/2025"))), (2025, 12, 25));
+        assert_eq!(parts(dv(&VBVariant::from_string("1/15/2025"))), (2025, 1, 15));
+    }
+
+    #[test]
+    fn parses_dash_and_iso_formats() {
+        assert_eq!(parts(dv(&VBVariant::from_string("2025-01-15"))), (2025, 1, 15));
+        assert_eq!(parts(dv(&VBVariant::from_string("1-15-2025"))), (2025, 1, 15));
+    }
+
+    #[test]
+    fn parses_compact_format() {
+        assert_eq!(parts(dv(&VBVariant::from_string("20250115"))), (2025, 1, 15));
+    }
+
+    #[test]
+    fn two_digit_years() {
+        assert_eq!(parts(dv(&VBVariant::from_string("1/15/25"))), (2025, 1, 15));
+        assert_eq!(parts(dv(&VBVariant::from_string("1/15/99"))), (1999, 1, 15));
+    }
+
+    #[test]
+    fn strips_time_portion() {
+        let serial = dv(&VBVariant::from_string("12/25/2025 3:30 PM"));
+        assert_eq!(parts(serial), (2025, 12, 25));
+        assert_eq!(serial.fract(), 0.0);
+        let serial = dv(&VBVariant::from_string("2025-01-15T09:05:30"));
+        assert_eq!(parts(serial), (2025, 1, 15));
+        assert_eq!(serial.fract(), 0.0);
+    }
+
+    #[test]
+    fn strips_time_from_date_variant() {
+        let serial = dv(&VBVariant::from_date_serial(45_658.75));
+        assert_eq!(parts(serial), (2025, 1, 1));
+        assert_eq!(serial.fract(), 0.0);
+    }
+
+    #[test]
+    fn treats_numeric_as_serial() {
+        assert_eq!(dv(&VBVariant::from_long(0)), 0.0);
+        assert_eq!(parts(dv(&VBVariant::from_long(45_658))), (2025, 1, 1));
+        assert_eq!(dv(&VBVariant::Empty), 0.0);
+        assert_eq!(dv(&VBVariant::from_bool(true)), -1.0);
+    }
+
+    #[test]
+    fn negative_serials_truncate_toward_midnight() {
+        let serial = dv(&VBVariant::from_double(-0.25));
+        assert_eq!(parts(serial), (1899, 12, 29));
+        assert_eq!(serial.fract(), 0.0);
+    }
+
+    #[test]
+    fn null_passes_through() {
+        let result = date_value(&VBVariant::Null).unwrap();
+        assert_eq!(result, VBVariant::Null);
+    }
+
+    #[test]
+    fn non_date_string_is_error_13() {
+        let err = date_value(&VBVariant::from_string("hello")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+        let err = date_value(&VBVariant::from_string("5")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+        let err = date_value(&VBVariant::from_string("")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+        let err = date_value(&VBVariant::from_string("1/1/10000")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn out_of_range_result_is_overflow() {
+        let err = date_value(&VBVariant::from_double(1.0e300)).unwrap_err();
+        assert_eq!(err.number, err_number::OVERFLOW);
+    }
+
+    #[test]
+    fn boundary_dates_are_valid() {
+        assert_eq!(parts(dv(&VBVariant::from_string("1/1/100"))), (100, 1, 1));
+        assert_eq!(parts(dv(&VBVariant::from_string("12/31/9999"))), (9999, 12, 31));
+    }
+}

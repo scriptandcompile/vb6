@@ -1236,7 +1236,7 @@ fn parse_vb_number(raw: &str) -> Option<f64> {
 }
 
 /// Parse a VB6 date string into a serial day number.
-fn parse_vb_date(raw: &str) -> Option<f64> {
+pub(crate) fn parse_vb_date(raw: &str) -> Option<f64> {
     use jiff::civil::Date;
     use jiff::{SpanRelativeTo, Unit};
 
@@ -1259,7 +1259,8 @@ fn parse_vb_date(raw: &str) -> Option<f64> {
     Some(serial)
 }
 
-/// Parse the date portion (`M/D/YYYY`, `YYYY-M-D`, `YYYYMMDD`).
+/// Parse the date portion (`M/D/YYYY`, `YYYY-M-D`, `YYYYMMDD`). Two-digit
+/// years follow VB6: 0-29 map to 2000-2029 and 30-99 map to 1930-1999.
 fn parse_date_part(s: &str) -> Option<jiff::civil::Date> {
     let s = s.trim();
     if s.len() == 8 && s.chars().all(|c| c.is_ascii_digit()) {
@@ -1279,8 +1280,12 @@ fn parse_date_part(s: &str) -> Option<jiff::civil::Date> {
             parts[2].parse().ok()?,
         )
     } else {
+        let mut year: i16 = parts[2].parse().ok()?;
+        if (0..=99).contains(&year) {
+            year = if year <= 29 { year + 2000 } else { year + 1900 };
+        }
         (
-            parts[2].parse().ok()?,
+            year,
             parts[0].parse().ok()?,
             parts[1].parse().ok()?,
         )
