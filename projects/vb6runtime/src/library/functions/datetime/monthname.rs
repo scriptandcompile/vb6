@@ -600,3 +600,135 @@
 //! `MonthName` is parsed as a regular function call (`CallExpression`). This module exists primarily
 //! for documentation purposes to provide comprehensive reference material for VB6 developers
 //! working with date formatting and display operations requiring localized month names.
+
+use crate::error::{VBError, VBResult};
+use crate::value::{VBString, VBVariant};
+
+const FULL_NAMES: [&str; 12] = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+];
+
+const ABBREVIATED_NAMES: [&str; 12] = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/// Implementation of the `MonthName` function.
+///
+/// VB6 behavior:
+/// - a month outside 1..=12 raises error 5 (invalid procedure call)
+/// - the `abbreviate` argument is optional and defaults to False (full name)
+/// - a non-numeric month raises error 13 (type mismatch); `Null` raises
+///   error 94 (invalid use of Null)
+pub fn month_name(month: &VBVariant, abbreviate: Option<&VBVariant>) -> VBResult<VBString> {
+    let month = month.as_i32()?;
+    if !(1..=12).contains(&month) {
+        return Err(VBError::invalid_procedure_call());
+    }
+    let abbreviate = match abbreviate {
+        None => false,
+        Some(v) => v.as_bool()?,
+    };
+    let index = (month - 1) as usize;
+    let name = if abbreviate {
+        ABBREVIATED_NAMES[index]
+    } else {
+        FULL_NAMES[index]
+    };
+    Ok(VBString::from(name))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{ABBREVIATED_NAMES, FULL_NAMES, month_name};
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn n(input: &VBVariant) -> String {
+        month_name(input, None).unwrap().as_str().to_string()
+    }
+
+    fn na(input: &VBVariant, abbreviate: &VBVariant) -> String {
+        month_name(input, Some(abbreviate))
+            .unwrap()
+            .as_str()
+            .to_string()
+    }
+
+    #[test]
+    fn full_names() {
+        for (i, name) in FULL_NAMES.iter().enumerate() {
+            assert_eq!(n(&VBVariant::from_long(i as i32 + 1)), *name);
+        }
+    }
+
+    #[test]
+    fn abbreviated_names() {
+        for (i, name) in ABBREVIATED_NAMES.iter().enumerate() {
+            assert_eq!(
+                na(&VBVariant::from_long(i as i32 + 1), &VBVariant::from_bool(true)),
+                *name
+            );
+        }
+    }
+
+    #[test]
+    fn abbreviate_defaults_to_false() {
+        assert_eq!(n(&VBVariant::from_long(1)), "January");
+    }
+
+    #[test]
+    fn abbreviate_accepts_numeric_values() {
+        assert_eq!(na(&VBVariant::from_long(2), &VBVariant::from_long(1)), "Feb");
+        assert_eq!(na(&VBVariant::from_long(2), &VBVariant::from_long(-1)), "Feb");
+        assert_eq!(na(&VBVariant::from_long(2), &VBVariant::from_long(0)), "February");
+    }
+
+    #[test]
+    fn abbreviate_accepts_string_values() {
+        assert_eq!(
+            na(&VBVariant::from_long(3), &VBVariant::from_string("true")),
+            "Mar"
+        );
+        assert_eq!(
+            na(&VBVariant::from_long(3), &VBVariant::from_string("false")),
+            "March"
+        );
+    }
+
+    #[test]
+    fn month_out_of_range_is_error_5() {
+        for bad in [0, -1, 13] {
+            let err = month_name(&VBVariant::from_long(bad), None).unwrap_err();
+            assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        }
+    }
+
+    #[test]
+    fn null_month_is_error_94() {
+        let err = month_name(&VBVariant::Null, None).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn non_numeric_month_is_error_13() {
+        let err = month_name(&VBVariant::from_string("abc"), None).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn returns_vbstring() {
+        let result = month_name(&VBVariant::from_long(12), None).unwrap();
+        assert_eq!(result.as_str(), "December");
+    }
+}
