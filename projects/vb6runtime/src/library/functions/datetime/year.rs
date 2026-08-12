@@ -521,3 +521,76 @@
 //! - Does not account for different calendar systems
 //! - No built-in leap year detection (requires separate function)
 //! - Cannot extract century separately (must calculate from year)
+
+use crate::error::{VBError, VBResult};
+use crate::value::{date_serial_to_datetime, VBVariant};
+
+/// Implementation of the `Year` function.
+///
+/// VB6 behavior:
+/// - a `Null` date returns `Null`
+/// - the year is extracted from the date serial, so the time portion of a
+///   datetime value is ignored
+/// - the result is an `Integer` (100–9999)
+/// - a value that cannot be interpreted as a date raises error 13 (type
+///   mismatch)
+pub fn year(date: &VBVariant) -> VBResult<VBVariant> {
+    if date.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    let serial = date.as_date_serial()?;
+    let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
+    Ok(VBVariant::from_integer(dt.year()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::year;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn y(input: &VBVariant) -> i16 {
+        let result = year(input).unwrap();
+        let VBVariant::Integer(v) = result else {
+            panic!("expected an Integer variant");
+        };
+        v
+    }
+
+    #[test]
+    fn extracts_year_from_serial() {
+        assert_eq!(y(&VBVariant::from_date_serial(45_672.0)), 2025);
+        assert_eq!(y(&VBVariant::from_date_serial(45_688.0)), 2025);
+        assert_eq!(y(&VBVariant::from_date_serial(0.0)), 1899);
+    }
+
+    #[test]
+    fn extracts_year_from_string() {
+        assert_eq!(y(&VBVariant::from_string("1/15/2025")), 2025);
+        assert_eq!(y(&VBVariant::from_string("12/25/2025 3:45 PM")), 2025);
+        assert_eq!(y(&VBVariant::from_string("2024-02-29")), 2024);
+    }
+
+    #[test]
+    fn ignores_time_portion() {
+        assert_eq!(y(&VBVariant::from_date_serial(45_672.75)), 2025);
+        assert_eq!(y(&VBVariant::from_string("1/15/2025 23:59:59")), 2025);
+    }
+
+    #[test]
+    fn treats_numeric_as_serial() {
+        assert_eq!(y(&VBVariant::from_long(45_672)), 2025);
+        assert_eq!(y(&VBVariant::from_double(45_672.75)), 2025);
+    }
+
+    #[test]
+    fn null_returns_null() {
+        assert_eq!(year(&VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn non_date_value_is_error_13() {
+        let err = year(&VBVariant::from_string("hello")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
