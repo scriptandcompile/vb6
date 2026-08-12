@@ -427,3 +427,81 @@
 //! - `TimeSerial`: Returns a Date for a specified hour, minute, and second
 //! - `TimeValue`: Converts a string to a time value
 //! - `Format`: Formats a date/time with custom formatting including AM/PM
+
+use crate::error::{VBError, VBResult};
+use crate::value::{date_serial_to_datetime, VBVariant};
+
+/// Implementation of the `Hour` function.
+///
+/// VB6 behavior:
+/// - a `Null` time returns `Null`
+/// - the hour is extracted from the date serial, so date-only values return 0
+/// - the result is an `Integer` from 0 (midnight) to 23 (11 PM)
+/// - a value that cannot be interpreted as a date raises error 13 (type
+///   mismatch)
+pub fn hour(time: &VBVariant) -> VBResult<VBVariant> {
+    if time.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    let serial = time.as_date_serial()?;
+    let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
+    Ok(VBVariant::from_integer(dt.hour() as i16))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::hour;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn h(input: &VBVariant) -> i16 {
+        let result = hour(input).unwrap();
+        let VBVariant::Integer(v) = result else {
+            panic!("expected an Integer variant");
+        };
+        v
+    }
+
+    #[test]
+    fn extracts_hour_from_date_serial() {
+        assert_eq!(h(&VBVariant::from_date_serial(45_658.75)), 18);
+        assert_eq!(h(&VBVariant::from_date_serial(45_658.1)), 2);
+        assert_eq!(h(&VBVariant::from_date_serial(45_658.999_9)), 23);
+    }
+
+    #[test]
+    fn midnight_is_zero() {
+        assert_eq!(h(&VBVariant::from_date_serial(45_658.0)), 0);
+    }
+
+    #[test]
+    fn extracts_hour_from_string() {
+        assert_eq!(h(&VBVariant::from_string("1/15/2025 3:45 PM")), 15);
+        assert_eq!(h(&VBVariant::from_string("1/15/2025 23:59:59")), 23);
+        assert_eq!(h(&VBVariant::from_string("1/15/2025 12:30 PM")), 12);
+        assert_eq!(h(&VBVariant::from_string("1/15/2025 12:30 AM")), 0);
+    }
+
+    #[test]
+    fn date_only_is_zero() {
+        assert_eq!(h(&VBVariant::from_string("1/15/2025")), 0);
+        assert_eq!(h(&VBVariant::from_date_serial(45_658.0)), 0);
+    }
+
+    #[test]
+    fn treats_numeric_as_serial() {
+        assert_eq!(h(&VBVariant::from_long(45_658)), 0);
+        assert_eq!(h(&VBVariant::from_double(45_658.75)), 18);
+    }
+
+    #[test]
+    fn null_returns_null() {
+        assert_eq!(hour(&VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn non_date_value_is_error_13() {
+        let err = hour(&VBVariant::from_string("hello")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
