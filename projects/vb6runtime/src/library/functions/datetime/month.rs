@@ -694,3 +694,87 @@
 //! Month is parsed as a regular function call (`CallExpression`). This module exists primarily
 //! for documentation purposes to provide comprehensive reference material for VB6 developers
 //! working with date calculations and month extraction operations.
+
+use crate::error::{VBError, VBResult};
+use crate::value::{date_serial_to_datetime, VBVariant};
+
+/// Implementation of the `Month` function.
+///
+/// VB6 behavior:
+/// - a `Null` date returns `Null`
+/// - the month is extracted from the date serial, so the time portion of a
+///   datetime value is ignored
+/// - the result is an `Integer` from 1 (January) to 12 (December)
+/// - a value that cannot be interpreted as a date raises error 13 (type
+///   mismatch)
+pub fn month(date: &VBVariant) -> VBResult<VBVariant> {
+    if date.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    let serial = date.as_date_serial()?;
+    let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
+    Ok(VBVariant::from_integer(dt.month() as i16))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::month;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn m(input: &VBVariant) -> i16 {
+        let result = month(input).unwrap();
+        let VBVariant::Integer(v) = result else {
+            panic!("expected an Integer variant");
+        };
+        v
+    }
+
+    #[test]
+    fn extracts_month_from_date_serial() {
+        assert_eq!(m(&VBVariant::from_date_serial(45_672.0)), 1);
+        assert_eq!(m(&VBVariant::from_date_serial(45_842.0)), 7);
+        assert_eq!(m(&VBVariant::from_date_serial(0.0)), 12);
+    }
+
+    #[test]
+    fn extracts_month_from_string() {
+        assert_eq!(m(&VBVariant::from_string("1/15/2025")), 1);
+        assert_eq!(m(&VBVariant::from_string("12/25/2025 3:45 PM")), 12);
+        assert_eq!(m(&VBVariant::from_string("2024-02-29")), 2);
+    }
+
+    #[test]
+    fn ignores_time_portion() {
+        assert_eq!(m(&VBVariant::from_date_serial(45_672.75)), 1);
+        assert_eq!(m(&VBVariant::from_string("1/15/2025 23:59:59")), 1);
+    }
+
+    #[test]
+    fn treats_numeric_as_serial() {
+        assert_eq!(m(&VBVariant::from_long(45_842)), 7);
+        assert_eq!(m(&VBVariant::from_double(45_672.75)), 1);
+    }
+
+    #[test]
+    fn leap_year_feb_29() {
+        assert_eq!(m(&VBVariant::from_date_serial(45_351.0)), 2);
+    }
+
+    #[test]
+    fn year_boundaries() {
+        assert_eq!(m(&VBVariant::from_date_serial(45_657.0)), 12);
+        assert_eq!(m(&VBVariant::from_date_serial(45_658.0)), 1);
+    }
+
+    #[test]
+    fn null_returns_null() {
+        assert_eq!(month(&VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn non_date_value_is_error_13() {
+        let err = month(&VBVariant::from_string("hello")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
