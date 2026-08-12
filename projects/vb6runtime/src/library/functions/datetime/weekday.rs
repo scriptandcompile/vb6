@@ -587,3 +587,129 @@
 //! - Does not account for holidays or business days
 //! - No built-in ISO 8601 week numbering (use DatePart("ww", ...) for that)
 //! - Cannot calculate week of year (use `DatePart` for that)
+
+use super::datepart::{first_day, weekday as weekday_offset};
+use crate::error::{VBError, VBResult};
+use crate::value::{date_serial_to_datetime, VBVariant};
+
+/// Implementation of the `Weekday` function.
+///
+/// VB6 behavior:
+/// - a `Null` date returns `Null`
+/// - the day of week is derived from the date serial, so the time portion of
+///   a datetime value is ignored
+/// - the result is an `Integer` from 1 to 7, where 1 is the first day of the
+///   week; the default (`vbSunday`, or `vbUseSystem`) numbers Sunday = 1
+/// - `firstdayofweek` accepts `vbUseSystem` (0) through `vbSaturday` (7);
+///   any other value raises error 5 (invalid procedure call)
+/// - a value that cannot be interpreted as a date raises error 13 (type
+///   mismatch)
+pub fn weekday(date: &VBVariant, firstdayofweek: Option<&VBVariant>) -> VBResult<VBVariant> {
+    if date.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    let fdow = first_day(firstdayofweek)?;
+    let serial = date.as_date_serial()?;
+    let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
+    Ok(VBVariant::from_integer(weekday_offset(&dt, fdow) as i16))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::weekday;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn w(input: &VBVariant, fdow: Option<&VBVariant>) -> i16 {
+        let result = weekday(input, fdow).unwrap();
+        let VBVariant::Integer(v) = result else {
+            panic!("expected an Integer variant");
+        };
+        v
+    }
+
+    fn sunday(input: &VBVariant) -> i16 {
+        w(input, None)
+    }
+
+    #[test]
+    fn default_is_sunday_first() {
+        assert_eq!(sunday(&VBVariant::from_date_serial(0.0)), 7);
+        assert_eq!(sunday(&VBVariant::from_date_serial(1.0)), 1);
+        assert_eq!(sunday(&VBVariant::from_date_serial(2.0)), 2);
+        assert_eq!(sunday(&VBVariant::from_date_serial(7.0)), 7);
+    }
+
+    #[test]
+    fn extracts_weekday_from_serial() {
+        assert_eq!(sunday(&VBVariant::from_date_serial(45_672.0)), 4);
+        assert_eq!(sunday(&VBVariant::from_date_serial(45_676.0)), 1);
+    }
+
+    #[test]
+    fn extracts_weekday_from_string() {
+        assert_eq!(sunday(&VBVariant::from_string("1/15/2025")), 4);
+        assert_eq!(sunday(&VBVariant::from_string("1/19/2025 3:45 PM")), 1);
+        assert_eq!(sunday(&VBVariant::from_string("2024-02-29")), 5);
+    }
+
+    #[test]
+    fn ignores_time_portion() {
+        assert_eq!(sunday(&VBVariant::from_date_serial(45_672.75)), 4);
+        assert_eq!(sunday(&VBVariant::from_string("1/15/2025 23:59:59")), 4);
+    }
+
+    #[test]
+    fn treats_numeric_as_serial() {
+        assert_eq!(sunday(&VBVariant::from_long(45_672)), 4);
+        assert_eq!(sunday(&VBVariant::from_double(45_672.75)), 4);
+    }
+
+    #[test]
+    fn honors_first_day_of_week() {
+        let input = &VBVariant::from_date_serial(45_672.0);
+        let cases: [(i16, i16); 8] = [
+            (0, 4),
+            (1, 4),
+            (2, 3),
+            (3, 2),
+            (4, 1),
+            (5, 7),
+            (6, 6),
+            (7, 5),
+        ];
+        for (fdow, expected) in cases {
+            assert_eq!(
+                w(input, Some(&VBVariant::from_integer(fdow))),
+                expected,
+                "firstdayofweek = {fdow}"
+            );
+        }
+    }
+
+    #[test]
+    fn null_returns_null() {
+        assert_eq!(
+            weekday(&VBVariant::Null, None).unwrap(),
+            VBVariant::Null
+        );
+    }
+
+    #[test]
+    fn non_date_value_is_error_13() {
+        let err = weekday(&VBVariant::from_string("hello"), None).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn invalid_first_day_of_week_is_error_5() {
+        for fdow in [8, -1] {
+            let err = weekday(
+                &VBVariant::from_date_serial(45_672.0),
+                Some(&VBVariant::from_integer(fdow)),
+            )
+            .unwrap_err();
+            assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        }
+    }
+}
