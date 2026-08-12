@@ -253,3 +253,140 @@
 //! End Function
 //! ```
 //!
+//! ## Error Handling
+//!
+//! The `Array` function does not typically raise errors:
+//!
+//! - An empty argument list returns an empty array (not an error)
+//! - Nested arrays are supported (arrays containing arrays)
+//! - All argument types are accepted without restriction
+//!
+//! ## Performance Notes
+//!
+//! - Fast operation with O(n) complexity where n is the number of elements
+//! - Creates a new array each time; consider caching for repeated use
+//! - Best suited for small collections (typically < 100 elements)
+//! - For larger datasets, consider using `ReDim` or other data structures
+//!
+//! ## Platform Notes
+//!
+//! - Available in VB6, VBA, and VBScript
+//! - Always creates zero-based arrays regardless of `Option Base` setting
+//! - Returns a `Variant` subtype array (not a strongly-typed array)
+//! - Behavior is consistent across all VB platforms
+
+use crate::array::ArrayValue;
+use crate::types::VBType;
+use crate::value::VBVariant;
+
+/// Implementation of the `Array` function.
+///
+/// Creates a zero-based Variant array from the given elements.
+///
+/// VB6 behavior:
+/// - The resulting array is always zero-based (`LBound` = 0)
+/// - Elements are stored as-is (no type coercion)
+/// - An empty argument list produces an empty array with `UBound` = -1
+/// - Nested arrays are supported
+pub fn array(elements: &[VBVariant]) -> VBVariant {
+    if elements.is_empty() {
+        // Empty array: bounds 0 To -1 (no elements)
+        return VBVariant::Array(ArrayValue::from_vec_with_bounds(
+            VBType::Variant,
+            Vec::new(),
+            0,
+        ));
+    }
+
+    VBVariant::Array(ArrayValue::from_vec_with_bounds(
+        VBType::Variant,
+        elements.to_vec(),
+        0,
+    ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::array;
+    use crate::value::VBVariant;
+
+    #[test]
+    fn creates_zero_based_array() {
+        let elements = vec![VBVariant::Long(1), VBVariant::Long(2), VBVariant::Long(3)];
+        let result = array(&elements);
+
+        assert!(result.is_array());
+        let arr = result.as_array().unwrap();
+        assert_eq!(arr.len(), 3);
+        assert_eq!(arr.lower_bound(0).unwrap(), 0);
+        assert_eq!(arr.upper_bound(0).unwrap(), 2);
+    }
+
+    #[test]
+    fn preserves_element_values() {
+        let elements = vec![
+            VBVariant::from_string("A"),
+            VBVariant::Long(42),
+            VBVariant::Boolean(true),
+        ];
+        let result = array(&elements);
+        let arr = result.as_array().unwrap();
+
+        assert_eq!(arr.get(&[0]).unwrap(), &VBVariant::from_string("A"));
+        assert_eq!(arr.get(&[1]).unwrap(), &VBVariant::Long(42));
+        assert_eq!(arr.get(&[2]).unwrap(), &VBVariant::Boolean(true));
+    }
+
+    #[test]
+    fn empty_array_has_negative_ubound() {
+        let result = array(&[]);
+        let arr = result.as_array().unwrap();
+
+        assert_eq!(arr.lower_bound(0).unwrap(), 0);
+        assert_eq!(arr.upper_bound(0).unwrap(), -1);
+        assert!(arr.is_empty());
+    }
+
+    #[test]
+    fn single_element_array() {
+        let elements = vec![VBVariant::from_string("only")];
+        let result = array(&elements);
+        let arr = result.as_array().unwrap();
+
+        assert_eq!(arr.lower_bound(0).unwrap(), 0);
+        assert_eq!(arr.upper_bound(0).unwrap(), 0);
+        assert_eq!(arr.get(&[0]).unwrap(), &VBVariant::from_string("only"));
+    }
+
+    #[test]
+    fn mixed_types_in_array() {
+        let elements = vec![
+            VBVariant::Empty,
+            VBVariant::Null,
+            VBVariant::Long(1),
+            VBVariant::from_string("text"),
+            VBVariant::Boolean(false),
+            VBVariant::Date(45672.0),
+        ];
+        let result = array(&elements);
+        let arr = result.as_array().unwrap();
+
+        assert_eq!(arr.get(&[0]).unwrap(), &VBVariant::Empty);
+        assert_eq!(arr.get(&[1]).unwrap(), &VBVariant::Null);
+        assert_eq!(arr.get(&[2]).unwrap(), &VBVariant::Long(1));
+        assert_eq!(arr.get(&[3]).unwrap(), &VBVariant::from_string("text"));
+        assert_eq!(arr.get(&[4]).unwrap(), &VBVariant::Boolean(false));
+        assert_eq!(arr.get(&[5]).unwrap(), &VBVariant::Date(45672.0));
+    }
+
+    #[test]
+    fn nested_arrays() {
+        let inner = array(&[VBVariant::Long(1), VBVariant::Long(2)]);
+        let elements = vec![inner, VBVariant::Long(3)];
+        let result = array(&elements);
+        let outer = result.as_array().unwrap();
+
+        assert_eq!(outer.len(), 2);
+        assert!(outer.get(&[0]).unwrap().is_array());
+    }
+}
