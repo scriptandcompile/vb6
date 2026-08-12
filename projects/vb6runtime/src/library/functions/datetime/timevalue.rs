@@ -349,3 +349,109 @@
 //! - No daylight saving time handling
 //! - Returns only time portion (date is zero)
 //! - Error on invalid input (not Null)
+
+use crate::error::{VBError, VBResult};
+use crate::value::{parse_time_part, parse_vb_date, VBVariant};
+
+/// Implementation of the `TimeValue` function.
+///
+/// VB6 behavior:
+/// - `Null` is returned unchanged
+/// - a string must be recognized as a time (a bare time, or a date with an
+///   attached time) — the date portion is discarded; otherwise error 13
+///   (type mismatch) is raised
+/// - other values (including `Empty` and numerics) are treated as date
+///   serials via `CDate` semantics, keeping only the fractional time
+/// - the date portion of the result is always midnight of 12/30/1899
+///   (serial 0)
+pub fn time_value(time: &VBVariant) -> VBResult<VBVariant> {
+    match time {
+        VBVariant::Null => Ok(VBVariant::Null),
+        VBVariant::String(s) => {
+            let serial = parse_time_part(s)
+                .or_else(|| parse_vb_date(s).map(|serial| serial.fract()))
+                .ok_or_else(VBError::type_mismatch)?;
+            Ok(VBVariant::from_date_serial(serial))
+        }
+        _ => {
+            let serial = time.as_date_serial()?;
+            Ok(VBVariant::from_date_serial(serial.fract()))
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::time_value;
+    use crate::error::err_number;
+    use crate::value::{date_serial_to_datetime, VBVariant};
+
+    fn tv(input: &VBVariant) -> f64 {
+        let result = time_value(input).unwrap();
+        let VBVariant::Date(serial) = result else {
+            panic!("expected a Date variant");
+        };
+        serial
+    }
+
+    fn parts(serial: f64) -> (i16, i16, i16) {
+        let dt = date_serial_to_datetime(serial).unwrap();
+        (dt.hour() as i16, dt.minute() as i16, dt.second() as i16)
+    }
+
+    #[test]
+    fn parses_time_strings() {
+        assert_eq!(parts(tv(&VBVariant::from_string("3:30 PM"))), (15, 30, 0));
+        assert_eq!(parts(tv(&VBVariant::from_string("14:30"))), (14, 30, 0));
+        assert_eq!(parts(tv(&VBVariant::from_string("23:59:59"))), (23, 59, 59));
+        assert_eq!(parts(tv(&VBVariant::from_string("12:00:00 AM"))), (0, 0, 0));
+    }
+
+    #[test]
+    fn parses_date_and_time_string() {
+        let serial = tv(&VBVariant::from_string("1/15/2025 3:30 PM"));
+        assert_eq!(parts(serial), (15, 30, 0));
+        assert_eq!(serial.floor(), 0.0);
+    }
+
+    #[test]
+    fn date_only_is_midnight() {
+        let serial = tv(&VBVariant::from_string("1/15/2025"));
+        assert_eq!(serial, 0.0);
+    }
+
+    #[test]
+    fn treats_numeric_as_serial() {
+        assert_eq!(tv(&VBVariant::from_double(0.5)), 0.5);
+        assert_eq!(tv(&VBVariant::from_double(45_658.75)), 0.75);
+        assert_eq!(tv(&VBVariant::Empty), 0.0);
+        assert_eq!(tv(&VBVariant::from_bool(true)), 0.0);
+    }
+
+    #[test]
+    fn date_variant_keeps_fraction() {
+        assert_eq!(tv(&VBVariant::from_date_serial(45_658.75)), 0.75);
+    }
+
+    #[test]
+    fn date_portion_is_zero() {
+        for input in [
+            &VBVariant::from_string("3:30 PM"),
+            &VBVariant::from_double(45_658.75),
+            &VBVariant::from_date_serial(0.5),
+        ] {
+            assert_eq!(tv(input).floor(), 0.0);
+        }
+    }
+
+    #[test]
+    fn null_returns_null() {
+        assert_eq!(time_value(&VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn invalid_string_is_error_13() {
+        let err = time_value(&VBVariant::from_string("hello")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
