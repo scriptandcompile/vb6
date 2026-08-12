@@ -533,3 +533,78 @@
 //! - Display format depends on system locale settings
 //! - Cannot return time as numeric value directly (use `CDbl` or cast)
 //! - No built-in support for daylight saving time handling
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `Time` function.
+///
+/// VB6 behavior:
+/// - returns the current system time as a `Date` variant with the date
+///   portion set to 12/30/1899 (serial 0)
+/// - the time is rounded to the nearest second
+/// - never raises an error
+pub fn time() -> VBResult<VBVariant> {
+    let now = jiff::Zoned::now().time();
+    let seconds = now.hour() as f64 * 3600.0
+        + now.minute() as f64 * 60.0
+        + now.second() as f64
+        + now.subsec_nanosecond() as f64 / 1_000_000_000.0;
+    Ok(VBVariant::from_date_serial(seconds.round() / 86_400.0))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::time;
+    use crate::VBVariant;
+
+    fn seconds_since_midnight() -> f64 {
+        let now = jiff::Zoned::now().time();
+        now.hour() as f64 * 3600.0
+            + now.minute() as f64 * 60.0
+            + now.second() as f64
+            + now.subsec_nanosecond() as f64 / 1_000_000_000.0
+    }
+
+    #[test]
+    fn returns_date_variant() {
+        let value = time().unwrap();
+        assert_eq!(value.var_type(), 7);
+        assert_eq!(value.type_of(), crate::VBType::Date);
+    }
+
+    #[test]
+    fn date_portion_is_zero() {
+        let value = time().unwrap();
+        let VBVariant::Date(serial) = value else {
+            panic!("expected a Date variant");
+        };
+        assert_eq!(serial.floor(), 0.0, "date must be 12/30/1899");
+    }
+
+    #[test]
+    fn matches_system_time() {
+        let reference = seconds_since_midnight();
+        let value = time().unwrap();
+        let VBVariant::Date(serial) = value else {
+            panic!("expected a Date variant");
+        };
+        let result = serial.fract() * 86_400.0;
+        // `Time` rounds to the nearest second (up to 0.5s off the fractional
+        // reference) and seconds-since-midnight resets at midnight, so compare
+        // modulo a day with a 1s tolerance.
+        let diff = (result - reference).rem_euclid(86_400.0);
+        assert!(
+            diff <= 1.0 || diff >= 86_400.0 - 1.0,
+            "time {result} differs from system time {reference} by {diff}s"
+        );
+    }
+
+    #[test]
+    fn rounds_to_nearest_second() {
+        let value = time().unwrap();
+        let VBVariant::Date(serial) = value else {
+            panic!("expected a Date variant");
+        };
+        assert!((serial.fract() * 86_400.0).fract().abs() < 1.0);
+    }
+}
