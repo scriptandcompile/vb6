@@ -20,11 +20,10 @@
 //! Returns a `String`
 //!
 //! - `String` containing all elements of the array joined by the delimiter
-//! - `Empty` string ("") if array has zero length
-//! - Returns `Null` if `sourcearray` is `Null`
+//! - Empty string ("") if array has zero length or is undimensioned
 //! - Each array element is converted to `String` before joining
-//! - Non-string elements are automatically converted using `Str`/`CStr`
-//! - `Empty` array elements become empty strings in result
+//! - Non-string elements are automatically converted using `Str`/`CStr` semantics
+//! - Empty array elements become empty strings in result
 //! - Trailing / leading spaces in delimiter are preserved
 //!
 //! ## Remarks
@@ -35,9 +34,8 @@
 //! - Only works with one-dimensional arrays
 //! - Array elements are converted to strings automatically
 //! - Default delimiter is a space (" ")
-//! - `Empty` string delimiter concatenates without separators
-//! - `Null` array returns `Null` (not an error)
-//! - Empty array (zero length) returns empty string
+//! - Empty string delimiter concatenates without separators
+//! - Empty/undimensioned array returns empty string
 //! - Preserves empty array elements as empty strings
 //! - Very efficient for building strings from multiple parts
 //! - Much faster than repeated string concatenation in loops
@@ -48,7 +46,8 @@
 //!
 //! ### Common Errors
 //!
-//! - **Error 13** (Type Mismatch): `sourcearray` is a multi-dimensional array.
+//! - **Error 13** (Type Mismatch): `sourcearray` is not an array, or is a multi-dimensional array.
+//! - **Error 94** (Invalid use of Null): `sourcearray` is `Null`.
 //!
 //! ## Performance Considerations
 //!
@@ -84,7 +83,6 @@
 //! ## Limitations
 //!
 //! - Cannot join multi-dimensional arrays (use loops to flatten first)
-//! - Returns `Null` for `Null` array (not empty `String`)
 //! - No built-in escaping for CSV (must implement manually)
 //! - Cannot skip empty elements automatically
 //! - No formatting options for numeric values
@@ -123,7 +121,6 @@
 //! ### Join With Custom Delimiter
 //!
 //! ```vb6
-//! ' Example 2: Join with custom delimiter
 //! Dim values(3) As String
 //! values(0) = "apple"
 //! values(1) = "banana"
@@ -182,16 +179,8 @@
 //! ### Pattern 3: Build Path From Components
 //!
 //! ```vb6
-//! Function BuildPath(ParamArray parts() As Variant) As String
-//!     Dim arr() As String
-//!     Dim i As Long
-//!     
-//!     ReDim arr(LBound(parts) To UBound(parts))
-//!     For i = LBound(parts) To UBound(parts)
-//!         arr(i) = CStr(parts(i))
-//!     Next i
-//!     
-//!     BuildPath = Join(arr, "\")
+//! Function BuildPath(parts() As String) As String
+//!     BuildPath = Join(parts, "\")
 //! End Function
 //! ```
 //!
@@ -229,31 +218,33 @@
 //!
 //! ```vb6
 //! Function JoinNonEmpty(arr As Variant, delimiter As String) As String
-//!     Dim result As Collection
-//!     Dim i As Long
-//!     Dim temp() As String
+//!     Dim result() As String
 //!     Dim count As Long
+//!     Dim i As Long
 //!     
 //!     If Not IsArray(arr) Then Exit Function
 //!     
-//!     Set result = New Collection
+//!     ' Count non-empty elements
+//!     count = 0
 //!     For i = LBound(arr) To UBound(arr)
-//!         If Len(arr(i)) > 0 Then
-//!             result.Add CStr(arr(i))
-//!         End If
+//!         If Len(arr(i)) > 0 Then count = count + 1
 //!     Next i
 //!     
-//!     If result.Count = 0 Then
+//!     If count = 0 Then
 //!         JoinNonEmpty = ""
 //!         Exit Function
 //!     End If
 //!     
-//!     ReDim temp(0 To result.Count - 1)
-//!     For i = 1 To result.Count
-//!         temp(i - 1) = result(i)
+//!     ReDim result(0 To count - 1)
+//!     count = 0
+//!     For i = LBound(arr) To UBound(arr)
+//!         If Len(arr(i)) > 0 Then
+//!             result(count) = CStr(arr(i))
+//!             count = count + 1
+//!         End If
 //!     Next i
 //!     
-//!     JoinNonEmpty = Join(temp, delimiter)
+//!     JoinNonEmpty = Join(result, delimiter)
 //! End Function
 //! ```
 //!
@@ -280,45 +271,6 @@
 //!     Else
 //!         BuildWhereClause = Join(conditions, " AND ")
 //!     End If
-//! End Function
-//! ```
-//!
-//! ### Pattern 9: Create Delimited String With Quotes
-//!
-//! ```vb6
-//! Function JoinQuoted(items As Variant, delimiter As String) As String
-//!     Dim i As Long
-//!     Dim quoted() As String
-//!     
-//!     If Not IsArray(items) Then Exit Function
-//!     
-//!     ReDim quoted(LBound(items) To UBound(items))
-//!     For i = LBound(items) To UBound(items)
-//!         quoted(i) = Chr(34) & items(i) & Chr(34)  ' Chr(34) = "
-//!     Next i
-//!     
-//!     JoinQuoted = Join(quoted, delimiter)
-//! End Function
-//! ```
-//!
-//! ### Pattern 10: Reverse of Split for Round-Trip
-//!
-//! ```vb6
-//! Function ReverseTransform(text As String) As String
-//!     Dim parts() As String
-//!     Dim i As Long
-//!     
-//!     parts = Split(text, " ")
-//!     
-//!     ' Reverse array
-//!     For i = LBound(parts) To (UBound(parts) - LBound(parts)) \ 2 + LBound(parts)
-//!         Dim temp As String
-//!         temp = parts(i)
-//!         parts(i) = parts(UBound(parts) - (i - LBound(parts)))
-//!         parts(UBound(parts) - (i - LBound(parts))) = temp
-//!     Next i
-//!     
-//!     ReverseTransform = Join(parts, " ")
 //! End Function
 //! ```
 //!
@@ -349,7 +301,6 @@
 //!     Private Function EscapeCSV(value As String) As String
 //!         If InStr(value, ",") > 0 Or InStr(value, Chr(34)) > 0 Or _
 //!            InStr(value, vbCrLf) > 0 Then
-//!             ' Need to quote and escape
 //!             EscapeCSV = Chr(34) & Replace(value, Chr(34), Chr(34) & Chr(34)) & Chr(34)
 //!         Else
 //!             EscapeCSV = value
@@ -372,10 +323,6 @@
 //!         
 //!         GetCSV = Join(lines, vbCrLf)
 //!     End Function
-//!     
-//!     Public Sub Clear()
-//!         Set m_rows = New Collection
-//!     End Sub
 //! End Class
 //! ```
 //!
@@ -399,10 +346,6 @@
 //!         m_parts.Add text
 //!     End Sub
 //!     
-//!     Public Sub AppendLine(text As String)
-//!         m_parts.Add text & vbCrLf
-//!     End Sub
-//!     
 //!     Public Function ToString() As String
 //!         Dim i As Long
 //!         Dim arr() As String
@@ -419,14 +362,6 @@
 //!         
 //!         ToString = Join(arr, m_delimiter)
 //!     End Function
-//!     
-//!     Public Sub Clear()
-//!         Set m_parts = New Collection
-//!     End Sub
-//!     
-//!     Public Function Length() As Long
-//!         Length = Len(ToString())
-//!     End Function
 //! End Class
 //! ```
 //!
@@ -437,12 +372,10 @@
 //!     Private m_select As Collection
 //!     Private m_from As String
 //!     Private m_where As Collection
-//!     Private m_orderBy As Collection
 //!     
 //!     Private Sub Class_Initialize()
 //!         Set m_select = New Collection
 //!         Set m_where = New Collection
-//!         Set m_orderBy = New Collection
 //!     End Sub
 //!     
 //!     Public Sub AddField(fieldName As String)
@@ -457,60 +390,25 @@
 //!         m_where.Add condition
 //!     End Sub
 //!     
-//!     Public Sub AddOrderBy(fieldName As String)
-//!         m_orderBy.Add fieldName
-//!     End Sub
-//!     
 //!     Public Function BuildSQL() As String
-//!         Dim sql As String
 //!         Dim fields() As String
-//!         Dim conditions() As String
-//!         Dim orderFields() As String
-//!         Dim i As Long
 //!         
 //!         ' SELECT clause
-//!         If m_select.Count = 0 Then
-//!             sql = "SELECT *"
-//!         Else
+//!         If m_select.Count > 0 Then
 //!             ReDim fields(0 To m_select.Count - 1)
 //!             For i = 1 To m_select.Count
 //!                 fields(i - 1) = m_select(i)
 //!             Next i
-//!             sql = "SELECT " & Join(fields, ", ")
+//!             BuildSQL = "SELECT " & Join(fields, ", ")
+//!         Else
+//!             BuildSQL = "SELECT *"
 //!         End If
 //!         
 //!         ' FROM clause
 //!         If m_from <> "" Then
-//!             sql = sql & " FROM " & m_from
+//!             BuildSQL = BuildSQL & " FROM " & m_from
 //!         End If
-//!         
-//!         ' WHERE clause
-//!         If m_where.Count > 0 Then
-//!             ReDim conditions(0 To m_where.Count - 1)
-//!             For i = 1 To m_where.Count
-//!                 conditions(i - 1) = m_where(i)
-//!             Next i
-//!             sql = sql & " WHERE " & Join(conditions, " AND ")
-//!         End If
-//!         
-//!         ' ORDER BY clause
-//!         If m_orderBy.Count > 0 Then
-//!             ReDim orderFields(0 To m_orderBy.Count - 1)
-//!             For i = 1 To m_orderBy.Count
-//!                 orderFields(i - 1) = m_orderBy(i)
-//!             Next i
-//!             sql = sql & " ORDER BY " & Join(orderFields, ", ")
-//!         End If
-//!         
-//!         BuildSQL = sql
 //!     End Function
-//!     
-//!     Public Sub Clear()
-//!         Set m_select = New Collection
-//!         m_from = ""
-//!         Set m_where = New Collection
-//!         Set m_orderBy = New Collection
-//!     End Sub
 //! End Class
 //! ```
 //!
@@ -521,22 +419,11 @@
 //!     Public Function FormatTable(data As Variant, headers As Variant, _
 //!                                  Optional delimiter As String = " | ") As String
 //!         Dim lines As Collection
-//!         Dim i As Long, j As Long
-//!         Dim row() As String
-//!         Dim allLines() As String
-//!         
 //!         Set lines = New Collection
 //!         
 //!         ' Add header
 //!         If IsArray(headers) Then
 //!             lines.Add Join(headers, delimiter)
-//!             
-//!             ' Add separator
-//!             ReDim row(LBound(headers) To UBound(headers))
-//!             For j = LBound(headers) To UBound(headers)
-//!                 row(j) = String(Len(headers(j)), "-")
-//!             Next j
-//!             lines.Add Join(row, delimiter)
 //!         End If
 //!         
 //!         ' Add data rows
@@ -558,24 +445,6 @@
 //!         
 //!         FormatTable = Join(allLines, vbCrLf)
 //!     End Function
-//!     
-//!     Public Function FormatList(items As Variant, _
-//!                                Optional prefix As String = "- ") As String
-//!         Dim i As Long
-//!         Dim lines() As String
-//!         
-//!         If Not IsArray(items) Then
-//!             FormatList = prefix & CStr(items)
-//!             Exit Function
-//!         End If
-//!         
-//!         ReDim lines(LBound(items) To UBound(items))
-//!         For i = LBound(items) To UBound(items)
-//!             lines(i) = prefix & CStr(items(i))
-//!         Next i
-//!         
-//!         FormatList = Join(lines, vbCrLf)
-//!     End Function
 //! End Class
 //! ```
 //!
@@ -591,24 +460,6 @@
 //! Debug.Print Join(emptyArr, ",")  ' Returns ""
 //! ```
 //!
-//! ### Null Array Returns Null
-//!
-//! ```vb6
-//! Dim nullArr As Variant
-//! nullArr = Null
-//! Debug.Print IsNull(Join(nullArr, ","))  ' True
-//! ```
-//!
-//! ### Works With Mixed-Type Variant Arrays
-//!
-//! ```vb6
-//! Dim mixed(2) As Variant
-//! mixed(0) = 123
-//! mixed(1) = "text"
-//! mixed(2) = True
-//! Debug.Print Join(mixed, "-")  ' "123-text-True"
-//! ```
-//!
 //! ### Multi-Dimensional Arrays Cause Type Mismatch Error
 //!
 //! ```vb6
@@ -622,10 +473,9 @@
 //! 2. **CSV Generation**: Properly escape values containing delimiters
 //! 3. **Empty Delimiter**: Use "" to concatenate without separators
 //! 4. **Check Array**: Verify array exists before calling `Join`
-//! 5. **Null Handling**: Be aware `Join` returns `Null` for `Null` arrays
-//! 6. **Line Breaks**: Use `vbCrLf`, `vbLf`, or `vbCr` as delimiter for multi-line text
+//! 5. **Line Breaks**: Use `vbCrLf`, `vbLf`, or `vbCr` as delimiter for multi-line text
+//! 6. **Type Conversion**: `Join` automatically converts non-string elements
 //! 7. **Collection to String**: Convert `Collection` to array first, then `Join`
-//! 8. **Type Conversion**: `Join` automatically converts non-string elements
 //!
 //! ## Comparison with Related Functions
 //!
@@ -633,7 +483,6 @@
 //! |----------|---------|-------|--------|
 //! | `Join` | Combine array to string | `Array` | `String` |
 //! | `Split` | Split string to array | `String` | `Array` |
-//! | `String` concatenation (&) | Combine two strings | `Strings` | `String` |
 //! | `Filter` | Filter array elements | `Array` | `Array` |
 //! | `UBound`/`LBound` | Get array bounds | `Array` | `Long` |
 //!
@@ -650,22 +499,278 @@
 //!
 //! ' Using concatenation (SLOW)
 //! result = arr(0) & "," & arr(1) & "," & arr(2)  ' "A,B,C"
-//!
-//! ' For large arrays, Join is dramatically faster
 //! ```
 //!
 //! ## Join and Split Round-Trip
 //!
 //! ```vb6
-//! ' Original string
 //! original = "apple,banana,cherry"
-//!
-//! ' Split into array
 //! parts = Split(original, ",")         ' ["apple", "banana", "cherry"]
-//!
-//! ' Join back to string
 //! rebuilt = Join(parts, ",")           ' "apple,banana,cherry"
-//!
 //! Debug.Print original = rebuilt       ' True - perfect round-trip
 //! ```
-//!
+
+use crate::error::{err_number, VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `Join` function.
+///
+/// Joins the elements of a one-dimensional array into a single string with a
+/// delimiter between each element.
+///
+/// VB6 behavior:
+/// - Default delimiter is a space (" ")
+/// - Works only with one-dimensional arrays
+/// - Non-string elements are converted to string via `CStr`-like semantics
+/// - Empty or undimensioned arrays return an empty string
+/// - Raises error 94 if `sourcearray` is `Null`
+/// - Raises error 13 if `sourcearray` is not an array or is multi-dimensional
+pub fn join(
+    sourcearray: &VBVariant,
+    delimiter: Option<&str>,
+) -> VBResult<String> {
+    // Validate sourcearray is not Null
+    if sourcearray.is_null() {
+        return Err(VBError::with_description(
+            err_number::INVALID_USE_OF_NULL,
+            "Invalid use of Null",
+        ));
+    }
+
+    // Validate sourcearray is an array
+    let VBVariant::Array(arr) = sourcearray else {
+        return Err(VBError::type_mismatch());
+    };
+
+    // Empty or undimensioned arrays return empty string
+    if !arr.is_initialized() || arr.is_empty() {
+        return Ok(String::new());
+    }
+
+    // Check for multi-dimensional arrays
+    if arr.rank() != 1 {
+        return Err(VBError::with_description(
+            err_number::TYPE_MISMATCH,
+            "Multi-dimensional array",
+        ));
+    }
+
+    let delimiter = delimiter.unwrap_or(" ");
+
+    let lower = arr.lower_bound(0).unwrap();
+    let upper = arr.upper_bound(0).unwrap();
+
+    let mut result = String::new();
+
+    for i in lower..=upper {
+        if i != lower {
+            result.push_str(delimiter);
+        }
+
+        let element = arr.get(&[i]).unwrap();
+        if element.is_null() {
+            return Err(VBError::invalid_use_of_null());
+        }
+        let s = element.as_string().map_err(|_| VBError::type_mismatch())?;
+        result.push_str(&s);
+    }
+
+    Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::join;
+    use crate::array::{ArrayDimension, ArrayValue};
+    use crate::error::err_number;
+    use crate::types::VBType;
+    use crate::value::VBVariant;
+
+    fn make_string_array(strings: &[&str]) -> VBVariant {
+        let data: Vec<VBVariant> = strings.iter().map(|s| VBVariant::from_string(*s)).collect();
+        VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::String, data, 0))
+    }
+
+    #[test]
+    fn join_with_default_delimiter() {
+        let source = make_string_array(&["Hello", "Visual", "Basic"]);
+        let result = join(&source, None).unwrap();
+        assert_eq!(result, "Hello Visual Basic");
+    }
+
+    #[test]
+    fn join_with_comma_space_delimiter() {
+        let source = make_string_array(&["apple", "banana", "cherry"]);
+        let result = join(&source, Some(", ")).unwrap();
+        assert_eq!(result, "apple, banana, cherry");
+    }
+
+    #[test]
+    fn join_with_custom_delimiter() {
+        let source = make_string_array(&["one", "two", "three"]);
+        let result = join(&source, Some(" | ")).unwrap();
+        assert_eq!(result, "one | two | three");
+    }
+
+    #[test]
+    fn join_with_empty_delimiter() {
+        let source = make_string_array(&["a", "b", "c"]);
+        let result = join(&source, Some("")).unwrap();
+        assert_eq!(result, "abc");
+    }
+
+    #[test]
+    fn join_single_element() {
+        let source = make_string_array(&["single"]);
+        let result = join(&source, Some(",")).unwrap();
+        assert_eq!(result, "single");
+    }
+
+    #[test]
+    fn join_empty_array_returns_empty_string() {
+        let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(
+            VBType::String,
+            Vec::new(),
+            0,
+        ));
+        let result = join(&source, Some(",")).unwrap();
+        assert_eq!(result, "");
+    }
+
+    #[test]
+    fn join_undimensioned_array_returns_empty_string() {
+        let source = VBVariant::Array(ArrayValue::new_dynamic(VBType::String));
+        let result = join(&source, Some(",")).unwrap();
+        assert_eq!(result, "");
+    }
+
+    #[test]
+    fn join_preserves_order() {
+        let source = make_string_array(&["first", "second", "third"]);
+        let result = join(&source, Some("-")).unwrap();
+        assert_eq!(result, "first-second-third");
+    }
+
+    #[test]
+    fn join_handles_empty_strings_in_array() {
+        let source = make_string_array(&["hello", "", "world"]);
+        let result = join(&source, Some(" ")).unwrap();
+        assert_eq!(result, "hello  world");
+    }
+
+    #[test]
+    fn null_source_is_error_94() {
+        let err = join(&VBVariant::Null, None).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn non_array_is_error_13() {
+        let err = join(&VBVariant::from_string("not an array"), None).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn multi_dimensional_array_is_error_13() {
+        let source = VBVariant::Array(
+            ArrayValue::new_fixed(
+                VBType::String,
+                &[ArrayDimension::new(0, 1), ArrayDimension::new(0, 1)],
+            )
+            .unwrap(),
+        );
+        let err = join(&source, None).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn join_with_one_based_array() {
+        let data: Vec<VBVariant> = vec![
+            VBVariant::from_string("A"),
+            VBVariant::from_string("B"),
+            VBVariant::from_string("C"),
+        ];
+        let source = VBVariant::Array(ArrayValue::from_vec(VBType::String, data));
+        let result = join(&source, Some(",")).unwrap();
+        assert_eq!(result, "A,B,C");
+    }
+
+    #[test]
+    fn join_with_arbitrary_lower_bound() {
+        let data: Vec<VBVariant> = vec![
+            VBVariant::from_string("x"),
+            VBVariant::from_string("y"),
+            VBVariant::from_string("z"),
+        ];
+        let source =
+            VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::String, data, -1));
+        let result = join(&source, Some("-")).unwrap();
+        assert_eq!(result, "x-y-z");
+    }
+
+    #[test]
+    fn join_preserves_whitespace_in_delimiter() {
+        let source = make_string_array(&["a", "b", "c"]);
+        let result = join(&source, Some("  ")).unwrap();
+        assert_eq!(result, "a  b  c");
+    }
+
+    #[test]
+    fn null_element_is_error_94() {
+        let data: Vec<VBVariant> = vec![
+            VBVariant::from_string("hello"),
+            VBVariant::Null,
+            VBVariant::from_string("world"),
+        ];
+        let source =
+            VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
+        let err = join(&source, None).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn join_converts_numeric_elements() {
+        let data: Vec<VBVariant> = vec![
+            VBVariant::from_integer(123),
+            VBVariant::from_long(456),
+            VBVariant::from_string("text"),
+        ];
+        let source =
+            VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
+        let result = join(&source, Some("-")).unwrap();
+        assert_eq!(result, "123-456-text");
+    }
+
+    #[test]
+    fn join_object_element_is_error_13() {
+        use crate::value::VBObject;
+
+        struct TestObj;
+        impl VBObject for TestObj {
+            fn type_name(&self) -> &str {
+                "TestObj"
+            }
+            fn as_any(&self) -> &dyn std::any::Any {
+                self
+            }
+            fn clone_box(&self) -> Box<dyn VBObject> {
+                Box::new(TestObj)
+            }
+        }
+        impl std::fmt::Debug for TestObj {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.write_str("TestObj")
+            }
+        }
+
+        let data: Vec<VBVariant> = vec![
+            VBVariant::from_string("hello"),
+            VBVariant::Object(Box::new(TestObj)),
+            VBVariant::from_string("world"),
+        ];
+        let source =
+            VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
+        let err = join(&source, None).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
