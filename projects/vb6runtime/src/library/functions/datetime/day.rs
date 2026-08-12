@@ -560,3 +560,81 @@
 //! - `DateSerial`: Constructs date from components
 //! - `Format`: Formats date as string with custom patterns
 //! - `Hour`, `Minute`, `Second`: Extract time components
+
+use crate::error::{VBError, VBResult};
+use crate::value::{date_serial_to_datetime, VBVariant};
+
+/// Implementation of the `Day` function.
+///
+/// VB6 behavior:
+/// - a `Null` date returns `Null`
+/// - the day is extracted from the date serial, so the time portion of a
+///   datetime value is ignored
+/// - the result is an `Integer` from 1 to 31
+/// - a value that cannot be interpreted as a date raises error 13 (type
+///   mismatch)
+pub fn day(date: &VBVariant) -> VBResult<VBVariant> {
+    if date.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    let serial = date.as_date_serial()?;
+    let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
+    Ok(VBVariant::from_integer(dt.day() as i16))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::day;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn d(input: &VBVariant) -> i16 {
+        let result = day(input).unwrap();
+        let VBVariant::Integer(v) = result else {
+            panic!("expected an Integer variant");
+        };
+        v
+    }
+
+    #[test]
+    fn extracts_day_from_date_serial() {
+        assert_eq!(d(&VBVariant::from_date_serial(45_672.0)), 15);
+        assert_eq!(d(&VBVariant::from_date_serial(45_688.0)), 31);
+        assert_eq!(d(&VBVariant::from_date_serial(0.0)), 30);
+    }
+
+    #[test]
+    fn extracts_day_from_string() {
+        assert_eq!(d(&VBVariant::from_string("1/15/2025")), 15);
+        assert_eq!(d(&VBVariant::from_string("12/25/2025 3:45 PM")), 25);
+        assert_eq!(d(&VBVariant::from_string("2024-02-29")), 29);
+    }
+
+    #[test]
+    fn ignores_time_portion() {
+        assert_eq!(d(&VBVariant::from_date_serial(45_672.75)), 15);
+        assert_eq!(d(&VBVariant::from_string("1/15/2025 23:59:59")), 15);
+    }
+
+    #[test]
+    fn treats_numeric_as_serial() {
+        assert_eq!(d(&VBVariant::from_long(45_672)), 15);
+        assert_eq!(d(&VBVariant::from_double(45_672.75)), 15);
+    }
+
+    #[test]
+    fn leap_year_feb_29() {
+        assert_eq!(d(&VBVariant::from_date_serial(45_351.0)), 29);
+    }
+
+    #[test]
+    fn null_returns_null() {
+        assert_eq!(day(&VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn non_date_value_is_error_13() {
+        let err = day(&VBVariant::from_string("hello")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
