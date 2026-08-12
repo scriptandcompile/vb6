@@ -497,3 +497,185 @@
 //! - `Error`: Returns error message for an error number
 //! - `Error$`: `String` version of `Error` function
 //! - `VarType`: Returns the subtype of a Variant (10 for `Error`)
+
+use crate::error::{err_number, VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `CVErr` function.
+///
+/// Creates a `Variant` of subtype `Error` containing the specified error number.
+///
+/// VB6 behavior:
+/// - Takes an error number (Long) and returns a Variant/Error value
+/// - Valid error number range is 0 to 65535 (unsigned 16-bit)
+/// - If `errornumber` is `Null`, raises error 94 (Invalid use of Null)
+/// - If `errornumber` cannot be converted to a Long, raises error 13 (Type mismatch)
+/// - Does NOT raise an exception; returns an error value that can be assigned and propagated
+pub fn cverr(errornumber: &VBVariant) -> VBResult<VBVariant> {
+    // Null propagates as error 94
+    if errornumber.is_null() {
+        return Err(VBError::invalid_use_of_null());
+    }
+
+    // Convert to Long (error numbers are 16-bit unsigned, stored as signed Long)
+    let error_num = errornumber.as_i32()?;
+
+    // Validate range: error numbers are 0-65535, but stored as signed Long.
+    // VB6 accepts negative values and treats them modulo 65536.
+    Ok(VBVariant::from_error(VBError::new(error_num)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::cverr;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    #[test]
+    fn cverr_creates_error_variant() {
+        let result = cverr(&VBVariant::from_long(2042)).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, 2042);
+    }
+
+    #[test]
+    fn cverr_with_zero() {
+        let result = cverr(&VBVariant::from_long(0)).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, 0);
+    }
+
+    #[test]
+    fn cverr_with_small_error() {
+        let result = cverr(&VBVariant::from_long(13)).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, 13);
+    }
+
+    #[test]
+    fn cverr_with_excel_error_div0() {
+        let result = cverr(&VBVariant::from_long(2007)).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, 2007);
+    }
+
+    #[test]
+    fn cverr_with_excel_error_na() {
+        let result = cverr(&VBVariant::from_long(2042)).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, 2042);
+    }
+
+    #[test]
+    fn cverr_with_max_valid_error() {
+        let result = cverr(&VBVariant::from_long(65535)).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, 65535);
+    }
+
+    #[test]
+    fn cverr_from_string_numeric() {
+        let result = cverr(&VBVariant::from_string("42")).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, 42);
+    }
+
+    #[test]
+    fn cverr_null_raises_error_94() {
+        let err = cverr(&VBVariant::Null).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn cverr_type_mismatch_for_object() {
+        use crate::value::VBObject;
+
+        struct TestObj;
+        impl VBObject for TestObj {
+            fn type_name(&self) -> &str {
+                "TestObj"
+            }
+            fn as_any(&self) -> &dyn std::any::Any {
+                self
+            }
+            fn clone_box(&self) -> Box<dyn VBObject> {
+                Box::new(TestObj)
+            }
+        }
+        impl std::fmt::Debug for TestObj {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.write_str("TestObj")
+            }
+        }
+
+        let obj = VBVariant::Object(Box::new(TestObj));
+        let err = cverr(&obj).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn cverr_type_mismatch_for_array() {
+        use crate::types::VBType;
+        let arr = VBVariant::array_dynamic(VBType::Long);
+        let err = cverr(&arr).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn cverr_var_type_is_error() {
+        let result = cverr(&VBVariant::from_long(13)).unwrap();
+        // VarType for Error is 10 (vbError)
+        assert_eq!(result.var_type(), 10);
+    }
+
+    #[test]
+    fn cverr_preserves_error_description() {
+        let result = cverr(&VBVariant::from_long(13)).unwrap();
+        let error = result.as_error().unwrap();
+        // Error 13 has the built-in description "Type mismatch"
+        assert_eq!(error.description, "Type mismatch");
+    }
+
+    #[test]
+    fn cverr_negative_error_number() {
+        // VB6 CVErr accepts negative numbers and stores them as-is in the Long
+        let result = cverr(&VBVariant::from_long(-1)).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, -1);
+    }
+
+    #[test]
+    fn cverr_empty_propagates_as_zero() {
+        // Empty converts to 0 in numeric contexts
+        let result = cverr(&VBVariant::Empty).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, 0);
+    }
+
+    #[test]
+    fn cverr_boolean_true() {
+        // Boolean True converts to -1 in VB6 numeric coercion
+        let result = cverr(&VBVariant::Boolean(true)).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, -1);
+    }
+
+    #[test]
+    fn cverr_boolean_false() {
+        // Boolean False converts to 0
+        let result = cverr(&VBVariant::Boolean(false)).unwrap();
+        assert!(result.is_error());
+        let error = result.as_error().unwrap();
+        assert_eq!(error.number, 0);
+    }
+}
