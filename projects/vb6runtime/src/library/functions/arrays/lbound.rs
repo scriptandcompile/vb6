@@ -683,4 +683,152 @@
 //!     On Error GoTo 0
 //! End Function
 //! ```
-//!
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `LBound` function.
+///
+/// Returns the lower bound (smallest available subscript) for the specified
+/// dimension of an array.
+///
+/// VB6 behavior:
+/// - Default dimension is 1 (first dimension) when omitted
+/// - Dimension parameter is 1-based (1 = first dimension, 2 = second, ...)
+/// - Raises error 9 (Subscript out of range) if the array is not initialized
+///   or if `dimension` exceeds the number of array dimensions
+/// - Raises error 9 if `dimension` is less than 1
+pub fn lbound(array: &VBVariant, dimension: Option<i32>) -> VBResult<VBVariant> {
+    // The dimension parameter is 1-based in VB6; convert to 0-based index
+    let dim_index = match dimension {
+        None => 0,
+        Some(d) if d >= 1 => (d - 1) as usize,
+        Some(_) => return Err(VBError::subscript_out_of_range()),
+    };
+
+    // Validate that the argument is an array
+    let VBVariant::Array(arr) = array else {
+        return Err(VBError::type_mismatch());
+    };
+
+    let lower = arr.lower_bound(dim_index)?;
+    Ok(VBVariant::Long(lower))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::lbound;
+    use crate::array::{ArrayDimension, ArrayValue};
+    use crate::error::err_number;
+    use crate::types::VBType;
+    use crate::value::VBVariant;
+
+    fn make_array(bounds: (i32, i32)) -> VBVariant {
+        let (lower, upper) = bounds;
+        let dim_len = (upper - lower + 1) as usize;
+        let data: Vec<VBVariant> = (0..dim_len).map(|_| VBVariant::Empty).collect();
+        VBVariant::Array(ArrayValue::from_vec_with_bounds(
+            VBType::Long,
+            data,
+            lower,
+        ))
+    }
+
+    #[test]
+    fn default_dimension_returns_first_lower_bound() {
+        let arr = make_array((0, 5));
+        let result = lbound(&arr, None).unwrap();
+        assert_eq!(result, VBVariant::Long(0));
+    }
+
+    #[test]
+    fn explicit_first_dimension() {
+        let arr = make_array((0, 5));
+        let result = lbound(&arr, Some(1)).unwrap();
+        assert_eq!(result, VBVariant::Long(0));
+    }
+
+    #[test]
+    fn non_zero_lower_bound() {
+        let arr = make_array((5, 10));
+        let result = lbound(&arr, None).unwrap();
+        assert_eq!(result, VBVariant::Long(5));
+    }
+
+    #[test]
+    fn negative_lower_bound() {
+        let arr = make_array((-2, 3));
+        let result = lbound(&arr, None).unwrap();
+        assert_eq!(result, VBVariant::Long(-2));
+    }
+
+    #[test]
+    fn multi_dimensional_first_dim() {
+        let dims = [ArrayDimension::new(1, 5), ArrayDimension::new(0, 3)];
+        let arr = VBVariant::Array(
+            ArrayValue::new_fixed(VBType::Long, &dims).unwrap(),
+        );
+        let result = lbound(&arr, None).unwrap();
+        assert_eq!(result, VBVariant::Long(1));
+    }
+
+    #[test]
+    fn multi_dimensional_second_dim() {
+        let dims = [ArrayDimension::new(1, 5), ArrayDimension::new(0, 3)];
+        let arr = VBVariant::Array(
+            ArrayValue::new_fixed(VBType::Long, &dims).unwrap(),
+        );
+        let result = lbound(&arr, Some(2)).unwrap();
+        assert_eq!(result, VBVariant::Long(0));
+    }
+
+    #[test]
+    fn dimension_out_of_range() {
+        let dims = [ArrayDimension::new(1, 5), ArrayDimension::new(0, 3)];
+        let arr = VBVariant::Array(
+            ArrayValue::new_fixed(VBType::Long, &dims).unwrap(),
+        );
+        let err = lbound(&arr, Some(3)).unwrap_err();
+        assert_eq!(err.number, err_number::SUBSCRIPT_OUT_OF_RANGE);
+    }
+
+    #[test]
+    fn zero_dimension_is_error() {
+        let arr = make_array((0, 5));
+        let err = lbound(&arr, Some(0)).unwrap_err();
+        assert_eq!(err.number, err_number::SUBSCRIPT_OUT_OF_RANGE);
+    }
+
+    #[test]
+    fn negative_dimension_is_error() {
+        let arr = make_array((0, 5));
+        let err = lbound(&arr, Some(-1)).unwrap_err();
+        assert_eq!(err.number, err_number::SUBSCRIPT_OUT_OF_RANGE);
+    }
+
+    #[test]
+    fn uninitialized_dynamic_array_errors() {
+        let arr = VBVariant::Array(ArrayValue::new_dynamic(VBType::Long));
+        let err = lbound(&arr, None).unwrap_err();
+        assert_eq!(err.number, err_number::SUBSCRIPT_OUT_OF_RANGE);
+    }
+
+    #[test]
+    fn non_array_is_type_mismatch() {
+        let err = lbound(&VBVariant::from_string("not an array"), None).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn paramarray_has_zero_lower_bound() {
+        // ParamArray always has LBound = 0
+        let data: Vec<VBVariant> = vec![VBVariant::from_string("a"); 3];
+        let arr = VBVariant::Array(ArrayValue::from_vec_with_bounds(
+            VBType::Variant,
+            data,
+            0,
+        ));
+        let result = lbound(&arr, None).unwrap();
+        assert_eq!(result, VBVariant::Long(0));
+    }
+}
