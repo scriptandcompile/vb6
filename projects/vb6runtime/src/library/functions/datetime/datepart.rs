@@ -634,7 +634,7 @@ pub fn date_part(
 }
 
 /// The `firstdayofweek` constant, normalized to a 1=Sunday..7=Saturday offset.
-fn first_day(first_day_of_week: Option<&VBVariant>) -> VBResult<i32> {
+pub(crate) fn first_day(first_day_of_week: Option<&VBVariant>) -> VBResult<i32> {
     match first_day_of_week {
         None => Ok(1),
         Some(v) => {
@@ -649,7 +649,7 @@ fn first_day(first_day_of_week: Option<&VBVariant>) -> VBResult<i32> {
 }
 
 /// Day of the week relative to `fdow` (1 = `fdow` itself .. 7).
-fn weekday(dt: &jiff::civil::DateTime, fdow: i32) -> i32 {
+pub(crate) fn weekday(dt: &jiff::civil::DateTime, fdow: i32) -> i32 {
     let sunday_based = dt.date().weekday().to_sunday_one_offset() as i32 - 1;
     (sunday_based - (fdow - 1)).rem_euclid(7) + 1
 }
