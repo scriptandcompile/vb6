@@ -10,6 +10,7 @@
 //! categories only need a new submodule plus one `register` call in
 //! [`registry`].
 
+mod arrays;
 mod datetime;
 mod logic;
 mod math;
@@ -86,6 +87,7 @@ fn registry() -> &'static Registry {
     static REGISTRY: OnceLock<Registry> = OnceLock::new();
     REGISTRY.get_or_init(|| {
         let mut registry = Registry::new();
+        arrays::register(&mut registry);
         datetime::register(&mut registry);
         logic::register(&mut registry);
         string::register(&mut registry);
@@ -523,5 +525,74 @@ mod tests {
         assert!(result.as_string().is_ok());
         let result = call_builtin("Time$", &[]).unwrap();
         assert!(result.as_string().is_ok());
+    }
+
+    #[test]
+    fn array_lbound_and_ubound_dispatch() {
+        let arr = call_builtin(
+            "Array",
+            &[
+                VBVariant::from_integer(10),
+                VBVariant::from_integer(20),
+                VBVariant::from_integer(30),
+            ],
+        )
+        .unwrap();
+        assert_eq!(
+            call_builtin("LBound", std::slice::from_ref(&arr)).unwrap(),
+            VBVariant::from_integer(0)
+        );
+        assert_eq!(
+            call_builtin("UBound", &[arr]).unwrap(),
+            VBVariant::from_integer(2)
+        );
+    }
+
+    #[test]
+    fn split_and_join_dispatch() {
+        let arr = call_builtin(
+            "Split",
+            &[
+                VBVariant::from_string("a,b,c"),
+                VBVariant::from_string(","),
+            ],
+        )
+        .unwrap();
+        assert_eq!(
+            call_builtin("UBound", std::slice::from_ref(&arr)).unwrap(),
+            VBVariant::from_integer(2)
+        );
+        assert_eq!(
+            call_builtin("Join", &[arr, VBVariant::from_string("-")]).unwrap(),
+            VBVariant::from_string("a-b-c")
+        );
+    }
+
+    #[test]
+    fn filter_dispatch() {
+        let arr = call_builtin(
+            "Filter",
+            &[
+                call_builtin(
+                    "Array",
+                    &[
+                        VBVariant::from_string("apple"),
+                        VBVariant::from_string("banana"),
+                        VBVariant::from_string("cherry"),
+                    ],
+                )
+                .unwrap(),
+                VBVariant::from_string("an"),
+            ],
+        )
+        .unwrap();
+        assert_eq!(
+            call_builtin("UBound", std::slice::from_ref(&arr)).unwrap(),
+            VBVariant::from_integer(0)
+        );
+        assert_eq!(
+            call_builtin("Join", &[arr, VBVariant::from_string(" ")]).unwrap(),
+            VBVariant::from_string("banana")
+        );
     }
 }
