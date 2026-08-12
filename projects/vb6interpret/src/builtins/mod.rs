@@ -10,6 +10,7 @@
 //! categories only need a new submodule plus one `register` call in
 //! [`registry`].
 
+mod datetime;
 mod logic;
 mod math;
 mod string;
@@ -85,6 +86,7 @@ fn registry() -> &'static Registry {
     static REGISTRY: OnceLock<Registry> = OnceLock::new();
     REGISTRY.get_or_init(|| {
         let mut registry = Registry::new();
+        datetime::register(&mut registry);
         logic::register(&mut registry);
         string::register(&mut registry);
         math::register(&mut registry);
@@ -389,5 +391,137 @@ mod tests {
             call_builtin("IsMissing", &[VBVariant::Null]).unwrap(),
             VBVariant::from_bool(false)
         );
+    }
+
+    #[test]
+    fn datetime_part_functions_dispatch() {
+        let date = VBVariant::from_string("2/14/2025");
+        assert_eq!(
+            call_builtin("Day", std::slice::from_ref(&date)).unwrap(),
+            VBVariant::from_integer(14)
+        );
+        assert_eq!(
+            call_builtin("Month", std::slice::from_ref(&date)).unwrap(),
+            VBVariant::from_integer(2)
+        );
+        assert_eq!(
+            call_builtin("Year", std::slice::from_ref(&date)).unwrap(),
+            VBVariant::from_integer(2025)
+        );
+        assert_eq!(
+            call_builtin("Weekday", &[date]).unwrap(),
+            VBVariant::from_integer(6)
+        );
+        assert_eq!(
+            call_builtin("MonthName", &[VBVariant::from_integer(2)]).unwrap(),
+            VBVariant::from_string("February")
+        );
+        assert_eq!(
+            call_builtin("WeekdayName", &[VBVariant::from_integer(6)]).unwrap(),
+            VBVariant::from_string("Friday")
+        );
+    }
+
+    #[test]
+    fn datetime_serial_functions_dispatch() {
+        let result = call_builtin(
+            "DateSerial",
+            &[
+                VBVariant::from_integer(2025),
+                VBVariant::from_integer(2),
+                VBVariant::from_integer(0),
+            ],
+        )
+        .unwrap();
+        assert_eq!(
+            call_builtin("Day", std::slice::from_ref(&result)).unwrap(),
+            VBVariant::from_integer(31)
+        );
+        assert_eq!(
+            call_builtin("Month", &[result]).unwrap(),
+            VBVariant::from_integer(1)
+        );
+
+        let result = call_builtin(
+            "TimeSerial",
+            &[
+                VBVariant::from_integer(13),
+                VBVariant::from_integer(30),
+                VBVariant::from_integer(0),
+            ],
+        )
+        .unwrap();
+        assert_eq!(
+            call_builtin("Hour", std::slice::from_ref(&result)).unwrap(),
+            VBVariant::from_integer(13)
+        );
+        assert_eq!(
+            call_builtin("Minute", std::slice::from_ref(&result)).unwrap(),
+            VBVariant::from_integer(30)
+        );
+        assert_eq!(
+            call_builtin("Second", &[result]).unwrap(),
+            VBVariant::from_integer(0)
+        );
+    }
+
+    #[test]
+    fn datetime_add_diff_part_dispatch() {
+        let result = call_builtin(
+            "DateAdd",
+            &[
+                VBVariant::from_string("d"),
+                VBVariant::from_integer(1),
+                VBVariant::from_string("12/31/2024"),
+            ],
+        )
+        .unwrap();
+        assert_eq!(
+            call_builtin("Year", &[result]).unwrap(),
+            VBVariant::from_integer(2025)
+        );
+
+        assert_eq!(
+            call_builtin(
+                "DateDiff",
+                &[
+                    VBVariant::from_string("d"),
+                    VBVariant::from_string("1/1/2025"),
+                    VBVariant::from_string("1/31/2025"),
+                ],
+            )
+            .unwrap(),
+            VBVariant::from_long(30)
+        );
+
+        assert_eq!(
+            call_builtin(
+                "DatePart",
+                &[
+                    VBVariant::from_string("yyyy"),
+                    VBVariant::from_string("2/14/2025"),
+                ],
+            )
+            .unwrap(),
+            VBVariant::from_integer(2025)
+        );
+
+        let result = call_builtin(
+            "DateValue",
+            &[VBVariant::from_string("2/14/2025 10:30 AM")],
+        )
+        .unwrap();
+        assert_eq!(
+            call_builtin("Day", &[result]).unwrap(),
+            VBVariant::from_integer(14)
+        );
+    }
+
+    #[test]
+    fn dollar_date_and_time_variants_dispatch() {
+        let result = call_builtin("Date$", &[]).unwrap();
+        assert!(result.as_string().is_ok());
+        let result = call_builtin("Time$", &[]).unwrap();
+        assert!(result.as_string().is_ok());
     }
 }
