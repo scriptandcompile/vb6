@@ -5,6 +5,7 @@
 //! declared here.
 
 pub mod arrays;
+pub mod conversion;
 pub mod datetime;
 pub mod logic;
 pub mod math;
