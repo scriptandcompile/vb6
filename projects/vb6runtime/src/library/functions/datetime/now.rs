@@ -741,3 +741,75 @@
 //! Now is a parameterless function that is parsed as a `CallExpression`. This module exists primarily
 //! for documentation purposes to provide comprehensive reference material for VB6 developers working
 //! with date and time operations, timestamps, logging, and time-based calculations.
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `Now` function.
+///
+/// VB6 behavior:
+/// - returns the current system date and time as a `Date` variant
+/// - the time portion is included as the fractional part of the date serial
+/// - never raises an error
+pub fn now() -> VBResult<VBVariant> {
+    use jiff::civil::DateTime;
+    use jiff::{SpanRelativeTo, Unit};
+
+    let now = jiff::Zoned::now().datetime();
+    let base = DateTime::new(1899, 12, 30, 0, 0, 0, 0).expect("valid epoch");
+    let serial = now
+        .since(base)
+        .ok()
+        .and_then(|span| {
+            span.total((Unit::Day, SpanRelativeTo::days_are_24_hours()))
+                .ok()
+        })
+        .unwrap_or(0.0);
+    Ok(VBVariant::from_date_serial(serial))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::now;
+    use crate::VBVariant;
+
+    fn serial_of_now() -> f64 {
+        use jiff::civil::DateTime;
+        use jiff::{SpanRelativeTo, Unit};
+        let now = jiff::Zoned::now().datetime();
+        let base = DateTime::new(1899, 12, 30, 0, 0, 0, 0).expect("valid epoch");
+        now.since(base)
+            .ok()
+            .and_then(|span| {
+                span.total((Unit::Day, SpanRelativeTo::days_are_24_hours()))
+                    .ok()
+            })
+            .unwrap()
+    }
+
+    #[test]
+    fn returns_date_variant() {
+        let value = now().unwrap();
+        assert_eq!(value.var_type(), 7);
+        assert_eq!(value.type_of(), crate::VBType::Date);
+    }
+
+    #[test]
+    fn matches_system_datetime() {
+        let before = serial_of_now();
+        let value = now().unwrap();
+        let after = serial_of_now();
+        let VBVariant::Date(serial) = value else {
+            panic!("expected a Date variant");
+        };
+        assert!(serial >= before && serial <= after);
+    }
+
+    #[test]
+    fn time_portion_is_within_a_day() {
+        let value = now().unwrap();
+        let VBVariant::Date(serial) = value else {
+            panic!("expected a Date variant");
+        };
+        assert!((0.0..1.0).contains(&serial.fract()));
+    }
+}
