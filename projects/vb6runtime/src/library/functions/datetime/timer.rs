@@ -630,3 +630,59 @@
 //! - Precision varies between systems
 //! - Not monotonic (can jump backwards at midnight)
 //! - No built-in high-resolution timer (use `QueryPerformanceCounter` API)
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `Timer` function.
+///
+/// VB6 behavior:
+/// - returns a `Single` with the number of seconds elapsed since midnight,
+///   including fractional seconds
+/// - the value ranges from 0 (midnight) to 86,400 (the next midnight)
+/// - never raises an error
+pub fn timer() -> VBResult<VBVariant> {
+    let now = jiff::Zoned::now().time();
+    let seconds = now.hour() as f64 * 3600.0
+        + now.minute() as f64 * 60.0
+        + now.second() as f64
+        + now.subsec_nanosecond() as f64 / 1_000_000_000.0;
+    Ok(VBVariant::from_single(seconds as f32))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::timer;
+
+    fn seconds_since_midnight() -> f64 {
+        let now = jiff::Zoned::now().time();
+        now.hour() as f64 * 3600.0
+            + now.minute() as f64 * 60.0
+            + now.second() as f64
+            + now.subsec_nanosecond() as f64 / 1_000_000_000.0
+    }
+
+    #[test]
+    fn returns_single_variant() {
+        let value = timer().unwrap();
+        assert_eq!(value.var_type(), 4);
+        assert_eq!(value.type_of(), crate::VBType::Single);
+    }
+
+    #[test]
+    fn is_within_a_day() {
+        let value = timer().unwrap().as_f64().unwrap();
+        assert!((0.0..=86_400.0).contains(&value));
+    }
+
+    #[test]
+    fn matches_system_time() {
+        let reference = seconds_since_midnight();
+        let value = timer().unwrap().as_f64().unwrap();
+        // Seconds-since-midnight resets at midnight, so compare modulo a day.
+        let diff = (value - reference).rem_euclid(86_400.0);
+        assert!(
+            diff <= 0.05 || diff >= 86_400.0 - 0.05,
+            "timer {value} differs from system time {reference} by {diff}s"
+        );
+    }
+}
