@@ -499,3 +499,251 @@
 //! - Cannot get day names for custom calendars (e.g., Hebrew, Islamic)
 //! - No built-in way to get single-letter day abbreviations
 //! - Cannot specify case (capitalization) of returned string
+
+use crate::error::{VBError, VBResult};
+use crate::library::functions::datetime::datepart::first_day;
+use crate::value::{VBString, VBVariant};
+
+const FULL_NAMES: [&str; 7] = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+];
+
+const ABBREVIATED_NAMES: [&str; 7] = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+/// Implementation of the `WeekdayName` function.
+///
+/// VB6 behavior:
+/// - returns a string with the day name based on `weekday` (1-7) and `firstdayofweek`
+/// - `abbreviate` is optional, defaults to False (full name)
+/// - `firstdayofweek` accepts vbUseSystem (0) through vbSaturday (7); any other
+///   value raises error 5 (invalid procedure call)
+/// - a `weekday` outside 1..=7 raises error 5
+/// - a non-numeric weekday raises error 13 (type mismatch); Null raises
+///   error 94 (invalid use of Null)
+pub fn weekday_name(
+    weekday: &VBVariant,
+    abbreviate: Option<&VBVariant>,
+    firstdayofweek: Option<&VBVariant>,
+) -> VBResult<VBString> {
+    let weekday = weekday.as_i32()?;
+    if !(1..=7).contains(&weekday) {
+        return Err(VBError::invalid_procedure_call());
+    }
+
+    let fdow = first_day(firstdayofweek)?;
+    let abbreviate = match abbreviate {
+        None => false,
+        Some(v) => v.as_bool()?,
+    };
+
+    // Convert weekday number (relative to fdow) to 0-indexed day where 0=Sunday
+    let sunday_based = ((weekday - 1) + (fdow - 1)).rem_euclid(7) as usize;
+    let name = if abbreviate {
+        ABBREVIATED_NAMES[sunday_based]
+    } else {
+        FULL_NAMES[sunday_based]
+    };
+
+    Ok(VBString::from(name))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{weekday_name, ABBREVIATED_NAMES, FULL_NAMES};
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn wn(input: &VBVariant) -> String {
+        weekday_name(input, None, None)
+            .unwrap()
+            .as_str()
+            .to_string()
+    }
+
+    fn wn_opts(
+        input: &VBVariant,
+        abbreviate: Option<&VBVariant>,
+        fdow: Option<&VBVariant>,
+    ) -> String {
+        weekday_name(input, abbreviate, fdow)
+            .unwrap()
+            .as_str()
+            .to_string()
+    }
+
+    #[test]
+    fn full_names_sunday_first() {
+        for (i, name) in FULL_NAMES.iter().enumerate() {
+            let day_num = i as i32 + 1;
+            assert_eq!(wn(&VBVariant::from_long(day_num)), *name);
+        }
+    }
+
+    #[test]
+    fn abbreviated_names_sunday_first() {
+        for (i, name) in ABBREVIATED_NAMES.iter().enumerate() {
+            let day_num = i as i32 + 1;
+            assert_eq!(
+                wn_opts(
+                    &VBVariant::from_long(day_num),
+                    Some(&VBVariant::from_bool(true)),
+                    None
+                ),
+                *name
+            );
+        }
+    }
+
+    #[test]
+    fn abbreviate_defaults_to_false() {
+        assert_eq!(wn(&VBVariant::from_long(1)), "Sunday");
+    }
+
+    #[test]
+    fn honors_first_day_of_week_monday() {
+        // With vbMonday (2): 1=Monday, 2=Tuesday, ..., 7=Sunday
+        assert_eq!(
+            wn_opts(
+                &VBVariant::from_long(1),
+                None,
+                Some(&VBVariant::from_long(2))
+            ),
+            "Monday"
+        );
+        assert_eq!(
+            wn_opts(
+                &VBVariant::from_long(2),
+                None,
+                Some(&VBVariant::from_long(2))
+            ),
+            "Tuesday"
+        );
+        assert_eq!(
+            wn_opts(
+                &VBVariant::from_long(7),
+                None,
+                Some(&VBVariant::from_long(2))
+            ),
+            "Sunday"
+        );
+    }
+
+    #[test]
+    fn honors_first_day_of_week_tuesday() {
+        // With vbTuesday (3): 1=Tuesday, ..., 7=Monday
+        assert_eq!(
+            wn_opts(
+                &VBVariant::from_long(1),
+                None,
+                Some(&VBVariant::from_long(3))
+            ),
+            "Tuesday"
+        );
+        assert_eq!(
+            wn_opts(
+                &VBVariant::from_long(7),
+                None,
+                Some(&VBVariant::from_long(3))
+            ),
+            "Monday"
+        );
+    }
+
+    #[test]
+    fn abbreviated_with_first_day_monday() {
+        assert_eq!(
+            wn_opts(
+                &VBVariant::from_long(1),
+                Some(&VBVariant::from_bool(true)),
+                Some(&VBVariant::from_long(2))
+            ),
+            "Mon"
+        );
+        assert_eq!(
+            wn_opts(
+                &VBVariant::from_long(7),
+                Some(&VBVariant::from_bool(true)),
+                Some(&VBVariant::from_long(2))
+            ),
+            "Sun"
+        );
+    }
+
+    #[test]
+    fn use_system_defaults_to_sunday() {
+        // vbUseSystem (0) defaults to Sunday
+        assert_eq!(
+            wn_opts(
+                &VBVariant::from_long(1),
+                None,
+                Some(&VBVariant::from_long(0))
+            ),
+            "Sunday"
+        );
+    }
+
+    #[test]
+    fn weekday_out_of_range_is_error_5() {
+        for bad in [0, -1, 8] {
+            let err = weekday_name(&VBVariant::from_long(bad), None, None).unwrap_err();
+            assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        }
+    }
+
+    #[test]
+    fn invalid_first_day_of_week_is_error_5() {
+        for fdow in [8, -1] {
+            let err = weekday_name(
+                &VBVariant::from_long(1),
+                None,
+                Some(&VBVariant::from_long(fdow)),
+            )
+            .unwrap_err();
+            assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        }
+    }
+
+    #[test]
+    fn null_weekday_is_error_94() {
+        let err = weekday_name(&VBVariant::Null, None, None).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn non_numeric_weekday_is_error_13() {
+        let err = weekday_name(&VBVariant::from_string("abc"), None, None).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn returns_vbstring() {
+        let result = weekday_name(&VBVariant::from_long(1), None, None).unwrap();
+        assert_eq!(result.as_str(), "Sunday");
+    }
+
+    #[test]
+    fn abbreviate_accepts_numeric_values() {
+        assert_eq!(
+            wn_opts(
+                &VBVariant::from_long(2),
+                Some(&VBVariant::from_long(1)),
+                None
+            ),
+            "Mon"
+        );
+        assert_eq!(
+            wn_opts(
+                &VBVariant::from_long(2),
+                Some(&VBVariant::from_long(0)),
+                None
+            ),
+            "Monday"
+        );
+    }
+}
