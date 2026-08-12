@@ -499,3 +499,119 @@
 //! - Limited to standard time resolution (seconds)
 //! - Cannot create times with milliseconds
 //! - Normalization may produce unexpected results if not understood
+
+use crate::error::VBResult;
+use crate::value::VBVariant;
+
+/// Implementation of the `TimeSerial` function.
+///
+/// VB6 behavior:
+/// - hour, minute, and second are normalized so the result is always within a
+///   single day, with excess or negative values rolling over (90 seconds is
+///   1 minute 30 seconds; 25 hours is 1:00:00; -30 minutes is 23:30:00)
+/// - the date portion is always midnight of 12/30/1899 (serial 0)
+/// - non-numeric arguments raise error 13 (type mismatch); `Null` raises
+///   error 94 (invalid use of Null)
+pub fn time_serial(
+    hour: &VBVariant,
+    minute: &VBVariant,
+    second: &VBVariant,
+) -> VBResult<VBVariant> {
+    let hour = hour.as_i32()?;
+    let minute = minute.as_i32()?;
+    let second = second.as_i32()?;
+
+    let total_seconds = hour as i64 * 3_600 + minute as i64 * 60 + second as i64;
+    let serial = total_seconds.rem_euclid(86_400) as f64 / 86_400.0;
+    Ok(VBVariant::from_date_serial(serial))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::time_serial;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn ts(h: i32, m: i32, s: i32) -> f64 {
+        let result = time_serial(
+            &VBVariant::from_long(h),
+            &VBVariant::from_long(m),
+            &VBVariant::from_long(s),
+        )
+        .unwrap();
+        let VBVariant::Date(serial) = result else {
+            panic!("expected a Date variant");
+        };
+        serial
+    }
+
+    fn parts(serial: f64) -> (i16, i16, i16) {
+        let dt = crate::value::date_serial_to_datetime(serial).unwrap();
+        (dt.hour() as i16, dt.minute() as i16, dt.second() as i16)
+    }
+
+    #[test]
+    fn basic_construction() {
+        assert_eq!(parts(ts(14, 30, 45)), (14, 30, 45));
+        assert_eq!(parts(ts(0, 0, 0)), (0, 0, 0));
+        assert_eq!(parts(ts(23, 59, 59)), (23, 59, 59));
+    }
+
+    #[test]
+    fn midnight_is_serial_zero() {
+        assert_eq!(ts(0, 0, 0), 0.0);
+    }
+
+    #[test]
+    fn second_rollover() {
+        assert_eq!(parts(ts(0, 0, 90)), (0, 1, 30));
+        assert_eq!(parts(ts(0, 0, 86400)), (0, 0, 0));
+    }
+
+    #[test]
+    fn minute_rollover() {
+        assert_eq!(parts(ts(0, 90, 0)), (1, 30, 0));
+        assert_eq!(parts(ts(0, 60, 30)), (1, 0, 30));
+    }
+
+    #[test]
+    fn hour_rollover() {
+        assert_eq!(parts(ts(25, 0, 0)), (1, 0, 0));
+        assert_eq!(parts(ts(24, 0, 0)), (0, 0, 0));
+    }
+
+    #[test]
+    fn negative_values() {
+        assert_eq!(parts(ts(0, -30, 0)), (23, 30, 0));
+        assert_eq!(parts(ts(12, 30, -60)), (12, 29, 0));
+        assert_eq!(parts(ts(-1, 0, 0)), (23, 0, 0));
+    }
+
+    #[test]
+    fn date_portion_is_zero() {
+        assert_eq!(ts(1, 2, 3).floor(), 0.0);
+        assert_eq!(ts(25, 0, 0).floor(), 0.0);
+    }
+
+    #[test]
+    fn non_numeric_argument_is_error_13() {
+        let err = time_serial(
+            &VBVariant::from_string("abc"),
+            &VBVariant::from_long(0),
+            &VBVariant::from_long(0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn null_argument_is_error_94() {
+        let err = time_serial(
+            &VBVariant::Null,
+            &VBVariant::from_long(0),
+            &VBVariant::from_long(0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+}
