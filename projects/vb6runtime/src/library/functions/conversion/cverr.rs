@@ -498,7 +498,7 @@
 //! - `Error$`: `String` version of `Error` function
 //! - `VarType`: Returns the subtype of a Variant (10 for `Error`)
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
 
 /// Implementation of the `CVErr` function.
