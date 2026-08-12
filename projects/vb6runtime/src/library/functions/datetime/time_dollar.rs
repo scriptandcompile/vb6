@@ -400,3 +400,56 @@
 //! - Returns string, not suitable for time arithmetic (use `Time` function instead)
 //! - Colons in output make it unsuitable for filenames without modification
 //! - Cannot be set (read-only; use `Time =` statement to set system time)
+
+use crate::{error::VBResult, value::VBString};
+
+/// Implementation of the `Time$` function.
+///
+/// VB6 behavior:
+/// - returns the current system time as a `String` in 24-hour `HH:MM:SS`
+///   format with leading zeros
+/// - never raises an error
+pub fn time_dollar() -> VBResult<VBString> {
+    let now = jiff::Zoned::now().datetime();
+    Ok(VBString::from(format!(
+        "{:02}:{:02}:{:02}",
+        now.hour(),
+        now.minute(),
+        now.second()
+    )))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::time_dollar;
+
+    fn parse_time(s: &str) -> (u8, u8, u8) {
+        let mut it = s.split(':');
+        let h = it.next().unwrap().parse().unwrap();
+        let m = it.next().unwrap().parse().unwrap();
+        let sec = it.next().unwrap().parse().unwrap();
+        assert!(it.next().is_none(), "unexpected extra parts in {s:?}");
+        (h, m, sec)
+    }
+
+    #[test]
+    fn format_is_hh_mm_ss() {
+        let value = time_dollar().unwrap();
+        let s = value.as_str();
+        assert_eq!(s.len(), 8);
+        let (h, m, sec) = parse_time(s);
+        assert!(h <= 23 && m <= 59 && sec <= 59);
+    }
+
+    #[test]
+    fn matches_system_time() {
+        let before = jiff::Zoned::now().time();
+        let value = time_dollar().unwrap();
+        let after = jiff::Zoned::now().time();
+        let (h, m, s) = parse_time(value.as_str());
+        let result = h as i64 * 3600 + m as i64 * 60 + s as i64;
+        let b = before.hour() as i64 * 3600 + before.minute() as i64 * 60 + before.second() as i64;
+        let a = after.hour() as i64 * 3600 + after.minute() as i64 * 60 + after.second() as i64;
+        assert!(result >= b && result <= a);
+    }
+}
