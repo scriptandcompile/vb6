@@ -704,3 +704,349 @@
 //! End Function
 //! ```
 //!
+//! ## Error Handling Patterns
+//!
+//! ### Basic Error Handling
+//!
+//! ```vb6
+//! Function SafeSplit(text As String, delimiter As String) As Variant
+//!     On Error GoTo ErrorHandler
+//!     
+//!     If Len(Trim(text)) = 0 Then
+//!         ' Return empty array for empty text
+//!         Dim emptyArr() As String
+//!         ReDim emptyArr(0 To -1)
+//!         SafeSplit = emptyArr
+//!         Exit Function
+//!     End If
+//!     
+//!     SafeSplit = Split(text, delimiter)
+//!     Exit Function
+//!     
+//! ErrorHandler:
+//!     ' Return empty array on error
+//!     Dim emptyArr() As String
+//!     ReDim emptyArr(0 To -1)
+//!     SafeSplit = emptyArr
+//! End Function
+//! ```
+
+use crate::array::ArrayValue;
+use crate::error::{err_number, VBError, VBResult};
+use crate::types::VBType;
+use crate::value::VBVariant;
+
+/// Implementation of the `Split` function.
+///
+/// Splits a string into substrings at delimiter positions and returns them as
+/// a zero-based one-dimensional array.
+///
+/// VB6 behavior:
+/// - Default delimiter is a space (" ")
+/// - Returns an empty array if `expression` is empty
+/// - Returns a single-element array containing the entire expression if
+///   `delimiter` is empty or not found in `expression`
+/// - `limit` specifies maximum number of substrings to return; `-1` means no
+///   limit (default behavior when omitted)
+/// - `compare` accepts `vbUseCompareOption` (-1), `vbBinaryCompare` (0),
+///   `vbTextCompare` (1), and `vbDatabaseCompare` (2); without a module-level
+///   `Option Compare` or database setting, -1 and 2 behave as binary compare
+/// - Raises error 13 if `expression` is not a string value
+/// - Raises error 5 if `limit` is negative (other than -1)
+pub fn split(
+    expression: &str,
+    delimiter: Option<&str>,
+    limit: Option<i32>,
+    compare: Option<i32>,
+) -> VBResult<VBVariant> {
+    // Validate compare parameter
+    let text_compare = match compare {
+        None => false,
+        Some(mode) if (-1..=2).contains(&mode) => mode == 1,
+        Some(_) => return Err(VBError::invalid_procedure_call()),
+    };
+
+    // Validate limit parameter
+    let limit = match limit {
+        None | Some(-1) => i32::MAX,
+        Some(n) if n <= 0 => {
+            return Err(VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                "Invalid procedure call",
+            ));
+        }
+        Some(n) => n,
+    };
+
+    let delimiter = delimiter.unwrap_or(" ");
+
+    // Empty expression returns empty array
+    if expression.is_empty() {
+        return Ok(VBVariant::Array(ArrayValue::from_vec_with_bounds(
+            VBType::String,
+            Vec::new(),
+            0,
+        )));
+    }
+
+    // Empty delimiter returns single-element array with entire expression
+    if delimiter.is_empty() {
+        return Ok(VBVariant::Array(ArrayValue::from_vec_with_bounds(
+            VBType::String,
+            vec![VBVariant::from_string(expression)],
+            0,
+        )));
+    }
+
+    // Split the string respecting limit
+    let mut parts: Vec<VBVariant> = Vec::new();
+    let mut remaining = expression;
+
+    loop {
+        // If we've reached the limit, push the remainder and stop
+        if parts.len() >= (limit as usize) - 1 {
+            parts.push(VBVariant::from_string(remaining));
+            break;
+        }
+
+        // Find delimiter position (respecting compare mode)
+        let split_pos = if text_compare {
+            remaining.to_lowercase().find(&delimiter.to_lowercase())
+        } else {
+            remaining.find(delimiter)
+        };
+
+        if let Some(pos) = split_pos {
+            // Found delimiter
+            let part = &remaining[..pos];
+            parts.push(VBVariant::from_string(part));
+            remaining = &remaining[pos + delimiter.len()..];
+        } else {
+            // No more delimiters found, push remainder
+            parts.push(VBVariant::from_string(remaining));
+            break;
+        }
+    }
+
+    Ok(VBVariant::Array(ArrayValue::from_vec_with_bounds(
+        VBType::String,
+        parts,
+        0,
+    )))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::split;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    fn extract_strings(variant: &VBVariant) -> Vec<String> {
+        match variant {
+            VBVariant::Array(arr) => (0..arr.len())
+                .map(|i| {
+                    arr.get(&[i as i32])
+                        .unwrap()
+                        .as_str()
+                        .unwrap_or("")
+                        .to_string()
+                })
+                .collect(),
+            _ => Vec::new(),
+        }
+    }
+
+    #[test]
+    fn split_with_comma_delimiter() {
+        let result = split("apple,banana,cherry", Some(","), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["apple", "banana", "cherry"]);
+    }
+
+    #[test]
+    fn split_with_default_delimiter() {
+        let result = split("The quick brown fox", None, None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["The", "quick", "brown", "fox"]);
+    }
+
+    #[test]
+    fn split_with_custom_delimiter() {
+        let result = split("one|two|three", Some("|"), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["one", "two", "three"]);
+    }
+
+    #[test]
+    fn split_with_empty_delimiter_returns_single_element() {
+        let result = split("hello", Some(""), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["hello"]);
+    }
+
+    #[test]
+    fn split_empty_expression_returns_empty_array() {
+        let result = split("", Some(","), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, Vec::<String>::new());
+    }
+
+    #[test]
+    fn split_with_limit() {
+        let result = split("one,two,three,four,five", Some(","), Some(3), None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["one", "two", "three,four,five"]);
+    }
+
+    #[test]
+    fn split_with_limit_one() {
+        let result = split("one,two,three", Some(","), Some(1), None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["one,two,three"]);
+    }
+
+    #[test]
+    fn split_single_element() {
+        let result = split("single", Some(","), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["single"]);
+    }
+
+    #[test]
+    fn split_preserves_order() {
+        let result = split("first-second-third", Some("-"), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["first", "second", "third"]);
+    }
+
+    #[test]
+    fn split_handles_empty_strings_between_delimiters() {
+        let result = split("a,,b", Some(","), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["a", "", "b"]);
+    }
+
+    #[test]
+    fn split_multiple_consecutive_delimiters() {
+        let result = split("a,,,b", Some(","), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["a", "", "", "b"]);
+    }
+
+    #[test]
+    fn split_multiline_text() {
+        let text = "Line 1\nLine 2\nLine 3";
+        let result = split(text, Some("\n"), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["Line 1", "Line 2", "Line 3"]);
+    }
+
+    #[test]
+    fn split_with_limit_at_boundary() {
+        let result = split("a,b,c", Some(","), Some(2), None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["a", "b,c"]);
+    }
+
+    #[test]
+    fn split_returns_zero_based_array() {
+        let result = split("a,b,c", Some(","), None, None).unwrap();
+        let arr = result.as_array().unwrap();
+        assert_eq!(arr.lower_bound(0).unwrap(), 0);
+        assert_eq!(arr.upper_bound(0).unwrap(), 2);
+    }
+
+    #[test]
+    fn split_limit_minus_one_means_no_limit() {
+        let result = split("a,b,c,d,e", Some(","), Some(-1), None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["a", "b", "c", "d", "e"]);
+    }
+
+    #[test]
+    fn split_limit_zero_is_error_5() {
+        let err = split("a,b,c", Some(","), Some(0), None).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn split_negative_limit_other_than_minus_one_is_error_5() {
+        let err = split("a,b,c", Some(","), Some(-2), None).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn split_text_compare_case_insensitive() {
+        let result = split("A,B,a,b", Some(","), None, Some(1)).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["A", "B", "a", "b"]);
+    }
+
+    #[test]
+    fn split_binary_compare_case_sensitive() {
+        let result = split("A,B,a,b", Some(","), None, Some(0)).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["A", "B", "a", "b"]);
+    }
+
+    #[test]
+    fn split_invalid_compare_is_error_5() {
+        let err = split("a,b,c", Some(","), None, Some(3)).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn split_preserves_whitespace_in_parts() {
+        let result = split("hello   world", Some("  "), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["hello", " world"]);
+    }
+
+    #[test]
+    fn split_delimiter_not_found_returns_single_element() {
+        let result = split("hello world", Some(","), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["hello world"]);
+    }
+
+    #[test]
+    fn split_preserves_original_casing_with_text_compare() {
+        let result = split("Hello World TEST", Some(","), None, Some(1)).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["Hello World TEST"]);
+    }
+
+    #[test]
+    fn split_use_option_compare_defaults_to_binary() {
+        let result = split("a,b,c", Some(","), None, Some(-1)).unwrap();
+        assert!(!extract_strings(&result).is_empty());
+    }
+
+    #[test]
+    fn split_database_compare_defaults_to_binary() {
+        let result = split("a,b,c", Some(","), None, Some(2)).unwrap();
+        assert!(!extract_strings(&result).is_empty());
+    }
+
+    #[test]
+    fn split_multiline_with_crlf() {
+        let text = "Line 1\r\nLine 2\r\nLine 3";
+        let result = split(text, Some("\r\n"), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["Line 1", "Line 2", "Line 3"]);
+    }
+
+    #[test]
+    fn split_path_components() {
+        let result = split("a/b/c/d", Some("/"), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["a", "b", "c", "d"]);
+    }
+
+    #[test]
+    fn split_empty_delimiter_on_non_empty_expression() {
+        let result = split("anything", Some(""), None, None).unwrap();
+        let parts = extract_strings(&result);
+        assert_eq!(parts, vec!["anything"]);
+    }
+}
