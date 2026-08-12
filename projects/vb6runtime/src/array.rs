@@ -81,6 +81,21 @@ impl ArrayValue {
         }
     }
 
+    /// Create a one-dimensional array from an existing element buffer
+    /// with the specified lower bound and upper bound derived from `data.len()`.
+    pub fn from_vec_with_bounds(element_type: VBType, data: Vec<VBVariant>, lower: i32) -> Self {
+        let upper = if data.is_empty() {
+            lower - 1
+        } else {
+            lower + (data.len() as i32 - 1)
+        };
+        Self {
+            element_type,
+            dimensions: vec![ArrayDimension::new(lower, upper)],
+            data,
+        }
+    }
+
     /// The element type of this array.
     pub fn element_type(&self) -> &VBType {
         &self.element_type
