@@ -308,6 +308,8 @@ pub fn array(elements: &[VBVariant]) -> VBVariant {
 #[cfg(test)]
 mod tests {
     use super::array;
+    use crate::error::{err_number, VBError};
+    use crate::types::VBType;
     use crate::value::VBVariant;
 
     #[test]
@@ -387,6 +389,76 @@ mod tests {
         let outer = result.as_array().unwrap();
 
         assert_eq!(outer.len(), 2);
+        assert!(outer.get(&[0]).unwrap().is_array());
+    }
+
+    #[test]
+    fn result_is_a_variant_array() {
+        let result = array(&[VBVariant::from_string("x")]);
+        let arr = result.as_array().unwrap();
+        assert_eq!(arr.element_type(), &VBType::Variant);
+    }
+
+    #[test]
+    fn preserves_all_variant_kinds() {
+        let elements = vec![
+            VBVariant::Empty,
+            VBVariant::Null,
+            VBVariant::Nothing,
+            VBVariant::Byte(255),
+            VBVariant::Integer(-1),
+            VBVariant::Long(-2_000_000_000),
+            VBVariant::Single(1.5),
+            VBVariant::Double(123.456),
+            VBVariant::from_currency(1234.56),
+            VBVariant::from_string("text"),
+            VBVariant::Boolean(true),
+            VBVariant::Date(45_672.5),
+            VBVariant::Error(VBError::new(err_number::TYPE_MISMATCH)),
+        ];
+        let result = array(&elements);
+        let arr = result.as_array().unwrap();
+
+        assert_eq!(arr.len(), elements.len());
+        for (i, expected) in elements.iter().enumerate() {
+            assert_eq!(arr.get(&[i as i32]).unwrap(), expected, "index {i}");
+        }
+    }
+
+    #[test]
+    fn result_is_independent_of_input() {
+        let mut elements = vec![VBVariant::from_string("a"), VBVariant::Long(1)];
+        let result = array(&elements);
+
+        elements[0] = VBVariant::from_string("changed");
+        elements[1] = VBVariant::Long(99);
+
+        let arr = result.as_array().unwrap();
+        assert_eq!(arr.get(&[0]).unwrap(), &VBVariant::from_string("a"));
+        assert_eq!(arr.get(&[1]).unwrap(), &VBVariant::Long(1));
+    }
+
+    #[test]
+    fn large_array_has_correct_bounds() {
+        let elements: Vec<VBVariant> = (0..100).map(VBVariant::Long).collect();
+        let result = array(&elements);
+        let arr = result.as_array().unwrap();
+
+        assert_eq!(arr.len(), 100);
+        assert_eq!(arr.lower_bound(0).unwrap(), 0);
+        assert_eq!(arr.upper_bound(0).unwrap(), 99);
+        assert_eq!(arr.get(&[0]).unwrap(), &VBVariant::Long(0));
+        assert_eq!(arr.get(&[50]).unwrap(), &VBVariant::Long(50));
+        assert_eq!(arr.get(&[99]).unwrap(), &VBVariant::Long(99));
+    }
+
+    #[test]
+    fn deeply_nested_arrays_are_supported() {
+        let inner = array(&[VBVariant::Long(1)]);
+        let middle = array(&[inner]);
+        let result = array(&[middle]);
+
+        let outer = result.as_array().unwrap();
         assert!(outer.get(&[0]).unwrap().is_array());
     }
 }
