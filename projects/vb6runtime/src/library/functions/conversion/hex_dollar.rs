@@ -28,7 +28,7 @@
 //! - `Integer` values: Up to 4 hex digits (0000-FFFF)
 //! - `Long` values: Up to 8 hex digits (00000000-FFFFFFFF)
 //! - Zero: Returns "0" (single character)
-//! - If `number` contains `Null`, returns `Null`
+//! - If `number` contains `Null`, raises error 94 (Invalid use of Null)
 //!
 //! ### Type Differences: `Hex$` vs `Hex`
 //!
@@ -476,3 +476,186 @@
 //! - Negative numbers return two's complement representation
 //! - Fractional values are rounded before conversion
 //! - No direct support for byte-order conversion (endianness)
+
+use crate::error::{err_number, VBError, VBResult};
+use crate::value::{VBString, VBVariant};
+
+/// Implementation of the `Hex$` function.
+///
+/// Converts a number to its hexadecimal string representation. The result uses
+/// uppercase letters (A-F) and does not include any prefix ("0x" or "&H").
+///
+/// VB6 behavior:
+/// - Fractional values are rounded to the nearest integer before conversion
+/// - Negative numbers use two's complement representation
+/// - `Integer` values produce up to 4 hex digits
+/// - `Long` values produce up to 8 hex digits
+/// - Raises error 94 if `number` is `Null`
+/// - Raises error 13 if `number` cannot be converted to a number
+pub fn hex_dollar(number: &VBVariant) -> VBResult<VBString> {
+    if number.is_null() {
+        return Err(VBError::with_description(
+            err_number::INVALID_USE_OF_NULL,
+            "Invalid use of Null",
+        ));
+    }
+
+    // Determine the bit width based on the variant type
+    let value = match number {
+        VBVariant::Integer(v) => {
+            // Integer is 16-bit; mask to u16 to get correct hex representation
+            format!("{:X}", *v as u16)
+        }
+        VBVariant::Long(v) => {
+            format!("{:X}", *v as u32)
+        }
+        VBVariant::Byte(v) => {
+            format!("{:X}", *v as u32)
+        }
+        _ => {
+            // For other types (Double, Single, Currency, String, etc.),
+            // convert to Long first via as_i64 which handles rounding
+            let v = number.as_i64()?;
+            if let Ok(long_val) = i32::try_from(v) {
+                format!("{:X}", long_val as u32)
+            } else {
+                return Err(VBError::overflow());
+            }
+        }
+    };
+
+    Ok(VBString::from(value))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::hex_dollar;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    #[test]
+    fn hex_dollar_zero() {
+        let result = hex_dollar(&VBVariant::from_long(0)).unwrap();
+        assert_eq!(result.as_str(), "0");
+    }
+
+    #[test]
+    fn hex_dollar_positive_long() {
+        let result = hex_dollar(&VBVariant::from_long(255)).unwrap();
+        assert_eq!(result.as_str(), "FF");
+
+        let result = hex_dollar(&VBVariant::from_long(4096)).unwrap();
+        assert_eq!(result.as_str(), "1000");
+
+        let result = hex_dollar(&VBVariant::from_long(65535)).unwrap();
+        assert_eq!(result.as_str(), "FFFF");
+    }
+
+    #[test]
+    fn hex_dollar_positive_integer() {
+        let result = hex_dollar(&VBVariant::from_integer(255)).unwrap();
+        assert_eq!(result.as_str(), "FF");
+
+        let result = hex_dollar(&VBVariant::from_integer(-1)).unwrap();
+        assert_eq!(result.as_str(), "FFFF");
+    }
+
+    #[test]
+    fn hex_dollar_negative_long() {
+        let result = hex_dollar(&VBVariant::from_long(-1)).unwrap();
+        assert_eq!(result.as_str(), "FFFFFFFF");
+
+        let result = hex_dollar(&VBVariant::from_long(-256)).unwrap();
+        assert_eq!(result.as_str(), "FFFFFF00");
+    }
+
+    #[test]
+    fn hex_dollar_byte() {
+        let result = hex_dollar(&VBVariant::from_byte(15)).unwrap();
+        assert_eq!(result.as_str(), "F");
+
+        let result = hex_dollar(&VBVariant::from_byte(255)).unwrap();
+        assert_eq!(result.as_str(), "FF");
+    }
+
+    #[test]
+    fn hex_dollar_double_rounds() {
+        // 15.3 rounds to 15 → "F"
+        let result = hex_dollar(&VBVariant::Double(15.3)).unwrap();
+        assert_eq!(result.as_str(), "F");
+
+        // 15.7 rounds to 16 → "10"
+        let result = hex_dollar(&VBVariant::Double(15.7)).unwrap();
+        assert_eq!(result.as_str(), "10");
+    }
+
+    #[test]
+    fn hex_dollar_from_string() {
+        let result = hex_dollar(&VBVariant::from_string("255")).unwrap();
+        assert_eq!(result.as_str(), "FF");
+    }
+
+    #[test]
+    fn hex_dollar_null_is_error_94() {
+        let err = hex_dollar(&VBVariant::Null).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn hex_dollar_max_long() {
+        let result = hex_dollar(&VBVariant::from_long(i32::MAX)).unwrap();
+        assert_eq!(result.as_str(), "7FFFFFFF");
+    }
+
+    #[test]
+    fn hex_dollar_min_long() {
+        let result = hex_dollar(&VBVariant::from_long(i32::MIN)).unwrap();
+        assert_eq!(result.as_str(), "80000000");
+    }
+
+    #[test]
+    fn hex_dollar_uppercase() {
+        // Values that produce A-F characters
+        let result = hex_dollar(&VBVariant::from_long(10)).unwrap();
+        assert_eq!(result.as_str(), "A");
+
+        let result = hex_dollar(&VBVariant::from_long(11)).unwrap();
+        assert_eq!(result.as_str(), "B");
+
+        let result = hex_dollar(&VBVariant::from_long(15)).unwrap();
+        assert_eq!(result.as_str(), "F");
+
+        let result = hex_dollar(&VBVariant::from_long(0xABCD)).unwrap();
+        assert_eq!(result.as_str(), "ABCD");
+    }
+
+    #[test]
+    fn hex_dollar_power_of_two() {
+        let result = hex_dollar(&VBVariant::from_long(16)).unwrap();
+        assert_eq!(result.as_str(), "10");
+
+        let result = hex_dollar(&VBVariant::from_long(256)).unwrap();
+        assert_eq!(result.as_str(), "100");
+
+        let result = hex_dollar(&VBVariant::from_long(4096)).unwrap();
+        assert_eq!(result.as_str(), "1000");
+
+        let result = hex_dollar(&VBVariant::from_long(65536)).unwrap();
+        assert_eq!(result.as_str(), "10000");
+    }
+
+    #[test]
+    fn hex_dollar_empty_returns_zero() {
+        let result = hex_dollar(&VBVariant::Empty).unwrap();
+        assert_eq!(result.as_str(), "0");
+    }
+
+    #[test]
+    fn hex_dollar_small_values() {
+        for i in 0..16 {
+            let result = hex_dollar(&VBVariant::from_long(i)).unwrap();
+            let expected = format!("{:X}", i);
+            assert_eq!(result.as_str(), expected, "Failed for value {}", i);
+        }
+    }
+}
