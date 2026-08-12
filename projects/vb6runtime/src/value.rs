@@ -1294,6 +1294,8 @@ fn parse_date_part(s: &str) -> Option<jiff::civil::Date> {
 }
 
 /// Parse the time portion (`H:MM[:SS][ AM/PM]`) as a fraction of a day.
+/// A bare time (no AM/PM) is 12-hour format up to hour 12; hours above 12
+/// are treated as 24-hour format, matching VB6.
 fn parse_time_part(s: &str) -> Option<f64> {
     let mut t = s.trim();
     let mut pm = false;
@@ -1317,7 +1319,13 @@ fn parse_time_part(s: &str) -> Option<f64> {
         .get(2)
         .map(|p| p.trim().parse().ok())
         .unwrap_or(Some(0.0))?;
-    let h = if pm { hours % 12 + 12 } else { hours % 12 };
+    let h = if pm {
+        hours % 12 + 12
+    } else if hours <= 12 {
+        hours % 12
+    } else {
+        hours
+    };
     Some((h as f64 * 3600.0 + minutes as f64 * 60.0 + seconds) / 86_400.0)
 }
 
