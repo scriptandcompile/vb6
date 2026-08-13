@@ -13,6 +13,7 @@
 mod arrays;
 mod conversion;
 mod datetime;
+mod financial;
 mod logic;
 mod math;
 mod string;
@@ -91,6 +92,7 @@ fn registry() -> &'static Registry {
         arrays::register(&mut registry);
         conversion::register(&mut registry);
         datetime::register(&mut registry);
+        financial::register(&mut registry);
         logic::register(&mut registry);
         string::register(&mut registry);
         math::register(&mut registry);
@@ -620,5 +622,35 @@ mod tests {
             call_builtin("CVErr", &[VBVariant::from_integer(13)]).unwrap(),
             VBVariant::from_error(vb6core::error::VBError::new(13))
         );
+    }
+
+    #[test]
+    fn financial_functions_dispatch() {
+        // DDB with default factor (2.0)
+        let result = call_builtin(
+            "DDB",
+            &[
+                VBVariant::from_double(10000.0),
+                VBVariant::from_double(1000.0),
+                VBVariant::from_double(5.0),
+                VBVariant::from_double(1.0),
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_f64().unwrap(), 4000.0);
+
+        // DDB with custom factor (1.5)
+        let result = call_builtin(
+            "DDB",
+            &[
+                VBVariant::from_double(10000.0),
+                VBVariant::from_double(1000.0),
+                VBVariant::from_double(5.0),
+                VBVariant::from_double(1.0),
+                VBVariant::from_double(1.5),
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_f64().unwrap(), 3000.0);
     }
 }
