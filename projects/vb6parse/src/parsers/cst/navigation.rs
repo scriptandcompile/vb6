@@ -209,6 +209,10 @@ pub struct CstNode {
     is_token: bool,
     /// The children of this node (empty for tokens)
     children: Vec<CstNode>,
+    /// Inclusive start byte offset of this node in the source file.
+    start_offset: u32,
+    /// Exclusive end byte offset of this node in the source file.
+    end_offset: u32,
 }
 
 impl Serialize for CstNode {
@@ -237,12 +241,33 @@ impl CstNode {
         is_token: bool,
         children: Vec<CstNode>,
     ) -> Self {
+        let end_offset = text.len() as u32;
         Self {
             kind,
             text,
             is_token,
             children,
+            start_offset: 0,
+            end_offset,
         }
+    }
+
+    /// The inclusive start byte offset of this node in the source file.
+    #[must_use]
+    pub fn start_offset(&self) -> u32 {
+        self.start_offset
+    }
+
+    /// The exclusive end byte offset of this node in the source file.
+    #[must_use]
+    pub fn end_offset(&self) -> u32 {
+        self.end_offset
+    }
+
+    /// The byte range of this node in the source file as `[start, end)`.
+    #[must_use]
+    pub fn byte_range(&self) -> (u32, u32) {
+        (self.start_offset, self.end_offset)
     }
 }
 
@@ -807,19 +832,27 @@ impl ConcreteSyntaxTree {
                     .map(Self::build_cst_node)
                     .collect();
 
+                let range = node.text_range();
                 CstNode {
                     kind: node.kind(),
                     text: node.text().to_string(),
                     is_token: false,
                     children,
+                    start_offset: range.start().into(),
+                    end_offset: range.end().into(),
                 }
             }
-            rowan::NodeOrToken::Token(token) => CstNode {
-                kind: token.kind(),
-                text: token.text().to_string(),
-                is_token: true,
-                children: Vec::new(),
-            },
+            rowan::NodeOrToken::Token(token) => {
+                let range = token.text_range();
+                CstNode {
+                    kind: token.kind(),
+                    text: token.text().to_string(),
+                    is_token: true,
+                    children: Vec::new(),
+                    start_offset: range.start().into(),
+                    end_offset: range.end().into(),
+                }
+            }
         }
     }
 
