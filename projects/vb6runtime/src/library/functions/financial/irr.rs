@@ -1,6 +1,7 @@
-//! # `IRR` Function
+//! # IRR Function
 //!
-//! Returns a `Double` specifying the internal rate of return for a series of periodic cash flows (payments and receipts).
+//! Returns a Double specifying the internal rate of return for a series of periodic cash flows
+//! (payments and receipts).
 //!
 //! ## Syntax
 //!
@@ -10,32 +11,29 @@
 //!
 //! ## Parameters
 //!
-//! - `values()` (Required): `Array` of `Double` specifying cash flow values. The array must contain at least one positive value (receipt) and one negative value (payment)
-//! - `guess` (Optional): `Variant` specifying value you estimate will be returned by `IRR`. If omitted, guess is 0.1 (10 percent)
+//! - `values()` (Required): Array of Double specifying cash flow values. The array must contain
+//!   at least one positive value (receipt) and one negative value (payment).
+//! - `guess` (Optional): Variant specifying value you estimate will be returned by IRR. If omitted,
+//!   guess is 0.1 (10 percent).
 //!
 //! ## Return Value
 //!
-//! Returns a `Double` representing the internal rate of return:
+//! Returns a Double representing the internal rate of return:
 //! - Expressed as a decimal (0.1 = 10%)
-//! - The discount rate that makes the net present value (`NPV`) of all cash flows equal to zero
+//! - The discount rate that makes the net present value (NPV) of all cash flows equal to zero
 //! - Used to evaluate the profitability of potential investments
-//! - Higher `IRR` indicates more desirable investment
+//! - Higher IRR indicates more desirable investment
 //!
 //! ## Remarks
 //!
-//! The internal rate of return is the interest rate received for an investment consisting of payments and receipts that occur at regular intervals:
+//! The internal rate of return is the interest rate received for an investment consisting of
+//! payments and receipts that occur at regular intervals.
 //!
-//! - `IRR` uses the order of values within the array to interpret the order of cash flows
-//! - Cash flows must occur at regular intervals (monthly, quarterly, annually, etc.)
-//! - First element is typically a negative value (initial investment)
+//! - Uses Newton-Raphson iteration to find the rate where NPV equals zero
+//! - Begins with guess value and iterates until result is accurate within 0.00001
+//! - Fails after 20 iterations if no convergence (Error 5)
 //! - Array must contain at least one positive and one negative value
-//! - Uses an iterative technique to calculate `IRR`
-//! - Begins with the value of `guess` and cycles through until result is accurate to within 0.00001 percent
-//! - If `IRR` can't find a result after 20 tries, it fails with Error 5
-//! - Most cases, you don't need to provide `guess`; if omitted, 10% is assumed
-//! - If `IRR` returns Error 5, try different value for `guess`
-//! - `IRR` is closely related to `NPV` (net present value) function
-//! - `IRR` is the rate where `NPV` equals zero: `NPV(IRR(values), values) = 0` (approximately)
+//! - Cash flows must occur at regular intervals
 //!
 //! ## Typical Uses
 //!
@@ -616,3 +614,152 @@
 //! - `FV`: Future value
 //! - `Rate`: Interest rate per period
 
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `IRR` function.
+///
+/// Calculates the internal rate of return for a series of periodic cash flows
+/// using iteration. The IRR is the discount rate that makes the net present value
+/// (NPV) of all cash flows equal to zero.
+///
+/// VB6 behavior:
+/// - `values` must be an array with at least one positive and one negative value
+/// - Optional `guess` defaults to 0.1 (10%)
+/// - Iterates up to 20 times until result is within 0.00001 of previous iteration
+/// - Raises error 5 if IRR cannot be found after 20 iterations
+pub fn irr(values: &VBVariant, guess: Option<&VBVariant>) -> VBResult<VBVariant> {
+    let arr = values.as_array()?;
+    let guess_val = guess.map(|g| g.as_f64()).transpose()?.unwrap_or(0.1);
+
+    let cash_flows: Vec<f64> = arr
+        .as_slice()
+        .iter()
+        .map(|v| v.as_f64())
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|_| VBError::type_mismatch())?;
+
+    if cash_flows.is_empty() {
+        return Err(VBError::new(5));
+    }
+
+    // Validate that array contains at least one positive and one negative value
+    let has_positive = cash_flows.iter().any(|&v| v > 0.0);
+    let has_negative = cash_flows.iter().any(|&v| v < 0.0);
+
+    if !has_positive || !has_negative {
+        return Err(VBError::new(5));
+    }
+
+    // Newton-Raphson iteration to find IRR
+    let mut rate = guess_val;
+    const TOLERANCE: f64 = 0.00001;
+    const MAX_ITERATIONS: usize = 20;
+
+    for _ in 0..MAX_ITERATIONS {
+        let npv = calculate_npv(&cash_flows, rate);
+        let derivative = calculate_npv_derivative(&cash_flows, rate);
+
+        if derivative.abs() < f64::EPSILON {
+            return Err(VBError::new(5));
+        }
+
+        let new_rate = rate - npv / derivative;
+
+        if (new_rate - rate).abs() < TOLERANCE {
+            return Ok(VBVariant::from_double(new_rate));
+        }
+
+        rate = new_rate;
+    }
+
+    // After 20 iterations, check if we're close enough
+    let npv = calculate_npv(&cash_flows, rate);
+    if npv.abs() < TOLERANCE {
+        return Ok(VBVariant::from_double(rate));
+    }
+
+    Err(VBError::new(5))
+}
+
+/// Calculate NPV for a given rate and cash flows.
+fn calculate_npv(cash_flows: &[f64], rate: f64) -> f64 {
+    let mut npv = 0.0;
+    for (i, &cf) in cash_flows.iter().enumerate() {
+        npv += cf / (1.0 + rate).powi(i as i32);
+    }
+    npv
+}
+
+/// Calculate the derivative of NPV with respect to rate.
+fn calculate_npv_derivative(cash_flows: &[f64], rate: f64) -> f64 {
+    let mut derivative = 0.0;
+    for (i, &cf) in cash_flows.iter().enumerate() {
+        let period = i as i32;
+        derivative += cf * (-period as f64) / (1.0 + rate).powi(period + 1);
+    }
+    derivative
+}
+
+#[cfg(test)]
+mod tests {
+    use super::irr;
+    use crate::value::VBVariant;
+
+    fn make_array(values: &[f64]) -> VBVariant {
+        VBVariant::Array(crate::array::ArrayValue::from_vec_with_bounds(
+            crate::types::VBType::Double,
+            values.iter().map(|v| VBVariant::from_double(*v)).collect(),
+            0,
+        ))
+    }
+
+    #[test]
+    fn irr_simple_investment() {
+        // -10000, 3000, 3500, 4000, 4500 -> IRR approx 0.1709 (17.09%)
+        let cash_flows = make_array(&[-10000.0, 3000.0, 3500.0, 4000.0, 4500.0]);
+        let result = irr(&cash_flows, None).unwrap();
+        let irr_val = result.as_f64().unwrap();
+        assert!((irr_val - 0.1709).abs() < 0.01);
+    }
+
+    #[test]
+    fn irr_with_guess() {
+        // Same cash flows with explicit guess
+        let cash_flows = make_array(&[-10000.0, 3000.0, 3500.0, 4000.0, 4500.0]);
+        let result = irr(&cash_flows, Some(&VBVariant::from_double(0.2))).unwrap();
+        let irr_val = result.as_f64().unwrap();
+        assert!((irr_val - 0.1709).abs() < 0.01);
+    }
+
+    #[test]
+    fn irr_all_positive_raises_error_5() {
+        let cash_flows = make_array(&[3000.0, 3500.0, 4000.0]);
+        let err = irr(&cash_flows, None).unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn irr_all_negative_raises_error_5() {
+        let cash_flows = make_array(&[-3000.0, -3500.0, -4000.0]);
+        let err = irr(&cash_flows, None).unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn irr_two_period_simple() {
+        // Simple case: -1000 invested, 1300 returned
+        // IRR should be 0.3 (30%)
+        let cash_flows = make_array(&[-1000.0, 1300.0]);
+        let result = irr(&cash_flows, None).unwrap();
+        let irr_val = result.as_f64().unwrap();
+        assert!((irr_val - 0.3).abs() < 0.001);
+    }
+
+    #[test]
+    fn irr_empty_array_raises_error_5() {
+        let cash_flows = make_array(&[]);
+        let err = irr(&cash_flows, None).unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+}

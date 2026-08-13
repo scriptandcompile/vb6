@@ -27,4 +27,9 @@ pub(super) fn register(registry: &mut Registry) {
         let type_ = if args.len() > 5 { Some(&args[5]) } else { None };
         finfn::ipmt::ipmt(&args[0], &args[1], &args[2], &args[3], fv, type_)
     }));
+
+    registry.insert(builtin!("irr", 1, 2, |args| {
+        let guess = if args.len() > 1 { Some(&args[1]) } else { None };
+        finfn::irr::irr(&args[0], guess)
+    }));
 }
