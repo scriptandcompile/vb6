@@ -514,3 +514,263 @@
 //! - `NPer`: Number of periods
 //! - `PV`: Present value
 //! - `FV`: Future value
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `IPmt` function.
+///
+/// Calculates the interest payment for a given period of an annuity based on
+/// periodic, fixed payments and a fixed interest rate.
+///
+/// VB6 behavior:
+/// - `rate` is the interest rate per period
+/// - `per` must be in range [1, nper]; if outside, raises error 5
+/// - `nper` must be positive; if <= 0, raises error 5
+/// - `pv` is the present value (loan amount)
+/// - `fv` defaults to 0 if omitted
+/// - `type` defaults to 0 (end of period) if omitted; use 1 for beginning of period
+/// - Returns a `Double`
+pub fn ipmt(
+    rate: &VBVariant,
+    per: &VBVariant,
+    nper: &VBVariant,
+    pv: &VBVariant,
+    fv: Option<&VBVariant>,
+    type_: Option<&VBVariant>,
+) -> VBResult<VBVariant> {
+    let rate_val = rate.as_f64()?;
+    let per_val = per.as_f64()?;
+    let nper_val = nper.as_f64()?;
+    let pv_val = pv.as_f64()?;
+    let fv_val = fv.map(|f| f.as_f64()).transpose()?.unwrap_or(0.0);
+    let type_val = type_.map(|t| t.as_i16()).transpose()?.unwrap_or(0);
+
+    // Validate inputs per VB6 behavior
+    if nper_val <= 0.0 {
+        return Err(VBError::new(5));
+    }
+
+    if per_val < 1.0 || per_val > nper_val {
+        return Err(VBError::new(5));
+    }
+
+    let ipmt_val = if rate_val == 0.0 {
+        // With zero interest rate, there is no interest payment
+        0.0
+    } else {
+        // Calculate the periodic payment using Pmt formula
+        let pmt_val = if type_val == 0 {
+            let factor = (1.0_f64 + rate_val).powf(nper_val);
+            -(pv_val * factor + fv_val) / ((factor - 1.0) / rate_val)
+        } else {
+            let factor = (1.0_f64 + rate_val).powf(nper_val);
+            -(pv_val * factor + fv_val) / ((factor - 1.0) / rate_val * (1.0_f64 + rate_val))
+        };
+
+        // Calculate the balance at start of period `per` using FV formula
+        // Balance = FV(rate, per-1, pmt, pv)
+        let k = per_val - 1.0;
+        let balance = fv_formula(rate_val, k, pmt_val, pv_val);
+
+        // Interest for the period is -balance * rate
+        // (negative because IPmt returns negative for loans where pv is positive)
+        -balance * rate_val
+    };
+
+    Ok(VBVariant::from_double(ipmt_val))
+}
+
+/// Calculate future value using the same formula as the FV function.
+fn fv_formula(rate: f64, nper: f64, pmt: f64, pv: f64) -> f64 {
+    if nper == 0.0 {
+        return -pv;
+    }
+    let factor = (1.0_f64 + rate).powf(nper);
+    let pv_part = -pv * factor;
+    let pmt_part = -pmt * (factor - 1.0) / rate;
+    pv_part + pmt_part
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ipmt;
+    use crate::value::VBVariant;
+
+    fn ipmt_defaults(rate: f64, per: f64, nper: f64, pv: f64) -> VBVariant {
+        ipmt(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(per),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pv),
+            None,
+            None,
+        )
+        .unwrap()
+    }
+
+    fn ipmt_with_fv(
+        rate: f64,
+        per: f64,
+        nper: f64,
+        pv: f64,
+        fv: f64,
+    ) -> VBVariant {
+        ipmt(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(per),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pv),
+            Some(&VBVariant::from_double(fv)),
+            None,
+        )
+        .unwrap()
+    }
+
+    fn ipmt_with_type(
+        rate: f64,
+        per: f64,
+        nper: f64,
+        pv: f64,
+        fv: f64,
+        ptype: i16,
+    ) -> VBVariant {
+        ipmt(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(per),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pv),
+            Some(&VBVariant::from_double(fv)),
+            Some(&VBVariant::from_integer(ptype)),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn ipmt_first_period_loan() {
+        // 8% annual rate, monthly payments, 48 months, $20,000 loan
+        // First month interest should be approximately -$133.33
+        let result = ipmt_defaults(0.08 / 12.0, 1.0, 48.0, -20000.0);
+        let ipmt_val = result.as_f64().unwrap();
+        assert!((ipmt_val - (-133.33)).abs() < 1.0);
+    }
+
+    #[test]
+    fn ipmt_last_period_less_interest() {
+        // Last period should have much less interest than first
+        let first = ipmt_defaults(0.08 / 12.0, 1.0, 48.0, -20000.0);
+        let last = ipmt_defaults(0.08 / 12.0, 48.0, 48.0, -20000.0);
+
+        let first_val = first.as_f64().unwrap();
+        let last_val = last.as_f64().unwrap();
+
+        // Interest decreases over time
+        assert!(last_val.abs() < first_val.abs());
+    }
+
+    #[test]
+    fn ipmt_zero_rate_returns_zero() {
+        let result = ipmt_defaults(0.0, 1.0, 48.0, -20000.0);
+        assert_eq!(result.as_f64().unwrap(), 0.0);
+    }
+
+    #[test]
+    fn ipmt_with_beginning_of_period() {
+        let result = ipmt_with_type(0.08 / 12.0, 1.0, 48.0, -20000.0, 0.0, 1);
+        let val = result.as_f64().unwrap();
+        // Should be different from end-of-period
+        assert!(val != 0.0);
+    }
+
+    #[test]
+    fn ipmt_zero_nper_raises_error_5() {
+        let err = ipmt(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(1.0),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(-20000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn ipmt_per_out_of_range_raises_error_5() {
+        let err = ipmt(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(49.0), // per > nper
+            &VBVariant::from_double(48.0),
+            &VBVariant::from_double(-20000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn ipmt_with_integer_args() {
+        let result = ipmt(
+            &VBVariant::from_double(0.08 / 12.0),
+            &VBVariant::from_long(1),
+            &VBVariant::from_long(48),
+            &VBVariant::from_long(-20000),
+            None,
+            None,
+        )
+        .unwrap();
+        let val = result.as_f64().unwrap();
+        assert!((val - (-133.33)).abs() < 1.0);
+    }
+
+    #[test]
+    fn ipmt_null_raises_invalid_use_of_null() {
+        let err = ipmt(
+            &VBVariant::Null,
+            &VBVariant::from_double(1.0),
+            &VBVariant::from_double(48.0),
+            &VBVariant::from_double(-20000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 94);
+    }
+
+    #[test]
+    fn ipmt_negative_nper_raises_error_5() {
+        let err = ipmt(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(1.0),
+            &VBVariant::from_double(-48.0),
+            &VBVariant::from_double(-20000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn ipmt_with_future_value() {
+        let result = ipmt_with_fv(0.08 / 12.0, 1.0, 48.0, -20000.0, -5000.0);
+        let val = result.as_f64().unwrap();
+        assert!(val != 0.0);
+    }
+
+    #[test]
+    fn ipmt_per_zero_raises_error_5() {
+        let err = ipmt(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(48.0),
+            &VBVariant::from_double(-20000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+}
