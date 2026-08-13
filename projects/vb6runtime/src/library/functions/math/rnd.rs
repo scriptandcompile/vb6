@@ -775,7 +775,7 @@ fn normalize(seed: u32) -> VBVariant {
 /// - `Rnd(x)` with `x > 0` returns the next value in the sequence
 ///
 /// The result is a `Single` in `[0, 1)`.
-pub fn rnd(value: VBVariant) -> VBResult<VBVariant> {
+pub fn rnd(value: &VBVariant) -> VBResult<VBVariant> {
     if value.is_null() {
         return Ok(VBVariant::Null);
     }
@@ -835,14 +835,14 @@ mod tests {
 
     #[test]
     fn returns_null_for_null() {
-        assert_eq!(rnd(VBVariant::Null).unwrap(), VBVariant::Null);
+        assert_eq!(rnd(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 
     #[test]
     fn returns_single_within_range() {
         with_default_seed(|| {
             for _ in 0..10_000 {
-                let value = as_single(rnd(VBVariant::Empty).unwrap());
+                let value = as_single(rnd(&VBVariant::Empty).unwrap());
                 assert!((0.0..1.0).contains(&value), "out of range: {value}");
             }
         });
@@ -851,19 +851,19 @@ mod tests {
     #[test]
     fn advances_through_the_default_sequence() {
         with_default_seed(|| {
-            let first = as_single(rnd(VBVariant::Empty).unwrap());
+            let first = as_single(rnd(&VBVariant::Empty).unwrap());
             assert_eq!(first, f32::from_bits(0x3F34_9EC3)); // 0.7055475
 
-            let second = as_single(rnd(VBVariant::Empty).unwrap());
+            let second = as_single(rnd(&VBVariant::Empty).unwrap());
             assert_eq!(second, f32::from_bits(0x3F08_8E7A)); // 0.53342402
 
-            let third = as_single(rnd(VBVariant::Empty).unwrap());
+            let third = as_single(rnd(&VBVariant::Empty).unwrap());
             assert_eq!(third, f32::from_bits(0x3F14_5B55)); // 0.5795186
 
-            let fourth = as_single(rnd(VBVariant::Empty).unwrap());
+            let fourth = as_single(rnd(&VBVariant::Empty).unwrap());
             assert_eq!(fourth, f32::from_bits(0x3E94_4188)); // 0.28956246
 
-            let fifth = as_single(rnd(VBVariant::Empty).unwrap());
+            let fifth = as_single(rnd(&VBVariant::Empty).unwrap());
             assert_eq!(fifth, f32::from_bits(0x3E9A_98EE)); // 0.30194801
         });
     }
@@ -872,24 +872,24 @@ mod tests {
     fn positive_argument_advances_like_omitted() {
         let _guard = TEST_LOCK.lock().unwrap();
         set_seed(DEFAULT_SEED);
-        let via_omitted = as_single(rnd(VBVariant::Empty).unwrap());
+        let via_omitted = as_single(rnd(&VBVariant::Empty).unwrap());
 
         set_seed(DEFAULT_SEED);
-        let via_positive = as_single(rnd(VBVariant::from_single(1.5)).unwrap());
+        let via_positive = as_single(rnd(&VBVariant::from_single(1.5)).unwrap());
         assert_eq!(via_positive, via_omitted);
     }
 
     #[test]
     fn zero_returns_last_number_without_advancing() {
         with_default_seed(|| {
-            let first = rnd(VBVariant::Empty).unwrap();
-            assert_eq!(rnd(VBVariant::from_single(0.0)).unwrap(), first);
+            let first = rnd(&VBVariant::Empty).unwrap();
+            assert_eq!(rnd(&VBVariant::from_single(0.0)).unwrap(), first);
 
             // Repeating Rnd(0) still reports the same value (no advance).
-            assert_eq!(rnd(VBVariant::from_single(0.0)).unwrap(), first);
+            assert_eq!(rnd(&VBVariant::from_single(0.0)).unwrap(), first);
 
             // The next call continues where the sequence left off.
-            assert_eq!(rnd(VBVariant::Empty).unwrap(), expected(8_949_370));
+            assert_eq!(rnd(&VBVariant::Empty).unwrap(), expected(8_949_370));
         });
     }
 
@@ -898,7 +898,7 @@ mod tests {
         with_default_seed(|| {
             // Before any Rnd call the "most recent" value is the initial seed.
             assert_eq!(
-                rnd(VBVariant::from_single(0.0)).unwrap(),
+                rnd(&VBVariant::from_single(0.0)).unwrap(),
                 expected(DEFAULT_SEED)
             );
         });
@@ -907,13 +907,13 @@ mod tests {
     #[test]
     fn negative_argument_seeds_the_generator() {
         with_default_seed(|| {
-            let first = as_single(rnd(VBVariant::from_single(-1.0)).unwrap());
+            let first = as_single(rnd(&VBVariant::from_single(-1.0)).unwrap());
             assert_eq!(first, f32::from_bits(0x3E65_6218)); // 0.22400701
 
-            let second = as_single(rnd(VBVariant::Empty).unwrap());
+            let second = as_single(rnd(&VBVariant::Empty).unwrap());
             assert_eq!(second, f32::from_bits(0x3D12_D310)); // 0.035845816
 
-            let third = as_single(rnd(VBVariant::Empty).unwrap());
+            let third = as_single(rnd(&VBVariant::Empty).unwrap());
             assert_eq!(third, f32::from_bits(0x3DB0_D980)); // 0.08635235
         });
     }
@@ -922,10 +922,10 @@ mod tests {
     fn negative_argument_is_repeatable() {
         let _guard = TEST_LOCK.lock().unwrap();
         set_seed(DEFAULT_SEED);
-        let first_run = rnd(VBVariant::from_single(-2.0)).unwrap();
+        let first_run = rnd(&VBVariant::from_single(-2.0)).unwrap();
 
         set_seed(DEFAULT_SEED);
-        let second_run = rnd(VBVariant::from_single(-2.0)).unwrap();
+        let second_run = rnd(&VBVariant::from_single(-2.0)).unwrap();
         assert_eq!(first_run, second_run);
         assert_eq!(first_run, expected(11_967_619));
     }
@@ -934,16 +934,16 @@ mod tests {
     fn accepts_numeric_strings() {
         let _guard = TEST_LOCK.lock().unwrap();
         set_seed(DEFAULT_SEED);
-        let via_string = rnd(VBVariant::from_string("1.5")).unwrap();
+        let via_string = rnd(&VBVariant::from_string("1.5")).unwrap();
 
         set_seed(DEFAULT_SEED);
-        let via_number = rnd(VBVariant::from_single(1.5)).unwrap();
+        let via_number = rnd(&VBVariant::from_single(1.5)).unwrap();
         assert_eq!(via_string, via_number);
     }
 
     #[test]
     fn rejects_non_numeric_values() {
-        let err = rnd(VBVariant::from_string("not-a-number")).unwrap_err();
+        let err = rnd(&VBVariant::from_string("not-a-number")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 }

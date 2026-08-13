@@ -400,7 +400,7 @@ use crate::{error::VBResult, value::VBVariant};
 /// VB6 behavior:
 /// - `Cos(Null)` returns `Null`
 /// - other values are coerced with numeric conversion rules and return `Double`
-pub fn cos(value: VBVariant) -> VBResult<VBVariant> {
+pub fn cos(value: &VBVariant) -> VBResult<VBVariant> {
     if value.is_null() {
         return Ok(VBVariant::Null);
     }
@@ -429,48 +429,48 @@ mod tests {
 
     #[test]
     fn returns_null_for_null() {
-        assert_eq!(cos(VBVariant::Null).unwrap(), VBVariant::Null);
+        assert_eq!(cos(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 
     #[test]
     fn returns_zero_for_empty() {
-        assert_eq!(cos(VBVariant::Empty).unwrap(), VBVariant::from_double(1.0));
+        assert_eq!(cos(&VBVariant::Empty).unwrap(), VBVariant::from_double(1.0));
     }
 
     #[test]
     fn returns_double_for_numeric_inputs() {
-        let result = cos(VBVariant::from_byte(5)).unwrap();
+        let result = cos(&VBVariant::from_byte(5)).unwrap();
         assert_eq!(result, VBVariant::from_double((5.0_f64).cos()));
 
-        let result = cos(VBVariant::from_integer(-123)).unwrap();
+        let result = cos(&VBVariant::from_integer(-123)).unwrap();
         assert_eq!(result, VBVariant::from_double((-123.0_f64).cos()));
 
-        let result = cos(VBVariant::from_long(-12345)).unwrap();
+        let result = cos(&VBVariant::from_long(-12345)).unwrap();
         assert_eq!(result, VBVariant::from_double((-12345.0_f64).cos()));
 
-        let result = cos(VBVariant::from_single(-12.5)).unwrap();
+        let result = cos(&VBVariant::from_single(-12.5)).unwrap();
         assert_eq!(result, VBVariant::from_double((-12.5_f64).cos()));
 
-        let result = cos(VBVariant::from_double(-12.5)).unwrap();
+        let result = cos(&VBVariant::from_double(-12.5)).unwrap();
         assert_eq!(result, VBVariant::from_double((-12.5_f64).cos()));
 
-        let result = cos(VBVariant::from_currency_scaled(-12_345)).unwrap();
+        let result = cos(&VBVariant::from_currency_scaled(-12_345)).unwrap();
         assert_eq!(result, VBVariant::from_double((-1.2345_f64).cos()));
     }
 
     #[test]
     fn returns_expected_special_angles() {
-        let VBVariant::Double(v) = cos(VBVariant::from_double(0.0)).unwrap() else {
+        let VBVariant::Double(v) = cos(&VBVariant::from_double(0.0)).unwrap() else {
             panic!("expected Double")
         };
         assert_approx_eq(v, 1.0);
 
-        let VBVariant::Double(v) = cos(VBVariant::from_double(1.0)).unwrap() else {
+        let VBVariant::Double(v) = cos(&VBVariant::from_double(1.0)).unwrap() else {
             panic!("expected Double")
         };
         assert_approx_eq(v, (1.0_f64).cos());
 
-        let VBVariant::Double(v) = cos(VBVariant::from_double(-1.0)).unwrap() else {
+        let VBVariant::Double(v) = cos(&VBVariant::from_double(-1.0)).unwrap() else {
             panic!("expected Double")
         };
         assert_approx_eq(v, (-1.0_f64).cos());
@@ -478,13 +478,13 @@ mod tests {
 
     #[test]
     fn rejects_non_numeric_values() {
-        let err = cos(VBVariant::from_string("not-a-number")).unwrap_err();
+        let err = cos(&VBVariant::from_string("not-a-number")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 
     #[test]
     fn accepts_numeric_strings() {
-        let result = cos(VBVariant::from_string("1.5")).unwrap();
+        let result = cos(&VBVariant::from_string("1.5")).unwrap();
         assert_eq!(result, VBVariant::from_double((1.5_f64).cos()));
     }
 }
