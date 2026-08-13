@@ -241,7 +241,7 @@ impl CstNode {
         is_token: bool,
         children: Vec<CstNode>,
     ) -> Self {
-        let end_offset = text.len() as u32;
+        let end_offset = u32::try_from(text.len()).unwrap_or(u32::MAX);
         Self {
             kind,
             text,
