@@ -550,7 +550,11 @@ fn starts_a_comment(rest_of_input: &str) -> bool {
     let line_start = rest_of_input.trim_start_matches([' ', '\t']);
 
     line_start.starts_with('\'')
-        || line_start.len() >= 4 && line_start[..4].eq_ignore_ascii_case("rem ")
+        // `get` rather than a slice: a continuation line can begin with a
+        // multi-byte character, and a fixed byte offset would land inside it.
+        || line_start
+            .get(..4)
+            .is_some_and(|prefix| prefix.eq_ignore_ascii_case("rem "))
 }
 
 /// Parses a VB6 numeric literal with optional type suffix from the input stream.
@@ -2458,6 +2462,25 @@ Attribute VB_Exposed = False
         assert_eq!(tokens[0], ("' first _", Token::EndOfLineComment));
         assert_eq!(tokens[1], ("\r\n", Token::Newline));
         assert_eq!(tokens[2], ("' second", Token::EndOfLineComment));
+    }
+
+    /// Looking for a `REM` on the continuation line must not slice it at a
+    /// fixed byte offset: when that line begins with an accented character the
+    /// offset lands inside it, which panics.
+    #[test]
+    fn continuation_line_may_start_with_a_multibyte_character() {
+        let content = "' primero _\r\n\u{e1}rea de trabajo\r\nDim x\r\n";
+        let (tokens_opt, _failures) = tokenize(&mut SourceStream::new("", content)).unpack();
+
+        let tokens = tokens_opt.expect("Expected tokens");
+
+        assert_eq!(
+            tokens[0],
+            (
+                "' primero _\r\n\u{e1}rea de trabajo",
+                Token::EndOfLineComment
+            )
+        );
     }
 
     /// REM comments go through the same path.
