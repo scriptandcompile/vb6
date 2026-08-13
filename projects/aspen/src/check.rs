@@ -4,12 +4,50 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use rayon::prelude::*;
 use vb6parse::files::project::ProjectReference;
+use vb6parse::lint::LintSettings;
 use vb6parse::{ProjectFile, SourceFile};
 
 use walkdir::WalkDir;
 
 pub struct CheckSettings {
     pub project_path: PathBuf,
+    pub lint: LintSettings,
+}
+
+/// Runs the selected lint rules over the files a project refers to.
+///
+/// The same file can be shared by several projects -- in the code base this
+/// was written against one module is referenced by eight of them -- so a
+/// finding is reported once per project that includes it. Deduplication is
+/// left to the summary, where the whole run is visible.
+fn run_lint_rules(paths: &[PathBuf], settings: &LintSettings) -> Vec<String> {
+    let mut findings: Vec<String> = paths
+        .par_iter()
+        .flat_map(|path| {
+            let Ok(source) = SourceFile::from_file(path) else {
+                // Unreadable files are already reported as missing or as a
+                // parse failure; do not say it twice.
+                return Vec::new();
+            };
+
+            vb6parse::lint::lint_source(source.as_ref(), settings)
+                .into_iter()
+                .map(|finding| {
+                    format!(
+                        "{}:{}:{}: {} {}",
+                        path.display(),
+                        finding.line,
+                        finding.column,
+                        finding.code,
+                        finding.message
+                    )
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect();
+
+    findings.sort();
+    findings
 }
 
 pub struct CheckResults {
@@ -18,6 +56,8 @@ pub struct CheckResults {
     pub non_english_files: Vec<String>,
     pub missing_files: Vec<String>,
     pub warnings: Vec<String>,
+    /// Findings from the lint rules, already formatted for display.
+    pub lint_findings: Vec<String>,
 }
 
 pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
@@ -30,6 +70,8 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
     }
 
     let mut check_summary = Vec::new();
+
+    let lint = check_settings.lint.clone();
 
     if check_settings.project_path.is_dir() {
         let search_path = check_settings.project_path.to_str().unwrap();
@@ -58,6 +100,7 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
                             project_path.as_ref().err().unwrap()
                         )],
                         warnings: Vec::new(),
+                        lint_findings: Vec::new(),
                     };
 
                     return check_result;
@@ -65,6 +108,7 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
 
                 let check_settings = CheckSettings {
                     project_path: project_path.as_ref().unwrap().path().to_path_buf(),
+                    lint: lint.clone(),
                 };
 
                 match check_project(&check_settings) {
@@ -75,6 +119,7 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
                         non_english_files: Vec::new(),
                         missing_files: Vec::new(),
                         warnings: Vec::new(),
+                        lint_findings: Vec::new(),
                     },
                 }
             })
@@ -88,6 +133,7 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
                 non_english_files: Vec::new(),
                 missing_files: Vec::new(),
                 warnings: Vec::new(),
+                lint_findings: Vec::new(),
             },
         };
         check_summary.push(check_result);
@@ -97,7 +143,21 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
         report_check(check_result);
     }
 
+    let anything_found = check_summary.iter().any(|result| {
+        !result.parsing_errors.is_empty()
+            || !result.missing_files.is_empty()
+            || !result.non_english_files.is_empty()
+            || !result.lint_findings.is_empty()
+    });
+
     report_check_summary(check_summary);
+
+    // Reporting problems and then exiting zero makes `check` useless as a CI
+    // gate: the gate passes in exactly the case where it should fail. The
+    // convention is ruff's -- 1 means the run worked and found something.
+    if anything_found {
+        std::process::exit(1);
+    }
 
     Ok(())
 }
@@ -107,6 +167,7 @@ fn report_check(check_results: &CheckResults) {
         && check_results.non_english_files.is_empty()
         && check_results.missing_files.is_empty()
         && check_results.warnings.is_empty()
+        && check_results.lint_findings.is_empty()
     {
         return;
     }
@@ -136,6 +197,12 @@ fn report_check(check_results: &CheckResults) {
             println!("  {}", warning);
         }
     }
+    if !check_results.lint_findings.is_empty() {
+        println!("Lint:");
+        for finding in &check_results.lint_findings {
+            println!("  {}", finding);
+        }
+    }
 }
 
 fn report_single_check_summary(summary: &CheckResults) {
@@ -155,6 +222,9 @@ fn report_single_check_summary(summary: &CheckResults) {
     }
     if !summary.warnings.is_empty() {
         parts.push(format!("{} warnings", summary.warnings.len()));
+    }
+    if !summary.lint_findings.is_empty() {
+        parts.push(format!("{} lint findings", summary.lint_findings.len()));
     }
 
     if parts.is_empty() {
@@ -184,6 +254,8 @@ fn report_check_summary(summary: Vec<CheckResults>) {
 
     let total_warning_count = summary.iter().fold(0, |acc, x| acc + x.warnings.len());
 
+    let total_lint_count = summary.iter().fold(0, |acc, x| acc + x.lint_findings.len());
+
     let mut parts = Vec::new();
 
     if total_missed_file_count != 0 {
@@ -200,6 +272,9 @@ fn report_check_summary(summary: Vec<CheckResults>) {
     }
     if total_warning_count != 0 {
         parts.push(format!("{} warnings", total_warning_count));
+    }
+    if total_lint_count != 0 {
+        parts.push(format!("{} lint findings", total_lint_count));
     }
 
     if parts.is_empty() {
@@ -238,6 +313,7 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
         non_english_files: Vec::new(),
         missing_files: Vec::new(),
         warnings: Vec::new(),
+        lint_findings: Vec::new(),
     };
 
     let project_contents = std::fs::read(&check_settings.project_path).unwrap();
@@ -296,6 +372,9 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
         }
     }
 
+    // Every source file the project refers to, for the lint rules to run over.
+    let mut source_paths: Vec<PathBuf> = Vec::new();
+
     for class_reference in project.classes() {
         let class_path = join_parent_project_path(project_directory, class_reference.path);
 
@@ -304,6 +383,8 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
             check_results
                 .missing_files
                 .push(format!("Class not found: {}", class_path.to_str().unwrap()));
+        } else {
+            source_paths.push(class_path);
         }
     }
 
@@ -316,6 +397,8 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
                 "Module not found: {}",
                 module_path.to_str().unwrap()
             ));
+        } else {
+            source_paths.push(module_path);
         }
     }
 
@@ -327,8 +410,12 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
             check_results
                 .missing_files
                 .push(format!("Form not found: {}", form_path.to_str().unwrap()));
+        } else {
+            source_paths.push(form_path);
         }
     }
+
+    check_results.lint_findings = run_lint_rules(&source_paths, &check_settings.lint);
 
     // Analyze the project with vb6semantic. This resolves names, builds symbol
     // tables, and reports semantic errors and warnings across all of the
@@ -360,4 +447,83 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
     }
 
     Ok(check_results)
+}
+
+/// The `[lint]` section of `.aspen.toml`, alongside the `[fmt]` section that
+/// is already read from the same file.
+#[derive(Debug, Clone, Default, serde::Deserialize)]
+pub struct LintConfig {
+    #[serde(default)]
+    pub select: Vec<String>,
+    #[serde(default)]
+    pub ignore: Vec<String>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+struct AspenConfig {
+    lint: Option<LintConfig>,
+}
+
+/// Reads the `[lint]` section next to the given path, then from the working
+/// directory, the same way the formatter finds its own settings.
+#[must_use]
+pub fn load_lint_settings(project_path: &Path) -> LintConfig {
+    let config_root = if project_path.is_dir() {
+        project_path.to_path_buf()
+    } else {
+        project_path
+            .parent()
+            .map_or_else(|| PathBuf::from("."), Path::to_path_buf)
+    };
+
+    let candidates = [
+        config_root.join(".aspenfmt.toml"),
+        config_root.join(".aspen.toml"),
+        PathBuf::from(".aspenfmt.toml"),
+        PathBuf::from(".aspen.toml"),
+    ];
+
+    for path in &candidates {
+        if !path.exists() {
+            continue;
+        }
+
+        let Ok(contents) = std::fs::read_to_string(path) else {
+            continue;
+        };
+
+        match toml::from_str::<AspenConfig>(&contents) {
+            Ok(config) => return config.lint.unwrap_or_default(),
+            Err(e) => {
+                // A malformed config that is silently ignored looks exactly
+                // like a config that selected nothing.
+                eprintln!("Ignoring {}: {}", path.display(), e);
+            }
+        }
+    }
+
+    LintConfig::default()
+}
+
+/// Prints every rule with its default and fixability.
+pub fn explain_rules() {
+    println!(
+        "{:<6} {:<24} {:<8} {:<8} {}",
+        "CODE", "NAME", "DEFAULT", "FIX", "SUMMARY"
+    );
+
+    for rule in vb6parse::lint::RULES {
+        println!(
+            "{:<6} {:<24} {:<8} {:<8} {}",
+            rule.code,
+            rule.name,
+            if rule.default_on { "on" } else { "off" },
+            match rule.fixability {
+                vb6parse::lint::Fixability::Safe => "safe",
+                vb6parse::lint::Fixability::Unsafe => "unsafe",
+                vb6parse::lint::Fixability::None => "none",
+            },
+            rule.summary
+        );
+    }
 }
