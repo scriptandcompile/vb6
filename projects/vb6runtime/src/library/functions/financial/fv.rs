@@ -675,3 +675,189 @@
 //! - `DDB` - Returns depreciation using double-declining balance
 //! - `SLN` - Returns straight-line depreciation
 //! - `SYD` - Returns sum-of-years' digits depreciation
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `Fv` function.
+///
+/// Calculates the future value of an annuity based on periodic, fixed payments
+/// and a fixed interest rate. The calculation supports both ordinary annuities
+/// (payments at end of period) and annuities due (payments at beginning of period).
+///
+/// VB6 behavior:
+/// - `rate` is the interest rate per period
+/// - `nper` must be positive; if <= 0, raises error 5 (Invalid procedure call)
+/// - `pv` defaults to 0 if omitted
+/// - `type` defaults to 0 (end of period) if omitted; use 1 for beginning of period
+/// - Returns a `Double`
+pub fn fv(
+    rate: &VBVariant,
+    nper: &VBVariant,
+    pmt: &VBVariant,
+    pv: Option<&VBVariant>,
+    type_: Option<&VBVariant>,
+) -> VBResult<VBVariant> {
+    let rate_val = rate.as_f64()?;
+    let nper_val = nper.as_f64()?;
+    let pmt_val = pmt.as_f64()?;
+    let pv_val = pv.map(|p| p.as_f64()).transpose()?.unwrap_or(0.0);
+    let type_val = type_.map(|t| t.as_i16()).transpose()?.unwrap_or(0);
+
+    // Validate inputs per VB6 behavior
+    if nper_val <= 0.0 {
+        return Err(VBError::new(5));
+    }
+
+    let fv_val = if rate_val == 0.0 {
+        // Special case: zero interest rate
+        -(pv_val + pmt_val * nper_val)
+    } else if type_val == 0 {
+        // Payments at end of period (ordinary annuity)
+        let factor = (1.0_f64 + rate_val).powf(nper_val);
+        let pv_part = -pv_val * factor;
+        let pmt_part = -pmt_val * (factor - 1.0) / rate_val;
+        pv_part + pmt_part
+    } else {
+        // Payments at beginning of period (annuity due)
+        let factor = (1.0_f64 + rate_val).powf(nper_val);
+        let pv_part = -pv_val * factor;
+        let pmt_part = -pmt_val * (factor - 1.0) / rate_val * (1.0_f64 + rate_val);
+        pv_part + pmt_part
+    };
+
+    Ok(VBVariant::from_double(fv_val))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::fv;
+    use crate::value::VBVariant;
+
+    fn fv_defaults(rate: f64, nper: f64, pmt: f64) -> VBVariant {
+        fv(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pmt),
+            None,
+            None,
+        )
+        .unwrap()
+    }
+
+    fn fv_with_pv(rate: f64, nper: f64, pmt: f64, pv: f64) -> VBVariant {
+        fv(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pmt),
+            Some(&VBVariant::from_double(pv)),
+            None,
+        )
+        .unwrap()
+    }
+
+    fn fv_with_type(
+        rate: f64,
+        nper: f64,
+        pmt: f64,
+        pv: f64,
+        ptype: i16,
+    ) -> VBVariant {
+        fv(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pmt),
+            Some(&VBVariant::from_double(pv)),
+            Some(&VBVariant::from_integer(ptype)),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn fv_ordinary_annuity() {
+        // $100/month for 12 months at 6% annual (0.5% monthly), no initial PV
+        let result = fv_defaults(0.06 / 12.0, 12.0, -100.0);
+        let fv_result = result.as_f64().unwrap();
+        assert!((fv_result - 1233.556).abs() < 0.01);
+    }
+
+    #[test]
+    fn fv_with_present_value() {
+        // Initial deposit of $1000 plus $100/month for 12 months at 0.5% monthly
+        let result = fv_with_pv(0.06 / 12.0, 12.0, -100.0, -1000.0);
+        let fv_result = result.as_f64().unwrap();
+        // PV grows to: 1000 * (1.005)^12 = 1061.68
+        // PMT part: 100 * ((1.005)^12 - 1) / 0.005 = 1233.56
+        // Total FV = -(1061.68 + 1233.56) = ~2295 (positive since inputs are negative)
+        assert!((fv_result - 2295.23).abs() < 0.01);
+    }
+
+    #[test]
+    fn fv_annuity_due() {
+        // Payments at beginning of period
+        let result = fv_with_type(0.06 / 12.0, 12.0, -100.0, -1000.0, 1);
+        let fv_result = result.as_f64().unwrap();
+        // Should be slightly higher than ordinary annuity
+        assert!((fv_result - 2301.40).abs() < 0.01);
+    }
+
+    #[test]
+    fn fv_zero_rate() {
+        // With zero rate, FV = -(pv + pmt * nper)
+        let result = fv_defaults(0.0, 12.0, -100.0);
+        let fv_result = result.as_f64().unwrap();
+        assert_eq!(fv_result, 1200.0);
+    }
+
+    #[test]
+    fn fv_zero_periods_raises_error_5() {
+        let err = fv(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(-100.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn fv_negative_periods_raises_error_5() {
+        let err = fv(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(-1.0),
+            &VBVariant::from_double(-100.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn fv_with_integer_args() {
+        let result = fv(
+            &VBVariant::from_double(0.005),
+            &VBVariant::from_long(12),
+            &VBVariant::from_long(-100),
+            None,
+            None,
+        )
+        .unwrap();
+        assert!((result.as_f64().unwrap() - 1233.556).abs() < 0.01);
+    }
+
+    #[test]
+    fn fv_null_raises_invalid_use_of_null() {
+        let err = fv(
+            &VBVariant::Null,
+            &VBVariant::from_double(12.0),
+            &VBVariant::from_double(-100.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 94);
+    }
+}
