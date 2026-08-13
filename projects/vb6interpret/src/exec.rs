@@ -612,8 +612,13 @@ impl Interpreter {
         let mut first = true;
         loop {
             // On the first pass highlight the counter assignment; on later
-            // passes highlight the check against the end value.
-            self.current_stmt_line = line;
+            // passes highlight the check against the end value. Rewinding the
+            // line to the loop top is only meaningful for trace snapshots; in
+            // run mode it would leave the final highlight stuck on the loop
+            // header instead of the `Next` line where the loop ends.
+            if self.record_debug_snapshots {
+                self.current_stmt_line = line;
+            }
             let cursor = if first { start_cursor } else { to_cursor };
             first = false;
             self.step_marked(cursor)?;
@@ -733,8 +738,13 @@ impl Interpreter {
 
         loop {
             // Entry: highlight the pre-test condition, or the bare `Do`
-            // keyword when the loop has no pre-test.
-            self.current_stmt_line = line;
+            // keyword when the loop has no pre-test. Rewinding the line to
+            // the loop top is only meaningful for trace snapshots; in run
+            // mode it would leave the final highlight stuck on the `Do` line
+            // instead of the `Loop` line where the loop ends.
+            if self.record_debug_snapshots {
+                self.current_stmt_line = line;
+            }
             self.step_marked(pre_cursor.or(do_cursor))?;
             if let Some((invert, cond)) = pre_test {
                 let condition = self.eval_expr(cond)?.as_bool()?;
@@ -813,7 +823,13 @@ impl Interpreter {
         };
 
         loop {
-            self.current_stmt_line = line;
+            // Rewinding the line to the loop top is only meaningful for trace
+            // snapshots; in run mode it would leave the final highlight stuck
+            // on the `While` header instead of the `Wend` line where the loop
+            // ends.
+            if self.record_debug_snapshots {
+                self.current_stmt_line = line;
+            }
             self.step_marked(cond_cursor)?;
             let b = self.eval_expr(cond)?.as_bool()?;
             if !b {

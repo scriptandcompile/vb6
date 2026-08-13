@@ -404,9 +404,15 @@ impl Interpreter {
         };
 
         let normal_end = matches!(&result, Ok(Flow::Next));
-        if normal_end && self.record_debug_snapshots {
+        if normal_end {
+            // A normal return leaves the reported position on the
+            // procedure's closing line so the final highlight lands on
+            // `End Sub` rather than the last body statement. In trace mode
+            // this is also captured as a snapshot.
             self.current_stmt_line = end_line;
-            self.capture_debug_snapshot();
+            if self.record_debug_snapshots {
+                self.capture_debug_snapshot();
+            }
         }
         self.frames.pop();
 
@@ -438,9 +444,13 @@ impl Interpreter {
         };
         let return_value = self.frames.last().and_then(|f| f.return_value.clone());
         let normal_end = matches!(&result, Ok(Flow::Next));
-        if normal_end && self.record_debug_snapshots {
+        if normal_end {
+            // Same as `call_sub`: a normal return leaves the reported
+            // position on the procedure's `End Function` line.
             self.current_stmt_line = end_line;
-            self.capture_debug_snapshot();
+            if self.record_debug_snapshots {
+                self.capture_debug_snapshot();
+            }
         }
         self.frames.pop();
 

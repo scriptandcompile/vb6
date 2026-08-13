@@ -1,11 +1,24 @@
 //! Integration tests for the `vb6interpret` tree-walking interpreter.
 
+use vb6interpret::Interpreter;
 use vb6interpret::run_source;
+use vb6parse::files::ModuleFile;
+use vb6parse::io::SourceFile;
 
 /// Run a module body and return the captured `Debug.Print` output.
 fn run(body: &str) -> Vec<String> {
     let source = format!("Attribute VB_Name = \"M\"\nSub Main()\n{}\nEnd Sub\n", body);
     run_source(&source).expect("interpretation failed")
+}
+
+/// Run a module like the playground's plain run (no trace snapshots) and
+/// return the final reported execution line.
+fn run_final_line(source: &str) -> usize {
+    let source_file = SourceFile::from_string("scratch.bas", source);
+    let module = ModuleFile::parse(&source_file).unwrap_or_fail();
+    let mut interpreter = Interpreter::new();
+    let _ = interpreter.run_module(&module);
+    interpreter.current_line()
 }
 
 #[test]
@@ -266,4 +279,65 @@ fn bitwise_logical_operators() {
          Debug.Print True And False\n\
          Debug.Print True Imp False\n");
     assert_eq!(out, vec!["1", "7", "4", "-7", "False", "False"]);
+}
+
+#[test]
+fn run_final_line_lands_on_end_sub_after_loop() {
+    let source = "Attribute VB_Name = \"M\"\n\n\
+Sub Main()\n\
+    For i = 1 To 2\n\
+        Debug.Print i\n\
+    Next i\n\
+End Sub\n";
+    // A normally-completing program ends with the highlight on the `End Sub`
+    // line, not the loop's closing keyword or header.
+    assert_eq!(run_final_line(source), 7);
+}
+
+#[test]
+fn run_final_line_lands_on_end_sub_after_while() {
+    let source = "Attribute VB_Name = \"M\"\n\n\
+Sub Main()\n\
+    i = 0\n\
+    While i < 2\n\
+        i = i + 1\n\
+    Wend\n\
+End Sub\n";
+    assert_eq!(run_final_line(source), 8);
+}
+
+#[test]
+fn run_final_line_lands_on_end_sub_after_do() {
+    let source = "Attribute VB_Name = \"M\"\n\n\
+Sub Main()\n\
+    i = 0\n\
+    Do While i < 2\n\
+        i = i + 1\n\
+    Loop\n\
+End Sub\n";
+    assert_eq!(run_final_line(source), 8);
+}
+
+#[test]
+fn run_final_line_lands_on_end_sub_after_post_test_loop() {
+    let source = "Attribute VB_Name = \"M\"\n\n\
+Sub Main()\n\
+    i = 0\n\
+    Do\n\
+        i = i + 1\n\
+    Loop While i < 2\n\
+End Sub\n";
+    assert_eq!(run_final_line(source), 8);
+}
+
+#[test]
+fn run_final_line_lands_on_end_sub_after_function_entry() {
+    let source = "Attribute VB_Name = \"M\"\n\n\
+Function Answer() As Integer\n\
+    Answer = 42\n\
+End Function\n\
+Sub Main()\n\
+    Debug.Print Answer\n\
+End Sub\n";
+    assert_eq!(run_final_line(source), 8);
 }
