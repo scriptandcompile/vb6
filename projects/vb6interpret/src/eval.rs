@@ -257,11 +257,16 @@ impl Interpreter {
             None => Vec::new(),
         };
 
-        // Array indexing: the name resolves to an array variable.
+        // Array reference: the name resolves to an array variable. An empty
+        // argument list (`Values()`) passes the whole array; any other
+        // argument list is element indexing.
         if let Some(VBVariant::Array(_)) = self.lookup(&name) {
+            let array = self.lookup(&name).ok_or_else(VBError::object_not_set)?;
+            if args.is_empty() {
+                return Ok(array.clone());
+            }
             let indices: VBResult<Vec<i32>> = args.iter().map(|arg| arg.as_i32()).collect();
             let indices = indices?;
-            let array = self.lookup(&name).ok_or_else(VBError::object_not_set)?;
             if let VBVariant::Array(array) = array {
                 let element = array.get(&indices)?;
                 return Ok(element.clone());
