@@ -585,3 +585,165 @@
 //! - `VDB`: Variable declining balance (can switch to SLN automatically)
 //! - `FV`: Future value (general financial calculation)
 //! - `PV`: Present value (general financial calculation)
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `DDB` function.
+///
+/// Calculates depreciation using the double-declining balance method (or another
+/// declining balance rate you specify). The book value decreases each period by
+/// applying a rate to the remaining undepreciated amount, capped so it never falls
+/// below salvage value.
+///
+/// VB6 behavior:
+/// - `cost`, `salvage`, and `life` must be positive; `period` must be > 0
+/// - If `life` is 0, raises error 5 (Invalid procedure call)
+/// - If any argument is negative or zero where inappropriate, raises error 5
+/// - Optional `factor` defaults to 2.0 (double-declining balance)
+/// - Returns a `Double`
+pub fn ddb(
+    cost: &VBVariant,
+    salvage: &VBVariant,
+    life: &VBVariant,
+    period: &VBVariant,
+    factor: Option<&VBVariant>,
+) -> VBResult<VBVariant> {
+    let cost_val = cost.as_f64()?;
+    let salvage_val = salvage.as_f64()?;
+    let life_val = life.as_f64()?;
+    let period_val = period.as_f64()?;
+    let factor_val = factor.map(|f| f.as_f64()).transpose()?.unwrap_or(2.0);
+
+    // Validate inputs per VB6 behavior
+    if life_val <= 0.0 || cost_val < 0.0 || salvage_val < 0.0 || period_val <= 0.0 {
+        return Err(VBError::new(5));
+    }
+
+    let rate = factor_val / life_val;
+    let mut book_value = cost_val;
+
+    // Calculate depreciation for each period up to the requested period
+    for i in 1..=period_val as i64 {
+        let depreciation = (book_value * rate).min(book_value - salvage_val);
+        book_value -= depreciation;
+
+        // On the target period, return the depreciation amount
+        if i == period_val as i64 {
+            return Ok(VBVariant::from_double(depreciation));
+        }
+    }
+
+    Ok(VBVariant::from_double(0.0))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ddb;
+    use crate::value::VBVariant;
+
+    fn ddb_default(cost: f64, salvage: f64, life: f64, period: f64) -> VBVariant {
+        ddb(
+            &VBVariant::from_double(cost),
+            &VBVariant::from_double(salvage),
+            &VBVariant::from_double(life),
+            &VBVariant::from_double(period),
+            None,
+        )
+        .unwrap()
+    }
+
+    fn ddb_with_factor(
+        cost: f64,
+        salvage: f64,
+        life: f64,
+        period: f64,
+        factor: f64,
+    ) -> VBVariant {
+        ddb(
+            &VBVariant::from_double(cost),
+            &VBVariant::from_double(salvage),
+            &VBVariant::from_double(life),
+            &VBVariant::from_double(period),
+            Some(&VBVariant::from_double(factor)),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn ddb_first_period_double_declining() {
+        // Cost=10000, Salvage=1000, Life=5, Period=1 (rate = 2/5 = 40%)
+        // Depreciation = 10000 * 0.4 = 4000
+        let result = ddb_default(10000.0, 1000.0, 5.0, 1.0);
+        assert_eq!(result.as_f64().unwrap(), 4000.0);
+    }
+
+    #[test]
+    fn ddb_second_period() {
+        // Book value after period 1 = 6000
+        // Depreciation = 6000 * 0.4 = 2400
+        let result = ddb_default(10000.0, 1000.0, 5.0, 2.0);
+        assert_eq!(result.as_f64().unwrap(), 2400.0);
+    }
+
+    #[test]
+    fn ddb_custom_factor() {
+        // 150% declining balance: rate = 1.5/5 = 30%
+        let result = ddb_with_factor(10000.0, 1000.0, 5.0, 1.0, 1.5);
+        assert_eq!(result.as_f64().unwrap(), 3000.0);
+    }
+
+    #[test]
+    fn ddb_respects_salvage_floor() {
+        // When depreciation would go below salvage, it's capped
+        let result = ddb_default(10000.0, 1000.0, 5.0, 5.0);
+        let depr = result.as_f64().unwrap();
+        // Should be non-zero and positive
+        assert!(depr > 0.0);
+    }
+
+    #[test]
+    fn ddb_zero_life_raises_error_5() {
+        let err = ddb(
+            &VBVariant::from_double(10000.0),
+            &VBVariant::from_double(1000.0),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(1.0),
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn ddb_negative_cost_raises_error_5() {
+        let err = ddb(
+            &VBVariant::from_double(-100.0),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(5.0),
+            &VBVariant::from_double(1.0),
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn ddb_with_integer_args() {
+        let result = ddb(
+            &VBVariant::from_long(10000),
+            &VBVariant::from_long(1000),
+            &VBVariant::from_long(5),
+            &VBVariant::from_long(1),
+            None,
+        )
+        .unwrap();
+        assert_eq!(result.as_f64().unwrap(), 4000.0);
+    }
+
+    #[test]
+    fn ddb_null_raises_invalid_use_of_null() {
+        let err = ddb(&VBVariant::Null, &VBVariant::Empty, &VBVariant::Empty, &VBVariant::Empty, None).unwrap_err();
+        assert_eq!(err.number, 94);
+    }
+}
