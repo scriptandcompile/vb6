@@ -285,6 +285,41 @@ impl<'a> SourceStream<'a> {
         }
     }
 
+    /// Takes the next whole character from the stream and advances the offset
+    /// past it.
+    ///
+    /// Unlike [`SourceStream::take_count`], which works in *bytes*, this method
+    /// always consumes exactly one `char`, however many bytes that character
+    /// occupies. This makes it safe to use as the "consume something and keep
+    /// going" fallback of a tokenizer loop: `take_count(1)` returns `None` for
+    /// any multi-byte character, because a single byte lands in the middle of
+    /// it, which would leave such a loop unable to make progress.
+    ///
+    /// Returns `None` only when the stream is empty.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use vb6parse::io::SourceStream;
+    ///
+    /// // 'ñ' is two bytes in UTF-8.
+    /// let mut stream = SourceStream::new("test.bas", "ñx");
+    ///
+    /// assert_eq!(stream.take_count(1), None);
+    /// assert_eq!(stream.take_character(), Some("ñ"));
+    /// assert_eq!(stream.take_character(), Some("x"));
+    /// assert_eq!(stream.take_character(), None);
+    /// ```
+    #[must_use]
+    pub fn take_character(&mut self) -> Option<&'a str> {
+        let remaining = &self.contents[self.offset..];
+        let character = remaining.chars().next()?;
+        let end_offset = self.offset + character.len_utf8();
+        let result = &self.contents[self.offset..end_offset];
+        self.offset = end_offset;
+        Some(result)
+    }
+
     /// Takes characters from the stream until a character that matches the
     /// compare `str` is encountered or the end of the stream is reached.
     ///

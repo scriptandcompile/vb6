@@ -37,6 +37,11 @@ impl<'a> CstFormatter<'a> {
             return;
         }
 
+        if is_designer_node(node.kind()) {
+            self.emit_verbatim(node);
+            return;
+        }
+
         self.passes.on_node_enter(node, &mut self.context);
 
         match node.kind() {
@@ -64,4 +69,36 @@ impl<'a> CstFormatter<'a> {
             self.output.push_str(&buffer.text);
         }
     }
+
+    /// Copies a subtree to the output exactly as it was read, without running
+    /// any pass over it.
+    fn emit_verbatim(&mut self, node: &CstNode) {
+        let text = node.text();
+        let ends_line = text.ends_with('\n');
+
+        self.output.push_str(text);
+
+        // Leave the layout state as if the copied text had been emitted token
+        // by token, so that whatever follows the block is still formatted.
+        self.context.pending_indent = ends_line;
+        self.context.line_has_content = !ends_line;
+        self.context.last_was_blank = false;
+    }
+}
+
+/// The designer section of a `.frm`, `.ctl` or `.cls` file: the `VERSION`
+/// header and the `Begin ... End` block that the VB6 IDE itself writes and
+/// reads.
+///
+/// That section is not source code. Reformatting it fights the IDE, which
+/// rewrites the block in its own layout every time the form is saved, so any
+/// change here comes straight back as diff noise. It is also where a form's
+/// control geometry lives, which makes silently rewriting it the riskiest
+/// thing a formatter could do to a VB6 project. It is copied through
+/// unchanged.
+fn is_designer_node(kind: SyntaxKind) -> bool {
+    matches!(
+        kind,
+        SyntaxKind::VersionStatement | SyntaxKind::PropertiesBlock
+    )
 }
