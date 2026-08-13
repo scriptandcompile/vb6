@@ -39,10 +39,17 @@ impl Interpreter {
                 }
                 kind if is_statement_kind(kind) => {
                     self.current_stmt_line = line;
-                    // `For` loops emit their own element-level trace snapshots,
-                    // so skip the generic whole-line snapshot to avoid a
-                    // duplicate highlight of the `For` line at loop entry.
-                    if self.record_debug_snapshots && kind == SyntaxKind::ForStatement {
+                    // Loops emit their own element-level trace snapshots, so
+                    // skip the generic whole-line snapshot to avoid a
+                    // duplicate highlight of the loop line at entry.
+                    if self.record_debug_snapshots
+                        && matches!(
+                            kind,
+                            SyntaxKind::ForStatement
+                                | SyntaxKind::DoStatement
+                                | SyntaxKind::WhileStatement
+                        )
+                    {
                         self.step_without_snapshot()?;
                     } else {
                         self.step()?;
@@ -662,18 +669,39 @@ impl Interpreter {
             .iter()
             .position(|part| part.kind() == SyntaxKind::DoKeyword)
             .unwrap_or(0);
+        let do_cursor = significant
+            .get(do_index)
+            .map(|part| (part.start_offset(), part.end_offset()));
         let loop_index = significant
             .iter()
             .position(|part| part.kind() == SyntaxKind::LoopKeyword);
+        let loop_cursor = loop_index
+            .and_then(|li| significant.get(li))
+            .map(|part| (part.start_offset(), part.end_offset()));
+        let loop_line = match children
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::LoopKeyword)
+        {
+            Some(idx) => {
+                line + children[..idx]
+                    .iter()
+                    .map(|c| count_newlines(c))
+                    .sum::<usize>()
+            }
+            None => line,
+        };
 
-        // Pre-test: `Do While cond` / `Do Until cond`.
+        // Pre-test: `Do While cond` / `Do Until cond`. The cursor spans the
+        // `While`/`Until` keyword through the end of the condition.
         let mut pre_test: Option<(bool, &CstNode)> = None;
+        let mut pre_cursor = None;
         for part in &significant[do_index + 1..] {
             match part.kind() {
                 SyntaxKind::WhileKeyword | SyntaxKind::UntilKeyword => {
                     if let Some(next) = part.next_significant(significant.as_slice()) {
                         let invert = part.kind() == SyntaxKind::UntilKeyword;
                         pre_test = Some((invert, next));
+                        pre_cursor = Some((part.start_offset(), next.end_offset()));
                     }
                     break;
                 }
@@ -682,8 +710,10 @@ impl Interpreter {
             }
         }
 
-        // Post-test: `Loop While cond` / `Loop Until cond`.
+        // Post-test: `Loop While cond` / `Loop Until cond`. The cursor spans
+        // the `While`/`Until` keyword through the end of the condition.
         let mut post_test: Option<(bool, &CstNode)> = None;
+        let mut post_cursor = None;
         if let Some(li) = loop_index {
             let after: Vec<&CstNode> = significant[li + 1..].to_vec();
             for part in &after {
@@ -692,6 +722,7 @@ impl Interpreter {
                         if let Some(next) = part.next_significant(&after) {
                             let invert = part.kind() == SyntaxKind::UntilKeyword;
                             post_test = Some((invert, next));
+                            post_cursor = Some((part.start_offset(), next.end_offset()));
                         }
                         break;
                     }
@@ -701,7 +732,10 @@ impl Interpreter {
         }
 
         loop {
-            self.step()?;
+            // Entry: highlight the pre-test condition, or the bare `Do`
+            // keyword when the loop has no pre-test.
+            self.current_stmt_line = line;
+            self.step_marked(pre_cursor.or(do_cursor))?;
             if let Some((invert, cond)) = pre_test {
                 let condition = self.eval_expr(cond)?.as_bool()?;
                 if condition == invert {
@@ -716,11 +750,19 @@ impl Interpreter {
                     Flow::Return | Flow::Terminate => return Ok(flow),
                 }
             }
-            if let Some((invert, cond)) = post_test {
-                let b = self.eval_expr(cond)?.as_bool()?;
-                if b == invert {
-                    break;
+            // After the body: highlight the post-test condition, or the
+            // `Loop` keyword when the loop has no post-test.
+            self.current_stmt_line = loop_line;
+            if post_test.is_some() {
+                self.step_marked(post_cursor)?;
+                if let Some((invert, cond)) = post_test {
+                    let b = self.eval_expr(cond)?.as_bool()?;
+                    if b == invert {
+                        break;
+                    }
                 }
+            } else if let Some(loop_c) = loop_cursor {
+                self.step_marked(Some(loop_c))?;
             }
         }
         Ok(Flow::Next)
@@ -736,6 +778,26 @@ impl Interpreter {
             .find(|c| !matches!(c.kind(), SyntaxKind::WhileKeyword))
             .copied()
             .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+        let cond_cursor = Some((cond.start_offset(), cond.end_offset()));
+        let wend_cursor = significant
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::WendKeyword)
+            .map(|idx| {
+                let wend = significant[idx];
+                (wend.start_offset(), wend.end_offset())
+            });
+        let wend_line = match children
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::WendKeyword)
+        {
+            Some(idx) => {
+                line + children[..idx]
+                    .iter()
+                    .map(|c| count_newlines(c))
+                    .sum::<usize>()
+            }
+            None => line,
+        };
 
         let body_index = children
             .iter()
@@ -751,7 +813,8 @@ impl Interpreter {
         };
 
         loop {
-            self.step()?;
+            self.current_stmt_line = line;
+            self.step_marked(cond_cursor)?;
             let b = self.eval_expr(cond)?.as_bool()?;
             if !b {
                 break;
@@ -763,6 +826,10 @@ impl Interpreter {
                     Flow::BreakLoop => break,
                     Flow::Return | Flow::Terminate => return Ok(flow),
                 }
+            }
+            self.current_stmt_line = wend_line;
+            if let Some(cursor) = wend_cursor {
+                self.step_marked(Some(cursor))?;
             }
         }
         Ok(Flow::Next)
