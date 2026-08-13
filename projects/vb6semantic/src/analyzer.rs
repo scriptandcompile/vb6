@@ -153,19 +153,28 @@ impl SemanticAnalyzer {
         // Analyze the source files in `.vbp` line order so that cross-module
         // name resolution matches the order the IDE sees the files in.
         for entry in project.file_entries() {
-            match entry {
+            let outcome = match entry {
                 vb6parse::files::project::ProjectFileEntry::Module(module_reference) => {
-                    self.analyze_module_reference(module_reference)?;
+                    self.analyze_module_reference(module_reference)
                 }
                 vb6parse::files::project::ProjectFileEntry::Class(class_reference) => {
-                    self.analyze_class_reference(class_reference)?;
+                    self.analyze_class_reference(class_reference)
                 }
                 vb6parse::files::project::ProjectFileEntry::Form(form_file_name) => {
-                    self.analyze_form_path(form_file_name)?;
+                    self.analyze_form_path(form_file_name)
                 }
                 // User controls, user documents, designers, property pages, and
                 // related documents are not analyzed yet.
-                _ => {}
+                _ => Ok(()),
+            };
+
+            // One file that cannot be analyzed must not hide every file after
+            // it: record the failure and carry on down the project. Stopping
+            // at the first problem makes the report say nothing about the
+            // project's real state, and on a large project the first problem
+            // is usually in the first form.
+            if let Err(error) = outcome {
+                self.errors.push(error);
             }
         }
 
@@ -437,6 +446,24 @@ impl SemanticAnalyzer {
 
         self.scope_manager.pop_scope()?;
         Ok(())
+    }
+
+    /// Whether a control or menu of this name is already registered in the
+    /// current scope.
+    ///
+    /// In VB6 that is not a redefinition: it is a control array, several
+    /// elements sharing one name and told apart by `Index`, with a single
+    /// event handler taking `Index As Integer`. Forms use them heavily -- a
+    /// row of buttons, a set of menu items -- so reporting every element as a
+    /// duplicate buries the real findings.
+    ///
+    /// The element's own `Index` cannot be used to detect this: index 0 is an
+    /// ordinary array element, and is also what a control with no `Index`
+    /// property reads as.
+    fn is_control_array_element(&self, name: &str) -> bool {
+        self.scope_manager
+            .lookup_in_scope(self.scope_manager.current_scope_id(), name)
+            .is_some_and(|existing| existing.kind == SymbolKind::Control)
     }
 
     /// Add a symbol to the current scope
@@ -958,15 +985,20 @@ impl SemanticAnalyzer {
         if !control.tag().is_empty() {
             attributes.insert("tag".to_string(), control.tag().to_string());
         }
-        self.add_symbol(Symbol {
-            name: control.name().to_string(),
-            kind: SymbolKind::Control,
-            type_info: TypeInfo::object(),
-            visibility: Visibility::Public,
-            location: self.make_location(1, 1),
-            scope_id: self.scope_manager.current_scope_id(),
-            attributes,
-        })?;
+
+        // Further elements of a control array share the name of the first and
+        // are not a redefinition of it.
+        if !self.is_control_array_element(control.name()) {
+            self.add_symbol(Symbol {
+                name: control.name().to_string(),
+                kind: SymbolKind::Control,
+                type_info: TypeInfo::object(),
+                visibility: Visibility::Public,
+                location: self.make_location(1, 1),
+                scope_id: self.scope_manager.current_scope_id(),
+                attributes,
+            })?;
+        }
 
         // Recursively register controls nested inside containers
         match control.kind() {
@@ -992,15 +1024,19 @@ impl SemanticAnalyzer {
         if menu.index() != 0 {
             attributes.insert("index".to_string(), menu.index().to_string());
         }
-        self.add_symbol(Symbol {
-            name: menu.name().to_string(),
-            kind: SymbolKind::Control,
-            type_info: TypeInfo::object(),
-            visibility: Visibility::Public,
-            location: self.make_location(1, 1),
-            scope_id: self.scope_manager.current_scope_id(),
-            attributes,
-        })?;
+
+        // Menus form control arrays too, and are the most common case of it.
+        if !self.is_control_array_element(menu.name()) {
+            self.add_symbol(Symbol {
+                name: menu.name().to_string(),
+                kind: SymbolKind::Control,
+                type_info: TypeInfo::object(),
+                visibility: Visibility::Public,
+                location: self.make_location(1, 1),
+                scope_id: self.scope_manager.current_scope_id(),
+                attributes,
+            })?;
+        }
         for sub in menu.sub_menus() {
             self.register_menu(sub)?;
         }
@@ -1560,6 +1596,65 @@ mod tests {
     use crate::types::TypeInfo;
     use std::{collections::HashMap, fs};
     use tempfile::tempdir;
+
+    /// A control array is several elements sharing one name, told apart by
+    /// `Index`, with a single event handler. Registering the second element
+    /// must not be reported as a redefinition of the first.
+    #[test]
+    fn control_array_elements_are_not_a_redefinition() {
+        let mut analyzer = SemanticAnalyzer::new();
+        analyzer
+            .scope_manager
+            .push_module_scope(ScopeKind::Class, "FrmTest".to_string());
+
+        let control = Symbol {
+            name: "Btn".to_string(),
+            kind: SymbolKind::Control,
+            type_info: TypeInfo::object(),
+            visibility: Visibility::Public,
+            location: analyzer.make_location(1, 1),
+            scope_id: analyzer.scope_manager.current_scope_id(),
+            attributes: HashMap::new(),
+        };
+
+        analyzer
+            .add_symbol(control)
+            .expect("the first element registers");
+
+        assert!(
+            analyzer.is_control_array_element("Btn"),
+            "a control of that name is already in scope"
+        );
+        assert!(
+            !analyzer.is_control_array_element("Lbl"),
+            "a name that is not in scope is not an array element"
+        );
+        assert_eq!(analyzer.errors.len(), 0);
+    }
+
+    /// A name already taken by something that is not a control is still a
+    /// redefinition.
+    #[test]
+    fn a_variable_of_the_same_name_is_not_a_control_array() {
+        let mut analyzer = SemanticAnalyzer::new();
+        analyzer
+            .scope_manager
+            .push_module_scope(ScopeKind::Class, "FrmTest".to_string());
+
+        analyzer
+            .add_symbol(Symbol {
+                name: "Total".to_string(),
+                kind: SymbolKind::Variable,
+                type_info: TypeInfo::object(),
+                visibility: Visibility::Public,
+                location: analyzer.make_location(1, 1),
+                scope_id: analyzer.scope_manager.current_scope_id(),
+                attributes: HashMap::new(),
+            })
+            .expect("registers");
+
+        assert!(!analyzer.is_control_array_element("Total"));
+    }
 
     #[test]
     fn analyze_empty_project() {
@@ -2238,9 +2333,17 @@ End Function
         assert!(failures.is_empty(), "Parse failures: {:?}", failures);
         let project = project_opt.expect("Project should parse");
 
-        // Without a base dir the bare relative path cannot be found.
+        // Without a base dir the bare relative path cannot be found. The
+        // analysis reports that rather than propagating it: one file it cannot
+        // read must not stop it from looking at the rest of the project.
         let mut analyzer = SemanticAnalyzer::new();
-        assert!(analyzer.analyze_project(&project).is_err());
+        let result = analyzer
+            .analyze_project(&project)
+            .expect("the run itself succeeds");
+        assert!(
+            !result.is_successful(),
+            "the unreadable module should be reported"
+        );
 
         // With the base dir set to the project directory it is found.
         let mut analyzer = SemanticAnalyzer::new();

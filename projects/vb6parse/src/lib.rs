@@ -189,6 +189,7 @@ pub mod files;
 pub mod io;
 pub mod language;
 pub mod lexer;
+pub mod lint;
 pub mod parsers;
 pub mod syntax;
 
