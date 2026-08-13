@@ -32,4 +32,12 @@ pub(super) fn register(registry: &mut Registry) {
         let guess = if args.len() > 1 { Some(&args[1]) } else { None };
         finfn::irr::irr(&args[0], guess)
     }));
+
+    registry.insert(builtin!("mirr", 2, 2, |args| {
+        finfn::mirr::mirr(
+            &args[0],
+            args[1].as_f64().unwrap(),
+            args[2].as_f64().unwrap(),
+        )
+    }));
 }

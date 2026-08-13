@@ -731,9 +731,142 @@
 //! - **Pmt** - Calculate payment for a loan/annuity
 //! - **XIRR** - IRR for irregular cash flow timing (Excel only)
 //! - **XNPV** - NPV for irregular cash flow timing (Excel only)
-//!
-//! ## VB6 Parser Notes
-//!
-//! MIRR is parsed as a regular function call (`CallExpression`). This module exists primarily
-//! for documentation purposes to provide comprehensive reference material for VB6 developers
-//! working with financial calculations involving modified internal rate of return analysis.
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `MIRR` function.
+///
+/// Calculates the modified internal rate of return for a series of periodic cash flows.
+/// Unlike IRR which assumes reinvestment at the IRR rate itself, MIRR uses separate
+/// rates for financing costs (`finance_rate`) and reinvestment gains (`reinvest_rate`).
+///
+/// Algorithm:
+/// 1. Discount all negative cash flows to period 0 using `finance_rate`
+/// 2. Compound all positive cash flows forward to period (n-1) using `reinvest_rate`
+/// 3. MIRR = (FV_pos / PV_neg)^(1/(n-1)) - 1
+///
+/// VB6 behavior:
+/// - `values` must contain at least one positive and one negative value
+/// - `finance_rate` and `reinvest_rate` are required parameters
+/// - Error 5 (Invalid procedure call) if array contains only positive or only negative values
+pub fn mirr(values: &VBVariant, finance_rate: f64, reinvest_rate: f64) -> VBResult<VBVariant> {
+    let arr = values.as_array()?;
+
+    let cash_flows: Vec<f64> = arr
+        .as_slice()
+        .iter()
+        .map(|v| v.as_f64())
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|_| VBError::type_mismatch())?;
+
+    if cash_flows.is_empty() {
+        return Err(VBError::new(5));
+    }
+
+    // Validate that array contains at least one positive and one negative value
+    let has_positive = cash_flows.iter().any(|&v| v > 0.0);
+    let has_negative = cash_flows.iter().any(|&v| v < 0.0);
+
+    if !has_positive || !has_negative {
+        return Err(VBError::new(5));
+    }
+
+    let n = cash_flows.len();
+
+    // Present value of negative cash flows at finance_rate (discounted to period 0)
+    let pv_neg: f64 = cash_flows
+        .iter()
+        .enumerate()
+        .map(|(i, &cf)| {
+            if cf < 0.0 {
+                (-cf) / (1.0 + finance_rate).powi(i as i32)
+            } else {
+                0.0
+            }
+        })
+        .sum();
+
+    // Future value of positive cash flows at reinvest_rate (compounded to end period n-1)
+    let fv_pos: f64 = cash_flows
+        .iter()
+        .enumerate()
+        .map(|(i, &cf)| {
+            if cf > 0.0 {
+                cf * (1.0 + reinvest_rate).powi((n - 1 - i) as i32)
+            } else {
+                0.0
+            }
+        })
+        .sum();
+
+    let mirr = (fv_pos / pv_neg).powf(1.0 / (n - 1) as f64) - 1.0;
+
+    Ok(VBVariant::from_double(mirr))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::mirr;
+    use crate::value::VBVariant;
+
+    fn make_array(values: &[f64]) -> VBVariant {
+        VBVariant::Array(crate::array::ArrayValue::from_vec_with_bounds(
+            crate::types::VBType::Double,
+            values.iter().map(|v| VBVariant::from_double(*v)).collect(),
+            0,
+        ))
+    }
+
+    #[test]
+    fn mirr_simple_two_period() {
+        // -100 invested, 120 returned -> MIRR should be positive
+        let cash_flows = make_array(&[-100.0, 120.0]);
+        let result = mirr(&cash_flows, 0.1, 0.05).unwrap();
+        let mirr_val = result.as_f64().unwrap();
+        assert!(mirr_val.is_finite());
+    }
+
+    #[test]
+    fn mirr_error_on_all_positive() {
+        let cash_flows = make_array(&[3000.0, 3500.0, 4000.0]);
+        let err = mirr(&cash_flows, 0.1, 0.05).unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn mirr_error_on_all_negative() {
+        let cash_flows = make_array(&[-3000.0, -3500.0, -4000.0]);
+        let err = mirr(&cash_flows, 0.1, 0.05).unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn mirr_with_mixed_cash_flows() {
+        // Simple investment: -100 (outflow), +120 (inflow)
+        let cash_flows = make_array(&[-100.0, 120.0]);
+        let result = mirr(&cash_flows, 0.1, 0.05).unwrap();
+        let mirr_val = result.as_f64().unwrap();
+        // Should produce a reasonable MIRR value
+        assert!(mirr_val.is_finite());
+    }
+
+    #[test]
+    fn mirr_empty_array_error() {
+        let cash_flows = make_array(&[]);
+        let err = mirr(&cash_flows, 0.1, 0.05).unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn mirr_known_value() {
+        // Excel verification: cash flows [-100, 120], finance_rate=0.1, reinvest_rate=0.05
+        // PV_neg = 100 (period 0, no discounting)
+        // FV_pos = 120 * (1+0.05)^(1-1) = 120
+        // MIRR = (120/100)^(1/(2-1)) - 1 = 1.2^1 - 1 = 0.2
+        let cash_flows = make_array(&[-100.0, 120.0]);
+        let result = mirr(&cash_flows, 0.1, 0.05).unwrap();
+        let mirr_val = result.as_f64().unwrap();
+        assert!((mirr_val - 0.2).abs() < 0.0001);
+    }
+}
