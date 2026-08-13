@@ -10,14 +10,10 @@ keywords = ["vb6", "visual-basic", "compiler", "types", "runtime"]
 categories = ["development-tools", "compilers"]
 
 [dependencies]
-serde = { workspace = true }
+serde.workspace = true
 
 # Optional LLVM backend support
-[dependencies.inkwell]
-version = "0.4"
-optional = true
-default-features = false
-features = ["llvm16-0"]
+inkwell = { workspace = true, optional = true }
 
 [features]
 default = []

@@ -13,8 +13,8 @@ categories = ["development-tools", "os::windows-apis"]
 crate-type = ["rlib"]
 
 [dependencies]
-thiserror = "2.0.18"
-serde = { version = "1.0", optional = true, features = ["derive"] }
+thiserror.workspace = true
+serde = { workspace = true, optional = true }
 
 [features]
 default = []

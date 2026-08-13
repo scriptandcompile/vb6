@@ -17,35 +17,35 @@ categories = ["development-tools", "parsing", "parser-implementations"]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-uuid = "1.24.0"
-thiserror = "2.0.19"
-ariadne = "0.6.0"
-image = "0.25.10"
-num_enum = "0.7.6"
-strum = "0.28.0"
-strum_macros = "0.28.0"
-encoding_rs = "0.8.35"
+uuid.workspace = true
+thiserror.workspace = true
+ariadne.workspace = true
+image.workspace = true
+num_enum.workspace = true
+strum.workspace = true
+strum_macros.workspace = true
+encoding_rs.workspace = true
 either.workspace = true
-serde = { version = "1.0.229", features = ["derive"] }
-phf = { version = "0.14.0", features = ["macros"] }
-rowan = "0.17.0"
+serde.workspace = true
+phf.workspace = true
+rowan.workspace = true
 
 # WASM-specific dependencies - only compiled for wasm32 target
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = "0.2.126"
-serde-wasm-bindgen = "0.6.5"
-console_error_panic_hook = "0.1.7"
-serde_json = "1.0.151"
+wasm-bindgen.workspace = true
+serde-wasm-bindgen.workspace = true
+console_error_panic_hook.workspace = true
+serde_json.workspace = true
 
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
-criterion = { version = "0.8.2", features = ["html_reports"] }
-insta = { version = "1.48.0", features = ["yaml"] }
-assert_matches = { version = "1.5.0" }
+criterion = { workspace = true, features = ["html_reports"] }
+insta.workspace = true
+assert_matches.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 criterion = { version = "0.8.2", default-features = false }
-insta = { version = "1.48.0", features = ["yaml"] }
-wasm-bindgen-test = "0.3.76"
+insta.workspace = true
+wasm-bindgen-test.workspace = true
 
 [[bench]]
 name = "lexer"

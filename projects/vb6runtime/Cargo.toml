@@ -10,24 +10,24 @@ keywords = ["vb6", "visual-basic", "runtime", "stdlib"]
 categories = ["development-tools", "compilers"]
 
 [dependencies]
-vb6parse = { workspace = true }
-vb6core = { workspace = true }
-thiserror = { workspace = true }
-serde = { workspace = true }
-anyhow = { workspace = true }
+vb6parse.workspace = true
+vb6core.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+anyhow.workspace = true
 
 # For numeric operations
-num-traits = "0.2"
+num-traits.workspace = true
 
 # For date/time operations
-jiff = "0.2.35"
+jiff.workspace = true
 
 # For file I/O
-encoding_rs = "0.8"
+encoding_rs.workspace = true
 
 [dev-dependencies]
-tempfile = "3.0"
-criterion = "0.8.2"
+tempfile.workspace = true
+criterion.workspace = true
 
 [features]
 default = []
