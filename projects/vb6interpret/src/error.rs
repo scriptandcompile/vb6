@@ -130,6 +130,20 @@ pub fn render_error_report(
         return None;
     }
     let line = error.line? + line_offset;
+    render_report_at_line(source_name, source, line, &error.error.to_string())
+}
+
+/// Render an ariadne report pointing at the 1-based source `line` with `message`
+/// as the report header. Used by callers that carry their own message rather
+/// than a VB6 `Err` value (e.g. parse diagnostics).
+///
+/// Returns `None` when the line lies outside the source text.
+pub fn render_report_at_line(
+    source_name: &str,
+    source: &str,
+    line: usize,
+    message: &str,
+) -> Option<String> {
     let (span_start, span_end) = line_byte_span(source, line)?;
 
     let cache = (source_name.to_string(), Source::from(source));
@@ -138,7 +152,7 @@ pub fn render_error_report(
         ReportKind::Error,
         (source_name.to_string(), span_start..=span_end),
     )
-    .with_message(error.error.to_string())
+    .with_message(message)
     .with_label(
         Label::new((source_name.to_string(), span_start..=span_end))
             .with_message("error here"),
@@ -212,6 +226,16 @@ End Sub\n";
         let source = "Sub Main()\nEnd Sub\n";
         let error = RunError::new(VBError::new(13)).at_line(99);
         assert!(render_error_report("m.bas", source, &error, 0).is_none());
+    }
+
+    #[test]
+    fn report_at_line_uses_provided_message() {
+        let source = "Dim x As ?\nSub Main()\nEnd Sub\n";
+        let report = render_report_at_line("m.bas", source, 1, "Unknown token '?'").unwrap();
+        assert!(report.contains("Unknown token '?'"));
+        assert!(report.contains("m.bas:1"));
+        assert!(report.contains("Dim x As ?"));
+        assert!(!report.contains("(Error "), "parse reports should not carry Err numbers");
     }
 }
 
