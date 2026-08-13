@@ -5,6 +5,7 @@
 
 use std::fmt;
 
+use ariadne::{Config, Label, Report, ReportKind, Source};
 use vb6core::error::VBError;
 
 /// An error raised during interpretation of VB6 code.
@@ -110,5 +111,107 @@ impl From<RunError> for VBError {
     }
 }
 
+/// Render an ariadne report pointing at the source line where `error` occurred.
+///
+/// `source` is the original source text and `source_name` its display name.
+/// `line_offset` is the number of header lines stripped from the module CST
+/// (see `ModuleFile::line_offset`); it is added to `error.line` to map the
+/// body-relative line number onto the original source.
+///
+/// Returns `None` when the error carries no line, is a debugger pause, or the
+/// line lies outside the source text.
+pub fn render_error_report(
+    source_name: &str,
+    source: &str,
+    error: &RunError,
+    line_offset: usize,
+) -> Option<String> {
+    if error.is_debug_pause {
+        return None;
+    }
+    let line = error.line? + line_offset;
+    let (span_start, span_end) = line_byte_span(source, line)?;
+
+    let cache = (source_name.to_string(), Source::from(source));
+    let mut buf = Vec::new();
+    let report = Report::build(
+        ReportKind::Error,
+        (source_name.to_string(), span_start..=span_end),
+    )
+    .with_message(error.error.to_string())
+    .with_label(
+        Label::new((source_name.to_string(), span_start..=span_end))
+            .with_message("error here"),
+    )
+    .with_config(Config::new().with_color(false));
+    report.finish().write(cache, &mut buf).ok()?;
+    String::from_utf8(buf).ok()
+}
+
+/// Byte offsets of the 1-based line `line` in `source`, with the trailing
+/// newline trimmed. The returned range always covers at least one byte.
+fn line_byte_span(source: &str, line: usize) -> Option<(usize, usize)> {
+    let mut start = 0usize;
+    for (index, part) in source.split_inclusive('\n').enumerate() {
+        let line_no = index + 1;
+        if line_no == line {
+            let trimmed = part.trim_end_matches(['\r', '\n']);
+            let end = start + trimmed.len();
+            return Some((start, end.max(start + 1)));
+        }
+        start += part.len();
+    }
+    None
+}
+
 /// Convenience alias for interpreter results.
 pub type RunResult<T> = Result<T, RunError>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn report_points_at_the_offending_line() {
+        let source = "Attribute VB_Name = \"M\"\n\
+Sub Main()\n\
+    Dim x As Double\n\
+    x = 1 / 0\n\
+End Sub\n";
+        // Body-relative line 3 (`x = 1 / 0`) plus the 1 stripped header line.
+        let error = RunError::new(VBError::new(11))
+            .at_line(3)
+            .in_procedure("Main");
+        let report = render_error_report("scratch.bas", source, &error, 1).unwrap();
+        assert!(report.contains("Runtime error 11") || report.contains("Error 11"));
+        assert!(report.contains("scratch.bas:4"));
+        assert!(report.contains("x = 1 / 0"));
+    }
+
+    #[test]
+    fn report_includes_error_number_and_description() {
+        let source = "Sub Main()\n    Debug.Print Missing()\nEnd Sub\n";
+        let error = RunError::new(VBError::new(450)).at_line(2);
+        let report = render_error_report("m.bas", source, &error, 0).unwrap();
+        assert!(report.contains("450"));
+        assert!(report.contains("Wrong number of arguments"));
+    }
+
+    #[test]
+    fn report_is_none_for_debug_pause_or_missing_line() {
+        let source = "Sub Main()\nEnd Sub\n";
+        let pause = RunError::debug_pause();
+        assert!(render_error_report("m.bas", source, &pause, 0).is_none());
+
+        let no_line = RunError::new(VBError::new(13));
+        assert!(render_error_report("m.bas", source, &no_line, 0).is_none());
+    }
+
+    #[test]
+    fn report_is_none_when_line_is_out_of_range() {
+        let source = "Sub Main()\nEnd Sub\n";
+        let error = RunError::new(VBError::new(13)).at_line(99);
+        assert!(render_error_report("m.bas", source, &error, 0).is_none());
+    }
+}
+

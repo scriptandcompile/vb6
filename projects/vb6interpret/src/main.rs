@@ -100,8 +100,16 @@ fn main() -> Result<()> {
                 Ok(()) => timeout > 0 && started.elapsed() > Duration::from_secs(timeout),
                 Err(error) => {
                     print_output(&interpreter);
-                    let message = error.to_string();
-                    eprintln!("Runtime error: {message}");
+                    eprintln!("Runtime error: {}", error.error);
+                    if let Some(report) = vb6interpret::error::render_error_report(
+                        &path.display().to_string(),
+                        source_file.as_ref(),
+                        &error,
+                        module.line_offset,
+                    ) {
+                        eprintln!();
+                        eprintln!("{report}");
+                    }
                     std::process::exit(1);
                 }
             };
