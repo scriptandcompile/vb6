@@ -15,4 +15,16 @@ pub(super) fn register(registry: &mut Registry) {
         let factor = if args.len() > 4 { Some(&args[4]) } else { None };
         finfn::ddb::ddb(&args[0], &args[1], &args[2], &args[3], factor)
     }));
+
+    registry.insert(builtin!("fv", 3, 5, |args| {
+        let pv = if args.len() > 3 { Some(&args[3]) } else { None };
+        let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
+        finfn::fv::fv(&args[0], &args[1], &args[2], pv, type_)
+    }));
+
+    registry.insert(builtin!("ipmt", 4, 6, |args| {
+        let fv = if args.len() > 4 { Some(&args[4]) } else { None };
+        let type_ = if args.len() > 5 { Some(&args[5]) } else { None };
+        finfn::ipmt::ipmt(&args[0], &args[1], &args[2], &args[3], fv, type_)
+    }));
 }
