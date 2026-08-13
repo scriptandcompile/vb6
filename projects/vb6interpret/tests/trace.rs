@@ -156,3 +156,126 @@ Sub Main()\n    For i = 1 To 2\n        Debug.Print i\n    Next\nEnd Sub\n";
         ]
     );
 }
+
+#[test]
+fn while_loop_highlights_condition_then_wend() {
+    let source = "Attribute VB_Name = \"WhileModule\"\n\n\
+Sub Main()\n    i = 0\n    While i < 3\n        i = i + 1\n    Wend\nEnd Sub\n";
+    let body = source
+        .strip_prefix("Attribute VB_Name = \"WhileModule\"\n")
+        .unwrap();
+
+    let cond_cursor = byte_range(body, "i < 3");
+    let wend_cursor = byte_range(body, "Wend");
+
+    assert_eq!(
+        trace_with_cursors(source),
+        vec![
+            (3, None),
+            (4, None),
+            // First pass through the condition, then the closing `Wend`.
+            (5, cond_cursor),
+            (6, None),
+            (7, wend_cursor),
+            (5, cond_cursor),
+            (6, None),
+            (7, wend_cursor),
+            (5, cond_cursor),
+            (6, None),
+            (7, wend_cursor),
+            // Fourth check fails and the loop exits.
+            (5, cond_cursor),
+            (8, None),
+        ]
+    );
+}
+
+#[test]
+fn do_while_loop_highlights_condition_then_loop() {
+    let source = "Attribute VB_Name = \"DoModule\"\n\n\
+Sub Main()\n    i = 0\n    Do While i < 3\n        i = i + 1\n    Loop\nEnd Sub\n";
+    let body = source.strip_prefix("Attribute VB_Name = \"DoModule\"\n").unwrap();
+
+    let pre_cursor = byte_range(body, "While i < 3");
+    let loop_cursor = byte_range(body, "Loop");
+
+    assert_eq!(
+        trace_with_cursors(source),
+        vec![
+            (3, None),
+            (4, None),
+            (5, pre_cursor),
+            (6, None),
+            (7, loop_cursor),
+            (5, pre_cursor),
+            (6, None),
+            (7, loop_cursor),
+            (5, pre_cursor),
+            (6, None),
+            (7, loop_cursor),
+            (5, pre_cursor),
+            (8, None),
+        ]
+    );
+}
+
+#[test]
+fn do_loop_while_highlights_do_then_post_condition() {
+    let source = "Attribute VB_Name = \"DoPostModule\"\n\n\
+Sub Main()\n    i = 0\n    Do\n        i = i + 1\n    Loop While i < 3\nEnd Sub\n";
+    let body = source
+        .strip_prefix("Attribute VB_Name = \"DoPostModule\"\n")
+        .unwrap();
+
+    let do_cursor = byte_range(body, "Do");
+    let post_cursor = byte_range(body, "While i < 3");
+
+    assert_eq!(
+        trace_with_cursors(source),
+        vec![
+            (3, None),
+            (4, None),
+            (5, do_cursor),
+            (6, None),
+            (7, post_cursor),
+            (5, do_cursor),
+            (6, None),
+            (7, post_cursor),
+            (5, do_cursor),
+            (6, None),
+            (7, post_cursor),
+            (8, None),
+        ]
+    );
+}
+
+#[test]
+fn do_until_loop_highlights_until_condition() {
+    let source = "Attribute VB_Name = \"DoUntilModule\"\n\n\
+Sub Main()\n    i = 0\n    Do Until i >= 3\n        i = i + 1\n    Loop\nEnd Sub\n";
+    let body = source
+        .strip_prefix("Attribute VB_Name = \"DoUntilModule\"\n")
+        .unwrap();
+
+    let pre_cursor = byte_range(body, "Until i >= 3");
+    let loop_cursor = byte_range(body, "Loop");
+
+    assert_eq!(
+        trace_with_cursors(source),
+        vec![
+            (3, None),
+            (4, None),
+            (5, pre_cursor),
+            (6, None),
+            (7, loop_cursor),
+            (5, pre_cursor),
+            (6, None),
+            (7, loop_cursor),
+            (5, pre_cursor),
+            (6, None),
+            (7, loop_cursor),
+            (5, pre_cursor),
+            (8, None),
+        ]
+    );
+}
