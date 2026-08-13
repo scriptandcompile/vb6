@@ -78,7 +78,7 @@
 //!
 //! ```vb6
 //! Dim arr(1 To 5) As Double
-//! Debug.Print VarType(arr) ' 8205 (vbArray + vbDouble)
+//! Debug.Print VarType(arr) ' 8197 (vbArray OR'd with vbDouble)
 //! ```
 //!
 //! ### Example 4: Get `VarType` of Variant
@@ -261,3 +261,202 @@
 //! - Returns vbUnknown (0) for unsupported types
 //! - Not for compile-time type checking
 //! - May return user-defined type/class constants
+
+use crate::error::VBResult;
+use crate::value::VBVariant;
+
+/// Implementation of the `VarType` function.
+///
+/// Returns an `Integer` value indicating the subtype of a Variant variable
+/// or expression.
+///
+/// VB6 behavior:
+/// - Takes any value and returns its VarType code as an Integer (i16)
+/// - Never raises an error; always succeeds
+/// - For arrays, returns 8192 (vbArray) OR'd with the element type code
+/// - For Empty, returns 0; for Null, returns 1
+/// - Returns 12 (vbVariant) when the argument itself is a Variant holding another Variant
+pub fn var_type(value: &VBVariant) -> VBResult<VBVariant> {
+    Ok(VBVariant::from_long(value.var_type()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::var_type;
+    use crate::{ArrayDimension, VBObject, VBType, VBVariant};
+
+    #[derive(Debug)]
+    struct TestObject(&'static str);
+
+    impl VBObject for TestObject {
+        fn type_name(&self) -> &str {
+            self.0
+        }
+        fn as_any(&self) -> &dyn std::any::Any {
+            self
+        }
+        fn clone_box(&self) -> Box<dyn VBObject> {
+            Box::new(TestObject(self.0))
+        }
+    }
+
+    #[test]
+    fn vartype_empty() {
+        assert_eq!(
+            var_type(&VBVariant::Empty).unwrap(),
+            VBVariant::from_long(0)
+        );
+    }
+
+    #[test]
+    fn vartype_null() {
+        assert_eq!(var_type(&VBVariant::Null).unwrap(), VBVariant::from_long(1));
+    }
+
+    #[test]
+    fn vartype_byte() {
+        assert_eq!(
+            var_type(&VBVariant::from_byte(42)).unwrap(),
+            VBVariant::from_long(17)
+        );
+    }
+
+    #[test]
+    fn vartype_integer() {
+        assert_eq!(
+            var_type(&VBVariant::from_integer(-12345)).unwrap(),
+            VBVariant::from_long(2)
+        );
+    }
+
+    #[test]
+    fn vartype_long() {
+        assert_eq!(
+            var_type(&VBVariant::from_long(12345678)).unwrap(),
+            VBVariant::from_long(3)
+        );
+    }
+
+    #[test]
+    fn vartype_single() {
+        assert_eq!(
+            var_type(&VBVariant::from_single(std::f32::consts::PI)).unwrap(),
+            VBVariant::from_long(4)
+        );
+    }
+
+    #[test]
+    fn vartype_double() {
+        assert_eq!(
+            var_type(&VBVariant::from_double(std::f64::consts::E)).unwrap(),
+            VBVariant::from_long(5)
+        );
+    }
+
+    #[test]
+    fn vartype_currency() {
+        assert_eq!(
+            var_type(&VBVariant::from_currency_scaled(12345678)).unwrap(),
+            VBVariant::from_long(6)
+        );
+    }
+
+    #[test]
+    fn vartype_string() {
+        assert_eq!(
+            var_type(&VBVariant::from_string("hello")).unwrap(),
+            VBVariant::from_long(8)
+        );
+    }
+
+    #[test]
+    fn vartype_boolean_true() {
+        assert_eq!(
+            var_type(&VBVariant::from_bool(true)).unwrap(),
+            VBVariant::from_long(11)
+        );
+    }
+
+    #[test]
+    fn vartype_boolean_false() {
+        assert_eq!(
+            var_type(&VBVariant::from_bool(false)).unwrap(),
+            VBVariant::from_long(11)
+        );
+    }
+
+    #[test]
+    fn vartype_date() {
+        assert_eq!(
+            var_type(&VBVariant::from_date_serial(45000.0)).unwrap(),
+            VBVariant::from_long(7)
+        );
+    }
+
+    #[test]
+    fn vartype_error() {
+        assert_eq!(
+            var_type(&VBVariant::from_error(crate::error::VBError::new(13))).unwrap(),
+            VBVariant::from_long(10)
+        );
+    }
+
+    #[test]
+    fn vartype_object() {
+        let obj = VBVariant::from_object(Box::new(TestObject("Test")));
+        assert_eq!(var_type(&obj).unwrap(), VBVariant::from_long(9));
+    }
+
+    #[test]
+    fn vartype_nothing() {
+        assert_eq!(
+            var_type(&VBVariant::Nothing).unwrap(),
+            VBVariant::from_long(9)
+        );
+    }
+
+    #[test]
+    fn vartype_array_integer() {
+        let arr = VBVariant::array_fixed(VBType::Integer, &[ArrayDimension::new(0, 4)]).unwrap();
+        // vbArray (8192) | vbInteger (2) = 8194
+        assert_eq!(var_type(&arr).unwrap(), VBVariant::from_long(8194));
+    }
+
+    #[test]
+    fn vartype_array_double() {
+        let arr = VBVariant::array_fixed(VBType::Double, &[ArrayDimension::new(0, 9)]).unwrap();
+        // vbArray (8192) | vbDouble (5) = 8197
+        assert_eq!(var_type(&arr).unwrap(), VBVariant::from_long(8197));
+    }
+
+    #[test]
+    fn vartype_array_string() {
+        let arr = VBVariant::array_fixed(VBType::String, &[ArrayDimension::new(1, 5)]).unwrap();
+        // vbArray (8192) | vbString (8) = 8200
+        assert_eq!(var_type(&arr).unwrap(), VBVariant::from_long(8200));
+    }
+
+    #[test]
+    fn vartype_dynamic_array() {
+        let arr = VBVariant::array_dynamic(VBType::Long);
+        // vbArray (8192) | vbLong (3) = 8195
+        assert_eq!(var_type(&arr).unwrap(), VBVariant::from_long(8195));
+    }
+
+    #[test]
+    fn vartype_returns_integer_type() {
+        let result = var_type(&VBVariant::from_string("test")).unwrap();
+        // The result itself should be a Long (VarType returns Integer, which is i32 in our representation)
+        assert_eq!(result.var_type(), 3); // vbLong
+    }
+
+    #[test]
+    fn vartype_never_errors() {
+        // VarType never raises an error for any input
+        assert!(var_type(&VBVariant::Empty).is_ok());
+        assert!(var_type(&VBVariant::Null).is_ok());
+        assert!(var_type(&VBVariant::Nothing).is_ok());
+        assert!(var_type(&VBVariant::from_error(crate::error::VBError::new(13))).is_ok());
+        assert!(var_type(&VBVariant::from_string("test")).is_ok());
+    }
+}
