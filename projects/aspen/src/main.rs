@@ -1,8 +1,10 @@
 mod check;
 mod fmt;
+mod lint;
 
 use check::check_subcommand;
 use fmt::fmt_subcommand;
+use lint::lint_subcommand;
 
 use anyhow::Result;
 
@@ -18,6 +20,42 @@ fn main() -> Result<()> {
                     .required(false)
                     .value_parser(value_parser!(PathBuf)),
             ),
+        )
+        .subcommand(
+            Command::new("lint")
+                .about("Check VB6 source files against selectable rules")
+                .arg(
+                    Arg::new("select")
+                        .long("select")
+                        .required(false)
+                        // One value per flag, repeatable, comma-separated. Not
+                        // `num_args(1..)`: that swallows the positional path.
+                        .num_args(1)
+                        .action(clap::ArgAction::Append)
+                        .value_delimiter(',')
+                        .help("rule codes or code prefixes to run, e.g. N001 or N"),
+                )
+                .arg(
+                    Arg::new("ignore")
+                        .long("ignore")
+                        .required(false)
+                        .num_args(1)
+                        .action(clap::ArgAction::Append)
+                        .value_delimiter(',')
+                        .help("rule codes or code prefixes to skip"),
+                )
+                .arg(
+                    Arg::new("explain")
+                        .long("explain")
+                        .required(false)
+                        .action(clap::ArgAction::SetTrue)
+                        .help("list every rule with its default and fixability"),
+                )
+                .arg(
+                    Arg::new("project path")
+                        .required(false)
+                        .value_parser(value_parser!(PathBuf)),
+                ),
         )
         .subcommand(
             Command::new("fmt")
@@ -134,6 +172,31 @@ fn main() -> Result<()> {
         };
 
         fmt_subcommand(cmd)?;
+
+        return Ok(());
+    }
+
+    if let Some(matches) = matches.subcommand_matches("lint") {
+        let current_dir = current_dir()?;
+
+        let project_path = matches
+            .get_one::<PathBuf>("project path")
+            .unwrap_or(&current_dir)
+            .to_path_buf();
+
+        let configured = lint::load_lint_settings(&project_path);
+        let from_cli = |name: &str| -> Option<Vec<String>> {
+            matches
+                .get_many::<String>(name)
+                .map(|values| values.cloned().collect())
+        };
+
+        lint_subcommand(lint::LintCommand {
+            select: from_cli("select").unwrap_or(configured.select),
+            ignore: from_cli("ignore").unwrap_or(configured.ignore),
+            explain: matches.get_flag("explain"),
+            project_path,
+        })?;
 
         return Ok(());
     }

@@ -1,9 +1,11 @@
 pub mod context;
 mod cst_formatter;
+pub mod lint;
 mod passes;
 pub mod rewrite;
 pub mod settings;
 
+pub use lint::{Diagnostic, Fixability, LintSettings, RULES, Rule, lint_source};
 pub use settings::FmtSettings;
 
 use anyhow::Result;
