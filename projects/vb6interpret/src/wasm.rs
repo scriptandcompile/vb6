@@ -3,7 +3,7 @@
 //! This module exposes a browser-friendly API for running a single VB6 module
 //! from source text and capturing its output.
 
-use crate::error::RunError;
+use crate::error::{render_error_report, render_report_at_line, RunError};
 use crate::interpreter::{DebugSnapshot, DebugVariable};
 use crate::Interpreter;
 use serde::{Deserialize, Serialize};
@@ -17,6 +17,9 @@ use wasm_bindgen::prelude::*;
 pub struct WasmRunError {
     /// Human-readable error message.
     pub message: String,
+    /// Ariadne-rendered pretty report pointing at the offending source line,
+    /// when the source location is known.
+    pub pretty_report: Option<String>,
     /// The VB6 error number, if the failure is a runtime `Err` value.
     pub error_number: Option<i32>,
     /// Whether this is an internal step pause rather than a runtime error.
@@ -182,9 +185,15 @@ fn parse_module(code: &str) -> Result<ModuleFile, WasmRunError> {
             let line = first.map(|error| {
                 byte_offset_to_line_column(error.source_content, error.error_offset as usize).0
             });
+            let pretty_report = first
+                .zip(line)
+                .and_then(|(error, line)| {
+                    render_report_at_line("playground.bas", code, line, &error.kind.to_string())
+                });
 
             Err(WasmRunError {
                 message,
+                pretty_report,
                 error_number: None,
                 is_debug_pause: false,
                 line,
@@ -194,9 +203,11 @@ fn parse_module(code: &str) -> Result<ModuleFile, WasmRunError> {
     }
 }
 
-fn convert_run_error(error: RunError) -> WasmRunError {
+fn convert_run_error(error: RunError, code: &str, line_offset: usize) -> WasmRunError {
+    let pretty_report = render_error_report("playground.bas", code, &error, line_offset);
     WasmRunError {
         message: error.to_string(),
+        pretty_report,
         error_number: (!error.is_debug_pause()).then_some(error.error.number),
         is_debug_pause: error.is_debug_pause(),
         line: error.line,
@@ -276,7 +287,7 @@ pub fn interpret_vb6_code(code: &str) -> Result<JsValue, JsError> {
         Ok(()) => Ok(to_value(&build_output(&interpreter, None))?),
         Err(error) => Ok(to_value(&build_output(
             &interpreter,
-            Some(convert_run_error(error)),
+            Some(convert_run_error(error, code, module.line_offset)),
         ))?),
     }
 }
@@ -308,7 +319,7 @@ pub fn debug_vb6_code(code: &str, pause_after_steps: u32) -> Result<JsValue, JsE
         Ok(()) => Ok(to_value(&build_output(&interpreter, None))?),
         Err(error) => Ok(to_value(&build_output(
             &interpreter,
-            Some(convert_run_error(error)),
+            Some(convert_run_error(error, code, module.line_offset)),
         ))?),
     }
 }
@@ -333,7 +344,7 @@ pub fn build_debug_trace(code: &str) -> Result<JsValue, JsError> {
 
     let error = match interpreter.run_module(&module) {
         Ok(()) => None,
-        Err(error) => Some(convert_run_error(error)),
+        Err(error) => Some(convert_run_error(error, code, module.line_offset)),
     };
 
     interpreter.capture_final_debug_snapshot();

@@ -339,6 +339,12 @@ function emptyDebugState() {
 }
 
 function renderError(error) {
+    if (error.pretty_report) {
+        elements.errorBox.textContent = error.pretty_report;
+        elements.errorBox.className = "error-box error";
+        return;
+    }
+
     const parts = [error.message];
 
     if (error.line) {
