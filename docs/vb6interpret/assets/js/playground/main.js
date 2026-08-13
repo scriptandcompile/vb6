@@ -306,7 +306,11 @@ function renderDebugState(debug, highlightLine = false) {
     elements.debugLocals.textContent = formatScope(debug.locals, "No active local scope.");
 
     if (highlightLine) {
-        Editor.highlightExecutionLine(debug.current_line);
+        if (debug.cursor) {
+            Editor.highlightExecutionRange(debug.cursor);
+        } else {
+            Editor.highlightExecutionLine(debug.current_line);
+        }
     } else {
         Editor.clearExecutionHighlight();
     }
@@ -330,6 +334,7 @@ function emptyDebugState() {
         stack_depth: 0,
         globals: [],
         locals: [],
+        cursor: null,
     };
 }
 

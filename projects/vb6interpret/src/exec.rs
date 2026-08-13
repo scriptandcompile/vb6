@@ -39,7 +39,14 @@ impl Interpreter {
                 }
                 kind if is_statement_kind(kind) => {
                     self.current_stmt_line = line;
-                    self.step()?;
+                    // `For` loops emit their own element-level trace snapshots,
+                    // so skip the generic whole-line snapshot to avoid a
+                    // duplicate highlight of the `For` line at loop entry.
+                    if self.record_debug_snapshots && kind == SyntaxKind::ForStatement {
+                        self.step_without_snapshot()?;
+                    } else {
+                        self.step()?;
+                    }
                     let flow = self.exec_stmt(child, line)?;
                     if flow != Flow::Next {
                         return Ok(flow);
@@ -506,8 +513,8 @@ impl Interpreter {
         let children: Vec<&CstNode> = node.children().iter().collect();
         let significant: Vec<&CstNode> = node.significant_children().collect();
 
-        let name = node
-            .first_child_by_kind(SyntaxKind::IdentifierExpression)
+        let counter = node.first_child_by_kind(SyntaxKind::IdentifierExpression);
+        let name = counter
             .and_then(|e| e.first_child_by_kind(SyntaxKind::Identifier))
             .map(|t| t.text().trim().to_string())
             .unwrap_or_default();
@@ -530,12 +537,17 @@ impl Interpreter {
             .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
 
         let mut step = VBVariant::from_long(1);
+        let mut step_cursor = None;
         if let Some(step_idx) = significant
             .iter()
             .position(|c| c.kind() == SyntaxKind::StepKeyword)
         {
             if let Some(step_node) = significant.get(step_idx + 1) {
                 step = self.eval_expr(step_node)?;
+                step_cursor = Some((
+                    significant[step_idx].start_offset(),
+                    step_node.end_offset(),
+                ));
             }
         }
 
@@ -559,10 +571,46 @@ impl Interpreter {
             None => line,
         };
 
-        let mut counter = start;
+        // Sub-line cursor targets for the loop's own elements: the counter
+        // assignment (`i = 1`), the end check (`To 100`), the step
+        // (`Step 5`), and the `Next i` closing line.
+        let start_cursor = counter.map(|c| (c.start_offset(), start_node.end_offset()));
+        let to_cursor = Some((significant[to_index].start_offset(), end_node.end_offset()));
+        let next_line = match children
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::NextKeyword)
+        {
+            Some(next_idx) => {
+                line + children[..next_idx]
+                    .iter()
+                    .map(|c| count_newlines(c))
+                    .sum::<usize>()
+            }
+            None => line,
+        };
+        let next_cursor = significant
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::NextKeyword)
+            .map(|next_idx| {
+                let next_kw = significant[next_idx];
+                let next_end = significant
+                    .get(next_idx + 1)
+                    .filter(|c| c.kind() == SyntaxKind::Identifier)
+                    .map(|c| c.end_offset())
+                    .unwrap_or_else(|| next_kw.end_offset());
+                (next_kw.start_offset(), next_end)
+            });
+
+        let mut counter_value = start;
+        let mut first = true;
         loop {
-            self.step()?;
-            let current = counter.as_f64()?;
+            // On the first pass highlight the counter assignment; on later
+            // passes highlight the check against the end value.
+            self.current_stmt_line = line;
+            let cursor = if first { start_cursor } else { to_cursor };
+            first = false;
+            self.step_marked(cursor)?;
+            let current = counter_value.as_f64()?;
             let end_value = end.as_f64()?;
             let done = if step_f >= 0.0 {
                 current > end_value
@@ -572,7 +620,10 @@ impl Interpreter {
             if done {
                 break;
             }
-            self.set_variable(&name, counter.clone());
+            self.set_variable(&name, counter_value.clone());
+            if let Some(cursor) = step_cursor {
+                self.step_marked(Some(cursor))?;
+            }
             if let Some(idx) = body_index {
                 let flow = self.exec_statements(children[idx], body_line)?;
                 match flow {
@@ -581,9 +632,11 @@ impl Interpreter {
                     Flow::Return | Flow::Terminate => return Ok(flow),
                 }
             }
-            counter = self.arith(counter, step.clone(), ArithmaticOperator::Add)?;
+            self.current_stmt_line = next_line;
+            self.step_marked(next_cursor)?;
+            counter_value = self.arith(counter_value, step.clone(), ArithmaticOperator::Add)?;
         }
-        self.set_variable(&name, counter);
+        self.set_variable(&name, counter_value);
         Ok(Flow::Next)
     }
 

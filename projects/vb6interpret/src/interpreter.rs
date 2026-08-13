@@ -63,6 +63,10 @@ pub struct DebugSnapshot {
     pub output_lines: Vec<String>,
     pub output_text: String,
     pub terminated: bool,
+    /// Byte range `[start, end)` of the specific source element being
+    /// executed, when the snapshot targets a sub-line element such as a
+    /// loop's counter, step, or `Next`. `None` means the whole line.
+    pub cursor_range: Option<(u32, u32)>,
 }
 
 /// The VB6 interpreter.
@@ -88,6 +92,10 @@ pub struct Interpreter {
     pub(crate) terminated: bool,
     /// 1-based line of the statement currently executing.
     pub(crate) current_stmt_line: usize,
+    /// Byte range `[start, end)` of the specific source element being
+    /// executed, when a snapshot should target a sub-line element. Consumed
+    /// by the next snapshot capture.
+    pub(crate) current_stmt_range: Option<(u32, u32)>,
     /// Optional debugger pause budget. When set, execution pauses before the
     /// next statement once `steps` reaches the configured value.
     pub(crate) pause_after_steps: Option<u64>,
@@ -118,6 +126,7 @@ impl Interpreter {
             steps: 0,
             terminated: false,
             current_stmt_line: 1,
+            current_stmt_range: None,
             pause_after_steps: None,
             record_debug_snapshots: false,
             debug_snapshots: Vec::new(),
@@ -252,6 +261,9 @@ impl Interpreter {
     }
 
     /// Capture the current interpreter state as a debugger snapshot.
+    ///
+    /// Consumes any pending `current_stmt_range`, so sub-line cursors are
+    /// attached to exactly one snapshot and never leak into later ones.
     pub fn capture_debug_snapshot(&mut self) {
         let current_procedure = self.current_procedure().map(str::to_string);
         let globals = scope_to_debug_variables(&self.globals);
@@ -259,6 +271,7 @@ impl Interpreter {
             .current_locals()
             .map(scope_to_debug_variables)
             .unwrap_or_default();
+        let cursor_range = self.current_stmt_range.take();
 
         let snapshot = DebugSnapshot {
             steps: self.steps,
@@ -270,6 +283,7 @@ impl Interpreter {
             output_lines: self.output().to_vec(),
             output_text: self.output_text(),
             terminated: self.is_terminated(),
+            cursor_range,
         };
 
         let should_push = self.debug_snapshots.last().is_none_or(|last| {
@@ -278,6 +292,7 @@ impl Interpreter {
                 || last.current_procedure != snapshot.current_procedure
                 || last.output_text != snapshot.output_text
                 || last.terminated != snapshot.terminated
+                || last.cursor_range != snapshot.cursor_range
         });
 
         if should_push {
@@ -317,7 +332,33 @@ impl Interpreter {
         if self.record_debug_snapshots {
             self.capture_debug_snapshot();
         }
+        self.advance_steps()
+    }
 
+    /// Charge one step against the budget without capturing a snapshot.
+    ///
+    /// Used for statements that emit their own element-level trace snapshots
+    /// (loops), avoiding a duplicate whole-line highlight at their start.
+    pub(crate) fn step_without_snapshot(&mut self) -> RunResult<()> {
+        self.advance_steps()
+    }
+
+    /// Charge one step against the execution budget, marking the snapshot
+    /// with a sub-line cursor over `range`.
+    ///
+    /// When debug snapshots are not being recorded this behaves exactly like
+    /// [`Interpreter::step`], so plain executions are unaffected.
+    pub(crate) fn step_marked(&mut self, range: Option<(u32, u32)>) -> RunResult<()> {
+        if self.record_debug_snapshots {
+            self.current_stmt_range = range;
+            self.capture_debug_snapshot();
+        }
+        self.advance_steps()
+    }
+
+    /// Enforce the pause budget, increment the step counter, and enforce the
+    /// statement limit.
+    fn advance_steps(&mut self) -> RunResult<()> {
         if self
             .pause_after_steps
             .is_some_and(|pause_after_steps| self.steps >= pause_after_steps)
