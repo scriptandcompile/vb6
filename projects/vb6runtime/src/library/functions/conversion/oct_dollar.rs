@@ -244,3 +244,184 @@
 //! - Limited usefulness in modern applications (hexadecimal is more common)
 //! - No validation that a string contains valid octal digits
 //! - Returns unsigned representation for negative numbers (two's complement)
+
+use crate::error::{err_number, VBError, VBResult};
+use crate::value::{VBString, VBVariant};
+
+/// Implementation of the `Oct$` function.
+///
+/// Converts a number to its octal (base-8) string representation. The result
+/// contains only digits 0-7 and does not include any prefix ("&O" or "0o").
+///
+/// VB6 behavior:
+/// - Fractional values are rounded to the nearest integer before conversion
+/// - Negative numbers use two's complement representation
+/// - `Integer` values produce up to 6 octal digits
+/// - `Long` values produce up to 11 octal digits
+/// - Raises error 94 if `number` is `Null`
+/// - Raises error 6 (overflow) if the value cannot fit in a `Long`
+pub fn oct_dollar(number: &VBVariant) -> VBResult<VBString> {
+    if number.is_null() {
+        return Err(VBError::with_description(
+            err_number::INVALID_USE_OF_NULL,
+            "Invalid use of Null",
+        ));
+    }
+
+    // Determine the bit width based on the variant type
+    let value = match number {
+        VBVariant::Integer(v) => {
+            // Integer is 16-bit; mask to u16 to get correct octal representation
+            format!("{:o}", *v as u16)
+        }
+        VBVariant::Long(v) => {
+            format!("{:o}", *v as u32)
+        }
+        VBVariant::Byte(v) => {
+            format!("{:o}", *v as u32)
+        }
+        _ => {
+            // For other types (Double, Single, Currency, String, etc.),
+            // convert to Long first via as_i64 which handles rounding
+            let v = number.as_i64()?;
+            if let Ok(long_val) = i32::try_from(v) {
+                format!("{:o}", long_val as u32)
+            } else {
+                return Err(VBError::overflow());
+            }
+        }
+    };
+
+    Ok(VBString::from(value))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::oct_dollar;
+    use crate::error::err_number;
+    use crate::value::VBVariant;
+
+    #[test]
+    fn oct_dollar_zero() {
+        let result = oct_dollar(&VBVariant::from_long(0)).unwrap();
+        assert_eq!(result.as_str(), "0");
+    }
+
+    #[test]
+    fn oct_dollar_positive_long() {
+        let result = oct_dollar(&VBVariant::from_long(8)).unwrap();
+        assert_eq!(result.as_str(), "10");
+
+        let result = oct_dollar(&VBVariant::from_long(64)).unwrap();
+        assert_eq!(result.as_str(), "100");
+
+        let result = oct_dollar(&VBVariant::from_long(511)).unwrap();
+        assert_eq!(result.as_str(), "777");
+    }
+
+    #[test]
+    fn oct_dollar_positive_integer() {
+        let result = oct_dollar(&VBVariant::from_integer(8)).unwrap();
+        assert_eq!(result.as_str(), "10");
+
+        let result = oct_dollar(&VBVariant::from_integer(-1)).unwrap();
+        assert_eq!(result.as_str(), "177777");
+    }
+
+    #[test]
+    fn oct_dollar_negative_long() {
+        let result = oct_dollar(&VBVariant::from_long(-1)).unwrap();
+        assert_eq!(result.as_str(), "37777777777");
+
+        let result = oct_dollar(&VBVariant::from_long(-256)).unwrap();
+        assert_eq!(result.as_str(), "37777777400");
+    }
+
+    #[test]
+    fn oct_dollar_byte() {
+        let result = oct_dollar(&VBVariant::from_byte(8)).unwrap();
+        assert_eq!(result.as_str(), "10");
+
+        let result = oct_dollar(&VBVariant::from_byte(64)).unwrap();
+        assert_eq!(result.as_str(), "100");
+    }
+
+    #[test]
+    fn oct_dollar_double_rounds() {
+        // 8.5 rounds to 8 → "10"
+        let result = oct_dollar(&VBVariant::Double(8.5)).unwrap();
+        assert_eq!(result.as_str(), "10");
+
+        // 8.6 rounds to 9 → "11"
+        let result = oct_dollar(&VBVariant::Double(8.6)).unwrap();
+        assert_eq!(result.as_str(), "11");
+    }
+
+    #[test]
+    fn oct_dollar_from_string() {
+        let result = oct_dollar(&VBVariant::from_string("255")).unwrap();
+        assert_eq!(result.as_str(), "377");
+    }
+
+    #[test]
+    fn oct_dollar_null_is_error_94() {
+        let err = oct_dollar(&VBVariant::Null).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn oct_dollar_max_long() {
+        let result = oct_dollar(&VBVariant::from_long(i32::MAX)).unwrap();
+        assert_eq!(result.as_str(), "17777777777");
+    }
+
+    #[test]
+    fn oct_dollar_min_long() {
+        let result = oct_dollar(&VBVariant::from_long(i32::MIN)).unwrap();
+        assert_eq!(result.as_str(), "20000000000");
+    }
+
+    #[test]
+    fn oct_dollar_file_permissions() {
+        // 493 decimal = 755 octal (rwxr-xr-x)
+        let result = oct_dollar(&VBVariant::from_long(493)).unwrap();
+        assert_eq!(result.as_str(), "755");
+
+        // 420 decimal = 644 octal (rw-r--r--)
+        let result = oct_dollar(&VBVariant::from_long(420)).unwrap();
+        assert_eq!(result.as_str(), "644");
+    }
+
+    #[test]
+    fn oct_dollar_powers_of_two() {
+        let result = oct_dollar(&VBVariant::from_long(1)).unwrap();
+        assert_eq!(result.as_str(), "1");
+
+        let result = oct_dollar(&VBVariant::from_long(2)).unwrap();
+        assert_eq!(result.as_str(), "2");
+
+        let result = oct_dollar(&VBVariant::from_long(4)).unwrap();
+        assert_eq!(result.as_str(), "4");
+
+        let result = oct_dollar(&VBVariant::from_long(8)).unwrap();
+        assert_eq!(result.as_str(), "10");
+
+        let result = oct_dollar(&VBVariant::from_long(64)).unwrap();
+        assert_eq!(result.as_str(), "100");
+    }
+
+    #[test]
+    fn oct_dollar_empty_returns_zero() {
+        let result = oct_dollar(&VBVariant::Empty).unwrap();
+        assert_eq!(result.as_str(), "0");
+    }
+
+    #[test]
+    fn oct_dollar_small_values() {
+        for i in 0..8 {
+            let result = oct_dollar(&VBVariant::from_long(i)).unwrap();
+            let expected = format!("{:o}", i);
+            assert_eq!(result.as_str(), expected, "Failed for value {}", i);
+        }
+    }
+}
