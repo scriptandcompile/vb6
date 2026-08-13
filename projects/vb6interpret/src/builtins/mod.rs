@@ -11,6 +11,7 @@
 //! [`registry`].
 
 mod arrays;
+mod conversion;
 mod datetime;
 mod logic;
 mod math;
@@ -88,6 +89,7 @@ fn registry() -> &'static Registry {
     REGISTRY.get_or_init(|| {
         let mut registry = Registry::new();
         arrays::register(&mut registry);
+        conversion::register(&mut registry);
         datetime::register(&mut registry);
         logic::register(&mut registry);
         string::register(&mut registry);
@@ -593,6 +595,30 @@ mod tests {
         assert_eq!(
             call_builtin("Join", &[arr, VBVariant::from_string(" ")]).unwrap(),
             VBVariant::from_string("banana")
+        );
+    }
+
+    #[test]
+    fn conversion_functions_dispatch() {
+        assert_eq!(
+            call_builtin("Hex", &[VBVariant::from_long(255)]).unwrap(),
+            VBVariant::from_string("FF")
+        );
+        assert_eq!(
+            call_builtin("Hex$", &[VBVariant::from_long(255)]).unwrap(),
+            VBVariant::from_string("FF")
+        );
+        assert_eq!(
+            call_builtin("Oct$", &[VBVariant::from_long(255)]).unwrap(),
+            VBVariant::from_string("377")
+        );
+        assert_eq!(
+            call_builtin("VarType", &[VBVariant::from_long(42)]).unwrap(),
+            VBVariant::from_long(3)
+        );
+        assert_eq!(
+            call_builtin("CVErr", &[VBVariant::from_integer(13)]).unwrap(),
+            VBVariant::from_error(vb6core::error::VBError::new(13))
         );
     }
 }
