@@ -301,7 +301,9 @@ fn continued_comment_lines(source: &str) -> std::collections::HashSet<usize> {
             continued.insert(index + 1);
         } else {
             inside_comment = trimmed.starts_with('\'')
-                || trimmed.len() >= 4 && trimmed[..4].eq_ignore_ascii_case("rem ");
+                || trimmed
+                    .get(..4)
+                    .is_some_and(|prefix| prefix.eq_ignore_ascii_case("rem "));
         }
 
         // The run of comment lines ends at the first one without a trailing
@@ -365,6 +367,21 @@ mod tests {
         let source = concat!(
             "' esta linea sigue en la siguiente _\r\n",
             "  S/N\u{ba}PROYECTO y su a\u{f1}o\r\n",
+            "Public Sub Main()\r\n",
+            "End Sub\r\n",
+        );
+
+        assert!(lint_source(source, &with(&["N001"])).is_empty());
+    }
+
+    /// The `REM` check must not slice a line at a fixed byte offset: on a
+    /// continuation line that starts with an accented character the offset
+    /// lands inside it, which panics.
+    #[test]
+    fn continuation_line_starting_with_a_multibyte_character() {
+        let source = concat!(
+            "' primero _\r\n",
+            "\u{e1}rea de trabajo\r\n",
             "Public Sub Main()\r\n",
             "End Sub\r\n",
         );
