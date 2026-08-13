@@ -233,6 +233,39 @@ export function highlightExecutionLine(lineNumber) {
     editor.revealLineInCenterIfOutsideViewport(lineNumber);
 }
 
+export function highlightExecutionRange(cursor) {
+    if (!editor || !cursor || cursor.length !== 4) {
+        return;
+    }
+
+    const [startLine, startColumn, endLine, endColumn] = cursor;
+    const model = editor.getModel();
+    if (!model || startLine < 1 || startLine > model.getLineCount()) {
+        clearExecutionHighlight();
+        return;
+    }
+
+    const startText = model.getLineContent(startLine);
+    const endText = model.getLineContent(endLine);
+    const clampedStart = Math.min(Math.max(1, startColumn), startText.length + 1);
+    const clampedEnd = Math.min(Math.max(clampedStart, endColumn), endText.length + 1);
+
+    executionLineDecorations = editor.deltaDecorations(executionLineDecorations, [
+        {
+            range: new monaco.Range(startLine, clampedStart, endLine, clampedEnd),
+            options: {
+                isWholeLine: false,
+                className: "execution-range-highlight",
+                glyphMarginClassName: "execution-line-glyph",
+                linesDecorationsClassName: "execution-line-decoration",
+                stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+            },
+        },
+    ]);
+
+    editor.revealLineInCenterIfOutsideViewport(startLine);
+}
+
 export function clearExecutionHighlight() {
     if (!editor) {
         return;

@@ -334,6 +334,13 @@ body {
     border-bottom: 1px solid rgba(255, 208, 0, 0.45);
 }
 
+.execution-range-highlight {
+    background: rgba(255, 208, 0, 0.35);
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(255, 208, 0, 0.65);
+    cursor: default;
+}
+
 .execution-line-decoration {
     border-left: 3px solid rgba(255, 208, 0, 0.85);
 }
@@ -351,6 +358,11 @@ body {
     background: rgba(255, 208, 0, 0.12);
     border-top-color: rgba(255, 208, 0, 0.35);
     border-bottom-color: rgba(255, 208, 0, 0.35);
+}
+
+[data-theme="dark"] .execution-range-highlight {
+    background: rgba(255, 208, 0, 0.28);
+    box-shadow: 0 0 0 1px rgba(255, 208, 0, 0.5);
 }
 
 .tab-nav {
