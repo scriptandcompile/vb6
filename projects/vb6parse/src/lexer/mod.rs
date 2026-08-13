@@ -376,14 +376,29 @@ pub fn tokenize<'a>(input: &mut SourceStream<'a>) -> ParseResult<'a, TokenStream
             continue;
         }
 
-        if let Some(token_text) = input.take_count(1) {
+        // Nothing above matched at this position. Consume one whole character
+        // so that the loop always makes progress, and report it as unknown.
+        //
+        // This must not use `take_count(1)`: that method works in *bytes* and
+        // returns `None` for any multi-byte character, because a single byte
+        // lands in the middle of it. A source file holding a non-ASCII
+        // character outside of a comment or a string literal -- an accented
+        // identifier, for instance, which VB6 itself accepts -- would then
+        // reach this point, consume nothing, and spin here forever.
+        if let Some(token_text) = input.take_character() {
             ctx.error(
                 input.span_here(),
                 LexerError::UnknownToken {
                     token: token_text.into(),
                 },
             );
+            continue;
         }
+
+        // The stream reports that it is not empty, yet nothing could be taken
+        // from it. That should not be reachable, but stopping is always better
+        // than looping forever.
+        break;
     }
 
     failures.extend(ctx.take_errors());
@@ -2327,5 +2342,51 @@ Attribute VB_Exposed = False
         assert_eq!(tokens[3], (" ", Token::Whitespace));
         assert_eq!(tokens[4], ("1.5E+10", Token::SingleLiteral));
         assert_eq!(tokens.len(), 5);
+    }
+
+    /// A multi-byte character in code used to hang the tokenizer: the fallback
+    /// branch asked for one *byte*, could not take it without splitting the
+    /// character, consumed nothing, and the loop spun forever.
+    ///
+    /// VB6 accepts accented identifiers, so real source files hit this.
+    #[test]
+    fn multibyte_character_in_code_terminates() {
+        // Reaching the end of this loop at all is the assertion: before the
+        // fix, tokenize() never returned for any of these inputs.
+        for content in ["x = ñ", "Dim año As Integer", "x = €", "x = 日"] {
+            let mut input = SourceStream::new("", content);
+            let (tokens_opt, _failures) = tokenize(&mut input).unpack();
+
+            assert!(tokens_opt.is_some(), "{content}");
+        }
+    }
+
+    /// The whole multi-byte character is reported, not a fragment of it, and
+    /// tokenizing carries on afterwards.
+    #[test]
+    fn multibyte_character_is_reported_whole() {
+        let mut input = SourceStream::new("", "x = ñ + 1");
+        let (tokens_opt, failures) = tokenize(&mut input).unpack();
+
+        let tokens = tokens_opt.expect("Expected tokens");
+        let last = tokens.len() - 1;
+        assert_eq!(
+            tokens[last].0, "1",
+            "tokenizing should continue past the unknown character"
+        );
+        assert_eq!(failures.len(), 1, "one unknown character, one failure");
+    }
+
+    /// Non-ASCII characters inside comments and string literals are consumed by
+    /// their own branches and must stay untouched by the fallback.
+    #[test]
+    fn multibyte_character_in_comment_or_string_is_not_an_error() {
+        for content in ["' año", "x = \"año\""] {
+            let mut input = SourceStream::new("", content);
+            let (tokens_opt, failures) = tokenize(&mut input).unpack();
+
+            assert!(tokens_opt.is_some(), "{content}");
+            assert!(failures.is_empty(), "{content}: {failures:?}");
+        }
     }
 }
