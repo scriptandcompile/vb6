@@ -119,11 +119,10 @@
 //! ' Pattern 7: Show bit pattern
 //! Sub ShowBitPattern(value As Long)
 //!     Debug.Print "Hex: " & Hex(value)
-//!     Debug.Print "Dec: " & value
 //! End Sub
 //!
 //! ' Pattern 8: Color component extraction
-//! Function GetRedComponent(color As Long) As Integer
+//! Function GetRedComponent(color As Integer) As Integer
 //!     GetRedComponent = color And &HFF
 //!     Debug.Print "Red: " & Hex(GetRedComponent)
 //! End Function
@@ -318,7 +317,7 @@
 //! - No built-in support for padding with leading zeros (use Right$ or Format$)
 //! - Returns uppercase letters only (A-F, not a-f)
 //! - No control over prefix inclusion (always excludes "&H")
-//! - Maximum value is Long range (−2,147,483,648 to 2,147,483,647)
+//! - Maximum value is Long range (-2,147,483,648 to 2,147,483,647)
 //! - Fractional parts are rounded, not truncated
 //!
 //! ## Related Functions
@@ -329,3 +328,147 @@
 //! - `CLng`: Converts an expression to a Long
 //! - `CInt`: Converts an expression to an Integer
 //! - `Val`: Returns the numbers contained in a string as a numeric value
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `Hex` function.
+///
+/// Converts a number to its hexadecimal string representation. The result uses
+/// uppercase letters (A-F) and does not include any prefix ("0x" or "&H").
+///
+/// Unlike `Hex$`, this variant propagates `Null` — if the argument is `Null`,
+/// it returns `Null` rather than raising an error.
+///
+/// VB6 behavior:
+/// - Fractional values are rounded to the nearest integer before conversion
+/// - Negative numbers use two's complement representation
+/// - `Integer` values produce up to 4 hex digits
+/// - `Long` values produce up to 8 hex digits
+/// - Returns `Null` if `number` is `Null`
+/// - Raises error 13 if `number` cannot be converted to a number
+pub fn hex(number: &VBVariant) -> VBResult<VBVariant> {
+    if number.is_null() {
+        return Ok(VBVariant::Null);
+    }
+
+    let result = match number {
+        VBVariant::Integer(v) => format!("{:X}", *v as u16),
+        VBVariant::Long(v) => format!("{:X}", *v as u32),
+        VBVariant::Byte(v) => format!("{:X}", *v as u32),
+        _ => {
+            let v = number.as_i64()?;
+            if let Ok(long_val) = i32::try_from(v) {
+                format!("{:X}", long_val as u32)
+            } else {
+                return Err(VBError::overflow());
+            }
+        }
+    };
+
+    Ok(VBVariant::from_string(&result))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::hex;
+    use crate::value::VBVariant;
+
+    #[test]
+    fn hex_zero() {
+        let result = hex(&VBVariant::from_long(0)).unwrap();
+        assert_eq!(result, VBVariant::from_string("0"));
+    }
+
+    #[test]
+    fn hex_positive_long() {
+        assert_eq!(hex(&VBVariant::from_long(255)).unwrap(), VBVariant::from_string("FF"));
+        assert_eq!(hex(&VBVariant::from_long(4096)).unwrap(), VBVariant::from_string("1000"));
+        assert_eq!(hex(&VBVariant::from_long(65535)).unwrap(), VBVariant::from_string("FFFF"));
+    }
+
+    #[test]
+    fn hex_positive_integer() {
+        assert_eq!(hex(&VBVariant::from_integer(255)).unwrap(), VBVariant::from_string("FF"));
+        assert_eq!(hex(&VBVariant::from_integer(-1)).unwrap(), VBVariant::from_string("FFFF"));
+    }
+
+    #[test]
+    fn hex_negative_long() {
+        assert_eq!(hex(&VBVariant::from_long(-1)).unwrap(), VBVariant::from_string("FFFFFFFF"));
+        assert_eq!(hex(&VBVariant::from_long(-256)).unwrap(), VBVariant::from_string("FFFFFF00"));
+    }
+
+    #[test]
+    fn hex_byte() {
+        assert_eq!(hex(&VBVariant::from_byte(15)).unwrap(), VBVariant::from_string("F"));
+        assert_eq!(hex(&VBVariant::from_byte(255)).unwrap(), VBVariant::from_string("FF"));
+    }
+
+    #[test]
+    fn hex_double_rounds() {
+        // 15.3 rounds to 15 → "F"
+        assert_eq!(hex(&VBVariant::Double(15.3)).unwrap(), VBVariant::from_string("F"));
+        // 15.7 rounds to 16 → "10"
+        assert_eq!(hex(&VBVariant::Double(15.7)).unwrap(), VBVariant::from_string("10"));
+    }
+
+    #[test]
+    fn hex_from_string() {
+        assert_eq!(hex(&VBVariant::from_string("255")).unwrap(), VBVariant::from_string("FF"));
+    }
+
+    #[test]
+    fn hex_null_returns_null() {
+        let result = hex(&VBVariant::Null).unwrap();
+        assert!(result.is_null());
+    }
+
+    #[test]
+    fn hex_max_long() {
+        assert_eq!(hex(&VBVariant::from_long(i32::MAX)).unwrap(), VBVariant::from_string("7FFFFFFF"));
+    }
+
+    #[test]
+    fn hex_min_long() {
+        assert_eq!(hex(&VBVariant::from_long(i32::MIN)).unwrap(), VBVariant::from_string("80000000"));
+    }
+
+    #[test]
+    fn hex_uppercase() {
+        assert_eq!(hex(&VBVariant::from_long(10)).unwrap(), VBVariant::from_string("A"));
+        assert_eq!(hex(&VBVariant::from_long(11)).unwrap(), VBVariant::from_string("B"));
+        assert_eq!(hex(&VBVariant::from_long(15)).unwrap(), VBVariant::from_string("F"));
+        assert_eq!(hex(&VBVariant::from_long(0xABCD)).unwrap(), VBVariant::from_string("ABCD"));
+    }
+
+    #[test]
+    fn hex_power_of_two() {
+        assert_eq!(hex(&VBVariant::from_long(16)).unwrap(), VBVariant::from_string("10"));
+        assert_eq!(hex(&VBVariant::from_long(256)).unwrap(), VBVariant::from_string("100"));
+        assert_eq!(hex(&VBVariant::from_long(4096)).unwrap(), VBVariant::from_string("1000"));
+        assert_eq!(hex(&VBVariant::from_long(65536)).unwrap(), VBVariant::from_string("10000"));
+    }
+
+    #[test]
+    fn hex_empty_returns_zero() {
+        let result = hex(&VBVariant::Empty).unwrap();
+        assert_eq!(result, VBVariant::from_string("0"));
+    }
+
+    #[test]
+    fn hex_small_values() {
+        for i in 0..16 {
+            let result = hex(&VBVariant::from_long(i)).unwrap();
+            let expected = format!("{:X}", i);
+            assert_eq!(result, VBVariant::from_string(&expected), "Failed for value {}", i);
+        }
+    }
+
+    #[test]
+    fn hex_variants_propagate_null() {
+        // Hex returns Null for Null input (different from Hex$ which raises error 94)
+        let result = hex(&VBVariant::Null).unwrap();
+        assert!(result.is_null());
+    }
+}
