@@ -17,33 +17,33 @@ name = "vb6interpret"
 path = "src/main.rs"
 
 [dependencies]
-vb6parse = { workspace = true }
-vb6semantic = { path = "../vb6semantic" }
-vb6runtime = { path = "../vb6runtime" }
-vb6core = { path = "../vb6core" }
-thiserror = { workspace = true }
-anyhow = { workspace = true }
-clap = { workspace = true }
-
-serde = { workspace = true }
+vb6parse.workspace = true
+vb6semantic.workspace = true
+vb6runtime.workspace = true
+vb6core.workspace = true
+ariadne.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+serde.workspace = true
 
 # For performance monitoring
-tracing = { version = "0.1", optional = true }
-tracing-subscriber = { version = "0.3", optional = true }
+tracing = { workspace = true, optional = true }
+tracing-subscriber = { workspace = true, optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # For REPL
-rustyline = { version = "17.0.2", optional = true }
-colored = { version = "3.1.1", optional = true }
+rustyline = { workspace = true, optional = true }
+colored = { workspace = true, optional = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = "0.2.126"
-serde-wasm-bindgen = "0.6.5"
-console_error_panic_hook = "0.1.7"
+wasm-bindgen.workspace = true
+serde-wasm-bindgen.workspace = true
+console_error_panic_hook.workspace = true
 
 [dev-dependencies]
-criterion = "0.8.2"
-tempfile = "3.8"
+criterion.workspace = true
+tempfile.workspace = true
 
 [features]
 default = []
