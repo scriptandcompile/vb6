@@ -341,3 +341,52 @@ Sub Main()\n\
 End Sub\n";
     assert_eq!(run_final_line(source), 8);
 }
+
+#[test]
+fn irr_passes_whole_array_with_empty_parens() {
+    let source = "Attribute VB_Name = \"M\"\n\
+Sub Main()\n\
+    Dim Guess, RetRate\n\
+    Dim Values(5) As Double\n\
+    Guess = .1\n\
+    Values(0) = -70000\n\
+    Values(1) = 22000\n\
+    Values(2) = 25000\n\
+    Values(3) = 28000\n\
+    Values(4) = 31000\n\
+    RetRate = IRR(Values(), Guess) * 100\n\
+    Debug.Print Format(RetRate, \"0.0\")\n\
+End Sub\n";
+    let out = run_source(source).expect("interpretation failed");
+    assert_eq!(out, vec!["17.7"]);
+}
+
+#[test]
+fn irr_default_guess_with_empty_parens() {
+    let source = "Attribute VB_Name = \"M\"\n\
+Sub Main()\n\
+    Dim cfs(0 To 3) As Double\n\
+    cfs(0) = -1000\n\
+    cfs(1) = 400\n\
+    cfs(2) = 400\n\
+    cfs(3) = 400\n\
+    Debug.Print Format(IRR(cfs()), \"0.00\")\n\
+End Sub\n";
+    let out = run_source(source).expect("interpretation failed");
+    assert_eq!(out, vec!["0.10"]);
+}
+
+#[test]
+fn array_element_indexing_still_works() {
+    let source = "Attribute VB_Name = \"M\"\n\
+Sub Main()\n\
+    Dim a(3) As Integer\n\
+    a(0) = 10\n\
+    a(1) = 20\n\
+    a(2) = 30\n\
+    Debug.Print a(1)\n\
+    Debug.Print a(0)\n\
+End Sub\n";
+    let out = run_source(source).expect("interpretation failed");
+    assert_eq!(out, vec!["20", "10"]);
+}
