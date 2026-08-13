@@ -13,11 +13,40 @@ use clap::{Arg, Command, builder::PossibleValue, command, value_parser};
 fn main() -> Result<()> {
     let matches = command!()
         .subcommand(
-            Command::new("check").about("Check the project").arg(
-                Arg::new("project path")
-                    .required(false)
-                    .value_parser(value_parser!(PathBuf)),
-            ),
+            Command::new("check")
+                .about("Check the project")
+                .arg(
+                    Arg::new("select")
+                        .long("select")
+                        .required(false)
+                        // One value per flag, repeatable, comma-separated. Not
+                        // `num_args(1..)`: that swallows the positional path.
+                        .num_args(1)
+                        .action(clap::ArgAction::Append)
+                        .value_delimiter(',')
+                        .help("lint rule codes or code prefixes to run, e.g. N001 or N"),
+                )
+                .arg(
+                    Arg::new("ignore")
+                        .long("ignore")
+                        .required(false)
+                        .num_args(1)
+                        .action(clap::ArgAction::Append)
+                        .value_delimiter(',')
+                        .help("lint rule codes or code prefixes to skip"),
+                )
+                .arg(
+                    Arg::new("explain")
+                        .long("explain")
+                        .required(false)
+                        .action(clap::ArgAction::SetTrue)
+                        .help("list every lint rule with its default and fixability"),
+                )
+                .arg(
+                    Arg::new("project path")
+                        .required(false)
+                        .value_parser(value_parser!(PathBuf)),
+                ),
         )
         .subcommand(
             Command::new("fmt")
@@ -97,7 +126,47 @@ fn main() -> Result<()> {
             .unwrap_or(&current_dir)
             .to_path_buf();
 
-        let check_settings = check::CheckSettings { project_path };
+        if matches.get_flag("explain") {
+            check::explain_rules();
+            return Ok(());
+        }
+
+        let configured = check::load_lint_settings(&project_path);
+        let from_cli = |name: &str| -> Option<Vec<String>> {
+            matches
+                .get_many::<String>(name)
+                .map(|values| values.cloned().collect())
+        };
+
+        let select = from_cli("select").unwrap_or(configured.select);
+        let ignore = from_cli("ignore").unwrap_or(configured.ignore);
+
+        let unknown: Vec<&String> = select
+            .iter()
+            .chain(ignore.iter())
+            .filter(|code| {
+                !vb6parse::lint::RULES
+                    .iter()
+                    .any(|rule| rule.code.starts_with(code.as_str()))
+            })
+            .collect();
+
+        if !unknown.is_empty() {
+            // A typo in a rule code must not quietly select nothing.
+            anyhow::bail!(
+                "unknown rule code(s): {}. `aspen check --explain` lists them.",
+                unknown
+                    .iter()
+                    .map(|code| code.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            );
+        }
+
+        let check_settings = check::CheckSettings {
+            project_path,
+            lint: vb6parse::lint::LintSettings::from_selection(&select, &ignore),
+        };
 
         check_subcommand(check_settings)?;
 

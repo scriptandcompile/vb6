@@ -369,3 +369,104 @@ Currently, only latin-1 source code is supported."
         SourceStream::new(self.context.file_name(), self.context.content())
     }
 }
+
+/// Encodes text back into the Windows-1252 bytes that VB6 expects on disk.
+///
+/// This is the counterpart of [`SourceFile::decode`]: anything that reads a
+/// source file, changes it and writes it back needs it, or the file silently
+/// becomes UTF-8 and VB6 stops reading its accented characters correctly.
+///
+/// Encoding is refused rather than made lossy. `encoding_rs` maps any
+/// character outside Windows-1252 to `?`, which loses it without telling
+/// anyone, so an unrepresentable character is reported as an error instead.
+///
+/// # Errors
+///
+/// Returns the first character that Windows-1252 cannot represent, together
+/// with its byte offset in `content`.
+///
+/// # Example
+///
+/// ```rust
+/// use vb6parse::io::{encode_windows_1252, SourceFile};
+///
+/// let bytes = b"' a\xF1o";
+/// let source = SourceFile::decode_with_replacement("m.bas", bytes).expect("decodes");
+///
+/// assert_eq!(encode_windows_1252(source.as_ref()).unwrap(), bytes);
+/// ```
+pub fn encode_windows_1252(content: &str) -> Result<Vec<u8>, UnrepresentableCharacter> {
+    let (bytes, _, had_errors) = WINDOWS_1252.encode(content);
+
+    if had_errors {
+        let (offset, character) = content
+            .char_indices()
+            .find(|(_, character)| {
+                let mut buffer = [0u8; 4];
+                let (_, _, unmappable) = WINDOWS_1252.encode(character.encode_utf8(&mut buffer));
+                unmappable
+            })
+            .expect("encode reported an unmappable character");
+
+        return Err(UnrepresentableCharacter { character, offset });
+    }
+
+    Ok(bytes.into_owned())
+}
+
+/// A character that [`encode_windows_1252`] could not represent.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct UnrepresentableCharacter {
+    /// The offending character.
+    pub character: char,
+    /// Its byte offset in the text that was being encoded.
+    pub offset: usize,
+}
+
+impl Display for UnrepresentableCharacter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "character {:?} (U+{:04X}) at byte {} cannot be represented in Windows-1252",
+            self.character, self.character as u32, self.offset
+        )
+    }
+}
+
+impl std::error::Error for UnrepresentableCharacter {}
+
+#[cfg(test)]
+mod encode_tests {
+    use super::*;
+
+    #[test]
+    fn round_trips_accented_text() {
+        let bytes = b"Public Function A\xF1adir() ' a\xF1o \xE1rea";
+        let source = SourceFile::decode_with_replacement("m.bas", bytes).expect("decodes");
+
+        let encoded = encode_windows_1252(source.as_ref()).expect("encodes");
+
+        assert_eq!(encoded, bytes, "the file must survive a decode/encode cycle");
+    }
+
+    #[test]
+    fn every_byte_round_trips() {
+        // Windows-1252 decodes all 256 byte values, so cycling the whole range
+        // is the strongest check that writing back is lossless.
+        let bytes: Vec<u8> = (0u8..=255).collect();
+        let source = SourceFile::decode_with_replacement("m.bas", &bytes).expect("decodes");
+
+        assert_eq!(
+            encode_windows_1252(source.as_ref()).expect("encodes"),
+            bytes
+        );
+    }
+
+    #[test]
+    fn refuses_characters_outside_windows_1252() {
+        let error = encode_windows_1252("año 日").expect_err("must not silently write '?'");
+
+        assert_eq!(error.character, '日');
+        assert_eq!(error.offset, 5, "offset is in bytes, and 'ñ' takes two");
+    }
+}

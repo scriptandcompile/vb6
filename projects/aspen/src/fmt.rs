@@ -5,6 +5,8 @@ use rayon::prelude::*;
 
 use walkdir::WalkDir;
 
+use vb6parse::io::{SourceFile, encode_windows_1252};
+
 pub use vb6format::FmtSettings;
 
 pub struct CliSettings {
@@ -134,42 +136,58 @@ pub fn fmt_subcommand(cmd: FmtCommand) -> Result<()> {
         blank_lines_around_top_level: blank_around_top_level,
     };
 
-    let results: Vec<(PathBuf, bool)> = files_to_format
+    let results: Vec<FileOutcome> = files_to_format
         .par_iter()
         .map(|file| {
             let result = process_file(file, &fmt_settings, cmd.cli.check);
             (file.clone(), result)
         })
         .map(|(file, result)| match result {
-            Ok(changed) => {
-                if changed {
-                    if cmd.cli.check {
-                        println!("Would reformat: {}", file.display());
-                    } else {
-                        println!("Formatted: {}", file.display());
-                    }
-                    (file, true)
+            Ok(true) => {
+                if cmd.cli.check {
+                    println!("Would reformat: {}", file.display());
                 } else {
-                    (file, false)
+                    println!("Formatted: {}", file.display());
                 }
+                FileOutcome::Changed
             }
+            Ok(false) => FileOutcome::Unchanged,
             Err(e) => {
                 eprintln!("Error formatting {}: {}", file.display(), e);
-                (file, false)
+                FileOutcome::Failed
             }
         })
         .collect();
 
-    let changed_count = results.iter().filter(|(_, changed)| *changed).count();
+    let changed_count = results
+        .iter()
+        .filter(|outcome| **outcome == FileOutcome::Changed)
+        .count();
+    let failed_count = results
+        .iter()
+        .filter(|outcome| **outcome == FileOutcome::Failed)
+        .count();
     let total = results.len();
 
     if cmd.cli.check {
         println!("{} of {} files would be reformatted.", changed_count, total);
-        if changed_count > 0 {
-            std::process::exit(1);
-        }
     } else {
         println!("Formatted {} of {} files.", changed_count, total);
+    }
+
+    // A file that could not be processed is not a file that is fine: reporting
+    // it and then exiting zero makes `fmt --check` pass in exactly the case it
+    // should fail, which is worthless as a CI gate. Say so, and say it loudly
+    // enough to be seen after a long list of file names.
+    if failed_count > 0 {
+        eprintln!(
+            "{} of {} files could not be processed and were not checked.",
+            failed_count, total
+        );
+    }
+
+    if failed_count > 0 || (cmd.cli.check && changed_count > 0) {
+        std::process::exit(1);
     }
 
     Ok(())
@@ -255,11 +273,25 @@ fn join_parent_project_path(parent_project_path: &Path, file_path: &str) -> Path
     }
 }
 
-fn process_file(path: &Path, fmt_settings: &FmtSettings, check_only: bool) -> Result<bool> {
-    let source = std::fs::read_to_string(path)
-        .with_context(|| format!("Failed to read {}", path.display()))?;
+/// What happened to a single file. An error is deliberately not folded into
+/// "unchanged": the two need to reach the exit code differently.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum FileOutcome {
+    Changed,
+    Unchanged,
+    Failed,
+}
 
-    let formatted = vb6format::fmt_source(&source, fmt_settings)
+fn process_file(path: &Path, fmt_settings: &FmtSettings, check_only: bool) -> Result<bool> {
+    // VB6 source files are Windows-1252, not UTF-8. `read_to_string` rejects
+    // every file holding an accented character, which in a non-English code
+    // base is most of them, so decode the way the rest of the library does.
+    let source = SourceFile::from_file(path)
+        .map_err(|e| anyhow::anyhow!("{}", e))
+        .with_context(|| format!("Failed to read {}", path.display()))?;
+    let source: &str = source.as_ref();
+
+    let formatted = vb6format::fmt_source(source, fmt_settings)
         .with_context(|| format!("Failed to format {}", path.display()))?;
 
     if formatted == source {
@@ -267,7 +299,14 @@ fn process_file(path: &Path, fmt_settings: &FmtSettings, check_only: bool) -> Re
     }
 
     if !check_only {
-        std::fs::write(path, &formatted)
+        // And write it back as Windows-1252 too. Writing the Rust string
+        // straight out would re-encode the file as UTF-8, which VB6 would then
+        // read incorrectly -- a silent corruption of every accented character
+        // in the project.
+        let bytes = encode_windows_1252(&formatted)
+            .with_context(|| format!("Failed to encode {}", path.display()))?;
+
+        std::fs::write(path, bytes)
             .with_context(|| format!("Failed to write {}", path.display()))?;
     }
 
