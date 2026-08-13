@@ -496,17 +496,65 @@ fn take_line_comment_with_token<'a>(
     input: &mut SourceStream<'a>,
     token: Token,
 ) -> Option<LineCommentTuple<'a>> {
-    match input.take_until_newline() {
-        None => None,
-        Some((comment, newline_optional)) => {
-            let comment_tuple = (comment, token);
+    let start_offset = input.offset();
 
-            match newline_optional {
-                None => Some((comment_tuple, None)),
-                Some(newline) => Some((comment_tuple, Some((newline, Token::Newline)))),
-            }
+    let (first_line, mut newline_optional) = input.take_until_newline()?;
+    let mut comment_end = start_offset + first_line.len();
+    let mut last_line = first_line;
+
+    // A trailing `_` continues a logical line in VB6, and a comment is a
+    // logical line: the text on the next line is still comment, even though it
+    // does not start with its own `'`. Without this the following line is read
+    // as code, and prose from the comment ends up in the token stream.
+    while newline_optional.is_some() && ends_with_line_continuation(last_line) {
+        // A continuation line that opens its own comment is left as its own
+        // token: it is already read as a comment, so nothing is misread, and
+        // keeping it separate preserves the existing tokenization. Only the
+        // lines that would otherwise be read as code are absorbed.
+        if starts_a_comment(&input.contents[input.offset()..]) {
+            break;
         }
+
+        let Some((next_line, next_newline)) = input.take_until_newline() else {
+            break;
+        };
+
+        comment_end = input.offset() - next_newline.map_or(0, str::len);
+        last_line = next_line;
+        newline_optional = next_newline;
     }
+
+    let comment_tuple = (&input.contents[start_offset..comment_end], token);
+
+    match newline_optional {
+        None => Some((comment_tuple, None)),
+        Some(newline) => Some((comment_tuple, Some((newline, Token::Newline)))),
+    }
+}
+
+/// Whether a line ends in the VB6 line-continuation character.
+///
+/// The continuation is *a space followed by an underscore*, so the space is
+/// required: `Close_` at the end of a line is an identifier ending in an
+/// underscore, not a continuation. Trailing whitespace after the `_` is
+/// allowed, and common in real source files.
+fn ends_with_line_continuation(line: &str) -> bool {
+    let line = line.trim_end_matches([' ', '\t']);
+
+    line.strip_suffix('_')
+        .is_some_and(|before| before.ends_with([' ', '\t']))
+}
+
+/// Whether the text at the start of a line opens a comment of its own.
+fn starts_a_comment(rest_of_input: &str) -> bool {
+    let line_start = rest_of_input.trim_start_matches([' ', '\t']);
+
+    line_start.starts_with('\'')
+        // `get` rather than a slice: a continuation line can begin with a
+        // multi-byte character, and a fixed byte offset would land inside it.
+        || line_start
+            .get(..4)
+            .is_some_and(|prefix| prefix.eq_ignore_ascii_case("rem "))
 }
 
 /// Parses a VB6 numeric literal with optional type suffix from the input stream.
@@ -2327,5 +2375,123 @@ Attribute VB_Exposed = False
         assert_eq!(tokens[3], (" ", Token::Whitespace));
         assert_eq!(tokens[4], ("1.5E+10", Token::SingleLiteral));
         assert_eq!(tokens.len(), 5);
+    }
+
+    /// A `_` at the end of a comment continues it onto the next line, the same
+    /// way it continues any other logical line. Without this the second line is
+    /// tokenized as code.
+    #[test]
+    fn line_comment_continues_over_underscore() {
+        let content = "' first _\r\n second\r\nx = 1";
+        let (tokens_opt, failures) = tokenize(&mut SourceStream::new("", content)).unpack();
+
+        assert!(failures.is_empty(), "{failures:?}");
+        let tokens = tokens_opt.expect("Expected tokens");
+
+        assert_eq!(tokens[0], ("' first _\r\n second", Token::EndOfLineComment));
+        assert_eq!(tokens[1], ("\r\n", Token::Newline));
+        assert_eq!(tokens[2], ("x", Token::Identifier));
+    }
+
+    /// Several continuations in a row are all one comment.
+    #[test]
+    fn line_comment_continues_over_several_lines() {
+        let content = "' one _\r\n two _\r\n three\r\nDim x";
+        let (tokens_opt, _failures) = tokenize(&mut SourceStream::new("", content)).unpack();
+
+        let tokens = tokens_opt.expect("Expected tokens");
+
+        assert_eq!(
+            tokens[0],
+            ("' one _\r\n two _\r\n three", Token::EndOfLineComment)
+        );
+        assert_eq!(tokens[2], ("Dim", Token::DimKeyword));
+    }
+
+    /// Without the continuation the comment still stops at its own line.
+    #[test]
+    fn line_comment_without_continuation_stops_at_the_line() {
+        let content = "' first\r\nDim x";
+        let (tokens_opt, _failures) = tokenize(&mut SourceStream::new("", content)).unpack();
+
+        let tokens = tokens_opt.expect("Expected tokens");
+
+        assert_eq!(tokens[0], ("' first", Token::EndOfLineComment));
+        assert_eq!(tokens[2], ("Dim", Token::DimKeyword));
+    }
+
+    /// Trailing whitespace after the `_` is common in real files and must not
+    /// stop the continuation.
+    #[test]
+    fn line_continuation_tolerates_trailing_whitespace() {
+        let content = "' first _  \r\n second\r\n";
+        let (tokens_opt, _failures) = tokenize(&mut SourceStream::new("", content)).unpack();
+
+        let tokens = tokens_opt.expect("Expected tokens");
+
+        assert_eq!(
+            tokens[0],
+            ("' first _  \r\n second", Token::EndOfLineComment)
+        );
+    }
+
+    /// The continuation is a space followed by an underscore. An identifier
+    /// that merely ends in `_` does not continue the line.
+    #[test]
+    fn underscore_without_a_leading_space_is_not_a_continuation() {
+        let content = "'m_oSocket.Close_\r\nSet x = Nothing\r\n";
+        let (tokens_opt, _failures) = tokenize(&mut SourceStream::new("", content)).unpack();
+
+        let tokens = tokens_opt.expect("Expected tokens");
+
+        assert_eq!(tokens[0], ("'m_oSocket.Close_", Token::EndOfLineComment));
+        assert_eq!(tokens[1], ("\r\n", Token::Newline));
+        assert_eq!(tokens[2], ("Set", Token::SetKeyword));
+    }
+
+    /// A continuation line that opens its own comment stays its own token.
+    /// Nothing is misread there, and merging it would change the tokenization
+    /// of source that already worked.
+    #[test]
+    fn continuation_onto_another_comment_stays_separate() {
+        let content = "' first _\r\n' second\r\n";
+        let (tokens_opt, _failures) = tokenize(&mut SourceStream::new("", content)).unpack();
+
+        let tokens = tokens_opt.expect("Expected tokens");
+
+        assert_eq!(tokens[0], ("' first _", Token::EndOfLineComment));
+        assert_eq!(tokens[1], ("\r\n", Token::Newline));
+        assert_eq!(tokens[2], ("' second", Token::EndOfLineComment));
+    }
+
+    /// Looking for a `REM` on the continuation line must not slice it at a
+    /// fixed byte offset: when that line begins with an accented character the
+    /// offset lands inside it, which panics.
+    #[test]
+    fn continuation_line_may_start_with_a_multibyte_character() {
+        let content = "' primero _\r\n\u{e1}rea de trabajo\r\nDim x\r\n";
+        let (tokens_opt, _failures) = tokenize(&mut SourceStream::new("", content)).unpack();
+
+        let tokens = tokens_opt.expect("Expected tokens");
+
+        assert_eq!(
+            tokens[0],
+            (
+                "' primero _\r\n\u{e1}rea de trabajo",
+                Token::EndOfLineComment
+            )
+        );
+    }
+
+    /// REM comments go through the same path.
+    #[test]
+    fn rem_comment_continues_over_underscore() {
+        let content = "REM first _\r\n second\r\nDim x";
+        let (tokens_opt, _failures) = tokenize(&mut SourceStream::new("", content)).unpack();
+
+        let tokens = tokens_opt.expect("Expected tokens");
+
+        assert_eq!(tokens[0], ("REM first _\r\n second", Token::RemComment));
+        assert_eq!(tokens[2], ("Dim", Token::DimKeyword));
     }
 }
