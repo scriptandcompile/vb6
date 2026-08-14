@@ -46,4 +46,8 @@ pub(super) fn register(registry: &mut Registry) {
         let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
         finfn::nper::nper(&args[0], &args[1], &args[2], fv, type_)
     }));
+
+    registry.insert(builtin!("npv", 2, 2, |args| {
+        finfn::npv::npv(&args[0], &args[1])
+    }));
 }
