@@ -259,11 +259,13 @@ impl<'a> SourceStream<'a> {
         Some(result)
     }
 
-    /// Takes a specific number of characters from the stream.
+    /// Takes exactly `count` bytes from the stream and advances the offset.
     ///
-    /// If the requested number of characters exceeds the remaining characters
-    /// in the stream, it returns `None`.
-    /// Takes the next `count` bytes from the stream and advances the offset.
+    /// This is a byte-oriented primitive: the caller must have already verified
+    /// that the next `count` bytes form a complete UTF-8 sequence (typically an
+    /// ASCII span such as a validated digit run or an operator literal). For
+    /// "consume the next single character regardless of its encoding", use
+    /// [`Self::take_character`].
     ///
     /// Returns `None` if the requested count exceeds the remaining contents
     /// or if taking that many bytes would not end at a UTF-8 character boundary.
@@ -283,6 +285,25 @@ impl<'a> SourceStream<'a> {
             self.offset = end_offset;
             Some(result)
         }
+    }
+
+    /// Takes a single character (one full UTF-8 code point) from the stream and
+    /// advances the offset past it.
+    ///
+    /// Unlike [`Self::take_count`], this advances by the character's full UTF-8
+    /// byte length, so it always makes progress even for multi-byte characters.
+    ///
+    /// Returns `None` if the stream is at the end of the contents.
+    #[must_use]
+    pub fn take_character(&mut self) -> Option<&'a str> {
+        if self.is_empty() {
+            return None;
+        }
+        let current_char = self.contents[self.offset..].chars().next()?;
+        let end_offset = self.offset + current_char.len_utf8();
+        let result = &self.contents[self.offset..end_offset];
+        self.offset = end_offset;
+        Some(result)
     }
 
     /// Takes characters from the stream until a character that matches the
@@ -516,22 +537,6 @@ impl<'a> SourceStream<'a> {
         self.take_until_lambda(|character| !character.is_ascii_alphabetic(), false)
     }
 
-    /// Takes a single character from the stream until a character that is not
-    /// an ASCII alphabetic (a-z, A-Z) is encountered or the end of the stream is
-    /// reached.
-    pub fn take_ascii_alphabetic(&mut self) -> Option<&'a str> {
-        match self.take_count(1usize) {
-            None => None,
-            Some(character) => {
-                if character.chars().next()?.is_ascii_alphabetic() {
-                    Some(character)
-                } else {
-                    None
-                }
-            }
-        }
-    }
-
     /// Takes characters from the stream until a character that is not an ASCII
     /// alphabetic character (a-z, A-Z), or "_" is encountered or the end of the
     /// stream is reached.
@@ -540,23 +545,6 @@ impl<'a> SourceStream<'a> {
             |character| !character.is_ascii_alphabetic() && character != '_',
             false,
         )
-    }
-
-    /// Takes a single character from the stream until a character that is not
-    /// an ASCII alphabetic (a-z, A-Z), "_", is encountered or the end of the
-    /// stream is reached.
-    pub fn take_ascii_underscore_alphabetic(&mut self) -> Option<&'a str> {
-        match self.take_count(1usize) {
-            None => None,
-            Some(character) => {
-                let single_character = character.chars().next()?;
-                if single_character.is_ascii_alphabetic() || single_character == '_' {
-                    Some(character)
-                } else {
-                    None
-                }
-            }
-        }
     }
 
     /// Takes characters from the stream until a characters that is not an ASCII
@@ -612,7 +600,7 @@ impl<'a> SourceStream<'a> {
     /// characters that some languages use to format numbers such as: "x", ".",
     /// ",", " ", "_", or non-ASCII digits such as "६" (Devanagari 6), or "೬" (Kannada 6).
     pub fn take_ascii_digit(&mut self) -> Option<&'a str> {
-        match self.take_count(1usize) {
+        match self.take_character() {
             None => None,
             Some(character) => {
                 if character.chars().next()?.is_ascii_digit() {
