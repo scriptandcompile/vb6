@@ -828,3 +828,144 @@
 //! - `FV`: Returns the future value of an investment
 //! - `NPer`: Returns the number of periods for an investment
 //! - `Rate`: Returns the interest rate per period
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `Pmt` function.
+///
+/// Returns a Double specifying the payment for an annuity based on periodic, fixed payments and a fixed interest rate.
+pub fn pmt(
+    rate: VBVariant,
+    nper: VBVariant,
+    pv: VBVariant,
+    fv: Option<&VBVariant>,
+    type_val: Option<&VBVariant>,
+) -> VBResult<VBVariant> {
+    let rate_f = rate.as_f64().map_err(|_| VBError::type_mismatch())?;
+    let nper_f = nper.as_f64().map_err(|_| VBError::type_mismatch())?;
+    let pv_f = pv.as_f64().map_err(|_| VBError::type_mismatch())?;
+    let fv_f = fv.map(|v| v.as_f64().unwrap_or(0.0)).unwrap_or(0.0);
+    let type_f = type_val.map(|v| v.as_f64().unwrap_or(0.0)).unwrap_or(0.0);
+
+    if nper_f == 0.0 || rate_f == -1.0 {
+        return Err(VBError::new(5));
+    }
+
+    if rate_f == 0.0 {
+        let pmt_val = -(pv_f - fv_f) / nper_f;
+        return Ok(VBVariant::from_double(pmt_val));
+    }
+
+    let multiplier = if type_f == 1.0 {
+        1.0 / (1.0 + rate_f)
+    } else {
+        1.0
+    };
+
+    let r = rate_f;
+    let n = nper_f;
+    let common_factor = (1.0 + r).powi(n as i32);
+
+    let pmt_val = -(pv_f * common_factor - fv_f) * r / (common_factor - 1.0) * multiplier;
+
+    Ok(VBVariant::from_double(pmt_val))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::value::VBVariant;
+
+    #[test]
+    fn pmt_simple_loan() {
+        // Example 1: Calculate monthly payment for a $20,000 loan at 6% APR for 5 years
+        // Pmt(0.06 / 12, 5 * 12, 20000)
+        let result = pmt(
+            VBVariant::from_double(0.06 / 12.0),
+            VBVariant::from_double(5.0 * 12.0),
+            VBVariant::from_double(20000.0),
+            None,
+            None,
+        )
+        .unwrap();
+        let val = result.as_f64().unwrap();
+        assert!((val - (-386.66)).abs() < 0.01);
+    }
+
+    #[test]
+    fn pmt_mortgage() {
+        // Example 2: $200,000 home loan, 30 years, 4.5% APR
+        // Pmt(0.045 / 12, 30 * 12, 200000)
+        let result = pmt(
+            VBVariant::from_double(0.045 / 12.0),
+            VBVariant::from_double(30.0 * 12.0),
+            VBVariant::from_double(200000.0),
+            None,
+            None,
+        )
+        .unwrap();
+        let val = result.as_f64().unwrap();
+        assert!((val - (-1013.37)).abs() < 0.01);
+    }
+
+    #[test]
+    fn pmt_savings_plan() {
+        // Example 3: How much to save monthly to accumulate $50,000 in 10 years at 5% annual return?
+        // Pmt(0.05 / 12, 10 * 12, 0, -50000)
+        let result = pmt(
+            VBVariant::from_double(0.05 / 12.0),
+            VBVariant::from_double(10.0 * 12.0),
+            VBVariant::from_double(0.0),
+            Some(&VBVariant::from_double(-50000.0)),
+            None,
+        )
+        .unwrap();
+        let val = result.as_f64().unwrap();
+        assert!((val - (-321.99)).abs() < 0.01);
+    }
+
+    #[test]
+    fn pmt_beginning_of_period() {
+        // Example 4: Lease payment due at start of month
+        // Pmt(0.08 / 12, 36, 25000, 0, 1)
+        let result = pmt(
+            VBVariant::from_double(0.08 / 12.0),
+            VBVariant::from_double(36.0),
+            VBVariant::from_double(25000.0),
+            None,
+            Some(&VBVariant::from_double(1.0)),
+        )
+        .unwrap();
+        let val = result.as_f64().unwrap();
+        assert!((val - (-778.22)).abs() < 0.01);
+    }
+
+    #[test]
+    fn pmt_zero_rate() {
+        // Pmt(0, 12, 1200) -> -(1200 - 0) / 12 = -100
+        let result = pmt(
+            VBVariant::from_double(0.0),
+            VBVariant::from_double(12.0),
+            VBVariant::from_double(1200.0),
+            None,
+            None,
+        )
+        .unwrap();
+        let val = result.as_f64().unwrap();
+        assert_eq!(val, -100.0);
+    }
+
+    #[test]
+    fn pmt_invalid_nper_raises_error_5() {
+        let result = pmt(
+            VBVariant::from_double(0.05),
+            VBVariant::from_double(0.0),
+            VBVariant::from_double(1000.0),
+            None,
+            None,
+        );
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 5);
+    }
+}
