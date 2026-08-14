@@ -40,4 +40,10 @@ pub(super) fn register(registry: &mut Registry) {
             args[2].as_f64().unwrap(),
         )
     }));
+
+    registry.insert(builtin!("nper", 3, 5, |args| {
+        let fv = if args.len() > 3 { Some(&args[3]) } else { None };
+        let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
+        finfn::nper::nper(&args[0], &args[1], &args[2], fv, type_)
+    }));
 }

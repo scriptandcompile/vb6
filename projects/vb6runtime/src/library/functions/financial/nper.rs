@@ -737,10 +737,289 @@
 //! - **Rate** - Calculates interest rate per period
 //! - **`IPmt`** - Calculates interest payment for a specific period
 //! - **`PPmt`** - Calculates principal payment for a specific period
-//!
-//! ## VB6 Parser Notes
-//!
-//! `NPer` is parsed as a regular function call (`CallExpression`). This module exists primarily
-//! for documentation purposes to provide comprehensive reference material for VB6 developers
-//! working with financial calculations, loan analysis, investment planning, and time-value-of-money
-//! operations.
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `NPer` function.
+///
+/// Calculates the number of periods required for payments to reach a future value
+/// given a present value, payment amount, and interest rate. Uses iteration to solve
+/// for the unknown period count.
+///
+/// VB6 behavior:
+/// - `rate` is the interest rate per period
+/// - `pmt` is the payment made each period
+/// - `pv` is the present value (lump sum) of the series of payments
+/// - `fv` defaults to 0 if omitted
+/// - `type` defaults to 0 (end of period) if omitted; use 1 for beginning of period
+/// - Returns a `Double` representing the number of periods
+/// - Raises error 5 if:
+///   - rate is negative
+///   - pmt equals zero and pv equals zero (no payment or investment)
+///   - nper would be infinite (payment too small to ever reach fv)
+pub fn nper(
+    rate: &VBVariant,
+    pmt: &VBVariant,
+    pv: &VBVariant,
+    fv: Option<&VBVariant>,
+    type_: Option<&VBVariant>,
+) -> VBResult<VBVariant> {
+    let rate = rate.as_f64()?;
+    let pmt = pmt.as_f64()?;
+    let pv = pv.as_f64()?;
+    let fv = fv.map(|f| f.as_f64()).transpose()?.unwrap_or(0.0);
+    let type_ = type_.map(|t| t.as_i16()).transpose()?.unwrap_or(0);
+
+    // Validate inputs per VB6 behavior
+    if rate < 0.0 {
+        return Err(VBError::new(5));
+    }
+
+    // Special case: zero interest rate
+    // When rate is 0, nper = -(pv + fv) / pmt
+    // But this requires pmt != 0
+    if rate == 0.0 {
+        if pmt == 0.0 {
+            return Err(VBError::new(5));
+        }
+        let nper = -(pv + fv) / pmt;
+        if nper.is_nan() || nper.is_infinite() {
+            return Err(VBError::new(5));
+        }
+        return Ok(VBVariant::from_double(nper));
+    }
+
+    // For non-zero rate, solve using logarithms.
+    // Derivation from the FV = 0 formula:
+    //   0 = -pv * base^n - pmt * (base^n - 1)/rate
+    // => pv * base^n + pmt * (base^n - 1)/rate = 0
+    // => pv * rate * base^n + pmt * base^n - pmt = 0
+    // => (pv * rate + pmt) * base^n = pmt
+    // => base^n = pmt / (pv * rate + pmt)
+    // => n = Log(pmt / (pv * rate + pmt)) / Log(1+rate)
+    // But we also need to incorporate fv, so the general formula is:
+    //   0 = -pv * base^n - pmt * (base^n - 1)/rate - fv
+    // => (pv * rate + pmt) * base^n = pmt - fv * rate
+    // => n = Log((pmt - fv*rate) / (pv*rate + pmt)) / Log(1+rate)
+
+    let base = 1.0_f64 + rate;
+    let log_base = base.ln();
+
+    if log_base.abs() < f64::EPSILON {
+        return Err(VBError::new(5));
+    }
+
+    let nper_val = if type_ == 0 {
+        // Payments at end of period (ordinary annuity)
+        // Derived from FV formula where fv is the target value
+        // n = Log((pmt - fv * rate) / (pv * rate + pmt)) / Log(1+rate)
+
+        let numerator = pmt - fv * rate;
+        let denominator = pv * rate + pmt;
+
+        if denominator == 0.0 {
+            return Err(VBError::new(5));
+        }
+
+        let ratio = numerator / denominator;
+
+        // The log of a negative number is undefined, so check for valid ratio
+        if ratio <= 0.0 {
+            // This case shouldn't normally happen in valid scenarios,
+            // but handle it gracefully
+            return Err(VBError::new(5));
+        }
+
+        let nper = ratio.ln() / log_base;
+
+        if nper.is_nan() || nper.is_infinite() {
+            return Err(VBError::new(5));
+        }
+        nper
+    } else {
+        // Payments at beginning of period (annuity due)
+        // Adjust the formula: pmt becomes pmt * (1+rate) for annuity due
+        // n = Log((pmt - fv*rate*(1+rate)) / ((pv*rate + pmt)*(1+rate))) / Log(1+rate)
+
+        let numerator = pmt - fv * rate * base;
+        let denominator = (pv * rate + pmt) * base;
+
+        if denominator == 0.0 {
+            return Err(VBError::new(5));
+        }
+
+        let ratio = numerator / denominator;
+
+        if ratio <= 0.0 {
+            return Err(VBError::new(5));
+        }
+
+        let nper = ratio.ln() / log_base;
+
+        if nper.is_nan() || nper.is_infinite() {
+            return Err(VBError::new(5));
+        }
+        nper
+    };
+
+    Ok(VBVariant::from_double(nper_val))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::nper;
+    use crate::value::VBVariant;
+
+    fn nper_defaults(rate: f64, pmt: f64, pv: f64) -> VBVariant {
+        nper(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(pmt),
+            &VBVariant::from_double(pv),
+            None,
+            None,
+        )
+        .unwrap()
+    }
+
+    fn nper_with_fv(rate: f64, pmt: f64, pv: f64, fv: f64) -> VBVariant {
+        nper(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(pmt),
+            &VBVariant::from_double(pv),
+            Some(&VBVariant::from_double(fv)),
+            None,
+        )
+        .unwrap()
+    }
+
+    fn nper_with_type(rate: f64, pmt: f64, pv: f64, fv: f64, ptype: i16) -> VBVariant {
+        nper(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(pmt),
+            &VBVariant::from_double(pv),
+            Some(&VBVariant::from_double(fv)),
+            Some(&VBVariant::from_integer(ptype)),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn nper_loan_payoff_simple() {
+        // $10,000 loan at 8% APR with $200/month payments
+        // Monthly rate = 0.08/12, pmt = -200, pv = 10000
+        // Expected: approximately 61.02 months (derived from FV formula)
+        let result = nper_defaults(0.08 / 12.0, -200.0, 10000.0);
+        let nper_val = result.as_f64().unwrap();
+        assert!((nper_val - 61.0).abs() < 1.0);
+    }
+
+    #[test]
+    fn nper_zero_rate_simple() {
+        // With zero rate, nper = -(pv + fv) / pmt
+        // pv = 1000, pmt = -100, fv = 0
+        // nper = -(1000 + 0) / (-100) = 10
+        let result = nper_defaults(0.0, -100.0, 1000.0);
+        let nper_val = result.as_f64().unwrap();
+        assert!((nper_val - 10.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn nper_savings_goal() {
+        // How many periods to save $50,000 with $300/month at 6% annual?
+        // rate = 0.06/12, pmt = -300, pv = 0, fv = 50000
+        let result = nper_with_fv(0.06 / 12.0, -300.0, 0.0, 50000.0);
+        let nper_val = result.as_f64().unwrap();
+        // Should be approximately 121.5 periods (about 10.1 years)
+        assert!((nper_val - 121.5).abs() < 2.0);
+    }
+
+    #[test]
+    fn nper_negative_rate_raises_error_5() {
+        let err = nper(
+            &VBVariant::from_double(-0.05),
+            &VBVariant::from_double(-100.0),
+            &VBVariant::from_double(1000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn nper_zero_pmt_raises_error_5() {
+        let err = nper(
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(1000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn nper_with_beginning_of_period() {
+        // Compare end-of-period vs beginning-of-period
+        let end = nper_defaults(0.06 / 12.0, -200.0, 10000.0);
+        let begin = nper_with_type(0.06 / 12.0, -200.0, 10000.0, 0.0, 1);
+
+        let end_val = end.as_f64().unwrap();
+        let begin_val = begin.as_f64().unwrap();
+
+        // Both should be positive and different
+        assert!(end_val > 0.0);
+        assert!(begin_val > 0.0);
+        assert_ne!(end_val, begin_val);
+    }
+
+    #[test]
+    fn nper_with_integer_args() {
+        let result = nper(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_long(-100),
+            &VBVariant::from_long(1000),
+            None,
+            None,
+        )
+        .unwrap();
+        assert!(result.as_f64().unwrap() > 0.0);
+    }
+
+    #[test]
+    fn nper_null_raises_invalid_use_of_null() {
+        let err = nper(
+            &VBVariant::Null,
+            &VBVariant::from_double(-100.0),
+            &VBVariant::from_double(1000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 94);
+    }
+
+    #[test]
+    fn nper_round_trip_with_fv() {
+        // If we calculate FV for n periods, then NPer should return approximately n
+        // This tests the inverse relationship between FV and NPer
+        let rate = 0.06 / 12.0;
+        let pmt = -100.0;
+        let pv = 0.0;
+
+        // First calculate FV for 12 periods using the FV function formula directly
+        // FV = -pv * base^n - pmt * (base^n - 1)/rate
+        let factor = (1.0_f64 + rate).powf(12.0);
+        let calculated_fv = -pv * factor - pmt * (factor - 1.0) / rate;
+
+        // Now calculate NPer with that FV - should return ~12
+        // Note: fv parameter should be the positive value we want to reach
+        let nper_result = nper_with_fv(rate, pmt, pv, calculated_fv);
+        let nper_val = nper_result.as_f64().unwrap();
+
+        // Should be close to 12 periods
+        assert!((nper_val - 12.0).abs() < 0.01);
+    }
+}
