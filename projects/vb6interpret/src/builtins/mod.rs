@@ -153,6 +153,7 @@ fn builtin_name(name: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use vb6runtime::ArrayValue;
 
     #[test]
     fn builtin_name_preserves_dollar_suffix() {
@@ -652,5 +653,24 @@ mod tests {
         )
         .unwrap();
         assert_eq!(result.as_f64().unwrap(), 3000.0);
+
+        // NPV: first cash flow discounted for one period
+        let result = call_builtin(
+            "NPV",
+            &[
+                VBVariant::from_double(0.1),
+                VBVariant::Array(ArrayValue::from_vec_with_bounds(
+                    vb6core::types::VBType::Double,
+                    vec![
+                        VBVariant::from_double(1000.0),
+                        VBVariant::from_double(2000.0),
+                        VBVariant::from_double(3000.0),
+                    ],
+                    0,
+                )),
+            ],
+        )
+        .unwrap();
+        assert!((result.as_f64().unwrap() - 4815.93).abs() < 0.1);
     }
 }
