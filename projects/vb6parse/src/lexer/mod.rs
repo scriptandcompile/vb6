@@ -376,7 +376,10 @@ pub fn tokenize<'a>(input: &mut SourceStream<'a>) -> ParseResult<'a, TokenStream
             continue;
         }
 
-        if let Some(token_text) = input.take_count(1) {
+        // Consume any unrecognized character and record an error. This always
+        // advances by at least one full UTF-8 character so the tokenizer can
+        // never loop forever on non-ASCII input.
+        if let Some(token_text) = input.take_character() {
             ctx.error(
                 input.span_here(),
                 LexerError::UnknownToken {
@@ -2327,5 +2330,57 @@ Attribute VB_Exposed = False
         assert_eq!(tokens[3], (" ", Token::Whitespace));
         assert_eq!(tokens[4], ("1.5E+10", Token::SingleLiteral));
         assert_eq!(tokens.len(), 5);
+    }
+
+    #[test]
+    fn multibyte_character_does_not_hang() {
+        // A non-ASCII character in a statement position used to make the
+        // tokenizer loop forever because `take_count(1)` refused to advance
+        // past a multi-byte UTF-8 character.
+        let content = "Foo + Bar \u{00e9}\nSub Test()\nEnd Sub";
+        let mut input = SourceStream::new("", content);
+        let result = tokenize(&mut input);
+
+        let (tokens_opt, failures) = result.unpack();
+
+        let tokens = tokens_opt.expect("Expected tokens");
+        assert_eq!(tokens[0], ("Foo", Token::Identifier));
+        assert_eq!(tokens[2], ("+", Token::AdditionOperator));
+
+        assert!(
+            failures.iter().any(|failure| matches!(
+                &*failure.kind,
+                crate::errors::ErrorKind::Lexer(LexerError::UnknownToken { .. })
+            )),
+            "expected an UnknownToken diagnostic for the non-ASCII character, got: {failures:?}"
+        );
+    }
+
+    #[test]
+    fn non_ascii_inside_string_and_comment_is_consumed() {
+        let content = "MsgBox \"caf\u{00e9}\"\n'na\u{00ef}ve \u{4e2d}\u{6587} comment";
+        let mut input = SourceStream::new("", content);
+        let result = tokenize(&mut input);
+
+        let (tokens_opt, failures) = result.unpack();
+
+        if !failures.is_empty() {
+            for failure in &failures {
+                failure.eprint();
+            }
+        }
+
+        let tokens = tokens_opt.expect("Expected tokens");
+        assert!(
+            tokens.tokens().iter().any(|(text, token)| {
+                *token == Token::StringLiteral && text.contains("caf\u{00e9}")
+            })
+        );
+        assert!(
+            tokens.tokens().iter().any(|(text, token)| {
+                *token == Token::EndOfLineComment && text.contains("comment")
+            }),
+            "expected the comment token, got failures: {failures:?}"
+        );
     }
 }
