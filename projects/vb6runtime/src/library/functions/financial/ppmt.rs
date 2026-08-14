@@ -902,3 +902,307 @@
 //! - `FV`: Returns the future value of an investment
 //! - `NPer`: Returns the number of periods for an investment
 //! - `Rate`: Returns the interest rate per period
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `PPmt` function.
+///
+/// Returns a Double specifying the principal payment for a given period of an annuity
+/// based on periodic, fixed payments and a fixed interest rate.
+///
+/// VB6 behavior:
+/// - `rate` is the interest rate per period
+/// - `per` must be in range [1, nper]; if outside, raises error 5
+/// - `nper` must be positive; if <= 0, raises error 5
+/// - `pv` is the present value (loan amount)
+/// - `fv` defaults to 0 if omitted
+/// - `type` defaults to 0 (end of period) if omitted; use 1 for beginning of period
+/// - Returns a `Double`
+pub fn ppmt(
+    rate: &VBVariant,
+    per: &VBVariant,
+    nper: &VBVariant,
+    pv: &VBVariant,
+    fv: Option<&VBVariant>,
+    type_: Option<&VBVariant>,
+) -> VBResult<VBVariant> {
+    let rate_val = rate.as_f64()?;
+    let per_val = per.as_f64()?;
+    let nper_val = nper.as_f64()?;
+    let pv_val = pv.as_f64()?;
+    let fv_val = fv.map(|f| f.as_f64()).transpose()?.unwrap_or(0.0);
+    let type_val = type_.map(|t| t.as_i16()).transpose()?.unwrap_or(0);
+
+    // Validate inputs per VB6 behavior
+    if nper_val <= 0.0 {
+        return Err(VBError::new(5));
+    }
+
+    if per_val < 1.0 || per_val > nper_val {
+        return Err(VBError::new(5));
+    }
+
+    // Periodic payment (same formula as Pmt).
+    let pmt_val = if rate_val == 0.0 {
+        -(pv_val + fv_val) / nper_val
+    } else {
+        let factor = (1.0_f64 + rate_val).powf(nper_val);
+        if type_val == 0 {
+            -(pv_val * factor + fv_val) / ((factor - 1.0) / rate_val)
+        } else {
+            -(pv_val * factor + fv_val) / ((factor - 1.0) / rate_val * (1.0_f64 + rate_val))
+        }
+    };
+
+    // PPmt is derived from the Pmt and IPmt relationship: PPmt = Pmt - IPmt.
+    // IPmt is the interest charged on the outstanding balance for the period,
+    // following the same rules as the VB6 IPmt function:
+    // - zero interest rate: no interest is charged
+    // - payments at the beginning of the period (type 1): the first payment
+    //   carries no interest; later ones accrue on the balance after the
+    //   previous payment
+    // - otherwise: interest accrues on the balance at the start of the period
+    let ipmt_val = if rate_val == 0.0 || (type_val != 0 && per_val == 1.0) {
+        // Zero interest: no interest is charged.
+        // Beginning-of-period first payment: made immediately, no interest yet.
+        0.0
+    } else if type_val != 0 {
+        let balance = fv_formula(rate_val, per_val - 2.0, pmt_val, pv_val + pmt_val);
+        balance * rate_val
+    } else {
+        let balance = fv_formula(rate_val, per_val - 1.0, pmt_val, pv_val);
+        balance * rate_val
+    };
+
+    let ppmt_val = pmt_val - ipmt_val;
+
+    Ok(VBVariant::from_double(ppmt_val))
+}
+
+/// Calculate future value using the same formula as the FV function.
+fn fv_formula(rate: f64, nper: f64, pmt: f64, pv: f64) -> f64 {
+    if nper == 0.0 {
+        return -pv;
+    }
+    let factor = (1.0_f64 + rate).powf(nper);
+    let pv_part = -pv * factor;
+    let pmt_part = -pmt * (factor - 1.0) / rate;
+    pv_part + pmt_part
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ppmt;
+    use crate::value::VBVariant;
+
+    fn ppmt_defaults(rate: f64, per: f64, nper: f64, pv: f64) -> VBVariant {
+        ppmt(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(per),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pv),
+            None,
+            None,
+        )
+        .unwrap()
+    }
+
+    fn ppmt_with_fv(
+        rate: f64,
+        per: f64,
+        nper: f64,
+        pv: f64,
+        fv: f64,
+    ) -> VBVariant {
+        ppmt(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(per),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pv),
+            Some(&VBVariant::from_double(fv)),
+            None,
+        )
+        .unwrap()
+    }
+
+    fn ppmt_with_type(
+        rate: f64,
+        per: f64,
+        nper: f64,
+        pv: f64,
+        fv: f64,
+        ptype: i16,
+    ) -> VBVariant {
+        ppmt(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(per),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pv),
+            Some(&VBVariant::from_double(fv)),
+            Some(&VBVariant::from_integer(ptype)),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn ppmt_first_period_loan() {
+        // 8% annual rate, monthly payments, 48 months, $20,000 loan
+        // First month principal should be small (mostly interest).
+        // With a negative pv (deposit), the principal payment is positive.
+        let result = ppmt_defaults(0.08 / 12.0, 1.0, 48.0, -20000.0);
+        let ppmt_val = result.as_f64().unwrap();
+        assert!((ppmt_val - 354.93).abs() < 0.01);
+    }
+
+    #[test]
+    fn ppmt_last_period_more_principal() {
+        // Last period should have more principal than first
+        let first = ppmt_defaults(0.08 / 12.0, 1.0, 48.0, -20000.0);
+        let last = ppmt_defaults(0.08 / 12.0, 48.0, 48.0, -20000.0);
+
+        let first_val = first.as_f64().unwrap();
+        let last_val = last.as_f64().unwrap();
+
+        // Principal increases over time
+        assert!((first_val - 354.93).abs() < 0.01);
+        assert!((last_val - 485.02).abs() < 0.01);
+        assert!(last_val > first_val);
+    }
+
+    #[test]
+    fn ppmt_zero_rate_even_principal() {
+        // With zero rate, principal is evenly distributed
+        let period = ppmt_defaults(0.0, 1.0, 12.0, -1200.0);
+        let val = period.as_f64().unwrap();
+        assert_eq!(val, 100.0); // -1200 / 12 = 100 per period (positive for negative pv)
+    }
+
+    #[test]
+    fn ppmt_with_beginning_of_period() {
+        // Payments due at beginning of period: the first payment carries no
+        // interest, so its entire amount goes to principal (equal to Pmt).
+        let result = ppmt_with_type(0.08 / 12.0, 1.0, 48.0, -20000.0, 0.0, 1);
+        let val = result.as_f64().unwrap();
+        assert!((val - 485.02).abs() < 0.01);
+    }
+
+    #[test]
+    fn ppmt_zero_nper_raises_error_5() {
+        let err = ppmt(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(1.0),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(-20000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn ppmt_per_out_of_range_raises_error_5() {
+        let err = ppmt(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(49.0), // per > nper
+            &VBVariant::from_double(48.0),
+            &VBVariant::from_double(-20000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn ppmt_with_integer_args() {
+        let result = ppmt(
+            &VBVariant::from_double(0.08 / 12.0),
+            &VBVariant::from_long(1),
+            &VBVariant::from_long(48),
+            &VBVariant::from_long(-20000),
+            None,
+            None,
+        )
+        .unwrap();
+        let val = result.as_f64().unwrap();
+        assert!((val - 354.93).abs() < 0.01); // Principal payment is positive for negative pv
+    }
+
+    #[test]
+    fn ppmt_null_raises_invalid_use_of_null() {
+        let err = ppmt(
+            &VBVariant::Null,
+            &VBVariant::from_double(1.0),
+            &VBVariant::from_double(48.0),
+            &VBVariant::from_double(-20000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 94);
+    }
+
+    #[test]
+    fn ppmt_negative_nper_raises_error_5() {
+        let err = ppmt(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(1.0),
+            &VBVariant::from_double(-48.0),
+            &VBVariant::from_double(-20000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn ppmt_with_future_value() {
+        let result = ppmt_with_fv(0.08 / 12.0, 1.0, 48.0, -20000.0, -5000.0);
+        let val = result.as_f64().unwrap();
+        assert!((val - 443.66).abs() < 0.01);
+    }
+
+    #[test]
+    fn ppmt_per_zero_raises_error_5() {
+        let err = ppmt(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(48.0),
+            &VBVariant::from_double(-20000.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn ppmt_principal_increases_over_time() {
+        // Principal in period 360 should be greater than period 12
+        let early = ppmt_defaults(0.06 / 12.0, 12.0, 360.0, -200000.0);
+        let late = ppmt_defaults(0.06 / 12.0, 360.0, 360.0, -200000.0);
+
+        let early_val = early.as_f64().unwrap();
+        let late_val = late.as_f64().unwrap();
+
+        // Both should be positive (principal returned for a negative pv)
+        assert!((early_val - 210.33).abs() < 0.01);
+        assert!((late_val - 1193.14).abs() < 0.01);
+        assert!(late_val > early_val);
+    }
+
+    #[test]
+    fn ppmt_matches_microsoft_reference_examples() {
+        // Published Microsoft PPMT examples:
+        // PPMT(10%/12, 1, 2*12, 2000) -> -75.62
+        let result = ppmt_defaults(0.10 / 12.0, 1.0, 2.0 * 12.0, 2000.0);
+        assert!((result.as_f64().unwrap() - (-75.62)).abs() < 0.01);
+
+        // PPMT(8%, 10, 10, 200000) -> -27,598.05
+        let result = ppmt_defaults(0.08, 10.0, 10.0, 200000.0);
+        assert!((result.as_f64().unwrap() - (-27598.05)).abs() < 0.01);
+    }
+}

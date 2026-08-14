@@ -555,8 +555,16 @@ pub fn ipmt(
         return Err(VBError::new(5));
     }
 
-    let ipmt_val = if rate_val == 0.0 {
-        // With zero interest rate, there is no interest payment
+    // IPmt is the interest charged on the outstanding balance for the period,
+    // following the same rules as VB6:
+    // - zero interest rate: no interest is charged
+    // - payments at the beginning of the period (type 1): the first payment
+    //   carries no interest; later ones accrue on the balance after the
+    //   previous payment
+    // - otherwise: interest accrues on the balance at the start of the period
+    let ipmt_val = if rate_val == 0.0 || (type_val != 0 && per_val == 1.0) {
+        // Zero interest: no interest is charged.
+        // Beginning-of-period first payment: made immediately, no interest yet.
         0.0
     } else {
         // Calculate the periodic payment using Pmt formula
@@ -568,14 +576,16 @@ pub fn ipmt(
             -(pv_val * factor + fv_val) / ((factor - 1.0) / rate_val * (1.0_f64 + rate_val))
         };
 
-        // Calculate the balance at start of period `per` using FV formula
-        // Balance = FV(rate, per-1, pmt, pv)
-        let k = per_val - 1.0;
-        let balance = fv_formula(rate_val, k, pmt_val, pv_val);
-
-        // Interest for the period is -balance * rate
-        // (negative because IPmt returns negative for loans where pv is positive)
-        -balance * rate_val
+        if type_val != 0 {
+            // Balance after the previous payment, using FV formula
+            let balance = fv_formula(rate_val, per_val - 2.0, pmt_val, pv_val + pmt_val);
+            balance * rate_val
+        } else {
+            // Balance at start of period `per` using FV formula
+            // Balance = FV(rate, per-1, pmt, pv)
+            let balance = fv_formula(rate_val, per_val - 1.0, pmt_val, pv_val);
+            balance * rate_val
+        }
     };
 
     Ok(VBVariant::from_double(ipmt_val))
@@ -649,10 +659,11 @@ mod tests {
     #[test]
     fn ipmt_first_period_loan() {
         // 8% annual rate, monthly payments, 48 months, $20,000 loan
-        // First month interest should be approximately -$133.33
+        // First month interest should be approximately $133.33.
+        // With a negative pv (deposit), the interest payment is positive.
         let result = ipmt_defaults(0.08 / 12.0, 1.0, 48.0, -20000.0);
         let ipmt_val = result.as_f64().unwrap();
-        assert!((ipmt_val - (-133.33)).abs() < 1.0);
+        assert!((ipmt_val - 133.33).abs() < 0.01);
     }
 
     #[test]
@@ -665,7 +676,9 @@ mod tests {
         let last_val = last.as_f64().unwrap();
 
         // Interest decreases over time
-        assert!(last_val.abs() < first_val.abs());
+        assert!((first_val - 133.33).abs() < 0.01);
+        assert!((last_val - 3.23).abs() < 0.01);
+        assert!(last_val < first_val);
     }
 
     #[test]
@@ -676,10 +689,11 @@ mod tests {
 
     #[test]
     fn ipmt_with_beginning_of_period() {
+        // Payments due at beginning of period: the first payment carries no
+        // interest (it is made immediately, before any interest accrues).
         let result = ipmt_with_type(0.08 / 12.0, 1.0, 48.0, -20000.0, 0.0, 1);
         let val = result.as_f64().unwrap();
-        // Should be different from end-of-period
-        assert!(val != 0.0);
+        assert_eq!(val, 0.0);
     }
 
     #[test]
@@ -722,7 +736,7 @@ mod tests {
         )
         .unwrap();
         let val = result.as_f64().unwrap();
-        assert!((val - (-133.33)).abs() < 1.0);
+        assert!((val - 133.33).abs() < 0.01); // Interest payment is positive for negative pv
     }
 
     #[test]
@@ -757,7 +771,53 @@ mod tests {
     fn ipmt_with_future_value() {
         let result = ipmt_with_fv(0.08 / 12.0, 1.0, 48.0, -20000.0, -5000.0);
         let val = result.as_f64().unwrap();
-        assert!(val != 0.0);
+        assert!((val - 133.33).abs() < 0.01);
+    }
+
+    #[test]
+    fn ipmt_plus_ppmt_equals_pmt() {
+        // VB6 guarantees IPmt(per) + PPmt(per) = Pmt for every period, for both
+        // end-of-period and beginning-of-period payment schedules.
+        let rate = 0.08 / 12.0;
+        for per in 1..=48 {
+            for ptype in [0, 1] {
+                let pmt_val = crate::library::functions::financial::pmt::pmt(
+                    VBVariant::from_double(rate),
+                    VBVariant::from_double(48.0),
+                    VBVariant::from_double(-20000.0),
+                    None,
+                    Some(&VBVariant::from_integer(ptype)),
+                )
+                .unwrap()
+                .as_f64()
+                .unwrap();
+
+                let ipmt_val = ipmt_with_type(rate, per as f64, 48.0, -20000.0, 0.0, ptype)
+                    .as_f64()
+                    .unwrap();
+                let ppmt_val = crate::library::functions::financial::ppmt::ppmt(
+                    &VBVariant::from_double(rate),
+                    &VBVariant::from_double(per as f64),
+                    &VBVariant::from_double(48.0),
+                    &VBVariant::from_double(-20000.0),
+                    None,
+                    Some(&VBVariant::from_integer(ptype)),
+                )
+                .unwrap()
+                .as_f64()
+                .unwrap();
+
+                assert!(
+                    (ipmt_val + ppmt_val - pmt_val).abs() < 1e-9,
+                    "per={}, type={}: ipmt {} + ppmt {} != pmt {}",
+                    per,
+                    ptype,
+                    ipmt_val,
+                    ppmt_val,
+                    pmt_val
+                );
+            }
+        }
     }
 
     #[test]
