@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/vb6_code.rs
+source: projects/vb6parse/tests/module/vb6_code.rs
 expression: module_file
 ---
 name: Declarations
@@ -461,8 +461,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "499"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "499"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -491,8 +493,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "499"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "499"
           - kind: Newline
             text: "\r\n"
       - kind: Newline

@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/module/chess_brain_vb.rs
-assertion_line: 313
 expression: module
 ---
 name: basIO
@@ -2276,10 +2275,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: LongLiteral
-            text: 10&
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: LongLiteral
+                    text: 10&
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2300,10 +2303,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: LongLiteral
-            text: 11&
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: LongLiteral
+                    text: 11&
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement

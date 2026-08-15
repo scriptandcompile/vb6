@@ -1,5 +1,5 @@
 ---
-source: src/syntax/statements/declarations/arrays.rs
+source: projects/vb6parse/src/syntax/statements/declarations/arrays.rs
 expression: tree
 ---
 root:
@@ -37,8 +37,10 @@ root:
                   text: argv
                 - kind: LeftParenthesis
                   text: (
-                - kind: LongLiteral
-                  text: 0&
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: LongLiteral
+                      text: 0&
                 - kind: RightParenthesis
                   text: )
                 - kind: Newline

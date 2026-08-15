@@ -52,8 +52,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "20"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "20"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -332,8 +334,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Comma
             text: ","
           - kind: Whitespace

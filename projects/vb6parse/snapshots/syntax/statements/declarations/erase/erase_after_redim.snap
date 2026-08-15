@@ -1,5 +1,5 @@
 ---
-source: src/syntax/statements/declarations/erase.rs
+source: projects/vb6parse/src/syntax/statements/declarations/erase.rs
 expression: tree
 ---
 root:
@@ -37,8 +37,10 @@ root:
                   text: myArray
                 - kind: LeftParenthesis
                   text: (
-                - kind: IntegerLiteral
-                  text: "100"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "100"
                 - kind: RightParenthesis
                   text: )
                 - kind: Newline

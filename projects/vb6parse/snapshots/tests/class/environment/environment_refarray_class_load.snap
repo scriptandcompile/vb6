@@ -52,8 +52,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "20"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "20"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -578,8 +580,8 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -5034,8 +5036,10 @@ cst:
                                                 text: p
                                               - kind: LeftParenthesis
                                                 text: (
-                                              - kind: Identifier
-                                                text: where
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: where
                                               - kind: RightParenthesis
                                                 text: )
                                               - kind: Newline
@@ -5072,8 +5076,10 @@ cst:
                                             text: p
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: where
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: where
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -11360,8 +11366,10 @@ cst:
                                             text: p
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: where
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: where
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -11674,8 +11682,10 @@ cst:
                                                         text: p
                                                       - kind: LeftParenthesis
                                                         text: (
-                                                      - kind: Identifier
-                                                        text: where
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: where
                                                       - kind: RightParenthesis
                                                         text: )
                                                       - kind: Newline
@@ -11726,8 +11736,10 @@ cst:
                                         text: p
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: where
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: where
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Newline
@@ -15716,8 +15728,10 @@ cst:
                                     text: p
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: where
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: where
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -18236,8 +18250,10 @@ cst:
                                             text: p
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: where
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: where
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -18274,8 +18290,10 @@ cst:
                                         text: p
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: where
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: where
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Newline
@@ -18392,8 +18410,10 @@ cst:
                                         text: p
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: IntegerLiteral
-                                        text: "0"
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "0"
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Newline
@@ -18420,8 +18440,10 @@ cst:
                                             text: p
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: where
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: where
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -18640,8 +18662,10 @@ cst:
                             text: pp
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: Size
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Size
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -18910,8 +18934,10 @@ cst:
                                         text: pp
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: Size
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Size
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Newline
@@ -19240,14 +19266,18 @@ cst:
                                             text: pp
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: Size
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Size
                                           - kind: Comma
                                             text: ","
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: Size1
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Size1
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -19322,20 +19352,26 @@ cst:
                                             text: pp
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: Size
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Size
                                           - kind: Comma
                                             text: ","
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: Size1
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Size1
                                           - kind: Comma
                                             text: ","
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: Size2
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Size2
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -30304,8 +30340,10 @@ cst:
                                                     text: p
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: Identifier
-                                                    text: Size
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: Size
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Newline
@@ -30502,8 +30540,10 @@ cst:
                                                         text: p
                                                       - kind: LeftParenthesis
                                                         text: (
-                                                      - kind: IntegerLiteral
-                                                        text: "0"
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "0"
                                                       - kind: RightParenthesis
                                                         text: )
                                                       - kind: Newline
@@ -30722,8 +30762,8 @@ cst:
                 text: ByVal
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: Comma

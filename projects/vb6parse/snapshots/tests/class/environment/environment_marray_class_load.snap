@@ -250,8 +250,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"mHandler\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"mHandler\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -272,8 +274,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Group\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Group\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -294,8 +298,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"lambda\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"lambda\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -316,8 +322,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"mArray\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"mArray\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -338,8 +346,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"tuple\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"tuple\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -360,8 +370,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"RefArray\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"RefArray\""
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -19240,8 +19252,8 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -19508,8 +19520,8 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -19746,8 +19758,8 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -24894,8 +24906,10 @@ cst:
                                             text: actualData
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: maxitems1
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: maxitems1
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -39910,8 +39924,10 @@ cst:
                                         text: actualData
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: maxitems1
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: maxitems1
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Newline
@@ -40484,8 +40500,10 @@ cst:
                                                     text: actualData
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "1"
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Newline
@@ -40872,8 +40890,10 @@ cst:
                                                         text: actualData
                                                       - kind: LeftParenthesis
                                                         text: (
-                                                      - kind: Identifier
-                                                        text: maxitems1
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: maxitems1
                                                       - kind: RightParenthesis
                                                         text: )
                                                       - kind: Newline
@@ -41164,18 +41184,28 @@ cst:
                                                 text: revlimit
                                               - kind: LeftParenthesis
                                                 text: (
-                                              - kind: Identifier
-                                                text: UBound
-                                              - kind: LeftParenthesis
-                                                text: (
-                                              - kind: Identifier
-                                                text: limit
-                                              - kind: LeftParenthesis
-                                                text: (
-                                              - kind: RightParenthesis
-                                                text: )
-                                              - kind: RightParenthesis
-                                                text: )
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: UBound
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: CallExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: limit
+                                                              - kind: LeftParenthesis
+                                                                text: (
+                                                              - kind: ArgumentList
+                                                                children: []
+                                                              - kind: RightParenthesis
+                                                                text: )
+                                                  - kind: RightParenthesis
+                                                    text: )
                                               - kind: RightParenthesis
                                                 text: )
                                               - kind: Comma
@@ -42054,8 +42084,10 @@ cst:
                                 text: actualData
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: maxitems
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: maxitems
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
@@ -43976,8 +44008,10 @@ cst:
                                                             text: actualData
                                                           - kind: LeftParenthesis
                                                             text: (
-                                                          - kind: IntegerLiteral
-                                                            text: "0"
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "0"
                                                           - kind: RightParenthesis
                                                             text: )
                                                           - kind: Newline
@@ -44156,8 +44190,10 @@ cst:
                                                                 text: actualData
                                                               - kind: LeftParenthesis
                                                                 text: (
-                                                              - kind: Identifier
-                                                                text: cursor
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: cursor
                                                               - kind: RightParenthesis
                                                                 text: )
                                                               - kind: Whitespace
@@ -44322,8 +44358,10 @@ cst:
                                         text: actualData
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: cursor
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: cursor
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Whitespace
@@ -44558,8 +44596,10 @@ cst:
                                             text: actualData
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: cursor
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: cursor
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Whitespace
@@ -57230,8 +57270,10 @@ cst:
                                                                 text: actualData
                                                               - kind: LeftParenthesis
                                                                 text: (
-                                                              - kind: Identifier
-                                                                text: maxitems
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: maxitems
                                                               - kind: RightParenthesis
                                                                 text: )
                                                               - kind: Newline
@@ -89516,36 +89558,36 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: nDx
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: VariantKeyword
-            text: Variant
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Name
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: nDx
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: VariantKeyword
+                text: Variant
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword
@@ -91920,32 +91962,32 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: v
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: VariantKeyword
-            text: Variant
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Name
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: v
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: VariantKeyword
+                text: Variant
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword
@@ -92050,46 +92092,46 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: v
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: VariantKeyword
-            text: Variant
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: index
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Name
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: v
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: VariantKeyword
+                text: Variant
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: index
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword

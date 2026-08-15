@@ -1631,8 +1631,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H80020004"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H80020004"
           - kind: Newline
             text: "\r\n"
       - kind: EnumStatement
@@ -5019,12 +5021,14 @@ cst:
                                     text: strNames
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: fncdsc
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: cParams
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: fncdsc
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: cParams
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace

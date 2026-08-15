@@ -1337,8 +1337,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -1371,8 +1373,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -1405,8 +1409,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "4"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -1439,8 +1445,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -1473,8 +1481,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "16"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "16"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1503,8 +1513,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "32"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "32"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1533,8 +1545,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "64"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "64"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1563,8 +1577,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "128"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "128"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1593,8 +1609,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "256"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "256"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1623,8 +1641,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "512"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "512"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1653,8 +1673,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1024"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1024"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -1687,8 +1709,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2048"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2048"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -1721,8 +1745,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "4096"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "4096"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -1755,8 +1781,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8192"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8192"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -1793,16 +1821,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: PLAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: PRAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: PLAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: PRAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1831,16 +1865,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: N1AttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: N2AttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: N1AttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: N2AttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1869,16 +1909,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: B1AttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: B2AttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: B1AttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: B2AttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1907,24 +1953,34 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: B1AttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: B2AttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: BXrayAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: B1AttackBit
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: B2AttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: BXrayAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1953,16 +2009,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: R1AttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: R2AttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: R1AttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: R2AttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1991,16 +2053,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: R1AttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: R1XrayAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: R1AttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: R1XrayAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2029,16 +2097,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: R2AttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: R2XrayAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: R2AttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: R2XrayAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2067,32 +2141,46 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: R1AttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: R2AttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: R1XrayAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: R2XrayAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: BinaryExpression
+                children:
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: R1AttackBit
+                      - kind: Whitespace
+                        text: " "
+                      - kind: OrKeyword
+                        text: Or
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: R2AttackBit
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: R1XrayAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: R2XrayAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2121,24 +2209,34 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: PAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: NAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: BAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: PAttackBit
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: NAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: BAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2167,16 +2265,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: RAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: BAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: RAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: BAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2205,16 +2309,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: ROrXrayAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: BOrXrayAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: ROrXrayAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: BOrXrayAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2243,16 +2353,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: QAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: QXrayAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: QAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: QXrayAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2281,16 +2397,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: QOrXrayAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: ROrXrayAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: QOrXrayAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: ROrXrayAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2319,16 +2441,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: QAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: BAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: QAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: BAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2357,16 +2485,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: QAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: RAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: QAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: RAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2395,24 +2529,34 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: QAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: RAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: BAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: QAttackBit
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: RAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: BAttackBit
           - kind: Whitespace
             text: "   "
           - kind: EndOfLineComment
@@ -2445,32 +2589,46 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: QAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: QXrayAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: ROrXrayAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: BOrXrayAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: BinaryExpression
+                children:
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: QAttackBit
+                      - kind: Whitespace
+                        text: " "
+                      - kind: OrKeyword
+                        text: Or
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: QXrayAttackBit
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ROrXrayAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: BOrXrayAttackBit
           - kind: Whitespace
             text: "    "
           - kind: EndOfLineComment
@@ -2503,32 +2661,46 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: QAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: RAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: BAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: NAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: BinaryExpression
+                children:
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: QAttackBit
+                      - kind: Whitespace
+                        text: " "
+                      - kind: OrKeyword
+                        text: Or
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: RAttackBit
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: BAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: NAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2557,32 +2729,46 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: PAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: NAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: BAttackBit
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: RAttackBit
+          - kind: BinaryExpression
+            children:
+              - kind: BinaryExpression
+                children:
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: PAttackBit
+                      - kind: Whitespace
+                        text: " "
+                      - kind: OrKeyword
+                        text: Or
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: NAttackBit
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: BAttackBit
+              - kind: Whitespace
+                text: " "
+              - kind: OrKeyword
+                text: Or
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: RAttackBit
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment

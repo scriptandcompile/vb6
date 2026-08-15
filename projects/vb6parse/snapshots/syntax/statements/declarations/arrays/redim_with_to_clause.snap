@@ -1,5 +1,5 @@
 ---
-source: src/syntax/statements/declarations/arrays.rs
+source: projects/vb6parse/src/syntax/statements/declarations/arrays.rs
 expression: tree
 ---
 root:
@@ -37,40 +37,56 @@ root:
                   text: hIcon
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: lIconIndex
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: lIconIndex
                 - kind: Whitespace
                   text: " "
                 - kind: ToKeyword
                   text: To
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: lIconIndex
-                - kind: Whitespace
-                  text: " "
-                - kind: AdditionOperator
-                  text: +
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: nIcons
-                - kind: Whitespace
-                  text: " "
-                - kind: MultiplicationOperator
-                  text: "*"
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "2"
-                - kind: Whitespace
-                  text: " "
-                - kind: SubtractionOperator
-                  text: "-"
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: BinaryExpression
+                  children:
+                    - kind: BinaryExpression
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: lIconIndex
+                        - kind: Whitespace
+                          text: " "
+                        - kind: AdditionOperator
+                          text: +
+                        - kind: Whitespace
+                          text: " "
+                        - kind: BinaryExpression
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: nIcons
+                            - kind: Whitespace
+                              text: " "
+                            - kind: MultiplicationOperator
+                              text: "*"
+                            - kind: Whitespace
+                              text: " "
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "2"
+                    - kind: Whitespace
+                      text: " "
+                    - kind: SubtractionOperator
+                      text: "-"
+                    - kind: Whitespace
+                      text: " "
+                    - kind: NumericLiteralExpression
+                      children:
+                        - kind: IntegerLiteral
+                          text: "1"
                 - kind: RightParenthesis
                   text: )
                 - kind: Newline

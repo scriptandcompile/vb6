@@ -1229,8 +1229,10 @@ cst:
                             text: UCIBook
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -1653,8 +1655,10 @@ cst:
                                                         text: UCIBook
                                                       - kind: LeftParenthesis
                                                         text: (
-                                                      - kind: Identifier
-                                                        text: UCIBookMax
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: UCIBookMax
                                                       - kind: RightParenthesis
                                                         text: )
                                                       - kind: Newline
@@ -2607,8 +2611,10 @@ cst:
                     text: UCIBook
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -3271,8 +3277,10 @@ cst:
                                         text: UCIBook
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: UCIBookMax
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: UCIBookMax
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Newline
@@ -5259,8 +5267,10 @@ cst:
                     text: UCIBook
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: UCIBookCnt
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: UCIBookCnt
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline

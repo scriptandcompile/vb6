@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/vb6_code.rs
+source: projects/vb6parse/tests/form/vb6_code.rs
 expression: form_file
 ---
 form:
@@ -9547,34 +9547,46 @@ cst:
                     text: FM
                   - kind: LeftParenthesis
                     text: (
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: IntegerLiteral
-                    text: "2"
+                  - kind: UnaryExpression
+                    children:
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "2"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "2"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "2"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: IntegerLiteral
-                    text: "2"
+                  - kind: UnaryExpression
+                    children:
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "2"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "2"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "2"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace

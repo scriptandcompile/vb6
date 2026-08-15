@@ -1264,8 +1264,10 @@ cst:
                     text: PriveSpace
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MaxSpace
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MaxSpace
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -1466,8 +1468,10 @@ cst:
                     text: PriveSpace
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MaxSpace
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MaxSpace
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -1692,8 +1696,10 @@ cst:
                     text: PriveSpace
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MaxSpace
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MaxSpace
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -1852,8 +1858,10 @@ cst:
                     text: PriveSpace
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MaxSpace
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MaxSpace
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -6290,8 +6298,10 @@ cst:
                                 text: PriveSpace
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: MaxSpace
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: MaxSpace
                               - kind: RightParenthesis
                                 text: )
                               - kind: Whitespace
@@ -11582,8 +11592,10 @@ cst:
                     text: Hash
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: hashlen
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: hashlen
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -12290,8 +12302,10 @@ cst:
                                     text: PriveSpace
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: MaxSpace
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: MaxSpace
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -12360,8 +12374,10 @@ cst:
                                     text: Hash
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: hashlen
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: hashlen
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -12438,8 +12454,10 @@ cst:
                                         text: PriveSpace
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: MaxSpace
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MaxSpace
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Whitespace
@@ -12734,8 +12752,10 @@ cst:
                                         text: PriveSpace
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: MaxSpace
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MaxSpace
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Whitespace
@@ -13764,24 +13784,34 @@ cst:
                                             text: Hash
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: MaxSpace
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: MultiplicationOperator
-                                            text: "*"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IntegerLiteral
-                                            text: "2"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: AdditionOperator
-                                            text: +
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IntegerLiteral
-                                            text: "3"
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: MaxSpace
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: MultiplicationOperator
+                                                    text: "*"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "2"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: AdditionOperator
+                                                text: +
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "3"
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -15030,8 +15060,10 @@ cst:
                             text: PriveSpace
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: MaxSpace
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: MaxSpace
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -52250,8 +52282,8 @@ cst:
             children:
               - kind: LeftParenthesis
                 text: (
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -54560,36 +54592,36 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: nDx
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: VariantKeyword
-            text: Variant
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Name
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: nDx
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: VariantKeyword
+                text: Variant
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword
@@ -58358,32 +58390,32 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: v
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: VariantKeyword
-            text: Variant
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Name
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: v
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: VariantKeyword
+                text: Variant
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword
@@ -58440,46 +58472,46 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: v
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: VariantKeyword
-            text: Variant
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: index
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Name
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: v
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: VariantKeyword
+                text: Variant
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: index
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/string/string_function.rs
+source: projects/vb6parse/src/syntax/library/functions/string/string_function.rs
 expression: tree
 ---
 root:
@@ -19,18 +19,18 @@ root:
           children:
             - kind: LeftParenthesis
               text: (
-        - kind: WidthKeyword
-          text: width
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: IntegerKeyword
-          text: Integer
-        - kind: RightParenthesis
-          text: )
+            - kind: Identifier
+              text: width
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IntegerKeyword
+              text: Integer
+            - kind: RightParenthesis
+              text: )
         - kind: Whitespace
           text: " "
         - kind: AsKeyword

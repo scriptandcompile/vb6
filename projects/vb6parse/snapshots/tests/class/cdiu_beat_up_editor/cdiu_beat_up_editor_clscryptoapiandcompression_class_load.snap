@@ -1966,16 +1966,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Microsoft Base Cryptographic Provider v1.0\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: vbNullChar
+          - kind: BinaryExpression
+            children:
+              - kind: StringLiteralExpression
+                children:
+                  - kind: StringLiteral
+                    text: "\"Microsoft Base Cryptographic Provider v1.0\""
+              - kind: Whitespace
+                text: " "
+              - kind: Ampersand
+                text: "&"
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: vbNullChar
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2004,16 +2010,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Microsoft Enhanced Cryptographic Provider v1.0\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: vbNullChar
+          - kind: BinaryExpression
+            children:
+              - kind: StringLiteralExpression
+                children:
+                  - kind: StringLiteral
+                    text: "\"Microsoft Enhanced Cryptographic Provider v1.0\""
+              - kind: Whitespace
+                text: " "
+              - kind: Ampersand
+                text: "&"
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: vbNullChar
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2042,8 +2054,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: MS_ENHANCED_PROV
+          - kind: IdentifierExpression
+            children:
+              - kind: Identifier
+                text: MS_ENHANCED_PROV
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -2076,16 +2090,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"CryptoAPIExample\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: vbNullChar
+          - kind: BinaryExpression
+            children:
+              - kind: StringLiteralExpression
+                children:
+                  - kind: StringLiteral
+                    text: "\"CryptoAPIExample\""
+              - kind: Whitespace
+                text: " "
+              - kind: Ampersand
+                text: "&"
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: vbNullChar
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -2118,8 +2138,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2148,8 +2170,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2178,8 +2202,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "16"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "16"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2208,8 +2234,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "4"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2238,8 +2266,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2268,8 +2298,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2298,8 +2330,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "24576"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "24576"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2328,8 +2362,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "32768"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "32768"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2358,8 +2394,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2388,8 +2426,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2048"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2048"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2418,8 +2458,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2448,8 +2490,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "3"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2478,8 +2522,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "4"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2508,32 +2554,46 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: ALG_CLASS_HASH
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: ALG_TYPE_ANY
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: ALG_SID_MD5
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: ParenthesizedExpression
+                    children:
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ALG_CLASS_HASH
+                          - kind: Whitespace
+                            text: " "
+                          - kind: OrKeyword
+                            text: Or
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ALG_TYPE_ANY
+                      - kind: RightParenthesis
+                        text: )
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ALG_SID_MD5
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2562,32 +2622,46 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: ALG_CLASS_DATA_ENCRYPT
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: ALG_TYPE_STREAM
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: ALG_SID_RC4
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: ParenthesizedExpression
+                    children:
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ALG_CLASS_DATA_ENCRYPT
+                          - kind: Whitespace
+                            text: " "
+                          - kind: OrKeyword
+                            text: Or
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ALG_TYPE_STREAM
+                      - kind: RightParenthesis
+                        text: )
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ALG_SID_RC4
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2616,32 +2690,46 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: ALG_CLASS_HASH
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: ALG_TYPE_ANY
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: ALG_SID_SHA
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: ParenthesizedExpression
+                    children:
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ALG_CLASS_HASH
+                          - kind: Whitespace
+                            text: " "
+                          - kind: OrKeyword
+                            text: Or
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ALG_TYPE_ANY
+                      - kind: RightParenthesis
+                        text: )
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ALG_SID_SHA
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2670,8 +2758,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2700,8 +2790,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2730,8 +2822,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2752,8 +2846,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2782,8 +2878,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "6"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "6"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2812,8 +2910,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "7"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "7"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2834,8 +2934,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "16"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "16"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2864,10 +2966,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "2146893818"
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "2146893818"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2888,8 +2994,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2000000"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -2914,8 +3022,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H4000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H4000000"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -2940,8 +3050,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H8000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H8000000"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -2966,8 +3078,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H10000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H10000000"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -2988,8 +3102,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H20000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H20000000"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -3010,8 +3126,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H40000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H40000000"
           - kind: Newline
             text: "\n"
       - kind: Newline
@@ -4124,60 +4242,60 @@ cst:
                 text: ByVal
               - kind: Whitespace
                 text: " "
-          - kind: TextKeyword
-            text: Text
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: DataSize
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: Key
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: Encrypt
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: BooleanKeyword
-            text: Boolean
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Text
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: DataSize
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: Key
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: Encrypt
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: BooleanKeyword
+                text: Boolean
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\n"
           - kind: StatementList

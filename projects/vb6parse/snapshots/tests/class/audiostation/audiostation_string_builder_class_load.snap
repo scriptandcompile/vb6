@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/audiostation.rs
+source: projects/vb6parse/tests/class/audiostation.rs
 expression: class
 ---
 header:
@@ -3530,34 +3530,36 @@ cst:
                 text: ByVal
               - kind: Whitespace
                 text: " "
-          - kind: CompareKeyword
-            text: compare
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: VbCompareMethod
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: vbTextCompare
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\n"
-          - kind: Whitespace
-            text: "   "
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: compare
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: VbCompareMethod
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: vbTextCompare
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\n"
+              - kind: Whitespace
+                text: "   "
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword

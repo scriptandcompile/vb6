@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/arrays/lbound.rs
+source: projects/vb6parse/src/syntax/library/functions/arrays/lbound.rs
 expression: tree
 ---
 root:
@@ -93,24 +93,32 @@ root:
                   text: arr
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: lb
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: lb
                 - kind: Whitespace
                   text: " "
                 - kind: ToKeyword
                   text: To
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: lb
-                - kind: Whitespace
-                  text: " "
-                - kind: AdditionOperator
-                  text: +
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "20"
+                - kind: BinaryExpression
+                  children:
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: lb
+                    - kind: Whitespace
+                      text: " "
+                    - kind: AdditionOperator
+                      text: +
+                    - kind: Whitespace
+                      text: " "
+                    - kind: NumericLiteralExpression
+                      children:
+                        - kind: IntegerLiteral
+                          text: "20"
                 - kind: RightParenthesis
                   text: )
                 - kind: Newline

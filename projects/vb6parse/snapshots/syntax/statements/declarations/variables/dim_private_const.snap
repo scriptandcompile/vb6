@@ -1,5 +1,5 @@
 ---
-source: src/syntax/statements/declarations/variables.rs
+source: projects/vb6parse/src/syntax/statements/declarations/variables.rs
 expression: tree
 ---
 root:
@@ -23,7 +23,9 @@ root:
           text: "="
         - kind: Whitespace
           text: " "
-        - kind: StringLiteral
-          text: "\"MyModule\""
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"MyModule\""
         - kind: Newline
           text: "\n"

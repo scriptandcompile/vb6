@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/form/vb6_code.rs
-assertion_line: 35
 expression: form_file
 ---
 form:
@@ -5596,30 +5595,38 @@ cst:
                     text: Food
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: WORLDWIDTH
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: WORLDWIDTH
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: WORLDHEIGHT
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: WORLDHEIGHT
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -6110,16 +6117,20 @@ cst:
                     text: creatures
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: InitialCreatures
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: InitialCreatures
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -6828,8 +6839,10 @@ cst:
                     text: creatures
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -8378,16 +8391,20 @@ cst:
                                                             text: creatures
                                                           - kind: LeftParenthesis
                                                             text: (
-                                                          - kind: IntegerLiteral
-                                                            text: "0"
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "0"
                                                           - kind: Whitespace
                                                             text: " "
                                                           - kind: ToKeyword
                                                             text: To
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: Identifier
-                                                            text: totalCreatures
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: totalCreatures
                                                           - kind: RightParenthesis
                                                             text: )
                                                           - kind: Whitespace

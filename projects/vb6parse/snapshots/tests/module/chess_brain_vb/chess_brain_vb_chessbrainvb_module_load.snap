@@ -25041,8 +25041,10 @@ cst:
                             text: sInput
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "4"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "4"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace

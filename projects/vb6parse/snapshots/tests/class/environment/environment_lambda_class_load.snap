@@ -48,7 +48,7 @@ cst:
             text: Public
           - kind: Whitespace
             text: " "
-          - kind: NameKeyword
+          - kind: Identifier
             text: Name
           - kind: DollarSign
             text: $
@@ -4350,8 +4350,10 @@ cst:
                             text: myVar
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: Total
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Total
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace

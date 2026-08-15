@@ -1,5 +1,5 @@
 ---
-source: src/syntax/statements/declarations/arrays.rs
+source: projects/vb6parse/src/syntax/statements/declarations/arrays.rs
 expression: tree
 ---
 root:
@@ -37,16 +37,20 @@ root:
                   text: ICI
                 - kind: LeftParenthesis
                   text: (
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Whitespace
                   text: " "
                 - kind: ToKeyword
                   text: To
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: num
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: num
                 - kind: RightParenthesis
                   text: )
                 - kind: Whitespace

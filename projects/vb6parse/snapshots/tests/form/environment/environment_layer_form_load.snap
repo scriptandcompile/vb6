@@ -382,8 +382,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2&"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2&"
           - kind: Newline
             text: "\r\n"
       - kind: SubStatement

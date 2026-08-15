@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/invalid_syntax/invalid_parameter_list.rs
+source: projects/vb6parse/tests/invalid_syntax/invalid_parameter_list.rs
 expression: tree
 ---
 root:
@@ -23,10 +23,10 @@ root:
               text: ByVal
             - kind: Whitespace
               text: " "
-        - kind: ByValKeyword
-          text: ByVal
-        - kind: Whitespace
-          text: " "
+            - kind: Identifier
+              text: ByVal
+            - kind: Whitespace
+              text: " "
         - kind: Identifier
           text: x
         - kind: Whitespace

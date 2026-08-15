@@ -6814,8 +6814,10 @@ cst:
                     text: ExifTemp
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: qqq
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: qqq
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -6962,8 +6964,10 @@ cst:
                     text: ExifTemp
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "10"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "10"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -9328,16 +9332,20 @@ cst:
                     text: IFDDirectory
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: NewDimensions
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: NewDimensions
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -27144,16 +27152,20 @@ cst:
                     text: IFDDirectory
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: NewDimensions
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: NewDimensions
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace

@@ -950,8 +950,10 @@ cst:
                     text: PriveSpace
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MaxSpace
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MaxSpace
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -4556,8 +4558,10 @@ cst:
                                 text: PriveSpace
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: MaxSpace
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: MaxSpace
                               - kind: RightParenthesis
                                 text: )
                               - kind: Whitespace
@@ -5714,8 +5718,10 @@ cst:
                     text: Hash
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: hashlen
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: hashlen
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -6422,8 +6428,10 @@ cst:
                                     text: PriveSpace
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: MaxSpace
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: MaxSpace
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -6492,8 +6500,10 @@ cst:
                                     text: Hash
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: hashlen
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: hashlen
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -6570,8 +6580,10 @@ cst:
                                         text: PriveSpace
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: MaxSpace
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MaxSpace
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Whitespace
@@ -6866,8 +6878,10 @@ cst:
                                         text: PriveSpace
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: MaxSpace
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MaxSpace
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Whitespace
@@ -7326,8 +7340,10 @@ cst:
                             text: PriveSpace
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: MaxSpace
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: MaxSpace
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -14198,66 +14214,66 @@ cst:
                 text: ByRef
               - kind: Whitespace
                 text: " "
-          - kind: TextKeyword
-            text: Text
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: ByRefKeyword
-            text: ByRef
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: cursor
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: LenOfText
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Text
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: ByRefKeyword
+                text: ByRef
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: cursor
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: LenOfText
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword

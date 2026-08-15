@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/math/exp.rs
+source: projects/vb6parse/src/syntax/library/functions/math/exp.rs
 expression: tree
 ---
 root:
@@ -33,18 +33,18 @@ root:
               text: ","
             - kind: Whitespace
               text: " "
-        - kind: TimeKeyword
-          text: time
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: DoubleKeyword
-          text: Double
-        - kind: RightParenthesis
-          text: )
+            - kind: Identifier
+              text: time
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: DoubleKeyword
+              text: Double
+            - kind: RightParenthesis
+              text: )
         - kind: Whitespace
           text: " "
         - kind: AsKeyword

@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/audiostation.rs
+source: projects/vb6parse/tests/module/audiostation.rs
 expression: module_file
 ---
 name: modArgs
@@ -479,8 +479,10 @@ cst:
                             text: argv
                           - kind: LeftParenthesis
                             text: (
-                          - kind: LongLiteral
-                            text: 0&
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: LongLiteral
+                                text: 0&
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -983,16 +985,22 @@ cst:
                                     text: argv
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: argc
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: SubtractionOperator
-                                    text: "-"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: LongLiteral
-                                    text: 1&
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: argc
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: SubtractionOperator
+                                        text: "-"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: LongLiteral
+                                            text: 1&
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -1413,16 +1421,22 @@ cst:
                                         text: argv
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: argc
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: SubtractionOperator
-                                        text: "-"
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: LongLiteral
-                                        text: 1&
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: argc
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: SubtractionOperator
+                                            text: "-"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: LongLiteral
+                                                text: 1&
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Newline
@@ -4847,16 +4861,22 @@ cst:
                                 text: argv
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: argc
-                              - kind: Whitespace
-                                text: " "
-                              - kind: SubtractionOperator
-                                text: "-"
-                              - kind: Whitespace
-                                text: " "
-                              - kind: LongLiteral
-                                text: 1&
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: argc
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: SubtractionOperator
+                                    text: "-"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: LongLiteral
+                                        text: 1&
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
