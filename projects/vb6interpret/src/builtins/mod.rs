@@ -672,5 +672,17 @@ mod tests {
         )
         .unwrap();
         assert!((result.as_f64().unwrap() - 4815.93).abs() < 0.1);
+
+        // RATE: $10,000 loan, $200/month for 5 years
+        let result = call_builtin(
+            "RATE",
+            &[
+                VBVariant::from_double(60.0),
+                VBVariant::from_double(-200.0),
+                VBVariant::from_double(10000.0),
+            ],
+        )
+        .unwrap();
+        assert!((result.as_f64().unwrap() - 0.0061834).abs() < 1e-6);
     }
 }
