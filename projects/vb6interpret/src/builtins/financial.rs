@@ -75,4 +75,8 @@ pub(super) fn register(registry: &mut Registry) {
         let guess = if args.len() > 5 { Some(&args[5]) } else { None };
         finfn::rate::rate(&args[0], &args[1], &args[2], fv, type_, guess)
     }));
+
+    registry.insert(builtin!("sln", 3, 3, |args| {
+        finfn::sln::sln(&args[0], &args[1], &args[2])
+    }));
 }
