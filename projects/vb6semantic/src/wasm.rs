@@ -15,6 +15,7 @@
 
 use crate::analyzer::SemanticAnalyzer;
 use crate::error::{SemanticError, SourceLocation};
+use crate::query::QueryIndex;
 use crate::scope::{Scope, ScopeManager};
 use crate::symbols::Symbol;
 use crate::types::TypeInfo;
@@ -99,6 +100,25 @@ pub struct WasmReferenceInfo {
     pub display_name: String,
 }
 
+/// A single occurrence of a symbol, as recorded by the query index.
+#[derive(Serialize, Deserialize)]
+pub struct WasmSymbolReference {
+    /// The scope the symbol lives in.
+    pub scope_id: usize,
+    /// The lowercased symbol name (VB6 names are case-insensitive).
+    pub name: String,
+    /// The role this occurrence plays: `Definition`, `Usage`, or `TypeReference`.
+    pub kind: String,
+    /// 1-based position of the identifier.
+    pub location: LocationInfo,
+    /// Inclusive start byte offset of the identifier.
+    pub start_offset: u32,
+    /// Exclusive end byte offset of the identifier.
+    pub end_offset: u32,
+    /// 1-based exclusive end column of the identifier.
+    pub end_column: usize,
+}
+
 /// Information about the output of the VB6 semantic analyzer.
 #[derive(Serialize, Deserialize)]
 pub struct AnalysisOutput {
@@ -112,6 +132,10 @@ pub struct AnalysisOutput {
     pub resolved_references: Vec<WasmReferenceInfo>,
     /// References no registered resolver could handle.
     pub unresolved_references: Vec<WasmReferenceInfo>,
+    /// Every resolved identifier occurrence in the source, grouped per symbol
+    /// by scope and name. Drives go-to-definition and find-references in the
+    /// editor extension.
+    pub references: Vec<WasmSymbolReference>,
     /// Whether analysis completed without any errors.
     pub successful: bool,
     /// The total number of errors.
@@ -230,6 +254,7 @@ fn build_analysis_output(analyzer: &SemanticAnalyzer) -> AnalysisOutput {
     let scopes = convert_scope_manager(analyzer.scope_manager());
     let errors: Vec<SemanticErrorInfo> = analyzer.errors().iter().map(convert_error).collect();
     let warnings = analyzer.warnings().to_vec();
+    let references = convert_query_index(analyzer.query_index());
 
     AnalysisOutput {
         successful: errors.is_empty(),
@@ -242,8 +267,27 @@ fn build_analysis_output(analyzer: &SemanticAnalyzer) -> AnalysisOutput {
         warnings,
         resolved_references: Vec::new(),
         unresolved_references: Vec::new(),
+        references,
         analyze_time_ms: 0.0,
     }
+}
+
+/// Convert every query-index occurrence to its wasm-facing form.
+fn convert_query_index(index: &QueryIndex) -> Vec<WasmSymbolReference> {
+    index
+        .iter()
+        .flat_map(|(key, references)| {
+            references.iter().map(move |reference| WasmSymbolReference {
+                scope_id: key.scope_id,
+                name: key.name.clone(),
+                kind: format!("{:?}", reference.kind),
+                location: convert_location(&reference.location),
+                start_offset: reference.start_offset,
+                end_offset: reference.end_offset,
+                end_column: reference.end_column,
+            })
+        })
+        .collect()
 }
 
 /// Analyze a single VB6 source string and populate the analyzer.
