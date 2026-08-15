@@ -737,3 +737,391 @@
 //! - `NPer`: Returns the number of periods for an annuity
 //! - `IRR`: Returns internal rate of return for irregular cash flows
 //! - `MIRR`: Returns modified internal rate of return
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `Rate` function.
+///
+/// Returns a Double specifying the interest rate per period for an annuity.
+/// The rate is found by iteratively solving the time-value-of-money equation:
+///
+/// ```text
+/// pv + pmt * ((1 - (1 + rate)^-nper) / rate) * (1 + rate * type)
+///     + fv * (1 + rate)^-nper = 0
+/// ```
+///
+/// VB6 behavior:
+/// - `nper` must be positive; if <= 0, raises error 5 (Invalid procedure call)
+/// - `fv` defaults to 0 if omitted
+/// - `type` defaults to 0 (end of period) if omitted; use 1 for beginning of period
+/// - `guess` defaults to 0.1 (10%) if omitted
+/// - Uses Newton-Raphson iteration on the equivalent polynomial in `R = 1 + rate`
+///   until successive results differ by less than 1e-7, up to 20 iterations
+/// - If the initial guess does not converge, retries with alternate guesses
+///   (0.05, 0.01, 0.005, 0.001) to handle long-term annuities such as
+///   30-year mortgages
+/// - Raises error 5 if no solution can be found (e.g., when the cash flows
+///   have no valid rate, or the equation has no real solution)
+/// - Returns a `Double`
+pub fn rate(
+    nper: &VBVariant,
+    pmt: &VBVariant,
+    pv: &VBVariant,
+    fv: Option<&VBVariant>,
+    type_: Option<&VBVariant>,
+    guess: Option<&VBVariant>,
+) -> VBResult<VBVariant> {
+    let nper_val = nper.as_f64()?;
+    let pmt_val = pmt.as_f64()?;
+    let pv_val = pv.as_f64()?;
+    let fv_val = fv.map(|f| f.as_f64()).transpose()?.unwrap_or(0.0);
+    let type_val = type_.map(|t| t.as_i16()).transpose()?.unwrap_or(0);
+    let guess_val = guess.map(|g| g.as_f64()).transpose()?.unwrap_or(0.1);
+
+    // Validate inputs per VB6 behavior
+    if nper_val <= 0.0 {
+        return Err(VBError::new(5));
+    }
+
+    // Special case: zero interest rate.
+    // At rate = 0 the time-value equation reduces to pv + pmt*nper + fv = 0.
+    let scale = pv_val
+        .abs()
+        .max((pmt_val * nper_val).abs())
+        .max(fv_val.abs());
+    if (pv_val + pmt_val * nper_val + fv_val).abs() <= 1e-12 * scale.max(1.0) {
+        return Ok(VBVariant::from_double(0.0));
+    }
+
+    // Newton-Raphson on the polynomial obtained by multiplying the time-value
+    // equation by (R - 1), where R = 1 + rate:
+    //   R^(nper+1) + a*R^nper + b*R + c = 0
+    // with
+    //   a = (pmt*(1 - type) - pv) / (pv + pmt*type)
+    //   b = (fv - pmt*type) / (pv + pmt*type)
+    //   c = (-pmt*(1 - type) - fv) / (pv + pmt*type)
+    let type_f = f64::from(type_val);
+    let denom = pv_val + pmt_val * type_f;
+    if denom == 0.0 {
+        return Err(VBError::new(5));
+    }
+    let a = (pmt_val * (1.0 - type_f) - pv_val) / denom;
+    let b = (fv_val - pmt_val * type_f) / denom;
+    let c = (-pmt_val * (1.0 - type_f) - fv_val) / denom;
+
+    const TOLERANCE: f64 = 1e-7;
+    const MAX_ITERATIONS: usize = 20;
+
+    // Run Newton-Raphson from a starting rate, returning the converged rate if
+    // it satisfies the original equation. Newton can converge to the spurious
+    // rate = 0 root introduced by the (R - 1) transformation, so every
+    // candidate is verified against the time-value equation before returning.
+    let solve = |start: f64| {
+        if start <= 0.0 {
+            return None;
+        }
+        let mut r = start;
+        for _ in 0..MAX_ITERATIONS {
+            let pow_n = r.powf(nper_val);
+            let poly = r * pow_n + a * pow_n + b * r + c;
+            let deriv = (nper_val + 1.0) * pow_n + a * nper_val * r.powf(nper_val - 1.0) + b;
+            if deriv == 0.0 || !poly.is_finite() || !deriv.is_finite() {
+                return None;
+            }
+            let new_r = r - poly / deriv;
+            if !new_r.is_finite() || new_r <= 0.0 {
+                return None;
+            }
+            if (new_r - r).abs() < TOLERANCE {
+                let rate_val = new_r - 1.0;
+                if rate_solves_equation(rate_val, nper_val, pmt_val, pv_val, fv_val, type_f, scale)
+                {
+                    return Some(rate_val);
+                }
+                return None;
+            }
+            r = new_r;
+        }
+        let rate_val = r - 1.0;
+        if rate_solves_equation(rate_val, nper_val, pmt_val, pv_val, fv_val, type_f, scale) {
+            Some(rate_val)
+        } else {
+            None
+        }
+    };
+
+    if let Some(rate_val) = solve(1.0 + guess_val) {
+        return Ok(VBVariant::from_double(rate_val));
+    }
+
+    // The default guess of 10% can fail to converge for long-term annuities
+    // (e.g., a 30-year mortgage), so retry with alternate starting points.
+    for alternate in [0.05, 0.01, 0.005, 0.001] {
+        if let Some(rate_val) = solve(1.0 + alternate) {
+            return Ok(VBVariant::from_double(rate_val));
+        }
+    }
+
+    Err(VBError::new(5))
+}
+
+/// Returns true when `rate` satisfies the time-value-of-money equation within
+/// a relative tolerance. This distinguishes a genuine root from the spurious
+/// rate = 0 root of the transformed polynomial.
+fn rate_solves_equation(
+    rate: f64,
+    nper: f64,
+    pmt: f64,
+    pv: f64,
+    fv: f64,
+    ptype: f64,
+    scale: f64,
+) -> bool {
+    let residual = if rate.abs() < 1e-8 {
+        // Limit of the equation as rate -> 0, avoiding division by zero.
+        pv + pmt * nper + fv
+    } else {
+        let base = 1.0 + rate;
+        let factor = base.powf(-nper);
+        pv + pmt * (1.0 - factor) / rate * (1.0 + rate * ptype) + fv * factor
+    };
+    residual.abs() <= 1e-6 * scale.max(1.0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::rate;
+    use crate::value::VBVariant;
+
+    fn rate_defaults(nper: f64, pmt: f64, pv: f64) -> VBVariant {
+        rate(
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pmt),
+            &VBVariant::from_double(pv),
+            None,
+            None,
+            None,
+        )
+        .unwrap()
+    }
+
+    fn rate_with_fv(nper: f64, pmt: f64, pv: f64, fv: f64) -> VBVariant {
+        rate(
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pmt),
+            &VBVariant::from_double(pv),
+            Some(&VBVariant::from_double(fv)),
+            None,
+            None,
+        )
+        .unwrap()
+    }
+
+    fn rate_with_type(nper: f64, pmt: f64, pv: f64, fv: f64, ptype: i16) -> VBVariant {
+        rate(
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pmt),
+            &VBVariant::from_double(pv),
+            Some(&VBVariant::from_double(fv)),
+            Some(&VBVariant::from_integer(ptype)),
+            None,
+        )
+        .unwrap()
+    }
+
+    fn rate_with_guess(nper: f64, pmt: f64, pv: f64, fv: f64, ptype: i16, guess: f64) -> VBVariant {
+        rate(
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pmt),
+            &VBVariant::from_double(pv),
+            Some(&VBVariant::from_double(fv)),
+            Some(&VBVariant::from_integer(ptype)),
+            Some(&VBVariant::from_double(guess)),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn rate_loan_example() {
+        // $10,000 loan, $200/month for 5 years: ~0.6183% monthly
+        let result = rate_defaults(60.0, -200.0, 10000.0);
+        let rate_val = result.as_f64().unwrap();
+        assert!((rate_val - 0.0061834).abs() < 1e-6);
+    }
+
+    #[test]
+    fn rate_annual_rate_from_monthly() {
+        // Monthly rate of 0.6183% gives ~7.42% annual
+        let result = rate_defaults(60.0, -200.0, 10000.0);
+        let annual = result.as_f64().unwrap() * 12.0;
+        assert!((annual - 0.0742).abs() < 1e-4);
+    }
+
+    #[test]
+    fn rate_with_guess_argument() {
+        // Guess of 8% monthly equivalent
+        let result = rate_with_guess(48.0, -250.0, 10000.0, 0.0, 0, 0.08);
+        let rate_val = result.as_f64().unwrap();
+        assert!((rate_val - 0.00770147).abs() < 1e-6);
+    }
+
+    #[test]
+    fn rate_weekly_loan() {
+        // RATE(2*52, -55, 5000)*52 ≈ 13.65% annual (weekly loan)
+        let result = rate_defaults(104.0, -55.0, 5000.0);
+        let weekly = result.as_f64().unwrap();
+        let annual = weekly * 52.0;
+        assert!((annual - 0.1365).abs() < 1e-4);
+    }
+
+    #[test]
+    fn rate_growth_investment() {
+        // RATE(7, 0, -2000, 3000) = 5.96% (investment growth)
+        let result = rate_with_fv(7.0, 0.0, -2000.0, 3000.0);
+        let rate_val = result.as_f64().unwrap();
+        assert!((rate_val - 0.05963).abs() < 1e-5);
+    }
+
+    #[test]
+    fn rate_with_future_value() {
+        // RATE(6, -5000, -10000, 55000) = 9.33% (pmt and pv both negative)
+        let result = rate_with_fv(6.0, -5000.0, -10000.0, 55000.0);
+        let rate_val = result.as_f64().unwrap();
+        assert!((rate_val - 0.09325).abs() < 1e-5);
+    }
+
+    #[test]
+    fn rate_annuity_due() {
+        // RATE(120, -250, -5000, 45000, 1) = 0.35% (payments at period start)
+        let result = rate_with_type(120.0, -250.0, -5000.0, 45000.0, 1);
+        let rate_val = result.as_f64().unwrap();
+        assert!((rate_val - 0.00352).abs() < 1e-5);
+    }
+
+    #[test]
+    fn rate_bond_yield() {
+        // RATE(3, 50, -1025, 1000) = 4.10% (bond yield)
+        let result = rate_with_fv(3.0, 50.0, -1025.0, 1000.0);
+        let rate_val = result.as_f64().unwrap();
+        assert!((rate_val - 0.04097).abs() < 1e-5);
+    }
+
+    #[test]
+    fn rate_savings_plan() {
+        // RATE(5, 0, -20000, 25000) = 4.56% (savings plan, no payments)
+        let result = rate_with_fv(5.0, 0.0, -20000.0, 25000.0);
+        let rate_val = result.as_f64().unwrap();
+        assert!((rate_val - 0.04564).abs() < 1e-5);
+    }
+
+    #[test]
+    fn rate_zero_interest() {
+        // $1,200 borrowed, 12 equal payments of $100 -> 0% rate
+        let result = rate_defaults(12.0, -100.0, 1200.0);
+        assert_eq!(result.as_f64().unwrap(), 0.0);
+    }
+
+    #[test]
+    fn rate_annuity_due_short() {
+        // Payments at beginning of period: slightly higher rate than ordinary
+        let result = rate_with_type(60.0, -200.0, 10000.0, 0.0, 1);
+        let rate_val = result.as_f64().unwrap();
+        assert!((rate_val - 0.006408).abs() < 1e-6);
+    }
+
+    #[test]
+    fn rate_long_term_mortgage() {
+        // 30-year mortgage: $150,000 at $1,000/month -> ~7.02% annual
+        let result = rate_defaults(360.0, -1000.0, 150000.0);
+        let monthly = result.as_f64().unwrap();
+        let annual = monthly * 12.0;
+        assert!((annual - 0.0702).abs() < 1e-4);
+    }
+
+    #[test]
+    fn rate_with_integer_args() {
+        let result = rate(
+            &VBVariant::from_long(60),
+            &VBVariant::from_long(-200),
+            &VBVariant::from_long(10000),
+            None,
+            None,
+            None,
+        )
+        .unwrap();
+        assert!((result.as_f64().unwrap() - 0.0061834).abs() < 1e-6);
+    }
+
+    #[test]
+    fn rate_negative_periods_raises_error_5() {
+        let err = rate(
+            &VBVariant::from_double(-1.0),
+            &VBVariant::from_double(-200.0),
+            &VBVariant::from_double(10000.0),
+            None,
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn rate_zero_periods_raises_error_5() {
+        let err = rate(
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(-200.0),
+            &VBVariant::from_double(10000.0),
+            None,
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn rate_same_sign_raises_error_5() {
+        // Both pmt and pv positive: no negative cash flow, no valid rate
+        let err = rate(
+            &VBVariant::from_double(60.0),
+            &VBVariant::from_double(200.0),
+            &VBVariant::from_double(10000.0),
+            None,
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn rate_same_sign_negative_raises_error_5() {
+        // Both pmt and pv negative
+        let err = rate(
+            &VBVariant::from_double(60.0),
+            &VBVariant::from_double(-200.0),
+            &VBVariant::from_double(-10000.0),
+            None,
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn rate_null_raises_invalid_use_of_null() {
+        let err = rate(
+            &VBVariant::Null,
+            &VBVariant::from_double(-200.0),
+            &VBVariant::from_double(10000.0),
+            None,
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 94);
+    }
+}
