@@ -50,4 +50,29 @@ pub(super) fn register(registry: &mut Registry) {
     registry.insert(builtin!("npv", 2, 2, |args| {
         finfn::npv::npv(&args[0], &args[1])
     }));
+
+    registry.insert(builtin!("pmt", 3, 5, |args| {
+        let fv = if args.len() > 3 { Some(&args[3]) } else { None };
+        let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
+        finfn::pmt::pmt(args[0].clone(), args[1].clone(), args[2].clone(), fv, type_)
+    }));
+
+    registry.insert(builtin!("ppmt", 4, 6, |args| {
+        let fv = if args.len() > 4 { Some(&args[4]) } else { None };
+        let type_ = if args.len() > 5 { Some(&args[5]) } else { None };
+        finfn::ppmt::ppmt(&args[0], &args[1], &args[2], &args[3], fv, type_)
+    }));
+
+    registry.insert(builtin!("pv", 3, 5, |args| {
+        let fv = if args.len() > 3 { Some(&args[3]) } else { None };
+        let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
+        finfn::pv::pv(&args[0], &args[1], &args[2], fv, type_)
+    }));
+
+    registry.insert(builtin!("rate", 3, 6, |args| {
+        let fv = if args.len() > 3 { Some(&args[3]) } else { None };
+        let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
+        let guess = if args.len() > 5 { Some(&args[5]) } else { None };
+        finfn::rate::rate(&args[0], &args[1], &args[2], fv, type_, guess)
+    }));
 }
