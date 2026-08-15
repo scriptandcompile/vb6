@@ -214,6 +214,15 @@ impl ScopeManager {
         self.current_scope
     }
 
+    /// Directly set the current scope.
+    ///
+    /// Used when resolving references after all declarations are registered,
+    /// where walking a CST a second time must restore each procedure's scope
+    /// without re-creating it.
+    pub fn set_current_scope(&mut self, scope_id: usize) {
+        self.current_scope = scope_id;
+    }
+
     /// Get a scope by ID
     pub fn get_scope(&self, scope_id: usize) -> Option<&Scope> {
         self.scopes.get(&scope_id)

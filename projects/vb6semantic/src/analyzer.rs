@@ -39,6 +39,8 @@
 //! ```
 
 use crate::error::{Result, SemanticError, SourceLocation};
+use crate::location::LineIndex;
+use crate::query::{QueryIndex, Reference as QueryReference, ReferenceKind};
 use crate::references::{ReferenceInfo, ReferenceRegistry, ReferenceResolver};
 use crate::scope::{ScopeKind, ScopeManager};
 use crate::symbols::{Symbol, SymbolKind, Visibility};
@@ -83,6 +85,27 @@ pub struct SemanticAnalyzer {
 
     /// Collected warnings
     warnings: Vec<String>,
+
+    /// Byte-offset → position mapping for the file currently being analyzed
+    line_index: LineIndex,
+
+    /// Lines consumed by the file header (form/class) and absent from the CST
+    current_line_offset: usize,
+
+    /// Resolved identifier occurrences collected during analysis
+    query_index: QueryIndex,
+
+    /// Whether reference collection is deferred until all files in a project
+    /// are registered (set during `analyze_project`). When false, each file
+    /// resolves its own references immediately after registration.
+    defer_resolution: bool,
+
+    /// Statement start offset → procedure scope id for the file currently
+    /// being analyzed (consumed by [`Self::resolve_pending`]).
+    procedure_scopes: HashMap<u32, usize>,
+
+    /// Files waiting for reference resolution once the project is registered.
+    pending_resolution: Vec<PendingResolution>,
 }
 
 impl SemanticAnalyzer {
@@ -99,6 +122,12 @@ impl SemanticAnalyzer {
             unresolved_references: Vec::new(),
             errors: Vec::new(),
             warnings: Vec::new(),
+            line_index: LineIndex::default(),
+            current_line_offset: 0,
+            query_index: QueryIndex::new(),
+            defer_resolution: false,
+            procedure_scopes: HashMap::new(),
+            pending_resolution: Vec::new(),
         }
     }
 
@@ -150,6 +179,10 @@ impl SemanticAnalyzer {
             .scope_manager
             .push_scope(ScopeKind::Global, project.properties.name.to_string());
 
+        // Defer per-file reference collection so forward and cross-module
+        // references resolve once every file's declarations are registered.
+        self.defer_resolution = true;
+
         // Analyze the source files in `.vbp` line order so that cross-module
         // name resolution matches the order the IDE sees the files in.
         for entry in project.file_entries() {
@@ -172,6 +205,9 @@ impl SemanticAnalyzer {
         // TODO: Analyze any additional project-level constructs if necessary
 
         self.scope_manager.pop_scope()?;
+        self.defer_resolution = false;
+        self.resolve_pending()?;
+        self.query_index.finalize();
 
         Ok(AnalysisResult {
             scope_manager: self.scope_manager.clone(),
@@ -179,6 +215,7 @@ impl SemanticAnalyzer {
             warnings: self.warnings.clone(),
             resolved_references: self.resolved_references.clone(),
             unresolved_references: self.unresolved_references.clone(),
+            query_index: self.query_index.clone(),
         })
     }
 
@@ -296,9 +333,12 @@ impl SemanticAnalyzer {
 
         // Process module-level declarations
         let root = module.cst.to_root_node();
+        self.line_index = LineIndex::from_cst_root(&root);
+        self.current_line_offset = module.line_offset;
         self.process_statements(&root, root.children(), module.line_offset)?;
 
         self.scope_manager.pop_scope()?;
+        self.finish_file_resolution(root, module_scope, module.line_offset)?;
         Ok(())
     }
 
@@ -362,9 +402,12 @@ impl SemanticAnalyzer {
 
         // Process class members (methods, properties, events, declarations)
         let root = class.cst.to_root_node();
+        self.line_index = LineIndex::from_cst_root(&root);
+        self.current_line_offset = class.line_offset;
         self.process_statements(&root, root.children(), class.line_offset)?;
 
         self.scope_manager.pop_scope()?;
+        self.finish_file_resolution(root, class_scope, class.line_offset)?;
         Ok(())
     }
 
@@ -433,9 +476,12 @@ impl SemanticAnalyzer {
 
         // Process the form code section (event handlers, module-level declarations)
         let root = form.cst.to_root_node();
+        self.line_index = LineIndex::from_cst_root(&root);
+        self.current_line_offset = form.line_offset;
         self.process_statements(&root, root.children(), form.line_offset)?;
 
         self.scope_manager.pop_scope()?;
+        self.finish_file_resolution(root, form_scope, form.line_offset)?;
         Ok(())
     }
 
@@ -475,6 +521,96 @@ impl SemanticAnalyzer {
         self.warnings.push(message);
     }
 
+    /// The collected query index of resolved identifier occurrences.
+    pub fn query_index(&self) -> &QueryIndex {
+        &self.query_index
+    }
+
+    /// The name of the file currently being analyzed.
+    fn current_file_name(&self) -> &str {
+        self.current_file
+            .as_deref()
+            .unwrap_or("<unknown>")
+    }
+
+    /// Create a precise source location for a byte offset in the current file
+    /// using the line index built from its CST.
+    fn location_at(&self, offset: u32) -> SourceLocation {
+        let (line, column) = self.line_index.position(offset);
+        SourceLocation {
+            file: self.current_file_name().to_string(),
+            line: line + self.current_line_offset,
+            column,
+        }
+    }
+
+    /// Record a symbol declaration in the query index.
+    fn record_definition(
+        &mut self,
+        scope_id: usize,
+        name: &str,
+        start_offset: u32,
+        end_offset: u32,
+    ) {
+        let reference = QueryReference::new(
+            ReferenceKind::Definition,
+            self.location_at(start_offset),
+            start_offset,
+            end_offset,
+        );
+        self.query_index.record(scope_id, name, reference);
+    }
+
+    /// Record every resolvable identifier in `node`'s subtree as a usage or
+    /// type reference, skipping tokens that are already recorded (definitions).
+    ///
+    /// Resolution happens against the scope that is current when called, so
+    /// procedure bodies must be walked while their parameter scope is pushed.
+    fn collect_usages_in(&mut self, node: &CstNode) -> Result<()> {
+        let mut prev_significant_kind: Option<SyntaxKind> = None;
+        for child in node.descendants() {
+            if !child.is_token() {
+                continue;
+            }
+            let kind = child.kind();
+            if Self::is_trivia(kind) {
+                continue;
+            }
+            if kind != SyntaxKind::Identifier {
+                prev_significant_kind = Some(kind);
+                continue;
+            }
+            let (start, end) = child.byte_range();
+            let is_type_reference = matches!(
+                prev_significant_kind,
+                Some(SyntaxKind::AsKeyword) | Some(SyntaxKind::NewKeyword)
+            );
+            prev_significant_kind = Some(kind);
+            if self
+                .query_index
+                .is_recorded(self.current_file_name(), start, end)
+            {
+                continue;
+            }
+            let Some(symbol) = self.scope_manager.lookup(child.text()) else {
+                continue;
+            };
+            let reference = QueryReference::new(
+                if is_type_reference {
+                    ReferenceKind::TypeReference
+                } else {
+                    ReferenceKind::Usage
+                },
+                self.location_at(start),
+                start,
+                end,
+            );
+            self.query_index
+                .record(symbol.scope_id, &symbol.name, reference);
+        }
+        Ok(())
+    }
+
     /// Create a source location for current file
     fn make_location(&self, line: usize, column: usize) -> SourceLocation {
         SourceLocation {
@@ -505,6 +641,78 @@ impl SemanticAnalyzer {
             scope_id,
             attributes: HashMap::new(),
         })
+    }
+
+    /// Finish a file's analysis: either queue it for project-wide resolution
+    /// or resolve its references immediately and finalize the index.
+    fn finish_file_resolution(
+        &mut self,
+        root: CstNode,
+        module_scope: usize,
+        line_offset: usize,
+    ) -> Result<()> {
+        if self.defer_resolution {
+            self.pending_resolution.push(PendingResolution {
+                file_name: self.current_file_name().to_string(),
+                line_offset,
+                line_index: std::mem::take(&mut self.line_index),
+                root,
+                procedure_scopes: std::mem::take(&mut self.procedure_scopes),
+                module_scope,
+            });
+            return Ok(());
+        }
+        let procedure_scopes = std::mem::take(&mut self.procedure_scopes);
+        self.resolve_file(root, module_scope, procedure_scopes)
+    }
+
+    /// Resolve every queued file's references against the fully-registered
+    /// project symbol table.
+    fn resolve_pending(&mut self) -> Result<()> {
+        let pending = std::mem::take(&mut self.pending_resolution);
+        let original_scope = self.scope_manager.current_scope_id();
+        for entry in pending {
+            self.current_file = Some(entry.file_name.clone());
+            self.current_line_offset = entry.line_offset;
+            self.line_index = entry.line_index;
+            self.resolve_file(entry.root, entry.module_scope, entry.procedure_scopes)?;
+        }
+        self.scope_manager.set_current_scope(original_scope);
+        Ok(())
+    }
+
+    /// Walk a file's statements a second time, resolving identifier usages
+    /// now that every declaration in scope is registered.
+    fn resolve_file(
+        &mut self,
+        root: CstNode,
+        module_scope: usize,
+        procedure_scopes: HashMap<u32, usize>,
+    ) -> Result<()> {
+        for statement in root.children() {
+            if statement.is_token() || Self::is_trivia(statement.kind()) {
+                continue;
+            }
+            let is_procedure = matches!(
+                statement.kind(),
+                SyntaxKind::SubStatement
+                    | SyntaxKind::FunctionStatement
+                    | SyntaxKind::PropertyStatement
+                    | SyntaxKind::DeclareStatement
+            );
+            if is_procedure {
+                if let Some(&procedure_scope) =
+                    procedure_scopes.get(&statement.start_offset())
+                {
+                    self.scope_manager.set_current_scope(procedure_scope);
+                }
+            } else {
+                self.scope_manager.set_current_scope(module_scope);
+            }
+            self.collect_usages_in(statement)?;
+        }
+        self.query_index.finalize();
+        Ok(())
     }
 
     /// Process a sequence of statements at module/class/form level
@@ -548,7 +756,7 @@ impl SemanticAnalyzer {
     }
 
     /// Process a `Dim` or `Const` statement (both use the `DimStatement` syntax kind)
-    fn process_dim_statement(&mut self, statement: &CstNode, line: usize) -> Result<()> {
+    fn process_dim_statement(&mut self, statement: &CstNode, _line: usize) -> Result<()> {
         let is_const = statement
             .children()
             .iter()
@@ -574,8 +782,9 @@ impl SemanticAnalyzer {
             if item.is_array {
                 type_info.is_array = true;
             }
+            let location = self.location_at(item.offset);
             self.add_symbol(Symbol {
-                name: item.name,
+                name: item.name.clone(),
                 kind: if is_const {
                     SymbolKind::Constant
                 } else {
@@ -583,20 +792,22 @@ impl SemanticAnalyzer {
                 },
                 type_info,
                 visibility,
-                location: self.make_location(line, 1),
+                location: location.clone(),
                 scope_id,
                 attributes,
             })?;
+            self.record_definition(scope_id, &item.name, item.offset, item.end);
         }
         Ok(())
     }
 
     /// Process a `Type` definition, registering the type and its members
     fn process_type_statement(&mut self, statement: &CstNode, line: usize) -> Result<()> {
-        let name = Self::first_identifier(statement).to_string();
-        if name.is_empty() {
+        let Some(name_node) = Self::first_identifier_node(statement) else {
             return Ok(());
-        }
+        };
+        let name = name_node.text().to_string();
+        let (name_offset, name_end) = name_node.byte_range();
         let visibility = Self::visibility_from_statement(statement).unwrap_or(Visibility::Private);
 
         // The type itself lives in the module/class scope; its members live in the type scope
@@ -606,10 +817,11 @@ impl SemanticAnalyzer {
             kind: SymbolKind::UserType,
             type_info: TypeInfo::new(VBType::UserType(name.clone())),
             visibility,
-            location: self.make_location(line, 1),
+            location: self.location_at(name_offset),
             scope_id,
             attributes: HashMap::new(),
         })?;
+        self.record_definition(scope_id, &name, name_offset, name_end);
 
         let type_scope = self.scope_manager.push_scope(ScopeKind::Type, name);
         if let Some(list) = statement.first_child_by_kind(SyntaxKind::StatementList) {
@@ -635,7 +847,7 @@ impl SemanticAnalyzer {
     fn register_type_member_line(
         &mut self,
         tokens: &[&CstNode],
-        line: usize,
+        _line: usize,
         scope_id: usize,
     ) -> Result<()> {
         let mut index = 0;
@@ -647,25 +859,28 @@ impl SemanticAnalyzer {
             if item.is_array {
                 type_info.is_array = true;
             }
+            let location = self.location_at(item.offset);
             self.add_symbol(Symbol {
-                name: item.name,
+                name: item.name.clone(),
                 kind: SymbolKind::TypeMember,
                 type_info,
                 visibility: Visibility::Private,
-                location: self.make_location(line, 1),
+                location: location.clone(),
                 scope_id,
                 attributes: HashMap::new(),
             })?;
+            self.record_definition(scope_id, &item.name, item.offset, item.end);
         }
         Ok(())
     }
 
     /// Process an `Enum` definition, registering the enum and its members
     fn process_enum_statement(&mut self, statement: &CstNode, line: usize) -> Result<()> {
-        let name = Self::first_identifier(statement).to_string();
-        if name.is_empty() {
+        let Some(name_node) = Self::first_identifier_node(statement) else {
             return Ok(());
-        }
+        };
+        let name = name_node.text().to_string();
+        let (name_offset, name_end) = name_node.byte_range();
         let visibility = Self::visibility_from_statement(statement).unwrap_or(Visibility::Private);
 
         // The enum itself lives in the module/class scope; its members live in the enum scope
@@ -675,10 +890,11 @@ impl SemanticAnalyzer {
             kind: SymbolKind::Enum,
             type_info: TypeInfo::new(VBType::Enum(name.clone())),
             visibility,
-            location: self.make_location(line, 1),
+            location: self.location_at(name_offset),
             scope_id,
             attributes: HashMap::new(),
         })?;
+        self.record_definition(scope_id, &name, name_offset, name_end);
 
         let enum_scope = self.scope_manager.push_scope(ScopeKind::Enum, name.clone());
 
@@ -716,12 +932,13 @@ impl SemanticAnalyzer {
         tokens: &[&CstNode],
         enum_name: String,
         enum_scope: usize,
-        line: usize,
+        _line: usize,
     ) -> Result<()> {
         let Some(first) = tokens.first() else {
             return Ok(());
         };
         let member_name = first.text().to_string();
+        let (offset, end) = first.byte_range();
 
         let mut attributes = HashMap::new();
         let mut i = 1;
@@ -730,28 +947,33 @@ impl SemanticAnalyzer {
             let mut parts = Vec::new();
             while i < tokens.len() {
                 parts.push(tokens[i].text().to_string());
+
                 i += 1;
             }
             attributes.insert("value".to_string(), parts.concat());
         }
 
+        let location = self.location_at(offset);
         self.add_symbol(Symbol {
-            name: member_name,
+            name: member_name.clone(),
             kind: SymbolKind::EnumMember,
             type_info: TypeInfo::new(VBType::Enum(enum_name)),
             visibility: Visibility::Private,
-            location: self.make_location(line, 1),
+            location: location.clone(),
             scope_id: enum_scope,
             attributes,
-        })
+        })?;
+        self.record_definition(enum_scope, &member_name, offset, end);
+        Ok(())
     }
 
     /// Process a `Sub`, `Function`, or `Property` procedure declaration
-    fn process_procedure(&mut self, statement: &CstNode, line: usize) -> Result<()> {
-        let name = Self::first_identifier(statement).to_string();
-        if name.is_empty() {
+    fn process_procedure(&mut self, statement: &CstNode, _line: usize) -> Result<()> {
+        let Some(name_node) = Self::first_identifier_node(statement) else {
             return Ok(());
-        }
+        };
+        let name = name_node.text().to_string();
+        let (name_offset, name_end) = name_node.byte_range();
         let kind = Self::procedure_symbol_kind(statement);
         let visibility = Self::visibility_from_statement(statement).unwrap_or(Visibility::Public);
         let type_info = match kind {
@@ -763,16 +985,18 @@ impl SemanticAnalyzer {
         };
 
         let scope_id = self.scope_manager.current_scope_id();
+        let is_property_accessor = matches!(
+            kind,
+            SymbolKind::PropertyGet | SymbolKind::PropertyLet | SymbolKind::PropertySet
+        );
 
         // Property Get/Let/Set accessors share a name in VB6 and must be merged
         // into a single property symbol rather than treated as duplicates.
-        if matches!(
-            kind,
-            SymbolKind::PropertyGet | SymbolKind::PropertyLet | SymbolKind::PropertySet
-        ) && self
-            .scope_manager
-            .lookup_in_scope(scope_id, &name)
-            .is_some()
+        if is_property_accessor
+            && self
+                .scope_manager
+                .lookup_in_scope(scope_id, &name)
+                .is_some()
         {
             if let Some(scope) = self.scope_manager.get_scope_mut(scope_id)
                 && let Some(existing) = scope.symbols.get_mut(&name)
@@ -795,60 +1019,64 @@ impl SemanticAnalyzer {
                     existing.type_info = type_info;
                 }
             }
-            self.register_parameters(statement, name, line)?;
-            return Ok(());
-        }
-
-        let mut attributes = HashMap::new();
-        if matches!(
-            kind,
-            SymbolKind::PropertyGet | SymbolKind::PropertyLet | SymbolKind::PropertySet
-        ) {
-            let accessor = match kind {
-                SymbolKind::PropertyGet => "get",
-                SymbolKind::PropertyLet => "let",
-                _ => "set",
-            };
-            attributes.insert("accessors".to_string(), accessor.to_string());
-        }
-
-        self.add_symbol(Symbol {
-            name: name.clone(),
-            kind,
-            type_info,
-            visibility,
-            location: self.make_location(line, 1),
-            scope_id,
-            attributes,
-        })?;
-
-        self.register_parameters(statement, name, line)?;
-        Ok(())
-    }
-
-    /// Register a procedure's parameters in a new procedure scope
-    fn register_parameters(
-        &mut self,
-        statement: &CstNode,
-        name: String,
-        line: usize,
-    ) -> Result<()> {
-        let procedure_scope = self.scope_manager.push_scope(ScopeKind::Procedure, name);
-        if let Some(param_list) = statement.first_child_by_kind(SyntaxKind::ParameterList) {
-            for param in self.parse_parameter_list(param_list, procedure_scope, line)? {
-                self.add_symbol(param)?;
+        } else {
+            let mut attributes = HashMap::new();
+            if is_property_accessor {
+                let accessor = match kind {
+                    SymbolKind::PropertyGet => "get",
+                    SymbolKind::PropertyLet => "let",
+                    _ => "set",
+                };
+                attributes.insert("accessors".to_string(), accessor.to_string());
             }
+            self.add_symbol(Symbol {
+                name: name.clone(),
+                kind,
+                type_info,
+                visibility,
+                location: self.location_at(name_offset),
+                scope_id,
+                attributes,
+            })?;
+            self.record_definition(scope_id, &name, name_offset, name_end);
         }
+
+        // Remember the procedure scope so the second (reference resolution)
+        // pass can restore it, then balance the push.
+        let procedure_scope = self.register_parameters(statement, name)?;
+        self.procedure_scopes
+            .insert(statement.start_offset(), procedure_scope);
         self.scope_manager.pop_scope()?;
         Ok(())
     }
 
-    /// Process an `Declare` (external API) declaration
-    fn process_declare_statement(&mut self, statement: &CstNode, line: usize) -> Result<()> {
-        let name = Self::first_identifier(statement).to_string();
-        if name.is_empty() {
-            return Ok(());
+    /// Register a procedure's parameters in a new procedure scope.
+    ///
+    /// The procedure scope is left pushed on return so the caller can walk the
+    /// procedure body against it; the caller is responsible for popping it.
+    fn register_parameters(&mut self, statement: &CstNode, name: String) -> Result<usize> {
+        let procedure_scope = self.scope_manager.push_scope(ScopeKind::Procedure, name);
+        if let Some(param_list) = statement.first_child_by_kind(SyntaxKind::ParameterList) {
+            for (param, offset, end) in self.parse_parameter_list(param_list, procedure_scope)? {
+                let location = self.location_at(offset);
+                self.query_index.record(
+                    procedure_scope,
+                    &param.name,
+                    QueryReference::new(ReferenceKind::Definition, location, offset, end),
+                );
+                self.add_symbol(param)?;
+            }
         }
+        Ok(procedure_scope)
+    }
+
+    /// Process a `Declare` (external API) declaration
+    fn process_declare_statement(&mut self, statement: &CstNode, _line: usize) -> Result<()> {
+        let Some(name_node) = Self::first_identifier_node(statement) else {
+            return Ok(());
+        };
+        let name = name_node.text().to_string();
+        let (name_offset, name_end) = name_node.byte_range();
         let is_function = statement
             .children()
             .iter()
@@ -875,32 +1103,39 @@ impl SemanticAnalyzer {
             kind,
             type_info,
             visibility: Self::visibility_from_statement(statement).unwrap_or(Visibility::Public),
-            location: self.make_location(line, 1),
+            location: self.location_at(name_offset),
             scope_id,
             attributes,
         })?;
+        self.record_definition(scope_id, &name, name_offset, name_end);
 
-        self.register_parameters(statement, name, line)?;
+        let procedure_scope = self.register_parameters(statement, name)?;
+        self.procedure_scopes
+            .insert(statement.start_offset(), procedure_scope);
+        self.scope_manager.pop_scope()?;
         Ok(())
     }
 
     /// Register a `Public Event` declaration
-    fn process_event_statement(&mut self, statement: &CstNode, line: usize) -> Result<()> {
-        let name = Self::first_identifier(statement).to_string();
-        if name.is_empty() {
+    fn process_event_statement(&mut self, statement: &CstNode, _line: usize) -> Result<()> {
+        let Some(name_node) = Self::first_identifier_node(statement) else {
             return Ok(());
-        }
+        };
+        let name = name_node.text().to_string();
+        let (name_offset, name_end) = name_node.byte_range();
         let mut attributes = HashMap::new();
         attributes.insert("event".to_string(), "true".to_string());
+        let scope_id = self.scope_manager.current_scope_id();
         self.add_symbol(Symbol {
-            name,
+            name: name.clone(),
             kind: SymbolKind::SubProcedure,
             type_info: TypeInfo::new(VBType::Sub),
             visibility: Self::visibility_from_statement(statement).unwrap_or(Visibility::Public),
-            location: self.make_location(line, 1),
-            scope_id: self.scope_manager.current_scope_id(),
+            location: self.location_at(name_offset),
+            scope_id,
             attributes,
         })?;
+        self.record_definition(scope_id, &name, name_offset, name_end);
         Ok(())
     }
 
@@ -1007,13 +1242,11 @@ impl SemanticAnalyzer {
         Ok(())
     }
 
-    /// Get the first identifier in a statement (the declared name)
-    fn first_identifier(node: &CstNode) -> &str {
+    /// Get the first identifier token in a statement (the declared name)
+    fn first_identifier_node(node: &CstNode) -> Option<&CstNode> {
         node.children()
             .iter()
             .find(|c| c.kind() == SyntaxKind::Identifier)
-            .map(|c| c.text())
-            .unwrap_or("")
     }
 
     /// Get the explicit visibility modifier of a statement, if any
@@ -1208,6 +1441,8 @@ impl SemanticAnalyzer {
             return None;
         }
 
+        let offset = tokens[*index].start_offset();
+        let end = tokens[*index].end_offset();
         let name = tokens[*index].text().to_string();
         *index += 1;
 
@@ -1265,16 +1500,20 @@ impl SemanticAnalyzer {
             is_array,
             with_events,
             value,
+            offset,
+            end,
         })
     }
 
-    /// Extract parameter symbols from a `ParameterList` node
+    /// Extract parameter symbols from a `ParameterList` node.
+    ///
+    /// Returns each parameter symbol together with the byte range of its name
+    /// token so the caller can record precise definition references.
     fn parse_parameter_list(
         &self,
         list: &CstNode,
         procedure_scope: usize,
-        line: usize,
-    ) -> Result<Vec<Symbol>> {
+    ) -> Result<Vec<(Symbol, u32, u32)>> {
         let tokens: Vec<&CstNode> = Self::significant_children(list).collect();
         let mut symbols = Vec::new();
 
@@ -1320,10 +1559,10 @@ impl SemanticAnalyzer {
                 break;
             }
 
+            let offset = tokens[i].start_offset();
+            let end = tokens[i].end_offset();
             let name = tokens[i].text().to_string();
             i += 1;
-
-            // Array parameter
             let mut is_array = false;
             if i < tokens.len() && tokens[i].kind() == SyntaxKind::LeftParenthesis {
                 is_array = true;
@@ -1387,15 +1626,19 @@ impl SemanticAnalyzer {
                 attributes.insert("default".to_string(), value);
             }
 
-            symbols.push(Symbol {
-                name,
-                kind: SymbolKind::Parameter,
-                type_info,
-                visibility: Visibility::Private,
-                location: self.make_location(line, 1),
-                scope_id: procedure_scope,
-                attributes,
-            });
+            symbols.push((
+                Symbol {
+                    name,
+                    kind: SymbolKind::Parameter,
+                    type_info,
+                    visibility: Visibility::Private,
+                    location: self.location_at(offset),
+                    scope_id: procedure_scope,
+                    attributes,
+                },
+                offset,
+                end,
+            ));
 
             if i < tokens.len() && tokens[i].kind() == SyntaxKind::Comma {
                 i += 1;
@@ -1509,12 +1752,33 @@ struct DeclaredItem {
     is_array: bool,
     with_events: bool,
     value: Option<String>,
+    /// Inclusive start byte offset of the declared name token.
+    offset: u32,
+    /// Exclusive end byte offset of the declared name token.
+    end: u32,
 }
 
 impl Default for SemanticAnalyzer {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// A file whose references are waiting to be resolved once the whole project
+/// has been registered, so that forward and cross-module references resolve.
+struct PendingResolution {
+    /// The file name recorded on occurrences.
+    file_name: String,
+    /// Lines consumed by the file header and absent from the CST.
+    line_offset: usize,
+    /// Position index for the file's CST.
+    line_index: LineIndex,
+    /// The file's CST root.
+    root: CstNode,
+    /// Statement start offset → procedure scope id.
+    procedure_scopes: HashMap<u32, usize>,
+    /// The file's module/class/form scope id.
+    module_scope: usize,
 }
 
 /// Result of semantic analysis
@@ -1534,6 +1798,10 @@ pub struct AnalysisResult {
 
     /// References no registered resolver could handle
     pub unresolved_references: Vec<ReferenceInfo>,
+
+    /// Resolved identifier occurrences (definitions and usages), keyed by
+    /// symbol and queryable by position.
+    pub query_index: QueryIndex,
 }
 
 impl AnalysisResult {

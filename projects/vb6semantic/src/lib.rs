@@ -36,6 +36,8 @@
 
 pub mod analyzer;
 pub mod error;
+pub mod location;
+pub mod query;
 pub mod references;
 pub mod resolution;
 pub mod scope;
