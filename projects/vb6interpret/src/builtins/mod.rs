@@ -684,5 +684,17 @@ mod tests {
         )
         .unwrap();
         assert!((result.as_f64().unwrap() - 0.0061834).abs() < 1e-6);
+
+        // SLN: straight-line depreciation
+        let result = call_builtin(
+            "SLN",
+            &[
+                VBVariant::from_double(50000.0),
+                VBVariant::from_double(5000.0),
+                VBVariant::from_double(5.0),
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_f64().unwrap(), 9000.0);
     }
 }

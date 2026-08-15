@@ -693,3 +693,114 @@
 //! - `FV`: Calculates future value (inverse concept)
 //! - `PV`: Calculates present value
 //!
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `SLN` function.
+///
+/// Calculates straight-line depreciation of an asset for a single period:
+/// `(cost - salvage) / life`.
+///
+/// VB6 behavior:
+/// - `cost` and `salvage` must be non-negative; `life` must be positive
+/// - If `life` is 0 or negative, raises error 5 (Invalid procedure call)
+/// - If `cost` or `salvage` is negative, raises error 5
+/// - Returns a `Double`
+pub fn sln(cost: &VBVariant, salvage: &VBVariant, life: &VBVariant) -> VBResult<VBVariant> {
+    let cost_val = cost.as_f64()?;
+    let salvage_val = salvage.as_f64()?;
+    let life_val = life.as_f64()?;
+
+    // Validate inputs per VB6 behavior
+    if life_val <= 0.0 || cost_val < 0.0 || salvage_val < 0.0 {
+        return Err(VBError::new(5));
+    }
+
+    Ok(VBVariant::from_double((cost_val - salvage_val) / life_val))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::sln;
+    use crate::value::VBVariant;
+
+    fn sln_default(cost: f64, salvage: f64, life: f64) -> VBVariant {
+        sln(
+            &VBVariant::from_double(cost),
+            &VBVariant::from_double(salvage),
+            &VBVariant::from_double(life),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn sln_basic_depreciation() {
+        // Cost=50000, Salvage=5000, Life=5 → (50000-5000)/5 = 9000
+        let result = sln_default(50000.0, 5000.0, 5.0);
+        assert_eq!(result.as_f64().unwrap(), 9000.0);
+    }
+
+    #[test]
+    fn sln_monthly_depreciation() {
+        // Cost=24000, Salvage=2000, Life=36 months → 22000/36 ≈ 611.11
+        let result = sln_default(24000.0, 2000.0, 36.0);
+        assert!((result.as_f64().unwrap() - 611.1111111111111).abs() < 1e-9);
+    }
+
+    #[test]
+    fn sln_zero_salvage() {
+        let result = sln_default(10000.0, 0.0, 10.0);
+        assert_eq!(result.as_f64().unwrap(), 1000.0);
+    }
+
+    #[test]
+    fn sln_zero_life_raises_error_5() {
+        let err = sln(
+            &VBVariant::from_double(10000.0),
+            &VBVariant::from_double(1000.0),
+            &VBVariant::from_double(0.0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn sln_negative_life_raises_error_5() {
+        let err = sln(
+            &VBVariant::from_double(10000.0),
+            &VBVariant::from_double(1000.0),
+            &VBVariant::from_double(-5.0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn sln_negative_cost_raises_error_5() {
+        let err = sln(
+            &VBVariant::from_double(-100.0),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(5.0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn sln_with_integer_args() {
+        let result = sln(
+            &VBVariant::from_long(10000),
+            &VBVariant::from_long(1000),
+            &VBVariant::from_long(5),
+        )
+        .unwrap();
+        assert_eq!(result.as_f64().unwrap(), 1800.0);
+    }
+
+    #[test]
+    fn sln_null_raises_invalid_use_of_null() {
+        let err = sln(&VBVariant::Null, &VBVariant::Empty, &VBVariant::Empty).unwrap_err();
+        assert_eq!(err.number, 94);
+    }
+}
