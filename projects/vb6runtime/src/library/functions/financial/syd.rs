@@ -658,3 +658,190 @@
 //! - Salvage value must be less than cost
 //! - No automatic switching to straight-line method
 //! - Does not account for bonus depreciation or special tax rules
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `SYD` function.
+///
+/// Calculates sum-of-years digits depreciation of an asset for a specified
+/// period:
+/// `((cost - salvage) * (life - period + 1) * 2) / (life * (life + 1))`
+///
+/// VB6 behavior:
+/// - `cost` and `salvage` must be non-negative; `life` must be positive
+/// - `period` must be between 1 and `life` (inclusive)
+/// - `cost` must be greater than `salvage`
+/// - If any argument is invalid, raises error 5 (Invalid procedure call)
+/// - Returns a `Double`
+pub fn syd(
+    cost: &VBVariant,
+    salvage: &VBVariant,
+    life: &VBVariant,
+    period: &VBVariant,
+) -> VBResult<VBVariant> {
+    let cost_val = cost.as_f64()?;
+    let salvage_val = salvage.as_f64()?;
+    let life_val = life.as_f64()?;
+    let period_val = period.as_f64()?;
+
+    // Validate inputs per VB6 behavior
+    if life_val <= 0.0
+        || cost_val < 0.0
+        || salvage_val < 0.0
+        || period_val < 1.0
+        || period_val > life_val
+        || cost_val <= salvage_val
+    {
+        return Err(VBError::new(5));
+    }
+
+    let depreciable_base = cost_val - salvage_val;
+    let remaining_life = life_val - period_val + 1.0;
+    let sum_of_years = life_val * (life_val + 1.0) / 2.0;
+
+    Ok(VBVariant::from_double(depreciable_base * remaining_life / sum_of_years))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::syd;
+    use crate::value::VBVariant;
+
+    fn syd_default(cost: f64, salvage: f64, life: f64, period: f64) -> VBVariant {
+        syd(
+            &VBVariant::from_double(cost),
+            &VBVariant::from_double(salvage),
+            &VBVariant::from_double(life),
+            &VBVariant::from_double(period),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn syd_first_period() {
+        // Cost=10000, Salvage=1000, Life=5, Period=1
+        // Sum-of-years=15, remaining=5 → 9000 * 5/15 = 3000
+        let result = syd_default(10000.0, 1000.0, 5.0, 1.0);
+        assert_eq!(result.as_f64().unwrap(), 3000.0);
+    }
+
+    #[test]
+    fn syd_second_period() {
+        // 9000 * 4/15 = 2400
+        let result = syd_default(10000.0, 1000.0, 5.0, 2.0);
+        assert_eq!(result.as_f64().unwrap(), 2400.0);
+    }
+
+    #[test]
+    fn syd_last_period() {
+        // 9000 * 1/15 = 600
+        let result = syd_default(10000.0, 1000.0, 5.0, 5.0);
+        assert_eq!(result.as_f64().unwrap(), 600.0);
+    }
+
+    #[test]
+    fn syd_total_depreciates_to_salvage() {
+        let cost = 10000.0;
+        let salvage = 1000.0;
+        let life = 5.0;
+        let mut total = 0.0;
+        for period in 1..=life as i64 {
+            total += syd_default(cost, salvage, life, period as f64)
+                .as_f64()
+                .unwrap();
+        }
+        assert!((total - (cost - salvage)).abs() < 1e-9);
+    }
+
+    #[test]
+    fn syd_zero_salvage() {
+        // Cost=10000, Salvage=0, Life=5, Period=1 → 10000 * 5/15 ≈ 3333.33
+        let result = syd_default(10000.0, 0.0, 5.0, 1.0);
+        assert!((result.as_f64().unwrap() - 3333.3333333333335).abs() < 1e-9);
+    }
+
+    #[test]
+    fn syd_with_integer_args() {
+        let result = syd(
+            &VBVariant::from_long(10000),
+            &VBVariant::from_long(1000),
+            &VBVariant::from_long(5),
+            &VBVariant::from_long(2),
+        )
+        .unwrap();
+        assert_eq!(result.as_f64().unwrap(), 2400.0);
+    }
+
+    #[test]
+    fn syd_zero_life_raises_error_5() {
+        let err = syd(
+            &VBVariant::from_double(10000.0),
+            &VBVariant::from_double(1000.0),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(1.0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn syd_period_greater_than_life_raises_error_5() {
+        let err = syd(
+            &VBVariant::from_double(10000.0),
+            &VBVariant::from_double(1000.0),
+            &VBVariant::from_double(5.0),
+            &VBVariant::from_double(6.0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn syd_period_less_than_one_raises_error_5() {
+        let err = syd(
+            &VBVariant::from_double(10000.0),
+            &VBVariant::from_double(1000.0),
+            &VBVariant::from_double(5.0),
+            &VBVariant::from_double(0.0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn syd_cost_less_than_salvage_raises_error_5() {
+        let err = syd(
+            &VBVariant::from_double(1000.0),
+            &VBVariant::from_double(2000.0),
+            &VBVariant::from_double(5.0),
+            &VBVariant::from_double(1.0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn syd_negative_cost_raises_error_5() {
+        let err = syd(
+            &VBVariant::from_double(-100.0),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(5.0),
+            &VBVariant::from_double(1.0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn syd_null_raises_invalid_use_of_null() {
+        let err = syd(
+            &VBVariant::Null,
+            &VBVariant::Empty,
+            &VBVariant::Empty,
+            &VBVariant::Empty,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 94);
+    }
+}

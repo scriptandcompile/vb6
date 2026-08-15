@@ -696,5 +696,18 @@ mod tests {
         )
         .unwrap();
         assert_eq!(result.as_f64().unwrap(), 9000.0);
+
+        // SYD: sum-of-years digits depreciation
+        let result = call_builtin(
+            "SYD",
+            &[
+                VBVariant::from_double(10000.0),
+                VBVariant::from_double(1000.0),
+                VBVariant::from_double(5.0),
+                VBVariant::from_double(2.0),
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_f64().unwrap(), 2400.0);
     }
 }

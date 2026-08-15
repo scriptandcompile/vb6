@@ -79,4 +79,8 @@ pub(super) fn register(registry: &mut Registry) {
     registry.insert(builtin!("sln", 3, 3, |args| {
         finfn::sln::sln(&args[0], &args[1], &args[2])
     }));
+
+    registry.insert(builtin!("syd", 4, 4, |args| {
+        finfn::syd::syd(&args[0], &args[1], &args[2], &args[3])
+    }));
 }
