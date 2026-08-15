@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/form/cdiu_beat_up_editor.rs
 expression: form_file
 ---
 form:
@@ -4545,32 +4545,32 @@ cst:
             children:
               - kind: LeftParenthesis
                 text: (
-          - kind: WidthKeyword
-            text: Width
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: Height
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Width
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: Height
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\n"
           - kind: StatementList
@@ -17769,12 +17769,14 @@ cst:
                                     text: SaveSelect
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: cma4
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: SelectedKeys
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: cma4
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: SelectedKeys
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -17921,8 +17923,10 @@ cst:
                                         text: SaveSelect
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: IntegerLiteral
-                                        text: "0"
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "0"
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Newline

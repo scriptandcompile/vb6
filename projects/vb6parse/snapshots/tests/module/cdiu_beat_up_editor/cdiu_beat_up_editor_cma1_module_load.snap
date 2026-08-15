@@ -61,8 +61,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"3\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"3\""
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -83,8 +85,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"6\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"6\""
           - kind: Newline
             text: "\n"
       - kind: Newline
@@ -1913,36 +1917,36 @@ cst:
             children:
               - kind: LeftParenthesis
                 text: (
-          - kind: NameKeyword
-            text: Name
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: Add
-          - kind: LeftParenthesis
-            text: (
-          - kind: RightParenthesis
-            text: )
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: ByteKeyword
-            text: Byte
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Name
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: Add
+              - kind: LeftParenthesis
+                text: (
+              - kind: RightParenthesis
+                text: )
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: ByteKeyword
+                text: Byte
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\n"
           - kind: StatementList
@@ -5043,42 +5047,62 @@ cst:
                             text: SongFile
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: FileLen
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: App
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: Path
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AdditionOperator
-                            text: +
-                          - kind: Whitespace
-                            text: " "
-                          - kind: StringLiteral
-                            text: "\"\\Game\\cma\\\""
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AdditionOperator
-                            text: +
-                          - kind: Whitespace
-                            text: " "
-                          - kind: StringLiteral
-                            text: "\"song.ogg\""
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: CallExpression
+                                children:
+                                  - kind: Identifier
+                                    text: FileLen
+                                  - kind: LeftParenthesis
+                                    text: (
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: MemberAccessExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: App
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: Path
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: AdditionOperator
+                                                    text: +
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: StringLiteralExpression
+                                                    children:
+                                                      - kind: StringLiteral
+                                                        text: "\"\\Game\\cma\\\""
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: AdditionOperator
+                                                text: +
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"song.ogg\""
+                                  - kind: RightParenthesis
+                                    text: )
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -6141,8 +6165,10 @@ cst:
                                     text: GData
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: LenTPData
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: LenTPData
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -6469,8 +6495,10 @@ cst:
                                     text: SData
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: LenTPData
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: LenTPData
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -10469,22 +10497,34 @@ cst:
                     text: SongFile
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: FileLen
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: SongPath
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: CallExpression
+                        children:
+                          - kind: Identifier
+                            text: FileLen
+                          - kind: LeftParenthesis
+                            text: (
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: SongPath
+                          - kind: RightParenthesis
+                            text: )
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -13713,8 +13753,10 @@ cst:
                             text: SData
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "70"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "70"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -13743,28 +13785,40 @@ cst:
                                 text: SData
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: Identifier
-                                text: TotalBeat
-                              - kind: Whitespace
-                                text: " "
-                              - kind: AdditionOperator
-                                text: +
-                              - kind: Whitespace
-                                text: " "
-                              - kind: IntegerLiteral
-                                text: "4"
-                              - kind: RightParenthesis
-                                text: )
-                              - kind: Whitespace
-                                text: " "
-                              - kind: MultiplicationOperator
-                                text: "*"
-                              - kind: Whitespace
-                                text: " "
-                              - kind: IntegerLiteral
-                                text: "8"
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: ParenthesizedExpression
+                                    children:
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: TotalBeat
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: AdditionOperator
+                                            text: +
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "4"
+                                      - kind: RightParenthesis
+                                        text: )
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: MultiplicationOperator
+                                    text: "*"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "8"
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
@@ -14973,16 +15027,22 @@ cst:
                             text: GameCheck
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: TotalBeat
-                          - kind: Whitespace
-                            text: " "
-                          - kind: MultiplicationOperator
-                            text: "*"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "8"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: TotalBeat
+                              - kind: Whitespace
+                                text: " "
+                              - kind: MultiplicationOperator
+                                text: "*"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "8"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -19439,16 +19499,22 @@ cst:
                             text: GameCheck
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: TotalBeat
-                          - kind: Whitespace
-                            text: " "
-                          - kind: MultiplicationOperator
-                            text: "*"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "8"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: TotalBeat
+                              - kind: Whitespace
+                                text: " "
+                              - kind: MultiplicationOperator
+                                text: "*"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "8"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/statements/declarations/arrays.rs
+source: projects/vb6parse/src/syntax/statements/declarations/arrays.rs
 expression: tree
 ---
 root:
@@ -41,16 +41,22 @@ root:
                   text: argv
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: argc
-                - kind: Whitespace
-                  text: " "
-                - kind: SubtractionOperator
-                  text: "-"
-                - kind: Whitespace
-                  text: " "
-                - kind: LongLiteral
-                  text: 1&
+                - kind: BinaryExpression
+                  children:
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: argc
+                    - kind: Whitespace
+                      text: " "
+                    - kind: SubtractionOperator
+                      text: "-"
+                    - kind: Whitespace
+                      text: " "
+                    - kind: NumericLiteralExpression
+                      children:
+                        - kind: LongLiteral
+                          text: 1&
                 - kind: RightParenthesis
                   text: )
                 - kind: Newline

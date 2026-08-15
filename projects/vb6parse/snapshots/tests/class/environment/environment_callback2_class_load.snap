@@ -852,18 +852,18 @@ cst:
                 text: Optional
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Name
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
           - kind: StatementList

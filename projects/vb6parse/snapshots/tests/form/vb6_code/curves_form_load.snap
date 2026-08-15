@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/vb6_code.rs
+source: projects/vb6parse/tests/form/vb6_code.rs
 expression: form_file
 ---
 form:
@@ -561,8 +561,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "32"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "32"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -827,8 +829,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "6"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "6"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -3411,8 +3415,10 @@ cst:
                     text: d
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: nPoints
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: nPoints
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -3437,8 +3443,10 @@ cst:
                     text: w
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: nPoints
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: nPoints
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -4997,8 +5005,10 @@ cst:
                     text: iX
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: nPoints
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: nPoints
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -5023,8 +5033,10 @@ cst:
                     text: iY
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: nPoints
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: nPoints
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -5049,8 +5061,10 @@ cst:
                     text: p
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: nPoints
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: nPoints
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -5075,8 +5089,10 @@ cst:
                     text: u
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: nPoints
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: nPoints
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -7477,8 +7493,10 @@ cst:
                                         text: iX
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: nPoints
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: nPoints
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Whitespace
@@ -7507,8 +7525,10 @@ cst:
                                         text: iY
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: nPoints
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: nPoints
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Whitespace
@@ -7537,8 +7557,10 @@ cst:
                                         text: p
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: nPoints
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: nPoints
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Whitespace
@@ -7567,8 +7589,10 @@ cst:
                                         text: u
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: nPoints
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: nPoints
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Whitespace

@@ -87,96 +87,96 @@ cst:
                 text: ByVal
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: name
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: Level
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: pPrinterEnum
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: cdBuf
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: pcbNeeded
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: pcReturned
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: name
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: Level
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: pPrinterEnum
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: cdBuf
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: pcbNeeded
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: pcReturned
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword
@@ -313,8 +313,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -343,8 +345,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -373,8 +377,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H8"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -403,8 +409,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -433,8 +441,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -463,8 +473,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H4000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H4000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -493,8 +505,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "260"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "260"
           - kind: Newline
             text: "\r\n"
       - kind: TypeStatement
@@ -957,24 +971,32 @@ cst:
                     text: longbuffer
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: numbytes
-                  - kind: Whitespace
-                    text: " "
-                  - kind: DivisionOperator
-                    text: /
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "4"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: numbytes
+                      - kind: Whitespace
+                        text: " "
+                      - kind: DivisionOperator
+                        text: /
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "4"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -1177,24 +1199,32 @@ cst:
                             text: longbuffer
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: numbytes
-                          - kind: Whitespace
-                            text: " "
-                          - kind: DivisionOperator
-                            text: /
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "4"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: numbytes
+                              - kind: Whitespace
+                                text: " "
+                              - kind: DivisionOperator
+                                text: /
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "4"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace

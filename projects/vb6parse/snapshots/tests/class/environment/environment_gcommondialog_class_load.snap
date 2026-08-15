@@ -838,8 +838,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "260"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "260"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -860,8 +862,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "260"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "260"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -2666,8 +2670,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "32"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "32"
           - kind: Newline
             text: "\r\n"
       - kind: TypeStatement
@@ -3762,8 +3768,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3784,8 +3792,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -4320,8 +4330,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "32"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "32"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -4342,8 +4354,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "32"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "32"
           - kind: Newline
             text: "\r\n"
       - kind: TypeStatement
@@ -7004,8 +7018,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H110"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H110"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7026,8 +7042,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H4E"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H4E"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7048,8 +7066,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H400"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H400"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7070,8 +7090,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H87"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H87"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7092,8 +7114,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H82"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H82"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -7130,16 +7154,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&HFFFF"
-          - kind: Whitespace
-            text: " "
-          - kind: AdditionOperator
-            text: +
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: BinaryExpression
+            children:
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: LongLiteral
+                    text: "&HFFFF"
+              - kind: Whitespace
+                text: " "
+              - kind: AdditionOperator
+                text: +
+              - kind: Whitespace
+                text: " "
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7160,20 +7190,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: H_MAX
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "601"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: H_MAX
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SubtractionOperator
+                    text: "-"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "601"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7194,20 +7232,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: H_MAX
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "699"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: H_MAX
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SubtractionOperator
+                    text: "-"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "699"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -7234,20 +7280,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: CDN_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H0"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CDN_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SubtractionOperator
+                    text: "-"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H0"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7268,20 +7322,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: CDN_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H1"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CDN_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SubtractionOperator
+                    text: "-"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H1"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7302,20 +7364,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: CDN_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H2"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CDN_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SubtractionOperator
+                    text: "-"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H2"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7336,20 +7406,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: CDN_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H3"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CDN_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SubtractionOperator
+                    text: "-"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H3"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7370,20 +7448,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: CDN_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H4"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CDN_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SubtractionOperator
+                    text: "-"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H4"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7404,20 +7490,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: CDN_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H5"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CDN_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SubtractionOperator
+                    text: "-"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H5"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7438,20 +7532,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: CDN_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H6"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CDN_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SubtractionOperator
+                    text: "-"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H6"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7472,20 +7574,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: CDN_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: LongLiteral
-            text: "&H7"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CDN_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SubtractionOperator
+                    text: "-"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H7"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -7508,20 +7618,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: WM_USER
-          - kind: Whitespace
-            text: " "
-          - kind: AdditionOperator
-            text: +
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "100"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: WM_USER
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AdditionOperator
+                    text: +
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "100"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7542,20 +7660,28 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: WM_USER
-          - kind: Whitespace
-            text: " "
-          - kind: AdditionOperator
-            text: +
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "200"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: WM_USER
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AdditionOperator
+                    text: +
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "200"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -7578,8 +7704,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\r\n"
       - kind: DeclareStatement

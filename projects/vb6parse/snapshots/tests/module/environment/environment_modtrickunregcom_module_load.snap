@@ -2227,8 +2227,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"{00000001-0000-0000-C000-000000000046}\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"{00000001-0000-0000-C000-000000000046}\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2257,8 +2259,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"{00000000-0000-0000-C000-000000000046}\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"{00000000-0000-0000-C000-000000000046}\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2287,8 +2291,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "4"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2317,8 +2323,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2347,8 +2355,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "5"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "5"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2377,8 +2387,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "4"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2407,8 +2419,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "3"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2437,8 +2451,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2467,8 +2483,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -4213,8 +4231,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H80020004"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H80020004"
           - kind: Newline
             text: "\r\n"
       - kind: EnumStatement
@@ -6259,16 +6279,22 @@ cst:
                             text: listOfClsid
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: Count
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Count
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -6285,16 +6311,22 @@ cst:
                             text: listOfNames
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: Count
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Count
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -7041,16 +7073,22 @@ cst:
                             text: listOfClsid
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: countCoClass
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: countCoClass
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -7071,16 +7109,22 @@ cst:
                             text: listOfNames
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: countCoClass
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: countCoClass
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -9787,20 +9831,26 @@ cst:
                                             text: strNames
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: fncdsc
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: cParams
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: AdditionOperator
-                                            text: +
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IntegerLiteral
-                                            text: "1"
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: fncdsc
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: cParams
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: AdditionOperator
+                                                text: +
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "1"
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Whitespace
@@ -11821,8 +11871,10 @@ cst:
                             text: strNames
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/vb6_code.rs
+source: projects/vb6parse/tests/form/vb6_code.rs
 expression: form_file
 ---
 form:
@@ -2252,30 +2252,38 @@ cst:
                     text: FlameArray
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: flameWidth
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: flameWidth
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: flameHeight
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: flameHeight
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace

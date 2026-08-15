@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/discrete_probability_detector.rs
+source: projects/vb6parse/tests/form/discrete_probability_detector.rs
 expression: form_file
 ---
 form:
@@ -1269,30 +1269,38 @@ cst:
                     text: e
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: w
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: w
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: d
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: d
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -1317,30 +1325,38 @@ cst:
                     text: m
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: w
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: w
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: d
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: d
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: w
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: w
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: d
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: d
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -3077,16 +3093,20 @@ cst:
                     text: e
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: d
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: d
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace

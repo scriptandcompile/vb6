@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -373,8 +373,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"\u0001\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"\u0001\""
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -7749,74 +7751,74 @@ cst:
                 text: "\r\n"
               - kind: Whitespace
                 text: "            "
-          - kind: TextKeyword
-            text: Text
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "            "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: HostAddress
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "            "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: HostPort
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "            "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: CodePage
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Text
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: HostAddress
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: HostPort
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: CodePage
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword
@@ -11087,32 +11089,44 @@ cst:
                     text: Buffer
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lBytes
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: lAvailable
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: lBytes
+                          - kind: Whitespace
+                            text: " "
+                          - kind: AdditionOperator
+                            text: +
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: lAvailable
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -11351,32 +11365,44 @@ cst:
                             text: Buffer
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: lBytes
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AdditionOperator
-                            text: +
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: lReceived
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: lBytes
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: AdditionOperator
+                                    text: +
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: lReceived
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -14577,86 +14603,86 @@ cst:
                 text: "\r\n"
               - kind: Whitespace
                 text: "            "
-          - kind: TextKeyword
-            text: Text
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "            "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: Timeout
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "            "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: HostAddress
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "            "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: HostPort
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "            "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: CodePage
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Text
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: Timeout
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: HostAddress
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: HostPort
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: CodePage
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword

@@ -696,10 +696,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "4"
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "4"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -722,8 +726,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&HC"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&HC"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -4296,8 +4302,10 @@ cst:
                             text: packet
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline

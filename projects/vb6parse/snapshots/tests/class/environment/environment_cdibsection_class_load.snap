@@ -62,8 +62,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H800"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H800"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -84,8 +86,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H200"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H200"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -106,8 +110,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1000"
           - kind: Newline
             text: "\r\n"
       - kind: DeclareStatement
@@ -1218,8 +1224,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SingleLiteral
-            text: "3.14159265359"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: SingleLiteral
+                text: "3.14159265359"
           - kind: Newline
             text: "\r\n"
       - kind: EventStatement
@@ -4370,8 +4378,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "3"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -4392,8 +4402,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "4"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -4750,8 +4762,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: 0&
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: 0&
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -4772,8 +4786,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: 2&
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: 2&
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -4794,8 +4810,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: 1&
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: 1&
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -4816,8 +4834,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -4842,8 +4862,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: TypeStatement
@@ -5462,8 +5484,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -5484,8 +5508,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6108,8 +6134,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H100"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H100"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6138,8 +6166,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "104"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "104"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6168,8 +6198,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "38"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "38"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6198,8 +6230,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "112"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "112"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6228,8 +6262,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "113"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "113"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6258,8 +6294,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6288,8 +6326,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "10"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "10"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6318,8 +6358,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "111"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "111"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6348,8 +6390,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "110"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "110"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6370,8 +6414,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "88"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "88"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -6392,8 +6438,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "90"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "90"
           - kind: Newline
             text: "\r\n"
       - kind: TypeStatement
@@ -7986,8 +8034,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8644,8 +8694,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H0"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8666,8 +8718,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H10"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H10"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8688,8 +8742,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H20"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H20"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8710,8 +8766,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H80"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H80"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8732,8 +8790,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H8000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H8000"
           - kind: Newline
             text: "\r\n"
       - kind: DeclareStatement

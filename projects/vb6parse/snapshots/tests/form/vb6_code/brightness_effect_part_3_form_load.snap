@@ -3368,68 +3368,88 @@ cst:
                     text: ImageData
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "2"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "2"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bm
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: bmWidth
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: bm
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: bmWidth
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bm
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: bmHeight
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: bm
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: bmHeight
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -5176,92 +5196,122 @@ cst:
                     text: ImageData
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: bm
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: bmBitsPixel
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BackwardSlashOperator
-                    text: "\\"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "8"
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: ParenthesizedExpression
+                        children:
+                          - kind: LeftParenthesis
+                            text: (
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: bm
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: bmBitsPixel
+                              - kind: Whitespace
+                                text: " "
+                              - kind: BackwardSlashOperator
+                                text: "\\"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "8"
+                          - kind: RightParenthesis
+                            text: )
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bm
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: bmWidth
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: bm
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: bmWidth
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bm
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: bmHeight
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: bm
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: bmHeight
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline

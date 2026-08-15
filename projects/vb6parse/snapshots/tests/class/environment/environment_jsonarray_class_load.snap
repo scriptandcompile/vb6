@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -308,8 +308,10 @@ cst:
                     text: ar
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -696,16 +698,22 @@ cst:
                                 text: ar
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: n
-                              - kind: Whitespace
-                                text: " "
-                              - kind: AdditionOperator
-                                text: +
-                              - kind: Whitespace
-                                text: " "
-                              - kind: IntegerLiteral
-                                text: "1"
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: n
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: AdditionOperator
+                                    text: +
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "1"
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
@@ -1174,16 +1182,22 @@ cst:
                                 text: ar
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: n
-                              - kind: Whitespace
-                                text: " "
-                              - kind: AdditionOperator
-                                text: +
-                              - kind: Whitespace
-                                text: " "
-                              - kind: IntegerLiteral
-                                text: "1"
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: n
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: AdditionOperator
+                                    text: +
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "1"
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
@@ -4898,66 +4912,66 @@ cst:
                 text: ByRef
               - kind: Whitespace
                 text: " "
-          - kind: TextKeyword
-            text: Text
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: ByRefKeyword
-            text: ByRef
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: cursor
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: LenOfText
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Text
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: ByRefKeyword
+                text: ByRef
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: cursor
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: LenOfText
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword

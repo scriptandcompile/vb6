@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/module/chess_brain_vb.rs
-assertion_line: 282
 expression: module
 ---
 name: basHash
@@ -62,8 +61,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "64"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "64"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -92,8 +93,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1400"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1400"
           - kind: Whitespace
             text: "  "
           - kind: EndOfLineComment
@@ -130,8 +133,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -160,8 +165,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -190,8 +197,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -220,8 +229,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "3"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -254,8 +265,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "4"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -284,8 +297,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "222"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "222"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -314,8 +329,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8192"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8192"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -346,8 +363,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "34000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "34000"
           - kind: Whitespace
             text: "  "
           - kind: EndOfLineComment
@@ -3380,16 +3399,22 @@ cst:
                                     text: HashTable
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: HashSize
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: AdditionOperator
-                                    text: +
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: HASH_CLUSTER
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: HashSize
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AdditionOperator
+                                        text: +
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: HASH_CLUSTER
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -3758,8 +3783,10 @@ cst:
                                 text: HashTable
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: IntegerLiteral
-                                text: "0"
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "0"
                               - kind: RightParenthesis
                                 text: )
                               - kind: Whitespace

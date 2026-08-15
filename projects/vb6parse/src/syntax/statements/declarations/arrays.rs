@@ -51,6 +51,11 @@ impl Parser<'_> {
 
         self.builder.start_node(SyntaxKind::ReDimStatement.to_raw());
 
+        // This parser may be entered while positioned on leading whitespace
+        // (e.g. an indented statement), so consume it before the keyword to
+        // ensure "ReDim" is never parsed as a variable name below.
+        self.consume_whitespace();
+
         // Consume "ReDim" keyword
         self.consume_token();
         self.consume_whitespace();
@@ -71,9 +76,11 @@ impl Parser<'_> {
                 break;
             }
 
-            // Variable name
+            // Variable name (keywords can be used as variable names in VB6, e.g. `Name`)
             if self.at_token(Token::Identifier) {
                 self.consume_token();
+            } else if self.at_keyword() {
+                self.consume_token_as_identifier();
             } else {
                 // Error recovery
                 while !self.is_at_end()
@@ -147,6 +154,35 @@ impl Parser<'_> {
 #[cfg(test)]
 mod tests {
     use crate::*;
+
+    #[test]
+    fn redim_keyword_name() {
+        // Regression: keywords are valid variable names in VB6 (e.g., `Name`),
+        // and must be parsed without error recovery swallowing the line.
+        let source = r"
+Sub Test()
+    ReDim Name(10)
+End Sub
+";
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
+        let cst = cst_opt.expect("CST should be parsed");
+
+        let redim = cst
+            .find(SyntaxKind::ReDimStatement)
+            .expect("ReDimStatement should be parsed");
+        let identifier_tokens: Vec<_> = redim
+            .children()
+            .iter()
+            .filter(|child| child.kind() == SyntaxKind::Identifier)
+            .map(|child| child.text().to_string())
+            .collect();
+        assert_eq!(
+            identifier_tokens,
+            vec!["Name"],
+            "keyword variable name should be an Identifier token"
+        );
+    }
 
     #[test]
     fn redim_simple_array() {

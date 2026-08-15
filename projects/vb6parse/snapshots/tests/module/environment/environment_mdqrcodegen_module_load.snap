@@ -2973,8 +2973,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3003,8 +3005,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "40"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "40"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3033,8 +3037,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "3"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3063,8 +3069,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "3"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3093,8 +3101,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "40"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "40"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3123,8 +3133,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "10"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "10"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3153,8 +3165,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "32767"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "32767"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3183,8 +3197,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2147483647"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2147483647"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3213,8 +3229,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3243,16 +3261,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SingleLiteral
-            text: "3.14159265358979"
-          - kind: Whitespace
-            text: " "
-          - kind: DivisionOperator
-            text: /
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: BinaryExpression
+            children:
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: SingleLiteral
+                    text: "3.14159265358979"
+              - kind: Whitespace
+                text: " "
+              - kind: DivisionOperator
+                text: /
+              - kind: Whitespace
+                text: " "
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3281,8 +3305,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3311,8 +3337,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3341,8 +3369,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "3"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3371,8 +3401,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "4"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3401,8 +3433,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "5"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "5"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3431,8 +3465,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "6"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "6"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3461,8 +3497,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "7"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "7"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3491,8 +3529,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -4835,20 +4875,28 @@ cst:
                             text: uSegments
                           - kind: LeftParenthesis
                             text: (
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: UnaryExpression
+                            children:
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: UnaryExpression
+                            children:
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -4883,16 +4931,20 @@ cst:
                                 text: uSegments
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: IntegerLiteral
-                                text: "0"
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "0"
                               - kind: Whitespace
                                 text: " "
                               - kind: ToKeyword
                                 text: To
                               - kind: Whitespace
                                 text: " "
-                              - kind: IntegerLiteral
-                                text: "0"
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "0"
                               - kind: RightParenthesis
                                 text: )
                               - kind: Whitespace
@@ -5743,16 +5795,20 @@ cst:
                     text: baQrCode
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -6813,30 +6869,44 @@ cst:
                     text: baQrCode
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: pvGetBufferLenForVersion
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: lVersion
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: CallExpression
+                        children:
+                          - kind: Identifier
+                            text: pvGetBufferLenForVersion
+                          - kind: LeftParenthesis
+                            text: (
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: lVersion
+                          - kind: RightParenthesis
+                            text: )
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -12373,32 +12443,44 @@ cst:
                     text: baOutput
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: cSize
-                  - kind: Whitespace
-                    text: " "
-                  - kind: MultiplicationOperator
-                    text: "*"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: DecimalLiteral
-                    text: 10000@
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "9"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: cSize
+                          - kind: Whitespace
+                            text: " "
+                          - kind: MultiplicationOperator
+                            text: "*"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: DecimalLiteral
+                                text: 10000@
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "9"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -14163,32 +14245,44 @@ cst:
                     text: baOutput
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: cSize
-                  - kind: Whitespace
-                    text: " "
-                  - kind: MultiplicationOperator
-                    text: "*"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: DecimalLiteral
-                    text: 10000@
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "9"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: cSize
+                          - kind: Whitespace
+                            text: " "
+                          - kind: MultiplicationOperator
+                            text: "*"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: DecimalLiteral
+                                text: 10000@
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "9"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -17537,24 +17631,32 @@ cst:
                             text: aRows
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: lQrSize
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: lQrSize
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -25665,40 +25767,56 @@ cst:
                     text: baResult
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lDataLen
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: lBlockEccLen
-                  - kind: Whitespace
-                    text: " "
-                  - kind: MultiplicationOperator
-                    text: "*"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: lNumBlocks
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: lDataLen
+                          - kind: Whitespace
+                            text: " "
+                          - kind: AdditionOperator
+                            text: +
+                          - kind: Whitespace
+                            text: " "
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: lBlockEccLen
+                              - kind: Whitespace
+                                text: " "
+                              - kind: MultiplicationOperator
+                                text: "*"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: lNumBlocks
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -26507,24 +26625,32 @@ cst:
                     text: baResult
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lDegree
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: lDegree
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -27177,24 +27303,32 @@ cst:
                     text: baResult
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lDegree
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: lDegree
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -28293,44 +28427,62 @@ cst:
                     text: baQrCode
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: lQrSize
-                  - kind: Whitespace
-                    text: " "
-                  - kind: MultiplicationOperator
-                    text: "*"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: lQrSize
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "7"
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Whitespace
-                    text: " "
-                  - kind: BackwardSlashOperator
-                    text: "\\"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "8"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: ParenthesizedExpression
+                        children:
+                          - kind: LeftParenthesis
+                            text: (
+                          - kind: BinaryExpression
+                            children:
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: lQrSize
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: MultiplicationOperator
+                                    text: "*"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: lQrSize
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AdditionOperator
+                                text: +
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "7"
+                          - kind: RightParenthesis
+                            text: )
+                      - kind: Whitespace
+                        text: " "
+                      - kind: BackwardSlashOperator
+                        text: "\\"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "8"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -36807,16 +36959,20 @@ cst:
                             text: aRunHistory
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "6"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "6"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -37547,16 +37703,20 @@ cst:
                             text: aRunHistory
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "6"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "6"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -43625,24 +43785,32 @@ cst:
                             text: baRetVal
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: lSize
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: lSize
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -44923,50 +45091,70 @@ cst:
                     text: uVectors
                   - kind: LeftParenthesis
                     text: (
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: UnaryExpression
+                    children:
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lQrSize
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: lQrSize
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AdditionOperator
+                        text: +
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: UnaryExpression
+                    children:
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lQrSize
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: lQrSize
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AdditionOperator
+                        text: +
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -51319,16 +51507,20 @@ cst:
                     text: uPoints
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "8"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "8"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -51353,16 +51545,20 @@ cst:
                     text: aPolys
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "8"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "8"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -57469,30 +57665,44 @@ cst:
                                     text: aPolys
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: IntegerLiteral
-                                    text: "2"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: MultiplicationOperator
-                                    text: "*"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: UBound
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: Identifier
-                                    text: aPolys
-                                  - kind: RightParenthesis
-                                    text: )
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "2"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: MultiplicationOperator
+                                        text: "*"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: UBound
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: aPolys
+                                          - kind: RightParenthesis
+                                            text: )
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -57613,24 +57823,32 @@ cst:
                     text: aPolys
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lNumPolys
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: lNumPolys
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -61021,30 +61239,44 @@ cst:
                             text: uPoints
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "2"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: MultiplicationOperator
-                            text: "*"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: UBound
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: uPoints
-                          - kind: RightParenthesis
-                            text: )
+                          - kind: BinaryExpression
+                            children:
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "2"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: MultiplicationOperator
+                                text: "*"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: CallExpression
+                                children:
+                                  - kind: Identifier
+                                    text: UBound
+                                  - kind: LeftParenthesis
+                                    text: (
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: uPoints
+                                  - kind: RightParenthesis
+                                    text: )
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace

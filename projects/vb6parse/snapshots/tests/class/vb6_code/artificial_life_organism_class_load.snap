@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/vb6_code.rs
+source: projects/vb6parse/tests/class/vb6_code.rs
 expression: class
 ---
 header:
@@ -88,8 +88,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "299"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "299"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -1784,16 +1786,20 @@ cst:
                     text: DNA
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: DNALENGTH
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: DNALENGTH
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -1950,16 +1956,20 @@ cst:
                     text: DNA
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: DNALENGTH
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: DNALENGTH
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace

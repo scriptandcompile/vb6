@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/functions/string/replace.rs
+source: projects/vb6parse/src/syntax/library/functions/string/replace.rs
 expression: tree
 ---
 root:
@@ -19,18 +19,18 @@ root:
           children:
             - kind: LeftParenthesis
               text: (
-        - kind: TextKeyword
-          text: text
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: StringKeyword
-          text: String
-        - kind: RightParenthesis
-          text: )
+            - kind: Identifier
+              text: text
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: StringKeyword
+              text: String
+            - kind: RightParenthesis
+              text: )
         - kind: Whitespace
           text: " "
         - kind: AsKeyword

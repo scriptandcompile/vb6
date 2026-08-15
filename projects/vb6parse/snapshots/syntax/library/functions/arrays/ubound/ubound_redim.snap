@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/arrays/ubound.rs
+source: projects/vb6parse/src/syntax/library/functions/arrays/ubound.rs
 expression: tree
 ---
 root:
@@ -41,36 +41,56 @@ root:
                   text: arr
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: LBound
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: arr
-                - kind: RightParenthesis
-                  text: )
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: LBound
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: arr
+                    - kind: RightParenthesis
+                      text: )
                 - kind: Whitespace
                   text: " "
                 - kind: ToKeyword
                   text: To
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: UBound
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: arr
-                - kind: RightParenthesis
-                  text: )
-                - kind: Whitespace
-                  text: " "
-                - kind: AdditionOperator
-                  text: +
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: BinaryExpression
+                  children:
+                    - kind: CallExpression
+                      children:
+                        - kind: Identifier
+                          text: UBound
+                        - kind: LeftParenthesis
+                          text: (
+                        - kind: ArgumentList
+                          children:
+                            - kind: Argument
+                              children:
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: arr
+                        - kind: RightParenthesis
+                          text: )
+                    - kind: Whitespace
+                      text: " "
+                    - kind: AdditionOperator
+                      text: +
+                    - kind: Whitespace
+                      text: " "
+                    - kind: NumericLiteralExpression
+                      children:
+                        - kind: IntegerLiteral
+                          text: "1"
                 - kind: RightParenthesis
                   text: )
                 - kind: Newline

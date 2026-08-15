@@ -81,8 +81,19 @@ impl Parser<'_> {
 
         self.builder.start_node(SyntaxKind::DimStatement.to_raw());
 
-        // Consume the keyword (Dim, Private, Public, Const, Static, etc.)
+        // Consume any leading whitespace, then the primary declaration keyword
+        // (Dim, Private, Public, Const, Static, etc.). The whitespace is consumed
+        // first so the keyword is never mistaken for a variable name below.
+        self.consume_whitespace();
         self.consume_token();
+        self.consume_whitespace();
+
+        // Consume a secondary declaration keyword, e.g. `Const` in
+        // `Private Const x = 1`, so it is not parsed as a variable name.
+        if self.at_token(Token::ConstKeyword) || self.at_token(Token::StaticKeyword) {
+            self.consume_token();
+            self.consume_whitespace();
+        }
 
         loop {
             self.consume_whitespace();
@@ -100,9 +111,11 @@ impl Parser<'_> {
                 self.consume_whitespace();
             }
 
-            // Variable name
+            // Variable name (keywords can be used as variable names in VB6, e.g. `Name`)
             if self.at_token(Token::Identifier) {
                 self.consume_token();
+            } else if self.at_keyword() {
+                self.consume_token_as_identifier();
             } else {
                 // Error recovery: consume until comma or newline
                 while !self.is_at_end()
@@ -192,6 +205,31 @@ mod tests {
     use crate::*;
 
     // Dim statement tests
+
+    #[test]
+    fn dim_keyword_name() {
+        // Regression: keywords are valid variable names in VB6 (e.g., `Name`),
+        // and must be parsed without error recovery swallowing the line.
+        let source = "Dim Name As String\n";
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
+        let cst = cst_opt.expect("CST should be parsed");
+
+        let dim = cst
+            .find(SyntaxKind::DimStatement)
+            .expect("DimStatement should be parsed");
+        let identifier_tokens: Vec<_> = dim
+            .children()
+            .iter()
+            .filter(|child| child.kind() == SyntaxKind::Identifier)
+            .map(|child| child.text().to_string())
+            .collect();
+        assert_eq!(
+            identifier_tokens,
+            vec!["Name"],
+            "keyword variable name should be an Identifier token"
+        );
+    }
 
     #[test]
     fn dim_simple_declaration() {

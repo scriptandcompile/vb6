@@ -19764,22 +19764,34 @@ cst:
                             text: Trush2
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: UBound
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: Trush2
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Whitespace
-                            text: " "
-                          - kind: MultiplicationOperator
-                            text: "*"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "2"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: CallExpression
+                                children:
+                                  - kind: Identifier
+                                    text: UBound
+                                  - kind: LeftParenthesis
+                                    text: (
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Trush2
+                                  - kind: RightParenthesis
+                                    text: )
+                              - kind: Whitespace
+                                text: " "
+                              - kind: MultiplicationOperator
+                                text: "*"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "2"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline

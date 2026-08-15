@@ -5720,20 +5720,24 @@ cst:
                     text: aParams
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: tDPAR
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: cArgs
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: tDPAR
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: cArgs
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -5750,20 +5754,24 @@ cst:
                     text: isRefAr
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: tDPAR
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: cArgs
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: tDPAR
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: cArgs
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -6686,20 +6694,24 @@ cst:
                     text: aParams
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: tDPAR
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: cArgs
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: tDPAR
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: cArgs
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline

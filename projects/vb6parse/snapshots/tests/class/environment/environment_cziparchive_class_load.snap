@@ -102,8 +102,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"cZipArchive\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"cZipArchive\""
           - kind: Newline
             text: "\r\n"
       - kind: Octothorpe
@@ -844,134 +846,172 @@ cst:
             text: "\r\n"
           - kind: Whitespace
             text: "    "
-          - kind: StringLiteral
-            text: "\"UYtEJAhTi1wkEFWLbCQYVleLeEQD64tEJCSJbCQQiwD2wwN0HDvddBQPthNDD7bIM9HB6AgzBJf2wwN16IlcJByL1cdEJBgAAAAAK9OD4vyNDBqDwgPB6gI7yxvJ99EjyolMJCB0eYvpjaQkAAAAAIsbi8vB6QgPtvGLyMHpCA+2yTPxi8vB6RAPttGLyMHpEIu0twAIAAAPtskz0YvIwekYM7SXAAQAAIvTweoYM9EPtsgPtsOLXCQcM8iDwwQzNJeJXCQcM7SPAAwAAItMJBiLxkGJTCQYO811lItsJBCLzTP2K8s76xvt99Uj6XQWD7YTjVsBD7bIRjPRwegIMwSXO/V16otMJCRfXl2JAVtZwhAAzMzMzMzMzMzMzMzMVot0JBCF9n41i1QkDE6LRCQIwe4ERoMCAYsKdQP/QgSJCItKBIlIBMdACAAAAADHQAwAAAAAg8AQg+4BddhewhAAzMzMzMzMzMzMzMzMzMyLVCQMhdJ0GotEJAhWi3Qk\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"CCvwigwGjUABMEj/g+oBdfJewhAAzMzMzMzMzMzMzMyDfCQMAItEJASLSAyJTCQED46OAAAAU1VWi3QkFFeLfCQgi++D5QGD5wKNmwAAAACKHoXtdBWLSAiDyQKL0YPyAQ+v0cHqCDLTiBaF/3QCih4PthBGD7bLi1wkFDPRiwjB6QiLFJOLWAgz0Q+2ygNIBGnJBYQICIkQD7bTwesIQYlIBA+2SAcz0YtMJBQzHJGLTCQcSYlYCIlMJByFyX+QX15dW8IQAMzMzMzMzMzMzFaLdCQIV2oMi0Yo/9CL+FeJN+gJCQAAi04oahT/0cdAEAAAAADHQAwAAAAAiUcIi8dfXsIQAMzMzMzMzMzMzMxWi3QkCFeLPv92CItHMP/Q/3YEi0cw/9CLRzBW/9BfXsIQAMzMzMzMzMzMzMzMzMyLRCQMVot0JAxXi3wkDIXAdA1Q/3YE/zb/N+gh/f///3YcjUYM/3YY/3YU/3YQUI1GCFD/dgT/NlfoIgkAAF9e\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"whAAzMzMzMzMzMzMzMzMzP90JATo5w8AAMIQAMzMzMxWi3QkCItODI1GDFeLPoXJdAw7TgR0B1BW6IIRAACLThCNRhCFyXQMO04IdAdQVuhsEQAAg34UAI1GFHQHUFboXBEAAI1GBFBW6FIRAACNRghQVuhIEQAAi0cwVv/QX17CEADMzMzMzMzMzMzMzMzMi0QkCFNVi2wkDFZXjVgMU414CFf/cAT/MFXoIQkAAItMJByL8IXJdBiF9nQUiweFwHQMUf8zUP91AOgx/P//i8ZfXl1bwhAAzMzMzMzMzMxWi3QkCIPK/4uGBIAEAA+3TMYCjQTGZjvKdAkPv8FmiRTG6xCLQASD+P90CGaJlEYIgAQAi4YEgAQAi0wkEIlMxgSLhgSABABmiVTGAo0UTouOBIAEAA+3ggiABABmiQTOi4YEgAQAD78Mxg+3wGaJggiABACD+f90DGaLhgSABABmiUTOAouOBIAEAIpEJAyIhA4AAAQAi4YEgAQAQCX/\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"fwAAiYYEgAQAXsIMAMzMzIPsDFNVi2wkIFZXi3wkIDP2i38EiXwkGDm3DIAGAA+O4gAAAIuPDIAGAIvBK8YDxYP4BA+MnAAAAItUJCQ78X0KD7aEPgiABgDrCIvGK8EPtgQQjV4CiEQkFI1D/zvBfQoPtoQ+CYAGAOsJi8YrwQ+2RBABiEQkFTvZfQoPtoQ+CoAGAOsJi8YrwQ+2RBACiEQkFo1DATvBfQoPtoQ+C4AGAOsJi8YrwQ+2RBADiEQkF4tEJBRpyL2nNR7B6RBRUFfoiv7//0Y7twyABgAPjFH////rMYvOO7cMgAYAfSeNlwiABgDrCY2kJAAAAACL/4qEDwiABgCNUgGIQv9BO48MgAYAfOoptwyABgCF7Q+O9QEAAOsKjaQkAAAAAI1JAItcJCSD/QQPjFkBAACLhwAABAAz7YmHAIAEAGkDvac1HsHoEA+/lEcIgAQAg/r/D4QxAQAAi48EgAQAi8Irwb4AgAAAJf9/AAAr8CvOgeH/\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"fwAAi4Q5AAAEADsDdQ6JtK8QgAYARTtsJCx9CQ+/FNeD+v91wIXtD47pAAAAi0QkKDlEJDB+BolEJDDrBItEJDC+BAAAADvGfnGNmwAAAACKBB4zyTPbiEQkE4XtfliQi5SPEIAGAIvGK8J5GIuHBIAEACvCA8Yl/38AAIqEOAAABADrC4t8JCSKBDiLfCQYOEQkE3UIiZSfEIAGAENBO818vYP7AX4Pi0QkMEaL64tcJCQ78HyZi1wkJItsJCg79X09i5cQgAYAi84ryo0sGoXJeRiLhwSABAArwgPGJf9/AACKhDgAAAQA6wOKBBk4BCl1CEZBO3QkKHzUi2wkKFb/txCABgD/dCQo6KAOAACF9n596ziLTCQgigM8j4sRi3EID7bIi0I8dwkPtkQIMGoI6w0PtgQIagmNBEUBAAAAUFZS6EcSAAC+AQAAAItsJCiD/QR8FmkDvac1HsHoEFAPtgNQV+h1/P//6xWLjwyABgCKA4iEDwiABgD/hwyA\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"BgBOQ02F9n/JiWwkKIlcJCSF7Q+PF/7//19eXVuDxAzCFADMzMzMzMzMzMzMzMzMg+wUU1WLbCQoVleLfCQoM/aLfwSJfCQgObcMgAYAD47iAAAAi48MgAYAi8ErxgPFg/gED4ycAAAAi1QkLDvxfQoPtoQ+CIAGAOsIi8YrwQ+2BBCNXgKIRCQYjUP/O8F9Cg+2hD4JgAYA6wmLxivBD7ZEEAGIRCQZO9l9Cg+2hD4KgAYA6wmLxivBD7ZEEAKIRCQajUMBO8F9Cg+2hD4LgAYA6wmLxivBD7ZEEAOIRCQbi0QkGGnIvac1HsHpEFFQV+hq+///Rju3DIAGAA+MUf///+sxi847twyABgB9J42XCIAGAOsJjaQkAAAAAIv/ioQPCIAGAI1SAYhC/0E7jwyABgB86im3DIAGADPAM8mJRCQUiUwkGIlEJByF7Q+OCQIAAOsKjaQkAAAAAI1JAItcJCyD/QQPjMABAACLhwAABAAz7YmHAIAEAGkDvac1\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"HsHoEA+/lEcIgAQAg/r/D4SYAQAAi48EgAQAi8Irwb4AgAAAJf9/AAAr8CvOgeH/fwAAi4Q5AAAEADsDdQ6JtK8QgAYARTtsJDR9CQ+/FNeD+v91wIXtD45MAQAAi1QkMItEJDg7wn4Gi8KJRCQ4vgQAAAA7xn53igQeM8kz24hEJBOF7X5g6weNpCQAAAAAi5SPEIAGAIvGK8J5GIuHBIAEACvCA8Yl/38AAIqEOAAABADrC4t8JCyKBDiLfCQgOEQkE3UIiZSfEIAGAENBO818vYP7AX4Pi0QkOEaL64tcJCw78HyRi1wkLItUJDA78n05i5cQgAYAi84ryo0sGoXJeRiLhwSABAArwgPGJf9/AACKhDgAAAQA6wOKBBk4BCl1CEZBO3QkMHzUi2wkFIXtfl6NRQE78H5Pi0QkKIsQi2gIi0QkHDyPD7bIi0I8dwkPtkQIMGoI6w0PtgQIagmNBEUBAAAAUFVS6CAPAAAPtgOLjxCABgCJTCQYiXQk\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"FIlEJBzpkAAAAItEJBhVUOsli4cQgAYAiUQkGA+2A4l0JBSJRCQc63GLTCQYi2wkFIXtfjJVUf90JDDo8AoAADPAjXX/iUQkFIX2f1KLbCQwi0wkGIXtD48D/v//X15dW4PEFMIUAItMJCiKAzyPixGLcQgPtsiLQjx3CQ+2RAgwagjrDQ+2BAhqCY0ERQEAAABQVlLodg4AAL4BAAAAi2wkMIP9BHwWaQO9pzUewegQUA+2A1BX6KT4///rFYuPDIAGAIoDiIQPCIAGAP+HDIAGAE5DTYX2f8mJbCQwiVwkLOlq////zMzMzMzMzMzMVleLfCQMaLCPBgCLB4tAKP/Qi/CF9nUFX17CBACJdwSNTgK6AIAAAIPI/+sDjUkAx0EC/////41JCGaJQfhmiUH2g+oBdemNvgiABAC5AIAAAPOrX4mWBIAEAI1CAYmWDIAGAF7CBADMzMzMzMzMzFZXi3wkDLkSAAAAvgBQ51W4kCnnVfOli0wkEIPAYF9e\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"xwEAEOdViUEEx0EIoEDnVcdBDHhE51XCCADMzMzMzMxTi1wkCFZXaACAAACLO4tzCItHKP/QiQYzwDlEJCRqAw+VwMdGCACAAACDwALHRgQAAAAAUFZX6DQNAACDfCQoAP90JDD/dCQw/3QkIP90JCBTdAfoF/j//+sF6DD7//9qB2oAVlfoBQ0AAIN8JCQAdBiLThCFyXQRuAgAAAArwVBqAFZX6OYMAACLRCQciw5fiQiLRCQci04EXluJCLgBAAAAwiQAzMzMzMzMzMzMzFFTVVaLdCQUV2gAgAAAix6JXCQci0Mo/9CLbCQgiYakgQAAx4asgQAAAIAAAMeGqIEAAAAAAACF7X8Ng76cAQAAAA+OtgUAAIO+nAEAABiNvpwBAAB9KotUJBzrA41JAIXtfhkPtgJNiw9C0+AJhpgBAACNQQiJB4P4GHzjiVQkHItGGIXAdQnHRhgBAAAA66aD+AF1c4sXg/oDD4xdBQAAi4aYAQAAg8L90eiLyIkX\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"wegCiYaYAQAAg+EDdR2LysdGGAoAAACD4Qcr0dPoiReJhpgBAADpXP///4P5AXUYi0YEiUYMi0YIiUYQx0YYBgAAAOk/////g/kCD4U2////iU4Y6S7///+D+AJ1bosXg/oOD4zlBAAAi46YAQAAi8GD4B/B6QUFAQEAAMdGLAAAAACJRiCLwYPgH8HpBUDHRhgDAAAAiUYki8GD4A/B6QSDwASJjpgBAACJRiiNQvKJBzPAiUZEiUZIiUZMiUZQZolGVIhGVum7/v//g/gDdW85Bw+MdQQAAItGLDtGKH0xgz8DfCyLS0CLRiyKlpgBAACA4gcPtgQBiFQwRP9GLItGLIMH/cGumAEAAAM7Rih8z4tGLDtGKA+Faf7//2oTjUZEUFboxgkAAIlGFMdGGAQAAADHRiwAAAAA6Uf+//+D+AQPheIAAACLRiSLTiADwTlGLHw/UY1GV1BW6I8JAAD/diSJRgyLRiCDwFcDxlBW6HoJAACNfhSJRhBXVui9\""
+          - kind: BinaryExpression
+            children:
+              - kind: BinaryExpression
+                children:
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"UYtEJAhTi1wkEFWLbCQYVleLeEQD64tEJCSJbCQQiwD2wwN0HDvddBQPthNDD7bIM9HB6AgzBJf2wwN16IlcJByL1cdEJBgAAAAAK9OD4vyNDBqDwgPB6gI7yxvJ99EjyolMJCB0eYvpjaQkAAAAAIsbi8vB6QgPtvGLyMHpCA+2yTPxi8vB6RAPttGLyMHpEIu0twAIAAAPtskz0YvIwekYM7SXAAQAAIvTweoYM9EPtsgPtsOLXCQcM8iDwwQzNJeJXCQcM7SPAAwAAItMJBiLxkGJTCQYO811lItsJBCLzTP2K8s76xvt99Uj6XQWD7YTjVsBD7bIRjPRwegIMwSXO/V16otMJCRfXl2JAVtZwhAAzMzMzMzMzMzMzMzMVot0JBCF9n41i1QkDE6LRCQIwe4ERoMCAYsKdQP/QgSJCItKBIlIBMdACAAAAADHQAwAAAAAg8AQg+4BddhewhAAzMzMzMzMzMzMzMzMzMyLVCQMhdJ0GotEJAhWi3Qk\""
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Ampersand
+                                                text: "&"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Underscore
+                                                text: _
+                                              - kind: Newline
+                                                text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "    "
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"CCvwigwGjUABMEj/g+oBdfJewhAAzMzMzMzMzMzMzMyDfCQMAItEJASLSAyJTCQED46OAAAAU1VWi3QkFFeLfCQgi++D5QGD5wKNmwAAAACKHoXtdBWLSAiDyQKL0YPyAQ+v0cHqCDLTiBaF/3QCih4PthBGD7bLi1wkFDPRiwjB6QiLFJOLWAgz0Q+2ygNIBGnJBYQICIkQD7bTwesIQYlIBA+2SAcz0YtMJBQzHJGLTCQcSYlYCIlMJByFyX+QX15dW8IQAMzMzMzMzMzMzFaLdCQIV2oMi0Yo/9CL+FeJN+gJCQAAi04oahT/0cdAEAAAAADHQAwAAAAAiUcIi8dfXsIQAMzMzMzMzMzMzMxWi3QkCFeLPv92CItHMP/Q/3YEi0cw/9CLRzBW/9BfXsIQAMzMzMzMzMzMzMzMzMyLRCQMVot0JAxXi3wkDIXAdA1Q/3YE/zb/N+gh/f///3YcjUYM/3YY/3YU/3YQUI1GCFD/dgT/NlfoIgkAAF9e\""
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: Ampersand
+                                            text: "&"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: Underscore
+                                            text: _
+                                          - kind: Newline
+                                            text: "\r\n"
+                                          - kind: Whitespace
+                                            text: "    "
+                                          - kind: StringLiteralExpression
+                                            children:
+                                              - kind: StringLiteral
+                                                text: "\"whAAzMzMzMzMzMzMzMzMzP90JATo5w8AAMIQAMzMzMxWi3QkCItODI1GDFeLPoXJdAw7TgR0B1BW6IIRAACLThCNRhCFyXQMO04IdAdQVuhsEQAAg34UAI1GFHQHUFboXBEAAI1GBFBW6FIRAACNRghQVuhIEQAAi0cwVv/QX17CEADMzMzMzMzMzMzMzMzMi0QkCFNVi2wkDFZXjVgMU414CFf/cAT/MFXoIQkAAItMJByL8IXJdBiF9nQUiweFwHQMUf8zUP91AOgx/P//i8ZfXl1bwhAAzMzMzMzMzMxWi3QkCIPK/4uGBIAEAA+3TMYCjQTGZjvKdAkPv8FmiRTG6xCLQASD+P90CGaJlEYIgAQAi4YEgAQAi0wkEIlMxgSLhgSABABmiVTGAo0UTouOBIAEAA+3ggiABABmiQTOi4YEgAQAD78Mxg+3wGaJggiABACD+f90DGaLhgSABABmiUTOAouOBIAEAIpEJAyIhA4AAAQAi4YEgAQAQCX/\""
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Ampersand
+                                        text: "&"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Underscore
+                                        text: _
+                                      - kind: Newline
+                                        text: "\r\n"
+                                      - kind: Whitespace
+                                        text: "    "
+                                      - kind: StringLiteralExpression
+                                        children:
+                                          - kind: StringLiteral
+                                            text: "\"fwAAiYYEgAQAXsIMAMzMzIPsDFNVi2wkIFZXi3wkIDP2i38EiXwkGDm3DIAGAA+O4gAAAIuPDIAGAIvBK8YDxYP4BA+MnAAAAItUJCQ78X0KD7aEPgiABgDrCIvGK8EPtgQQjV4CiEQkFI1D/zvBfQoPtoQ+CYAGAOsJi8YrwQ+2RBABiEQkFTvZfQoPtoQ+CoAGAOsJi8YrwQ+2RBACiEQkFo1DATvBfQoPtoQ+C4AGAOsJi8YrwQ+2RBADiEQkF4tEJBRpyL2nNR7B6RBRUFfoiv7//0Y7twyABgAPjFH////rMYvOO7cMgAYAfSeNlwiABgDrCY2kJAAAAACL/4qEDwiABgCNUgGIQv9BO48MgAYAfOoptwyABgCF7Q+O9QEAAOsKjaQkAAAAAI1JAItcJCSD/QQPjFkBAACLhwAABAAz7YmHAIAEAGkDvac1HsHoEA+/lEcIgAQAg/r/D4QxAQAAi48EgAQAi8Irwb4AgAAAJf9/AAAr8CvOgeH/\""
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Ampersand
+                                    text: "&"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Underscore
+                                    text: _
+                                  - kind: Newline
+                                    text: "\r\n"
+                                  - kind: Whitespace
+                                    text: "    "
+                                  - kind: StringLiteralExpression
+                                    children:
+                                      - kind: StringLiteral
+                                        text: "\"fwAAi4Q5AAAEADsDdQ6JtK8QgAYARTtsJCx9CQ+/FNeD+v91wIXtD47pAAAAi0QkKDlEJDB+BolEJDDrBItEJDC+BAAAADvGfnGNmwAAAACKBB4zyTPbiEQkE4XtfliQi5SPEIAGAIvGK8J5GIuHBIAEACvCA8Yl/38AAIqEOAAABADrC4t8JCSKBDiLfCQYOEQkE3UIiZSfEIAGAENBO818vYP7AX4Pi0QkMEaL64tcJCQ78HyZi1wkJItsJCg79X09i5cQgAYAi84ryo0sGoXJeRiLhwSABAArwgPGJf9/AACKhDgAAAQA6wOKBBk4BCl1CEZBO3QkKHzUi2wkKFb/txCABgD/dCQo6KAOAACF9n596ziLTCQgigM8j4sRi3EID7bIi0I8dwkPtkQIMGoI6w0PtgQIagmNBEUBAAAAUFZS6EcSAAC+AQAAAItsJCiD/QR8FmkDvac1HsHoEFAPtgNQV+h1/P//6xWLjwyABgCKA4iEDwiABgD/hwyA\""
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Ampersand
+                                text: "&"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Underscore
+                                text: _
+                              - kind: Newline
+                                text: "\r\n"
+                              - kind: Whitespace
+                                text: "    "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"BgBOQ02F9n/JiWwkKIlcJCSF7Q+PF/7//19eXVuDxAzCFADMzMzMzMzMzMzMzMzMg+wUU1WLbCQoVleLfCQoM/aLfwSJfCQgObcMgAYAD47iAAAAi48MgAYAi8ErxgPFg/gED4ycAAAAi1QkLDvxfQoPtoQ+CIAGAOsIi8YrwQ+2BBCNXgKIRCQYjUP/O8F9Cg+2hD4JgAYA6wmLxivBD7ZEEAGIRCQZO9l9Cg+2hD4KgAYA6wmLxivBD7ZEEAKIRCQajUMBO8F9Cg+2hD4LgAYA6wmLxivBD7ZEEAOIRCQbi0QkGGnIvac1HsHpEFFQV+hq+///Rju3DIAGAA+MUf///+sxi847twyABgB9J42XCIAGAOsJjaQkAAAAAIv/ioQPCIAGAI1SAYhC/0E7jwyABgB86im3DIAGADPAM8mJRCQUiUwkGIlEJByF7Q+OCQIAAOsKjaQkAAAAAI1JAItcJCyD/QQPjMABAACLhwAABAAz7YmHAIAEAGkDvac1\""
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Ampersand
+                            text: "&"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Underscore
+                            text: _
+                          - kind: Newline
+                            text: "\r\n"
+                          - kind: Whitespace
+                            text: "    "
+                          - kind: StringLiteralExpression
+                            children:
+                              - kind: StringLiteral
+                                text: "\"HsHoEA+/lEcIgAQAg/r/D4SYAQAAi48EgAQAi8Irwb4AgAAAJf9/AAAr8CvOgeH/fwAAi4Q5AAAEADsDdQ6JtK8QgAYARTtsJDR9CQ+/FNeD+v91wIXtD45MAQAAi1QkMItEJDg7wn4Gi8KJRCQ4vgQAAAA7xn53igQeM8kz24hEJBOF7X5g6weNpCQAAAAAi5SPEIAGAIvGK8J5GIuHBIAEACvCA8Yl/38AAIqEOAAABADrC4t8JCyKBDiLfCQgOEQkE3UIiZSfEIAGAENBO818vYP7AX4Pi0QkOEaL64tcJCw78HyRi1wkLItUJDA78n05i5cQgAYAi84ryo0sGoXJeRiLhwSABAArwgPGJf9/AACKhDgAAAQA6wOKBBk4BCl1CEZBO3QkMHzUi2wkFIXtfl6NRQE78H5Pi0QkKIsQi2gIi0QkHDyPD7bIi0I8dwkPtkQIMGoI6w0PtgQIagmNBEUBAAAAUFVS6CAPAAAPtgOLjxCABgCJTCQYiXQk\""
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Ampersand
+                        text: "&"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Underscore
+                        text: _
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "    "
+                      - kind: StringLiteralExpression
+                        children:
+                          - kind: StringLiteral
+                            text: "\"FIlEJBzpkAAAAItEJBhVUOsli4cQgAYAiUQkGA+2A4l0JBSJRCQc63GLTCQYi2wkFIXtfjJVUf90JDDo8AoAADPAjXX/iUQkFIX2f1KLbCQwi0wkGIXtD48D/v//X15dW4PEFMIUAItMJCiKAzyPixGLcQgPtsiLQjx3CQ+2RAgwagjrDQ+2BAhqCY0ERQEAAABQVlLodg4AAL4BAAAAi2wkMIP9BHwWaQO9pzUewegQUA+2A1BX6KT4///rFYuPDIAGAIoDiIQPCIAGAP+HDIAGAE5DTYX2f8mJbCQwiVwkLOlq////zMzMzMzMzMzMVleLfCQMaLCPBgCLB4tAKP/Qi/CF9nUFX17CBACJdwSNTgK6AIAAAIPI/+sDjUkAx0EC/////41JCGaJQfhmiUH2g+oBdemNvgiABAC5AIAAAPOrX4mWBIAEAI1CAYmWDIAGAF7CBADMzMzMzMzMzFZXi3wkDLkSAAAAvgBQ51W4kCnnVfOli0wkEIPAYF9e\""
+                  - kind: Whitespace
+                    text: " "
+                  - kind: Ampersand
+                    text: "&"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: Underscore
+                    text: _
+                  - kind: Newline
+                    text: "\r\n"
+                  - kind: Whitespace
+                    text: "    "
+                  - kind: StringLiteralExpression
+                    children:
+                      - kind: StringLiteral
+                        text: "\"xwEAEOdViUEEx0EIoEDnVcdBDHhE51XCCADMzMzMzMxTi1wkCFZXaACAAACLO4tzCItHKP/QiQYzwDlEJCRqAw+VwMdGCACAAACDwALHRgQAAAAAUFZX6DQNAACDfCQoAP90JDD/dCQw/3QkIP90JCBTdAfoF/j//+sF6DD7//9qB2oAVlfoBQ0AAIN8JCQAdBiLThCFyXQRuAgAAAArwVBqAFZX6OYMAACLRCQciw5fiQiLRCQci04EXluJCLgBAAAAwiQAzMzMzMzMzMzMzFFTVVaLdCQUV2gAgAAAix6JXCQci0Mo/9CLbCQgiYakgQAAx4asgQAAAIAAAMeGqIEAAAAAAACF7X8Ng76cAQAAAA+OtgUAAIO+nAEAABiNvpwBAAB9KotUJBzrA41JAIXtfhkPtgJNiw9C0+AJhpgBAACNQQiJB4P4GHzjiVQkHItGGIXAdQnHRhgBAAAA66aD+AF1c4sXg/oDD4xdBQAAi4aYAQAAg8L90eiLyIkX\""
+              - kind: Whitespace
+                text: " "
+              - kind: Ampersand
+                text: "&"
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: StringLiteralExpression
+                children:
+                  - kind: StringLiteral
+                    text: "\"wegCiYaYAQAAg+EDdR2LysdGGAoAAACD4Qcr0dPoiReJhpgBAADpXP///4P5AXUYi0YEiUYMi0YIiUYQx0YYBgAAAOk/////g/kCD4U2////iU4Y6S7///+D+AJ1bosXg/oOD4zlBAAAi46YAQAAi8GD4B/B6QUFAQEAAMdGLAAAAACJRiCLwYPgH8HpBUDHRhgDAAAAiUYki8GD4A/B6QSDwASJjpgBAACJRiiNQvKJBzPAiUZEiUZIiUZMiUZQZolGVIhGVum7/v//g/gDdW85Bw+MdQQAAItGLDtGKH0xgz8DfCyLS0CLRiyKlpgBAACA4gcPtgQBiFQwRP9GLItGLIMH/cGumAEAAAM7Rih8z4tGLDtGKA+Faf7//2oTjUZEUFboxgkAAIlGFMdGGAQAAADHRiwAAAAA6Uf+//+D+AQPheIAAACLRiSLTiADwTlGLHw/UY1GV1BW6I8JAAD/diSJRgyLRiCDwFcDxlBW6HoJAACNfhSJRhBXVui9\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1006,134 +1046,172 @@ cst:
             text: "\r\n"
           - kind: Whitespace
             text: "    "
-          - kind: StringLiteral
-            text: "\"BQAAxwcAAAAAx0YYBgAAAOny/f///3YUjYaYAQAAV1DoGwYAAIvIg/n/D4SeAwAAg/n+D4RiAwAAg/kQfQ+LRiyITDBX/0Ys6br9//91B7gCAAAA6w8zwIP5EQ+VwI0EhQMAAACJRjAzwIP5Eg+UwI0ExQMAAACJRjSD+RB1G4tGLIXAfhQPtkQwVolGPMdGGAUAAADpbf3//zPAx0YYBQAAAIlGPOlc/f//g/gFdVyLH4tOMDvZD4wRAwAAi4aYAQAAugEAAADT4ivZSokfI9DT6ANWNImGmAEAAIXSfhyLRiQDRiCLTiw7yH0PikY8SohEMVf/RiyF0n/ki1wkGMdGGAQAAADp+/z//4P4Bg+FnAAAAP92DI1eDFeNhpgBAABQ6BgFAACD+P8PhJ0CAACD+P4PhF0CAAA9AAEAAH0QUFboCAQAAItcJBjptvz//3VAiwPHRhgBAAAAO0YEdA1TVuhYBAAAxwMAAAAAi0YQjX4Qi1wkGDtGCA+Ehvz/\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"/1dW6DgEAADHBwAAAADpdPz//4tcJBg9HgEAAA+NZfz//8dGGAcAAACJRhzpVvz//4P4B3VUi0YcLQEBAACNDECLQzSNHIgPv0sCOQ8PjPsBAACLlpgBAAC4AQAAANPgSCPCA0MEiUY4D79DAikHiksCi1wkGNPqiZaYAQAAx0YYCAAAAOn9+///g/gIdTr/dhCNhpgBAABXUOghBAAAg/j/D4SmAQAAg/j+D4RqAQAAg/geD41hAQAAx0YYCQAAAIlGHOm++///g/gJD4WPAAAAi0YcixeNDECLQziNBIgPv0gCiUQkIIlMJBA70Q+MWgEAAIuGmAEAALsBAAAAK1QkENPji0wkIEsj2ANZBIkXikkC0+iDfjgAiYaYAQAAx0YYBgAAAHQsjaQkAAAAAIuGoIEAAP9OOCvDJf9/AAAPtoQwoAEAAFBW6IECAACDfjgAddv/TjiLXCQY6Sb7//+D+Ap1MYsXg/oQD4zdAAAAi46YAQAAD7fBiUZAjULw\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"wekQiQeJjpgBAADHRhgLAAAA6fD6//+D+At1P4sHg/gQD4ynAAAAi46YAQAAg8DwD7fRiQeB8v//AACLRkDB6RCJjpgBAAA7wnVQ99gbwIPgC0CJRhjprPr//4P4DA+Fo/r//4M/CHxlD7aGmAEAAFBW6NkBAACDB/jBrpgBAAAIg0ZA/w+FfPr//8dGGAEAAADpcPr//4tcJBj/tqSBAACLQzD/0ItEJCTHhqSBAAAAAAAAX17HAAAAAACLRCQgXVvHAAAAAAAzwFnCFACLTCQkuAEAAACLlqSBAABfiRGLlqiBAACLTCQkXl1biRFZwhQAzMzMzMzMzMzMzMzMzIHsIAEAAFNWi7QkLAEAAFdosIEAAItGKP/Qi9iNfCQMuAgICAi5JAAAAGggAQAAiTPzq7gJCQkJjbwkoAAAALkcAAAA86uNRCQQx4QkEAEAAAcHBwdQU8eEJBwBAAAHBwcHx4QkIAEAAAcHBwfHhCQkAQAABwcHB8eEJCgBAAAH\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"BwcHx4QkLAEAAAcHBwfHhCQwAQAACAgICMeEJDQBAAAICAgI6McEAACJQwSNRCQMaiBQU8dEJBgFBQUFx0QkHAUFBQXHRCQgBQUFBcdEJCQFBQUFx0QkKAUFBQXHRCQsBQUFBcdEJDAFBQUFx0QkNAUFBQXodwQAAF+JQwiLw17HQxgAAAAAx0MUAAAAAMdDEAAAAADHQwwAAAAAx4OYAQAAAAAAAMeDnAEAAAAAAADHg6CBAAAAAAAAW4HEIAEAAMIEAMzMzMzMzMzMzMzMzFOLXCQMVot0JAyLhqCBAACLDoicMKABAACLhqCBAABAJf9/AACJhqCBAACLhqiBAAA7hqyBAAB8GgPAUP+2pIEAAImGrIEAAItBLP/QiYakgQAAi4aogQAAi46kgQAAiBwB/4aogQAAXlvCCADMzMxTi1wkCFWLbCQQiwOJRCQMhe11CF2DyP9bwggAV4t9AIX/dEtWM/Y5N3wj6wONSQCLRwSNBPCDwASDOAB0B1BT\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"6Lv///9GOzd+5otEJBT/dwSLQDD/0ItEJBTHRwQAAAAAV4tAMP/Qx0UAAAAAAF5fXTPAW8IIAMzMzMzMzMzMzItEJAxTi1wkDFaLCItABIszV4t8JBCLFyPKjQTID7YIO85/Jg+2CNPqK/Fmg3gC/3Usi0AEhcB0GosIi0AEI8qNBMgPtgg7zn7aX16DyP9bwgwAX164/v///1vCDACJF4kzD79AAl9eW8IMAMzMzMyD7AiLRCQMVYsoi0AIiUQkEItEJBiJbCQEhcAPji0BAABTVlc9BAEAAH4HvgIBAADrDIvwPQIBAAB+A41w/SvGux0AAACJRCQkg8//i0U0i+iJRCQUjQQ7mSvC0fiNDEA7dI0EfQSL2OvrO3SNCH4Ei/jr4YtcJByNBECNPIUAAAAAuRcBAAAPtwQvA/2LbCQQZjvBD7/Ii0U8fwwPtoRIAP7//2oH6wcPtkQBqGoIUFNV6CkDAAAPt0cCZoXAdA0rdwSYUFZTVegTAwAAi0U4\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"g87/i1wkIL8eAAAAi+iL/40EN5krwtH4jQxAO1yNBH0Ei/jr6ztcjQh+BIvw6+GLfCQcjQRAjTSFAAAAAAP1i2wkEGoFD78Oi0U8D7YEyFBXVei5AgAAD7dGAmaFwHQPmFCLwytGBFBXVeihAgAAi0QkJIXAD4/Z/v//X15bXYPECMIMAMzMzMzMzMzMzMzMU1WLbCQMVldqCItFKP/Qi1wkKIv4i8u4AQAAANPgvgEAAACLTCQsSNPmiUQkKI0E9QAAAABQi0Uo/9CJRwQzyY1G/4PK/4kHhcB4I41kJACLRwRmiVTIAotHBMYEyACLRwTHRMgEAAAAAEE7D37hM+05bCQgfmmLdCQc6wONSQAPtgQuO8N+UYtEJBiLBKiLyCNMJCg7TCQkdT6Ly9P4Iwc7B380i08EZolswQKLTwQPthQuK9ONNMEPtg47yn0CiBaLdCQcugEAAAAPtgwuK8vT4gPCOwd+zEU7bCQgfKAz9jk3fGeLVCQsi2wkHIv/\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"i0cEjQzwD7YBO8J+S4PI/2aJQQKLRwSNDPAPtgErwoP4B34FuAcAAABQjQQTiBFQi8uLxtPgC0QkLFD/dCQsVf90JCz/dCQs6MP+//+LTwSLVCQsiUTxBEY7N36ji8dfXl1bwhwAzMzMzMzMzMzMzIHsBAUAADPAM9JVi6wkFAUAAIlUJASJRCQMiUQkEIlEJBSJRCQYiUQkHIlEJCCJRCQkiUQkKIlEJCyJRCQwiUQkNIlEJDiJRCQ8iUQkQIlEJERWi7QkFAUAAIXtfhmL/w+2DDD/RIwMO9F9AovRQDvFfO2JVCQIM9IzyesDjUkAiVQMUANUDBCDwQQD0oP5PHzuVzP/he1+SVONnCSUAAAAD7Y0N8cDAAAAAItUtFSNQgGJRLRUhfZ0GDPAjWQkAIvKA8CD4QHR+gvBg+4BdfCJA4u0JBwFAABHg8MEO/18wFuLRCQMX4P4CXwFuAkAAABQagBqAFX/tCQkBQAAjYQkoAAAAFCLhCQoBQAA/zDo\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"jP3//15dgcQEBQAAwgwAzItEJAxWi3QkDItOENPgCUYMi0QkFAPBiUYQg/gIfDlXi3wkDItGCDlGBHwPA8BQ/zaJRgiLRyz/0IkGi1YEiw6KRgyIBAr/RgTBbgwIg0YQ+IN+EAh9zV9ewhAAVYvsiwCAQMAgoGDgEJBQ0DCwcPAIiEjIKKho6BiYWNg4uHj4BIRExCSkZOQUlFTUNLR09AyMTMwsrGzsHJxc3Dy8fPwCgkLCIqJi4hKSUtIysnLyCopKyiqqauoamlraOrp6+gaGRsYmpmbmFpZW1ja2dvYOjk7OLq5u7h6eXt4+vn7+AYFBwSGhYeERkVHRMbFx8QmJSckpqWnpGZlZ2Tm5efkFhUXFJaVl5RWVVdU1tXX1DY1NzS2tbe0dnV3dPb19/QODQ8Mjo2PjE5NT0zOzc/MLi0vLK6tr6xubW9s7u3v7B4dHxyenZ+cXl1fXN7d39w+PT88vr2/vH59f3z+/f/8BAQAAAwAAAAMAAAACAQAA\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"BAAAAAQAAAADAQAABQAAAAUAAAAEAQAABgAAAAYAAAAFAQAABwAAAAcAAAAGAQAACAAAAAgAAAAHAQAACQAAAAkAAAAIAQAACgAAAAoAAAAJAQEACwAAAAwAAAAKAQEADQAAAA4AAAALAQEADwAAABAAAAAMAQEAEQAAABIAAAANAQIAEwAAABYAAAAOAQIAFwAAABoAAAAPAQIAGwAAAB4AAAAQAQIAHwAAACIAAAARAQMAIwAAACoAAAASAQMAKwAAADIAAAATAQMAMwAAADoAAAAUAQMAOwAAAEIAAAAVAQQAQwAAAFIAAAAWAQQAUwAAAGIAAAAXAQQAYwAAAHIAAAAYAQQAcwAAAIIAAAAZAQUAgwAAAKIAAAAaAQUAowAAAMIAAAAbAQUAwwAAAOIAAAAcAQUA4wAAAAEBAAAdAQAAAgEAAAIBAAAQERIACAcJBgoFCwQMAw0CDgEPAAAAAAABAAAAAQAAAAEAAAACAAAAAgAAAAIAAAADAAAA\""
-          - kind: Whitespace
-            text: " "
-          - kind: Ampersand
-            text: "&"
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "    "
-          - kind: StringLiteral
-            text: "\"AwAAAAMAAAAEAAAABAAAAAQAAQAFAAAABgAAAAUAAQAHAAAACAAAAAYAAgAJAAAADAAAAAcAAgANAAAAEAAAAAgAAwARAAAAGAAAAAkAAwAZAAAAIAAAAAoABAAhAAAAMAAAAAsABAAxAAAAQAAAAAwABQBBAAAAYAAAAA0ABQBhAAAAgAAAAA4ABgCBAAAAwAAAAA8ABgDBAAAAAAEAABAABwABAQAAgAEAABEABwCBAQAAAAIAABIACAABAgAAAAMAABMACAABAwAAAAQAABQACQABBAAAAAYAABUACQABBgAAAAgAABYACgABCAAAAAwAABcACgABDAAAABAAABgACwABEAAAABgAABkACwABGAAAACAAABoADAABIAAAADAAABsADAABMAAAAEAAABwADQABQAAAAGAAAB0ADQABYAAAAIAAAA==\""
+          - kind: BinaryExpression
+            children:
+              - kind: BinaryExpression
+                children:
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"BQAAxwcAAAAAx0YYBgAAAOny/f///3YUjYaYAQAAV1DoGwYAAIvIg/n/D4SeAwAAg/n+D4RiAwAAg/kQfQ+LRiyITDBX/0Ys6br9//91B7gCAAAA6w8zwIP5EQ+VwI0EhQMAAACJRjAzwIP5Eg+UwI0ExQMAAACJRjSD+RB1G4tGLIXAfhQPtkQwVolGPMdGGAUAAADpbf3//zPAx0YYBQAAAIlGPOlc/f//g/gFdVyLH4tOMDvZD4wRAwAAi4aYAQAAugEAAADT4ivZSokfI9DT6ANWNImGmAEAAIXSfhyLRiQDRiCLTiw7yH0PikY8SohEMVf/RiyF0n/ki1wkGMdGGAQAAADp+/z//4P4Bg+FnAAAAP92DI1eDFeNhpgBAABQ6BgFAACD+P8PhJ0CAACD+P4PhF0CAAA9AAEAAH0QUFboCAQAAItcJBjptvz//3VAiwPHRhgBAAAAO0YEdA1TVuhYBAAAxwMAAAAAi0YQjX4Qi1wkGDtGCA+Ehvz/\""
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Ampersand
+                                                text: "&"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Underscore
+                                                text: _
+                                              - kind: Newline
+                                                text: "\r\n"
+                                              - kind: Whitespace
+                                                text: "    "
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"/1dW6DgEAADHBwAAAADpdPz//4tcJBg9HgEAAA+NZfz//8dGGAcAAACJRhzpVvz//4P4B3VUi0YcLQEBAACNDECLQzSNHIgPv0sCOQ8PjPsBAACLlpgBAAC4AQAAANPgSCPCA0MEiUY4D79DAikHiksCi1wkGNPqiZaYAQAAx0YYCAAAAOn9+///g/gIdTr/dhCNhpgBAABXUOghBAAAg/j/D4SmAQAAg/j+D4RqAQAAg/geD41hAQAAx0YYCQAAAIlGHOm++///g/gJD4WPAAAAi0YcixeNDECLQziNBIgPv0gCiUQkIIlMJBA70Q+MWgEAAIuGmAEAALsBAAAAK1QkENPji0wkIEsj2ANZBIkXikkC0+iDfjgAiYaYAQAAx0YYBgAAAHQsjaQkAAAAAIuGoIEAAP9OOCvDJf9/AAAPtoQwoAEAAFBW6IECAACDfjgAddv/TjiLXCQY6Sb7//+D+Ap1MYsXg/oQD4zdAAAAi46YAQAAD7fBiUZAjULw\""
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: Ampersand
+                                            text: "&"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: Underscore
+                                            text: _
+                                          - kind: Newline
+                                            text: "\r\n"
+                                          - kind: Whitespace
+                                            text: "    "
+                                          - kind: StringLiteralExpression
+                                            children:
+                                              - kind: StringLiteral
+                                                text: "\"wekQiQeJjpgBAADHRhgLAAAA6fD6//+D+At1P4sHg/gQD4ynAAAAi46YAQAAg8DwD7fRiQeB8v//AACLRkDB6RCJjpgBAAA7wnVQ99gbwIPgC0CJRhjprPr//4P4DA+Fo/r//4M/CHxlD7aGmAEAAFBW6NkBAACDB/jBrpgBAAAIg0ZA/w+FfPr//8dGGAEAAADpcPr//4tcJBj/tqSBAACLQzD/0ItEJCTHhqSBAAAAAAAAX17HAAAAAACLRCQgXVvHAAAAAAAzwFnCFACLTCQkuAEAAACLlqSBAABfiRGLlqiBAACLTCQkXl1biRFZwhQAzMzMzMzMzMzMzMzMzIHsIAEAAFNWi7QkLAEAAFdosIEAAItGKP/Qi9iNfCQMuAgICAi5JAAAAGggAQAAiTPzq7gJCQkJjbwkoAAAALkcAAAA86uNRCQQx4QkEAEAAAcHBwdQU8eEJBwBAAAHBwcHx4QkIAEAAAcHBwfHhCQkAQAABwcHB8eEJCgBAAAH\""
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Ampersand
+                                        text: "&"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Underscore
+                                        text: _
+                                      - kind: Newline
+                                        text: "\r\n"
+                                      - kind: Whitespace
+                                        text: "    "
+                                      - kind: StringLiteralExpression
+                                        children:
+                                          - kind: StringLiteral
+                                            text: "\"BwcHx4QkLAEAAAcHBwfHhCQwAQAACAgICMeEJDQBAAAICAgI6McEAACJQwSNRCQMaiBQU8dEJBgFBQUFx0QkHAUFBQXHRCQgBQUFBcdEJCQFBQUFx0QkKAUFBQXHRCQsBQUFBcdEJDAFBQUFx0QkNAUFBQXodwQAAF+JQwiLw17HQxgAAAAAx0MUAAAAAMdDEAAAAADHQwwAAAAAx4OYAQAAAAAAAMeDnAEAAAAAAADHg6CBAAAAAAAAW4HEIAEAAMIEAMzMzMzMzMzMzMzMzFOLXCQMVot0JAyLhqCBAACLDoicMKABAACLhqCBAABAJf9/AACJhqCBAACLhqiBAAA7hqyBAAB8GgPAUP+2pIEAAImGrIEAAItBLP/QiYakgQAAi4aogQAAi46kgQAAiBwB/4aogQAAXlvCCADMzMxTi1wkCFWLbCQQiwOJRCQMhe11CF2DyP9bwggAV4t9AIX/dEtWM/Y5N3wj6wONSQCLRwSNBPCDwASDOAB0B1BT\""
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Ampersand
+                                    text: "&"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Underscore
+                                    text: _
+                                  - kind: Newline
+                                    text: "\r\n"
+                                  - kind: Whitespace
+                                    text: "    "
+                                  - kind: StringLiteralExpression
+                                    children:
+                                      - kind: StringLiteral
+                                        text: "\"6Lv///9GOzd+5otEJBT/dwSLQDD/0ItEJBTHRwQAAAAAV4tAMP/Qx0UAAAAAAF5fXTPAW8IIAMzMzMzMzMzMzItEJAxTi1wkDFaLCItABIszV4t8JBCLFyPKjQTID7YIO85/Jg+2CNPqK/Fmg3gC/3Usi0AEhcB0GosIi0AEI8qNBMgPtgg7zn7aX16DyP9bwgwAX164/v///1vCDACJF4kzD79AAl9eW8IMAMzMzMyD7AiLRCQMVYsoi0AIiUQkEItEJBiJbCQEhcAPji0BAABTVlc9BAEAAH4HvgIBAADrDIvwPQIBAAB+A41w/SvGux0AAACJRCQkg8//i0U0i+iJRCQUjQQ7mSvC0fiNDEA7dI0EfQSL2OvrO3SNCH4Ei/jr4YtcJByNBECNPIUAAAAAuRcBAAAPtwQvA/2LbCQQZjvBD7/Ii0U8fwwPtoRIAP7//2oH6wcPtkQBqGoIUFNV6CkDAAAPt0cCZoXAdA0rdwSYUFZTVegTAwAAi0U4\""
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Ampersand
+                                text: "&"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Underscore
+                                text: _
+                              - kind: Newline
+                                text: "\r\n"
+                              - kind: Whitespace
+                                text: "    "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"g87/i1wkIL8eAAAAi+iL/40EN5krwtH4jQxAO1yNBH0Ei/jr6ztcjQh+BIvw6+GLfCQcjQRAjTSFAAAAAAP1i2wkEGoFD78Oi0U8D7YEyFBXVei5AgAAD7dGAmaFwHQPmFCLwytGBFBXVeihAgAAi0QkJIXAD4/Z/v//X15bXYPECMIMAMzMzMzMzMzMzMzMU1WLbCQMVldqCItFKP/Qi1wkKIv4i8u4AQAAANPgvgEAAACLTCQsSNPmiUQkKI0E9QAAAABQi0Uo/9CJRwQzyY1G/4PK/4kHhcB4I41kJACLRwRmiVTIAotHBMYEyACLRwTHRMgEAAAAAEE7D37hM+05bCQgfmmLdCQc6wONSQAPtgQuO8N+UYtEJBiLBKiLyCNMJCg7TCQkdT6Ly9P4Iwc7B380i08EZolswQKLTwQPthQuK9ONNMEPtg47yn0CiBaLdCQcugEAAAAPtgwuK8vT4gPCOwd+zEU7bCQgfKAz9jk3fGeLVCQsi2wkHIv/\""
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Ampersand
+                            text: "&"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Underscore
+                            text: _
+                          - kind: Newline
+                            text: "\r\n"
+                          - kind: Whitespace
+                            text: "    "
+                          - kind: StringLiteralExpression
+                            children:
+                              - kind: StringLiteral
+                                text: "\"i0cEjQzwD7YBO8J+S4PI/2aJQQKLRwSNDPAPtgErwoP4B34FuAcAAABQjQQTiBFQi8uLxtPgC0QkLFD/dCQsVf90JCz/dCQs6MP+//+LTwSLVCQsiUTxBEY7N36ji8dfXl1bwhwAzMzMzMzMzMzMzIHsBAUAADPAM9JVi6wkFAUAAIlUJASJRCQMiUQkEIlEJBSJRCQYiUQkHIlEJCCJRCQkiUQkKIlEJCyJRCQwiUQkNIlEJDiJRCQ8iUQkQIlEJERWi7QkFAUAAIXtfhmL/w+2DDD/RIwMO9F9AovRQDvFfO2JVCQIM9IzyesDjUkAiVQMUANUDBCDwQQD0oP5PHzuVzP/he1+SVONnCSUAAAAD7Y0N8cDAAAAAItUtFSNQgGJRLRUhfZ0GDPAjWQkAIvKA8CD4QHR+gvBg+4BdfCJA4u0JBwFAABHg8MEO/18wFuLRCQMX4P4CXwFuAkAAABQagBqAFX/tCQkBQAAjYQkoAAAAFCLhCQoBQAA/zDo\""
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Ampersand
+                        text: "&"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Underscore
+                        text: _
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "    "
+                      - kind: StringLiteralExpression
+                        children:
+                          - kind: StringLiteral
+                            text: "\"jP3//15dgcQEBQAAwgwAzItEJAxWi3QkDItOENPgCUYMi0QkFAPBiUYQg/gIfDlXi3wkDItGCDlGBHwPA8BQ/zaJRgiLRyz/0IkGi1YEiw6KRgyIBAr/RgTBbgwIg0YQ+IN+EAh9zV9ewhAAVYvsiwCAQMAgoGDgEJBQ0DCwcPAIiEjIKKho6BiYWNg4uHj4BIRExCSkZOQUlFTUNLR09AyMTMwsrGzsHJxc3Dy8fPwCgkLCIqJi4hKSUtIysnLyCopKyiqqauoamlraOrp6+gaGRsYmpmbmFpZW1ja2dvYOjk7OLq5u7h6eXt4+vn7+AYFBwSGhYeERkVHRMbFx8QmJSckpqWnpGZlZ2Tm5efkFhUXFJaVl5RWVVdU1tXX1DY1NzS2tbe0dnV3dPb19/QODQ8Mjo2PjE5NT0zOzc/MLi0vLK6tr6xubW9s7u3v7B4dHxyenZ+cXl1fXN7d39w+PT88vr2/vH59f3z+/f/8BAQAAAwAAAAMAAAACAQAA\""
+                  - kind: Whitespace
+                    text: " "
+                  - kind: Ampersand
+                    text: "&"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: Underscore
+                    text: _
+                  - kind: Newline
+                    text: "\r\n"
+                  - kind: Whitespace
+                    text: "    "
+                  - kind: StringLiteralExpression
+                    children:
+                      - kind: StringLiteral
+                        text: "\"BAAAAAQAAAADAQAABQAAAAUAAAAEAQAABgAAAAYAAAAFAQAABwAAAAcAAAAGAQAACAAAAAgAAAAHAQAACQAAAAkAAAAIAQAACgAAAAoAAAAJAQEACwAAAAwAAAAKAQEADQAAAA4AAAALAQEADwAAABAAAAAMAQEAEQAAABIAAAANAQIAEwAAABYAAAAOAQIAFwAAABoAAAAPAQIAGwAAAB4AAAAQAQIAHwAAACIAAAARAQMAIwAAACoAAAASAQMAKwAAADIAAAATAQMAMwAAADoAAAAUAQMAOwAAAEIAAAAVAQQAQwAAAFIAAAAWAQQAUwAAAGIAAAAXAQQAYwAAAHIAAAAYAQQAcwAAAIIAAAAZAQUAgwAAAKIAAAAaAQUAowAAAMIAAAAbAQUAwwAAAOIAAAAcAQUA4wAAAAEBAAAdAQAAAgEAAAIBAAAQERIACAcJBgoFCwQMAw0CDgEPAAAAAAABAAAAAQAAAAEAAAACAAAAAgAAAAIAAAADAAAA\""
+              - kind: Whitespace
+                text: " "
+              - kind: Ampersand
+                text: "&"
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "    "
+              - kind: StringLiteralExpression
+                children:
+                  - kind: StringLiteral
+                    text: "\"AwAAAAMAAAAEAAAABAAAAAQAAQAFAAAABgAAAAUAAQAHAAAACAAAAAYAAgAJAAAADAAAAAcAAgANAAAAEAAAAAgAAwARAAAAGAAAAAkAAwAZAAAAIAAAAAoABAAhAAAAMAAAAAsABAAxAAAAQAAAAAwABQBBAAAAYAAAAA0ABQBhAAAAgAAAAA4ABgCBAAAAwAAAAA8ABgDBAAAAAAEAABAABwABAQAAgAEAABEABwCBAQAAAAIAABIACAABAgAAAAMAABMACAABAwAAAAQAABQACQABBAAAAAYAABUACQABBgAAAAgAABYACgABCAAAAAwAABcACgABDAAAABAAABgACwABEAAAABgAABkACwABGAAAACAAABoADAABIAAAADAAABsADAABMAAAAEAAABwADQABQAAAAGAAAB0ADQABYAAAAIAAAA==\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1162,8 +1240,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"592|656|704|784|800|912|0|288|368|416|0|0|0|6896|7264|6640|7244\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"592|656|704|784|800|912|0|288|368|416|0|0|0|6896|7264|6640|7244\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1192,8 +1272,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"12.1.2018 17:15:52\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"12.1.2018 17:15:52\""
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1242,8 +1324,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H4000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H4000"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1276,8 +1360,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "260"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "260"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1306,10 +1392,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1342,8 +1432,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1372,8 +1464,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H3"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1402,8 +1496,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H40000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H40000000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1432,8 +1528,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H80000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H80000000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1462,8 +1560,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1492,8 +1592,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1526,8 +1628,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H40"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H40"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1556,8 +1660,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1000"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1590,8 +1696,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1620,8 +1728,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1650,8 +1760,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1684,8 +1796,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "65001"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "65001"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1714,8 +1828,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1748,8 +1864,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1778,8 +1896,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H200"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H200"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1812,10 +1932,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1848,8 +1972,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1882,8 +2008,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Microsoft Primitive Provider\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Microsoft Primitive Provider\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1912,8 +2040,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"SHA1\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"SHA1\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1942,8 +2072,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"AES\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"AES\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1972,8 +2104,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"HashDigestLength\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"HashDigestLength\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2002,8 +2136,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"ObjectLength\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"ObjectLength\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2032,8 +2168,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"ChainingMode\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"ChainingMode\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2062,8 +2200,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"ChainingModeECB\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"ChainingModeECB\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2092,8 +2232,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -2126,10 +2268,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: LongLiteral
-            text: 10&
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: LongLiteral
+                    text: 10&
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2158,10 +2304,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: LongLiteral
-            text: 11&
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: LongLiteral
+                    text: 11&
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2190,10 +2340,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: LongLiteral
-            text: 12&
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: LongLiteral
+                    text: 12&
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -7760,8 +7914,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H4034B50"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H4034B50"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7790,8 +7946,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2014B50"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2014B50"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7820,8 +7978,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H6054B50"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H6054B50"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7850,8 +8010,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H7064B50"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H7064B50"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7880,8 +8042,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H8074B50"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H8074B50"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7910,8 +8074,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "30"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "30"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7940,8 +8106,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "46"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "46"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -7970,8 +8138,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "22"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "22"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8000,8 +8170,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "16"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "16"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8030,8 +8202,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "10"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "10"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8060,8 +8234,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "20"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "20"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8090,8 +8266,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "45"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "45"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8120,8 +8298,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8150,8 +8330,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8180,8 +8362,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "65536"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "65536"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8210,8 +8394,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "99"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "99"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8240,8 +8426,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H9901"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H9901"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8270,8 +8458,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H4541"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H4541"
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -8304,8 +8494,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "11"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "11"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8334,8 +8526,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "20"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "20"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8364,8 +8558,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "12"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "12"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8394,8 +8590,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "10"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "10"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8424,8 +8622,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "16"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "16"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8454,8 +8654,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "109"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "109"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8484,8 +8686,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"User cancelled\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"User cancelled\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8514,8 +8718,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Cannot init deflate compressor\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Cannot init deflate compressor\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8544,8 +8750,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Error compressing\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Error compressing\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8574,8 +8782,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Empty archive\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Empty archive\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8604,8 +8814,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Invalid archive\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Invalid archive\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8634,8 +8846,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Archive not opened\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Archive not opened\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8664,8 +8878,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Invalid local header\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Invalid local header\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8694,8 +8910,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Unsupported compression method %1\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Unsupported compression method %1\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8724,8 +8942,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Cannot init inflate decompressor\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Cannot init inflate decompressor\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8754,8 +8974,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Error reading archive\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Error reading archive\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8784,8 +9006,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Error decompressing\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Error decompressing\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8814,8 +9038,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"CRC check failed\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"CRC check failed\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8844,8 +9070,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Entry %1 has invalid signature\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Entry %1 has invalid signature\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8874,8 +9102,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Entry %1 has no filename\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Entry %1 has no filename\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8904,8 +9134,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Unsupported encryption\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Unsupported encryption\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8934,8 +9166,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Password required\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Password required\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8964,8 +9198,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Invalid password\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Invalid password\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8994,8 +9230,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Invalid authentication code\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Invalid authentication code\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -9024,8 +9262,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Invalid byte array\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Invalid byte array\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -9054,8 +9294,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"[buffer]\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"[buffer]\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -9084,8 +9326,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"[stream]\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"[stream]\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -9114,8 +9358,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"[entry %1]\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"[entry %1]\""
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -12382,124 +12628,128 @@ cst:
                                 text: Optional
                               - kind: Whitespace
                                 text: " "
-                          - kind: NameKeyword
-                            text: Name
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: StringKeyword
-                            text: String
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Underscore
-                            text: _
-                          - kind: Newline
-                            text: "\r\n"
-                          - kind: Whitespace
-                            text: "            "
-                          - kind: OptionalKeyword
-                            text: Optional
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Comment
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: StringKeyword
-                            text: String
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Underscore
-                            text: _
-                          - kind: Newline
-                            text: "\r\n"
-                          - kind: Whitespace
-                            text: "            "
-                          - kind: OptionalKeyword
-                            text: Optional
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Password
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: StringKeyword
-                            text: String
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Underscore
-                            text: _
-                          - kind: Newline
-                            text: "\r\n"
-                          - kind: Whitespace
-                            text: "            "
-                          - kind: OptionalKeyword
-                            text: Optional
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: EncrStrength
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: LongKeyword
-                            text: Long
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Underscore
-                            text: _
-                          - kind: Newline
-                            text: "\r\n"
-                          - kind: Whitespace
-                            text: "            "
-                          - kind: OptionalKeyword
-                            text: Optional
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Level
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: LongKeyword
-                            text: Long
-                          - kind: Whitespace
-                            text: " "
-                          - kind: EqualityOperator
-                            text: "="
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: IntegerLiteral
-                            text: "1"
-                          - kind: RightParenthesis
-                            text: )
+                              - kind: Identifier
+                                text: Name
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringKeyword
+                                text: String
+                              - kind: Comma
+                                text: ","
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Underscore
+                                text: _
+                              - kind: Newline
+                                text: "\r\n"
+                              - kind: Whitespace
+                                text: "            "
+                              - kind: OptionalKeyword
+                                text: Optional
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: Comment
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringKeyword
+                                text: String
+                              - kind: Comma
+                                text: ","
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Underscore
+                                text: _
+                              - kind: Newline
+                                text: "\r\n"
+                              - kind: Whitespace
+                                text: "            "
+                              - kind: OptionalKeyword
+                                text: Optional
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: Password
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringKeyword
+                                text: String
+                              - kind: Comma
+                                text: ","
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Underscore
+                                text: _
+                              - kind: Newline
+                                text: "\r\n"
+                              - kind: Whitespace
+                                text: "            "
+                              - kind: OptionalKeyword
+                                text: Optional
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: EncrStrength
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: LongKeyword
+                                text: Long
+                              - kind: Comma
+                                text: ","
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Underscore
+                                text: _
+                              - kind: Newline
+                                text: "\r\n"
+                              - kind: Whitespace
+                                text: "            "
+                              - kind: OptionalKeyword
+                                text: Optional
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: Level
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: LongKeyword
+                                text: Long
+                              - kind: Whitespace
+                                text: " "
+                              - kind: EqualityOperator
+                                text: "="
+                              - kind: Whitespace
+                                text: " "
+                              - kind: UnaryExpression
+                                children:
+                                  - kind: SubtractionOperator
+                                    text: "-"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "1"
+                              - kind: RightParenthesis
+                                text: )
                           - kind: Whitespace
                             text: " "
                           - kind: AsKeyword
@@ -12638,16 +12888,20 @@ cst:
                                             text: m_uFiles
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: IntegerLiteral
-                                            text: "0"
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "0"
                                           - kind: Whitespace
                                             text: " "
                                           - kind: ToKeyword
                                             text: To
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: IntegerLiteral
-                                            text: "2"
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "2"
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Whitespace
@@ -12720,30 +12974,44 @@ cst:
                                                 text: m_uFiles
                                               - kind: LeftParenthesis
                                                 text: (
-                                              - kind: IntegerLiteral
-                                                text: "0"
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "0"
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: ToKeyword
                                                 text: To
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: IntegerLiteral
-                                                text: "2"
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: MultiplicationOperator
-                                                text: "*"
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: Identifier
-                                                text: UBound
-                                              - kind: LeftParenthesis
-                                                text: (
-                                              - kind: Identifier
-                                                text: m_uFiles
-                                              - kind: RightParenthesis
-                                                text: )
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "2"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: MultiplicationOperator
+                                                    text: "*"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: CallExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: UBound
+                                                      - kind: LeftParenthesis
+                                                        text: (
+                                                      - kind: ArgumentList
+                                                        children:
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: m_uFiles
+                                                      - kind: RightParenthesis
+                                                        text: )
                                               - kind: RightParenthesis
                                                 text: )
                                               - kind: Whitespace
@@ -14478,24 +14746,32 @@ cst:
                                     text: baBuffer
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: LNG_IOBUF_SIZE
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: SubtractionOperator
-                                    text: "-"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: LNG_IOBUF_SIZE
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: SubtractionOperator
+                                        text: "-"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -14520,24 +14796,32 @@ cst:
                                     text: baNext
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: LNG_IOBUF_SIZE
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: SubtractionOperator
-                                    text: "-"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: LNG_IOBUF_SIZE
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: SubtractionOperator
+                                        text: "-"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -18260,42 +18544,58 @@ cst:
                                                                                                     text: baBuffer
                                                                                                   - kind: LeftParenthesis
                                                                                                     text: (
-                                                                                                  - kind: IntegerLiteral
-                                                                                                    text: "0"
+                                                                                                  - kind: NumericLiteralExpression
+                                                                                                    children:
+                                                                                                      - kind: IntegerLiteral
+                                                                                                        text: "0"
                                                                                                   - kind: Whitespace
                                                                                                     text: " "
                                                                                                   - kind: ToKeyword
                                                                                                     text: To
                                                                                                   - kind: Whitespace
                                                                                                     text: " "
-                                                                                                  - kind: LeftParenthesis
-                                                                                                    text: (
-                                                                                                  - kind: Identifier
-                                                                                                    text: uBuf
-                                                                                                  - kind: PeriodOperator
-                                                                                                    text: "."
-                                                                                                  - kind: Identifier
-                                                                                                    text: OutLen
-                                                                                                  - kind: Whitespace
-                                                                                                    text: " "
-                                                                                                  - kind: AndKeyword
-                                                                                                    text: And
-                                                                                                  - kind: Whitespace
-                                                                                                    text: " "
-                                                                                                  - kind: SubtractionOperator
-                                                                                                    text: "-"
-                                                                                                  - kind: IntegerLiteral
-                                                                                                    text: "2048"
-                                                                                                  - kind: RightParenthesis
-                                                                                                    text: )
-                                                                                                  - kind: Whitespace
-                                                                                                    text: " "
-                                                                                                  - kind: AdditionOperator
-                                                                                                    text: +
-                                                                                                  - kind: Whitespace
-                                                                                                    text: " "
-                                                                                                  - kind: IntegerLiteral
-                                                                                                    text: "2047"
+                                                                                                  - kind: BinaryExpression
+                                                                                                    children:
+                                                                                                      - kind: ParenthesizedExpression
+                                                                                                        children:
+                                                                                                          - kind: LeftParenthesis
+                                                                                                            text: (
+                                                                                                          - kind: BinaryExpression
+                                                                                                            children:
+                                                                                                              - kind: MemberAccessExpression
+                                                                                                                children:
+                                                                                                                  - kind: Identifier
+                                                                                                                    text: uBuf
+                                                                                                                  - kind: PeriodOperator
+                                                                                                                    text: "."
+                                                                                                                  - kind: Identifier
+                                                                                                                    text: OutLen
+                                                                                                              - kind: Whitespace
+                                                                                                                text: " "
+                                                                                                              - kind: AndKeyword
+                                                                                                                text: And
+                                                                                                              - kind: Whitespace
+                                                                                                                text: " "
+                                                                                                              - kind: UnaryExpression
+                                                                                                                children:
+                                                                                                                  - kind: SubtractionOperator
+                                                                                                                    text: "-"
+                                                                                                                  - kind: NumericLiteralExpression
+                                                                                                                    children:
+                                                                                                                      - kind: IntegerLiteral
+                                                                                                                        text: "2048"
+                                                                                                          - kind: RightParenthesis
+                                                                                                            text: )
+                                                                                                      - kind: Whitespace
+                                                                                                        text: " "
+                                                                                                      - kind: AdditionOperator
+                                                                                                        text: +
+                                                                                                      - kind: Whitespace
+                                                                                                        text: " "
+                                                                                                      - kind: NumericLiteralExpression
+                                                                                                        children:
+                                                                                                          - kind: IntegerLiteral
+                                                                                                            text: "2047"
                                                                                                   - kind: RightParenthesis
                                                                                                     text: )
                                                                                                   - kind: Whitespace
@@ -31444,24 +31744,32 @@ cst:
                                                     text: baRetVal
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: IntegerLiteral
-                                                    text: "0"
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "0"
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: ToKeyword
                                                     text: To
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: lSize
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: SubtractionOperator
-                                                    text: "-"
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                                  - kind: BinaryExpression
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: lSize
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: SubtractionOperator
+                                                        text: "-"
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "1"
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Whitespace
@@ -32728,28 +33036,36 @@ cst:
                                                     text: baComment
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: IntegerLiteral
-                                                    text: "0"
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "0"
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: ToKeyword
                                                     text: To
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: uEndHdr
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: LenCom
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: SubtractionOperator
-                                                    text: "-"
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                                  - kind: BinaryExpression
+                                                    children:
+                                                      - kind: MemberAccessExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: uEndHdr
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: LenCom
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: SubtractionOperator
+                                                        text: "-"
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "1"
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Whitespace
@@ -32888,20 +33204,24 @@ cst:
                                             text: uFiles
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: IntegerLiteral
-                                            text: "0"
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "0"
                                           - kind: Whitespace
                                             text: " "
                                           - kind: ToKeyword
                                             text: To
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: uEndHdr
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: Entries
+                                          - kind: MemberAccessExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: uEndHdr
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: Entries
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Whitespace
@@ -34414,16 +34734,20 @@ cst:
                                                                             text: uFiles
                                                                           - kind: LeftParenthesis
                                                                             text: (
-                                                                          - kind: IntegerLiteral
-                                                                            text: "0"
+                                                                          - kind: NumericLiteralExpression
+                                                                            children:
+                                                                              - kind: IntegerLiteral
+                                                                                text: "0"
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                           - kind: ToKeyword
                                                                             text: To
                                                                           - kind: Whitespace
                                                                             text: " "
-                                                                          - kind: IntegerLiteral
-                                                                            text: "3"
+                                                                          - kind: NumericLiteralExpression
+                                                                            children:
+                                                                              - kind: IntegerLiteral
+                                                                                text: "3"
                                                                           - kind: RightParenthesis
                                                                             text: )
                                                                           - kind: Whitespace
@@ -34500,28 +34824,36 @@ cst:
                                                                                 text: uFiles
                                                                               - kind: LeftParenthesis
                                                                                 text: (
-                                                                              - kind: IntegerLiteral
-                                                                                text: "0"
+                                                                              - kind: NumericLiteralExpression
+                                                                                children:
+                                                                                  - kind: IntegerLiteral
+                                                                                    text: "0"
                                                                               - kind: Whitespace
                                                                                 text: " "
                                                                               - kind: ToKeyword
                                                                                 text: To
                                                                               - kind: Whitespace
                                                                                 text: " "
-                                                                              - kind: IntegerLiteral
-                                                                                text: "2"
-                                                                              - kind: Whitespace
-                                                                                text: " "
-                                                                              - kind: MultiplicationOperator
-                                                                                text: "*"
-                                                                              - kind: Whitespace
-                                                                                text: " "
-                                                                              - kind: Identifier
-                                                                                text: uEndHdr
-                                                                              - kind: PeriodOperator
-                                                                                text: "."
-                                                                              - kind: Identifier
-                                                                                text: Entries
+                                                                              - kind: BinaryExpression
+                                                                                children:
+                                                                                  - kind: NumericLiteralExpression
+                                                                                    children:
+                                                                                      - kind: IntegerLiteral
+                                                                                        text: "2"
+                                                                                  - kind: Whitespace
+                                                                                    text: " "
+                                                                                  - kind: MultiplicationOperator
+                                                                                    text: "*"
+                                                                                  - kind: Whitespace
+                                                                                    text: " "
+                                                                                  - kind: MemberAccessExpression
+                                                                                    children:
+                                                                                      - kind: Identifier
+                                                                                        text: uEndHdr
+                                                                                      - kind: PeriodOperator
+                                                                                        text: "."
+                                                                                      - kind: Identifier
+                                                                                        text: Entries
                                                                               - kind: RightParenthesis
                                                                                 text: )
                                                                               - kind: Whitespace
@@ -34794,28 +35126,36 @@ cst:
                                                                             text: baBuffer
                                                                           - kind: LeftParenthesis
                                                                             text: (
-                                                                          - kind: IntegerLiteral
-                                                                            text: "0"
+                                                                          - kind: NumericLiteralExpression
+                                                                            children:
+                                                                              - kind: IntegerLiteral
+                                                                                text: "0"
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                           - kind: ToKeyword
                                                                             text: To
                                                                           - kind: Whitespace
                                                                             text: " "
-                                                                          - kind: Identifier
-                                                                            text: uCentral
-                                                                          - kind: PeriodOperator
-                                                                            text: "."
-                                                                          - kind: Identifier
-                                                                            text: USize
-                                                                          - kind: Whitespace
-                                                                            text: " "
-                                                                          - kind: SubtractionOperator
-                                                                            text: "-"
-                                                                          - kind: Whitespace
-                                                                            text: " "
-                                                                          - kind: Identifier
-                                                                            text: LNG_LEN_EXTLOCAL
+                                                                          - kind: BinaryExpression
+                                                                            children:
+                                                                              - kind: MemberAccessExpression
+                                                                                children:
+                                                                                  - kind: Identifier
+                                                                                    text: uCentral
+                                                                                  - kind: PeriodOperator
+                                                                                    text: "."
+                                                                                  - kind: Identifier
+                                                                                    text: USize
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: SubtractionOperator
+                                                                                text: "-"
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: IdentifierExpression
+                                                                                children:
+                                                                                  - kind: Identifier
+                                                                                    text: LNG_LEN_EXTLOCAL
                                                                           - kind: RightParenthesis
                                                                             text: )
                                                                           - kind: Whitespace
@@ -35774,20 +36114,24 @@ cst:
                                                 text: uFiles
                                               - kind: LeftParenthesis
                                                 text: (
-                                              - kind: IntegerLiteral
-                                                text: "0"
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "0"
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: ToKeyword
                                                 text: To
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: uEndHdr
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: Entries
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: uEndHdr
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: Entries
                                               - kind: RightParenthesis
                                                 text: )
                                               - kind: Whitespace
@@ -36718,28 +37062,36 @@ cst:
                                                     text: baFName
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: IntegerLiteral
-                                                    text: "0"
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "0"
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: ToKeyword
                                                     text: To
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: uCentral
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: LenFname
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: SubtractionOperator
-                                                    text: "-"
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                                  - kind: BinaryExpression
+                                                    children:
+                                                      - kind: MemberAccessExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: uCentral
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: LenFname
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: SubtractionOperator
+                                                        text: "-"
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "1"
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Whitespace
@@ -37144,28 +37496,36 @@ cst:
                                                     text: baExtra
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: IntegerLiteral
-                                                    text: "0"
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "0"
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: ToKeyword
                                                     text: To
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: uCentral
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: LenExt
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: SubtractionOperator
-                                                    text: "-"
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                                  - kind: BinaryExpression
+                                                    children:
+                                                      - kind: MemberAccessExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: uCentral
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: LenExt
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: SubtractionOperator
+                                                        text: "-"
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "1"
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Whitespace
@@ -37324,28 +37684,36 @@ cst:
                                                     text: baComment
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: IntegerLiteral
-                                                    text: "0"
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "0"
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: ToKeyword
                                                     text: To
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: uCentral
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: LenCom
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: SubtractionOperator
-                                                    text: "-"
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                                  - kind: BinaryExpression
+                                                    children:
+                                                      - kind: MemberAccessExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: uCentral
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: LenCom
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: SubtractionOperator
+                                                        text: "-"
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "1"
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Whitespace
@@ -39340,24 +39708,32 @@ cst:
                                     text: baBuffer
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: LNG_IOBUF_SIZE
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: SubtractionOperator
-                                    text: "-"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: LNG_IOBUF_SIZE
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: SubtractionOperator
+                                        text: "-"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -41018,28 +41394,36 @@ cst:
                                                             text: baFName
                                                           - kind: LeftParenthesis
                                                             text: (
-                                                          - kind: IntegerLiteral
-                                                            text: "0"
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "0"
                                                           - kind: Whitespace
                                                             text: " "
                                                           - kind: ToKeyword
                                                             text: To
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: Identifier
-                                                            text: uLocal
-                                                          - kind: PeriodOperator
-                                                            text: "."
-                                                          - kind: Identifier
-                                                            text: LenFname
-                                                          - kind: Whitespace
-                                                            text: " "
-                                                          - kind: SubtractionOperator
-                                                            text: "-"
-                                                          - kind: Whitespace
-                                                            text: " "
-                                                          - kind: IntegerLiteral
-                                                            text: "1"
+                                                          - kind: BinaryExpression
+                                                            children:
+                                                              - kind: MemberAccessExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: uLocal
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: LenFname
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: SubtractionOperator
+                                                                text: "-"
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: NumericLiteralExpression
+                                                                children:
+                                                                  - kind: IntegerLiteral
+                                                                    text: "1"
                                                           - kind: RightParenthesis
                                                             text: )
                                                           - kind: Whitespace
@@ -41176,28 +41560,36 @@ cst:
                                                             text: baExt
                                                           - kind: LeftParenthesis
                                                             text: (
-                                                          - kind: IntegerLiteral
-                                                            text: "0"
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "0"
                                                           - kind: Whitespace
                                                             text: " "
                                                           - kind: ToKeyword
                                                             text: To
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: Identifier
-                                                            text: uLocal
-                                                          - kind: PeriodOperator
-                                                            text: "."
-                                                          - kind: Identifier
-                                                            text: LenExt
-                                                          - kind: Whitespace
-                                                            text: " "
-                                                          - kind: SubtractionOperator
-                                                            text: "-"
-                                                          - kind: Whitespace
-                                                            text: " "
-                                                          - kind: IntegerLiteral
-                                                            text: "1"
+                                                          - kind: BinaryExpression
+                                                            children:
+                                                              - kind: MemberAccessExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: uLocal
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: LenExt
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: SubtractionOperator
+                                                                text: "-"
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: NumericLiteralExpression
+                                                                children:
+                                                                  - kind: IntegerLiteral
+                                                                    text: "1"
                                                           - kind: RightParenthesis
                                                             text: )
                                                           - kind: Whitespace
@@ -42174,26 +42566,34 @@ cst:
                                                                         text: OutputTarget
                                                                       - kind: LeftParenthesis
                                                                         text: (
-                                                                      - kind: IntegerLiteral
-                                                                        text: "0"
+                                                                      - kind: NumericLiteralExpression
+                                                                        children:
+                                                                          - kind: IntegerLiteral
+                                                                            text: "0"
                                                                       - kind: Whitespace
                                                                         text: " "
                                                                       - kind: ToKeyword
                                                                         text: To
                                                                       - kind: Whitespace
                                                                         text: " "
-                                                                      - kind: PeriodOperator
-                                                                        text: "."
-                                                                      - kind: Identifier
-                                                                        text: Size
-                                                                      - kind: Whitespace
-                                                                        text: " "
-                                                                      - kind: SubtractionOperator
-                                                                        text: "-"
-                                                                      - kind: Whitespace
-                                                                        text: " "
-                                                                      - kind: IntegerLiteral
-                                                                        text: "1"
+                                                                      - kind: BinaryExpression
+                                                                        children:
+                                                                          - kind: IdentifierExpression
+                                                                            children:
+                                                                              - kind: PeriodOperator
+                                                                                text: "."
+                                                                              - kind: Identifier
+                                                                                text: Size
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: SubtractionOperator
+                                                                            text: "-"
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: NumericLiteralExpression
+                                                                            children:
+                                                                              - kind: IntegerLiteral
+                                                                                text: "1"
                                                                       - kind: RightParenthesis
                                                                         text: )
                                                                       - kind: Whitespace
@@ -43546,24 +43946,32 @@ cst:
                                                                                         text: baSalt
                                                                                       - kind: LeftParenthesis
                                                                                         text: (
-                                                                                      - kind: IntegerLiteral
-                                                                                        text: "0"
+                                                                                      - kind: NumericLiteralExpression
+                                                                                        children:
+                                                                                          - kind: IntegerLiteral
+                                                                                            text: "0"
                                                                                       - kind: Whitespace
                                                                                         text: " "
                                                                                       - kind: ToKeyword
                                                                                         text: To
                                                                                       - kind: Whitespace
                                                                                         text: " "
-                                                                                      - kind: Identifier
-                                                                                        text: lSaltSize
-                                                                                      - kind: Whitespace
-                                                                                        text: " "
-                                                                                      - kind: SubtractionOperator
-                                                                                        text: "-"
-                                                                                      - kind: Whitespace
-                                                                                        text: " "
-                                                                                      - kind: IntegerLiteral
-                                                                                        text: "1"
+                                                                                      - kind: BinaryExpression
+                                                                                        children:
+                                                                                          - kind: IdentifierExpression
+                                                                                            children:
+                                                                                              - kind: Identifier
+                                                                                                text: lSaltSize
+                                                                                          - kind: Whitespace
+                                                                                            text: " "
+                                                                                          - kind: SubtractionOperator
+                                                                                            text: "-"
+                                                                                          - kind: Whitespace
+                                                                                            text: " "
+                                                                                          - kind: NumericLiteralExpression
+                                                                                            children:
+                                                                                              - kind: IntegerLiteral
+                                                                                                text: "1"
                                                                                       - kind: RightParenthesis
                                                                                         text: )
                                                                                       - kind: Whitespace
@@ -45930,24 +46338,32 @@ cst:
                                                                             text: baSalt
                                                                           - kind: LeftParenthesis
                                                                             text: (
-                                                                          - kind: IntegerLiteral
-                                                                            text: "0"
+                                                                          - kind: NumericLiteralExpression
+                                                                            children:
+                                                                              - kind: IntegerLiteral
+                                                                                text: "0"
                                                                           - kind: Whitespace
                                                                             text: " "
                                                                           - kind: ToKeyword
                                                                             text: To
                                                                           - kind: Whitespace
                                                                             text: " "
-                                                                          - kind: Identifier
-                                                                            text: LNG_AES_AUTHCODE_SIZE
-                                                                          - kind: Whitespace
-                                                                            text: " "
-                                                                          - kind: SubtractionOperator
-                                                                            text: "-"
-                                                                          - kind: Whitespace
-                                                                            text: " "
-                                                                          - kind: IntegerLiteral
-                                                                            text: "1"
+                                                                          - kind: BinaryExpression
+                                                                            children:
+                                                                              - kind: IdentifierExpression
+                                                                                children:
+                                                                                  - kind: Identifier
+                                                                                    text: LNG_AES_AUTHCODE_SIZE
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: SubtractionOperator
+                                                                                text: "-"
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: NumericLiteralExpression
+                                                                                children:
+                                                                                  - kind: IntegerLiteral
+                                                                                    text: "1"
                                                                           - kind: RightParenthesis
                                                                             text: )
                                                                           - kind: Whitespace
@@ -49114,28 +49530,36 @@ cst:
                                             text: baOutput
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: IntegerLiteral
-                                            text: "0"
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "0"
                                           - kind: Whitespace
                                             text: " "
                                           - kind: ToKeyword
                                             text: To
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: uBuf
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: OutLen
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: SubtractionOperator
-                                            text: "-"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IntegerLiteral
-                                            text: "1"
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: uBuf
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: OutLen
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: SubtractionOperator
+                                                text: "-"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "1"
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Whitespace
@@ -50586,28 +51010,36 @@ cst:
                                             text: baOutput
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: IntegerLiteral
-                                            text: "0"
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "0"
                                           - kind: Whitespace
                                             text: " "
                                           - kind: ToKeyword
                                             text: To
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: uBuf
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: OutLen
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: SubtractionOperator
-                                            text: "-"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IntegerLiteral
-                                            text: "1"
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: uBuf
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: OutLen
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: SubtractionOperator
+                                                text: "-"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "1"
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Whitespace
@@ -51970,32 +52402,44 @@ cst:
                                     text: baDerivedKey
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: IntegerLiteral
-                                    text: "2"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: MultiplicationOperator
-                                    text: "*"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: lKeyLen
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: AdditionOperator
-                                    text: +
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "2"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: MultiplicationOperator
+                                            text: "*"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: lKeyLen
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AdditionOperator
+                                        text: +
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -57076,28 +57520,36 @@ cst:
                                     text: baResult
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: m_uCrypto
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: HmacHashLen
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: SubtractionOperator
-                                    text: "-"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: m_uCrypto
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: HmacHashLen
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: SubtractionOperator
+                                        text: "-"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -57200,24 +57652,32 @@ cst:
                                     text: baResult
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: lSize
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: SubtractionOperator
-                                    text: "-"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: lSize
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: SubtractionOperator
+                                        text: "-"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -57348,16 +57808,20 @@ cst:
                                     text: baResult
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: IntegerLiteral
-                                    text: "15"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "15"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -57422,24 +57886,32 @@ cst:
                                     text: baResult
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: lSize
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: SubtractionOperator
-                                    text: "-"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: lSize
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: SubtractionOperator
+                                        text: "-"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -69854,16 +70326,20 @@ cst:
                                     text: aTable
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: LongLiteral
-                                    text: "&H3FF"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: LongLiteral
+                                        text: "&H3FF"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -72746,24 +73222,32 @@ cst:
                                     text: baOutput
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: lSize
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: SubtractionOperator
-                                    text: "-"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: lSize
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: SubtractionOperator
+                                        text: "-"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -74290,24 +74774,32 @@ cst:
                                             text: baRetVal
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: IntegerLiteral
-                                            text: "0"
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "0"
                                           - kind: Whitespace
                                             text: " "
                                           - kind: ToKeyword
                                             text: To
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: lSize
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: SubtractionOperator
-                                            text: "-"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IntegerLiteral
-                                            text: "1"
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: lSize
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: SubtractionOperator
+                                                text: "-"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "1"
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Whitespace

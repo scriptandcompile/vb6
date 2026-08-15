@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/audiostation.rs
+source: projects/vb6parse/tests/class/audiostation.rs
 expression: class
 ---
 header:
@@ -118,8 +118,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1000"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -148,16 +150,22 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: Identifier
-            text: CHUNK_SIZE
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "10"
+          - kind: BinaryExpression
+            children:
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: CHUNK_SIZE
+              - kind: Whitespace
+                text: " "
+              - kind: MultiplicationOperator
+                text: "*"
+              - kind: Whitespace
+                text: " "
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "10"
           - kind: Newline
             text: "\n"
       - kind: Newline
@@ -182,18 +190,18 @@ cst:
                 text: ByVal
               - kind: Whitespace
                 text: " "
-          - kind: TextKeyword
-            text: Text
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Text
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\n"
           - kind: StatementList

@@ -176,8 +176,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H100"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H100"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -198,8 +200,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2000"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -220,8 +224,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H800"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H800"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -242,8 +248,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H400"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H400"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -264,8 +272,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1000"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -286,8 +296,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H200"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H200"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -308,8 +320,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&HFF"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&HFF"
           - kind: Newline
             text: "\n"
       - kind: DeclareStatement
@@ -696,8 +710,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: 48&
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: 48&
           - kind: Newline
             text: "\n"
       - kind: Newline
@@ -3470,16 +3486,20 @@ cst:
                                                 text: sFiles
                                               - kind: LeftParenthesis
                                                 text: (
-                                              - kind: IntegerLiteral
-                                                text: "1"
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "1"
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: ToKeyword
                                                 text: To
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: iFileCount
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: iFileCount
                                               - kind: RightParenthesis
                                                 text: )
                                               - kind: Whitespace
@@ -3716,16 +3736,20 @@ cst:
                             text: sFiles
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: iFileCount
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: iFileCount
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -3840,16 +3864,20 @@ cst:
                                 text: sFiles
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: IntegerLiteral
-                                text: "1"
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                               - kind: Whitespace
                                 text: " "
                               - kind: ToKeyword
                                 text: To
                               - kind: Whitespace
                                 text: " "
-                              - kind: IntegerLiteral
-                                text: "1"
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                               - kind: RightParenthesis
                                 text: )
                               - kind: Whitespace

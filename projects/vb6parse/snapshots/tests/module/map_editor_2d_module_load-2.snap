@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/vb6_code.rs
+source: projects/vb6parse/tests/module/vb6_code.rs
 expression: declaration_module_file
 ---
 name: Sub_Module
@@ -191,30 +191,38 @@ cst:
                     text: MapArray
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: SizeX
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: SizeX
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: SizeY
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: SizeY
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace

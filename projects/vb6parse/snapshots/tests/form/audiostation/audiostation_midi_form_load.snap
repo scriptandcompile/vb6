@@ -25553,8 +25553,10 @@ cst:
                     text: MainStreamGroup
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -32959,22 +32961,28 @@ cst:
                     text: arMsgFF81Tempo
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MB_DIMENSION1UBOUND
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MB_DIMENSION1UBOUND
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1000"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1000"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -32991,22 +32999,28 @@ cst:
                     text: arMsgFF88TPQ
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MB_DIMENSION1UBOUND
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MB_DIMENSION1UBOUND
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1000"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1000"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -35871,12 +35885,14 @@ cst:
                     text: arTrackDone
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MIDIFile1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: NumberOfTracks
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -35893,12 +35909,14 @@ cst:
                     text: arTrackMessageTimeNext
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MIDIFile1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: NumberOfTracks
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -35915,12 +35933,14 @@ cst:
                     text: arTrackMessageCurrent
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MIDIFile1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: NumberOfTracks
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -35937,12 +35957,14 @@ cst:
                     text: arMsgFF81TempoCount
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MIDIFile1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: NumberOfTracks
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -35959,12 +35981,14 @@ cst:
                     text: arMsgFF88TPQCount
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MIDIFile1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: NumberOfTracks
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -35981,12 +36005,14 @@ cst:
                     text: arStreamTicksCurrent
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MIDIFile1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: NumberOfTracks
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -36003,12 +36029,14 @@ cst:
                     text: arStreamTimeCurrent
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MIDIFile1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: NumberOfTracks
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -36025,12 +36053,14 @@ cst:
                     text: arStreamTimeStart
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MIDIFile1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: NumberOfTracks
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -36047,12 +36077,14 @@ cst:
                     text: arTicksPerMillisecond
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MIDIFile1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: NumberOfTracks
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -36069,12 +36101,14 @@ cst:
                     text: arTempoPrevious
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MIDIFile1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: NumberOfTracks
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -45727,22 +45761,28 @@ cst:
                     text: arMsgFF81Tempo
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MB_DIMENSION1UBOUND
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MB_DIMENSION1UBOUND
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1000"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1000"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -45759,22 +45799,28 @@ cst:
                     text: arMsgFF88TPQ
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MB_DIMENSION1UBOUND
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MB_DIMENSION1UBOUND
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1000"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1000"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -55767,26 +55813,34 @@ cst:
                     text: MainStreamGroup
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MIDIFile1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: NumberOfTracks
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: MIDIFile1
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: NumberOfTracks
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AdditionOperator
+                        text: +
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "2"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "2"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -57389,22 +57443,28 @@ cst:
                     text: arMsgFF81Tempo
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MB_DIMENSION1UBOUND
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MB_DIMENSION1UBOUND
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1000"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1000"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -57421,22 +57481,28 @@ cst:
                     text: arMsgFF88TPQ
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MB_DIMENSION1UBOUND
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MB_DIMENSION1UBOUND
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1000"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1000"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -83851,16 +83917,20 @@ cst:
                     text: arMidiFFTracking
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: LongLiteral
-                    text: "&HFFFF&"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&HFFFF&"
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/module/cdiu_beat_up_editor.rs
 expression: module
 ---
 name: cma7
@@ -2785,16 +2785,22 @@ cst:
                             text: sBuffer
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: RSize
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AdditionOperator
-                            text: +
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "200"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: RSize
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AdditionOperator
+                                text: +
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "200"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -3001,16 +3007,22 @@ cst:
                             text: sBuffer
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: RSize
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: RSize
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -14035,8 +14047,10 @@ cst:
                             text: TData
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: Number
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Number
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline

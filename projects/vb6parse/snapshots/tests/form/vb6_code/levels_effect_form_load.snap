@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/vb6_code.rs
+source: projects/vb6parse/tests/form/vb6_code.rs
 expression: form_file
 ---
 form:
@@ -1186,8 +1186,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SingleLiteral
-            text: "1.8460498941512"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: SingleLiteral
+                text: "1.8460498941512"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1216,8 +1218,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SingleLiteral
-            text: "0.68377223398334"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: SingleLiteral
+                text: "0.68377223398334"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1246,8 +1250,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SingleLiteral
-            text: "3.16227766"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: SingleLiteral
+                text: "3.16227766"
           - kind: Newline
             text: "\r\n"
       - kind: Newline

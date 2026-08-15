@@ -668,7 +668,7 @@ cst:
             text: Public
           - kind: Whitespace
             text: " "
-          - kind: ErrorKeyword
+          - kind: Identifier
             text: Error
           - kind: Whitespace
             text: " "
@@ -726,7 +726,7 @@ cst:
             text: Public
           - kind: Whitespace
             text: " "
-          - kind: WidthKeyword
+          - kind: Identifier
             text: Width
           - kind: Whitespace
             text: " "
@@ -800,8 +800,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H0&"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H0&"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -826,8 +828,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -850,8 +854,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "32"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "32"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -874,8 +880,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "64"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "64"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -898,8 +906,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "16"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "16"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -922,8 +932,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H3&"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H3&"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -946,8 +958,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H0&"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H0&"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -970,8 +984,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2&"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2&"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -994,8 +1010,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H0&"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H0&"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -1018,8 +1036,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1000&"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1000&"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -1050,20 +1070,28 @@ cst:
             text: "\r\n"
           - kind: Whitespace
             text: "                     "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: MIXERLINE_COMPONENTTYPE_DST_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: AdditionOperator
-            text: +
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "4"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MIXERLINE_COMPONENTTYPE_DST_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AdditionOperator
+                    text: +
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "4"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -1094,20 +1122,28 @@ cst:
             text: "\r\n"
           - kind: Whitespace
             text: "                     "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: MIXERLINE_COMPONENTTYPE_SRC_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: AdditionOperator
-            text: +
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "3"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MIXERLINE_COMPONENTTYPE_SRC_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AdditionOperator
+                    text: +
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "3"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -1138,20 +1174,28 @@ cst:
             text: "\r\n"
           - kind: Whitespace
             text: "                     "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: MIXERLINE_COMPONENTTYPE_SRC_FIRST
-          - kind: Whitespace
-            text: " "
-          - kind: AdditionOperator
-            text: +
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "2"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MIXERLINE_COMPONENTTYPE_SRC_FIRST
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AdditionOperator
+                    text: +
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "2"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -1176,8 +1220,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H50000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H50000000"
           - kind: Newline
             text: "\r\n"
       - kind: Whitespace
@@ -1200,8 +1246,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H30000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H30000"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -1232,26 +1280,34 @@ cst:
             text: "\r\n"
           - kind: Whitespace
             text: "                     "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: MIXERCONTROL_CT_CLASS_FADER
-          - kind: Whitespace
-            text: " "
-          - kind: OrKeyword
-            text: Or
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "                     "
-          - kind: Identifier
-            text: MIXERCONTROL_CT_UNITS_UNSIGNED
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MIXERCONTROL_CT_CLASS_FADER
+                  - kind: Whitespace
+                    text: " "
+                  - kind: OrKeyword
+                    text: Or
+                  - kind: Whitespace
+                    text: " "
+                  - kind: Underscore
+                    text: _
+                  - kind: Newline
+                    text: "\r\n"
+                  - kind: Whitespace
+                    text: "                     "
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MIXERCONTROL_CT_UNITS_UNSIGNED
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -1282,20 +1338,28 @@ cst:
             text: "\r\n"
           - kind: Whitespace
             text: "                     "
-          - kind: LeftParenthesis
-            text: (
-          - kind: Identifier
-            text: MIXERCONTROL_CONTROLTYPE_FADER
-          - kind: Whitespace
-            text: " "
-          - kind: AdditionOperator
-            text: +
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "1"
-          - kind: RightParenthesis
-            text: )
+          - kind: ParenthesizedExpression
+            children:
+              - kind: LeftParenthesis
+                text: (
+              - kind: BinaryExpression
+                children:
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MIXERCONTROL_CONTROLTYPE_FADER
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AdditionOperator
+                    text: +
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -10432,32 +10496,32 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: WidthKeyword
-            text: Width
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: Height
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Width
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: Height
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: RightParenthesis
+                text: )
           - kind: Newline
             text: "\r\n"
           - kind: StatementList

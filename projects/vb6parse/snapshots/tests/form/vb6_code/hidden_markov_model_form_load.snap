@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/vb6_code.rs
+source: projects/vb6parse/tests/form/vb6_code.rs
 expression: form_file
 ---
 form:
@@ -3818,16 +3818,20 @@ cst:
                     text: bHMM
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lenDNA
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: lenDNA
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -3852,16 +3856,20 @@ cst:
                     text: iHMM
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lenDNA
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: lenDNA
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -5106,16 +5114,20 @@ cst:
                     text: bHMM1
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lenDNA
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: lenDNA
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -5140,16 +5152,20 @@ cst:
                     text: bHMM2
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lenDNA
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: lenDNA
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -5174,16 +5190,20 @@ cst:
                     text: iHMM1
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lenDNA
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: lenDNA
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -5208,16 +5228,20 @@ cst:
                     text: iHMM2
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lenDNA
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: lenDNA
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -5780,16 +5804,20 @@ cst:
                     text: vHMM
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lenDNA
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: lenDNA
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -7764,16 +7792,20 @@ cst:
                             text: fText
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: eFile
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: eFile
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -8272,16 +8304,20 @@ cst:
                                                     text: fText
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: IntegerLiteral
-                                                    text: "0"
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "0"
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: ToKeyword
                                                     text: To
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: eFile
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: eFile
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Whitespace
@@ -8474,16 +8510,20 @@ cst:
                             text: fText
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: numOfLines
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: numOfLines
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -8508,16 +8548,20 @@ cst:
                             text: DNA
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: numChars
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: numChars
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -9874,24 +9918,32 @@ cst:
                     text: wResults
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lenDNA
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: winSize
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: lenDNA
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: winSize
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -9950,24 +10002,32 @@ cst:
                     text: oeResults
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: Whitespace
                     text: " "
                   - kind: ToKeyword
                     text: To
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: lenDNA
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: winSize
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: lenDNA
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: winSize
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace

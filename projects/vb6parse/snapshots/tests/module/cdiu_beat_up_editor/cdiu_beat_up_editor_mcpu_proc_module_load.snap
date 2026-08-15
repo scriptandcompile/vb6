@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/module/cdiu_beat_up_editor.rs
 expression: module
 ---
 name: MCPU_PRoc
@@ -439,8 +439,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&HFFFF"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&HFFFF"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -461,8 +463,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H102"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H102"
           - kind: Newline
             text: "\n"
       - kind: Newline
@@ -773,14 +777,22 @@ cst:
                     text: iParam
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: UBound
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: Data
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: UBound
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Data
+                      - kind: RightParenthesis
+                        text: )
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -1201,7 +1213,7 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: TimeKeyword
+                  - kind: Identifier
                     text: Time
                   - kind: Whitespace
                     text: " "
@@ -1447,7 +1459,7 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: TimeKeyword
+                  - kind: Identifier
                     text: Time
                   - kind: Whitespace
                     text: " "
@@ -1553,8 +1565,10 @@ cst:
                     text: OData
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: ByteUBound
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ByteUBound
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -1731,7 +1745,7 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: TimeKeyword
+                  - kind: Identifier
                     text: Time
                   - kind: Whitespace
                     text: " "
@@ -1829,24 +1843,34 @@ cst:
                             text: OData
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: ByteUBound
-                          - kind: Whitespace
-                            text: " "
-                          - kind: MultiplicationOperator
-                            text: "*"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "2"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AdditionOperator
-                            text: +
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: ByteUBound
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: MultiplicationOperator
+                                    text: "*"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "2"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AdditionOperator
+                                text: +
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -1997,7 +2021,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: TimeKeyword
+                  - kind: Identifier
                     text: Time
                   - kind: Whitespace
                     text: " "

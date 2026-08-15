@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/class/audiostation.rs
-assertion_line: 64
 expression: class
 ---
 header:
@@ -373,8 +372,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\n"
       - kind: DimStatement
@@ -395,8 +396,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "260"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "260"
           - kind: Newline
             text: "\n"
       - kind: Newline
@@ -2879,7 +2882,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: OutputKeyword
+                  - kind: Identifier
                     text: Output
                   - kind: Whitespace
                     text: " "

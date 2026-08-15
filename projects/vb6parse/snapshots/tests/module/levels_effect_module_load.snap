@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/vb6_code.rs
+source: projects/vb6parse/tests/module/vb6_code.rs
 expression: module_file
 ---
 name: modPublicVars
@@ -37,8 +37,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "3"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -67,8 +69,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\r\n"
       - kind: Newline

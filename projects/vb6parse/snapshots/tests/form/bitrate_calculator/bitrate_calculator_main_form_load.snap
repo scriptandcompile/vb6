@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/bitrate_calculator.rs
+source: projects/vb6parse/tests/form/bitrate_calculator.rs
 expression: form_file
 ---
 form:
@@ -2607,8 +2607,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&HA1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&HA1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2629,8 +2631,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: Newline

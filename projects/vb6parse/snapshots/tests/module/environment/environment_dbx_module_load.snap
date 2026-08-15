@@ -8305,8 +8305,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8327,8 +8329,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\";Jet OLEDB:Database Password=100101;\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\";Jet OLEDB:Database Password=100101;\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8349,8 +8353,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8371,8 +8377,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\";Jet OLEDB:Database Password=100101;\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\";Jet OLEDB:Database Password=100101;\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -8503,8 +8511,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\".mdb\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\".mdb\""
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -8529,8 +8539,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\";Persist Security Info=False\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\";Persist Security Info=False\""
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -21147,7 +21159,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: BaseKeyword
+                  - kind: Identifier
                     text: Base
                   - kind: Whitespace
                     text: " "
@@ -22587,36 +22599,36 @@ cst:
             children:
               - kind: LeftParenthesis
                 text: (
-          - kind: BaseKeyword
-            text: Base
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: bstackstr
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: basetask
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: r
+              - kind: Identifier
+                text: Base
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: bstackstr
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: basetask
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: r
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -24635,36 +24647,36 @@ cst:
             children:
               - kind: LeftParenthesis
                 text: (
-          - kind: BaseKeyword
-            text: Base
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: bstackstr
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: basetask
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: r
+              - kind: Identifier
+                text: Base
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: bstackstr
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: basetask
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: r
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -31355,22 +31367,22 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: BaseKeyword
-            text: Base
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: r
+              - kind: Identifier
+                text: Base
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: r
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -40043,7 +40055,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: BaseKeyword
+                  - kind: Identifier
                     text: Base
                   - kind: Whitespace
                     text: " "
@@ -52379,7 +52391,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: BaseKeyword
+                  - kind: Identifier
                     text: Base
                   - kind: Whitespace
                     text: " "
@@ -57019,7 +57031,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: BaseKeyword
+                  - kind: Identifier
                     text: Base
                   - kind: Whitespace
                     text: " "
@@ -60085,7 +60097,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: BaseKeyword
+                  - kind: Identifier
                     text: Base
                   - kind: Whitespace
                     text: " "
@@ -64957,7 +64969,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: BaseKeyword
+                  - kind: Identifier
                     text: Base
                   - kind: Whitespace
                     text: " "
@@ -70725,7 +70737,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: BaseKeyword
+                  - kind: Identifier
                     text: Base
                   - kind: Whitespace
                     text: " "
@@ -72619,7 +72631,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: BaseKeyword
+                  - kind: Identifier
                     text: Base
                   - kind: DollarSign
                     text: $

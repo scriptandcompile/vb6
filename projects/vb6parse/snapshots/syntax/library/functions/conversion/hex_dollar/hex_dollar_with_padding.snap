@@ -1,6 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/functions/conversion/hex_dollar.rs
-assertion_line: 611
+source: projects/vb6parse/src/syntax/library/functions/conversion/hex_dollar.rs
 expression: tree
 ---
 root:
@@ -34,18 +33,18 @@ root:
               text: ","
             - kind: Whitespace
               text: " "
-        - kind: WidthKeyword
-          text: width
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: IntegerKeyword
-          text: Integer
-        - kind: RightParenthesis
-          text: )
+            - kind: Identifier
+              text: width
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IntegerKeyword
+              text: Integer
+            - kind: RightParenthesis
+              text: )
         - kind: Whitespace
           text: " "
         - kind: AsKeyword

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/statements/declarations/arrays.rs
+source: projects/vb6parse/src/syntax/statements/declarations/arrays.rs
 expression: tree
 ---
 root:
@@ -41,8 +41,10 @@ root:
                   text: fileNameArray
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: rdIconMaximum
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: rdIconMaximum
                 - kind: RightParenthesis
                   text: )
                 - kind: Whitespace
@@ -71,8 +73,10 @@ root:
                   text: dictionaryLocationArray
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: rdIconMaximum
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: rdIconMaximum
                 - kind: RightParenthesis
                   text: )
                 - kind: Whitespace
@@ -101,8 +105,10 @@ root:
                   text: namesListArray
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: rdIconMaximum
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: rdIconMaximum
                 - kind: RightParenthesis
                   text: )
                 - kind: Whitespace

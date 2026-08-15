@@ -394,8 +394,10 @@ cst:
                     text: PriveSpace
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MaxSpace
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MaxSpace
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -586,8 +588,10 @@ cst:
                     text: PriveSpace
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MaxSpace
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MaxSpace
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -818,8 +822,10 @@ cst:
                     text: Hash
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: hashlen
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: hashlen
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -1058,8 +1064,10 @@ cst:
                             text: PriveSpace
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: MaxSpace
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: MaxSpace
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace

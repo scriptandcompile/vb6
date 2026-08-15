@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -64,8 +64,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: 183&
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: 183&
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -86,8 +88,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1F0001"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1F0001"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -334,8 +338,8 @@ cst:
             children:
               - kind: LeftParenthesis
                 text: (
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: RightParenthesis
@@ -826,8 +830,8 @@ cst:
             children:
               - kind: LeftParenthesis
                 text: (
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: RightParenthesis

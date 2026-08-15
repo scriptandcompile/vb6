@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/bitrate_calculator.rs
+source: projects/vb6parse/tests/module/bitrate_calculator.rs
 expression: module
 ---
 name: modGlobal
@@ -161,8 +161,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8388608"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8388608"
           - kind: Whitespace
             text: "    "
           - kind: EndOfLineComment

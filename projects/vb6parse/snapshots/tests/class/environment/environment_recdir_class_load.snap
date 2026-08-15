@@ -78,8 +78,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "260"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "260"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -108,24 +110,34 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "260"
-          - kind: Whitespace
-            text: " "
-          - kind: MultiplicationOperator
-            text: "*"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "2"
-          - kind: Whitespace
-            text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: Whitespace
-            text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: BinaryExpression
+            children:
+              - kind: BinaryExpression
+                children:
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "260"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: MultiplicationOperator
+                    text: "*"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "2"
+              - kind: Whitespace
+                text: " "
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: Whitespace
+                text: " "
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -26100,8 +26112,8 @@ cst:
                 text: ByVal
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: RightParenthesis

@@ -190,8 +190,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SingleLiteral
-            text: "3.14159265358979"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: SingleLiteral
+                text: "3.14159265358979"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -212,8 +214,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SingleLiteral
-            text: "1.5707963267949"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: SingleLiteral
+                text: "1.5707963267949"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -234,8 +238,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SingleLiteral
-            text: "1.74532925199433E-02"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: SingleLiteral
+                text: "1.74532925199433E-02"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -264,8 +270,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Whitespace
             text: "               "
           - kind: EndOfLineComment
@@ -298,10 +306,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "1"
           - kind: Whitespace
             text: "              "
           - kind: EndOfLineComment
@@ -334,8 +346,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Whitespace
             text: "               "
           - kind: EndOfLineComment
@@ -368,10 +382,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "2"
           - kind: Whitespace
             text: "              "
           - kind: EndOfLineComment
@@ -404,8 +422,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "3"
           - kind: Whitespace
             text: "               "
           - kind: EndOfLineComment
@@ -438,10 +458,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "3"
           - kind: Whitespace
             text: "           "
           - kind: EndOfLineComment

@@ -1076,8 +1076,10 @@ cst:
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: LongLiteral
-                    text: "&H1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -1164,8 +1166,10 @@ cst:
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: LongLiteral
-                    text: "&H20"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H20"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -1236,8 +1240,10 @@ cst:
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: LongLiteral
-                    text: "&H200"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H200"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -1308,8 +1314,10 @@ cst:
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: LongLiteral
-                    text: "&H2000"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H2000"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -1380,8 +1388,10 @@ cst:
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: LongLiteral
-                    text: "&H20000"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H20000"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -1452,8 +1462,10 @@ cst:
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: LongLiteral
-                    text: "&H200000"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: LongLiteral
+                        text: "&H200000"
                   - kind: Newline
                     text: "\r\n"
           - kind: CompilerEndIfClause
@@ -1776,8 +1788,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "16384"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "16384"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1806,8 +1820,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "262144"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "262144"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1836,8 +1852,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1024"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1024"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1866,8 +1884,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "260"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "260"
           - kind: Newline
             text: "\r\n"
       - kind: Newline

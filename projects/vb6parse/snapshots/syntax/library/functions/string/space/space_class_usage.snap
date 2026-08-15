@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/functions/string/space.rs
+source: projects/vb6parse/src/syntax/library/functions/string/space.rs
 expression: tree
 ---
 root:
@@ -55,18 +55,18 @@ root:
               text: ","
             - kind: Whitespace
               text: " "
-        - kind: WidthKeyword
-          text: width
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: IntegerKeyword
-          text: Integer
-        - kind: RightParenthesis
-          text: )
+            - kind: Identifier
+              text: width
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IntegerKeyword
+              text: Integer
+            - kind: RightParenthesis
+              text: )
         - kind: Whitespace
           text: " "
         - kind: AsKeyword

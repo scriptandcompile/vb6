@@ -97,8 +97,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "260"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "260"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -119,8 +121,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -141,8 +145,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "132"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "132"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -163,8 +169,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -185,8 +193,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "50"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "50"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -207,8 +217,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "87"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "87"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -229,8 +241,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "111"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "111"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -251,8 +265,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "232"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "232"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -1619,16 +1635,22 @@ cst:
                                 text: APIAdapterInfoBuffer
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: pOutBufLen
-                              - kind: Whitespace
-                                text: " "
-                              - kind: SubtractionOperator
-                                text: "-"
-                              - kind: Whitespace
-                                text: " "
-                              - kind: IntegerLiteral
-                                text: "1"
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: pOutBufLen
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: SubtractionOperator
+                                    text: "-"
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "1"
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
@@ -1851,8 +1873,10 @@ cst:
                                                     text: AdaptersInfo
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: Identifier
-                                                    text: lngAdapterCount
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: lngAdapterCount
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Newline

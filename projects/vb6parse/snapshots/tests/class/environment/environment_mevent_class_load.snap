@@ -2168,8 +2168,10 @@ cst:
                     text: PriveSpace
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MaxSpace
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MaxSpace
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -2380,8 +2382,10 @@ cst:
                     text: PriveSpace
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: MaxSpace
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MaxSpace
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -2856,8 +2860,8 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -2976,8 +2980,8 @@ cst:
                 text: ","
               - kind: Whitespace
                 text: " "
-          - kind: NameKeyword
-            text: Name
+              - kind: Identifier
+                text: Name
           - kind: DollarSign
             text: $
           - kind: Comma
@@ -3232,8 +3236,10 @@ cst:
                     text: Hash
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: hashlen
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: hashlen
                   - kind: RightParenthesis
                     text: )
                   - kind: Whitespace
@@ -3852,8 +3858,10 @@ cst:
                                     text: PriveSpace
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: MaxSpace
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: MaxSpace
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -3882,24 +3890,34 @@ cst:
                                     text: Hash
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: MaxSpace
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: MultiplicationOperator
-                                    text: "*"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "2"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: AdditionOperator
-                                    text: +
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "3"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: MaxSpace
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: MultiplicationOperator
+                                            text: "*"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "2"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AdditionOperator
+                                        text: +
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "3"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -4304,8 +4322,10 @@ cst:
                                         text: PriveSpace
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: MaxSpace
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MaxSpace
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Whitespace
@@ -4374,8 +4394,10 @@ cst:
                                         text: Hash
                                       - kind: LeftParenthesis
                                         text: (
-                                      - kind: Identifier
-                                        text: hashlen
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: hashlen
                                       - kind: RightParenthesis
                                         text: )
                                       - kind: Newline
@@ -4712,8 +4734,10 @@ cst:
                             text: PriveSpace
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: MaxSpace
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: MaxSpace
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -5804,24 +5828,34 @@ cst:
                                             text: Hash
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: MaxSpace
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: MultiplicationOperator
-                                            text: "*"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IntegerLiteral
-                                            text: "2"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: AdditionOperator
-                                            text: +
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IntegerLiteral
-                                            text: "3"
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: MaxSpace
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: MultiplicationOperator
+                                                    text: "*"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "2"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: AdditionOperator
+                                                text: +
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "3"
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline

@@ -48,9 +48,11 @@ impl Parser<'_> {
                 self.consume_whitespace();
             }
 
-            // Variable name
+            // Variable name (keywords can be used as variable names in VB6, e.g. `Name`)
             if self.at_token(Token::Identifier) {
                 self.consume_token();
+            } else if self.at_keyword() {
+                self.consume_token_as_identifier();
             } else {
                 // Error recovery
                 break;
@@ -128,6 +130,54 @@ End Sub
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn parameter_list_keyword_name() {
+        // Regression: keywords are valid parameter names in VB6 (e.g., `Name`),
+        // and must be kept inside the ParameterList node.
+        let source = r"
+Sub Test(Name As String, Type As Integer)
+End Sub
+";
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
+        let cst = cst_opt.expect("CST should be parsed");
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../snapshots/parsers/cst/parameters");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn parameter_list_keyword_name_as_identifier_token() {
+        // The keyword-used-as-name must be emitted as an Identifier token so
+        // downstream consumers can treat it as a real parameter.
+        let source = r"
+Sub Test(Name As String)
+End Sub
+";
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
+        let cst = cst_opt.expect("CST should be parsed");
+
+        let parameter_list = cst
+            .find(SyntaxKind::ParameterList)
+            .expect("ParameterList should be parsed");
+        let identifier_tokens: Vec<_> = parameter_list
+            .children()
+            .iter()
+            .filter(|child| child.kind() == SyntaxKind::Identifier)
+            .map(|child| child.text().to_string())
+            .collect();
+        assert_eq!(
+            identifier_tokens,
+            vec!["Name"],
+            "keyword param name should be an Identifier token"
+        );
     }
 
     #[test]

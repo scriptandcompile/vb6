@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/module/cdiu_beat_up_editor.rs
 expression: module
 ---
 name: cma3
@@ -411,8 +411,10 @@ cst:
                             text: TData
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: Number
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Number
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -625,14 +627,18 @@ cst:
                                     text: KData
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "20"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "20"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: YNumber
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: YNumber
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -3357,36 +3363,58 @@ cst:
                                                     text: GData
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: Identifier
-                                                    text: CLng
-                                                  - kind: LeftParenthesis
-                                                    text: (
-                                                  - kind: Identifier
-                                                    text: chkr
-                                                  - kind: LeftParenthesis
-                                                    text: (
-                                                  - kind: Identifier
-                                                    text: i
-                                                  - kind: RightParenthesis
-                                                    text: )
-                                                  - kind: RightParenthesis
-                                                    text: )
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: MultiplicationOperator
-                                                    text: "*"
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IntegerLiteral
-                                                    text: "8"
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: AdditionOperator
-                                                    text: +
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IntegerLiteral
-                                                    text: "7"
+                                                  - kind: BinaryExpression
+                                                    children:
+                                                      - kind: BinaryExpression
+                                                        children:
+                                                          - kind: CallExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: CLng
+                                                              - kind: LeftParenthesis
+                                                                text: (
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: CallExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: chkr
+                                                                          - kind: LeftParenthesis
+                                                                            text: (
+                                                                          - kind: ArgumentList
+                                                                            children:
+                                                                              - kind: Argument
+                                                                                children:
+                                                                                  - kind: IdentifierExpression
+                                                                                    children:
+                                                                                      - kind: Identifier
+                                                                                        text: i
+                                                                          - kind: RightParenthesis
+                                                                            text: )
+                                                              - kind: RightParenthesis
+                                                                text: )
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: MultiplicationOperator
+                                                            text: "*"
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "8"
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: AdditionOperator
+                                                        text: +
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "7"
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Newline
@@ -3779,8 +3807,10 @@ cst:
                             text: TData
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: Number
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Number
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -4957,14 +4987,18 @@ cst:
                                     text: LData
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "20"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "20"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: YNumber
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: YNumber
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -5975,14 +6009,18 @@ cst:
                                                 text: LData
                                               - kind: LeftParenthesis
                                                 text: (
-                                              - kind: IntegerLiteral
-                                                text: "20"
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "20"
                                               - kind: Comma
                                                 text: ","
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: YNumber
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: YNumber
                                               - kind: RightParenthesis
                                                 text: )
                                               - kind: Newline
@@ -7457,8 +7495,10 @@ cst:
                     text: GData
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -7609,42 +7649,68 @@ cst:
                                     text: GData
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: CLng
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: Identifier
-                                    text: KData
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: IntegerLiteral
-                                    text: "4"
-                                  - kind: Comma
-                                    text: ","
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: i
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: MultiplicationOperator
-                                    text: "*"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "8"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: AdditionOperator
-                                    text: +
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "5"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: CallExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: CLng
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: CallExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: KData
+                                                          - kind: LeftParenthesis
+                                                            text: (
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: NumericLiteralExpression
+                                                                    children:
+                                                                      - kind: IntegerLiteral
+                                                                        text: "4"
+                                                              - kind: Comma
+                                                                text: ","
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: i
+                                                          - kind: RightParenthesis
+                                                            text: )
+                                              - kind: RightParenthesis
+                                                text: )
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: MultiplicationOperator
+                                            text: "*"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "8"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AdditionOperator
+                                        text: +
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "5"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -8433,42 +8499,68 @@ cst:
                                     text: GData
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: CLng
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: Identifier
-                                    text: KData
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: IntegerLiteral
-                                    text: "4"
-                                  - kind: Comma
-                                    text: ","
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: i
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: MultiplicationOperator
-                                    text: "*"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "8"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: AdditionOperator
-                                    text: +
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "6"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: CallExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: CLng
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: CallExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: KData
+                                                          - kind: LeftParenthesis
+                                                            text: (
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: NumericLiteralExpression
+                                                                    children:
+                                                                      - kind: IntegerLiteral
+                                                                        text: "4"
+                                                              - kind: Comma
+                                                                text: ","
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: i
+                                                          - kind: RightParenthesis
+                                                            text: )
+                                              - kind: RightParenthesis
+                                                text: )
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: MultiplicationOperator
+                                            text: "*"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "8"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AdditionOperator
+                                        text: +
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "6"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -8669,42 +8761,68 @@ cst:
                                     text: GData
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: CLng
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: Identifier
-                                    text: KData
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: IntegerLiteral
-                                    text: "4"
-                                  - kind: Comma
-                                    text: ","
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: i
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: MultiplicationOperator
-                                    text: "*"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "8"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: AdditionOperator
-                                    text: +
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "7"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: CallExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: CLng
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: CallExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: KData
+                                                          - kind: LeftParenthesis
+                                                            text: (
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: NumericLiteralExpression
+                                                                    children:
+                                                                      - kind: IntegerLiteral
+                                                                        text: "4"
+                                                              - kind: Comma
+                                                                text: ","
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: i
+                                                          - kind: RightParenthesis
+                                                            text: )
+                                              - kind: RightParenthesis
+                                                text: )
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: MultiplicationOperator
+                                            text: "*"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "8"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AdditionOperator
+                                        text: +
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "7"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -9481,16 +9599,22 @@ cst:
                                     text: TName
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: i
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: SubtractionOperator
-                                    text: "-"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: i
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: SubtractionOperator
+                                        text: "-"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Newline
@@ -12365,14 +12489,22 @@ cst:
                                 text: Data1
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: UBound
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: Identifier
-                                text: Slk4
-                              - kind: RightParenthesis
-                                text: )
+                              - kind: CallExpression
+                                children:
+                                  - kind: Identifier
+                                    text: UBound
+                                  - kind: LeftParenthesis
+                                    text: (
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Slk4
+                                  - kind: RightParenthesis
+                                    text: )
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
@@ -12389,14 +12521,22 @@ cst:
                                 text: Data2
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: UBound
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: Identifier
-                                text: Slk3
-                              - kind: RightParenthesis
-                                text: )
+                              - kind: CallExpression
+                                children:
+                                  - kind: Identifier
+                                    text: UBound
+                                  - kind: LeftParenthesis
+                                    text: (
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Slk3
+                                  - kind: RightParenthesis
+                                    text: )
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
@@ -12677,14 +12817,22 @@ cst:
                                 text: Data1
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: UBound
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: Identifier
-                                text: Slk1
-                              - kind: RightParenthesis
-                                text: )
+                              - kind: CallExpression
+                                children:
+                                  - kind: Identifier
+                                    text: UBound
+                                  - kind: LeftParenthesis
+                                    text: (
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Slk1
+                                  - kind: RightParenthesis
+                                    text: )
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
@@ -12701,14 +12849,22 @@ cst:
                                 text: Data2
                               - kind: LeftParenthesis
                                 text: (
-                              - kind: Identifier
-                                text: UBound
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: Identifier
-                                text: Slk2
-                              - kind: RightParenthesis
-                                text: )
+                              - kind: CallExpression
+                                children:
+                                  - kind: Identifier
+                                    text: UBound
+                                  - kind: LeftParenthesis
+                                    text: (
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Slk2
+                                  - kind: RightParenthesis
+                                    text: )
                               - kind: RightParenthesis
                                 text: )
                               - kind: Newline
@@ -15449,24 +15605,34 @@ cst:
                     text: GData
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: LenTPData
-                  - kind: Whitespace
-                    text: " "
-                  - kind: DivisionOperator
-                    text: /
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "7"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: MultiplicationOperator
-                    text: "*"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "8"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: LenTPData
+                          - kind: Whitespace
+                            text: " "
+                          - kind: DivisionOperator
+                            text: /
+                          - kind: Whitespace
+                            text: " "
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "7"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: MultiplicationOperator
+                        text: "*"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "8"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -15483,8 +15649,10 @@ cst:
                     text: KData
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: LenTPData
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: LenTPData
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -16809,16 +16977,22 @@ cst:
                     text: KData
                   - kind: LeftParenthesis
                     text: (
-                  - kind: Identifier
-                    text: TotalBeat
-                  - kind: Whitespace
-                    text: " "
-                  - kind: MultiplicationOperator
-                    text: "*"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "7"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: TotalBeat
+                      - kind: Whitespace
+                        text: " "
+                      - kind: MultiplicationOperator
+                        text: "*"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "7"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -22727,22 +22901,34 @@ cst:
                             text: SongFile
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: FileLen
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: SongPath
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: CallExpression
+                                children:
+                                  - kind: Identifier
+                                    text: FileLen
+                                  - kind: LeftParenthesis
+                                    text: (
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: SongPath
+                                  - kind: RightParenthesis
+                                    text: )
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -25545,8 +25731,10 @@ cst:
                                             text: GData
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: LenTPData
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: LenTPData
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -25865,8 +26053,10 @@ cst:
                                             text: SData
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: LenTPData
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: LenTPData
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -26145,8 +26335,10 @@ cst:
                                             text: MData
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: LenTPData
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: LenTPData
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline

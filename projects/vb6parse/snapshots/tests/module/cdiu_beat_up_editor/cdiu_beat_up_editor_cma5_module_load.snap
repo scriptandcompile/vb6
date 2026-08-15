@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/module/cdiu_beat_up_editor.rs
 expression: module
 ---
 name: cma5
@@ -641,8 +641,10 @@ cst:
                     text: SaveSelect
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -1343,8 +1345,10 @@ cst:
                     text: SaveSelect
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -3339,7 +3343,7 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: BaseKeyword
+                  - kind: Identifier
                     text: Base
                   - kind: Whitespace
                     text: " "
@@ -3723,8 +3727,10 @@ cst:
                             text: SaveSelect
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -3989,8 +3995,10 @@ cst:
                     text: SaveSelect
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -4611,8 +4619,10 @@ cst:
                     text: SaveSelect
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -5007,8 +5017,10 @@ cst:
                             text: DataC
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -5187,22 +5199,34 @@ cst:
                                             text: DataC
                                           - kind: LeftParenthesis
                                             text: (
-                                          - kind: Identifier
-                                            text: UBound
-                                          - kind: LeftParenthesis
-                                            text: (
-                                          - kind: Identifier
-                                            text: DataC
-                                          - kind: RightParenthesis
-                                            text: )
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: AdditionOperator
-                                            text: +
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: IntegerLiteral
-                                            text: "1"
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: UBound
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: DataC
+                                                  - kind: RightParenthesis
+                                                    text: )
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: AdditionOperator
+                                                text: +
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: NumericLiteralExpression
+                                                children:
+                                                  - kind: IntegerLiteral
+                                                    text: "1"
                                           - kind: RightParenthesis
                                             text: )
                                           - kind: Newline
@@ -5805,8 +5829,10 @@ cst:
                     text: SaveSelect
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -16953,8 +16979,10 @@ cst:
                             text: TData
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: Number
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Number
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline
@@ -19933,8 +19961,10 @@ cst:
                     text: SaveSelect
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -20279,8 +20309,10 @@ cst:
                     text: SaveSelect
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -20703,8 +20735,10 @@ cst:
                     text: SaveSelect
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -21687,8 +21721,10 @@ cst:
                     text: SaveSelect
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -22963,8 +22999,10 @@ cst:
                     text: SaveSelect
                   - kind: LeftParenthesis
                     text: (
-                  - kind: IntegerLiteral
-                    text: "0"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "0"
                   - kind: RightParenthesis
                     text: )
                   - kind: Newline
@@ -23133,7 +23171,7 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: NameKeyword
+                  - kind: Identifier
                     text: Name
                   - kind: Whitespace
                     text: " "
@@ -25233,7 +25271,7 @@ cst:
                     text: Dim
                   - kind: Whitespace
                     text: " "
-                  - kind: NameKeyword
+                  - kind: Identifier
                     text: Name
                   - kind: Whitespace
                     text: " "
@@ -26367,8 +26405,10 @@ cst:
                             text: FastTeam
                           - kind: LeftParenthesis
                             text: (
-                          - kind: Identifier
-                            text: Tmp
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
                           - kind: RightParenthesis
                             text: )
                           - kind: Newline

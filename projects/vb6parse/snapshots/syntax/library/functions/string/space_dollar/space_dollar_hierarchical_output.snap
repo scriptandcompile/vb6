@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/functions/string/space_dollar.rs
+source: projects/vb6parse/src/syntax/library/functions/string/space_dollar.rs
 expression: tree
 ---
 root:
@@ -19,32 +19,32 @@ root:
           children:
             - kind: LeftParenthesis
               text: (
-        - kind: TextKeyword
-          text: text
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: StringKeyword
-          text: String
-        - kind: Comma
-          text: ","
-        - kind: Whitespace
-          text: " "
-        - kind: Identifier
-          text: level
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: IntegerKeyword
-          text: Integer
-        - kind: RightParenthesis
-          text: )
+            - kind: Identifier
+              text: text
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: StringKeyword
+              text: String
+            - kind: Comma
+              text: ","
+            - kind: Whitespace
+              text: " "
+            - kind: Identifier
+              text: level
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IntegerKeyword
+              text: Integer
+            - kind: RightParenthesis
+              text: )
         - kind: Newline
           text: "\n"
         - kind: StatementList

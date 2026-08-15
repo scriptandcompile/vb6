@@ -133,8 +133,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"cTlsSocket\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"cTlsSocket\""
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -883,8 +885,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -913,8 +917,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H10"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H10"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -943,8 +949,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&HF0000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&HF0000000"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -977,8 +985,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1007,8 +1017,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H10000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H10000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1037,8 +1049,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "25"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "25"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1067,8 +1081,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "27"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "27"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1097,8 +1113,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "34"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "34"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1127,8 +1145,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "43"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "43"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1157,8 +1177,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "44"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "44"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1187,8 +1209,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "45"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "45"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1217,8 +1241,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "73"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "73"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1247,8 +1273,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "82"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "82"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1277,8 +1305,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "83"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "83"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1307,8 +1337,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1337,8 +1369,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H4"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1367,8 +1401,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H8000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H8000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1397,8 +1433,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "7"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "7"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1431,8 +1469,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1461,8 +1501,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H4000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H4000000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1491,8 +1533,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H80090008"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H80090008"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1525,8 +1569,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1555,8 +1601,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1589,8 +1637,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1619,8 +1669,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H8000&"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H8000&"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1653,8 +1705,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "7"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "7"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1687,8 +1741,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1717,8 +1773,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H10000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H10000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1747,8 +1805,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H20000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H20000"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1781,8 +1841,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H80"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H80"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1811,8 +1873,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H400"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H400"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1845,8 +1909,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H80000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H80000000"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1879,8 +1945,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -1913,8 +1981,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1943,8 +2013,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "10"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "10"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -1973,8 +2045,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2003,8 +2077,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H10000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H10000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2033,8 +2109,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H20000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H20000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2063,8 +2141,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H40000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H40000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2093,8 +2173,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H50000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H50000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2123,8 +2205,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H60000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H60000"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -2157,8 +2241,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "2"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -2191,8 +2277,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H20000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H20000000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2221,8 +2309,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2251,8 +2341,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2281,8 +2373,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H4"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2311,8 +2405,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H8"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2341,8 +2437,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H20"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H20"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2371,8 +2469,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H40"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H40"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2401,8 +2501,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H10000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H10000"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -2435,8 +2537,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "0"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "0"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2465,8 +2569,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&HD0000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&HD0000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2495,8 +2601,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H30004"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H30004"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2525,8 +2633,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H80007"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H80007"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2555,8 +2665,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H140000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H140000"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -2589,8 +2701,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "3"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "3"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -2623,8 +2737,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -2657,8 +2773,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "70"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "70"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2687,8 +2805,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H80000000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H80000000"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -2721,8 +2841,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"1.2.840.113549.1.1.1\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"1.2.840.113549.1.1.1\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2751,8 +2873,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"1.2.840.10045.3.1.7\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"1.2.840.10045.3.1.7\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2781,8 +2905,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"1.3.132.0.34\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"1.3.132.0.34\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2811,8 +2937,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"1.3.132.0.35\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"1.3.132.0.35\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2841,8 +2969,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"1.2.840.113549.1.12.1.3\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"1.2.840.113549.1.12.1.3\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2871,8 +3001,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"2.5.29.17\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"2.5.29.17\""
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -2905,8 +3037,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H32415352"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H32415352"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2935,8 +3069,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H324B4345"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H324B4345"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2965,8 +3101,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H344B4345"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H344B4345"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -2995,8 +3133,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H364B4345"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H364B4345"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -3029,8 +3169,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "41"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "41"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3059,8 +3201,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "42"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "42"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3089,8 +3233,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "45"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "45"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3119,8 +3265,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "46"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "46"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -3153,8 +3301,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H1"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H1"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3183,8 +3333,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H2"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H2"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -3217,8 +3369,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "10057"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "10057"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3247,8 +3401,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H800705B4"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H800705B4"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -3277,10 +3433,14 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: SubtractionOperator
-            text: "-"
-          - kind: IntegerLiteral
-            text: "1"
+          - kind: UnaryExpression
+            children:
+              - kind: SubtractionOperator
+                text: "-"
+              - kind: NumericLiteralExpression
+                children:
+                  - kind: IntegerLiteral
+                    text: "1"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -8869,8 +9029,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "8"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "8"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -10857,8 +11019,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "16"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "16"
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -11293,8 +11457,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"\u0001\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"\u0001\""
           - kind: Whitespace
             text: " "
           - kind: EndOfLineComment
@@ -11327,8 +11493,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: IntegerLiteral
-            text: "5000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: IntegerLiteral
+                text: "5000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11357,8 +11525,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&H80070000"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&H80070000"
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11387,8 +11557,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: LongLiteral
-            text: "&HC000003E"
+          - kind: NumericLiteralExpression
+            children:
+              - kind: LongLiteral
+                text: "&HC000003E"
           - kind: Newline
             text: "\r\n"
       - kind: EndOfLineComment
@@ -11421,8 +11593,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"No certificate subject name matches target host name\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"No certificate subject name matches target host name\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11451,8 +11625,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"No certificate is available\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"No certificate is available\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11481,8 +11657,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Trust for this certificate or one of the certificates in the certificate chain has been revoked\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Trust for this certificate or one of the certificates in the certificate chain has been revoked\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11511,8 +11689,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"The certificate or one of the certificates in the certificate chain does not have a valid signature\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"The certificate or one of the certificates in the certificate chain does not have a valid signature\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11541,8 +11721,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"The certificate chain is not complete\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"The certificate chain is not complete\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11571,8 +11753,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"The certificate or certificate chain is based on an untrusted root\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"The certificate or certificate chain is based on an untrusted root\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11601,8 +11785,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"The certificate has expired\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"The certificate has expired\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11631,8 +11817,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"The revocation status of the certificate or one of the certificates in the certificate chain is unknown\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"The revocation status of the certificate or one of the certificates in the certificate chain is unknown\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11661,8 +11849,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Unknown CNG private key magic (%1)\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Unknown CNG private key magic (%1)\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11691,8 +11881,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Unknown CAPI private key magic (%1)\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Unknown CAPI private key magic (%1)\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11721,8 +11913,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Unknown CertGetCertificateChain error mask (%1)\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Unknown CertGetCertificateChain error mask (%1)\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11751,8 +11945,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Unknown %1 OID (%2)\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Unknown %1 OID (%2)\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11781,8 +11977,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Incorrect password\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Incorrect password\""
           - kind: Newline
             text: "\r\n"
       - kind: DimStatement
@@ -11811,8 +12009,10 @@ cst:
             text: "="
           - kind: Whitespace
             text: " "
-          - kind: StringLiteral
-            text: "\"Server-side TLS not compiled (ASYNCSOCKET_NO_TLSSERVER = 1)\""
+          - kind: StringLiteralExpression
+            children:
+              - kind: StringLiteral
+                text: "\"Server-side TLS not compiled (ASYNCSOCKET_NO_TLSSERVER = 1)\""
           - kind: Newline
             text: "\r\n"
       - kind: Newline
@@ -22083,106 +22283,108 @@ cst:
                 text: "\r\n"
               - kind: Whitespace
                 text: "            "
-          - kind: TextKeyword
-            text: Text
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "            "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: HostAddress
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: StringKeyword
-            text: String
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "            "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: HostPort
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: LongKeyword
-            text: Long
-          - kind: Comma
-            text: ","
-          - kind: Whitespace
-            text: " "
-          - kind: Underscore
-            text: _
-          - kind: Newline
-            text: "\r\n"
-          - kind: Whitespace
-            text: "            "
-          - kind: OptionalKeyword
-            text: Optional
-          - kind: Whitespace
-            text: " "
-          - kind: ByValKeyword
-            text: ByVal
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: CodePage
-          - kind: Whitespace
-            text: " "
-          - kind: AsKeyword
-            text: As
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: UcsAsyncSocketCodePageEnum
-          - kind: Whitespace
-            text: " "
-          - kind: EqualityOperator
-            text: "="
-          - kind: Whitespace
-            text: " "
-          - kind: Identifier
-            text: ucsScpUtf8
-          - kind: RightParenthesis
-            text: )
+              - kind: Identifier
+                text: Text
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: HostAddress
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: StringKeyword
+                text: String
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: HostPort
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: LongKeyword
+                text: Long
+              - kind: Comma
+                text: ","
+              - kind: Whitespace
+                text: " "
+              - kind: Underscore
+                text: _
+              - kind: Newline
+                text: "\r\n"
+              - kind: Whitespace
+                text: "            "
+              - kind: OptionalKeyword
+                text: Optional
+              - kind: Whitespace
+                text: " "
+              - kind: ByValKeyword
+                text: ByVal
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: CodePage
+              - kind: Whitespace
+                text: " "
+              - kind: AsKeyword
+                text: As
+              - kind: Whitespace
+                text: " "
+              - kind: Identifier
+                text: UcsAsyncSocketCodePageEnum
+              - kind: Whitespace
+                text: " "
+              - kind: EqualityOperator
+                text: "="
+              - kind: Whitespace
+                text: " "
+              - kind: IdentifierExpression
+                children:
+                  - kind: Identifier
+                    text: ucsScpUtf8
+              - kind: RightParenthesis
+                text: )
           - kind: Whitespace
             text: " "
           - kind: AsKeyword
@@ -27229,82 +27431,84 @@ cst:
                         text: "\r\n"
                       - kind: Whitespace
                         text: "            "
-                  - kind: TextKeyword
-                    text: Text
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringKeyword
-                    text: String
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Underscore
-                    text: _
-                  - kind: Newline
-                    text: "\r\n"
-                  - kind: Whitespace
-                    text: "            "
-                  - kind: OptionalKeyword
-                    text: Optional
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ByValKeyword
-                    text: ByVal
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: Timeout
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: LongKeyword
-                    text: Long
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Underscore
-                    text: _
-                  - kind: Newline
-                    text: "\r\n"
-                  - kind: Whitespace
-                    text: "            "
-                  - kind: OptionalKeyword
-                    text: Optional
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ByValKeyword
-                    text: ByVal
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: CodePage
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: UcsAsyncSocketCodePageEnum
-                  - kind: Whitespace
-                    text: " "
-                  - kind: EqualityOperator
-                    text: "="
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: ucsScpUtf8
-                  - kind: RightParenthesis
-                    text: )
+                      - kind: Identifier
+                        text: Text
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: StringKeyword
+                        text: String
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Underscore
+                        text: _
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "            "
+                      - kind: OptionalKeyword
+                        text: Optional
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ByValKeyword
+                        text: ByVal
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: Timeout
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: LongKeyword
+                        text: Long
+                      - kind: Comma
+                        text: ","
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Underscore
+                        text: _
+                      - kind: Newline
+                        text: "\r\n"
+                      - kind: Whitespace
+                        text: "            "
+                      - kind: OptionalKeyword
+                        text: Optional
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ByValKeyword
+                        text: ByVal
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: CodePage
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: UcsAsyncSocketCodePageEnum
+                      - kind: Whitespace
+                        text: " "
+                      - kind: EqualityOperator
+                        text: "="
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: ucsScpUtf8
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Whitespace
                     text: " "
                   - kind: AsKeyword
@@ -63059,30 +63263,44 @@ cst:
                                     text: vRetVal
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: IntegerLiteral
-                                    text: "0"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "0"
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ToKeyword
                                     text: To
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: UBound
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: Identifier
-                                    text: vRetVal
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: AdditionOperator
-                                    text: +
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: UBound
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: vRetVal
+                                          - kind: RightParenthesis
+                                            text: )
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AdditionOperator
+                                        text: +
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: NumericLiteralExpression
+                                        children:
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -84173,28 +84391,36 @@ cst:
                             text: uCertRdn
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: uNameInfo
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: cbData
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: uNameInfo
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: cbData
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -87107,28 +87333,36 @@ cst:
                                                         text: uDers
                                                       - kind: LeftParenthesis
                                                         text: (
-                                                      - kind: IntegerLiteral
-                                                        text: "0"
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "0"
                                                       - kind: Whitespace
                                                         text: " "
                                                       - kind: ToKeyword
                                                         text: To
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Identifier
-                                                        text: uBlob
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: cbData
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: SubtractionOperator
-                                                        text: "-"
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: IntegerLiteral
-                                                        text: "1"
+                                                      - kind: BinaryExpression
+                                                        children:
+                                                          - kind: MemberAccessExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: uBlob
+                                                              - kind: PeriodOperator
+                                                                text: "."
+                                                              - kind: Identifier
+                                                                text: cbData
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: SubtractionOperator
+                                                            text: "-"
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "1"
                                                       - kind: RightParenthesis
                                                         text: )
                                                       - kind: Whitespace
@@ -87943,16 +88177,20 @@ cst:
                                                             text: uDers
                                                           - kind: LeftParenthesis
                                                             text: (
-                                                          - kind: IntegerLiteral
-                                                            text: "0"
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "0"
                                                           - kind: Whitespace
                                                             text: " "
                                                           - kind: ToKeyword
                                                             text: To
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: IntegerLiteral
-                                                            text: "0"
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "0"
                                                           - kind: RightParenthesis
                                                             text: )
                                                           - kind: Whitespace
@@ -90479,24 +90717,32 @@ cst:
                             text: baRetVal
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: lSize
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: lSize
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace
@@ -90743,24 +90989,32 @@ cst:
                             text: baArray
                           - kind: LeftParenthesis
                             text: (
-                          - kind: IntegerLiteral
-                            text: "0"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
                           - kind: Whitespace
                             text: " "
                           - kind: ToKeyword
                             text: To
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: lSize
-                          - kind: Whitespace
-                            text: " "
-                          - kind: SubtractionOperator
-                            text: "-"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: lSize
+                              - kind: Whitespace
+                                text: " "
+                              - kind: SubtractionOperator
+                                text: "-"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: RightParenthesis
                             text: )
                           - kind: Whitespace

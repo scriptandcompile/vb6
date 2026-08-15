@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/string/lcase_dollar.rs
+source: projects/vb6parse/src/syntax/library/functions/string/lcase_dollar.rs
 expression: tree
 ---
 root:
@@ -19,32 +19,32 @@ root:
           children:
             - kind: LeftParenthesis
               text: (
-        - kind: LineKeyword
-          text: line
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: StringKeyword
-          text: String
-        - kind: Comma
-          text: ","
-        - kind: Whitespace
-          text: " "
-        - kind: Identifier
-          text: key
-        - kind: Whitespace
-          text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: StringKeyword
-          text: String
-        - kind: RightParenthesis
-          text: )
+            - kind: Identifier
+              text: line
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: StringKeyword
+              text: String
+            - kind: Comma
+              text: ","
+            - kind: Whitespace
+              text: " "
+            - kind: Identifier
+              text: key
+            - kind: Whitespace
+              text: " "
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: StringKeyword
+              text: String
+            - kind: RightParenthesis
+              text: )
         - kind: Whitespace
           text: " "
         - kind: AsKeyword
