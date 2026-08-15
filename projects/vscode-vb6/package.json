@@ -13,7 +13,8 @@
   ],
   "activationEvents": [
     "onLanguage:vb6",
-    "onCommand:vb6.updateKeywordManifest"
+    "onCommand:vb6.updateKeywordManifest",
+    "onCommand:vb6.parseFile"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -46,13 +47,35 @@
       {
         "command": "vb6.updateKeywordManifest",
         "title": "VB6: Update Keyword Manifest"
+      },
+      {
+        "command": "vb6.parseFile",
+        "title": "VB6: Parse Current File",
+        "category": "VB6"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "VB6",
+      "properties": {
+        "vb6.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Report VB6 parser diagnostics (errors and recovery events) in the Problems panel."
+        },
+        "vb6.diagnostics.debounceMs": {
+          "type": "number",
+          "default": 300,
+          "description": "Delay in milliseconds after a change before re-parsing the document."
+        }
+      }
+    }
   },
   "scripts": {
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "update-keywords": "node ./scripts/update-keywords.mjs"
+    "compile": "tsc -p ./ && node ./scripts/copy-assets.mjs",
+    "watch": "node ./scripts/copy-assets.mjs && tsc -watch -p ./",
+    "update-keywords": "node ./scripts/update-keywords.mjs",
+    "build-wasm": "node ./scripts/build-wasm.mjs",
+    "check-diagnostics": "node ./scripts/check-diagnostics.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
