@@ -656,10 +656,195 @@
 //!
 //! ## Related Functions
 //!
-//! - `FV`: Returns the future value of an investment
-//! - `Pmt`: Returns the periodic payment for an annuity
-//! - `PPmt`: Returns the principal payment for a specific period
-//! - `IPmt`: Returns the interest payment for a specific period
-//! - `NPer`: Returns the number of periods for an investment
-//! - `Rate`: Returns the interest rate per period
-//! - `NPV`: Returns the net present value with irregular cash flows
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `PV` function.
+///
+/// Calculates the present value of an annuity based on periodic, fixed payments
+/// and a fixed interest rate. The calculation supports both ordinary annuities
+/// (payments at end of period) and annuities due (payments at beginning of period).
+///
+/// VB6 behavior:
+/// - `rate` is the interest rate per period
+/// - `nper` must be positive; if <= 0, raises error 5 (Invalid procedure call)
+/// - `fv` defaults to 0 if omitted
+/// - `type` defaults to 0 (end of period) if omitted; use 1 for beginning of period
+/// - Returns a `Double`
+pub fn pv(
+    rate: &VBVariant,
+    nper: &VBVariant,
+    pmt: &VBVariant,
+    fv: Option<&VBVariant>,
+    type_: Option<&VBVariant>,
+) -> VBResult<VBVariant> {
+    let rate_val = rate.as_f64()?;
+    let nper_val = nper.as_f64()?;
+    let pmt_val = pmt.as_f64()?;
+    let fv_val = fv.map(|f| f.as_f64()).transpose()?.unwrap_or(0.0);
+    let type_val = type_.map(|t| t.as_i16()).transpose()?.unwrap_or(0);
+
+    // Validate inputs per VB6 behavior
+    if nper_val <= 0.0 {
+        return Err(VBError::new(5));
+    }
+
+    let pv_val = if rate_val == 0.0 {
+        // Special case: zero interest rate
+        -(pmt_val * nper_val + fv_val)
+    } else if type_val == 0 {
+        // Payments at end of period (ordinary annuity)
+        let factor = (1.0_f64 + rate_val).powi(nper_val as i32);
+        let pmt_part = pmt_val * (1.0 - 1.0 / factor) / rate_val;
+        let fv_part = -fv_val / factor;
+        pmt_part + fv_part
+    } else {
+        // Payments at beginning of period (annuity due)
+        let factor = (1.0_f64 + rate_val).powi(nper_val as i32);
+        let pmt_part = pmt_val * (1.0 - 1.0 / factor) / rate_val * (1.0 + rate_val);
+        let fv_part = -fv_val / factor;
+        pmt_part + fv_part
+    };
+
+    Ok(VBVariant::from_double(pv_val))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::pv;
+    use crate::value::VBVariant;
+
+    fn pv_defaults(rate: f64, nper: f64, pmt: f64) -> VBVariant {
+        pv(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pmt),
+            None,
+            None,
+        )
+        .unwrap()
+    }
+
+    fn pv_with_fv(rate: f64, nper: f64, pmt: f64, fv: f64) -> VBVariant {
+        pv(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pmt),
+            Some(&VBVariant::from_double(fv)),
+            None,
+        )
+        .unwrap()
+    }
+
+    fn pv_with_type(rate: f64, nper: f64, pmt: f64, fv: f64, ptype: i16) -> VBVariant {
+        pv(
+            &VBVariant::from_double(rate),
+            &VBVariant::from_double(nper),
+            &VBVariant::from_double(pmt),
+            Some(&VBVariant::from_double(fv)),
+            Some(&VBVariant::from_integer(ptype)),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn pv_ordinary_annuity() {
+        // $100/month for 12 months at 6% annual (0.5% monthly), no FV
+        let result = pv_defaults(0.06 / 12.0, 12.0, -100.0);
+        let pv_result = result.as_f64().unwrap();
+        assert!((pv_result - (-1161.893)).abs() < 0.01);
+    }
+
+    #[test]
+    fn pv_with_future_value() {
+        // Present value of -$100/month plus -$1000 FV for 12 months at 0.5% monthly
+        let result = pv_with_fv(0.06 / 12.0, 12.0, -100.0, -1000.0);
+        let pv_result = result.as_f64().unwrap();
+        assert!((pv_result - (-219.988)).abs() < 0.01);
+    }
+
+    #[test]
+    fn pv_annuity_due() {
+        // Payments at beginning of period
+        let result = pv_with_type(0.06 / 12.0, 12.0, -100.0, -1000.0, 1);
+        let pv_result = result.as_f64().unwrap();
+        assert!((pv_result - (-225.797)).abs() < 0.01);
+    }
+
+    #[test]
+    fn pv_zero_rate() {
+        // With zero rate, PV = -(pmt * nper + fv)
+        let result = pv_defaults(0.0, 12.0, -100.0);
+        let pv_result = result.as_f64().unwrap();
+        assert_eq!(pv_result, 1200.0);
+    }
+
+    #[test]
+    fn pv_negative_periods_raises_error_5() {
+        let err = pv(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(-1.0),
+            &VBVariant::from_double(-100.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn pv_zero_periods_raises_error_5() {
+        let err = pv(
+            &VBVariant::from_double(0.05),
+            &VBVariant::from_double(0.0),
+            &VBVariant::from_double(-100.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+    }
+
+    #[test]
+    fn pv_with_integer_args() {
+        let result = pv(
+            &VBVariant::from_double(0.005),
+            &VBVariant::from_long(12),
+            &VBVariant::from_long(-100),
+            None,
+            None,
+        )
+        .unwrap();
+        assert!((result.as_f64().unwrap() - (-1161.893)).abs() < 0.01);
+    }
+
+    #[test]
+    fn pv_null_raises_invalid_use_of_null() {
+        let err = pv(
+            &VBVariant::Null,
+            &VBVariant::from_double(12.0),
+            &VBVariant::from_double(-100.0),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 94);
+    }
+
+    #[test]
+    fn pv_loan_example() {
+        // Loan PV: $20,000 at 6% APR for 5 years (60 payments)
+        // Monthly payment would be ~$386.66
+        let result = pv_defaults(0.06 / 12.0, 60.0, -386.66);
+        let pv_result = result.as_f64().unwrap();
+        assert!((pv_result - (-20000.0)).abs() < 1.0);
+    }
+
+    #[test]
+    fn pv_single_period() {
+        // Single period: PV should be PMT / (1+r)
+        let result = pv_defaults(0.05, 1.0, -100.0);
+        let pv_result = result.as_f64().unwrap();
+        assert!((pv_result - (-95.238)).abs() < 0.01);
+    }
+}
