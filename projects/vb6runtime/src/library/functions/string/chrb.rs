@@ -321,10 +321,7 @@
 //! - Code page dependent for values 128-255.
 //! - Runtime error if charcode is outside valid range.
 
-use crate::{
-    error::VBResult,
-    value::VBVariant,
-};
+use crate::{error::VBResult, value::VBVariant};
 
 use super::chrb_dollar::chrb_dollar;
 

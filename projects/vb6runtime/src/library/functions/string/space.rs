@@ -676,7 +676,10 @@ mod tests {
             space(&VBLong::from(3)).unwrap(),
             VBVariant::from_string("   ")
         );
-        assert_eq!(space(&VBLong::from(1)).unwrap(), VBVariant::from_string(" "));
+        assert_eq!(
+            space(&VBLong::from(1)).unwrap(),
+            VBVariant::from_string(" ")
+        );
     }
 
     #[test]

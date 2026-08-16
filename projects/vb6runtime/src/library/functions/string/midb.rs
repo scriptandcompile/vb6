@@ -49,7 +49,6 @@
 //! result = MidB("Hi", 10)  ' Returns ""
 //! ```
 
-
 use crate::{
     error::VBResult,
     value::{VBLong, VBVariant},
@@ -64,11 +63,7 @@ use super::midb_dollar::midb_dollar;
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `start` is less
 /// than 1 or `length` is negative.
-pub fn midb(
-    input: &VBVariant,
-    start: &VBLong,
-    length: Option<&VBLong>,
-) -> VBResult<VBVariant> {
+pub fn midb(input: &VBVariant, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBVariant> {
     if input.is_null() {
         return Ok(VBVariant::Null);
     }

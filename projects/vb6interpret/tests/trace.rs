@@ -97,7 +97,9 @@ fn for_loop_steps_each_element_then_next() {
 Sub Main()\n    For i = 1 To 3 Step 1\n        Debug.Print i\n    Next i\nEnd Sub\n";
     // The CST (and thus cursor byte offsets) is relative to the module body,
     // with the `Attribute` header stripped.
-    let body = source.strip_prefix("Attribute VB_Name = \"ForModule\"\n").unwrap();
+    let body = source
+        .strip_prefix("Attribute VB_Name = \"ForModule\"\n")
+        .unwrap();
 
     let start_cursor = byte_range(body, "i = 1");
     let step_cursor = byte_range(body, "Step 1");
@@ -135,7 +137,9 @@ Sub Main()\n    For i = 1 To 3 Step 1\n        Debug.Print i\n    Next i\nEnd Su
 fn for_loop_without_step_skips_the_step_highlight() {
     let source = "Attribute VB_Name = \"PlainFor\"\n\n\
 Sub Main()\n    For i = 1 To 2\n        Debug.Print i\n    Next\nEnd Sub\n";
-    let body = source.strip_prefix("Attribute VB_Name = \"PlainFor\"\n").unwrap();
+    let body = source
+        .strip_prefix("Attribute VB_Name = \"PlainFor\"\n")
+        .unwrap();
 
     let start_cursor = byte_range(body, "i = 1");
     let to_cursor = byte_range(body, "To 2");
@@ -194,7 +198,9 @@ Sub Main()\n    i = 0\n    While i < 3\n        i = i + 1\n    Wend\nEnd Sub\n";
 fn do_while_loop_highlights_condition_then_loop() {
     let source = "Attribute VB_Name = \"DoModule\"\n\n\
 Sub Main()\n    i = 0\n    Do While i < 3\n        i = i + 1\n    Loop\nEnd Sub\n";
-    let body = source.strip_prefix("Attribute VB_Name = \"DoModule\"\n").unwrap();
+    let body = source
+        .strip_prefix("Attribute VB_Name = \"DoModule\"\n")
+        .unwrap();
 
     let pre_cursor = byte_range(body, "While i < 3");
     let loop_cursor = byte_range(body, "Loop");

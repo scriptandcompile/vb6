@@ -659,19 +659,34 @@ mod tests {
 
     #[test]
     fn parses_numeric_date() {
-        assert_eq!(parts(dv(&VBVariant::from_string("12/25/2025"))), (2025, 12, 25));
-        assert_eq!(parts(dv(&VBVariant::from_string("1/15/2025"))), (2025, 1, 15));
+        assert_eq!(
+            parts(dv(&VBVariant::from_string("12/25/2025"))),
+            (2025, 12, 25)
+        );
+        assert_eq!(
+            parts(dv(&VBVariant::from_string("1/15/2025"))),
+            (2025, 1, 15)
+        );
     }
 
     #[test]
     fn parses_dash_and_iso_formats() {
-        assert_eq!(parts(dv(&VBVariant::from_string("2025-01-15"))), (2025, 1, 15));
-        assert_eq!(parts(dv(&VBVariant::from_string("1-15-2025"))), (2025, 1, 15));
+        assert_eq!(
+            parts(dv(&VBVariant::from_string("2025-01-15"))),
+            (2025, 1, 15)
+        );
+        assert_eq!(
+            parts(dv(&VBVariant::from_string("1-15-2025"))),
+            (2025, 1, 15)
+        );
     }
 
     #[test]
     fn parses_compact_format() {
-        assert_eq!(parts(dv(&VBVariant::from_string("20250115"))), (2025, 1, 15));
+        assert_eq!(
+            parts(dv(&VBVariant::from_string("20250115"))),
+            (2025, 1, 15)
+        );
     }
 
     #[test]
@@ -739,6 +754,9 @@ mod tests {
     #[test]
     fn boundary_dates_are_valid() {
         assert_eq!(parts(dv(&VBVariant::from_string("1/1/100"))), (100, 1, 1));
-        assert_eq!(parts(dv(&VBVariant::from_string("12/31/9999"))), (9999, 12, 31));
+        assert_eq!(
+            parts(dv(&VBVariant::from_string("12/31/9999"))),
+            (9999, 12, 31)
+        );
     }
 }

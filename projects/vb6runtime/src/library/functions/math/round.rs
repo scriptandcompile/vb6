@@ -744,7 +744,10 @@ fn round_half_even(scaled: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::round;
-    use crate::{error::err_number, value::{VBLong, VBVariant}};
+    use crate::{
+        error::err_number,
+        value::{VBLong, VBVariant},
+    };
 
     fn assert_approx_eq(actual: f64, expected: f64) {
         if (actual == f64::INFINITY && expected == f64::INFINITY)
@@ -933,4 +936,3 @@ mod tests {
         assert_eq!(result, VBVariant::from_double(1.2));
     }
 }
-

@@ -721,10 +721,7 @@
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
 
-use crate::{
-    error::VBResult,
-    value::VBVariant,
-};
+use crate::{error::VBResult, value::VBVariant};
 
 use super::trim_dollar::trim_dollar;
 

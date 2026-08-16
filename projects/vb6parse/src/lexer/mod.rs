@@ -2371,11 +2371,9 @@ Attribute VB_Exposed = False
         }
 
         let tokens = tokens_opt.expect("Expected tokens");
-        assert!(
-            tokens.tokens().iter().any(|(text, token)| {
-                *token == Token::StringLiteral && text.contains("caf\u{00e9}")
-            })
-        );
+        assert!(tokens.tokens().iter().any(|(text, token)| {
+            *token == Token::StringLiteral && text.contains("caf\u{00e9}")
+        }));
         assert!(
             tokens.tokens().iter().any(|(text, token)| {
                 *token == Token::EndOfLineComment && text.contains("comment")

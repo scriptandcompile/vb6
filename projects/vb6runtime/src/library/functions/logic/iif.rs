@@ -312,7 +312,10 @@ mod tests {
     use crate::{error::err_number, value::VBVariant};
 
     fn args() -> (VBVariant, VBVariant) {
-        (VBVariant::from_string("true"), VBVariant::from_string("false"))
+        (
+            VBVariant::from_string("true"),
+            VBVariant::from_string("false"),
+        )
     }
 
     #[test]

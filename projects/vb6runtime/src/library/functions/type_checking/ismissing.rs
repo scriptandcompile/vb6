@@ -605,10 +605,7 @@ mod tests {
 
     #[test]
     fn returns_true_for_omitted_argument() {
-        assert_eq!(
-            is_missing(None).unwrap(),
-            VBVariant::from_bool(true)
-        );
+        assert_eq!(is_missing(None).unwrap(), VBVariant::from_bool(true));
     }
 
     #[test]

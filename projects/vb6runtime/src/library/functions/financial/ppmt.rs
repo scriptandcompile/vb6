@@ -1008,13 +1008,7 @@ mod tests {
         .unwrap()
     }
 
-    fn ppmt_with_fv(
-        rate: f64,
-        per: f64,
-        nper: f64,
-        pv: f64,
-        fv: f64,
-    ) -> VBVariant {
+    fn ppmt_with_fv(rate: f64, per: f64, nper: f64, pv: f64, fv: f64) -> VBVariant {
         ppmt(
             &VBVariant::from_double(rate),
             &VBVariant::from_double(per),
@@ -1026,14 +1020,7 @@ mod tests {
         .unwrap()
     }
 
-    fn ppmt_with_type(
-        rate: f64,
-        per: f64,
-        nper: f64,
-        pv: f64,
-        fv: f64,
-        ptype: i16,
-    ) -> VBVariant {
+    fn ppmt_with_type(rate: f64, per: f64, nper: f64, pv: f64, fv: f64, ptype: i16) -> VBVariant {
         ppmt(
             &VBVariant::from_double(rate),
             &VBVariant::from_double(per),

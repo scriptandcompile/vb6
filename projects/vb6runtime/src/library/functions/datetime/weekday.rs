@@ -689,10 +689,7 @@ mod tests {
 
     #[test]
     fn null_returns_null() {
-        assert_eq!(
-            weekday(&VBVariant::Null, None).unwrap(),
-            VBVariant::Null
-        );
+        assert_eq!(weekday(&VBVariant::Null, None).unwrap(), VBVariant::Null);
     }
 
     #[test]

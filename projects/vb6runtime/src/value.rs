@@ -637,7 +637,11 @@ impl VBVariant {
     pub fn is_integral(&self) -> bool {
         matches!(
             self,
-            VBVariant::Byte(_) | VBVariant::Integer(_) | VBVariant::Long(_) | VBVariant::Boolean(_) | VBVariant::Empty
+            VBVariant::Byte(_)
+                | VBVariant::Integer(_)
+                | VBVariant::Long(_)
+                | VBVariant::Boolean(_)
+                | VBVariant::Empty
         )
     }
 
@@ -745,7 +749,9 @@ impl VBVariant {
         match self {
             VBVariant::Empty => Ok(false),
             VBVariant::Null => Err(VBError::invalid_use_of_null()),
-            VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => Err(VBError::type_mismatch()),
+            VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => {
+                Err(VBError::type_mismatch())
+            }
             VBVariant::Error(e) => Err(e.clone()),
             VBVariant::Boolean(b) => Ok(*b),
             VBVariant::String(s) => {
@@ -772,7 +778,9 @@ impl VBVariant {
         match self {
             VBVariant::Empty => Ok(0),
             VBVariant::Null => Err(VBError::invalid_use_of_null()),
-            VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => Err(VBError::type_mismatch()),
+            VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => {
+                Err(VBError::type_mismatch())
+            }
             VBVariant::Error(e) => Err(e.clone()),
             VBVariant::Byte(v) => Ok(*v as i64),
             VBVariant::Integer(v) => Ok(*v as i64),
@@ -814,7 +822,9 @@ impl VBVariant {
         match self {
             VBVariant::Empty => Ok(0.0),
             VBVariant::Null => Err(VBError::invalid_use_of_null()),
-            VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => Err(VBError::type_mismatch()),
+            VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => {
+                Err(VBError::type_mismatch())
+            }
             VBVariant::Error(e) => Err(e.clone()),
             VBVariant::Boolean(b) => Ok(if *b { -1.0 } else { 0.0 }),
             VBVariant::String(s) => parse_vb_number(s).ok_or_else(VBError::type_mismatch),
@@ -832,7 +842,9 @@ impl VBVariant {
         match self {
             VBVariant::Empty => Ok(0),
             VBVariant::Null => Err(VBError::invalid_use_of_null()),
-            VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => Err(VBError::type_mismatch()),
+            VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => {
+                Err(VBError::type_mismatch())
+            }
             VBVariant::Error(e) => Err(e.clone()),
             VBVariant::Boolean(b) => Ok(if *b { -CURRENCY_SCALE } else { 0 }),
             VBVariant::Currency(v) => Ok(*v),
@@ -860,7 +872,9 @@ impl VBVariant {
         match self {
             VBVariant::Empty => Ok(0.0),
             VBVariant::Null => Err(VBError::invalid_use_of_null()),
-            VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => Err(VBError::type_mismatch()),
+            VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => {
+                Err(VBError::type_mismatch())
+            }
             VBVariant::Error(e) => Err(e.clone()),
             VBVariant::Boolean(b) => Ok(if *b { -1.0 } else { 0.0 }),
             VBVariant::Date(v) => Ok(*v),
@@ -1097,14 +1111,8 @@ mod wrapper_tests {
         assert_eq!(value.as_vbbyte().unwrap(), VBByte::from(42));
         assert_eq!(value.as_vbdouble().unwrap(), VBDouble::from(42.0));
         assert_eq!(value.as_vbsingle().unwrap(), VBSingle::from(42.0));
-        assert_eq!(
-            value.as_vbcurrency().unwrap(),
-            VBCurrency::from(420000)
-        );
-        assert_eq!(
-            value.as_vbdate().unwrap(),
-            VBDate::from(42.0)
-        );
+        assert_eq!(value.as_vbcurrency().unwrap(), VBCurrency::from(420000));
+        assert_eq!(value.as_vbdate().unwrap(), VBDate::from(42.0));
         assert_eq!(
             VBVariant::from_bool(true).as_vbboolean().unwrap(),
             VBBoolean::from(true)
@@ -1284,11 +1292,7 @@ fn parse_date_part(s: &str) -> Option<jiff::civil::Date> {
         if (0..=99).contains(&year) {
             year = if year <= 29 { year + 2000 } else { year + 1900 };
         }
-        (
-            year,
-            parts[0].parse().ok()?,
-            parts[1].parse().ok()?,
-        )
+        (year, parts[0].parse().ok()?, parts[1].parse().ok()?)
     };
     jiff::civil::Date::new(y, m, d).ok()
 }
@@ -1369,7 +1373,10 @@ mod tests {
         assert_eq!(VBVariant::from_string("x").var_type(), 8);
         assert_eq!(VBVariant::Boolean(true).var_type(), 11);
         assert_eq!(VBVariant::from_error(VBError::new(13)).var_type(), 10);
-        assert_eq!(VBVariant::array_dynamic(VBType::Double).var_type(), 8192 + 5);
+        assert_eq!(
+            VBVariant::array_dynamic(VBType::Double).var_type(),
+            8192 + 5
+        );
     }
 
     #[test]
@@ -1394,7 +1401,10 @@ mod tests {
             VBVariant::from_currency_scaled(12500).as_string().unwrap(),
             "1.25"
         );
-        assert_eq!(VBVariant::from_currency_scaled(10000).as_string().unwrap(), "1");
+        assert_eq!(
+            VBVariant::from_currency_scaled(10000).as_string().unwrap(),
+            "1"
+        );
         assert_eq!(
             VBVariant::from_currency_scaled(-12500).as_string().unwrap(),
             "-1.25"
@@ -1425,7 +1435,10 @@ mod tests {
         assert_eq!(VBVariant::from_string("&H1F").as_i32().unwrap(), 31);
         assert_eq!(VBVariant::from_string("&O10").as_i32().unwrap(), 8);
         assert_eq!(VBVariant::from_string("5%").as_i32().unwrap(), 5);
-        assert_eq!(VBVariant::from_string("abc").as_i32().unwrap_err().number, 13);
+        assert_eq!(
+            VBVariant::from_string("abc").as_i32().unwrap_err().number,
+            13
+        );
     }
 
     #[test]
@@ -1479,7 +1492,10 @@ mod tests {
     fn date_serial_round_trip() {
         assert_eq!(VBVariant::Date(0.0).as_string().unwrap(), "12/30/1899");
         assert_eq!(VBVariant::Date(2.0).as_string().unwrap(), "1/1/1900");
-        assert_eq!(VBVariant::Date(0.5).as_string().unwrap(), "12/30/1899 12:00:00");
+        assert_eq!(
+            VBVariant::Date(0.5).as_string().unwrap(),
+            "12/30/1899 12:00:00"
+        );
         assert_eq!(
             VBVariant::from_string("1/1/2026").as_date_serial().unwrap(),
             46023.0
@@ -1492,7 +1508,10 @@ mod tests {
     fn numeric_equality_coerces() {
         assert_eq!(VBVariant::Integer(1), VBVariant::Double(1.0));
         assert_eq!(VBVariant::Integer(1), VBVariant::from_string("1"));
-        assert_eq!(VBVariant::from_currency_scaled(10000), VBVariant::Double(1.0));
+        assert_eq!(
+            VBVariant::from_currency_scaled(10000),
+            VBVariant::Double(1.0)
+        );
         assert_ne!(VBVariant::Integer(1), VBVariant::Double(1.5));
         assert_ne!(VBVariant::Integer(1), VBVariant::from_string("abc"));
     }
@@ -1546,13 +1565,22 @@ mod tests {
 
     #[test]
     fn default_values() {
-        assert_eq!(VBVariant::default_for_type(&VBType::Integer), VBVariant::Integer(0));
+        assert_eq!(
+            VBVariant::default_for_type(&VBType::Integer),
+            VBVariant::Integer(0)
+        );
         assert_eq!(
             VBVariant::default_for_type(&VBType::String),
             VBVariant::String(String::new())
         );
-        assert_eq!(VBVariant::default_for_type(&VBType::Variant), VBVariant::Empty);
-        assert_eq!(VBVariant::default_for_type(&VBType::Object), VBVariant::Nothing);
+        assert_eq!(
+            VBVariant::default_for_type(&VBType::Variant),
+            VBVariant::Empty
+        );
+        assert_eq!(
+            VBVariant::default_for_type(&VBType::Object),
+            VBVariant::Nothing
+        );
     }
 
     #[test]

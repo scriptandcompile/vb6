@@ -566,10 +566,7 @@
 //! - No culture-aware formatting
 //! - Return value length is unpredictable (depends on number magnitude)
 
-use crate::{
-    error::VBResult,
-    value::VBVariant,
-};
+use crate::{error::VBResult, value::VBVariant};
 
 use super::str_dollar::str_dollar;
 

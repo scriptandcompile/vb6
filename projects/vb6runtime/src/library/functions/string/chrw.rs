@@ -295,10 +295,7 @@
 //! - Not all fonts support all Unicode characters; display depends on available fonts
 //! - Some Unicode features like combining characters may not render correctly in all VB6 controls
 
-use crate::{
-    error::VBResult,
-    value::VBVariant,
-};
+use crate::{error::VBResult, value::VBVariant};
 
 use super::chrw_dollar::chrw_dollar;
 

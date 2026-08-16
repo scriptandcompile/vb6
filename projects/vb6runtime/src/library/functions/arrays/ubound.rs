@@ -660,11 +660,7 @@ mod tests {
         let (lower, upper) = bounds;
         let dim_len = (upper - lower + 1) as usize;
         let data: Vec<VBVariant> = (0..dim_len).map(|_| VBVariant::Empty).collect();
-        VBVariant::Array(ArrayValue::from_vec_with_bounds(
-            VBType::Long,
-            data,
-            lower,
-        ))
+        VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Long, data, lower))
     }
 
     #[test]
@@ -698,9 +694,7 @@ mod tests {
     #[test]
     fn multi_dimensional_first_dim() {
         let dims = [ArrayDimension::new(1, 5), ArrayDimension::new(0, 3)];
-        let arr = VBVariant::Array(
-            ArrayValue::new_fixed(VBType::Long, &dims).unwrap(),
-        );
+        let arr = VBVariant::Array(ArrayValue::new_fixed(VBType::Long, &dims).unwrap());
         let result = ubound(&arr, None).unwrap();
         assert_eq!(result, VBVariant::Long(5));
     }
@@ -708,9 +702,7 @@ mod tests {
     #[test]
     fn multi_dimensional_second_dim() {
         let dims = [ArrayDimension::new(1, 5), ArrayDimension::new(0, 3)];
-        let arr = VBVariant::Array(
-            ArrayValue::new_fixed(VBType::Long, &dims).unwrap(),
-        );
+        let arr = VBVariant::Array(ArrayValue::new_fixed(VBType::Long, &dims).unwrap());
         let result = ubound(&arr, Some(2)).unwrap();
         assert_eq!(result, VBVariant::Long(3));
     }
@@ -718,9 +710,7 @@ mod tests {
     #[test]
     fn dimension_out_of_range() {
         let dims = [ArrayDimension::new(1, 5), ArrayDimension::new(0, 3)];
-        let arr = VBVariant::Array(
-            ArrayValue::new_fixed(VBType::Long, &dims).unwrap(),
-        );
+        let arr = VBVariant::Array(ArrayValue::new_fixed(VBType::Long, &dims).unwrap());
         let err = ubound(&arr, Some(3)).unwrap_err();
         assert_eq!(err.number, err_number::SUBSCRIPT_OUT_OF_RANGE);
     }
@@ -756,11 +746,7 @@ mod tests {
     fn paramarray_has_correct_upper_bound() {
         // ParamArray always has LBound = 0 and UBound = n-1
         let data: Vec<VBVariant> = vec![VBVariant::from_string("a"); 3];
-        let arr = VBVariant::Array(ArrayValue::from_vec_with_bounds(
-            VBType::Variant,
-            data,
-            0,
-        ));
+        let arr = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
         let result = ubound(&arr, None).unwrap();
         assert_eq!(result, VBVariant::Long(2));
     }

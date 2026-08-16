@@ -414,10 +414,7 @@
 //! - `AscW`: Returns the Unicode character code
 //! - `AscB`: Returns the byte value
 
-use crate::{
-    error::VBResult,
-    value::VBVariant,
-};
+use crate::{error::VBResult, value::VBVariant};
 
 use super::chr_dollar::chr_dollar;
 

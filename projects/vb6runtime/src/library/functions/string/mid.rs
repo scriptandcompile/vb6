@@ -835,7 +835,12 @@ mod tests {
     #[test]
     fn omitting_length_returns_rest() {
         assert_eq!(
-            mid(&VBVariant::from_string("Hello World"), &VBLong::from(7), None).unwrap(),
+            mid(
+                &VBVariant::from_string("Hello World"),
+                &VBLong::from(7),
+                None
+            )
+            .unwrap(),
             VBVariant::from_string("World")
         );
     }

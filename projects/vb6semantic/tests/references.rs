@@ -82,11 +82,7 @@ fn procedure_scope_id(analyzer: &SemanticAnalyzer, name: &str) -> usize {
 }
 
 /// The (line, column) of every occurrence of the given symbol.
-fn occurrences(
-    index: &QueryIndex,
-    scope_id: usize,
-    name: &str,
-) -> Vec<(usize, usize)> {
+fn occurrences(index: &QueryIndex, scope_id: usize, name: &str) -> Vec<(usize, usize)> {
     index
         .references_for(scope_id, name)
         .map(|refs| {
@@ -165,9 +161,7 @@ fn symbol_at_resolves_cursor_to_symbol() {
 
     // references_at / definition_at resolve through the cursor.
     assert_eq!(index.references_at("MathUtils", 9, 5).unwrap().len(), 4);
-    let definition = index
-        .definition_at("MathUtils", 9, 5)
-        .expect("definition");
+    let definition = index.definition_at("MathUtils", 9, 5).expect("definition");
     assert_eq!(definition.location.line, 8);
 }
 
@@ -214,7 +208,10 @@ fn cross_module_usage_resolves_across_files() {
     let greet_refs = index.references_for(greeter_scope, "greet").unwrap();
     assert_eq!(greet_refs.len(), 3);
     assert_eq!(
-        greet_refs.iter().map(|r| r.location.file.as_str()).collect::<Vec<_>>(),
+        greet_refs
+            .iter()
+            .map(|r| r.location.file.as_str())
+            .collect::<Vec<_>>(),
         vec!["Greeter", "Greeter", "Runner"]
     );
 

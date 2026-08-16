@@ -694,7 +694,10 @@ fn day_serial(date: jiff::civil::Date) -> f64 {
     let base = Date::new(1899, 12, 30).expect("valid epoch");
     date.since(base)
         .ok()
-        .and_then(|span| span.total((Unit::Day, SpanRelativeTo::days_are_24_hours())).ok())
+        .and_then(|span| {
+            span.total((Unit::Day, SpanRelativeTo::days_are_24_hours()))
+                .ok()
+        })
         .unwrap_or(0.0)
 }
 

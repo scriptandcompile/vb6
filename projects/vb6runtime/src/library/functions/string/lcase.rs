@@ -529,10 +529,7 @@
 //! - `Replace`: Replace substrings (with case-sensitive option)
 //! - `InStr`: Find substring (can be case-insensitive)
 
-use crate::{
-    error::VBResult,
-    value::VBVariant,
-};
+use crate::{error::VBResult, value::VBVariant};
 
 use super::lcase_dollar::lcase_dollar;
 

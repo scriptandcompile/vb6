@@ -191,7 +191,6 @@
 //! - `Left`: Character-based left extraction
 //! - `Mid`: Character-based middle extraction
 
-
 use crate::{
     error::VBResult,
     value::{VBLong, VBVariant},

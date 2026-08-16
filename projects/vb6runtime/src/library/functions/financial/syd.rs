@@ -700,7 +700,9 @@ pub fn syd(
     let remaining_life = life_val - period_val + 1.0;
     let sum_of_years = life_val * (life_val + 1.0) / 2.0;
 
-    Ok(VBVariant::from_double(depreciable_base * remaining_life / sum_of_years))
+    Ok(VBVariant::from_double(
+        depreciable_base * remaining_life / sum_of_years,
+    ))
 }
 
 #[cfg(test)]
