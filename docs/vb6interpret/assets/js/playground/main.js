@@ -1,4 +1,4 @@
-import init, { build_debug_trace, interpret_vb6_code, init_panic_hook } from "../../wasm/vb6interpret.js";
+import init, { build_debug_trace, dump_settings, install_setting, interpret_vb6_code, init_panic_hook } from "../../wasm/vb6interpret.js";
 import { getDefaultExample, getExample } from "./examples.js";
 import * as Editor from "./editor.js";
 
@@ -43,6 +43,54 @@ const elements = {
     tabPanes: Array.from(document.querySelectorAll(".tab-pane")),
 };
 
+/// Key prefix under which settings are persisted in `localStorage`, mirroring
+/// the registry-style `<appname>/<section>/<key>` hierarchy the runtime uses
+/// on disk. Each stored entry is a single localStorage key.
+const SETTINGS_STORAGE_PREFIX = "vb6interpret-settings:";
+
+function settingsStorageKey(appname, section, key) {
+    return `${SETTINGS_STORAGE_PREFIX}${appname}/${section}/${key}`;
+}
+
+/// Seed the in-memory settings store from `localStorage` so `GetSetting`
+/// sees previously persisted values. The webassembly host has no filesystem,
+/// so localStorage stands in for the store root.
+function loadSettingsFromLocalStorage() {
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+        const storageKey = window.localStorage.key(index);
+        if (!storageKey || !storageKey.startsWith(SETTINGS_STORAGE_PREFIX)) {
+            continue;
+        }
+        const [appname, section, key] = storageKey
+            .slice(SETTINGS_STORAGE_PREFIX.length)
+            .split("/");
+        if (appname && section && key) {
+            install_setting(appname, section, key, window.localStorage.getItem(storageKey));
+        }
+    }
+}
+
+/// Write every current setting back to `localStorage` (replacing the whole
+/// block) so changes made during a run, such as a future `SaveSetting`,
+/// survive a page reload.
+function persistSettingsToLocalStorage() {
+    const settings = dump_settings();
+    const staleKeys = [];
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+        const storageKey = window.localStorage.key(index);
+        if (storageKey && storageKey.startsWith(SETTINGS_STORAGE_PREFIX)) {
+            staleKeys.push(storageKey);
+        }
+    }
+    staleKeys.forEach((storageKey) => window.localStorage.removeItem(storageKey));
+    settings.forEach((setting) => {
+        window.localStorage.setItem(
+            settingsStorageKey(setting.appname, setting.section, setting.key),
+            setting.value,
+        );
+    });
+}
+
 async function initPlayground() {
     state.initialCode = loadInitialCode();
     bindEvents();
@@ -52,6 +100,7 @@ async function initPlayground() {
         await init(buildWasmUrl());
         init_panic_hook();
         state.wasmReady = true;
+        loadSettingsFromLocalStorage();
         elements.wasmStatus.textContent = "WebAssembly ready";
         setStatus("Ready", "success");
         syncExecutionControls();
@@ -153,6 +202,7 @@ async function runModule() {
             state.debugTraceIndex = state.debugTrace.snapshots.length - 1;
         } else {
             resetDebugProgress();
+            persistSettingsToLocalStorage();
         }
 
         updateSessionCompletion(result);
@@ -199,6 +249,7 @@ async function stepModule() {
             state.debugTrace = build_debug_trace(source);
             state.lastDebugSource = source;
             state.debugTraceIndex = -1;
+            persistSettingsToLocalStorage();
         } catch (error) {
             console.error("Failed to create debug trace", error);
             renderOutput({

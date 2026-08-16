@@ -3,7 +3,10 @@
 export const memory: WebAssembly.Memory;
 export const build_debug_trace: (a: number, b: number, c: number) => void;
 export const debug_vb6_code: (a: number, b: number, c: number, d: number) => void;
+export const dump_settings: (a: number) => void;
+export const install_setting: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => void;
 export const interpret_vb6_code: (a: number, b: number, c: number) => void;
+export const remove_setting: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
 export const parse_vb6_code: (a: number, b: number, c: number, d: number, e: number) => void;
 export const tokenize_vb6_code: (a: number, b: number, c: number) => void;
 export const init_panic_hook: () => void;

@@ -1,3 +1,5 @@
+/* @ts-self-types="./vb6interpret.d.ts" */
+
 /**
  * Build a full statement-boundary execution trace that the browser can use
  * for true resume-from-current-state stepping.
@@ -48,10 +50,54 @@ export function debug_vb6_code(code, pause_after_steps) {
 }
 
 /**
+ * Every setting currently in the store, for persisting back to `localStorage`.
+ * @returns {any}
+ */
+export function dump_settings() {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.dump_settings(retptr);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
  * Initializes the panic hook for better error messages in the browser console.
  */
 export function init_panic_hook() {
     wasm.init_panic_hook();
+}
+
+/**
+ * Install or overwrite the setting `(appname, section, key)` with `value`.
+ *
+ * The webassembly host has no filesystem, so `localStorage` takes the role
+ * of the settings store root: the host calls [`install_setting`] once per
+ * persisted entry before running a module, and persists [`dump_settings`]
+ * afterwards. `GetSetting` reads whatever is installed.
+ * @param {string} appname
+ * @param {string} section
+ * @param {string} key
+ * @param {string} value
+ */
+export function install_setting(appname, section, key, value) {
+    const ptr0 = passStringToWasm0(appname, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(section, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(key, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len2 = WASM_VECTOR_LEN;
+    const ptr3 = passStringToWasm0(value, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len3 = WASM_VECTOR_LEN;
+    wasm.install_setting(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
 }
 
 /**
@@ -114,6 +160,22 @@ export function parse_vb6_code(code, _file_type) {
     } finally {
         wasm.__wbindgen_add_to_stack_pointer(16);
     }
+}
+
+/**
+ * Remove the setting `(appname, section, key)`, if present.
+ * @param {string} appname
+ * @param {string} section
+ * @param {string} key
+ */
+export function remove_setting(appname, section, key) {
+    const ptr0 = passStringToWasm0(appname, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(section, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(key, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len2 = WASM_VECTOR_LEN;
+    wasm.remove_setting(ptr0, len0, ptr1, len1, ptr2, len2);
 }
 
 /**
