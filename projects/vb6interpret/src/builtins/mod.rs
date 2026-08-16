@@ -13,11 +13,18 @@
 mod arrays;
 mod conversion;
 mod datetime;
+mod environment;
 mod financial;
 mod logic;
 mod math;
 mod string;
 mod type_checking;
+
+use std::collections::HashMap;
+use std::sync::OnceLock;
+
+use vb6core::error::{VBError, VBResult};
+use vb6runtime::value::{VBLong, VBString, VBVariant};
 
 /// Build a [`Builtin`] registry entry from an adapter closure.
 ///
@@ -35,13 +42,6 @@ macro_rules! builtin {
         }
     };
 }
-
-use std::collections::HashMap;
-use std::sync::OnceLock;
-
-use vb6core::error::{VBError, VBResult};
-use vb6runtime::value::{VBLong, VBString};
-use vb6runtime::VBVariant;
 
 /// A callable that adapts a slice of evaluated arguments into a runtime call.
 type BuiltinFn = fn(&[VBVariant]) -> VBResult<VBVariant>;
@@ -92,6 +92,7 @@ fn registry() -> &'static Registry {
         arrays::register(&mut registry);
         conversion::register(&mut registry);
         datetime::register(&mut registry);
+        environment::register(&mut registry);
         financial::register(&mut registry);
         logic::register(&mut registry);
         string::register(&mut registry);
@@ -342,8 +343,11 @@ mod tests {
             VBVariant::from_bool(true)
         );
         assert_eq!(
-            call_builtin("IsError", &[VBVariant::from_error(vb6core::error::VBError::new(13))])
-                .unwrap(),
+            call_builtin(
+                "IsError",
+                &[VBVariant::from_error(vb6core::error::VBError::new(13))]
+            )
+            .unwrap(),
             VBVariant::from_bool(true)
         );
         assert_eq!(
@@ -513,11 +517,8 @@ mod tests {
             VBVariant::from_integer(2025)
         );
 
-        let result = call_builtin(
-            "DateValue",
-            &[VBVariant::from_string("2/14/2025 10:30 AM")],
-        )
-        .unwrap();
+        let result =
+            call_builtin("DateValue", &[VBVariant::from_string("2/14/2025 10:30 AM")]).unwrap();
         assert_eq!(
             call_builtin("Day", &[result]).unwrap(),
             VBVariant::from_integer(14)
@@ -557,10 +558,7 @@ mod tests {
     fn split_and_join_dispatch() {
         let arr = call_builtin(
             "Split",
-            &[
-                VBVariant::from_string("a,b,c"),
-                VBVariant::from_string(","),
-            ],
+            &[VBVariant::from_string("a,b,c"), VBVariant::from_string(",")],
         )
         .unwrap();
         assert_eq!(
@@ -571,6 +569,33 @@ mod tests {
             call_builtin("Join", &[arr, VBVariant::from_string("-")]).unwrap(),
             VBVariant::from_string("a-b-c")
         );
+    }
+
+    #[test]
+    fn environ_dollar_dispatch_reads_the_snapshot() {
+        use vb6runtime::library::functions::environment::state as env_state;
+
+        // Serialize against the shared snapshot and restore it afterwards so
+        // the process environment baseline is left intact.
+        env_state::reset();
+        env_state::set_env("VB6INTERPRET_TEST_VAR", "hello");
+        assert_eq!(
+            call_builtin(
+                "Environ$",
+                &[VBVariant::from_string("vb6interpret_test_var")]
+            )
+            .unwrap(),
+            VBVariant::from_string("hello")
+        );
+        assert_eq!(
+            call_builtin(
+                "Environ$",
+                &[VBVariant::from_string("VB6INTERPRET_MISSING")]
+            )
+            .unwrap(),
+            VBVariant::from_string("")
+        );
+        env_state::reset();
     }
 
     #[test]
