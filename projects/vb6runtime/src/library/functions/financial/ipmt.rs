@@ -619,13 +619,7 @@ mod tests {
         .unwrap()
     }
 
-    fn ipmt_with_fv(
-        rate: f64,
-        per: f64,
-        nper: f64,
-        pv: f64,
-        fv: f64,
-    ) -> VBVariant {
+    fn ipmt_with_fv(rate: f64, per: f64, nper: f64, pv: f64, fv: f64) -> VBVariant {
         ipmt(
             &VBVariant::from_double(rate),
             &VBVariant::from_double(per),
@@ -637,14 +631,7 @@ mod tests {
         .unwrap()
     }
 
-    fn ipmt_with_type(
-        rate: f64,
-        per: f64,
-        nper: f64,
-        pv: f64,
-        fv: f64,
-        ptype: i16,
-    ) -> VBVariant {
+    fn ipmt_with_type(rate: f64, per: f64, nper: f64, pv: f64, fv: f64, ptype: i16) -> VBVariant {
         ipmt(
             &VBVariant::from_double(rate),
             &VBVariant::from_double(per),

@@ -654,10 +654,7 @@
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
 
-use crate::{
-    error::VBResult,
-    value::VBVariant,
-};
+use crate::{error::VBResult, value::VBVariant};
 
 use super::rtrim_dollar::rtrim_dollar;
 

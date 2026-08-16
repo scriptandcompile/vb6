@@ -154,8 +154,7 @@ pub fn render_report_at_line(
     )
     .with_message(message)
     .with_label(
-        Label::new((source_name.to_string(), span_start..=span_end))
-            .with_message("error here"),
+        Label::new((source_name.to_string(), span_start..=span_end)).with_message("error here"),
     )
     .with_config(Config::new().with_color(false));
     report.finish().write(cache, &mut buf).ok()?;
@@ -235,7 +234,9 @@ End Sub\n";
         assert!(report.contains("Unknown token '?'"));
         assert!(report.contains("m.bas:1"));
         assert!(report.contains("Dim x As ?"));
-        assert!(!report.contains("(Error "), "parse reports should not carry Err numbers");
+        assert!(
+            !report.contains("(Error "),
+            "parse reports should not carry Err numbers"
+        );
     }
 }
-

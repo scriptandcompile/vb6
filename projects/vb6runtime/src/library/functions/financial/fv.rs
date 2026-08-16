@@ -756,13 +756,7 @@ mod tests {
         .unwrap()
     }
 
-    fn fv_with_type(
-        rate: f64,
-        nper: f64,
-        pmt: f64,
-        pv: f64,
-        ptype: i16,
-    ) -> VBVariant {
+    fn fv_with_type(rate: f64, nper: f64, pmt: f64, pv: f64, ptype: i16) -> VBVariant {
         fv(
             &VBVariant::from_double(rate),
             &VBVariant::from_double(nper),

@@ -628,7 +628,11 @@ mod tests {
     fn returns_true_for_array_of_objects() {
         let array = VBVariant::array_fixed(VBType::Object, &[ArrayDimension::new(1, 3)]).unwrap();
         assert_eq!(is_object(&array).unwrap(), VBVariant::from_bool(true));
-        let array = VBVariant::array_fixed(VBType::Class("Foo".to_string()), &[ArrayDimension::new(1, 2)]).unwrap();
+        let array = VBVariant::array_fixed(
+            VBType::Class("Foo".to_string()),
+            &[ArrayDimension::new(1, 2)],
+        )
+        .unwrap();
         assert_eq!(is_object(&array).unwrap(), VBVariant::from_bool(true));
     }
 

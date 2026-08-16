@@ -427,18 +427,12 @@ mod tests {
             space_dollar(&VBLong::from(3)).unwrap(),
             VBString::from("   ")
         );
-        assert_eq!(
-            space_dollar(&VBLong::from(1)).unwrap(),
-            VBString::from(" ")
-        );
+        assert_eq!(space_dollar(&VBLong::from(1)).unwrap(), VBString::from(" "));
     }
 
     #[test]
     fn zero_returns_empty() {
-        assert_eq!(
-            space_dollar(&VBLong::from(0)).unwrap(),
-            VBString::from("")
-        );
+        assert_eq!(space_dollar(&VBLong::from(0)).unwrap(), VBString::from(""));
     }
 
     #[test]

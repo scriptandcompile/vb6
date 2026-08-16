@@ -308,14 +308,8 @@ mod tests {
 
     #[test]
     fn returns_ascii_characters() {
-        assert_eq!(
-            chrw_dollar(&VBLong::from(65)).unwrap(),
-            VBString::from("A")
-        );
-        assert_eq!(
-            chrw_dollar(&VBLong::from(97)).unwrap(),
-            VBString::from("a")
-        );
+        assert_eq!(chrw_dollar(&VBLong::from(65)).unwrap(), VBString::from("A"));
+        assert_eq!(chrw_dollar(&VBLong::from(97)).unwrap(), VBString::from("a"));
     }
 
     #[test]

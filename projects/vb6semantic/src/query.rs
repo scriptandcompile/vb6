@@ -219,7 +219,14 @@ mod tests {
         }
     }
 
-    fn record(index: &mut QueryIndex, scope: usize, name: &str, kind: ReferenceKind, line: usize, col: usize) {
+    fn record(
+        index: &mut QueryIndex,
+        scope: usize,
+        name: &str,
+        kind: ReferenceKind,
+        line: usize,
+        col: usize,
+    ) {
         let reference = Reference::new(kind, location("M.bas", line, col), 10, 14);
         index.record(scope, name, reference);
     }

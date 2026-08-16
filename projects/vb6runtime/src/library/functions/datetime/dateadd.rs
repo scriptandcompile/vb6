@@ -519,11 +519,7 @@ use crate::value::{date_serial_to_datetime, VBVariant};
 /// - the time portion is preserved for month/quarter/year additions
 /// - results outside the 100-9999 AD range raise error 6 (overflow)
 /// - an unknown interval raises error 5 (invalid procedure call)
-pub fn date_add(
-    interval: &VBVariant,
-    number: &VBVariant,
-    date: &VBVariant,
-) -> VBResult<VBVariant> {
+pub fn date_add(interval: &VBVariant, number: &VBVariant, date: &VBVariant) -> VBResult<VBVariant> {
     if interval.is_null() || number.is_null() || date.is_null() {
         return Ok(VBVariant::Null);
     }
@@ -666,7 +662,10 @@ mod tests {
     #[test]
     fn adds_years() {
         assert_eq!(parts(add("yyyy", 1.0, "1/15/2025")), (2026, 1, 15, 0, 0, 0));
-        assert_eq!(parts(add("yyyy", -1.0, "1/15/2025")), (2024, 1, 15, 0, 0, 0));
+        assert_eq!(
+            parts(add("yyyy", -1.0, "1/15/2025")),
+            (2024, 1, 15, 0, 0, 0)
+        );
     }
 
     #[test]

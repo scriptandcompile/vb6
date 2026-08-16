@@ -159,7 +159,12 @@ impl Interpreter {
     }
 
     /// Evaluate a binary operation. `op` is the operator token node.
-    fn eval_binary(&mut self, left: &CstNode, op: &CstNode, right: &CstNode) -> RunResult<VBVariant> {
+    fn eval_binary(
+        &mut self,
+        left: &CstNode,
+        op: &CstNode,
+        right: &CstNode,
+    ) -> RunResult<VBVariant> {
         let lhs = self.eval_expr(left)?;
         let rhs = self.eval_expr(right)?;
 
@@ -314,7 +319,12 @@ impl Interpreter {
     }
 
     /// Generic arithmetic dispatch on an arithmetic operator.
-    pub(crate) fn arith(&self, lhs: VBVariant, rhs: VBVariant, op: ArithmaticOperator) -> RunResult<VBVariant> {
+    pub(crate) fn arith(
+        &self,
+        lhs: VBVariant,
+        rhs: VBVariant,
+        op: ArithmaticOperator,
+    ) -> RunResult<VBVariant> {
         // Integer arithmetic when both operands are integral types. (This
         // must not fire for Singles/Doubles/Currency, which hold fractional
         // values that `as_i64` would silently round.)

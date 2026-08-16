@@ -525,10 +525,7 @@ use crate::value::VBVariant;
 /// - Empty or undimensioned arrays return an empty string
 /// - Raises error 94 if `sourcearray` is `Null`
 /// - Raises error 13 if `sourcearray` is not an array or is multi-dimensional
-pub fn join(
-    sourcearray: &VBVariant,
-    delimiter: Option<&str>,
-) -> VBResult<String> {
+pub fn join(sourcearray: &VBVariant, delimiter: Option<&str>) -> VBResult<String> {
     // Validate sourcearray is not Null
     if sourcearray.is_null() {
         return Err(VBError::with_description(
@@ -702,8 +699,7 @@ mod tests {
             VBVariant::from_string("y"),
             VBVariant::from_string("z"),
         ];
-        let source =
-            VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::String, data, -1));
+        let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::String, data, -1));
         let result = join(&source, Some("-")).unwrap();
         assert_eq!(result, "x-y-z");
     }
@@ -722,8 +718,7 @@ mod tests {
             VBVariant::Null,
             VBVariant::from_string("world"),
         ];
-        let source =
-            VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
+        let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
         let err = join(&source, None).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
     }
@@ -735,8 +730,7 @@ mod tests {
             VBVariant::from_long(456),
             VBVariant::from_string("text"),
         ];
-        let source =
-            VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
+        let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
         let result = join(&source, Some("-")).unwrap();
         assert_eq!(result, "123-456-text");
     }
@@ -768,8 +762,7 @@ mod tests {
             VBVariant::Object(Box::new(TestObj)),
             VBVariant::from_string("world"),
         ];
-        let source =
-            VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
+        let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
         let err = join(&source, None).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }

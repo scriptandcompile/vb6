@@ -528,9 +528,7 @@ impl SemanticAnalyzer {
 
     /// The name of the file currently being analyzed.
     fn current_file_name(&self) -> &str {
-        self.current_file
-            .as_deref()
-            .unwrap_or("<unknown>")
+        self.current_file.as_deref().unwrap_or("<unknown>")
     }
 
     /// Create a precise source location for a byte offset in the current file
@@ -701,9 +699,7 @@ impl SemanticAnalyzer {
                     | SyntaxKind::DeclareStatement
             );
             if is_procedure {
-                if let Some(&procedure_scope) =
-                    procedure_scopes.get(&statement.start_offset())
-                {
+                if let Some(&procedure_scope) = procedure_scopes.get(&statement.start_offset()) {
                     self.scope_manager.set_current_scope(procedure_scope);
                 }
             } else {

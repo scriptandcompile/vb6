@@ -382,40 +382,76 @@ mod tests {
 
     #[test]
     fn hex_positive_long() {
-        assert_eq!(hex(&VBVariant::from_long(255)).unwrap(), VBVariant::from_string("FF"));
-        assert_eq!(hex(&VBVariant::from_long(4096)).unwrap(), VBVariant::from_string("1000"));
-        assert_eq!(hex(&VBVariant::from_long(65535)).unwrap(), VBVariant::from_string("FFFF"));
+        assert_eq!(
+            hex(&VBVariant::from_long(255)).unwrap(),
+            VBVariant::from_string("FF")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_long(4096)).unwrap(),
+            VBVariant::from_string("1000")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_long(65535)).unwrap(),
+            VBVariant::from_string("FFFF")
+        );
     }
 
     #[test]
     fn hex_positive_integer() {
-        assert_eq!(hex(&VBVariant::from_integer(255)).unwrap(), VBVariant::from_string("FF"));
-        assert_eq!(hex(&VBVariant::from_integer(-1)).unwrap(), VBVariant::from_string("FFFF"));
+        assert_eq!(
+            hex(&VBVariant::from_integer(255)).unwrap(),
+            VBVariant::from_string("FF")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_integer(-1)).unwrap(),
+            VBVariant::from_string("FFFF")
+        );
     }
 
     #[test]
     fn hex_negative_long() {
-        assert_eq!(hex(&VBVariant::from_long(-1)).unwrap(), VBVariant::from_string("FFFFFFFF"));
-        assert_eq!(hex(&VBVariant::from_long(-256)).unwrap(), VBVariant::from_string("FFFFFF00"));
+        assert_eq!(
+            hex(&VBVariant::from_long(-1)).unwrap(),
+            VBVariant::from_string("FFFFFFFF")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_long(-256)).unwrap(),
+            VBVariant::from_string("FFFFFF00")
+        );
     }
 
     #[test]
     fn hex_byte() {
-        assert_eq!(hex(&VBVariant::from_byte(15)).unwrap(), VBVariant::from_string("F"));
-        assert_eq!(hex(&VBVariant::from_byte(255)).unwrap(), VBVariant::from_string("FF"));
+        assert_eq!(
+            hex(&VBVariant::from_byte(15)).unwrap(),
+            VBVariant::from_string("F")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_byte(255)).unwrap(),
+            VBVariant::from_string("FF")
+        );
     }
 
     #[test]
     fn hex_double_rounds() {
         // 15.3 rounds to 15 → "F"
-        assert_eq!(hex(&VBVariant::Double(15.3)).unwrap(), VBVariant::from_string("F"));
+        assert_eq!(
+            hex(&VBVariant::Double(15.3)).unwrap(),
+            VBVariant::from_string("F")
+        );
         // 15.7 rounds to 16 → "10"
-        assert_eq!(hex(&VBVariant::Double(15.7)).unwrap(), VBVariant::from_string("10"));
+        assert_eq!(
+            hex(&VBVariant::Double(15.7)).unwrap(),
+            VBVariant::from_string("10")
+        );
     }
 
     #[test]
     fn hex_from_string() {
-        assert_eq!(hex(&VBVariant::from_string("255")).unwrap(), VBVariant::from_string("FF"));
+        assert_eq!(
+            hex(&VBVariant::from_string("255")).unwrap(),
+            VBVariant::from_string("FF")
+        );
     }
 
     #[test]
@@ -426,28 +462,58 @@ mod tests {
 
     #[test]
     fn hex_max_long() {
-        assert_eq!(hex(&VBVariant::from_long(i32::MAX)).unwrap(), VBVariant::from_string("7FFFFFFF"));
+        assert_eq!(
+            hex(&VBVariant::from_long(i32::MAX)).unwrap(),
+            VBVariant::from_string("7FFFFFFF")
+        );
     }
 
     #[test]
     fn hex_min_long() {
-        assert_eq!(hex(&VBVariant::from_long(i32::MIN)).unwrap(), VBVariant::from_string("80000000"));
+        assert_eq!(
+            hex(&VBVariant::from_long(i32::MIN)).unwrap(),
+            VBVariant::from_string("80000000")
+        );
     }
 
     #[test]
     fn hex_uppercase() {
-        assert_eq!(hex(&VBVariant::from_long(10)).unwrap(), VBVariant::from_string("A"));
-        assert_eq!(hex(&VBVariant::from_long(11)).unwrap(), VBVariant::from_string("B"));
-        assert_eq!(hex(&VBVariant::from_long(15)).unwrap(), VBVariant::from_string("F"));
-        assert_eq!(hex(&VBVariant::from_long(0xABCD)).unwrap(), VBVariant::from_string("ABCD"));
+        assert_eq!(
+            hex(&VBVariant::from_long(10)).unwrap(),
+            VBVariant::from_string("A")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_long(11)).unwrap(),
+            VBVariant::from_string("B")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_long(15)).unwrap(),
+            VBVariant::from_string("F")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_long(0xABCD)).unwrap(),
+            VBVariant::from_string("ABCD")
+        );
     }
 
     #[test]
     fn hex_power_of_two() {
-        assert_eq!(hex(&VBVariant::from_long(16)).unwrap(), VBVariant::from_string("10"));
-        assert_eq!(hex(&VBVariant::from_long(256)).unwrap(), VBVariant::from_string("100"));
-        assert_eq!(hex(&VBVariant::from_long(4096)).unwrap(), VBVariant::from_string("1000"));
-        assert_eq!(hex(&VBVariant::from_long(65536)).unwrap(), VBVariant::from_string("10000"));
+        assert_eq!(
+            hex(&VBVariant::from_long(16)).unwrap(),
+            VBVariant::from_string("10")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_long(256)).unwrap(),
+            VBVariant::from_string("100")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_long(4096)).unwrap(),
+            VBVariant::from_string("1000")
+        );
+        assert_eq!(
+            hex(&VBVariant::from_long(65536)).unwrap(),
+            VBVariant::from_string("10000")
+        );
     }
 
     #[test]
@@ -461,7 +527,12 @@ mod tests {
         for i in 0..16 {
             let result = hex(&VBVariant::from_long(i)).unwrap();
             let expected = format!("{:X}", i);
-            assert_eq!(result, VBVariant::from_string(&expected), "Failed for value {}", i);
+            assert_eq!(
+                result,
+                VBVariant::from_string(&expected),
+                "Failed for value {}",
+                i
+            );
         }
     }
 

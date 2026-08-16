@@ -619,10 +619,7 @@ mod tests {
             VBVariant::from_bool(false),
             VBVariant::from_bool(true),
         ];
-        assert_eq!(
-            switch(&arguments).unwrap(),
-            VBVariant::from_long(42)
-        );
+        assert_eq!(switch(&arguments).unwrap(), VBVariant::from_long(42));
 
         let arguments = vec![
             VBVariant::from_bool(false),
@@ -630,10 +627,7 @@ mod tests {
             VBVariant::from_bool(true),
             VBVariant::from_bool(true),
         ];
-        assert_eq!(
-            switch(&arguments).unwrap(),
-            VBVariant::from_bool(true)
-        );
+        assert_eq!(switch(&arguments).unwrap(), VBVariant::from_bool(true));
     }
 
     #[test]

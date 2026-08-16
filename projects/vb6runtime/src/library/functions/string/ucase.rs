@@ -494,10 +494,7 @@
 //! - No built-in toggle case functionality
 //! - Cannot convert specific character ranges
 
-use crate::{
-    error::VBResult,
-    value::VBVariant,
-};
+use crate::{error::VBResult, value::VBVariant};
 
 use super::ucase_dollar::ucase_dollar;
 

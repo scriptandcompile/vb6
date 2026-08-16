@@ -1036,8 +1036,7 @@ mod tests {
             VBVariant::from_string("bb"),
             VBVariant::from_string("c"),
         ];
-        let source =
-            VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::String, data, -2));
+        let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::String, data, -2));
         let result = filter(&source, "b", None, None).unwrap();
         assert_eq!(extract_strings(&result), vec!["bb"]);
         // Result is zero-based even though the source was not

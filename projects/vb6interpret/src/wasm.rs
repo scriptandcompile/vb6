@@ -185,11 +185,9 @@ fn parse_module(code: &str) -> Result<ModuleFile, WasmRunError> {
             let line = first.map(|error| {
                 byte_offset_to_line_column(error.source_content, error.error_offset as usize).0
             });
-            let pretty_report = first
-                .zip(line)
-                .and_then(|(error, line)| {
-                    render_report_at_line("playground.bas", code, line, &error.kind.to_string())
-                });
+            let pretty_report = first.zip(line).and_then(|(error, line)| {
+                render_report_at_line("playground.bas", code, line, &error.kind.to_string())
+            });
 
             Err(WasmRunError {
                 message,
@@ -354,7 +352,10 @@ pub fn build_debug_trace(code: &str) -> Result<JsValue, JsError> {
     // body starts inside the original source so cursors can be converted to
     // line/column coordinates.
     let filtered_text = module.cst.text();
-    let delta = code.find(&filtered_text).map(|offset| offset as u32).unwrap_or(0);
+    let delta = code
+        .find(&filtered_text)
+        .map(|offset| offset as u32)
+        .unwrap_or(0);
 
     let last_index = interpreter.debug_snapshots().len().saturating_sub(1);
     let snapshots = interpreter

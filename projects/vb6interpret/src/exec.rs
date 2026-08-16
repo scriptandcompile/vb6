@@ -551,10 +551,7 @@ impl Interpreter {
         {
             if let Some(step_node) = significant.get(step_idx + 1) {
                 step = self.eval_expr(step_node)?;
-                step_cursor = Some((
-                    significant[step_idx].start_offset(),
-                    step_node.end_offset(),
-                ));
+                step_cursor = Some((significant[step_idx].start_offset(), step_node.end_offset()));
             }
         }
 
@@ -961,7 +958,12 @@ impl Interpreter {
     }
 
     /// `low <= selector <= high` (numeric or string range).
-    fn in_range(&mut self, selector: &VBVariant, low: &VBVariant, high: &VBVariant) -> RunResult<bool> {
+    fn in_range(
+        &mut self,
+        selector: &VBVariant,
+        low: &VBVariant,
+        high: &VBVariant,
+    ) -> RunResult<bool> {
         let s = selector.as_f64()?;
         let lo = low.as_f64()?;
         let hi = high.as_f64()?;
@@ -1159,11 +1161,14 @@ pub(crate) fn coerce(value: VBVariant, ty: &vb6core::types::VBType) -> VBVariant
             .as_currency_scaled()
             .map(VBVariant::Currency)
             .unwrap_or(value),
-        vb6core::types::VBType::String => {
-            value.as_string().map(VBVariant::from_string).unwrap_or(value)
-        }
+        vb6core::types::VBType::String => value
+            .as_string()
+            .map(VBVariant::from_string)
+            .unwrap_or(value),
         vb6core::types::VBType::Boolean => value.as_bool().map(VBVariant::Boolean).unwrap_or(value),
-        vb6core::types::VBType::Date => value.as_date_serial().map(VBVariant::Date).unwrap_or(value),
+        vb6core::types::VBType::Date => {
+            value.as_date_serial().map(VBVariant::Date).unwrap_or(value)
+        }
         _ => value,
     }
 }

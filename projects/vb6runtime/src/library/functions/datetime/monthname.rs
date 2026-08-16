@@ -650,7 +650,7 @@ pub fn month_name(month: &VBVariant, abbreviate: Option<&VBVariant>) -> VBResult
 
 #[cfg(test)]
 mod tests {
-    use super::{ABBREVIATED_NAMES, FULL_NAMES, month_name};
+    use super::{month_name, ABBREVIATED_NAMES, FULL_NAMES};
     use crate::error::err_number;
     use crate::value::VBVariant;
 
@@ -676,7 +676,10 @@ mod tests {
     fn abbreviated_names() {
         for (i, name) in ABBREVIATED_NAMES.iter().enumerate() {
             assert_eq!(
-                na(&VBVariant::from_long(i as i32 + 1), &VBVariant::from_bool(true)),
+                na(
+                    &VBVariant::from_long(i as i32 + 1),
+                    &VBVariant::from_bool(true)
+                ),
                 *name
             );
         }
@@ -689,9 +692,18 @@ mod tests {
 
     #[test]
     fn abbreviate_accepts_numeric_values() {
-        assert_eq!(na(&VBVariant::from_long(2), &VBVariant::from_long(1)), "Feb");
-        assert_eq!(na(&VBVariant::from_long(2), &VBVariant::from_long(-1)), "Feb");
-        assert_eq!(na(&VBVariant::from_long(2), &VBVariant::from_long(0)), "February");
+        assert_eq!(
+            na(&VBVariant::from_long(2), &VBVariant::from_long(1)),
+            "Feb"
+        );
+        assert_eq!(
+            na(&VBVariant::from_long(2), &VBVariant::from_long(-1)),
+            "Feb"
+        );
+        assert_eq!(
+            na(&VBVariant::from_long(2), &VBVariant::from_long(0)),
+            "February"
+        );
     }
 
     #[test]

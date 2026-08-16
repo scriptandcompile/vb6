@@ -52,8 +52,7 @@ mod tests {
     use vb6parse::parsers::cst::ConcreteSyntaxTree;
 
     fn index_for(source: &str) -> LineIndex {
-        let (cst_opt, failures) =
-            ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
         assert!(failures.is_empty(), "parse failures: {failures:?}");
         let cst = cst_opt.expect("CST should parse");
         LineIndex::from_cst_root(&cst.to_root_node())

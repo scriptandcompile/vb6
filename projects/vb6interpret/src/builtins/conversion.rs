@@ -14,9 +14,7 @@ pub(super) fn register(registry: &mut Registry) {
     registry.insert(builtin!("cverr", 1, 1, |args| {
         convfn::cverr::cverr(&args[0])
     }));
-    registry.insert(builtin!("hex", 1, 1, |args| {
-        convfn::hex::hex(&args[0])
-    }));
+    registry.insert(builtin!("hex", 1, 1, |args| { convfn::hex::hex(&args[0]) }));
     registry.insert(builtin!("hex$", 1, 1, |args| {
         convfn::hex_dollar::hex_dollar(&args[0]).map(VBVariant::from)
     }));

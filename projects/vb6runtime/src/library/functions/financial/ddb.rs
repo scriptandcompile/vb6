@@ -653,13 +653,7 @@ mod tests {
         .unwrap()
     }
 
-    fn ddb_with_factor(
-        cost: f64,
-        salvage: f64,
-        life: f64,
-        period: f64,
-        factor: f64,
-    ) -> VBVariant {
+    fn ddb_with_factor(cost: f64, salvage: f64, life: f64, period: f64, factor: f64) -> VBVariant {
         ddb(
             &VBVariant::from_double(cost),
             &VBVariant::from_double(salvage),
@@ -743,7 +737,14 @@ mod tests {
 
     #[test]
     fn ddb_null_raises_invalid_use_of_null() {
-        let err = ddb(&VBVariant::Null, &VBVariant::Empty, &VBVariant::Empty, &VBVariant::Empty, None).unwrap_err();
+        let err = ddb(
+            &VBVariant::Null,
+            &VBVariant::Empty,
+            &VBVariant::Empty,
+            &VBVariant::Empty,
+            None,
+        )
+        .unwrap_err();
         assert_eq!(err.number, 94);
     }
 }

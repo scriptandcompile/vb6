@@ -661,6 +661,9 @@ mod tests {
 
     #[test]
     fn propagates_null() {
-        assert_eq!(formatdatetime(&VBVariant::Null, None).unwrap(), VBVariant::Null);
+        assert_eq!(
+            formatdatetime(&VBVariant::Null, None).unwrap(),
+            VBVariant::Null
+        );
     }
 }

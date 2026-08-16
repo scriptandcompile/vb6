@@ -11,9 +11,7 @@ use vb6runtime::VBVariant;
 
 /// Register the datetime functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {
-    registry.insert(builtin!("date", 0, 0, |_args| {
-        datetimefn::date::date()
-    }));
+    registry.insert(builtin!("date", 0, 0, |_args| { datetimefn::date::date() }));
     registry.insert(builtin!("date$", 0, 0, |_args| {
         datetimefn::date_dollar::date_dollar().map(VBVariant::from)
     }));
@@ -47,15 +45,11 @@ pub(super) fn register(registry: &mut Registry) {
     registry.insert(builtin!("monthname", 1, 2, |args| {
         datetimefn::monthname::month_name(&args[0], args.get(1)).map(VBVariant::from)
     }));
-    registry.insert(builtin!("now", 0, 0, |_args| {
-        datetimefn::now::now()
-    }));
+    registry.insert(builtin!("now", 0, 0, |_args| { datetimefn::now::now() }));
     registry.insert(builtin!("second", 1, 1, |args| {
         datetimefn::second::second(&args[0])
     }));
-    registry.insert(builtin!("time", 0, 0, |_args| {
-        datetimefn::time::time()
-    }));
+    registry.insert(builtin!("time", 0, 0, |_args| { datetimefn::time::time() }));
     registry.insert(builtin!("time$", 0, 0, |_args| {
         datetimefn::time_dollar::time_dollar().map(VBVariant::from)
     }));
