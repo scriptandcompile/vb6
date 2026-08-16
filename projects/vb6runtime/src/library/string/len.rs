@@ -590,7 +590,7 @@ use crate::{
 /// # Examples
 ///
 /// ```
-/// use vb6runtime::library::functions::string::len;
+/// use vb6runtime::library::string::len;
 /// use vb6runtime::value::{VBLong, VBString};
 /// assert_eq!(len(&VBString::from("Hello")).unwrap(), VBLong::from(5));
 /// assert_eq!(len(&VBString::from("")).unwrap(), VBLong::from(0));

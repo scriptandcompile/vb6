@@ -1,17 +1,17 @@
 //! VB6 environment function registry.
 //!
 //! One [`Builtin`](super::Builtin) entry per environment function, each
-//! wrapping the typed `vb6runtime::library::functions::environment`
+//! wrapping the typed `vb6runtime::library::environment`
 //! implementation.
 
 use super::{Builtin, Registry};
 use crate::builtin;
 use vb6core::error::VBResult;
-use vb6runtime::library::functions::environment::environ::environ;
-use vb6runtime::library::functions::environment::environ_dollar::environ_dollar;
-use vb6runtime::library::functions::environment::error::error;
-use vb6runtime::library::functions::environment::error_dollar::error_dollar;
-use vb6runtime::library::functions::environment::getsetting::get_setting;
+use vb6runtime::library::environment::environ::environ;
+use vb6runtime::library::environment::environ_dollar::environ_dollar;
+use vb6runtime::library::environment::error::error;
+use vb6runtime::library::environment::error_dollar::error_dollar;
+use vb6runtime::library::environment::getsetting::get_setting;
 use vb6runtime::VBVariant;
 
 /// Register the environment functions in `registry`.

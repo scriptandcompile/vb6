@@ -1,10 +1,15 @@
-//! VB6 string functions.
+//! VB6 string functions and statements.
 //!
 //! Each implemented function lives in its own file (e.g. `len.rs`) and is
 //! re-exported here so it is callable as `string::len(...)` rather than
 //! `string::len::len(...)`. Documentation-only stubs stay as plain modules.
 
 pub mod ansi;
+
+pub mod lset;
+pub mod mid_statement;
+pub mod midb_statement;
+pub mod rset;
 
 pub mod asc;
 pub use asc::asc;

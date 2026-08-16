@@ -501,7 +501,7 @@
 //! - Cannot specify case (capitalization) of returned string
 
 use crate::error::{VBError, VBResult};
-use crate::library::functions::datetime::datepart::first_day;
+use crate::library::datetime::datepart::first_day;
 use crate::value::{VBString, VBVariant};
 
 const FULL_NAMES: [&str; 7] = [

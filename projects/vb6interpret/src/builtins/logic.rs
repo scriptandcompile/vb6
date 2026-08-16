@@ -1,12 +1,12 @@
 //! VB6 logic function registry.
 //!
 //! One [`Builtin`](super::Builtin) entry per logic function, each wrapping the
-//! typed `vb6runtime::library::functions::logic` implementation.
+//! typed `vb6runtime::library::logic` implementation.
 
 use super::{Builtin, Registry};
 use crate::builtin;
 use vb6core::error::VBResult;
-use vb6runtime::library::functions::logic as logicfn;
+use vb6runtime::library::logic as logicfn;
 use vb6runtime::VBVariant;
 
 /// Register the logic functions in `registry`.

@@ -1,4 +1,4 @@
-//! VB6 math functions.
+//! VB6 math functions and statements.
 
 pub mod abs;
 pub mod atn;
@@ -7,6 +7,7 @@ pub mod exp;
 pub mod fix;
 pub mod int;
 pub mod log;
+pub mod randomize;
 pub mod rnd;
 pub mod round;
 pub mod sgn;

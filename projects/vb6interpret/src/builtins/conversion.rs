@@ -1,12 +1,12 @@
 //! VB6 conversion function registry.
 //!
 //! One [`Builtin`](super::Builtin) entry per conversion function, each wrapping
-//! the typed `vb6runtime::library::functions::conversion` implementation.
+//! the typed `vb6runtime::library::conversion` implementation.
 
 use super::{Builtin, Registry};
 use crate::builtin;
 use vb6core::error::VBResult;
-use vb6runtime::library::functions::conversion as convfn;
+use vb6runtime::library::conversion as convfn;
 use vb6runtime::VBVariant;
 
 /// Register the conversion functions in `registry`.

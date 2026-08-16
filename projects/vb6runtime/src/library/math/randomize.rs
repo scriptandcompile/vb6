@@ -118,7 +118,7 @@ pub fn randomize(value: Option<VBVariant>) -> VBResult<()> {
 mod tests {
     use super::randomize;
     use crate::error::err_number;
-    use crate::library::functions::math::rnd::rnd;
+    use crate::library::math::rnd::rnd;
     use crate::state::random::{seed, set_seed, MODULUS};
     use crate::state::test_support::TEST_LOCK;
     use crate::value::VBVariant;

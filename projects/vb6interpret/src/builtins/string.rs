@@ -1,12 +1,12 @@
 //! VB6 string function registry.
 //!
 //! One [`Builtin`](super::Builtin) entry per string function, each wrapping the
-//! typed `vb6runtime::library::functions::string` implementation.
+//! typed `vb6runtime::library::string` implementation.
 
 use super::{arg_long, arg_string, Builtin, Registry};
 use crate::builtin;
 use vb6core::error::VBResult;
-use vb6runtime::library::functions::string as strfn;
+use vb6runtime::library::string as strfn;
 use vb6runtime::value::{VBLong, VBString};
 use vb6runtime::VBVariant;
 
