@@ -4,6 +4,7 @@ use vb6interpret::run_source;
 use vb6interpret::Interpreter;
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
+use vb6runtime::state::settings as settings_state;
 
 use std::sync::Mutex;
 
@@ -540,4 +541,152 @@ End Sub\n";
         .run_source(source)
         .expect_err("expected error 5");
     assert_eq!(error.error.number, 5);
+}
+
+#[test]
+fn get_setting_reads_from_the_settings_store() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let dir = tempfile::tempdir().expect("failed to create temp dir");
+    settings_state::set_store_root(dir.path());
+    settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
+
+    let out = run(
+        "    Debug.Print GetSetting(\"MyApp\", \"Startup\", \"Left\", \"0\")\n\
+         Debug.Print GetSetting(\"MyApp\", \"Startup\", \"Missing\", \"42\")\n\
+         Debug.Print GetSetting(\"myapp\", \"startup\", \"left\")\n",
+    );
+    assert_eq!(out, vec!["150", "42", "150"]);
+
+    settings_state::reset_store_root();
+}
+
+/// Redirect the shared settings store to a fresh temp directory for the
+/// duration of the test, restoring the default root on drop so later tests
+/// never touch the user's real settings.
+struct TempSettingsStore {
+    _dir: tempfile::TempDir,
+}
+
+impl TempSettingsStore {
+    fn new() -> Self {
+        let dir = tempfile::tempdir().expect("failed to create temp dir");
+        settings_state::set_store_root(dir.path());
+        Self { _dir: dir }
+    }
+}
+
+impl Drop for TempSettingsStore {
+    fn drop(&mut self) {
+        settings_state::reset_store_root();
+    }
+}
+
+/// Run a module body in a fresh interpreter whose settings were staged
+/// beforehand, and return the captured `Debug.Print` output.
+fn run_with_settings(body: &str, setup: impl FnOnce(&mut Interpreter)) -> Vec<String> {
+    let source = format!("Attribute VB_Name = \"M\"\nSub Main()\n{body}\nEnd Sub\n");
+    let mut interpreter = Interpreter::new();
+    setup(&mut interpreter);
+    interpreter
+        .run_source(&source)
+        .expect("interpretation failed");
+    interpreter.output().to_vec()
+}
+
+#[test]
+fn staged_settings_are_visible_to_getsetting_during_a_run() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let _store = TempSettingsStore::new();
+    let out = run_with_settings(
+        "    Debug.Print GetSetting(\"MyApp\", \"Startup\", \"Left\", \"0\")\n",
+        |i| i.set_setting("MyApp", "Startup", "Left", "150"),
+    );
+    assert_eq!(out, vec!["150"]);
+}
+
+#[test]
+fn get_setting_returns_staged_values_before_and_after_a_run() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let _store = TempSettingsStore::new();
+    let mut interpreter = Interpreter::new();
+    interpreter.set_setting("MyApp", "Startup", "Left", "150");
+    assert_eq!(
+        interpreter.get_setting("MyApp", "Startup", "Left"),
+        Some("150".to_string())
+    );
+    assert_eq!(interpreter.get_setting("MyApp", "Startup", "Missing"), None);
+    interpreter
+        .run_source("Attribute VB_Name = \"M\"\nSub Main()\nEnd Sub\n")
+        .expect("interpretation failed");
+    assert_eq!(
+        interpreter.get_setting("myapp", "startup", "left"),
+        Some("150".to_string())
+    );
+}
+
+#[test]
+fn staged_settings_override_values_already_in_the_store() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let _store = TempSettingsStore::new();
+    settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
+    let out = run_with_settings(
+        "    Debug.Print GetSetting(\"MyApp\", \"Startup\", \"Left\", \"0\")\n",
+        |i| i.set_setting("MyApp", "Startup", "Left", "200"),
+    );
+    assert_eq!(out, vec!["200"]);
+}
+
+#[test]
+fn remove_setting_removes_staged_and_store_values() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let _store = TempSettingsStore::new();
+    let mut interpreter = Interpreter::new();
+    interpreter.set_setting("MyApp", "Startup", "Left", "150");
+    interpreter.set_setting("MyApp", "Startup", "Right", "300");
+    interpreter.remove_setting("MyApp", "Startup", "Left");
+    assert_eq!(interpreter.get_setting("MyApp", "Startup", "Left"), None);
+    assert_eq!(
+        interpreter.get_setting("MyApp", "Startup", "Right"),
+        Some("300".to_string())
+    );
+    // The store value was written during a run, so it must be gone too.
+    interpreter
+        .run_source("Attribute VB_Name = \"M\"\nSub Main()\nEnd Sub\n")
+        .expect("interpretation failed");
+    interpreter.remove_setting("MyApp", "Startup", "Right");
+    assert_eq!(interpreter.get_setting("MyApp", "Startup", "Right"), None);
+}
+
+#[test]
+fn clear_settings_removes_staged_and_store_values() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let _store = TempSettingsStore::new();
+    let mut interpreter = Interpreter::new();
+    interpreter.set_setting("MyApp", "Startup", "Left", "150");
+    interpreter.set_setting("MyApp", "Startup", "Right", "300");
+    interpreter.clear_settings();
+    assert_eq!(interpreter.get_setting("MyApp", "Startup", "Left"), None);
+    assert_eq!(interpreter.get_setting("MyApp", "Startup", "Right"), None);
+}
+
+#[test]
+fn staged_settings_survive_clear() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let _store = TempSettingsStore::new();
+    let mut interpreter = Interpreter::new();
+    interpreter.set_setting("MyApp", "Startup", "Left", "150");
+    interpreter.clear();
+    assert_eq!(
+        interpreter.get_setting("MyApp", "Startup", "Left"),
+        Some("150".to_string())
+    );
+    interpreter
+        .run_source(
+            "Attribute VB_Name = \"M\"\n\
+             Sub Main()\n\
+                 Debug.Print GetSetting(\"MyApp\", \"Startup\", \"Left\", \"0\")\n\
+             End Sub\n",
+        )
+        .expect("interpretation failed");
+    assert_eq!(interpreter.output(), &["150"]);
 }

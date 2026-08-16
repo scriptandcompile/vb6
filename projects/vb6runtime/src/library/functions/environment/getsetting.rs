@@ -314,3 +314,177 @@
 //! - `Environ`: Returns the string associated with an environment variable
 //! - `Command`: Returns the argument portion of the command line
 //! - `App.Path`: Returns the path where the application executable is located
+
+use crate::error::VBResult;
+use crate::state::settings;
+use crate::value::VBVariant;
+
+/// Returns the value stored for `(appname, section, key)` under the VB6
+/// settings store, or `default` when no value is stored.
+///
+/// The three path components are matched case-insensitively, mirroring the
+/// Windows registry. `default` defaults to the empty string when the argument
+/// is `Empty` (omitted). `Null` arguments raise error 94 (invalid use of
+/// `Null`); object and array arguments raise error 13 (type mismatch).
+pub fn get_setting(
+    appname: &VBVariant,
+    section: &VBVariant,
+    key: &VBVariant,
+    default: &VBVariant,
+) -> VBResult<VBVariant> {
+    let appname = appname.as_string()?;
+    let section = section.as_string()?;
+    let key = key.as_string()?;
+    let default = default.as_string()?;
+    let value = settings::get(&appname, &section, &key).unwrap_or(default);
+    Ok(VBVariant::from_string(value))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::settings as settings_state;
+    use crate::state::test_support::with_temp_settings_store;
+
+    fn string(value: &str) -> VBVariant {
+        VBVariant::from_string(value)
+    }
+
+    #[test]
+    fn returns_the_stored_value() {
+        with_temp_settings_store(|_| {
+            settings_state::set("MyApp", "Window", "Left", "150").unwrap();
+            assert_eq!(
+                get_setting(
+                    &string("MyApp"),
+                    &string("Window"),
+                    &string("Left"),
+                    &string("0"),
+                )
+                .unwrap(),
+                string("150")
+            );
+        });
+    }
+
+    #[test]
+    fn returns_default_when_the_key_is_missing() {
+        with_temp_settings_store(|_| {
+            assert_eq!(
+                get_setting(
+                    &string("MyApp"),
+                    &string("Window"),
+                    &string("Missing"),
+                    &string("42"),
+                )
+                .unwrap(),
+                string("42")
+            );
+        });
+    }
+
+    #[test]
+    fn omitted_default_returns_an_empty_string() {
+        with_temp_settings_store(|_| {
+            assert_eq!(
+                get_setting(
+                    &string("MyApp"),
+                    &string("Window"),
+                    &string("Missing"),
+                    &VBVariant::Empty,
+                )
+                .unwrap(),
+                string("")
+            );
+        });
+    }
+
+    #[test]
+    fn lookup_is_case_insensitive() {
+        with_temp_settings_store(|_| {
+            settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
+            assert_eq!(
+                get_setting(
+                    &string("myapp"),
+                    &string("startup"),
+                    &string("LEFT"),
+                    &string("0")
+                )
+                .unwrap(),
+                string("150")
+            );
+        });
+    }
+
+    #[test]
+    fn empty_arguments_return_the_default() {
+        with_temp_settings_store(|_| {
+            for (appname, section, key) in [
+                ("", "Section", "Key"),
+                ("App", "", "Key"),
+                ("App", "Section", ""),
+            ] {
+                assert_eq!(
+                    get_setting(
+                        &string(appname),
+                        &string(section),
+                        &string(key),
+                        &string("fallback"),
+                    )
+                    .unwrap(),
+                    string("fallback")
+                );
+            }
+        });
+    }
+
+    #[test]
+    fn null_arguments_are_error_94() {
+        with_temp_settings_store(|_| {
+            let err = get_setting(
+                &VBVariant::Null,
+                &string("Section"),
+                &string("Key"),
+                &string(""),
+            )
+            .unwrap_err();
+            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
+            let err = get_setting(
+                &string("App"),
+                &string("Section"),
+                &string("Key"),
+                &VBVariant::Null,
+            )
+            .unwrap_err();
+            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
+        });
+    }
+
+    #[test]
+    fn object_and_array_arguments_are_error_13() {
+        with_temp_settings_store(|_| {
+            let array = VBVariant::array_dynamic(vb6core::types::VBType::String);
+            let err =
+                get_setting(&array, &string("Section"), &string("Key"), &string("")).unwrap_err();
+            assert_eq!(err.number, crate::error::err_number::TYPE_MISMATCH);
+        });
+    }
+
+    #[test]
+    fn values_survive_a_reload_from_disk() {
+        with_temp_settings_store(|_| {
+            settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
+            settings_state::reset();
+            assert_eq!(
+                get_setting(
+                    &string("MyApp"),
+                    &string("Startup"),
+                    &string("Left"),
+                    &string("0")
+                )
+                .unwrap(),
+                string("150")
+            );
+        });
+    }
+}

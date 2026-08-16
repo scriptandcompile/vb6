@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use vb6core::error::VBError;
 use vb6parse::files::ModuleFile;
 use vb6runtime::state::environment as env_state;
+use vb6runtime::state::settings as settings_state;
 use vb6runtime::VBVariant;
 
 use crate::error::{RunError, RunResult};
@@ -107,6 +108,9 @@ pub struct Interpreter {
     /// Environment variables installed via [`Interpreter::set_environment`],
     /// written into the shared runtime snapshot at the start of every run.
     pub(crate) environment: HashMap<String, String>,
+    /// Settings staged via [`Interpreter::set_setting`], written into the
+    /// shared settings store at the start of every run.
+    pub(crate) settings: Vec<(String, String, String, String)>,
 }
 
 impl Default for Interpreter {
@@ -135,6 +139,7 @@ impl Interpreter {
             record_debug_snapshots: false,
             debug_snapshots: Vec::new(),
             environment: HashMap::new(),
+            settings: Vec::new(),
         }
     }
 
@@ -163,17 +168,80 @@ impl Interpreter {
         self.environment.clear();
     }
 
+    /// Assign an application setting before the next run.
+    ///
+    /// `GetSetting` reads these values during execution, on top of any values
+    /// already present in the settings store (or on disk). The assignment
+    /// survives [`Interpreter::clear`] and is re-applied at the start of every
+    /// run, so it can be configured once before calling
+    /// [`Interpreter::run_source`] or [`Interpreter::run_module`]. A setting
+    /// staged later overrides an earlier one with the same
+    /// `(appname, section, key)`.
+    pub fn set_setting(&mut self, appname: &str, section: &str, key: &str, value: &str) {
+        self.settings.push((
+            appname.to_string(),
+            section.to_string(),
+            key.to_string(),
+            value.to_string(),
+        ));
+    }
+
+    /// The value for `(appname, section, key)`, or `None` when unset.
+    ///
+    /// Staged settings win over values already in the store; among staged
+    /// settings the most recently staged value wins.
+    pub fn get_setting(&self, appname: &str, section: &str, key: &str) -> Option<String> {
+        for (a, s, k, v) in self.settings.iter().rev() {
+            if a.eq_ignore_ascii_case(appname)
+                && s.eq_ignore_ascii_case(section)
+                && k.eq_ignore_ascii_case(key)
+            {
+                return Some(v.clone());
+            }
+        }
+        settings_state::get(appname, section, key)
+    }
+
+    /// Remove a single setting, both staged and from the store.
+    pub fn remove_setting(&mut self, appname: &str, section: &str, key: &str) {
+        self.settings.retain(|(a, s, k, _)| {
+            !(a.eq_ignore_ascii_case(appname)
+                && s.eq_ignore_ascii_case(section)
+                && k.eq_ignore_ascii_case(key))
+        });
+        let _ = settings_state::remove_key(appname, section, key);
+    }
+
+    /// Remove every setting staged with [`Interpreter::set_setting`], both
+    /// staged and from the store.
+    pub fn clear_settings(&mut self) {
+        for (appname, section, key, _) in &self.settings {
+            let _ = settings_state::remove_key(appname, section, key);
+        }
+        self.settings.clear();
+    }
+
+    /// Redirect the settings store to `root` for this interpreter.
+    ///
+    /// Equivalent to [`vb6runtime::state::settings::set_store_root`], scoped
+    /// to the interpreter for convenience.
+    pub fn set_settings_store_root(&self, root: impl Into<std::path::PathBuf>) {
+        settings_state::set_store_root(root);
+    }
+
     /// Reset all runtime state (globals, frames, output, program).
     pub fn clear(&mut self) {
         let step_limit = self.step_limit;
         let pause_after_steps = self.pause_after_steps;
         let record_debug_snapshots = self.record_debug_snapshots;
         let environment = std::mem::take(&mut self.environment);
+        let settings = std::mem::take(&mut self.settings);
         *self = Self::new();
         self.step_limit = step_limit;
         self.pause_after_steps = pause_after_steps;
         self.record_debug_snapshots = record_debug_snapshots;
         self.environment = environment;
+        self.settings = settings;
     }
 
     /// Pause execution before the next statement once this many statements
@@ -202,6 +270,13 @@ impl Interpreter {
         // runtime snapshot so `Environ$` sees them during this run.
         for (name, value) in &self.environment {
             env_state::set_env(name, value);
+        }
+        // Apply staged settings on top of the shared settings store so
+        // `GetSetting` sees them during this run. Failures are ignored when
+        // there is no store location (e.g. wasm) — staged settings still win
+        // in [`Interpreter::get_setting`].
+        for (appname, section, key, value) in &self.settings {
+            let _ = settings_state::set(appname, section, key, value);
         }
         let root = module.cst.to_root_node();
         let program = crate::program::build_program(&root, &module.name);
