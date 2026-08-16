@@ -1,9 +1,16 @@
 //! Integration tests for the `vb6interpret` tree-walking interpreter.
 
-use vb6interpret::Interpreter;
 use vb6interpret::run_source;
+use vb6interpret::Interpreter;
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
+
+use std::sync::Mutex;
+
+/// Serializes tests that install an environment on the shared runtime
+/// snapshot; every `run_module` resets it, so parallel runs would stomp each
+/// other's assignments.
+static ENV_TEST_LOCK: Mutex<()> = Mutex::new(());
 
 /// Run a module body and return the captured `Debug.Print` output.
 fn run(body: &str) -> Vec<String> {
@@ -389,4 +396,102 @@ Sub Main()\n\
 End Sub\n";
     let out = run_source(source).expect("interpretation failed");
     assert_eq!(out, vec!["20", "10"]);
+}
+
+/// Run a module body with an environment variable assigned before the run.
+fn run_with_env(body: &str, name: &str, value: &str) -> Vec<String> {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let source = format!("Attribute VB_Name = \"M\"\nSub Main()\n{body}\nEnd Sub\n");
+    let mut interpreter = Interpreter::new();
+    interpreter.set_environment(name, value);
+    interpreter
+        .run_source(&source)
+        .expect("interpretation failed");
+    interpreter.output().to_vec()
+}
+
+#[test]
+fn environ_dollar_reads_variable_assigned_before_running() {
+    let out = run_with_env(
+        "    Debug.Print Environ$(\"VB6_TEST_VAR\")\n",
+        "VB6_TEST_VAR",
+        "hello",
+    );
+    assert_eq!(out, vec!["hello"]);
+}
+
+#[test]
+fn environ_dollar_lookup_is_case_insensitive() {
+    let out = run_with_env(
+        "    Debug.Print Environ$(\"vb6_test_var\")\n",
+        "VB6_TEST_VAR",
+        "hello",
+    );
+    assert_eq!(out, vec!["hello"]);
+}
+
+#[test]
+fn environ_dollar_returns_empty_for_unset_variable() {
+    let out = run_with_env(
+        "    Debug.Print \"[\" & Environ$(\"VB6_TEST_MISSING\") & \"]\"\n",
+        "VB6_TEST_VAR",
+        "hello",
+    );
+    assert_eq!(out, vec!["[]"]);
+}
+
+#[test]
+fn environ_dollar_numeric_argument_enumerates_the_table() {
+    let out = run_with_env(
+        "    Dim i As Integer\n\
+         i = 1\n\
+         Do While Environ$(i) <> \"\"\n\
+             Debug.Print Environ$(i)\n\
+             i = i + 1\n\
+         Loop\n",
+        "VB6_TEST_VAR",
+        "hello",
+    );
+    // The interpreter's overrides are appended at the end of the table, so the
+    // assigned variable is the final entry and appears in the enumeration.
+    assert!(!out.is_empty());
+    for entry in &out {
+        assert!(entry.contains('='));
+    }
+    assert_eq!(out.last().map(String::as_str), Some("VB6_TEST_VAR=hello"));
+}
+
+#[test]
+fn environ_dollar_assignment_survives_repeated_runs() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let mut interpreter = Interpreter::new();
+    interpreter.set_environment("VB6_TEST_VAR", "one");
+    interpreter
+        .run_source(
+            "Attribute VB_Name = \"M\"\nSub Main()\n    Debug.Print Environ$(\"VB6_TEST_VAR\")\nEnd Sub\n",
+        )
+        .expect("interpretation failed");
+    assert_eq!(interpreter.output().to_vec(), vec!["one"]);
+
+    interpreter
+        .run_source(
+            "Attribute VB_Name = \"M\"\nSub Main()\n    Debug.Print Environ$(\"VB6_TEST_VAR\")\nEnd Sub\n",
+        )
+        .expect("interpretation failed");
+    assert_eq!(interpreter.output().to_vec(), vec!["one"]);
+}
+
+#[test]
+fn environ_dollar_error_for_bad_index() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let source = "Attribute VB_Name = \"M\"\n\
+Sub Main()\n\
+    Debug.Print Environ$(0)\n\
+End Sub\n";
+    let mut interpreter = Interpreter::new();
+    interpreter.set_environment("VB6_TEST_VAR", "hello");
+    let error = interpreter
+        .run_source(source)
+        .expect_err("expected error 5");
+    assert_eq!(error.error.number, 5);
 }

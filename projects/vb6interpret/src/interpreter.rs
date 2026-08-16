@@ -8,6 +8,7 @@ use std::collections::HashMap;
 
 use vb6core::error::VBError;
 use vb6parse::files::ModuleFile;
+use vb6runtime::library::functions::environment::state as env_state;
 use vb6runtime::VBVariant;
 
 use crate::error::{RunError, RunResult};
@@ -103,6 +104,9 @@ pub struct Interpreter {
     pub(crate) record_debug_snapshots: bool,
     /// Statement-boundary snapshots captured during the current run.
     pub(crate) debug_snapshots: Vec<DebugSnapshot>,
+    /// Environment variables installed via [`Interpreter::set_environment`],
+    /// written into the shared runtime snapshot at the start of every run.
+    pub(crate) environment: HashMap<String, String>,
 }
 
 impl Default for Interpreter {
@@ -130,6 +134,7 @@ impl Interpreter {
             pause_after_steps: None,
             record_debug_snapshots: false,
             debug_snapshots: Vec::new(),
+            environment: HashMap::new(),
         }
     }
 
@@ -140,15 +145,35 @@ impl Interpreter {
         self.step_limit = limit;
     }
 
+    /// Assign an environment variable before the next run.
+    ///
+    /// `Environ$`/`Environ` read these values during execution, on top of the
+    /// process environment. The assignment survives [`Interpreter::clear`] and
+    /// is re-applied at the start of every run, so it can be configured once
+    /// before calling [`Interpreter::run_source`] or [`Interpreter::run_module`].
+    pub fn set_environment(&mut self, name: &str, value: &str) {
+        self.environment.insert(name.to_string(), value.to_string());
+    }
+
+    /// Clear all environment variables installed with [`Interpreter::set_environment`].
+    pub fn clear_environment(&mut self) {
+        for name in self.environment.keys() {
+            env_state::remove_env(name);
+        }
+        self.environment.clear();
+    }
+
     /// Reset all runtime state (globals, frames, output, program).
     pub fn clear(&mut self) {
         let step_limit = self.step_limit;
         let pause_after_steps = self.pause_after_steps;
         let record_debug_snapshots = self.record_debug_snapshots;
+        let environment = std::mem::take(&mut self.environment);
         *self = Self::new();
         self.step_limit = step_limit;
         self.pause_after_steps = pause_after_steps;
         self.record_debug_snapshots = record_debug_snapshots;
+        self.environment = environment;
     }
 
     /// Pause execution before the next statement once this many statements
@@ -173,6 +198,11 @@ impl Interpreter {
     /// Execute a parsed module.
     pub fn run_module(&mut self, module: &ModuleFile) -> RunResult<()> {
         self.clear();
+        // Apply the interpreter's environment overrides on top of the shared
+        // runtime snapshot so `Environ$` sees them during this run.
+        for (name, value) in &self.environment {
+            env_state::set_env(name, value);
+        }
         let root = module.cst.to_root_node();
         let program = crate::program::build_program(&root, &module.name);
         self.module_name = module.name.clone();
@@ -424,7 +454,11 @@ impl Interpreter {
     }
 
     /// Invoke a Function procedure, returning its result value.
-    pub(crate) fn call_function(&mut self, name: &str, args: Vec<VBVariant>) -> RunResult<VBVariant> {
+    pub(crate) fn call_function(
+        &mut self,
+        name: &str,
+        args: Vec<VBVariant>,
+    ) -> RunResult<VBVariant> {
         let procedure = self.lookup_procedure(name)?;
         let return_type = procedure.return_type.clone();
         let body = procedure.body.clone();

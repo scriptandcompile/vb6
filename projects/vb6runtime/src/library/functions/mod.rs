@@ -7,6 +7,7 @@
 pub mod arrays;
 pub mod conversion;
 pub mod datetime;
+pub mod environment;
 pub mod financial;
 pub mod logic;
 pub mod math;
