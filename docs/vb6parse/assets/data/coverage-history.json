@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-08-15T09:01:30Z",
+  "last_updated": "2026-08-16T02:41:41Z",
   "snapshots": [
     {
       "timestamp": "2026-08-02T05:53:42Z",
@@ -477,27 +477,61 @@
           "percent": 94.16
         }
       }
+    },
+    {
+      "timestamp": "2026-08-16T02:41:41Z",
+      "commit_sha": "0ce339fb12505e30b42109212b3f7d01c8e53c98",
+      "commit_message": "getsettings is now working in wasm and added environment display in the playground",
+      "coverage": {
+        "line_coverage": 93.82,
+        "function_coverage": 91.28,
+        "region_coverage": 94.2
+      },
+      "tests": {
+        "total": 6730,
+        "lib_tests": 6600,
+        "doc_tests": 130,
+        "integration_tests": 0,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 120515,
+          "total": 128458,
+          "percent": 93.82
+        },
+        "functions": {
+          "covered": 8433,
+          "total": 9239,
+          "percent": 91.28
+        },
+        "regions": {
+          "covered": 202424,
+          "total": 214890,
+          "percent": 94.2
+        }
+      }
     }
   ],
   "coverage_summary": {
     "line_coverage": {
-      "latest": 93.77,
+      "latest": 93.82,
       "trend": "stable",
       "change_percent": 0.05,
       "best": 94.32,
       "worst": 93.32,
-      "average": 93.87
+      "average": 93.86
     },
     "function_coverage": {
-      "latest": 91.13,
-      "trend": "stable",
-      "change_percent": 0.08,
-      "best": 91.24,
+      "latest": 91.28,
+      "trend": "improving",
+      "change_percent": 0.15,
+      "best": 91.28,
       "worst": 89.87,
-      "average": 90.75
+      "average": 90.78
     },
     "region_coverage": {
-      "latest": 94.16,
+      "latest": 94.2,
       "trend": "stable",
       "change_percent": 0.04,
       "best": 94.76,
@@ -505,10 +539,10 @@
       "average": 94.26
     },
     "test_count": {
-      "latest": 6635,
+      "latest": 6730,
       "trend": "growing",
-      "change_count": 66,
-      "growth_rate": 1.0
+      "change_count": 95,
+      "growth_rate": 1.43
     }
   }
 }
