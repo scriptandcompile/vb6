@@ -215,9 +215,8 @@
 //! - Variable availability differs between operating systems
 
 use crate::error::{VBError, VBResult};
+use crate::state::environment;
 use crate::value::VBVariant;
-
-use super::state;
 
 /// Returns the value of an environment variable.
 ///
@@ -232,7 +231,7 @@ use super::state;
 /// numeric index below 1.
 pub fn environ_dollar(arg: &VBVariant) -> VBResult<VBVariant> {
     let result = match arg {
-        VBVariant::String(_) => state::get_env(&arg.as_string()?).unwrap_or_default(),
+        VBVariant::String(_) => environment::get_env(&arg.as_string()?).unwrap_or_default(),
         VBVariant::Empty | VBVariant::Null => return Err(VBError::invalid_procedure_call()),
         VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => {
             return Err(VBError::type_mismatch());
@@ -242,7 +241,7 @@ pub fn environ_dollar(arg: &VBVariant) -> VBResult<VBVariant> {
             if index < 1 {
                 return Err(VBError::invalid_procedure_call());
             }
-            state::env_at(index as usize).unwrap_or_default()
+            environment::env_at(index as usize).unwrap_or_default()
         }
     };
     Ok(VBVariant::from_string(result))
@@ -250,13 +249,13 @@ pub fn environ_dollar(arg: &VBVariant) -> VBResult<VBVariant> {
 
 #[cfg(test)]
 mod tests {
-    use super::state::test_support::{position_of, TEST_LOCK};
     use super::*;
+    use crate::state::test_support::{position_of, TEST_LOCK};
 
     fn reset_with_sample_env() {
-        state::reset();
-        state::set_env("VB6_ENVIRON_PATH", "C:\\bin");
-        state::set_env("VB6_ENVIRON_USER", "arthur");
+        environment::reset();
+        environment::set_env("VB6_ENVIRON_PATH", "C:\\bin");
+        environment::set_env("VB6_ENVIRON_USER", "arthur");
     }
 
     #[test]

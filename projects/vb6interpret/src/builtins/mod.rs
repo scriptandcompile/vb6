@@ -578,7 +578,7 @@ mod tests {
 
     #[test]
     fn environ_dollar_dispatch_reads_the_snapshot() {
-        use vb6runtime::library::functions::environment::state as env_state;
+        use vb6runtime::state::environment as env_state;
 
         // Serialize against the shared snapshot and restore it afterwards so
         // the process environment baseline is left intact.
@@ -606,7 +606,7 @@ mod tests {
 
     #[test]
     fn environ_dispatch_reads_the_snapshot() {
-        use vb6runtime::library::functions::environment::state as env_state;
+        use vb6runtime::state::environment as env_state;
 
         // Serialize against the shared snapshot and restore it afterwards so
         // the process environment baseline is left intact.

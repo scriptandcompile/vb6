@@ -64,7 +64,7 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::error::VBResult;
-use crate::library::functions::math::rnd::{seed, set_seed};
+use crate::state::random::{seed, set_seed};
 use crate::value::VBVariant;
 
 /// Splice a value into the middle 16 bits of the current seed.
@@ -116,16 +116,12 @@ pub fn randomize(value: Option<VBVariant>) -> VBResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::Mutex;
-
     use super::randomize;
     use crate::error::err_number;
-    use crate::library::functions::math::rnd::{rnd, set_seed, MODULUS};
+    use crate::library::functions::math::rnd::rnd;
+    use crate::state::random::{seed, set_seed, MODULUS};
+    use crate::state::test_support::TEST_LOCK;
     use crate::value::VBVariant;
-
-    /// Serializes tests that read or write the shared RNG state so that
-    /// parallel test execution cannot interfere with a test's fixed seed.
-    static TEST_LOCK: Mutex<()> = Mutex::new(());
 
     /// The exact `Single` value produced by a given seed, `seed / 2^24`.
     fn expected(seed: u32) -> f32 {
@@ -145,7 +141,7 @@ mod tests {
         let _guard = TEST_LOCK.lock().unwrap();
         set_seed(0);
         randomize(Some(VBVariant::from_double(42.0))).unwrap();
-        assert_eq!(super::seed(), 0x0040_4500);
+        assert_eq!(seed(), 0x0040_4500);
 
         let next = as_single(rnd(&VBVariant::Empty).unwrap());
         assert_eq!(next, f32::from_bits(0x3EAD_9F86));
@@ -158,7 +154,7 @@ mod tests {
         // survives, which is why the same number never repeats a sequence.
         set_seed(0x0000_0123);
         randomize(Some(VBVariant::from_double(1.0))).unwrap();
-        assert_eq!(super::seed(), 0x003F_F023);
+        assert_eq!(seed(), 0x003F_F023);
     }
 
     #[test]
@@ -166,7 +162,7 @@ mod tests {
         let _guard = TEST_LOCK.lock().unwrap();
         set_seed(0);
         randomize(Some(VBVariant::from_double(-1.0))).unwrap();
-        assert_eq!(super::seed(), 0xFFBF_F000);
+        assert_eq!(seed(), 0xFFBF_F000);
 
         // Rnd(0) normalizes the raw stored seed (VB6-faithful; it can be >= 1).
         assert_eq!(
@@ -186,7 +182,7 @@ mod tests {
         set_seed(0x1234_5678);
         randomize(None).unwrap();
 
-        let reseeded = super::seed();
+        let reseeded = seed();
         assert_ne!(reseeded, 0x1234_5678);
         // The low byte of the previous seed survives the splice.
         assert_eq!(reseeded & 0xFF, 0x78);
@@ -200,7 +196,7 @@ mod tests {
         let _guard = TEST_LOCK.lock().unwrap();
         set_seed(0);
         randomize(Some(VBVariant::from_string("42"))).unwrap();
-        assert_eq!(super::seed(), 0x0040_4500);
+        assert_eq!(seed(), 0x0040_4500);
     }
 
     #[test]

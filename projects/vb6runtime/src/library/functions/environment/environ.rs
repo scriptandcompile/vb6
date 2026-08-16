@@ -640,13 +640,13 @@ pub fn environ(arg: &VBVariant) -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::library::functions::environment::state;
-    use crate::library::functions::environment::state::test_support::{position_of, TEST_LOCK};
+    use crate::state::environment;
+    use crate::state::test_support::{position_of, TEST_LOCK};
 
     fn reset_with_sample_env() {
-        state::reset();
-        state::set_env("VB6_ENVIRON_PATH", "C:\\bin");
-        state::set_env("VB6_ENVIRON_USER", "arthur");
+        environment::reset();
+        environment::set_env("VB6_ENVIRON_PATH", "C:\\bin");
+        environment::set_env("VB6_ENVIRON_USER", "arthur");
     }
 
     #[test]

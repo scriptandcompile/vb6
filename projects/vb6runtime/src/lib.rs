@@ -9,12 +9,15 @@
 //!
 //! The standard library function implementations live under `library::` and are
 //! added incrementally, using [`VBVariant`] and [`VBType`] as their foundations.
+//! Process-global runtime state (the environment snapshot, RNG seed) lives under
+//! `state::` and is shared across functions and statements.
 
 #![warn(missing_docs)]
 #![warn(rust_2018_idioms)]
 
 pub mod array;
 pub mod library;
+pub mod state;
 pub mod value;
 
 /// Runtime error types, re-exported from [`vb6core`].

@@ -119,31 +119,9 @@ pub fn env_at(position: usize) -> Option<String> {
 }
 
 #[cfg(test)]
-pub(crate) mod test_support {
-    use std::sync::Mutex;
-
-    /// Serializes tests that read or write the shared environment snapshot so
-    /// parallel test execution cannot interfere with a test's fixed
-    /// environment. Shared by every environment test module.
-    pub(crate) static TEST_LOCK: Mutex<()> = Mutex::new(());
-
-    /// Find the 1-based position of `name` in the current snapshot.
-    pub(crate) fn position_of(name: &str) -> usize {
-        let mut i = 1;
-        while let Some(entry) = super::env_at(i) {
-            if entry.starts_with(&format!("{name}=")) {
-                return i;
-            }
-            i += 1;
-        }
-        panic!("{name} not found in environment snapshot");
-    }
-}
-
-#[cfg(test)]
 mod tests {
-    use super::test_support::{position_of, TEST_LOCK};
     use super::*;
+    use crate::state::test_support::{position_of, TEST_LOCK};
 
     #[test]
     fn set_env_overwrites_in_place() {
