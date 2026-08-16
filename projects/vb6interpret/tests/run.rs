@@ -411,6 +411,52 @@ fn run_with_env(body: &str, name: &str, value: &str) -> Vec<String> {
 }
 
 #[test]
+fn environ_reads_variable_assigned_before_running() {
+    let out = run_with_env(
+        "    Debug.Print Environ(\"VB6_TEST_VAR\")\n",
+        "VB6_TEST_VAR",
+        "hello",
+    );
+    assert_eq!(out, vec!["hello"]);
+}
+
+#[test]
+fn environ_numeric_argument_enumerates_the_table() {
+    let out = run_with_env(
+        "    Dim i As Integer\n\
+         i = 1\n\
+         Do While Environ(i) <> \"\"\n\
+             Debug.Print Environ(i)\n\
+             i = i + 1\n\
+         Loop\n",
+        "VB6_TEST_VAR",
+        "hello",
+    );
+    // The interpreter's overrides are appended at the end of the table, so the
+    // assigned variable is the final entry and appears in the enumeration.
+    assert!(!out.is_empty());
+    for entry in &out {
+        assert!(entry.contains('='));
+    }
+    assert_eq!(out.last().map(String::as_str), Some("VB6_TEST_VAR=hello"));
+}
+
+#[test]
+fn environ_error_for_bad_index() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let source = "Attribute VB_Name = \"M\"\n\
+Sub Main()\n\
+    Debug.Print Environ(0)\n\
+End Sub\n";
+    let mut interpreter = Interpreter::new();
+    interpreter.set_environment("VB6_TEST_VAR", "hello");
+    let error = interpreter
+        .run_source(source)
+        .expect_err("expected error 5");
+    assert_eq!(error.error.number, 5);
+}
+
+#[test]
 fn environ_dollar_reads_variable_assigned_before_running() {
     let out = run_with_env(
         "    Debug.Print Environ$(\"VB6_TEST_VAR\")\n",
