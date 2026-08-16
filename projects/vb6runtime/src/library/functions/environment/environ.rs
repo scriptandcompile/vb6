@@ -617,3 +617,129 @@
 //! - `Shell`: Executes external programs (can set environment)
 //! - `GetSetting`: Reads application settings from registry
 //! - `SaveSetting`: Writes application settings to registry
+
+use crate::error::VBResult;
+use crate::value::VBVariant;
+
+use super::environ_dollar::environ_dollar;
+
+/// Returns the value of an environment variable, exactly as [`environ_dollar`]
+/// does, except that a `Null` argument propagates as `Null` instead of raising
+/// an error.
+///
+/// `Environ` is the Variant-returning counterpart of `Environ$`; its runtime
+/// semantics are otherwise identical (per the VBAL specification, the two
+/// functions differ only in the declared type of the return value).
+pub fn environ(arg: &VBVariant) -> VBResult<VBVariant> {
+    if arg.is_null() {
+        return Ok(VBVariant::Null);
+    }
+    environ_dollar(arg)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::library::functions::environment::state;
+    use crate::library::functions::environment::state::test_support::{position_of, TEST_LOCK};
+
+    fn reset_with_sample_env() {
+        state::reset();
+        state::set_env("VB6_ENVIRON_PATH", "C:\\bin");
+        state::set_env("VB6_ENVIRON_USER", "arthur");
+    }
+
+    #[test]
+    fn returns_value_for_existing_variable() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        reset_with_sample_env();
+        assert_eq!(
+            environ(&VBVariant::from_string("VB6_ENVIRON_PATH")).unwrap(),
+            VBVariant::from_string("C:\\bin")
+        );
+    }
+
+    #[test]
+    fn lookup_is_case_insensitive() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        reset_with_sample_env();
+        assert_eq!(
+            environ(&VBVariant::from_string("vb6_environ_user")).unwrap(),
+            VBVariant::from_string("arthur")
+        );
+    }
+
+    #[test]
+    fn returns_empty_string_for_unknown_variable() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        reset_with_sample_env();
+        assert_eq!(
+            environ(&VBVariant::from_string("VB6_ENVIRON_MISSING")).unwrap(),
+            VBVariant::from_string("")
+        );
+    }
+
+    #[test]
+    fn numeric_argument_returns_position_including_equals() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        reset_with_sample_env();
+        let path = position_of("VB6_ENVIRON_PATH") as i16;
+        let user = position_of("VB6_ENVIRON_USER") as i16;
+        assert_eq!(
+            environ(&VBVariant::from_integer(path)).unwrap(),
+            VBVariant::from_string("VB6_ENVIRON_PATH=C:\\bin")
+        );
+        assert_eq!(
+            environ(&VBVariant::from_integer(user)).unwrap(),
+            VBVariant::from_string("VB6_ENVIRON_USER=arthur")
+        );
+    }
+
+    #[test]
+    fn numeric_argument_is_rounded_to_a_whole_number() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        reset_with_sample_env();
+        let user = position_of("VB6_ENVIRON_USER") as f64;
+        // 0.4 below the position rounds down to the user entry.
+        assert_eq!(
+            environ(&VBVariant::from_double(user + 0.4)).unwrap(),
+            VBVariant::from_string("VB6_ENVIRON_USER=arthur")
+        );
+    }
+
+    #[test]
+    fn out_of_range_position_returns_empty_string() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        reset_with_sample_env();
+        let last = position_of("VB6_ENVIRON_USER") as i16;
+        assert_eq!(
+            environ(&VBVariant::from_integer(last + 1)).unwrap(),
+            VBVariant::from_string("")
+        );
+    }
+
+    #[test]
+    fn index_below_one_is_error_5() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        reset_with_sample_env();
+        let err = environ(&VBVariant::from_integer(0)).unwrap_err();
+        assert_eq!(err.number, crate::error::err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn null_propagates_as_null() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        reset_with_sample_env();
+        assert_eq!(environ(&VBVariant::Null).unwrap(), VBVariant::Null);
+    }
+
+    #[test]
+    fn empty_is_error_5() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        reset_with_sample_env();
+        assert_eq!(
+            environ(&VBVariant::Empty).unwrap_err().number,
+            crate::error::err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

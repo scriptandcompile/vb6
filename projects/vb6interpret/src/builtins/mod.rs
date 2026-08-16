@@ -156,6 +156,11 @@ mod tests {
     use super::*;
     use vb6runtime::ArrayValue;
 
+    /// Serializes dispatch tests that read or write the shared environment
+    /// snapshot so parallel test execution cannot interfere with a test's
+    /// fixed environment.
+    static ENV_DISPATCH_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
     #[test]
     fn builtin_name_preserves_dollar_suffix() {
         assert_eq!(builtin_name("Format$"), "format$");
@@ -577,6 +582,7 @@ mod tests {
 
         // Serialize against the shared snapshot and restore it afterwards so
         // the process environment baseline is left intact.
+        let _guard = ENV_DISPATCH_LOCK.lock().unwrap();
         env_state::reset();
         env_state::set_env("VB6INTERPRET_TEST_VAR", "hello");
         assert_eq!(
@@ -594,6 +600,30 @@ mod tests {
             )
             .unwrap(),
             VBVariant::from_string("")
+        );
+        env_state::reset();
+    }
+
+    #[test]
+    fn environ_dispatch_reads_the_snapshot() {
+        use vb6runtime::library::functions::environment::state as env_state;
+
+        // Serialize against the shared snapshot and restore it afterwards so
+        // the process environment baseline is left intact.
+        let _guard = ENV_DISPATCH_LOCK.lock().unwrap();
+        env_state::reset();
+        env_state::set_env("VB6INTERPRET_TEST_VAR", "hello");
+        assert_eq!(
+            call_builtin(
+                "Environ",
+                &[VBVariant::from_string("vb6interpret_test_var")]
+            )
+            .unwrap(),
+            VBVariant::from_string("hello")
+        );
+        assert_eq!(
+            call_builtin("Environ", &[VBVariant::Null]).unwrap(),
+            VBVariant::Null
         );
         env_state::reset();
     }
