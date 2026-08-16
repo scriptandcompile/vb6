@@ -8,4 +8,3 @@ pub mod getallsettings;
 pub mod getautoserversettings;
 pub mod getsetting;
 pub mod imestatus;
-pub mod state;

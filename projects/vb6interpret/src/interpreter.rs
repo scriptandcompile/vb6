@@ -8,7 +8,7 @@ use std::collections::HashMap;
 
 use vb6core::error::VBError;
 use vb6parse::files::ModuleFile;
-use vb6runtime::library::functions::environment::state as env_state;
+use vb6runtime::state::environment as env_state;
 use vb6runtime::VBVariant;
 
 use crate::error::{RunError, RunResult};
