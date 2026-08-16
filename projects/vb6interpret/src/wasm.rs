@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
+use vb6runtime::state::settings as settings_state;
 use wasm_bindgen::prelude::*;
 
 /// Structured runtime or parse error information for the browser UI.
@@ -381,4 +382,45 @@ pub fn build_debug_trace(code: &str) -> Result<JsValue, JsError> {
         error,
         snapshots,
     })?)
+}
+
+/// A single setting's full registry-style path and value.
+#[derive(Clone, Serialize, Deserialize)]
+pub struct WasmSetting {
+    pub appname: String,
+    pub section: String,
+    pub key: String,
+    pub value: String,
+}
+
+/// Install or overwrite the setting `(appname, section, key)` with `value`.
+///
+/// The webassembly host has no filesystem, so `localStorage` takes the role
+/// of the settings store root: the host calls [`install_setting`] once per
+/// persisted entry before running a module, and persists [`dump_settings`]
+/// afterwards. `GetSetting` reads whatever is installed.
+#[wasm_bindgen]
+pub fn install_setting(appname: &str, section: &str, key: &str, value: &str) {
+    let _ = settings_state::set(appname, section, key, value);
+}
+
+/// Remove the setting `(appname, section, key)`, if present.
+#[wasm_bindgen]
+pub fn remove_setting(appname: &str, section: &str, key: &str) {
+    let _ = settings_state::remove_key(appname, section, key);
+}
+
+/// Every setting currently in the store, for persisting back to `localStorage`.
+#[wasm_bindgen]
+pub fn dump_settings() -> Result<JsValue, JsError> {
+    let settings: Vec<WasmSetting> = settings_state::entries()
+        .into_iter()
+        .map(|(appname, section, key, value)| WasmSetting {
+            appname,
+            section,
+            key,
+            value,
+        })
+        .collect();
+    Ok(to_value(&settings)?)
 }

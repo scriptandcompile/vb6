@@ -255,6 +255,29 @@ pub fn get_all(appname: &str, section: &str) -> Vec<(String, String)> {
     out
 }
 
+/// Every `(appname, section, key, value)` stored in the whole store, sorted
+/// by appname, then section, then key.
+///
+/// Components are returned in the case they were stored under. This is the
+/// complete contents of the store, for hosts that need to persist the whole
+/// snapshot (for example a webassembly host mirroring it into `localStorage`).
+pub fn entries() -> Vec<(String, String, String, String)> {
+    let mut out: Vec<(String, String, String, String)> = lock()
+        .values
+        .values()
+        .map(|entry| {
+            (
+                entry.path.appname.clone(),
+                entry.path.section.clone(),
+                entry.path.key.clone(),
+                entry.value.clone(),
+            )
+        })
+        .collect();
+    out.sort();
+    out
+}
+
 /// Set `(appname, section, key)` to `value`, persisting it to the store root.
 ///
 /// The components must be valid single path segments; an existing entry keeps
@@ -415,6 +438,38 @@ mod tests {
                 ]
             );
             assert_eq!(get_all("myapp", "startup"), get_all("MyApp", "Startup"));
+        });
+    }
+
+    #[test]
+    fn entries_returns_every_setting_sorted_and_in_original_case() {
+        with_temp_settings_store(|_| {
+            set("MyApp", "Startup", "Top", "40").unwrap();
+            set("myapp", "Startup", "left", "150").unwrap();
+            set("OtherApp", "Startup", "Left", "1").unwrap();
+            assert_eq!(
+                entries(),
+                vec![
+                    (
+                        "MyApp".to_string(),
+                        "Startup".to_string(),
+                        "Top".to_string(),
+                        "40".to_string()
+                    ),
+                    (
+                        "OtherApp".to_string(),
+                        "Startup".to_string(),
+                        "Left".to_string(),
+                        "1".to_string()
+                    ),
+                    (
+                        "myapp".to_string(),
+                        "Startup".to_string(),
+                        "left".to_string(),
+                        "150".to_string()
+                    ),
+                ]
+            );
         });
     }
 
