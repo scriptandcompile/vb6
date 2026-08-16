@@ -529,6 +529,103 @@ body {
     font-size: 1rem;
 }
 
+.notes-text {
+    margin: 0 0 14px;
+    font-size: 0.92rem;
+    color: var(--placeholder-color);
+}
+
+.env-table {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.env-empty {
+    padding: 14px;
+    background-color: var(--toolbar-bg);
+    border: 1px dashed var(--panel-border);
+    border-radius: 8px;
+    color: var(--placeholder-color);
+    font-size: 0.92rem;
+}
+
+.env-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background-color: var(--toolbar-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+}
+
+.env-key {
+    flex: 0 0 38%;
+    font-weight: 600;
+    color: var(--secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.env-value {
+    flex: 1;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.env-remove {
+    flex: 0 0 auto;
+}
+
+.env-add-form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.env-input {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    height: 32px;
+    box-sizing: border-box;
+}
+
+.env-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.env-name-input {
+    flex: 0 0 auto;
+}
+
+.setting-add-form .env-name-input {
+    min-width: 100px;
+}
+
+.env-input:disabled,
+.env-row .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+#environment-status.status-edit-locked {
+    color: var(--status-warning);
+}
+
 #run-status.status-pending {
     color: var(--status-warning);
 }

@@ -112,8 +112,8 @@
                 <button class="tab-btn" data-tab="debug">
                     <span class="tab-icon">🪲</span> Debug
                 </button>
-                <button class="tab-btn" data-tab="info">
-                    <span class="tab-icon">ℹ</span> Info
+                <button class="tab-btn" data-tab="environment">
+                    <span class="tab-icon">🌍</span> Environment
                 </button>
             </div>
 
@@ -175,33 +175,37 @@
                     </div>
                 </div>
 
-                <div id="info-tab" class="tab-pane">
+                <div id="environment-tab" class="tab-pane">
+                    <div class="tab-toolbar">
+                        <span id="environment-status" class="toggle-label helper-text">Environment variables and `GetSetting`/`SaveSetting` registry entries.</span>
+                    </div>
                     <div class="output-scroll info-content">
                         <div class="info-section">
-                            <h4>Statistics</h4>
-                            <div class="stats-grid">
-                                <div class="stat-item">
-                                    <span class="stat-label">Steps</span>
-                                    <span id="stat-steps" class="stat-value">0</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Terminated</span>
-                                    <span id="stat-terminated" class="stat-value">No</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Output Lines</span>
-                                    <span id="stat-lines" class="stat-value">0</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Mode</span>
-                                    <span class="stat-value">Module</span>
-                                </div>
+                            <h4>Environment Variables</h4>
+                            <p class="notes-text">Read by `Environ$`. The browser has no OS environment, so these start empty and are remembered across page loads.</p>
+                            <div id="env-table" class="env-table">
+                                <div class="env-empty">No environment variables set.</div>
                             </div>
+                            <form id="env-add-form" class="env-add-form">
+                                <input id="env-name" class="env-input env-name-input" type="text" placeholder="NAME" autocomplete="off" spellcheck="false">
+                                <input id="env-value" class="env-input" type="text" placeholder="Value" autocomplete="off" spellcheck="false">
+                                <button type="submit" class="btn btn-primary btn-sm">Add</button>
+                            </form>
                         </div>
 
-                        <div class="info-section notes-section">
-                            <h4>Current Scope</h4>
-                            <p>This playground currently executes a single VB6 module in-browser. Project loading, forms, and debugger controls are still CLI-only.</p>
+                        <div class="info-section">
+                            <h4>Settings</h4>
+                            <p class="notes-text">Registry-style entries read by `GetSetting`, written by `SaveSetting`, and removed by `DeleteSetting`.</p>
+                            <div id="settings-table" class="env-table">
+                                <div class="env-empty">No settings.</div>
+                            </div>
+                            <form id="setting-add-form" class="env-add-form setting-add-form">
+                                <input id="setting-appname" class="env-input env-name-input" type="text" placeholder="AppName" autocomplete="off" spellcheck="false">
+                                <input id="setting-section" class="env-input env-name-input" type="text" placeholder="Section" autocomplete="off" spellcheck="false">
+                                <input id="setting-key" class="env-input env-name-input" type="text" placeholder="Key" autocomplete="off" spellcheck="false">
+                                <input id="setting-value" class="env-input" type="text" placeholder="Value" autocomplete="off" spellcheck="false">
+                                <button type="submit" class="btn btn-primary btn-sm">Add</button>
+                            </form>
                         </div>
                     </div>
                 </div>

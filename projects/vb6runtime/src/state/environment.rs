@@ -26,7 +26,14 @@ struct EnvState {
 impl EnvState {
     /// Snapshot the current process environment.
     fn from_process() -> Self {
+        // `std::env::vars` panics on targets that carry no environment
+        // (notably the browser's wasm32-unknown-unknown), so hosts there
+        // install variables with [`set_env`] instead.
+        #[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
         let entries: Vec<Entry> = std::env::vars().collect();
+        #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+        let entries: Vec<Entry> = Vec::new();
+
         let index = entries
             .iter()
             .enumerate()
@@ -116,6 +123,11 @@ pub fn get_env(name: &str) -> Option<String> {
 /// The `NAME=value` string at the 1-based position `position`, if any.
 pub fn env_at(position: usize) -> Option<String> {
     lock().at(position)
+}
+
+/// Every `NAME`/value pair in the table, in environment-table order.
+pub fn entries() -> Vec<(String, String)> {
+    lock().entries.clone()
 }
 
 #[cfg(test)]

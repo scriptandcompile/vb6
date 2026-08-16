@@ -1,4 +1,4 @@
-import init, { build_debug_trace, dump_settings, install_setting, interpret_vb6_code, init_panic_hook } from "../../wasm/vb6interpret.js";
+import init, { build_debug_trace, dump_env, dump_settings, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, set_env } from "../../wasm/vb6interpret.js";
 import { getDefaultExample, getExample } from "./examples.js";
 import * as Editor from "./editor.js";
 
@@ -27,9 +27,6 @@ const elements = {
     errorBox: document.getElementById("error-box"),
     wasmStatus: document.getElementById("wasm-status"),
     runStatus: document.getElementById("run-status"),
-    steps: document.getElementById("stat-steps"),
-    terminated: document.getElementById("stat-terminated"),
-    lines: document.getElementById("stat-lines"),
     resizer: document.getElementById("resizer"),
     editorPanel: document.querySelector(".editor-panel"),
     outputPanel: document.querySelector(".output-panel"),
@@ -39,6 +36,18 @@ const elements = {
     debugStackDepth: document.getElementById("debug-stack-depth"),
     debugGlobals: document.getElementById("debug-globals"),
     debugLocals: document.getElementById("debug-locals"),
+    environmentTab: document.getElementById("environment-tab"),
+    environmentStatus: document.getElementById("environment-status"),
+    envTable: document.getElementById("env-table"),
+    envAddForm: document.getElementById("env-add-form"),
+    envName: document.getElementById("env-name"),
+    envValue: document.getElementById("env-value"),
+    settingsTable: document.getElementById("settings-table"),
+    settingAddForm: document.getElementById("setting-add-form"),
+    settingAppname: document.getElementById("setting-appname"),
+    settingSection: document.getElementById("setting-section"),
+    settingKey: document.getElementById("setting-key"),
+    settingValue: document.getElementById("setting-value"),
     tabButtons: Array.from(document.querySelectorAll(".tab-btn")),
     tabPanes: Array.from(document.querySelectorAll(".tab-pane")),
 };
@@ -47,6 +56,11 @@ const elements = {
 /// the registry-style `<appname>/<section>/<key>` hierarchy the runtime uses
 /// on disk. Each stored entry is a single localStorage key.
 const SETTINGS_STORAGE_PREFIX = "vb6interpret-settings:";
+
+/// Key prefix under which environment variables are persisted in
+/// `localStorage`. The browser has no OS environment, so this snapshot stands
+/// in for it.
+const ENV_STORAGE_PREFIX = "vb6interpret-env:";
 
 function settingsStorageKey(appname, section, key) {
     return `${SETTINGS_STORAGE_PREFIX}${appname}/${section}/${key}`;
@@ -91,6 +105,38 @@ function persistSettingsToLocalStorage() {
     });
 }
 
+/// Seed the environment snapshot from `localStorage` so `Environ$` sees
+/// previously persisted variables.
+function loadEnvFromLocalStorage() {
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+        const storageKey = window.localStorage.key(index);
+        if (!storageKey || !storageKey.startsWith(ENV_STORAGE_PREFIX)) {
+            continue;
+        }
+        const name = storageKey.slice(ENV_STORAGE_PREFIX.length);
+        if (name) {
+            set_env(name, window.localStorage.getItem(storageKey));
+        }
+    }
+}
+
+/// Write every current environment variable back to `localStorage` so edits
+/// made in the Environment tab survive a page reload.
+function persistEnvToLocalStorage() {
+    const entries = dump_env();
+    const staleKeys = [];
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+        const storageKey = window.localStorage.key(index);
+        if (storageKey && storageKey.startsWith(ENV_STORAGE_PREFIX)) {
+            staleKeys.push(storageKey);
+        }
+    }
+    staleKeys.forEach((storageKey) => window.localStorage.removeItem(storageKey));
+    entries.forEach((entry) => {
+        window.localStorage.setItem(`${ENV_STORAGE_PREFIX}${entry.name}`, entry.value);
+    });
+}
+
 async function initPlayground() {
     state.initialCode = loadInitialCode();
     bindEvents();
@@ -101,8 +147,10 @@ async function initPlayground() {
         init_panic_hook();
         state.wasmReady = true;
         loadSettingsFromLocalStorage();
+        loadEnvFromLocalStorage();
         elements.wasmStatus.textContent = "WebAssembly ready";
         setStatus("Ready", "success");
+        renderEnvironment();
         syncExecutionControls();
     } catch (error) {
         console.error("Failed to initialize wasm", error);
@@ -142,6 +190,8 @@ function bindEvents() {
     elements.resetButton.addEventListener("click", resetExecutionSession);
     elements.shareButton.addEventListener("click", shareCode);
     elements.clearButton.addEventListener("click", clearEditor);
+    elements.envAddForm.addEventListener("submit", addEnvironmentVariable);
+    elements.settingAddForm.addEventListener("submit", addSetting);
 
     elements.tabButtons.forEach((button) => {
         button.addEventListener("click", () => setActiveTab(button.dataset.tab));
@@ -310,10 +360,8 @@ async function stepModule() {
 
 function renderOutput(result) {
     syncExecutionControls();
+    renderEnvironment();
     elements.stdout.textContent = result.output_text || "No output.";
-    elements.steps.textContent = String(result.steps ?? 0);
-    elements.terminated.textContent = result.terminated ? "Yes" : "No";
-    elements.lines.textContent = String(result.output_lines?.length ?? 0);
     renderDebugState(
         result.debug ?? emptyDebugState(),
         Boolean(result.debug?.current_line) && Boolean(result.paused || result.error || (result.steps ?? 0) > 0),
@@ -465,6 +513,152 @@ function resetExecutionSession() {
         debug: emptyDebugState(),
     });
     setStatus("Idle", "pending");
+}
+
+function renderEnvironment() {
+    if (!state.wasmReady) {
+        return;
+    }
+    renderEnvVars();
+    renderSettings();
+    syncEnvironmentControls();
+}
+
+function renderEnvVars() {
+    const entries = dump_env();
+    const container = elements.envTable;
+    container.innerHTML = "";
+
+    if (!entries || entries.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "env-empty";
+        empty.textContent = "No environment variables set.";
+        container.appendChild(empty);
+        return;
+    }
+
+    entries.forEach((entry) => {
+        container.appendChild(
+            buildEnvRow(entry.name, entry.value, () => removeEnvironmentVariable(entry.name)),
+        );
+    });
+}
+
+function renderSettings() {
+    const settings = dump_settings();
+    const container = elements.settingsTable;
+    container.innerHTML = "";
+
+    if (!settings || settings.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "env-empty";
+        empty.textContent = "No settings.";
+        container.appendChild(empty);
+        return;
+    }
+
+    settings.forEach((setting) => {
+        const key = `${setting.appname}/${setting.section}/${setting.key}`;
+        container.appendChild(buildEnvRow(key, setting.value, () => {
+            removeSetting(setting.appname, setting.section, setting.key);
+        }));
+    });
+}
+
+function buildEnvRow(key, value, onRemove) {
+    const row = document.createElement("div");
+    row.className = "env-row";
+
+    const keyEl = document.createElement("span");
+    keyEl.className = "env-key";
+    keyEl.textContent = key;
+    keyEl.title = key;
+
+    const valueEl = document.createElement("span");
+    valueEl.className = "env-value";
+    valueEl.textContent = value;
+    valueEl.title = value;
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "btn btn-secondary btn-sm env-remove";
+    remove.textContent = "Remove";
+    remove.addEventListener("click", onRemove);
+
+    row.append(keyEl, valueEl, remove);
+    return row;
+}
+
+function addEnvironmentVariable(event) {
+    event.preventDefault();
+    if (state.hasExecutionState) {
+        return;
+    }
+    const name = elements.envName.value.trim();
+    if (!name) {
+        return;
+    }
+    set_env(name, elements.envValue.value);
+    elements.envName.value = "";
+    elements.envValue.value = "";
+    persistEnvToLocalStorage();
+    renderEnvironment();
+}
+
+function removeEnvironmentVariable(name) {
+    if (state.hasExecutionState) {
+        return;
+    }
+    remove_env(name);
+    persistEnvToLocalStorage();
+    renderEnvironment();
+}
+
+function addSetting(event) {
+    event.preventDefault();
+    if (state.hasExecutionState) {
+        return;
+    }
+    const appname = elements.settingAppname.value.trim();
+    const section = elements.settingSection.value.trim();
+    const key = elements.settingKey.value.trim();
+    if (!appname || !section || !key) {
+        return;
+    }
+    install_setting(appname, section, key, elements.settingValue.value);
+    elements.settingAppname.value = "";
+    elements.settingSection.value = "";
+    elements.settingKey.value = "";
+    elements.settingValue.value = "";
+    persistSettingsToLocalStorage();
+    renderEnvironment();
+}
+
+function removeSetting(appname, section, key) {
+    if (state.hasExecutionState) {
+        return;
+    }
+    remove_setting(appname, section, key);
+    persistSettingsToLocalStorage();
+    renderEnvironment();
+}
+
+/// Lock the Environment tab while the interpreter has run or is stepping so
+/// its contents mirror the state the program observes; edits are allowed only
+/// after a Reset or before the first run.
+function syncEnvironmentControls() {
+    const editable = !state.hasExecutionState;
+    elements.environmentTab
+        ?.querySelectorAll("input, button, select")
+        .forEach((element) => {
+            element.disabled = !editable;
+        });
+    if (elements.environmentStatus) {
+        elements.environmentStatus.textContent = editable
+            ? "Editable while the interpreter is idle. Environment variables and `GetSetting`/`SaveSetting` registry entries."
+            : "Read-only while running or after a run. Press Reset to edit.";
+        elements.environmentStatus.classList.toggle("status-edit-locked", !editable);
+    }
 }
 
 function handleThemeToggle() {
