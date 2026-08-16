@@ -1,12 +1,12 @@
 //! VB6 datetime function registry.
 //!
 //! One [`Builtin`](super::Builtin) entry per datetime function, each wrapping
-//! the typed `vb6runtime::library::functions::datetime` implementation.
+//! the typed `vb6runtime::library::datetime` implementation.
 
 use super::{Builtin, Registry};
 use crate::builtin;
 use vb6core::error::VBResult;
-use vb6runtime::library::functions::datetime as datetimefn;
+use vb6runtime::library::datetime as datetimefn;
 use vb6runtime::VBVariant;
 
 /// Register the datetime functions in `registry`.

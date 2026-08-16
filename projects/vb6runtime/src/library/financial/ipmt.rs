@@ -768,7 +768,7 @@ mod tests {
         let rate = 0.08 / 12.0;
         for per in 1..=48 {
             for ptype in [0, 1] {
-                let pmt_val = crate::library::functions::financial::pmt::pmt(
+                let pmt_val = crate::library::financial::pmt::pmt(
                     VBVariant::from_double(rate),
                     VBVariant::from_double(48.0),
                     VBVariant::from_double(-20000.0),
@@ -782,7 +782,7 @@ mod tests {
                 let ipmt_val = ipmt_with_type(rate, per as f64, 48.0, -20000.0, 0.0, ptype)
                     .as_f64()
                     .unwrap();
-                let ppmt_val = crate::library::functions::financial::ppmt::ppmt(
+                let ppmt_val = crate::library::financial::ppmt::ppmt(
                     &VBVariant::from_double(rate),
                     &VBVariant::from_double(per as f64),
                     &VBVariant::from_double(48.0),

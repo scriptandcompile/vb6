@@ -1,0 +1,35 @@
+//! VB6 file functions and statements.
+
+pub mod ch_dir;
+pub mod ch_drive;
+pub mod close;
+pub mod curdir;
+pub mod curdir_dollar;
+pub mod dir;
+pub mod eof;
+pub mod file_copy;
+pub mod fileattr;
+pub mod filedatetime;
+pub mod filelen;
+pub mod freefile;
+pub mod get;
+pub mod getattr;
+pub mod input_statement;
+pub mod kill;
+pub mod line_input;
+pub mod loc;
+pub mod lock;
+pub mod lof;
+pub mod mkdir;
+pub mod name;
+pub mod open;
+pub mod print;
+pub mod put;
+pub mod reset;
+pub mod rmdir;
+pub mod seek;
+pub mod seek_statement;
+pub mod setattr;
+pub mod unlock;
+pub mod width;
+pub mod write;

@@ -1,12 +1,12 @@
 //! VB6 financial function registry.
 //!
 //! One [`Builtin`](super::Builtin) entry per financial function, each wrapping
-//! the typed `vb6runtime::library::functions::financial` implementation.
+//! the typed `vb6runtime::library::financial` implementation.
 
 use super::{Builtin, Registry};
 use crate::builtin;
 use vb6core::error::VBResult;
-use vb6runtime::library::functions::financial as finfn;
+use vb6runtime::library::financial as finfn;
 use vb6runtime::VBVariant;
 
 /// Register the financial functions in `registry`.

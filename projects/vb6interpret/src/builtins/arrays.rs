@@ -1,12 +1,12 @@
 //! VB6 array function registry.
 //!
 //! One [`Builtin`](super::Builtin) entry per array function, each wrapping the
-//! typed `vb6runtime::library::functions::arrays` implementation.
+//! typed `vb6runtime::library::arrays` implementation.
 
 use super::{Builtin, Registry};
 use crate::builtin;
 use vb6core::error::VBResult;
-use vb6runtime::library::functions::arrays as arrayfn;
+use vb6runtime::library::arrays as arrayfn;
 use vb6runtime::value::VBString;
 use vb6runtime::VBVariant;
 

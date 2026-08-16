@@ -1,13 +1,13 @@
 //! VB6 type-checking function registry.
 //!
 //! One [`Builtin`](super::Builtin) entry per type-checking function, each
-//! wrapping the typed `vb6runtime::library::functions::type_checking`
+//! wrapping the typed `vb6runtime::library::type_checking`
 //! implementation.
 
 use super::{Builtin, Registry};
 use crate::builtin;
 use vb6core::error::VBResult;
-use vb6runtime::library::functions::type_checking as typefn;
+use vb6runtime::library::type_checking as typefn;
 use vb6runtime::VBVariant;
 
 /// Register the type-checking functions in `registry`.

@@ -1,12 +1,12 @@
 //! VB6 math function registry.
 //!
 //! One [`Builtin`](super::Builtin) entry per math function, each wrapping the
-//! typed `vb6runtime::library::functions::math` implementation.
+//! typed `vb6runtime::library::math` implementation.
 
 use super::{Builtin, Registry};
 use crate::builtin;
 use vb6core::error::VBResult;
-use vb6runtime::library::functions::math as mathfn;
+use vb6runtime::library::math as mathfn;
 use vb6runtime::value::VBLong;
 use vb6runtime::VBVariant;
 
