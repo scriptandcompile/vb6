@@ -14,6 +14,12 @@ export function build_debug_trace(code: string): any;
 export function debug_vb6_code(code: string, pause_after_steps: number): any;
 
 /**
+ * Every environment variable currently in the snapshot, for display and
+ * persisting back to `localStorage`.
+ */
+export function dump_env(): any;
+
+/**
  * Every setting currently in the store, for persisting back to `localStorage`.
  */
 export function dump_settings(): any;
@@ -57,9 +63,23 @@ export function interpret_vb6_code(code: string): any;
 export function parse_vb6_code(code: string, _file_type: string): any;
 
 /**
+ * Remove environment variable `name` from the snapshot, if present.
+ */
+export function remove_env(name: string): void;
+
+/**
  * Remove the setting `(appname, section, key)`, if present.
  */
 export function remove_setting(appname: string, section: string, key: string): void;
+
+/**
+ * Set (or replace) the value of environment variable `name` in the snapshot.
+ *
+ * The webassembly host has no process environment, so the snapshot starts
+ * empty and is seeded from `localStorage` before a run; `Environ$` reads
+ * whatever is installed here.
+ */
+export function set_env(name: string, value: string): void;
 
 /**
  * Tokenizes VB6 code and returns a list of `TokenInfo` objects for quick preview.
@@ -83,10 +103,13 @@ export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly build_debug_trace: (a: number, b: number, c: number) => void;
     readonly debug_vb6_code: (a: number, b: number, c: number, d: number) => void;
+    readonly dump_env: (a: number) => void;
     readonly dump_settings: (a: number) => void;
     readonly install_setting: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => void;
     readonly interpret_vb6_code: (a: number, b: number, c: number) => void;
+    readonly remove_env: (a: number, b: number) => void;
     readonly remove_setting: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
+    readonly set_env: (a: number, b: number, c: number, d: number) => void;
     readonly parse_vb6_code: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly tokenize_vb6_code: (a: number, b: number, c: number) => void;
     readonly init_panic_hook: () => void;

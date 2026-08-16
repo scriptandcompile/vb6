@@ -225,14 +225,6 @@ pub fn reset_store_root() {
     reset();
 }
 
-/// An `io` error for when no store location is available.
-fn no_store_error() -> io::Error {
-    io::Error::new(
-        io::ErrorKind::NotFound,
-        "no settings store location available",
-    )
-}
-
 /// The value stored for `(appname, section, key)`, matched case-insensitively.
 pub fn get(appname: &str, section: &str, key: &str) -> Option<String> {
     let index = index_key(appname, section, key);
@@ -282,7 +274,9 @@ pub fn entries() -> Vec<(String, String, String, String)> {
 ///
 /// The components must be valid single path segments; an existing entry keeps
 /// the case it was originally stored under so no duplicate-case files appear.
-/// Returns an `io` error when there is no store location or the write fails.
+/// When no store location is available (for example a webassembly host) the
+/// store is kept in memory only. Returns an `io` error when a component is
+/// invalid or a disk write fails.
 pub fn set(appname: &str, section: &str, key: &str, value: &str) -> io::Result<()> {
     for component in [appname, section, key] {
         if !valid_component(component) {
@@ -292,7 +286,7 @@ pub fn set(appname: &str, section: &str, key: &str, value: &str) -> io::Result<(
             ));
         }
     }
-    let root = store_root().ok_or_else(no_store_error)?;
+    let root = store_root();
     let index = index_key(appname, section, key);
     let mut state = lock();
     let path = match state.values.get(&index) {
@@ -303,11 +297,13 @@ pub fn set(appname: &str, section: &str, key: &str, value: &str) -> io::Result<(
             key: key.to_string(),
         },
     };
-    let file = root.join(&path.appname).join(&path.section).join(&path.key);
-    if let Some(parent) = file.parent() {
-        fs::create_dir_all(parent)?;
+    if let Some(root) = root {
+        let file = root.join(&path.appname).join(&path.section).join(&path.key);
+        if let Some(parent) = file.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        fs::write(&file, value)?;
     }
-    fs::write(&file, value)?;
     state.values.insert(
         index,
         Entry {
@@ -319,8 +315,10 @@ pub fn set(appname: &str, section: &str, key: &str, value: &str) -> io::Result<(
 }
 
 /// Remove the setting `(appname, section, key)` from the store.
+///
+/// When no store location is available the store is kept in memory only.
 pub fn remove_key(appname: &str, section: &str, key: &str) -> io::Result<()> {
-    let root = store_root().ok_or_else(no_store_error)?;
+    let root = store_root();
     let index = index_key(appname, section, key);
     let mut state = lock();
     let path = match state.values.remove(&index) {
@@ -331,42 +329,52 @@ pub fn remove_key(appname: &str, section: &str, key: &str) -> io::Result<()> {
             key: key.to_string(),
         },
     };
-    let file = root.join(&path.appname).join(&path.section).join(&path.key);
-    let _ = fs::remove_file(&file);
-    // Best-effort removal of now-empty section and appname directories.
-    let _ = fs::remove_dir(file.parent().unwrap_or(&root));
-    let _ = fs::remove_dir(file.parent().and_then(Path::parent).unwrap_or(&root));
+    if let Some(root) = root {
+        let file = root.join(&path.appname).join(&path.section).join(&path.key);
+        let _ = fs::remove_file(&file);
+        // Best-effort removal of now-empty section and appname directories.
+        let _ = fs::remove_dir(file.parent().unwrap_or(&root));
+        let _ = fs::remove_dir(file.parent().and_then(Path::parent).unwrap_or(&root));
+    }
     Ok(())
 }
 
 /// Remove every setting under `(appname, section)`, including the section.
+///
+/// When no store location is available the store is kept in memory only.
 pub fn remove_section(appname: &str, section: &str) -> io::Result<()> {
-    let root = store_root().ok_or_else(no_store_error)?;
+    let root = store_root();
     let mut state = lock();
     state.values.retain(|(a, s, _), _| {
         !a.eq_ignore_ascii_case(appname) || !s.eq_ignore_ascii_case(section)
     });
-    if let Some(app_dir) = find_child(&root, appname) {
-        if let Some(section_dir) = find_child(&app_dir, section) {
-            if section_dir.is_dir() {
-                fs::remove_dir_all(&section_dir)?;
+    if let Some(root) = root {
+        if let Some(app_dir) = find_child(&root, appname) {
+            if let Some(section_dir) = find_child(&app_dir, section) {
+                if section_dir.is_dir() {
+                    fs::remove_dir_all(&section_dir)?;
+                }
             }
+            let _ = fs::remove_dir(app_dir);
         }
-        let _ = fs::remove_dir(app_dir);
     }
     Ok(())
 }
 
 /// Remove every setting under `appname`, including the application directory.
+///
+/// When no store location is available the store is kept in memory only.
 pub fn remove_appname(appname: &str) -> io::Result<()> {
-    let root = store_root().ok_or_else(no_store_error)?;
+    let root = store_root();
     let mut state = lock();
     state
         .values
         .retain(|(a, _, _), _| !a.eq_ignore_ascii_case(appname));
-    if let Some(app_dir) = find_child(&root, appname) {
-        if app_dir.is_dir() {
-            fs::remove_dir_all(&app_dir)?;
+    if let Some(root) = root {
+        if let Some(app_dir) = find_child(&root, appname) {
+            if app_dir.is_dir() {
+                fs::remove_dir_all(&app_dir)?;
+            }
         }
     }
     Ok(())

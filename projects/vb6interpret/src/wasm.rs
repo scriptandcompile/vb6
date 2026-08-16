@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
+use vb6runtime::state::environment as env_state;
 use vb6runtime::state::settings as settings_state;
 use wasm_bindgen::prelude::*;
 
@@ -391,6 +392,40 @@ pub struct WasmSetting {
     pub section: String,
     pub key: String,
     pub value: String,
+}
+
+/// A single `NAME`/value pair of the environment snapshot.
+#[derive(Clone, Serialize, Deserialize)]
+pub struct WasmEnvEntry {
+    pub name: String,
+    pub value: String,
+}
+
+/// Every environment variable currently in the snapshot, for display and
+/// persisting back to `localStorage`.
+#[wasm_bindgen]
+pub fn dump_env() -> Result<JsValue, JsError> {
+    let entries: Vec<WasmEnvEntry> = env_state::entries()
+        .into_iter()
+        .map(|(name, value)| WasmEnvEntry { name, value })
+        .collect();
+    Ok(to_value(&entries)?)
+}
+
+/// Set (or replace) the value of environment variable `name` in the snapshot.
+///
+/// The webassembly host has no process environment, so the snapshot starts
+/// empty and is seeded from `localStorage` before a run; `Environ$` reads
+/// whatever is installed here.
+#[wasm_bindgen]
+pub fn set_env(name: &str, value: &str) {
+    env_state::set_env(name, value);
+}
+
+/// Remove environment variable `name` from the snapshot, if present.
+#[wasm_bindgen]
+pub fn remove_env(name: &str) {
+    env_state::remove_env(name);
 }
 
 /// Install or overwrite the setting `(appname, section, key)` with `value`.

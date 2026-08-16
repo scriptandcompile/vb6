@@ -50,6 +50,27 @@ export function debug_vb6_code(code, pause_after_steps) {
 }
 
 /**
+ * Every environment variable currently in the snapshot, for display and
+ * persisting back to `localStorage`.
+ * @returns {any}
+ */
+export function dump_env() {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.dump_env(retptr);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
  * Every setting currently in the store, for persisting back to `localStorage`.
  * @returns {any}
  */
@@ -163,6 +184,16 @@ export function parse_vb6_code(code, _file_type) {
 }
 
 /**
+ * Remove environment variable `name` from the snapshot, if present.
+ * @param {string} name
+ */
+export function remove_env(name) {
+    const ptr0 = passStringToWasm0(name, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    wasm.remove_env(ptr0, len0);
+}
+
+/**
  * Remove the setting `(appname, section, key)`, if present.
  * @param {string} appname
  * @param {string} section
@@ -176,6 +207,23 @@ export function remove_setting(appname, section, key) {
     const ptr2 = passStringToWasm0(key, wasm.__wbindgen_export, wasm.__wbindgen_export2);
     const len2 = WASM_VECTOR_LEN;
     wasm.remove_setting(ptr0, len0, ptr1, len1, ptr2, len2);
+}
+
+/**
+ * Set (or replace) the value of environment variable `name` in the snapshot.
+ *
+ * The webassembly host has no process environment, so the snapshot starts
+ * empty and is seeded from `localStorage` before a run; `Environ$` reads
+ * whatever is installed here.
+ * @param {string} name
+ * @param {string} value
+ */
+export function set_env(name, value) {
+    const ptr0 = passStringToWasm0(name, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(value, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len1 = WASM_VECTOR_LEN;
+    wasm.set_env(ptr0, len0, ptr1, len1);
 }
 
 /**
