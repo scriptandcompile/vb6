@@ -629,6 +629,38 @@ mod tests {
     }
 
     #[test]
+    fn error_and_error_dollar_dispatch() {
+        use vb6runtime::state::err as err_state;
+
+        // Serialize against the shared current-error state and clear it
+        // afterwards so other tests start from a no-error baseline.
+        let _guard = ENV_DISPATCH_LOCK.lock().unwrap();
+        err_state::clear();
+        assert_eq!(
+            call_builtin("Error$", &[]).unwrap(),
+            VBVariant::from_string("")
+        );
+        assert_eq!(
+            call_builtin("Error", &[VBVariant::from_integer(0)]).unwrap(),
+            VBVariant::from_string("")
+        );
+        assert_eq!(
+            call_builtin("Error", &[VBVariant::from_long(11)]).unwrap(),
+            VBVariant::from_string("Division by zero")
+        );
+        assert_eq!(
+            call_builtin("Error$", &[VBVariant::from_long(999)]).unwrap(),
+            VBVariant::from_string("Application-defined or object-defined error")
+        );
+        err_state::set_number(53);
+        assert_eq!(
+            call_builtin("Error", &[]).unwrap(),
+            VBVariant::from_string("File not found")
+        );
+        err_state::clear();
+    }
+
+    #[test]
     fn filter_dispatch() {
         let arr = call_builtin(
             "Filter",

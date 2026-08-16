@@ -224,3 +224,130 @@
 //! - Limited to VB6's predefined error numbers.
 //! - Does not provide error source or context.
 //! - Message text may change between VB versions.
+
+use crate::error::{default_description, VBResult};
+use crate::state::err as err_state;
+use crate::value::VBVariant;
+
+/// Returns the error message corresponding to an error number, as a `String`.
+///
+/// - **Omitted argument** (`Empty`): the message for the current run-time
+///   error (`Err.Number`), or `""` when no error is current.
+/// - **Numeric argument**: the message for that error number, rounded with
+///   VB6's half-to-even `Long` semantics. `0` returns `""`; numbers with no
+///   predefined message return `"Application-defined or object-defined
+///   error"`.
+///
+/// Returns error 94 (invalid use of Null) for a `Null` argument and error 13
+/// (type mismatch) for a value that does not convert to a number.
+pub fn error_dollar(arg: &VBVariant) -> VBResult<VBVariant> {
+    let number = match arg {
+        VBVariant::Empty => err_state::current_number(),
+        _ => arg.as_i32()?,
+    };
+    let description = if number == 0 {
+        String::new()
+    } else {
+        default_description(number)
+    };
+    Ok(VBVariant::from_string(description))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::test_support::TEST_LOCK;
+
+    #[test]
+    fn returns_message_for_known_number() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        assert_eq!(
+            error_dollar(&VBVariant::from_integer(5)).unwrap(),
+            VBVariant::from_string("Invalid procedure call or argument")
+        );
+        assert_eq!(
+            error_dollar(&VBVariant::from_integer(11)).unwrap(),
+            VBVariant::from_string("Division by zero")
+        );
+        assert_eq!(
+            error_dollar(&VBVariant::from_integer(53)).unwrap(),
+            VBVariant::from_string("File not found")
+        );
+    }
+
+    #[test]
+    fn error_number_zero_returns_empty_string() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        assert_eq!(
+            error_dollar(&VBVariant::from_integer(0)).unwrap(),
+            VBVariant::from_string("")
+        );
+    }
+
+    #[test]
+    fn unknown_number_returns_generic_message() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        assert_eq!(
+            error_dollar(&VBVariant::from_long(999)).unwrap(),
+            VBVariant::from_string("Application-defined or object-defined error")
+        );
+        assert_eq!(
+            error_dollar(&VBVariant::from_integer(-100)).unwrap(),
+            VBVariant::from_string("Application-defined or object-defined error")
+        );
+    }
+
+    #[test]
+    fn fractional_number_is_rounded() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        assert_eq!(
+            error_dollar(&VBVariant::from_double(5.4)).unwrap(),
+            VBVariant::from_string("Invalid procedure call or argument")
+        );
+        assert_eq!(
+            error_dollar(&VBVariant::from_double(10.6)).unwrap(),
+            VBVariant::from_string("Division by zero")
+        );
+    }
+
+    #[test]
+    fn omitted_argument_uses_the_current_error_number() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        err_state::set_number(53);
+        assert_eq!(
+            error_dollar(&VBVariant::Empty).unwrap(),
+            VBVariant::from_string("File not found")
+        );
+        err_state::clear();
+    }
+
+    #[test]
+    fn omitted_argument_with_no_current_error_is_empty() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        err_state::clear();
+        assert_eq!(
+            error_dollar(&VBVariant::Empty).unwrap(),
+            VBVariant::from_string("")
+        );
+    }
+
+    #[test]
+    fn null_is_invalid_use_of_null() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        assert_eq!(
+            error_dollar(&VBVariant::Null).unwrap_err().number,
+            crate::error::err_number::INVALID_USE_OF_NULL
+        );
+    }
+
+    #[test]
+    fn non_numeric_string_is_type_mismatch() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        assert_eq!(
+            error_dollar(&VBVariant::from_string("some text"))
+                .unwrap_err()
+                .number,
+            crate::error::err_number::TYPE_MISMATCH
+        );
+    }
+}

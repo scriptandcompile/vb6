@@ -3,15 +3,17 @@
 //! VB6 keeps mutable process-wide state that spans individual functions and
 //! statements rather than being owned by a single call: the environment
 //! snapshot read by `Environ` and written by the `Environ` assignment
-//! statement, and the random-number generator seed shared by `Rnd` and the
-//! `Randomize` statement. A host installs a controlled baseline before a
-//! program runs; statements mutate it as the program runs.
+//! statement, the random-number generator seed shared by `Rnd` and the
+//! `Randomize` statement, and the current run-time error number read by the
+//! omitted-argument form of `Error`/`Error$`. A host installs a controlled
+//! baseline before a program runs; statements mutate it as the program runs.
 //!
 //! Each piece of state lives in its own submodule ([`environment`],
-//! [`random`]), exposing a small typed API over an internal mutex or atomic so
-//! callers never touch the raw storage.
+//! [`random`], [`err`]), exposing a small typed API over an internal mutex or
+//! atomic so callers never touch the raw storage.
 
 pub mod environment;
+pub mod err;
 pub mod random;
 
 #[cfg(test)]
