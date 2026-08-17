@@ -12,6 +12,7 @@ use vb6runtime::library::environment::environ_dollar::environ_dollar;
 use vb6runtime::library::environment::error::error;
 use vb6runtime::library::environment::error_dollar::error_dollar;
 use vb6runtime::library::environment::getsetting::get_setting;
+use vb6runtime::library::environment::getallsettings::get_all_settings;
 use vb6runtime::VBVariant;
 
 /// Register the environment functions in `registry`.
@@ -33,5 +34,8 @@ pub(super) fn register(registry: &mut Registry) {
             &args[2],
             args.get(3).unwrap_or(&VBVariant::Empty),
         )
+    }));
+    registry.insert(builtin!("getallsettings", 2, 2, |args| {
+        get_all_settings(&args[0], &args[1])
     }));
 }

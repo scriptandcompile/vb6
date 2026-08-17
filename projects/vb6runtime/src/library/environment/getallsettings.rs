@@ -780,3 +780,155 @@
 //! - `DeleteSetting` - Deletes a section or key setting from the registry
 //! - `Environ` - Returns the string associated with an operating system environment variable
 //! - `Command` - Returns the command-line arguments
+
+use crate::error::VBResult;
+use crate::state::settings;
+use crate::types::VBType;
+use crate::value::VBVariant;
+use crate::array::{ArrayDimension, ArrayValue};
+
+/// Returns every `(key, value)` pair stored under `(appname, section)`.
+///
+/// The result is a zero-based two-dimensional `String` array where column 0
+/// holds the key names and column 1 holds the corresponding values. Keys are
+/// returned sorted and in the case they were stored under.
+///
+/// When no settings exist for the given `(appname, section)` the return value
+/// is `Empty` (testing `IsEmpty()` on it yields `True`).
+///
+/// `Null` arguments raise error 94 (invalid use of `Null`); object and array
+/// arguments raise error 13 (type mismatch).
+pub fn get_all_settings(
+    appname: &VBVariant,
+    section: &VBVariant,
+) -> VBResult<VBVariant> {
+    let appname = appname.as_string()?;
+    let section = section.as_string()?;
+
+    let pairs = settings::get_all(&appname, &section);
+
+    if pairs.is_empty() {
+        return Ok(VBVariant::Empty);
+    }
+
+    let count = pairs.len() as i32;
+    // VB6 GetAllSettings returns a 0-based, 2D array: (0..count-1, 0..1).
+    let dims = [
+        ArrayDimension::new(0, count - 1),
+        ArrayDimension::new(0, 1),
+    ];
+    let mut arr = ArrayValue::new_fixed(VBType::String, &dims)?;
+
+    for (i, (key, value)) in pairs.into_iter().enumerate() {
+        let row = i as i32;
+        arr.set(&[row, 0], VBVariant::from_string(key))?;
+        arr.set(&[row, 1], VBVariant::from_string(value))?;
+    }
+
+    Ok(VBVariant::Array(arr))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::settings as settings_state;
+    use crate::state::test_support::with_temp_settings_store;
+
+    fn string(value: &str) -> VBVariant {
+        VBVariant::from_string(value)
+    }
+
+    #[test]
+    fn returns_empty_when_no_settings_exist() {
+        with_temp_settings_store(|_| {
+            let result = get_all_settings(&string("MyApp"), &string("Section")).unwrap();
+            assert!(result.is_empty());
+        });
+    }
+
+    #[test]
+    fn returns_2d_array_of_key_value_pairs() {
+        with_temp_settings_store(|_| {
+            settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
+            settings_state::set("MyApp", "Startup", "Top", "40").unwrap();
+
+            let result = get_all_settings(&string("MyApp"), &string("Startup")).unwrap();
+            let arr = result.as_array().unwrap();
+
+            // Should be a 2D array with 2 rows and 2 columns
+            assert_eq!(arr.rank(), 2);
+            assert_eq!(arr.lower_bound(0).unwrap(), 0);
+            assert_eq!(arr.upper_bound(0).unwrap(), 1);
+            assert_eq!(arr.lower_bound(1).unwrap(), 0);
+            assert_eq!(arr.upper_bound(1).unwrap(), 1);
+
+            // Keys are sorted: "Left" comes before "Top"
+            assert_eq!(arr.get(&[0, 0]).unwrap(), &string("Left"));
+            assert_eq!(arr.get(&[0, 1]).unwrap(), &string("150"));
+            assert_eq!(arr.get(&[1, 0]).unwrap(), &string("Top"));
+            assert_eq!(arr.get(&[1, 1]).unwrap(), &string("40"));
+        });
+    }
+
+    #[test]
+    fn lookup_is_case_insensitive() {
+        with_temp_settings_store(|_| {
+            settings_state::set("MyApp", "Window", "Width", "600").unwrap();
+
+            let result = get_all_settings(&string("myapp"), &string("window")).unwrap();
+            let arr = result.as_array().unwrap();
+
+            assert_eq!(arr.get(&[0, 0]).unwrap(), &string("Width"));
+            assert_eq!(arr.get(&[0, 1]).unwrap(), &string("600"));
+        });
+    }
+
+    #[test]
+    fn returns_only_matching_section() {
+        with_temp_settings_store(|_| {
+            settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
+            settings_state::set("MyApp", "Other", "Top", "40").unwrap();
+
+            let result = get_all_settings(&string("MyApp"), &string("Startup")).unwrap();
+            let arr = result.as_array().unwrap();
+
+            assert_eq!(arr.upper_bound(0).unwrap(), 0); // Only 1 row
+            assert_eq!(arr.get(&[0, 0]).unwrap(), &string("Left"));
+            assert_eq!(arr.get(&[0, 1]).unwrap(), &string("150"));
+        });
+    }
+
+    #[test]
+    fn null_arguments_are_error_94() {
+        with_temp_settings_store(|_| {
+            let err = get_all_settings(&VBVariant::Null, &string("Section")).unwrap_err();
+            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
+
+            let err = get_all_settings(&string("App"), &VBVariant::Null).unwrap_err();
+            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
+        });
+    }
+
+    #[test]
+    fn object_and_array_arguments_are_error_13() {
+        with_temp_settings_store(|_| {
+            let array = VBVariant::array_dynamic(vb6core::types::VBType::String);
+            let err = get_all_settings(&array, &string("Section")).unwrap_err();
+            assert_eq!(err.number, crate::error::err_number::TYPE_MISMATCH);
+        });
+    }
+
+    #[test]
+    fn values_survive_a_reload_from_disk() {
+        with_temp_settings_store(|_| {
+            settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
+            settings_state::reset();
+
+            let result = get_all_settings(&string("MyApp"), &string("Startup")).unwrap();
+            let arr = result.as_array().unwrap();
+
+            assert_eq!(arr.get(&[0, 0]).unwrap(), &string("Left"));
+            assert_eq!(arr.get(&[0, 1]).unwrap(), &string("150"));
+        });
+    }
+}
