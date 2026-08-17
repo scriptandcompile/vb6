@@ -392,3 +392,28 @@
 //! Public Const vbIMEHangulHalf = 9   ' Half Hangul
 //! Public Const vbIMEHangulFull = 10  ' Full Hangul
 //! ```
+
+use crate::error::VBResult;
+use crate::value::VBVariant;
+
+/// Returns an `Integer` indicating the current IME mode.
+///
+/// Always returns `vbIMENoOp` (0). Full IME detection is not yet
+/// implemented — platform-specific support should be added later.
+pub fn imestatus() -> VBResult<VBVariant> {
+    // TODO: detect the real IME mode via platform APIs (e.g. Windows
+    // ImmGetContext / ImmGetOpenStatus) and return the appropriate
+    // vbIME* constant.  For now, return vbIMENoOp (0) which is the
+    // safe default on systems without an IME.
+    Ok(VBVariant::from_integer(0))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn returns_zero() {
+        assert_eq!(imestatus().unwrap(), VBVariant::from_integer(0));
+    }
+}
