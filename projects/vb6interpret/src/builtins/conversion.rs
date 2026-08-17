@@ -18,6 +18,7 @@ pub(super) fn register(registry: &mut Registry) {
     registry.insert(builtin!("hex$", 1, 1, |args| {
         convfn::hex_dollar::hex_dollar(&args[0]).map(VBVariant::from)
     }));
+    registry.insert(builtin!("oct", 1, 1, |args| { convfn::oct::oct(&args[0]) }));
     registry.insert(builtin!("oct$", 1, 1, |args| {
         convfn::oct_dollar::oct_dollar(&args[0]).map(VBVariant::from)
     }));
