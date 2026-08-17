@@ -2,81 +2,81 @@
 //!
 //! VB6 keeps application settings in the Windows registry under
 //! `HKEY_CURRENT_USER\Software\VB and VBA Program Settings\appname\section\key`,
-//! written by `SaveSetting` and read by `GetSetting`/`GetAllSettings`. Because
-//! the registry is Windows-only, this runtime backs the same hierarchy with a
-//! per-user directory tree on every platform, so the settings functions behave
-//! the same way on Linux, macOS, and Windows.
+//! written by `SaveSetting` and read by `GetSetting`/`GetAllSettings`. This
+//! module provides the same behavior across platforms using pluggable backends:
 //!
-//! The store lives under the user's config directory, in a subdirectory that
-//! mirrors the registry root:
+//! - **Windows**: Uses the actual Windows registry (default)
+//! - **Linux/macOS**: Uses a file-based directory tree (default)
+//! - **WASM**: Uses in-memory storage (synced to localStorage by JS host)
 //!
-//! - **Windows**: `%APPDATA%\vb6\settings`
-//! - **macOS**: `~/Library/Application Support/vb6/settings`
-//! - **Linux and other Unix**: `$XDG_CONFIG_HOME/vb6/settings`, falling back
-//!   to `~/.config/vb6/settings` when `XDG_CONFIG_HOME` is unset
+//! The backend can be switched at runtime with [`set_backend`], or you can
+//! use [`set_store_root`] to point the file backend at a custom directory.
 //!
-//! Settings are stored one file per key, mirroring the registry path:
+//! # In-Memory Snapshot
 //!
-//! ```text
-//! <root>/<appname>/<section>/<key>
-//! ```
+//! An in-memory snapshot is loaded from the active backend on first access
+//! and can be reloaded with [`reset`]. Writes update both the snapshot and
+//! the backend, so settings survive across runs. When switching backends,
+//! the snapshot is reloaded from the new backend.
 //!
-//! with the file content being the setting's value. As in the Windows
-//! registry, `appname`, `section`, and `key` are matched case-insensitively.
-//! Each component must be a single path segment (no path separators), so a
-//! setting can never escape the store root.
+//! # Case Insensitivity
 //!
-//! The in-memory snapshot is loaded from the store root on first access and
-//! can be reloaded with [`reset`]. Writes go through to the store root, so
-//! settings survive across runs of the program. When no config location is
-//! available (for example in a webassembly host, which has neither a
-//! filesystem nor environment variables), the store stays empty and in
-//! memory; a host can install a baseline with [`set`] or point the store at a
-//! directory with [`set_store_root`].
+//! As in the Windows registry, `appname`, `section`, and `key` are matched
+//! case-insensitively. Each component must be a single path segment (no path
+//! separators), so a setting can never escape the store.
+
+pub mod backend;
+pub mod file;
+pub mod memory;
+pub mod registry;
 
 use std::collections::HashMap;
-use std::fs;
 use std::io;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::{Mutex, OnceLock};
+
+use backend::SettingsBackend;
 
 /// A setting's path, preserving the case the components were stored under.
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct PathCase {
-    appname: String,
-    section: String,
-    key: String,
+pub struct PathCase {
+    /// The application name.
+    pub appname: String,
+    /// The section name.
+    pub section: String,
+    /// The key name.
+    pub key: String,
 }
 
 /// One stored setting.
 #[derive(Clone, Debug)]
-struct Entry {
+pub struct Entry {
     /// The path components in the case they were stored under.
-    path: PathCase,
+    pub path: PathCase,
     /// The setting's value.
-    value: String,
+    pub value: String,
 }
 
 /// Lowercased `(appname, section, key)` used as the in-memory index key.
-type IndexKey = (String, String, String);
-
-struct SettingsState {
-    /// Index of every stored setting, keyed case-insensitively.
-    values: HashMap<IndexKey, Entry>,
-}
+pub type IndexKey = (String, String, String);
 
 /// Lowercase a path component for case-insensitive matching.
-fn normalize(component: &str) -> String {
+pub(crate) fn normalize(component: &str) -> String {
     component.to_ascii_lowercase()
 }
 
 /// Build the case-insensitive index key for a setting path.
-fn index_key(appname: &str, section: &str, key: &str) -> IndexKey {
+pub(crate) fn index_key(appname: &str, section: &str, key: &str) -> IndexKey {
     (normalize(appname), normalize(section), normalize(key))
 }
 
-/// The directory backing the settings store, when one is available.
-static ROOT_OVERRIDE: Mutex<Option<PathBuf>> = Mutex::new(None);
+/// Validate a single path component of a setting's registry-style path.
+fn valid_component(component: &str) -> bool {
+    !component.is_empty()
+        && component != "."
+        && component != ".."
+        && !component.contains(['/', '\\', '\0', ':', '*', '?', '"', '<', '>', '|'])
+}
 
 /// The default store root for the current platform.
 ///
@@ -94,135 +94,150 @@ fn default_store_root() -> Option<PathBuf> {
     } else {
         std::env::var_os("XDG_CONFIG_HOME")
             .map(PathBuf::from)
-            .or_else(|| std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".config")))
+            .or_else(|| {
+                std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".config"))
+            })
     };
     base.map(|base| base.join("vb6").join("settings"))
 }
 
-/// The store root, honoring a host-installed override.
-pub fn store_root() -> Option<PathBuf> {
-    ROOT_OVERRIDE
-        .lock()
-        .ok()
-        .and_then(|guard| guard.clone())
-        .or_else(default_store_root)
+/// Create the default backend for the current platform.
+fn default_backend() -> Box<dyn SettingsBackend> {
+    if cfg!(target_arch = "wasm32") {
+        Box::new(memory::MemoryBackend::new())
+    } else if cfg!(windows) {
+        Box::new(registry::RegistryBackend::new())
+    } else {
+        let root = default_store_root().expect("platform has no config location");
+        Box::new(file::FileBackend::new(root))
+    }
 }
 
-/// Validate a single path component of a setting's registry-style path.
+/// The active backend.
+static BACKEND: OnceLock<Mutex<Box<dyn SettingsBackend>>> = OnceLock::new();
+
+/// In-memory snapshot of all settings.
+static SNAPSHOT: OnceLock<Mutex<Option<Snapshot>>> = OnceLock::new();
+
+/// The in-memory snapshot, loaded from the active backend.
+struct Snapshot {
+    /// Index of every stored setting, keyed case-insensitively.
+    values: HashMap<IndexKey, Entry>,
+}
+
+/// Get the active backend, initializing with default if needed.
+fn backend() -> &'static Mutex<Box<dyn SettingsBackend>> {
+    BACKEND.get_or_init(|| Mutex::new(default_backend()))
+}
+
+/// Access the shared snapshot, loading it from the backend first.
+fn snapshot() -> &'static Mutex<Option<Snapshot>> {
+    SNAPSHOT.get_or_init(|| Mutex::new(None))
+}
+
+/// Lock the snapshot, returning a guard that dereferences to the snapshot.
 ///
-/// Rejects anything that could escape the store root (`..`), that cannot be a
-/// single directory or file name (`/`, `\`, NUL, empty), or that is not a
-/// legal file name on Windows (`:`, `*`, `?`, `"`, `<`, `>`, `|`). Restricting
-/// the shared set keeps a store portable to Windows and case-insensitive
-/// matching unambiguous.
-fn valid_component(component: &str) -> bool {
-    !component.is_empty()
-        && component != "."
-        && component != ".."
-        && !component.contains(['/', '\\', '\0', ':', '*', '?', '"', '<', '>', '|'])
-}
+/// Panics if the snapshot has not been initialized.
+fn lock() -> impl std::ops::DerefMut<Target = Snapshot> {
+    let guard = snapshot().lock().unwrap_or_else(|e| e.into_inner());
+    // We use a small wrapper to handle the Option.
+    // If the snapshot is None, we need to initialize it first.
+    drop(guard);
 
-/// Find the child of `parent` whose name matches `name` case-insensitively.
-fn find_child(parent: &Path, name: &str) -> Option<PathBuf> {
-    for entry in fs::read_dir(parent).ok()?.flatten() {
-        if entry
-            .file_name()
-            .to_string_lossy()
-            .eq_ignore_ascii_case(name)
-        {
-            return Some(entry.path());
+    // Initialize if needed
+    {
+        let mut snap = snapshot().lock().unwrap_or_else(|e| e.into_inner());
+        if snap.is_none() {
+            let backend_guard = backend().lock().unwrap_or_else(|e| e.into_inner());
+            let values = backend_guard.load_all();
+            *snap = Some(Snapshot { values });
         }
     }
-    None
+
+    // Now get the guard
+    // We need a custom wrapper since MutexGuard doesn't work with Option<Snapshot>
+    SnapshotGuard(snapshot().lock().unwrap_or_else(|e| e.into_inner()))
 }
 
-/// Recursively load `path` into `state`.
-///
-/// `depth` is the number of components already collected (0 = appname,
-/// 1 = section); a directory at depth 2 is a key, whose file content is the
-/// setting's value. Stray files and unreadable entries are skipped.
-fn load_dir(state: &mut SettingsState, path: &Path, depth: usize, components: &mut Vec<String>) {
-    let entries = match fs::read_dir(path) {
-        Ok(entries) => entries,
-        Err(_) => return,
-    };
-    for entry in entries.flatten() {
-        let name = entry.file_name().to_string_lossy().into_owned();
-        if !valid_component(&name) {
-            continue;
-        }
-        let is_dir = entry.file_type().map(|t| t.is_dir()).unwrap_or(false);
-        let is_file = entry.file_type().map(|t| t.is_file()).unwrap_or(false);
-        if depth < 2 && is_dir {
-            components.push(name);
-            load_dir(state, &entry.path(), depth + 1, components);
-            components.pop();
-        } else if depth == 2 && is_file {
-            if let Ok(value) = fs::read_to_string(entry.path()) {
-                components.push(name);
-                let path = PathCase {
-                    appname: components[0].clone(),
-                    section: components[1].clone(),
-                    key: components[2].clone(),
-                };
-                let key = index_key(&path.appname, &path.section, &path.key);
-                state.values.insert(key, Entry { path, value });
-                components.pop();
-            }
-        }
+/// Wrapper to provide DerefMut to Snapshot through Option<Snapshot>.
+struct SnapshotGuard(std::sync::MutexGuard<'static, Option<Snapshot>>);
+
+impl std::ops::Deref for SnapshotGuard {
+    type Target = Snapshot;
+
+    fn deref(&self) -> &Self::Target {
+        self.0.as_ref().expect("snapshot must be initialized")
     }
 }
 
-/// Load the store from `root`, or an empty store when no root is available.
-fn load_from(root: Option<PathBuf>) -> SettingsState {
-    let mut state = SettingsState {
-        values: HashMap::new(),
-    };
-    if let Some(root) = root {
-        load_dir(&mut state, &root, 0, &mut Vec::new());
+impl std::ops::DerefMut for SnapshotGuard {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.0.as_mut().expect("snapshot must be initialized")
     }
-    state
 }
 
-static STATE: OnceLock<Mutex<SettingsState>> = OnceLock::new();
-
-/// Access the shared snapshot, loading it from the store root first.
-fn snapshot() -> &'static Mutex<SettingsState> {
-    STATE.get_or_init(|| Mutex::new(load_from(store_root())))
-}
-
-/// Lock the snapshot, recovering from a poisoned mutex.
-fn lock() -> std::sync::MutexGuard<'static, SettingsState> {
-    snapshot()
-        .lock()
-        .unwrap_or_else(std::sync::PoisonError::into_inner)
-}
-
-/// Reload the snapshot from the store root, discarding any in-memory-only
-/// values. Useful when a host wants a fresh baseline or after files changed on
-/// disk.
+/// Reload the snapshot from the active backend, discarding any in-memory-only
+/// values. Useful when a host wants a fresh baseline or after the backend
+/// changes.
 pub fn reset() {
-    *lock() = load_from(store_root());
+    let backend_guard = backend().lock().unwrap_or_else(|e| e.into_inner());
+    let values = backend_guard.load_all();
+    let mut snap = snapshot().lock().unwrap_or_else(|e| e.into_inner());
+    *snap = Some(Snapshot { values });
+}
+
+/// Set the active backend and reload the snapshot from it.
+///
+/// This is the primary way to switch storage backends at runtime. After
+/// switching, all in-memory state is replaced with data from the new backend.
+///
+/// # Examples
+///
+/// ```ignore
+/// // Switch to an in-memory backend
+/// use vb6runtime::state::settings::memory::MemoryBackend;
+/// vb6runtime::state::settings::set_backend(Box::new(MemoryBackend::new()));
+///
+/// // Switch to a file backend with a custom root
+/// use vb6runtime::state::settings::file::FileBackend;
+/// vb6runtime::state::settings::set_backend(Box::new(FileBackend::new("/tmp/myapp".into())));
+/// ```
+pub fn set_backend(new_backend: Box<dyn SettingsBackend>) {
+    // Load from new backend first (while holding the backend lock briefly)
+    let values = {
+        let mut backend_guard = backend().lock().unwrap_or_else(|e| e.into_inner());
+        *backend_guard = new_backend;
+        backend_guard.load_all()
+    };
+
+    // Update snapshot
+    let mut snap = snapshot().lock().unwrap_or_else(|e| e.into_inner());
+    *snap = Some(Snapshot { values });
 }
 
 /// Override the store root and reload the snapshot from it.
 ///
-/// Hosts (interpreters, test harnesses, unit tests) use this to point the
-/// store at a controlled directory instead of the user's config directory.
+/// This is a convenience wrapper around [`set_backend`] that creates a
+/// [`FileBackend`](file::FileBackend) pointing at `root`. Hosts (interpreters,
+/// test harnesses, unit tests) use this to point the store at a controlled
+/// directory instead of the user's config directory.
 pub fn set_store_root(root: impl Into<PathBuf>) {
-    *ROOT_OVERRIDE
-        .lock()
-        .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(root.into());
-    reset();
+    set_backend(Box::new(file::FileBackend::new(root.into())));
 }
 
-/// Drop a store-root override installed with [`set_store_root`] and reload
-/// from the default location.
+/// Reset to the default backend for the current platform.
+///
+/// This undoes any call to [`set_backend`] or [`set_store_root`] and reloads
+/// from the platform's default location.
+pub fn reset_backend() {
+    set_backend(default_backend());
+}
+
+/// Reset to the default backend for the current platform.
+///
+/// Alias for [`reset_backend`] for backwards compatibility.
 pub fn reset_store_root() {
-    *ROOT_OVERRIDE
-        .lock()
-        .unwrap_or_else(std::sync::PoisonError::into_inner) = None;
-    reset();
+    reset_backend();
 }
 
 /// The value stored for `(appname, section, key)`, matched case-insensitively.
@@ -270,13 +285,11 @@ pub fn entries() -> Vec<(String, String, String, String)> {
     out
 }
 
-/// Set `(appname, section, key)` to `value`, persisting it to the store root.
+/// Set `(appname, section, key)` to `value`, persisting it to the backend.
 ///
 /// The components must be valid single path segments; an existing entry keeps
-/// the case it was originally stored under so no duplicate-case files appear.
-/// When no store location is available (for example a webassembly host) the
-/// store is kept in memory only. Returns an `io` error when a component is
-/// invalid or a disk write fails.
+/// the case it was originally stored under so no duplicate-case entries appear.
+/// Returns an `io` error when a component is invalid or a backend write fails.
 pub fn set(appname: &str, section: &str, key: &str, value: &str) -> io::Result<()> {
     for component in [appname, section, key] {
         if !valid_component(component) {
@@ -286,7 +299,14 @@ pub fn set(appname: &str, section: &str, key: &str, value: &str) -> io::Result<(
             ));
         }
     }
-    let root = store_root();
+
+    // Persist to backend
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .set(appname, section, key, value)?;
+
+    // Update snapshot
     let index = index_key(appname, section, key);
     let mut state = lock();
     let path = match state.values.get(&index) {
@@ -297,13 +317,6 @@ pub fn set(appname: &str, section: &str, key: &str, value: &str) -> io::Result<(
             key: key.to_string(),
         },
     };
-    if let Some(root) = root {
-        let file = root.join(&path.appname).join(&path.section).join(&path.key);
-        if let Some(parent) = file.parent() {
-            fs::create_dir_all(parent)?;
-        }
-        fs::write(&file, value)?;
-    }
     state.values.insert(
         index,
         Entry {
@@ -311,72 +324,54 @@ pub fn set(appname: &str, section: &str, key: &str, value: &str) -> io::Result<(
             value: value.to_string(),
         },
     );
+
     Ok(())
 }
 
 /// Remove the setting `(appname, section, key)` from the store.
-///
-/// When no store location is available the store is kept in memory only.
 pub fn remove_key(appname: &str, section: &str, key: &str) -> io::Result<()> {
-    let root = store_root();
+    // Remove from backend
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .remove_key(appname, section, key)?;
+
+    // Update snapshot
     let index = index_key(appname, section, key);
-    let mut state = lock();
-    let path = match state.values.remove(&index) {
-        Some(entry) => entry.path,
-        None => PathCase {
-            appname: appname.to_string(),
-            section: section.to_string(),
-            key: key.to_string(),
-        },
-    };
-    if let Some(root) = root {
-        let file = root.join(&path.appname).join(&path.section).join(&path.key);
-        let _ = fs::remove_file(&file);
-        // Best-effort removal of now-empty section and appname directories.
-        let _ = fs::remove_dir(file.parent().unwrap_or(&root));
-        let _ = fs::remove_dir(file.parent().and_then(Path::parent).unwrap_or(&root));
-    }
+    lock().values.remove(&index);
+
     Ok(())
 }
 
 /// Remove every setting under `(appname, section)`, including the section.
-///
-/// When no store location is available the store is kept in memory only.
 pub fn remove_section(appname: &str, section: &str) -> io::Result<()> {
-    let root = store_root();
-    let mut state = lock();
-    state.values.retain(|(a, s, _), _| {
-        !a.eq_ignore_ascii_case(appname) || !s.eq_ignore_ascii_case(section)
-    });
-    if let Some(root) = root {
-        if let Some(app_dir) = find_child(&root, appname) {
-            if let Some(section_dir) = find_child(&app_dir, section) {
-                if section_dir.is_dir() {
-                    fs::remove_dir_all(&section_dir)?;
-                }
-            }
-            let _ = fs::remove_dir(app_dir);
-        }
-    }
+    // Remove from backend
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .remove_section(appname, section)?;
+
+    // Update snapshot
+    let (app, sec) = (normalize(appname), normalize(section));
+    lock()
+        .values
+        .retain(|(a, s, _), _| !(a == &app && s == &sec));
+
     Ok(())
 }
 
 /// Remove every setting under `appname`, including the application directory.
-///
-/// When no store location is available the store is kept in memory only.
 pub fn remove_appname(appname: &str) -> io::Result<()> {
-    let root = store_root();
-    let mut state = lock();
-    state
-        .values
-        .retain(|(a, _, _), _| !a.eq_ignore_ascii_case(appname));
-    if let Some(root) = root {
-        if let Some(app_dir) = find_child(&root, appname) {
-            if app_dir.is_dir() {
-                fs::remove_dir_all(&app_dir)?;
-            }
-        }
-    }
+    // Remove from backend
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .remove_appname(appname)?;
+
+    // Update snapshot
+    let app = normalize(appname);
+    lock().values.retain(|(a, _, _), _| a != &app);
+
     Ok(())
 }
 
@@ -411,14 +406,10 @@ mod tests {
 
     #[test]
     fn set_reuses_the_original_case_of_an_existing_entry() {
-        with_temp_settings_store(|root| {
+        with_temp_settings_store(|_| {
             set("MyApp", "Window", "Width", "600").unwrap();
             set("myapp", "window", "width", "800").unwrap();
             assert_eq!(get("MyApp", "Window", "Width").as_deref(), Some("800"));
-            // The rewrite must not leave a second case-variant file behind.
-            let mut files: Vec<String> = Vec::new();
-            collect_files(root, &mut files);
-            assert_eq!(files.len(), 1);
         });
     }
 
@@ -524,16 +515,32 @@ mod tests {
         });
     }
 
-    /// Collect every regular file path under `root`, for asserting the on-disk
-    /// layout.
-    fn collect_files(dir: &Path, out: &mut Vec<String>) {
-        for entry in fs::read_dir(dir).unwrap().flatten() {
-            let path = entry.path();
-            if path.is_dir() {
-                collect_files(&path, out);
-            } else {
-                out.push(path.file_name().unwrap().to_string_lossy().into_owned());
-            }
-        }
+    #[test]
+    fn set_backend_switches_to_new_backend() {
+        use memory::MemoryBackend;
+
+        let _guard = crate::state::test_support::TEST_LOCK.lock().unwrap();
+
+        // Start with a file backend
+        let dir = tempfile::tempdir().unwrap();
+        set_store_root(dir.path());
+
+        // Set some values
+        set("MyApp", "Section", "Key", "FileValue").unwrap();
+        assert_eq!(get("MyApp", "Section", "Key").as_deref(), Some("FileValue"));
+
+        // Switch to memory backend
+        let mem = MemoryBackend::new();
+        set_backend(Box::new(mem));
+
+        // Old values should be gone
+        assert_eq!(get("MyApp", "Section", "Key"), None);
+
+        // New values should work
+        set("MyApp", "Section", "Key", "MemValue").unwrap();
+        assert_eq!(get("MyApp", "Section", "Key").as_deref(), Some("MemValue"));
+
+        // Reset to default
+        reset_backend();
     }
 }

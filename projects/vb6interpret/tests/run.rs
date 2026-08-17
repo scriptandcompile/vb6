@@ -690,3 +690,47 @@ fn staged_settings_survive_clear() {
         .expect("interpretation failed");
     assert_eq!(interpreter.output(), &["150"]);
 }
+
+#[test]
+fn set_settings_backend_switches_to_new_backend() {
+    use vb6runtime::state::settings::memory::MemoryBackend;
+
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let interpreter = Interpreter::new();
+
+    // Switch to memory backend
+    interpreter.set_settings_backend(Box::new(MemoryBackend::new()));
+
+    // Set a value in the memory backend
+    settings_state::set("MyApp", "TestSection", "TestKey", "MemValue").unwrap();
+
+    // Verify it's accessible
+    let out = run_with_settings(
+        "    Debug.Print GetSetting(\"MyApp\", \"TestSection\", \"TestKey\", \"default\")\n",
+        |_| {},
+    );
+    assert_eq!(out, vec!["MemValue"]);
+
+    // Reset backend
+    interpreter.reset_settings_backend();
+}
+
+#[test]
+fn reset_settings_backend_restores_default() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let _store = TempSettingsStore::new();
+    let interpreter = Interpreter::new();
+
+    // Set a value in the file backend
+    settings_state::set("MyApp", "TestSection", "TestKey", "FileValue").unwrap();
+
+    // Verify it works
+    let out = run_with_settings(
+        "    Debug.Print GetSetting(\"MyApp\", \"TestSection\", \"TestKey\", \"default\")\n",
+        |_| {},
+    );
+    assert_eq!(out, vec!["FileValue"]);
+
+    // Reset backend (should restore default)
+    interpreter.reset_settings_backend();
+}
