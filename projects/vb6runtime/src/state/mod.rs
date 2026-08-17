@@ -5,15 +5,17 @@
 //! snapshot read by `Environ` and written by the `Environ` assignment
 //! statement, the random-number generator seed shared by `Rnd` and the
 //! `Randomize` statement, the current run-time error number read by the
-//! omitted-argument form of `Error`/`Error$`, and the application settings
+//! omitted-argument form of `Error`/`Error$`, the application settings
 //! store read by `GetSetting`/`GetAllSettings` and written by
-//! `SaveSetting`/`DeleteSetting`. A host installs a controlled baseline before
-//! a program runs; statements mutate it as the program runs.
+//! `SaveSetting`/`DeleteSetting`, and the mock clock used by the `Date` and
+//! `Time` statements. A host installs a controlled baseline before a program
+//! runs; statements mutate it as the program runs.
 //!
-//! Each piece of state lives in its own submodule ([`environment`],
+//! Each piece of state lives in its own submodule ([`clock`], [`environment`],
 //! [`random`], [`err`], [`settings`]), exposing a small typed API over an
 //! internal mutex or atomic so callers never touch the raw storage.
 
+pub mod clock;
 pub mod environment;
 pub mod err;
 pub mod random;

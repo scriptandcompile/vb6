@@ -20,6 +20,10 @@ pub mod library;
 pub mod state;
 pub mod value;
 
+/// `jiff` civil date/time types re-exported for consumers that need to pass
+/// them across crate boundaries (e.g. interpreter configuration).
+pub use jiff::civil;
+
 /// Runtime error types, re-exported from [`vb6core`].
 pub use vb6core::error;
 

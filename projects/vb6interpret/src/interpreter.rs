@@ -111,6 +111,17 @@ pub struct Interpreter {
     /// Settings staged via [`Interpreter::set_setting`], written into the
     /// shared settings store at the start of every run.
     pub(crate) settings: Vec<(String, String, String, String)>,
+    /// Whether the `Date` and `Time` statements are allowed to modify the
+    /// real system clock.  When `false`, these statements write to an
+    /// internal mock clock that advances in real time from the set point.
+    /// Defaults to `true`.
+    pub(crate) allow_system_time: bool,
+    /// Optional initial date to set on the mock clock at the start of a run.
+    /// Only used when `allow_system_time` is `false`.
+    pub(crate) initial_date: Option<vb6runtime::civil::Date>,
+    /// Optional initial time to set on the mock clock at the start of a run.
+    /// Only used when `allow_system_time` is `false`.
+    pub(crate) initial_time: Option<vb6runtime::civil::Time>,
 }
 
 impl Default for Interpreter {
@@ -140,6 +151,9 @@ impl Interpreter {
             debug_snapshots: Vec::new(),
             environment: HashMap::new(),
             settings: Vec::new(),
+            allow_system_time: true,
+            initial_date: None,
+            initial_time: None,
         }
     }
 
@@ -236,12 +250,18 @@ impl Interpreter {
         let record_debug_snapshots = self.record_debug_snapshots;
         let environment = std::mem::take(&mut self.environment);
         let settings = std::mem::take(&mut self.settings);
+        let allow_system_time = self.allow_system_time;
+        let initial_date = self.initial_date;
+        let initial_time = self.initial_time;
         *self = Self::new();
         self.step_limit = step_limit;
         self.pause_after_steps = pause_after_steps;
         self.record_debug_snapshots = record_debug_snapshots;
         self.environment = environment;
         self.settings = settings;
+        self.allow_system_time = allow_system_time;
+        self.initial_date = initial_date;
+        self.initial_time = initial_time;
     }
 
     /// Pause execution before the next statement once this many statements
@@ -254,6 +274,73 @@ impl Interpreter {
     pub fn set_record_debug_snapshots(&mut self, enabled: bool) {
         self.record_debug_snapshots = enabled;
         self.debug_snapshots.clear();
+    }
+
+    /// Control whether `Date` and `Time` statements may modify the real
+    /// system clock.
+    ///
+    /// - `true` (default): statements write to the real system clock.
+    /// - `false`: statements write to an internal mock clock that advances
+    ///   in real time from the set point.  The real clock is never touched.
+    ///
+    /// When set to `false`, the current real date/time is captured as the
+    /// mock clock's starting point (unless overridden with
+    /// [`set_initial_date`] or [`set_initial_time`]).
+    pub fn set_allow_system_time(&mut self, allowed: bool) {
+        self.allow_system_time = allowed;
+    }
+
+    /// Whether `Date` and `Time` statements may modify the real system clock.
+    pub fn allow_system_time(&self) -> bool {
+        self.allow_system_time
+    }
+
+    /// Set an initial date for the mock clock at the start of a run.
+    ///
+    /// Automatically disables real-clock writes (equivalent to calling
+    /// [`set_allow_system_time(false)`](Self::set_allow_system_time)).
+    /// When set, the mock clock starts at this date (preserving the current
+    /// time-of-day) instead of the real system date.
+    pub fn set_initial_date(&mut self, date: vb6runtime::civil::Date) {
+        self.allow_system_time = false;
+        self.initial_date = Some(date);
+    }
+
+    /// Clear any initial date override.
+    pub fn clear_initial_date(&mut self) {
+        self.initial_date = None;
+    }
+
+    /// Set an initial time for the mock clock at the start of a run.
+    ///
+    /// Automatically disables real-clock writes (equivalent to calling
+    /// [`set_allow_system_time(false)`](Self::set_allow_system_time)).
+    /// When set, the mock clock starts at this time (preserving the current
+    /// date) instead of the real system time.
+    pub fn set_initial_time(&mut self, time: vb6runtime::civil::Time) {
+        self.allow_system_time = false;
+        self.initial_time = Some(time);
+    }
+
+    /// Set both the initial date and time for the mock clock at the start
+    /// of a run.
+    ///
+    /// Automatically disables real-clock writes.  This is a convenience
+    /// shorthand for calling [`set_initial_date`] and [`set_initial_time`]
+    /// together.
+    pub fn set_initial_date_time(
+        &mut self,
+        date: vb6runtime::civil::Date,
+        time: vb6runtime::civil::Time,
+    ) {
+        self.allow_system_time = false;
+        self.initial_date = Some(date);
+        self.initial_time = Some(time);
+    }
+
+    /// Clear any initial time override.
+    pub fn clear_initial_time(&mut self) {
+        self.initial_time = None;
     }
 
     /// Execute a VB6 module from source text.
@@ -277,6 +364,20 @@ impl Interpreter {
         // in [`Interpreter::get_setting`].
         for (appname, section, key, value) in &self.settings {
             let _ = settings_state::set(appname, section, key, value);
+        }
+        // Configure the clock. When the real clock is allowed the mock clock
+        // stays at offset zero and reads from the system directly. When it
+        // is disabled, snapshot the real time and apply any initial overrides.
+        if !self.allow_system_time {
+            vb6runtime::state::clock::reset();
+            if let Some(date) = self.initial_date {
+                vb6runtime::state::clock::set_date(date);
+            }
+            if let Some(time) = self.initial_time {
+                vb6runtime::state::clock::set_time(time);
+            }
+        } else {
+            vb6runtime::state::clock::reset();
         }
         let root = module.cst.to_root_node();
         let program = crate::program::build_program(&root, &module.name);

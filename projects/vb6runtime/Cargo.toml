@@ -25,6 +25,13 @@ jiff.workspace = true
 # For file I/O
 encoding_rs.workspace = true
 
+# Platform-specific system clock
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+libc.workspace = true
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys.workspace = true
+
 [dev-dependencies]
 tempfile.workspace = true
 criterion.workspace = true
