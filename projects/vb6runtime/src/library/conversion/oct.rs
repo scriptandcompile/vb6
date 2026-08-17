@@ -657,3 +657,171 @@
 //! - `Format`: Format number with custom patterns
 //! - `CLng`: Convert string (including "&O" prefix) to Long
 //! - `Val`: Parse numeric string to number
+
+use crate::error::{VBError, VBResult};
+use crate::value::VBVariant;
+
+/// Implementation of the `Oct` function.
+///
+/// Converts a number to its octal (base-8) string representation. The result
+/// contains only digits 0-7 and does not include any prefix ("&O" or "0o").
+///
+/// Unlike `Oct$`, this variant propagates `Null` — if the argument is `Null`,
+/// it returns `Null` rather than raising an error.
+///
+/// VB6 behavior:
+/// - Fractional values are rounded to the nearest integer before conversion
+/// - Negative numbers use two's complement representation
+/// - `Integer` values produce up to 6 octal digits
+/// - `Long` values produce up to 11 octal digits
+/// - Returns `Null` if `number` is `Null`
+/// - Raises error 13 if `number` cannot be converted to a number
+pub fn oct(number: &VBVariant) -> VBResult<VBVariant> {
+    if number.is_null() {
+        return Ok(VBVariant::Null);
+    }
+
+    let result = match number {
+        VBVariant::Integer(v) => format!("{:o}", *v as u16),
+        VBVariant::Long(v) => format!("{:o}", *v as u32),
+        VBVariant::Byte(v) => format!("{:o}", *v as u32),
+        _ => {
+            let v = number.as_i64()?;
+            if let Ok(long_val) = i32::try_from(v) {
+                format!("{:o}", long_val as u32)
+            } else {
+                return Err(VBError::overflow());
+            }
+        }
+    };
+
+    Ok(VBVariant::from_string(&result))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::oct;
+    use crate::value::VBVariant;
+
+    #[test]
+    fn oct_zero() {
+        let result = oct(&VBVariant::from_long(0)).unwrap();
+        assert_eq!(result, VBVariant::from_string("0"));
+    }
+
+    #[test]
+    fn oct_positive_long() {
+        assert_eq!(
+            oct(&VBVariant::from_long(8)).unwrap(),
+            VBVariant::from_string("10")
+        );
+        assert_eq!(
+            oct(&VBVariant::from_long(64)).unwrap(),
+            VBVariant::from_string("100")
+        );
+        assert_eq!(
+            oct(&VBVariant::from_long(511)).unwrap(),
+            VBVariant::from_string("777")
+        );
+    }
+
+    #[test]
+    fn oct_positive_integer() {
+        assert_eq!(
+            oct(&VBVariant::from_integer(8)).unwrap(),
+            VBVariant::from_string("10")
+        );
+        assert_eq!(
+            oct(&VBVariant::from_integer(-1)).unwrap(),
+            VBVariant::from_string("177777")
+        );
+    }
+
+    #[test]
+    fn oct_negative_long() {
+        assert_eq!(
+            oct(&VBVariant::from_long(-1)).unwrap(),
+            VBVariant::from_string("37777777777")
+        );
+        assert_eq!(
+            oct(&VBVariant::from_long(-256)).unwrap(),
+            VBVariant::from_string("37777777400")
+        );
+    }
+
+    #[test]
+    fn oct_byte() {
+        assert_eq!(
+            oct(&VBVariant::from_byte(8)).unwrap(),
+            VBVariant::from_string("10")
+        );
+        assert_eq!(
+            oct(&VBVariant::from_byte(64)).unwrap(),
+            VBVariant::from_string("100")
+        );
+    }
+
+    #[test]
+    fn oct_double_rounds() {
+        // 8.5 rounds to 8 → "10"
+        assert_eq!(
+            oct(&VBVariant::Double(8.5)).unwrap(),
+            VBVariant::from_string("10")
+        );
+        // 8.6 rounds to 9 → "11"
+        assert_eq!(
+            oct(&VBVariant::Double(8.6)).unwrap(),
+            VBVariant::from_string("11")
+        );
+    }
+
+    #[test]
+    fn oct_from_string() {
+        assert_eq!(
+            oct(&VBVariant::from_string("255")).unwrap(),
+            VBVariant::from_string("377")
+        );
+    }
+
+    #[test]
+    fn oct_null_returns_null() {
+        let result = oct(&VBVariant::Null).unwrap();
+        assert!(result.is_null());
+    }
+
+    #[test]
+    fn oct_max_long() {
+        assert_eq!(
+            oct(&VBVariant::from_long(i32::MAX)).unwrap(),
+            VBVariant::from_string("17777777777")
+        );
+    }
+
+    #[test]
+    fn oct_min_long() {
+        assert_eq!(
+            oct(&VBVariant::from_long(i32::MIN)).unwrap(),
+            VBVariant::from_string("20000000000")
+        );
+    }
+
+    #[test]
+    fn oct_empty_returns_zero() {
+        let result = oct(&VBVariant::Empty).unwrap();
+        assert_eq!(result, VBVariant::from_string("0"));
+    }
+
+    #[test]
+    fn oct_file_permissions() {
+        // 493 decimal = 755 octal (rwxr-xr-x)
+        assert_eq!(
+            oct(&VBVariant::from_long(493)).unwrap(),
+            VBVariant::from_string("755")
+        );
+        // 420 decimal = 644 octal (rw-r--r--)
+        assert_eq!(
+            oct(&VBVariant::from_long(420)).unwrap(),
+            VBVariant::from_string("644")
+        );
+    }
+}
