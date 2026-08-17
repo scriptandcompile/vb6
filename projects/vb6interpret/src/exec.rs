@@ -13,6 +13,40 @@ use vb6runtime::{ArrayValue, VBVariant};
 use crate::error::{RunError, RunResult};
 use crate::eval::ArithmaticOperator;
 use crate::interpreter::{Flow, Interpreter};
+
+/// Convert a VB6 date serial (days since 1899-12-30) to a [`jiff::Timestamp`].
+///
+/// The serial is the integer part (date) plus the fractional part (time).
+/// Returns `None` if the serial is out of the representable range.
+fn serial_to_timestamp(serial: f64) -> Option<jiff::Timestamp> {
+    let base = jiff::civil::Date::new(1899, 12, 30).ok()?;
+    let days = serial.floor();
+    let date = base.checked_add(jiff::SignedDuration::from_secs((days * 86400.0) as i64)).ok()?;
+    let fraction = serial.fract();
+    let total_secs = (fraction * 86_400.0).round() as i64;
+    let h = (total_secs / 3600) as i8;
+    let m = ((total_secs % 3600) / 60) as i8;
+    let s = (total_secs % 60) as i8;
+    let dt = date.at(h, m, s, 0);
+    let zoned = dt.in_tz("UTC").ok()?;
+    Some(zoned.timestamp())
+}
+
+/// Convert a time-only serial (fractional part of a date serial) to a
+/// [`jiff::Timestamp`] using today's date.
+fn time_serial_to_timestamp(serial: f64) -> Option<jiff::Timestamp> {
+    let ts = vb6runtime::state::clock::get();
+    let zoned = jiff::Zoned::new(ts, jiff::tz::TimeZone::UTC);
+    let d = zoned.date();
+    let fraction = serial.fract();
+    let total_secs = (fraction * 86_400.0).round() as i64;
+    let h = (total_secs / 3600) as i8;
+    let m = ((total_secs % 3600) / 60) as i8;
+    let s = (total_secs % 60) as i8;
+    let dt = d.at(h, m, s, 0);
+    let zoned = dt.in_tz("UTC").ok()?;
+    Some(zoned.timestamp())
+}
 use crate::program::{identifier_name, is_identifier_like, is_statement_kind, type_from_keyword};
 
 /// Number of `\n` characters in a node's text span.
@@ -109,6 +143,14 @@ impl Interpreter {
             | SyntaxKind::DeclareStatement => Ok(Flow::Next),
             SyntaxKind::EraseStatement => {
                 self.exec_erase(node)?;
+                Ok(Flow::Next)
+            }
+            SyntaxKind::DateStatement => {
+                self.exec_date_statement(node)?;
+                Ok(Flow::Next)
+            }
+            SyntaxKind::TimeStatement => {
+                self.exec_time_statement(node)?;
                 Ok(Flow::Next)
             }
             SyntaxKind::OnErrorStatement
@@ -317,6 +359,59 @@ impl Interpreter {
             let element_type = array.element_type().clone();
             let dynamic = ArrayValue::new_dynamic(element_type);
             self.set_variable(&name, VBVariant::Array(dynamic));
+        }
+        Ok(())
+    }
+
+    /// `Date = expr`: set the system date.
+    fn exec_date_statement(&mut self, node: &CstNode) -> RunResult<()> {
+        let significant: Vec<&CstNode> = node.significant_children().collect();
+        let eq_index = significant
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::EqualityOperator)
+            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call()))?;
+        let expr = significant
+            .get(eq_index + 1)
+            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call()))?;
+        let value = self.eval_expr(expr)?;
+        // Always set the mock clock so `Date` reads correctly.
+        vb6runtime::library::datetime::date_statement::date_statement(&value)
+            .map_err(|e| self.error_here(e))?;
+        // When the real clock is allowed, also write the OS clock and clear the mock offset.
+        if self.allow_system_time {
+            let serial = value.as_date_serial().map_err(|e| self.error_here(e))?;
+            if let Some(ts) = serial_to_timestamp(serial) {
+                if let Err(_e) = vb6runtime::state::clock::system_set(ts) {
+                    // Best-effort: the real clock write may fail due to
+                    // permissions.  The mock clock still has the correct value.
+                }
+                vb6runtime::state::clock::reset();
+            }
+        }
+        Ok(())
+    }
+
+    /// `Time = expr` statement.
+    fn exec_time_statement(&mut self, node: &CstNode) -> RunResult<()> {
+        let significant: Vec<&CstNode> = node.significant_children().collect();
+        let eq_index = significant
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::EqualityOperator)
+            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call()))?;
+        let expr = significant
+            .get(eq_index + 1)
+            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call()))?;
+        let value = self.eval_expr(expr)?;
+        vb6runtime::library::datetime::time_statement::time_statement(&value)
+            .map_err(|e| self.error_here(e))?;
+        if self.allow_system_time {
+            let serial = value.as_date_serial().map_err(|e| self.error_here(e))?;
+            if let Some(ts) = time_serial_to_timestamp(serial) {
+                if let Err(_e) = vb6runtime::state::clock::system_set(ts) {
+                    // Best-effort.
+                }
+                vb6runtime::state::clock::reset();
+            }
         }
         Ok(())
     }

@@ -544,7 +544,9 @@ use crate::{error::VBResult, value::VBVariant};
 /// - the time is rounded to the nearest second
 /// - never raises an error
 pub fn time() -> VBResult<VBVariant> {
-    let now = jiff::Zoned::now().time();
+    let instant = crate::state::clock::get();
+    let zoned = jiff::Zoned::new(instant, jiff::tz::TimeZone::UTC);
+    let now = zoned.time();
     let seconds = now.hour() as f64 * 3600.0
         + now.minute() as f64 * 60.0
         + now.second() as f64
@@ -555,10 +557,13 @@ pub fn time() -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::time;
+    use crate::state::test_support::TEST_LOCK;
     use crate::VBVariant;
 
     fn seconds_since_midnight() -> f64 {
-        let now = jiff::Zoned::now().time();
+        let instant = crate::state::clock::get();
+        let zoned = jiff::Zoned::new(instant, jiff::tz::TimeZone::UTC);
+        let now = zoned.time();
         now.hour() as f64 * 3600.0
             + now.minute() as f64 * 60.0
             + now.second() as f64
@@ -567,22 +572,30 @@ mod tests {
 
     #[test]
     fn returns_date_variant() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        crate::state::clock::reset();
         let value = time().unwrap();
         assert_eq!(value.var_type(), 7);
         assert_eq!(value.type_of(), crate::VBType::Date);
+        crate::state::clock::reset();
     }
 
     #[test]
     fn date_portion_is_zero() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        crate::state::clock::reset();
         let value = time().unwrap();
         let VBVariant::Date(serial) = value else {
             panic!("expected a Date variant");
         };
         assert_eq!(serial.floor(), 0.0, "date must be 12/30/1899");
+        crate::state::clock::reset();
     }
 
     #[test]
     fn matches_system_time() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        crate::state::clock::reset();
         let reference = seconds_since_midnight();
         let value = time().unwrap();
         let VBVariant::Date(serial) = value else {
@@ -597,14 +610,36 @@ mod tests {
             diff <= 1.0 || diff >= 86_400.0 - 1.0,
             "time {result} differs from system time {reference} by {diff}s"
         );
+        crate::state::clock::reset();
     }
 
     #[test]
     fn rounds_to_nearest_second() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        crate::state::clock::reset();
         let value = time().unwrap();
         let VBVariant::Date(serial) = value else {
             panic!("expected a Date variant");
         };
         assert!((serial.fract() * 86_400.0).fract().abs() < 1.0);
+        crate::state::clock::reset();
+    }
+
+    #[test]
+    fn reflects_mock_clock() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        let target = jiff::civil::Time::new(14, 30, 0, 0).unwrap();
+        crate::state::clock::set_time(target);
+        let value = time().unwrap();
+        let VBVariant::Date(serial) = value else {
+            panic!("expected a Date variant");
+        };
+        let result = serial.fract() * 86_400.0;
+        let expected = 14.0 * 3600.0 + 30.0 * 60.0;
+        assert!(
+            (result - expected).abs() < 1.0,
+            "expected ~{expected}s, got {result}s"
+        );
+        crate::state::clock::reset();
     }
 }

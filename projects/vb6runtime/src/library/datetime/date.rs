@@ -483,7 +483,9 @@ pub fn date() -> VBResult<VBVariant> {
     use jiff::civil::Date;
     use jiff::{SpanRelativeTo, Unit};
 
-    let today = jiff::Zoned::now().date();
+    let instant = crate::state::clock::get();
+    let zoned = jiff::Zoned::new(instant, jiff::tz::TimeZone::UTC);
+    let today = zoned.date();
     let base = Date::new(1899, 12, 30).expect("valid epoch");
     let serial = today
         .since(base)
@@ -499,29 +501,44 @@ pub fn date() -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::date;
+    use crate::state::test_support::TEST_LOCK;
     use crate::VBVariant;
 
     #[test]
     fn returns_date_variant() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        crate::state::clock::reset();
         let value = date().unwrap();
         assert_eq!(value.var_type(), 7);
         assert_eq!(value.type_of(), crate::VBType::Date);
+        crate::state::clock::reset();
     }
 
     #[test]
     fn time_portion_is_midnight() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        crate::state::clock::reset();
         let value = date().unwrap();
         let VBVariant::Date(serial) = value else {
             panic!("expected a Date variant");
         };
         assert_eq!(serial.fract(), 0.0, "time must be midnight");
+        crate::state::clock::reset();
     }
 
     #[test]
     fn matches_system_date() {
-        let before = jiff::Zoned::now().date();
+        let _guard = TEST_LOCK.lock().unwrap();
+        crate::state::clock::reset();
+        let before = {
+            let ts = crate::state::clock::get();
+            jiff::Zoned::new(ts, jiff::tz::TimeZone::UTC).date()
+        };
         let value = date().unwrap();
-        let after = jiff::Zoned::now().date();
+        let after = {
+            let ts = crate::state::clock::get();
+            jiff::Zoned::new(ts, jiff::tz::TimeZone::UTC).date()
+        };
         let VBVariant::Date(serial) = value else {
             panic!("expected a Date variant");
         };
@@ -529,5 +546,22 @@ mod tests {
         let parsed = jiff::civil::Date::new(parsed.year(), parsed.month(), parsed.day())
             .expect("valid civil date");
         assert!(parsed >= before && parsed <= after);
+        crate::state::clock::reset();
+    }
+
+    #[test]
+    fn reflects_mock_clock() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        let target = jiff::civil::Date::new(2025, 6, 15).unwrap();
+        crate::state::clock::set_date(target);
+        let value = date().unwrap();
+        let VBVariant::Date(serial) = value else {
+            panic!("expected a Date variant");
+        };
+        let parsed = crate::value::date_serial_to_datetime(serial).expect("valid serial");
+        let parsed_date =
+            jiff::civil::Date::new(parsed.year(), parsed.month(), parsed.day()).unwrap();
+        assert_eq!(parsed_date, target);
+        crate::state::clock::reset();
     }
 }
