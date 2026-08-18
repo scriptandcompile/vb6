@@ -75,6 +75,9 @@ pub struct OpenFile {
 /// Implementations must be `Send` so the backend can be shared across threads
 /// via a `Mutex<Box<dyn FileBackend>>`.
 pub trait FileBackend: Send {
+    /// Get a reference to self as `Any` for downcasting.
+    fn as_any(&self) -> &dyn std::any::Any;
+
     /// Open a file and return its handle.
     fn open(
         &mut self,

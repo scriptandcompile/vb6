@@ -44,6 +44,10 @@ impl Default for NativeBackend {
 }
 
 impl FileBackend for NativeBackend {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
     fn open(
         &mut self,
         path: &Path,

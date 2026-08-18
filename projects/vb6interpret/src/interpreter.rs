@@ -258,7 +258,10 @@ impl Interpreter {
     /// let mut interp = Interpreter::new();
     /// interp.set_settings_backend(Box::new(MemoryBackend::new()));
     /// ```
-    pub fn set_settings_backend(&self, backend: Box<dyn vb6runtime::state::settings::backend::SettingsBackend>) {
+    pub fn set_settings_backend(
+        &self,
+        backend: Box<dyn vb6runtime::state::settings::backend::SettingsBackend>,
+    ) {
         settings_state::set_backend(backend);
     }
 
@@ -297,7 +300,11 @@ impl Interpreter {
     }
 
     /// Reset all runtime state (globals, frames, output, program).
+    ///
+    /// Also closes any files left open by a prior run, e.g. one that
+    /// stopped because of an error before reaching a `Close` statement.
     pub fn clear(&mut self) {
+        let _ = vb6runtime::state::file::close_all_files();
         let step_limit = self.step_limit;
         let pause_after_steps = self.pause_after_steps;
         let record_debug_snapshots = self.record_debug_snapshots;

@@ -15,6 +15,16 @@ use super::backend::{AccessMode, FileBackend, LockMode, OpenFile, OpenMode};
 /// A locked range: `(start, end)` inclusive, both 1-based.
 type LockRange = (i32, i32);
 
+/// The current wall-clock time, falling back to the Unix epoch on platforms
+/// without one (e.g. `wasm32-unknown-unknown`, where `SystemTime::now()` panics).
+fn current_time() -> SystemTime {
+    if cfg!(target_arch = "wasm32") {
+        SystemTime::UNIX_EPOCH
+    } else {
+        SystemTime::now()
+    }
+}
+
 /// A virtual file stored in memory.
 #[derive(Debug, Clone)]
 pub struct VirtualFile {
@@ -26,6 +36,28 @@ pub struct VirtualFile {
     attributes: i16,
     /// Last-modified timestamp.
     modified: SystemTime,
+}
+
+impl VirtualFile {
+    /// Check if the file exists.
+    pub fn exists(&self) -> bool {
+        self.exists
+    }
+
+    /// Get the file content.
+    pub fn content(&self) -> &[u8] {
+        &self.content
+    }
+
+    /// Get the file attributes.
+    pub fn attributes(&self) -> i16 {
+        self.attributes
+    }
+
+    /// Get the last-modified timestamp.
+    pub fn modified(&self) -> SystemTime {
+        self.modified
+    }
 }
 
 /// In-memory file I/O backend.
@@ -75,7 +107,7 @@ impl MemoryBackend {
                 content,
                 exists: true,
                 attributes: 0,
-                modified: SystemTime::now(),
+                modified: current_time(),
             },
         );
         Self {
@@ -106,6 +138,10 @@ impl Default for MemoryBackend {
 }
 
 impl FileBackend for MemoryBackend {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
     fn open(
         &mut self,
         path: &std::path::Path,
@@ -137,7 +173,7 @@ impl FileBackend for MemoryBackend {
                         content: Vec::new(),
                         exists: true,
                         attributes: 0,
-                        modified: SystemTime::now(),
+                        modified: current_time(),
                     },
                 );
             }
@@ -150,7 +186,7 @@ impl FileBackend for MemoryBackend {
                             content: Vec::new(),
                             exists: true,
                             attributes: 0,
-                            modified: SystemTime::now(),
+                            modified: current_time(),
                         },
                     );
                 }
@@ -164,7 +200,7 @@ impl FileBackend for MemoryBackend {
                             content: Vec::new(),
                             exists: true,
                             attributes: 0,
-                            modified: SystemTime::now(),
+                            modified: current_time(),
                         },
                     );
                 }
@@ -256,10 +292,7 @@ impl FileBackend for MemoryBackend {
 
     fn file_exists(&mut self, path: &std::path::Path) -> bool {
         let path_str = path.to_string_lossy().to_string();
-        self.files
-            .get(&path_str)
-            .map(|f| f.exists)
-            .unwrap_or(false)
+        self.files.get(&path_str).map(|f| f.exists).unwrap_or(false)
     }
 
     fn position(&self, file: &OpenFile) -> i64 {
@@ -312,10 +345,7 @@ impl FileBackend for MemoryBackend {
         let path_str = path.to_string_lossy().to_string();
         match self.files.remove(&path_str) {
             Some(f) if f.exists => Ok(()),
-            _ => Err(io::Error::new(
-                io::ErrorKind::NotFound,
-                "File not found",
-            )),
+            _ => Err(io::Error::new(io::ErrorKind::NotFound, "File not found")),
         }
     }
 
@@ -365,10 +395,7 @@ impl FileBackend for MemoryBackend {
                 f.attributes = attrs;
                 Ok(())
             }
-            _ => Err(io::Error::new(
-                io::ErrorKind::NotFound,
-                "File not found",
-            )),
+            _ => Err(io::Error::new(io::ErrorKind::NotFound, "File not found")),
         }
     }
 
@@ -395,7 +422,8 @@ impl FileBackend for MemoryBackend {
             ));
         }
         self.current_dir = path.to_path_buf();
-        self.drive_dirs.insert(self.current_drive, path.to_path_buf());
+        self.drive_dirs
+            .insert(self.current_drive, path.to_path_buf());
         Ok(())
     }
 
@@ -419,11 +447,7 @@ impl FileBackend for MemoryBackend {
         Ok(())
     }
 
-    fn lock_file(
-        &mut self,
-        path: &Path,
-        record_range: Option<(i32, i32)>,
-    ) -> io::Result<()> {
+    fn lock_file(&mut self, path: &Path, record_range: Option<(i32, i32)>) -> io::Result<()> {
         let path_str = path.to_string_lossy().to_string();
         let existing = self.locks.entry(path_str).or_default();
 
@@ -450,23 +474,20 @@ impl FileBackend for MemoryBackend {
         Ok(())
     }
 
-    fn unlock_file(
-        &mut self,
-        path: &Path,
-        record_range: Option<(i32, i32)>,
-    ) -> io::Result<()> {
+    fn unlock_file(&mut self, path: &Path, record_range: Option<(i32, i32)>) -> io::Result<()> {
         let path_str = path.to_string_lossy().to_string();
-        let existing = self.locks.get_mut(&path_str).ok_or_else(|| {
-            io::Error::new(io::ErrorKind::NotFound, "File not locked")
-        })?;
+        let existing = self
+            .locks
+            .get_mut(&path_str)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "File not locked"))?;
 
-        let pos = existing.iter().position(|lock| {
-            match (lock, &record_range) {
+        let pos = existing
+            .iter()
+            .position(|lock| match (lock, &record_range) {
                 (None, None) => true,
                 (Some((a, b)), Some((c, d))) => a == c && b == d,
                 _ => false,
-            }
-        });
+            });
 
         match pos {
             Some(i) => {
@@ -476,10 +497,7 @@ impl FileBackend for MemoryBackend {
                 }
                 Ok(())
             }
-            None => Err(io::Error::new(
-                io::ErrorKind::NotFound,
-                "File not locked",
-            )),
+            None => Err(io::Error::new(io::ErrorKind::NotFound, "File not locked")),
         }
     }
 }
@@ -495,7 +513,13 @@ mod tests {
         let path = PathBuf::from("/test.txt");
 
         let mut file = backend
-            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Output,
+                AccessMode::Write,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         file.number = 1;
         backend.close(&file).unwrap();
@@ -508,14 +532,26 @@ mod tests {
 
         // Write
         let mut file = backend
-            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Output,
+                AccessMode::Write,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         file.number = 1;
         backend.write(&mut file, b"Hello, World!").unwrap();
 
         // Read
         let mut file = backend
-            .open(&path, OpenMode::Input, AccessMode::Read, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Input,
+                AccessMode::Read,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         file.number = 1;
         let mut buf = [0u8; 13];
@@ -532,7 +568,13 @@ mod tests {
         assert!(!backend.file_exists(&path));
 
         let file = backend
-            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Output,
+                AccessMode::Write,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         drop(file);
 
@@ -545,7 +587,13 @@ mod tests {
         let path = PathBuf::from("/test.txt");
 
         let mut file = backend
-            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Output,
+                AccessMode::Write,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         file.number = 1;
         backend.write(&mut file, b"12345").unwrap();
@@ -561,21 +609,39 @@ mod tests {
 
         // Write initial content
         let mut file = backend
-            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Output,
+                AccessMode::Write,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         file.number = 1;
         backend.write(&mut file, b"Hello").unwrap();
 
         // Append more content
         let mut file = backend
-            .open(&path, OpenMode::Append, AccessMode::Write, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Append,
+                AccessMode::Write,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         file.number = 1;
         backend.write(&mut file, b", World!").unwrap();
 
         // Verify
         let mut file = backend
-            .open(&path, OpenMode::Input, AccessMode::Read, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Input,
+                AccessMode::Read,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         file.number = 1;
         let mut buf = [0u8; 13];
@@ -590,21 +656,39 @@ mod tests {
 
         // Write initial content
         let mut file = backend
-            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Output,
+                AccessMode::Write,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         file.number = 1;
         backend.write(&mut file, b"Hello").unwrap();
 
         // Open for output again (should truncate)
         let mut file = backend
-            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Output,
+                AccessMode::Write,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         file.number = 1;
         backend.write(&mut file, b"Hi").unwrap();
 
         // Verify
         let mut file = backend
-            .open(&path, OpenMode::Input, AccessMode::Read, LockMode::Shared, 0)
+            .open(
+                &path,
+                OpenMode::Input,
+                AccessMode::Read,
+                LockMode::Shared,
+                0,
+            )
             .unwrap();
         file.number = 1;
         let mut buf = [0u8; 2];
