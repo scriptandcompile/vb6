@@ -299,6 +299,32 @@ impl Interpreter {
         vb6runtime::state::file::reset_backend();
     }
 
+    /// Set the active clock backend for this interpreter.
+    ///
+    /// Equivalent to [`vb6runtime::state::clock::set_backend`], scoped
+    /// to the interpreter for convenience.
+    ///
+    /// # Examples
+    ///
+    /// ```ignore
+    /// use vb6interpret::Interpreter;
+    /// use vb6runtime::state::clock::memory::MemoryBackend;
+    ///
+    /// let mut interp = Interpreter::new();
+    /// interp.set_clock_backend(Box::new(MemoryBackend::new()));
+    /// ```
+    pub fn set_clock_backend(&self, backend: Box<dyn vb6runtime::state::clock::ClockBackend>) {
+        vb6runtime::state::clock::set_backend(backend);
+    }
+
+    /// Reset the clock backend to the platform default.
+    ///
+    /// Equivalent to [`vb6runtime::state::clock::reset_backend`], scoped
+    /// to the interpreter for convenience.
+    pub fn reset_clock_backend(&self) {
+        vb6runtime::state::clock::reset_backend();
+    }
+
     /// Reset all interpreter state (globals, frames, output, program).
     pub fn clear(&mut self) {
         let step_limit = self.step_limit;
