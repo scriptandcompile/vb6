@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-08-17T00:13:12Z",
+  "last_updated": "2026-08-18T17:44:45Z",
   "snapshots": [
     {
       "timestamp": "2026-08-02T05:53:42Z",
@@ -545,38 +545,72 @@
           "percent": 94.2
         }
       }
+    },
+    {
+      "timestamp": "2026-08-18T17:44:45Z",
+      "commit_sha": "b5e9b77e7694b56a8ae9a60930dd2612936a150d",
+      "commit_message": "vb6runtime state system for random has been converted into the same 'backend' structure that we have with the others only we have added a Playback for a set list of items, a Classic for standard vb6 behavior, and modern for migrating to a more modern and secure random generator.",
+      "coverage": {
+        "line_coverage": 93.1,
+        "function_coverage": 89.47,
+        "region_coverage": 93.6
+      },
+      "tests": {
+        "total": 6942,
+        "lib_tests": 6808,
+        "doc_tests": 134,
+        "integration_tests": 0,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 125049,
+          "total": 134317,
+          "percent": 93.1
+        },
+        "functions": {
+          "covered": 8900,
+          "total": 9947,
+          "percent": 89.47
+        },
+        "regions": {
+          "covered": 210279,
+          "total": 224658,
+          "percent": 93.6
+        }
+      }
     }
   ],
   "coverage_summary": {
     "line_coverage": {
-      "latest": 93.82,
-      "trend": "stable",
-      "change_percent": 0.0,
+      "latest": 93.1,
+      "trend": "degrading",
+      "change_percent": 0.72,
       "best": 94.32,
-      "worst": 93.32,
-      "average": 93.86
+      "worst": 93.1,
+      "average": 93.82
     },
     "function_coverage": {
-      "latest": 91.28,
-      "trend": "stable",
-      "change_percent": 0.0,
+      "latest": 89.47,
+      "trend": "degrading",
+      "change_percent": 1.81,
       "best": 91.28,
-      "worst": 89.87,
-      "average": 90.82
+      "worst": 89.47,
+      "average": 90.74
     },
     "region_coverage": {
-      "latest": 94.2,
-      "trend": "stable",
-      "change_percent": 0.0,
+      "latest": 93.6,
+      "trend": "degrading",
+      "change_percent": 0.6,
       "best": 94.76,
       "worst": 93.53,
-      "average": 94.25
+      "average": 94.22
     },
     "test_count": {
-      "latest": 6730,
-      "trend": "stable",
-      "change_count": 0,
-      "growth_rate": 0.0
+      "latest": 6942,
+      "trend": "growing",
+      "change_count": 212,
+      "growth_rate": 3.15
     }
   }
 }
