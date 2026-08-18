@@ -20,7 +20,7 @@
 //! Returns a String:
 //! - String containing the text from the resource file
 //! - Empty string ("") if resource not found (in some VB versions)
-//! - May raise error 32813 if resource not found
+//! - Raises error 326 if resource not found
 //! - Preserves all formatting including line breaks
 //! - Unicode strings supported in VB6
 //!
@@ -41,7 +41,7 @@
 //! - Index must be numeric (string names not supported)
 //! - Common for error messages, prompts, labels
 //! - Supports Unicode in VB6
-//! - Error 32813: "Resource not found" if ID doesn't exist
+//! - Error 326: "Resource with identifier not found" if ID doesn't exist
 //! - Error 48: "Error loading from file" if resource file corrupt
 //! - More maintainable than hardcoded strings
 //! - Easier to update text without recompiling code
@@ -119,7 +119,7 @@
 //! On Error Resume Next
 //! Dim msg As String
 //! msg = LoadResString(9999)
-//! If Err.Number = 32813 Then
+//! If Err.Number = 326 Then
 //!     msg = "String resource not found!"
 //!     Err.Clear
 //! End If
@@ -498,11 +498,11 @@
 //! ## Error Handling
 //!
 //! ```vb
-//! ' Error 32813: Resource not found
+//! ' Error 326: Resource with identifier not found
 //! On Error Resume Next
 //! Dim msg As String
 //! msg = LoadResString(9999)
-//! If Err.Number = 32813 Then
+//! If Err.Number = 326 Then
 //!     MsgBox "String resource not found!"
 //! End If
 //!
@@ -622,3 +622,237 @@
 //! - `LoadPicture`: Load picture from external file
 //! - `Format`: Format strings with values
 //! - `Replace`: Replace placeholders in strings
+
+use super::resfile::{rt, ResFile, STRINGS_PER_BUNDLE};
+use super::resource_not_found;
+use crate::error::VBResult;
+use crate::state::resources;
+use crate::value::VBVariant;
+
+/// Implementation of the `LoadResString` function.
+///
+/// VB6 behavior:
+/// - Reads a string from the project's linked `.res` file
+/// - `index` must be numeric; string names are not supported for strings
+/// - Returns the string, preserving embedded line breaks and Unicode
+/// - Raises error 326 if the string, or the resource file, is not found
+///
+/// # String bundles
+///
+/// Win32 does not store one resource per string. Strings are grouped into
+/// bundles of [`STRINGS_PER_BUNDLE`], so the string with ID `index` lives in
+/// the `RT_STRING` resource whose ordinal is `index / 16 + 1`, at position
+/// `index % 16` within it. Each bundle is a run of 16 length-prefixed UTF-16LE
+/// strings:
+///
+/// ```text
+/// u16  length in UTF-16 code units (0 = that slot is unused)
+/// ...  `length` UTF-16LE code units
+/// ```
+///
+/// A zero-length slot means no string was defined for that ID, which is
+/// reported as error 326 exactly as a missing bundle is.
+pub fn loadresstring(index: &VBVariant) -> VBResult<VBVariant> {
+    // Strings are addressed only by number: a name cannot identify a slot
+    // within a bundle.
+    if !index.is_numeric() {
+        return Err(resource_not_found());
+    }
+    let id = index.as_i32().map_err(|_| resource_not_found())?;
+    let id = u16::try_from(id).map_err(|_| resource_not_found())?;
+
+    let text = resources::with_file(|res| string_from_bundle(res, id))?;
+    Ok(VBVariant::from_string(text))
+}
+
+/// Extracts the string with ID `id` from its `RT_STRING` bundle.
+fn string_from_bundle(res: &ResFile, id: u16) -> VBResult<String> {
+    let bundle_ordinal = id / STRINGS_PER_BUNDLE + 1;
+    let slot = usize::from(id % STRINGS_PER_BUNDLE);
+
+    let entry = res
+        .find_by_ordinal(rt::STRING, bundle_ordinal)
+        .ok_or_else(resource_not_found)?;
+    let data = res.data(entry);
+
+    // Walk the length-prefixed runs to reach the requested slot. Slots before
+    // it must still be traversed, since each one's length sets the next offset.
+    let mut offset = 0usize;
+    for current in 0..=slot {
+        let length = read_u16(data, offset).ok_or_else(resource_not_found)?;
+        offset += 2;
+
+        let byte_length = usize::from(length) * 2;
+        let units = data
+            .get(offset..offset + byte_length)
+            .ok_or_else(resource_not_found)?;
+
+        if current == slot {
+            if length == 0 {
+                // Slot defined by the bundle's layout but holding no string.
+                return Err(resource_not_found());
+            }
+            let code_units: Vec<u16> = units
+                .as_chunks::<2>()
+                .0
+                .iter()
+                .map(|pair| u16::from_le_bytes(*pair))
+                .collect();
+            return Ok(String::from_utf16_lossy(&code_units));
+        }
+
+        offset += byte_length;
+    }
+
+    Err(resource_not_found())
+}
+
+/// Reads a little-endian `u16` at `offset`, or `None` past the end.
+fn read_u16(data: &[u8], offset: usize) -> Option<u16> {
+    data.get(offset..offset + 2)
+        .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]]))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+    use crate::library::resources::test_support::{null_record, record, with_linked_res};
+
+    /// Builds an `RT_STRING` bundle body from 16 optional slots.
+    fn bundle(slots: &[&str]) -> Vec<u8> {
+        assert!(slots.len() <= STRINGS_PER_BUNDLE as usize);
+        let mut bytes = Vec::new();
+        for slot in 0..STRINGS_PER_BUNDLE as usize {
+            let text = slots.get(slot).copied().unwrap_or("");
+            let units: Vec<u16> = text.encode_utf16().collect();
+            bytes.extend_from_slice(&(units.len() as u16).to_le_bytes());
+            for unit in units {
+                bytes.extend_from_slice(&unit.to_le_bytes());
+            }
+        }
+        bytes
+    }
+
+    /// A `.res` image whose first bundle (IDs 0-15) holds `slots`.
+    fn res_with_first_bundle(slots: &[&str]) -> Vec<u8> {
+        let mut bytes = null_record();
+        bytes.extend(record(rt::STRING, 1, &bundle(slots)));
+        bytes
+    }
+
+    #[test]
+    fn loads_the_first_string_in_a_bundle() {
+        // Slot 0 of bundle 1 is ID 0.
+        let image = res_with_first_bundle(&["first"]);
+        with_linked_res(&image, || {
+            let value = loadresstring(&VBVariant::from_integer(0)).unwrap();
+            assert_eq!(value.as_str(), Some("first"));
+        });
+    }
+
+    #[test]
+    fn loads_a_later_slot_in_the_same_bundle() {
+        let image = res_with_first_bundle(&["zero", "one", "two", "three"]);
+        with_linked_res(&image, || {
+            assert_eq!(
+                loadresstring(&VBVariant::from_integer(2)).unwrap().as_str(),
+                Some("two")
+            );
+            assert_eq!(
+                loadresstring(&VBVariant::from_integer(3)).unwrap().as_str(),
+                Some("three")
+            );
+        });
+    }
+
+    #[test]
+    fn maps_ids_to_the_correct_bundle() {
+        // ID 1001 -> bundle ordinal 1001/16+1 = 63, slot 1001%16 = 9.
+        let mut slots = vec![""; 16];
+        slots[9] = "the-message";
+        let mut image = null_record();
+        image.extend(record(rt::STRING, 63, &bundle(&slots)));
+
+        with_linked_res(&image, || {
+            let value = loadresstring(&VBVariant::from_long(1001)).unwrap();
+            assert_eq!(value.as_str(), Some("the-message"));
+        });
+    }
+
+    #[test]
+    fn preserves_line_breaks_and_unicode() {
+        let image = res_with_first_bundle(&["line1\r\nline2 \u{00e9}\u{4e2d}"]);
+        with_linked_res(&image, || {
+            let value = loadresstring(&VBVariant::from_integer(0)).unwrap();
+            assert_eq!(value.as_str(), Some("line1\r\nline2 \u{00e9}\u{4e2d}"));
+        });
+    }
+
+    #[test]
+    fn empty_slot_raises_326() {
+        // Slot 5 is present in the layout but zero-length.
+        let image = res_with_first_bundle(&["zero"]);
+        with_linked_res(&image, || {
+            let error = loadresstring(&VBVariant::from_integer(5)).unwrap_err();
+            assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+        });
+    }
+
+    #[test]
+    fn missing_bundle_raises_326() {
+        let image = res_with_first_bundle(&["zero"]);
+        with_linked_res(&image, || {
+            // ID 5000 lands in bundle 313, which the file does not contain.
+            let error = loadresstring(&VBVariant::from_long(5000)).unwrap_err();
+            assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+        });
+    }
+
+    #[test]
+    fn string_index_is_rejected() {
+        let image = res_with_first_bundle(&["zero"]);
+        with_linked_res(&image, || {
+            let error = loadresstring(&VBVariant::from_string("MESSAGE")).unwrap_err();
+            assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+        });
+    }
+
+    #[test]
+    fn out_of_range_index_raises_326() {
+        let image = res_with_first_bundle(&["zero"]);
+        with_linked_res(&image, || {
+            for index in [
+                VBVariant::from_long(-1),
+                VBVariant::from_long(70000),
+                VBVariant::Null,
+            ] {
+                let error = loadresstring(&index).unwrap_err();
+                assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+            }
+        });
+    }
+
+    #[test]
+    fn truncated_bundle_raises_326_rather_than_panicking() {
+        // A bundle claiming a 40-unit string but holding only a few bytes.
+        let mut body = Vec::new();
+        body.extend_from_slice(&40u16.to_le_bytes());
+        body.extend_from_slice(&[0x41, 0x00, 0x42, 0x00]);
+        let mut image = null_record();
+        image.extend(record(rt::STRING, 1, &body));
+
+        with_linked_res(&image, || {
+            let error = loadresstring(&VBVariant::from_integer(0)).unwrap_err();
+            assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+        });
+    }
+
+    #[test]
+    fn no_linked_resource_file_raises_326() {
+        let _guard = crate::state::test_support::lock_test();
+        resources::clear();
+        let error = loadresstring(&VBVariant::from_integer(1)).unwrap_err();
+        assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+    }
+}

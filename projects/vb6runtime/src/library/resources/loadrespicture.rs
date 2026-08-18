@@ -25,7 +25,7 @@
 //! - Object can be assigned to Picture properties of controls
 //! - Object implements `IPicture` interface
 //! - Returns Nothing if resource not found (some VB versions)
-//! - May raise error 32813 if resource not found
+//! - Raises error 326 if resource not found
 //!
 //! ## Remarks
 //!
@@ -46,7 +46,7 @@
 //! - Resource files created with Resource Editor or RC.EXE
 //! - Index can be numeric ID or string name
 //! - Format constants: vbResBitmap, vbResIcon, vbResCursor
-//! - Error 32813: "Resource not found" if ID/format don't match
+//! - Error 326: "Resource with identifier not found" if ID/format don't match
 //! - Error 48: "Error loading from file" if resource file corrupt
 //! - Pictures are not cached (loaded each time)
 //! - Set object = Nothing to release memory
@@ -134,7 +134,7 @@
 //! ```vb
 //! On Error Resume Next
 //! Picture1.Picture = LoadResPicture(999, vbResBitmap)
-//! If Err.Number = 32813 Then
+//! If Err.Number = 326 Then
 //!     MsgBox "Resource not found!", vbCritical
 //!     Err.Clear
 //! ElseIf Err.Number <> 0 Then
@@ -567,10 +567,10 @@
 //! ## Error Handling
 //!
 //! ```vb
-//! ' Error 32813: Resource not found
+//! ' Error 326: Resource with identifier not found
 //! On Error Resume Next
 //! Set pic = LoadResPicture(999, vbResBitmap)
-//! If Err.Number = 32813 Then
+//! If Err.Number = 326 Then
 //!     MsgBox "Resource not found!"
 //! End If
 //!
@@ -683,3 +683,441 @@
 //! - `LoadResString`: Load string from resources
 //! - `SavePicture`: Save picture object to file
 //! - `Set`: Assign object references
+
+use super::resfile::{rt, ResEntry, ResFile, ResId, VB_RES_BITMAP, VB_RES_CURSOR, VB_RES_ICON};
+use super::{index_to_res_id, resource_not_found};
+use crate::error::VBResult;
+use crate::state::resources;
+use crate::value::VBVariant;
+use crate::StdPicture;
+
+/// Byte offset of `biWidth` within a `BITMAPINFOHEADER`.
+const BI_WIDTH_OFFSET: usize = 4;
+/// Byte offset of `biHeight` within a `BITMAPINFOHEADER`.
+const BI_HEIGHT_OFFSET: usize = 8;
+/// Byte length of the `BITMAPINFOHEADER` that opens `RT_BITMAP` and `RT_ICON`
+/// data. Shorter headers (`BITMAPCOREHEADER`) are not produced by the VB6
+/// Resource Editor and are not supported.
+const BITMAPINFOHEADER_LEN: usize = 40;
+
+/// Byte offset of the entry count within a `GRPICONDIR`/`GRPCURSORDIR`.
+const GROUP_COUNT_OFFSET: usize = 4;
+/// Byte length of a `GRPICONDIR`/`GRPCURSORDIR` header, after which the first
+/// `GRPICONDIRENTRY` begins.
+const GROUP_HEADER_LEN: usize = 6;
+/// A `GRPICONDIRENTRY` width or height byte of 0 means 256 pixels, since the
+/// field cannot hold 256 itself.
+const GROUP_DIMENSION_256: i32 = 256;
+
+/// Implementation of the `LoadResPicture` function.
+///
+/// VB6 behavior:
+/// - Reads a bitmap, icon, or cursor from the project's linked `.res` file
+/// - `index` is a numeric resource ID or a string resource name
+/// - `format` is `vbResBitmap` (0), `vbResIcon` (1), or `vbResCursor` (2)
+/// - Returns a `StdPicture` object carrying the image's real dimensions
+/// - Raises error 326 if the picture, or the resource file, is not found
+///
+/// # Icons and cursors are indirect
+///
+/// A `.res` file does not store an icon as one resource. The ID a program
+/// passes names an `RT_GROUP_ICON` *directory*, which lists the `RT_ICON`
+/// images that make up the icon (16x16, 32x32, and so on). Cursors work the
+/// same way through `RT_GROUP_CURSOR`. This resolves the group and reports the
+/// first listed image's dimensions, which is the one VB6 draws by default.
+pub fn loadrespicture(index: &VBVariant, format: &VBVariant) -> VBResult<VBVariant> {
+    let res_id = index_to_res_id(index)?;
+    let format = format.as_i32().map_err(|_| resource_not_found())?;
+
+    let (width, height) = resources::with_file(|res| match format {
+        VB_RES_BITMAP => bitmap_size(res, &res_id),
+        VB_RES_ICON => group_size(res, &res_id, rt::GROUP_ICON, rt::ICON),
+        VB_RES_CURSOR => group_size(res, &res_id, rt::GROUP_CURSOR, rt::CURSOR),
+        // VB6 only defines the three constants above.
+        _ => Err(resource_not_found()),
+    })?;
+
+    Ok(VBVariant::from_object(Box::new(StdPicture::new(
+        width, height,
+    ))))
+}
+
+/// Dimensions of an `RT_BITMAP` resource, from its `BITMAPINFOHEADER`.
+fn bitmap_size(res: &ResFile, res_id: &ResId) -> VBResult<(i32, i32)> {
+    let entry = find(res, rt::BITMAP, res_id)?;
+    let data = res.data(entry);
+    let (width, height) = bitmapinfoheader_size(data)?;
+    // A top-down bitmap has a negative biHeight; the picture's height is the
+    // magnitude either way.
+    Ok((width, height.abs()))
+}
+
+/// Dimensions of the first image listed in an icon or cursor group.
+///
+/// Falls back to the individual `member_type` resource when no group directory
+/// names the requested ID, which is how a `.res` file holding a lone image
+/// without a group is laid out.
+fn group_size(
+    res: &ResFile,
+    res_id: &ResId,
+    group_type: u16,
+    member_type: u16,
+) -> VBResult<(i32, i32)> {
+    if let Ok(group) = find(res, group_type, res_id) {
+        let data = res.data(group);
+
+        let count = read_u16(data, GROUP_COUNT_OFFSET).ok_or_else(resource_not_found)?;
+        if count == 0 {
+            return Err(resource_not_found());
+        }
+
+        // The directory's own width/height bytes describe the image, so the
+        // member resource does not need to be read.
+        let width = *data.get(GROUP_HEADER_LEN).ok_or_else(resource_not_found)?;
+        let height = *data
+            .get(GROUP_HEADER_LEN + 1)
+            .ok_or_else(resource_not_found)?;
+        return Ok((byte_dimension(width), byte_dimension(height)));
+    }
+
+    // No group: treat the ID as naming the image directly.
+    let entry = find(res, member_type, res_id)?;
+    let (width, height) = bitmapinfoheader_size(res.data(entry))?;
+    // An icon's BITMAPINFOHEADER covers the colour bitmap stacked on the AND
+    // mask, so biHeight is twice the icon's visible height.
+    Ok((width, height.abs() / 2))
+}
+
+/// Reads `biWidth` and `biHeight` from a `BITMAPINFOHEADER`.
+fn bitmapinfoheader_size(data: &[u8]) -> VBResult<(i32, i32)> {
+    if data.len() < BITMAPINFOHEADER_LEN {
+        return Err(resource_not_found());
+    }
+    let width = read_i32(data, BI_WIDTH_OFFSET).ok_or_else(resource_not_found)?;
+    let height = read_i32(data, BI_HEIGHT_OFFSET).ok_or_else(resource_not_found)?;
+    Ok((width, height))
+}
+
+/// Interprets a `GRPICONDIRENTRY` dimension byte, where 0 encodes 256.
+fn byte_dimension(value: u8) -> i32 {
+    if value == 0 {
+        GROUP_DIMENSION_256
+    } else {
+        i32::from(value)
+    }
+}
+
+/// Finds the entry of type `res_type` matching `res_id`.
+fn find<'a>(res: &'a ResFile, res_type: u16, res_id: &ResId) -> VBResult<&'a ResEntry> {
+    match res_id {
+        ResId::Ordinal(ordinal) => res.find_by_ordinal(res_type, *ordinal),
+        ResId::Name(name) => res.find_by_name(res_type, name),
+    }
+    .ok_or_else(resource_not_found)
+}
+
+/// Reads a little-endian `u16` at `offset`, or `None` past the end.
+fn read_u16(data: &[u8], offset: usize) -> Option<u16> {
+    data.get(offset..offset + 2)
+        .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]]))
+}
+
+/// Reads a little-endian `i32` at `offset`, or `None` past the end.
+fn read_i32(data: &[u8], offset: usize) -> Option<i32> {
+    data.get(offset..offset + 4)
+        .map(|bytes| i32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+    use crate::library::resources::test_support::{
+        named_record, null_record, record, with_linked_res,
+    };
+
+    /// Builds a `BITMAPINFOHEADER` with the given dimensions.
+    fn bitmapinfoheader(width: i32, height: i32) -> Vec<u8> {
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&(BITMAPINFOHEADER_LEN as u32).to_le_bytes());
+        bytes.extend_from_slice(&width.to_le_bytes());
+        bytes.extend_from_slice(&height.to_le_bytes());
+        bytes.extend_from_slice(&1u16.to_le_bytes()); // biPlanes
+        bytes.extend_from_slice(&4u16.to_le_bytes()); // biBitCount
+        bytes.resize(BITMAPINFOHEADER_LEN, 0);
+        bytes
+    }
+
+    /// Builds a `GRPICONDIR` naming one member image.
+    fn group_dir(width: u8, height: u8, member_id: u16) -> Vec<u8> {
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&0u16.to_le_bytes()); // reserved
+        bytes.extend_from_slice(&1u16.to_le_bytes()); // type: 1 = icon
+        bytes.extend_from_slice(&1u16.to_le_bytes()); // count
+        bytes.push(width);
+        bytes.push(height);
+        bytes.push(0); // colour count
+        bytes.push(0); // reserved
+        bytes.extend_from_slice(&1u16.to_le_bytes()); // planes
+        bytes.extend_from_slice(&4u16.to_le_bytes()); // bit count
+        bytes.extend_from_slice(&744u32.to_le_bytes()); // bytes in resource
+        bytes.extend_from_slice(&member_id.to_le_bytes());
+        bytes
+    }
+
+    /// Dimensions of the `StdPicture` inside `value`.
+    fn size_of(value: &VBVariant) -> (i32, i32) {
+        let object = value.as_object().unwrap();
+        let picture = object.as_any().downcast_ref::<StdPicture>().unwrap();
+        (picture.width(), picture.height())
+    }
+
+    #[test]
+    fn loads_a_bitmap_with_real_dimensions() {
+        let mut image = null_record();
+        image.extend(record(rt::BITMAP, 101, &bitmapinfoheader(120, 80)));
+
+        with_linked_res(&image, || {
+            let value = loadrespicture(
+                &VBVariant::from_integer(101),
+                &VBVariant::from_long(VB_RES_BITMAP),
+            )
+            .unwrap();
+            assert_eq!(value.as_object().unwrap().type_name(), "StdPicture");
+            assert_eq!(size_of(&value), (120, 80));
+        });
+    }
+
+    #[test]
+    fn top_down_bitmap_reports_positive_height() {
+        // A negative biHeight marks a top-down DIB.
+        let mut image = null_record();
+        image.extend(record(rt::BITMAP, 1, &bitmapinfoheader(64, -48)));
+
+        with_linked_res(&image, || {
+            let value = loadrespicture(
+                &VBVariant::from_integer(1),
+                &VBVariant::from_long(VB_RES_BITMAP),
+            )
+            .unwrap();
+            assert_eq!(size_of(&value), (64, 48));
+        });
+    }
+
+    #[test]
+    fn loads_a_bitmap_by_string_name() {
+        let mut image = null_record();
+        image.extend(named_record("2", "LOGO", &bitmapinfoheader(16, 16)));
+
+        with_linked_res(&image, || {
+            let value = loadrespicture(
+                &VBVariant::from_string("LOGO"),
+                &VBVariant::from_long(VB_RES_BITMAP),
+            )
+            .unwrap();
+            assert_eq!(size_of(&value), (16, 16));
+        });
+    }
+
+    #[test]
+    fn loads_an_icon_through_its_group_directory() {
+        let mut image = null_record();
+        // The icon's BITMAPINFOHEADER height is doubled (image + AND mask).
+        image.extend(record(rt::ICON, 1, &bitmapinfoheader(32, 64)));
+        image.extend(record(rt::GROUP_ICON, 101, &group_dir(32, 32, 1)));
+
+        with_linked_res(&image, || {
+            let value = loadrespicture(
+                &VBVariant::from_integer(101),
+                &VBVariant::from_long(VB_RES_ICON),
+            )
+            .unwrap();
+            assert_eq!(size_of(&value), (32, 32));
+        });
+    }
+
+    #[test]
+    fn icon_group_dimension_zero_means_256() {
+        let mut image = null_record();
+        image.extend(record(rt::ICON, 1, &bitmapinfoheader(256, 512)));
+        image.extend(record(rt::GROUP_ICON, 101, &group_dir(0, 0, 1)));
+
+        with_linked_res(&image, || {
+            let value = loadrespicture(
+                &VBVariant::from_integer(101),
+                &VBVariant::from_long(VB_RES_ICON),
+            )
+            .unwrap();
+            assert_eq!(size_of(&value), (256, 256));
+        });
+    }
+
+    #[test]
+    fn icon_without_a_group_halves_the_doubled_height() {
+        // No RT_GROUP_ICON, so the ID names the RT_ICON directly.
+        let mut image = null_record();
+        image.extend(record(rt::ICON, 5, &bitmapinfoheader(48, 96)));
+
+        with_linked_res(&image, || {
+            let value = loadrespicture(
+                &VBVariant::from_integer(5),
+                &VBVariant::from_long(VB_RES_ICON),
+            )
+            .unwrap();
+            assert_eq!(size_of(&value), (48, 48));
+        });
+    }
+
+    #[test]
+    fn loads_a_cursor_through_its_group_directory() {
+        let mut image = null_record();
+        image.extend(record(rt::CURSOR, 1, &bitmapinfoheader(32, 64)));
+        image.extend(record(rt::GROUP_CURSOR, 201, &group_dir(32, 32, 1)));
+
+        with_linked_res(&image, || {
+            let value = loadrespicture(
+                &VBVariant::from_integer(201),
+                &VBVariant::from_long(VB_RES_CURSOR),
+            )
+            .unwrap();
+            assert_eq!(size_of(&value), (32, 32));
+        });
+    }
+
+    #[test]
+    fn format_selects_the_resource_type() {
+        // Same ID under both RT_BITMAP and RT_GROUP_ICON, different sizes.
+        let mut image = null_record();
+        image.extend(record(rt::BITMAP, 1, &bitmapinfoheader(10, 20)));
+        image.extend(record(rt::ICON, 2, &bitmapinfoheader(32, 64)));
+        image.extend(record(rt::GROUP_ICON, 1, &group_dir(32, 32, 2)));
+
+        with_linked_res(&image, || {
+            let bitmap = loadrespicture(
+                &VBVariant::from_integer(1),
+                &VBVariant::from_long(VB_RES_BITMAP),
+            )
+            .unwrap();
+            assert_eq!(size_of(&bitmap), (10, 20));
+
+            let icon = loadrespicture(
+                &VBVariant::from_integer(1),
+                &VBVariant::from_long(VB_RES_ICON),
+            )
+            .unwrap();
+            assert_eq!(size_of(&icon), (32, 32));
+        });
+    }
+
+    #[test]
+    fn missing_picture_raises_326() {
+        let mut image = null_record();
+        image.extend(record(rt::BITMAP, 101, &bitmapinfoheader(8, 8)));
+
+        with_linked_res(&image, || {
+            let error = loadrespicture(
+                &VBVariant::from_integer(999),
+                &VBVariant::from_long(VB_RES_BITMAP),
+            )
+            .unwrap_err();
+            assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+        });
+    }
+
+    #[test]
+    fn unknown_format_raises_326() {
+        let mut image = null_record();
+        image.extend(record(rt::BITMAP, 1, &bitmapinfoheader(8, 8)));
+
+        with_linked_res(&image, || {
+            for format in [VBVariant::from_long(3), VBVariant::from_long(-1)] {
+                let error = loadrespicture(&VBVariant::from_integer(1), &format).unwrap_err();
+                assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+            }
+        });
+    }
+
+    #[test]
+    fn truncated_bitmap_header_raises_326_rather_than_panicking() {
+        let mut image = null_record();
+        image.extend(record(rt::BITMAP, 1, &[0u8; 12]));
+
+        with_linked_res(&image, || {
+            let error = loadrespicture(
+                &VBVariant::from_integer(1),
+                &VBVariant::from_long(VB_RES_BITMAP),
+            )
+            .unwrap_err();
+            assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+        });
+    }
+
+    #[test]
+    fn empty_icon_group_raises_326() {
+        // A directory header declaring zero images.
+        let mut body = Vec::new();
+        body.extend_from_slice(&0u16.to_le_bytes());
+        body.extend_from_slice(&1u16.to_le_bytes());
+        body.extend_from_slice(&0u16.to_le_bytes()); // count = 0
+        let mut image = null_record();
+        image.extend(record(rt::GROUP_ICON, 101, &body));
+
+        with_linked_res(&image, || {
+            let error = loadrespicture(
+                &VBVariant::from_integer(101),
+                &VBVariant::from_long(VB_RES_ICON),
+            )
+            .unwrap_err();
+            assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+        });
+    }
+
+    #[test]
+    fn no_linked_resource_file_raises_326() {
+        let _guard = crate::state::test_support::lock_test();
+        resources::clear();
+        let error = loadrespicture(
+            &VBVariant::from_integer(1),
+            &VBVariant::from_long(VB_RES_BITMAP),
+        )
+        .unwrap_err();
+        assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+    }
+    // ---- against a real VB6-authored .res file ----
+
+    #[test]
+    fn loads_the_icon_from_a_real_res_file() {
+        // mexe2_2.res holds an RT_GROUP_ICON named "A" listing three RT_ICON
+        // images; the first is 32x32 at 4bpp.
+        use crate::library::resources::test_support::with_test_data_res;
+
+        with_test_data_res("test-data/Environment/mexe2_2.res", || {
+            let value = loadrespicture(
+                &VBVariant::from_string("A"),
+                &VBVariant::from_long(VB_RES_ICON),
+            )
+            .unwrap();
+            assert_eq!(size_of(&value), (32, 32));
+        });
+    }
+
+    #[test]
+    fn loads_individual_icon_images_from_a_real_res_file() {
+        // The three RT_ICON members are 32x32, 32x32, and 16x16. Addressed
+        // directly (no group names them), the doubled BITMAPINFOHEADER height
+        // must be halved back to the visible size.
+        use crate::library::resources::test_support::with_test_data_res;
+
+        with_test_data_res("test-data/Environment/mexe2_2.res", || {
+            let format = VBVariant::from_long(VB_RES_ICON);
+            assert_eq!(
+                size_of(&loadrespicture(&VBVariant::from_integer(1), &format).unwrap()),
+                (32, 32)
+            );
+            assert_eq!(
+                size_of(&loadrespicture(&VBVariant::from_integer(3), &format).unwrap()),
+                (16, 16)
+            );
+        });
+    }
+}

@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use vb6core::error::VBError;
 use vb6parse::files::ModuleFile;
 use vb6runtime::state::environment as env_state;
+use vb6runtime::state::resources as resources_state;
 use vb6runtime::state::settings as settings_state;
 use vb6runtime::VBVariant;
 
@@ -122,6 +123,11 @@ pub struct Interpreter {
     /// Optional initial time to set on the mock clock at the start of a run.
     /// Only used when `allow_system_time` is `false`.
     pub(crate) initial_time: Option<vb6runtime::civil::Time>,
+    /// Path of the `.res` file staged via [`Interpreter::set_resource_file`],
+    /// linked into the shared runtime at the start of every run so the
+    /// `LoadRes*` functions can read it. `None` means the program has no
+    /// resource file, as a VB6 project that never added one.
+    pub(crate) resource_file: Option<String>,
 }
 
 impl Default for Interpreter {
@@ -154,6 +160,7 @@ impl Interpreter {
             allow_system_time: true,
             initial_date: None,
             initial_time: None,
+            resource_file: None,
         }
     }
 
@@ -273,6 +280,46 @@ impl Interpreter {
         settings_state::reset_backend();
     }
 
+    /// Link the `.res` file the program's `LoadRes*` functions read from.
+    ///
+    /// A VB6 project links exactly one resource file at compile time (the
+    /// `ResFile32=` entry in the `.vbp`), and `LoadResData`, `LoadResPicture`,
+    /// and `LoadResString` all read from it without naming it. This stages the
+    /// equivalent binding: it survives [`Interpreter::clear`] and is applied at
+    /// the start of every run, so it can be configured once before calling
+    /// [`Interpreter::run_source`] or [`Interpreter::run_module`].
+    ///
+    /// `path` is resolved through the active file backend at first use, so a
+    /// relative path is taken against the runtime file root and a missing file
+    /// is not reported until a `LoadRes*` call needs it — matching VB6, where a
+    /// broken resource link surfaces as a run-time error.
+    ///
+    /// # Examples
+    ///
+    /// ```ignore
+    /// use vb6interpret::Interpreter;
+    ///
+    /// let mut interp = Interpreter::new();
+    /// interp.set_resource_file("MyApp.res");
+    /// interp.run_source("Debug.Print LoadResString(1001)")?;
+    /// ```
+    pub fn set_resource_file(&mut self, path: impl Into<String>) {
+        self.resource_file = Some(path.into());
+    }
+
+    /// The staged `.res` file path, or `None` when no resource file is linked.
+    pub fn resource_file(&self) -> Option<&str> {
+        self.resource_file.as_deref()
+    }
+
+    /// Unlink the resource file, as a project with no `ResFile32=` entry.
+    ///
+    /// Subsequent `LoadRes*` calls raise error 326.
+    pub fn clear_resource_file(&mut self) {
+        self.resource_file = None;
+        resources_state::clear();
+    }
+
     /// Set the active file backend for this interpreter.
     ///
     /// Equivalent to [`vb6runtime::state::file::set_backend`], scoped
@@ -335,6 +382,7 @@ impl Interpreter {
         let allow_system_time = self.allow_system_time;
         let initial_date = self.initial_date;
         let initial_time = self.initial_time;
+        let resource_file = std::mem::take(&mut self.resource_file);
         *self = Self::new();
         self.step_limit = step_limit;
         self.pause_after_steps = pause_after_steps;
@@ -344,6 +392,7 @@ impl Interpreter {
         self.allow_system_time = allow_system_time;
         self.initial_date = initial_date;
         self.initial_time = initial_time;
+        self.resource_file = resource_file;
     }
 
     /// Pause execution before the next statement once this many statements
@@ -446,6 +495,13 @@ impl Interpreter {
         // in [`Interpreter::get_setting`].
         for (appname, section, key, value) in &self.settings {
             let _ = settings_state::set(appname, section, key, value);
+        }
+        // Link the resource file so `LoadRes*` can read it. Re-linking drops
+        // any cached parse, so a run always sees the file's current contents
+        // even if the host rewrote it between runs.
+        match &self.resource_file {
+            Some(path) => resources_state::set_file(path),
+            None => resources_state::clear(),
         }
         // Configure the clock. When the real clock is allowed the mock clock
         // stays at offset zero and reads from the system directly. When it
