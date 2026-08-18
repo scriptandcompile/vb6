@@ -129,7 +129,7 @@ use crate::state::file;
 /// # Returns
 ///
 /// Returns `Ok(())` on success, or `Err(VBError)` on failure.
-pub fn width_statement(file_number: i16, _width: i16) -> VBResult<()> {
+pub fn width_statement(file_number: i16, width: i16) -> VBResult<()> {
     // Check file number is valid
     if !(file::MIN_FILE_NUMBER..=file::MAX_FILE_NUMBER).contains(&file_number) {
         return Err(VBError::with_description(
@@ -146,9 +146,17 @@ pub fn width_statement(file_number: i16, _width: i16) -> VBResult<()> {
         ));
     }
 
-    // Width is stored but not currently used by the runtime
-    // This is a placeholder for future implementation
-    // TODO: Implement actual width handling for the file output.
+    // Store the width in the file's open state
+    file::with_file_mut(file_number, |file| {
+        file.width = width;
+    })
+    .map_err(|_| {
+        VBError::with_description(
+            52, // Bad file name or number
+            format!("File not open: #{}", file_number),
+        )
+    })?;
+
     Ok(())
 }
 

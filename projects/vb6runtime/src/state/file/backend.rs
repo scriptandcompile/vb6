@@ -68,6 +68,8 @@ pub struct OpenFile {
     pub record_length: i32,
     /// Current position in the file.
     pub position: i64,
+    /// Output line width (0 means no limit).
+    pub width: i16,
 }
 
 /// Abstraction over file I/O operations.
