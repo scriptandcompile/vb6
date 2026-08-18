@@ -790,9 +790,9 @@
 //! - `FileExists` - Checks if a file exists (custom function using Dir)
 
 use crate::error::{VBError, VBResult};
-use vb6core::error::err_number;
 use crate::state::file;
 use crate::value::{VBInteger, VBVariant};
+use vb6core::error::err_number;
 
 // VB6 file attribute constants.
 
@@ -835,7 +835,7 @@ pub fn getattr(pathname: VBVariant) -> VBResult<VBInteger> {
         VBError::with_description(
             match e.kind() {
                 std::io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND, // File not found
-                _ => err_number::DEVICE_IO_ERROR,                            // Device I/O error
+                _ => err_number::DEVICE_IO_ERROR,                           // Device I/O error
             },
             e.to_string(),
         )
@@ -846,9 +846,9 @@ pub fn getattr(pathname: VBVariant) -> VBResult<VBInteger> {
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
+    use vb6core::error::err_number;
 
     #[test]
     fn getattr_returns_normal_for_file() {

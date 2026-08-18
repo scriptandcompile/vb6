@@ -773,10 +773,10 @@
 //! - `GetAttr`: Returns attributes of any file (readonly, hidden, etc.)
 
 use crate::error::{VBError, VBResult};
-use vb6core::error::err_number;
 use crate::state::file;
 use crate::state::file::{OpenMode, MAX_FILE_NUMBER, MIN_FILE_NUMBER};
 use crate::value::{VBLong, VBVariant};
+use vb6core::error::err_number;
 
 /// Get the file mode or handle for an open file.
 ///
@@ -832,8 +832,9 @@ pub fn fileattr(file_number: VBVariant, return_type: VBVariant) -> VBResult<VBLo
     }
 
     // Get the file
-    let file =
-        file::get_file(file_num).ok_or_else(|| VBError::with_description(err_number::BAD_FILE_NAME_OR_NUMBER, "File not open"))?;
+    let file = file::get_file(file_num).ok_or_else(|| {
+        VBError::with_description(err_number::BAD_FILE_NAME_OR_NUMBER, "File not open")
+    })?;
 
     match ret_type {
         1 => {
@@ -861,9 +862,9 @@ pub fn fileattr(file_number: VBVariant, return_type: VBVariant) -> VBResult<VBLo
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+    use vb6core::error::err_number;
 
     #[test]
     fn fileattr_returns_file_mode() {
@@ -896,7 +897,10 @@ mod tests {
 
         let result = fileattr(VBVariant::Long(0), VBVariant::Long(1));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }
@@ -908,7 +912,10 @@ mod tests {
 
         let result = fileattr(VBVariant::Long(1), VBVariant::Long(1));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }
@@ -934,7 +941,10 @@ mod tests {
 
         let result = fileattr(VBVariant::Long(1), VBVariant::Long(3));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::INVALID_PROCEDURE_CALL);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
 
         let _ = file::close_all_files();
     }

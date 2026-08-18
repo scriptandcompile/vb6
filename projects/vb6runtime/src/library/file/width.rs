@@ -148,14 +148,15 @@ pub fn width_statement(file_number: i16, _width: i16) -> VBResult<()> {
 
     // Width is stored but not currently used by the runtime
     // This is a placeholder for future implementation
+    // TODO: Implement actual width handling for the file output.
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+    use vb6core::error::err_number;
 
     #[test]
     fn width_succeeds_for_open_file() {
@@ -188,11 +189,17 @@ mod tests {
 
         let result = width_statement(0, 80);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let result = width_statement(512, 80);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }
@@ -204,7 +211,10 @@ mod tests {
 
         let result = width_statement(1, 80);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }

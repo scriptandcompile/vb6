@@ -285,8 +285,8 @@ mod windows_impl {
                         break;
                     }
 
-                    let name = String::from_utf16(&name_buffer[..name_size as usize])
-                        .unwrap_or_default();
+                    let name =
+                        String::from_utf16(&name_buffer[..name_size as usize]).unwrap_or_default();
 
                     // Now query the value
                     let mut value_type: u32 = 0;
@@ -377,7 +377,8 @@ mod windows_impl {
                     // Open appname key to enumerate sections
                     let appname_wide = to_wide(&appname);
                     let mut app_hkey = 0isize;
-                    let result = RegOpenKeyExW(hkey, appname_wide.as_ptr(), 0, KEY_READ, &mut app_hkey);
+                    let result =
+                        RegOpenKeyExW(hkey, appname_wide.as_ptr(), 0, KEY_READ, &mut app_hkey);
 
                     if result == ERROR_SUCCESS {
                         let mut sec_index = 0;
@@ -408,12 +409,7 @@ mod windows_impl {
                             let settings =
                                 <Self as SettingsBackend>::get_all(self, &appname, &section);
                             for (key, value) in settings {
-                                out.push((
-                                    appname.clone(),
-                                    section.clone(),
-                                    key,
-                                    value,
-                                ));
+                                out.push((appname.clone(), section.clone(), key, value));
                             }
 
                             sec_index += 1;
@@ -505,7 +501,9 @@ mod tests {
             let backend = RegistryBackend::new();
             // Use a unique appname to avoid test interference
             let appname = format!("VB6RuntimeTest_{}", std::process::id());
-            backend.set(&appname, "TestSection", "TestKey", "TestValue").unwrap();
+            backend
+                .set(&appname, "TestSection", "TestKey", "TestValue")
+                .unwrap();
             assert_eq!(
                 backend.get(&appname, "TestSection", "TestKey").as_deref(),
                 Some("TestValue")

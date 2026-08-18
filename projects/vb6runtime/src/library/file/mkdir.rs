@@ -46,9 +46,9 @@
 //! [MkDir Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/mkdir-statement)
 
 use crate::error::{VBError, VBResult};
-use vb6core::error::err_number;
 use crate::state::file;
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Create a new directory.
 ///
@@ -76,9 +76,9 @@ pub fn mkdir(path: VBVariant) -> VBResult<()> {
         VBError::with_description(
             match e.kind() {
                 std::io::ErrorKind::AlreadyExists => err_number::PATH_FILE_ACCESS_ERROR, // Path/File access error
-                std::io::ErrorKind::NotFound => err_number::PATH_NOT_FOUND,      // Path not found
+                std::io::ErrorKind::NotFound => err_number::PATH_NOT_FOUND, // Path not found
                 std::io::ErrorKind::PermissionDenied => err_number::PERMISSION_DENIED, // Permission denied
-                _ => err_number::DEVICE_IO_ERROR,                                 // Device I/O error
+                _ => err_number::DEVICE_IO_ERROR, // Device I/O error
             },
             e.to_string(),
         )
@@ -89,9 +89,9 @@ pub fn mkdir(path: VBVariant) -> VBResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
+    use vb6core::error::err_number;
 
     #[test]
     fn mkdir_creates_directory() {
@@ -119,7 +119,10 @@ mod tests {
 
         let result = mkdir(VBVariant::from_string("existing"));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::PATH_FILE_ACCESS_ERROR);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::PATH_FILE_ACCESS_ERROR
+        );
     }
 
     #[test]

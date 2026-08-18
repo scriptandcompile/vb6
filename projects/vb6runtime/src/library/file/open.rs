@@ -56,8 +56,8 @@
 //! [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/open-statement)
 
 use std::io;
-use vb6core::error::err_number;
 use std::path::Path;
+use vb6core::error::err_number;
 
 use crate::error::{VBError, VBResult};
 use crate::state::file;
@@ -134,10 +134,10 @@ pub fn open_file(
     file::open_file(path, mode, access, lock, record_length, filenumber).map_err(|e| {
         VBError::with_description(
             match e.kind() {
-                io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND,         // File not found
+                io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND, // File not found
                 io::ErrorKind::PermissionDenied => err_number::PERMISSION_DENIED, // Permission denied
-                io::ErrorKind::AlreadyExists => err_number::FILE_ALREADY_OPEN,    // File already open
-                _ => err_number::DEVICE_IO_ERROR,                               // Device I/O error
+                io::ErrorKind::AlreadyExists => err_number::FILE_ALREADY_OPEN, // File already open
+                _ => err_number::DEVICE_IO_ERROR,                              // Device I/O error
             },
             e.to_string(),
         )
@@ -196,9 +196,9 @@ pub fn parse_lock(lock: &str) -> VBResult<LockMode> {
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file;
+    use vb6core::error::err_number;
 
     #[test]
     fn open_and_close_output_file() {
@@ -241,7 +241,10 @@ mod tests {
             0,
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let result = open_file(
             &path,
@@ -252,7 +255,10 @@ mod tests {
             0,
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }

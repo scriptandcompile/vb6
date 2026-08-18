@@ -27,11 +27,11 @@
 //!
 //! [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/unlock-statement)
 
-use std::io;
 use crate::error::{VBError, VBResult};
-use vb6core::error::err_number;
 use crate::state::file;
 use crate::value::VBVariant;
+use std::io;
+use vb6core::error::err_number;
 
 /// Unlock all or part of an open file.
 ///
@@ -87,9 +87,9 @@ pub fn unlock_file(file_number: VBVariant, record_range: VBVariant) -> VBResult<
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
+    use vb6core::error::err_number;
 
     #[test]
     fn unlock_entire_file() {

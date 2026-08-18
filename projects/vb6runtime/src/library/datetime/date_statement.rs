@@ -151,9 +151,7 @@ pub fn date_statement(value: &VBVariant) -> VBResult<()> {
     let base = Date::new(1899, 12, 30).expect("valid epoch");
     let days = serial.floor();
     let date = base
-        .checked_add(jiff::SignedDuration::from_secs(
-            (days * 86400.0) as i64,
-        ))
+        .checked_add(jiff::SignedDuration::from_secs((days * 86400.0) as i64))
         .map_err(|_| crate::error::VBError::type_mismatch())?;
 
     crate::state::clock::set_date(date);

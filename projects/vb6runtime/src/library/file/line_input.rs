@@ -98,10 +98,10 @@ pub fn line_input(file_number: i16) -> VBResult<VBVariant> {
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self, AccessMode, LockMode, OpenMode};
     use std::io::Write;
+    use vb6core::error::err_number;
 
     #[test]
     fn line_input_reads_single_line() {
@@ -225,7 +225,10 @@ mod tests {
 
         let result = line_input(0);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }
@@ -237,7 +240,10 @@ mod tests {
 
         let result = line_input(1);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }

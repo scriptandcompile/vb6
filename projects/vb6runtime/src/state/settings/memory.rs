@@ -152,15 +152,24 @@ mod tests {
     fn set_then_get_roundtrips() {
         let backend = MemoryBackend::new();
         backend.set("MyApp", "Startup", "Left", "150").unwrap();
-        assert_eq!(backend.get("MyApp", "Startup", "Left").as_deref(), Some("150"));
+        assert_eq!(
+            backend.get("MyApp", "Startup", "Left").as_deref(),
+            Some("150")
+        );
     }
 
     #[test]
     fn lookup_is_case_insensitive() {
         let backend = MemoryBackend::new();
         backend.set("MyApp", "Window", "Width", "600").unwrap();
-        assert_eq!(backend.get("myapp", "window", "width").as_deref(), Some("600"));
-        assert_eq!(backend.get("MYAPP", "WINDOW", "WIDTH").as_deref(), Some("600"));
+        assert_eq!(
+            backend.get("myapp", "window", "width").as_deref(),
+            Some("600")
+        );
+        assert_eq!(
+            backend.get("MYAPP", "WINDOW", "WIDTH").as_deref(),
+            Some("600")
+        );
     }
 
     #[test]
@@ -168,7 +177,10 @@ mod tests {
         let backend = MemoryBackend::new();
         backend.set("MyApp", "Window", "Width", "600").unwrap();
         backend.set("myapp", "window", "width", "800").unwrap();
-        assert_eq!(backend.get("MyApp", "Window", "Width").as_deref(), Some("800"));
+        assert_eq!(
+            backend.get("MyApp", "Window", "Width").as_deref(),
+            Some("800")
+        );
         // In-memory, only one entry exists
         assert_eq!(backend.load_all().len(), 1);
     }
@@ -187,7 +199,10 @@ mod tests {
                 ("Top".to_string(), "40".to_string()),
             ]
         );
-        assert_eq!(backend.get_all("myapp", "startup"), backend.get_all("MyApp", "Startup"));
+        assert_eq!(
+            backend.get_all("myapp", "startup"),
+            backend.get_all("MyApp", "Startup")
+        );
     }
 
     #[test]
@@ -197,7 +212,10 @@ mod tests {
         backend.set("MyApp", "Startup", "Top", "40").unwrap();
         backend.remove_key("MyApp", "Startup", "left").unwrap();
         assert_eq!(backend.get("MyApp", "Startup", "Left"), None);
-        assert_eq!(backend.get("MyApp", "Startup", "Top").as_deref(), Some("40"));
+        assert_eq!(
+            backend.get("MyApp", "Startup", "Top").as_deref(),
+            Some("40")
+        );
     }
 
     #[test]
@@ -254,7 +272,11 @@ mod tests {
     fn from_entries_prepopulates_the_backend() {
         let mut entries = HashMap::new();
         entries.insert(
-            ("myapp".to_string(), "startup".to_string(), "left".to_string()),
+            (
+                "myapp".to_string(),
+                "startup".to_string(),
+                "left".to_string(),
+            ),
             Entry {
                 path: PathCase {
                     appname: "MyApp".to_string(),
@@ -265,6 +287,9 @@ mod tests {
             },
         );
         let backend = MemoryBackend::from_entries(entries);
-        assert_eq!(backend.get("MyApp", "Startup", "Left").as_deref(), Some("150"));
+        assert_eq!(
+            backend.get("MyApp", "Startup", "Left").as_deref(),
+            Some("150")
+        );
     }
 }
