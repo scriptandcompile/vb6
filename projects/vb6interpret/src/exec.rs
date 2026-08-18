@@ -19,6 +19,7 @@ use crate::interpreter::{Flow, Interpreter};
 /// Convert a VB6 date serial (days since 1899-12-30) to a [`jiff::Timestamp`].
 ///
 /// The serial is the integer part (date) plus the fractional part (time).
+/// Interpreted in the system's local time zone, matching VB6 semantics.
 /// Returns `None` if the serial is out of the representable range.
 fn serial_to_timestamp(serial: f64) -> Option<jiff::Timestamp> {
     let base = jiff::civil::Date::new(1899, 12, 30).ok()?;
@@ -32,15 +33,17 @@ fn serial_to_timestamp(serial: f64) -> Option<jiff::Timestamp> {
     let m = ((total_secs % 3600) / 60) as i8;
     let s = (total_secs % 60) as i8;
     let dt = date.at(h, m, s, 0);
-    let zoned = dt.in_tz("UTC").ok()?;
+    let zoned = dt.to_zoned(jiff::tz::TimeZone::system()).ok()?;
     Some(zoned.timestamp())
 }
 
 /// Convert a time-only serial (fractional part of a date serial) to a
-/// [`jiff::Timestamp`] using today's date.
+/// [`jiff::Timestamp`] using today's date, interpreted in the system's
+/// local time zone, matching VB6 semantics.
 fn time_serial_to_timestamp(serial: f64) -> Option<jiff::Timestamp> {
     let ts = vb6runtime::state::clock::get();
-    let zoned = jiff::Zoned::new(ts, jiff::tz::TimeZone::UTC);
+    let tz = jiff::tz::TimeZone::system();
+    let zoned = jiff::Zoned::new(ts, tz.clone());
     let d = zoned.date();
     let fraction = serial.fract();
     let total_secs = (fraction * 86_400.0).round() as i64;
@@ -48,7 +51,7 @@ fn time_serial_to_timestamp(serial: f64) -> Option<jiff::Timestamp> {
     let m = ((total_secs % 3600) / 60) as i8;
     let s = (total_secs % 60) as i8;
     let dt = d.at(h, m, s, 0);
-    let zoned = dt.in_tz("UTC").ok()?;
+    let zoned = dt.to_zoned(tz).ok()?;
     Some(zoned.timestamp())
 }
 use crate::program::{identifier_name, is_identifier_like, is_statement_kind, type_from_keyword};

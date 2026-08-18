@@ -545,7 +545,7 @@ use crate::{error::VBResult, value::VBVariant};
 /// - never raises an error
 pub fn time() -> VBResult<VBVariant> {
     let instant = crate::state::clock::get();
-    let zoned = jiff::Zoned::new(instant, jiff::tz::TimeZone::UTC);
+    let zoned = jiff::Zoned::new(instant, jiff::tz::TimeZone::system());
     let now = zoned.time();
     let seconds = now.hour() as f64 * 3600.0
         + now.minute() as f64 * 60.0
@@ -562,7 +562,7 @@ mod tests {
 
     fn seconds_since_midnight() -> f64 {
         let instant = crate::state::clock::get();
-        let zoned = jiff::Zoned::new(instant, jiff::tz::TimeZone::UTC);
+        let zoned = jiff::Zoned::new(instant, jiff::tz::TimeZone::system());
         let now = zoned.time();
         now.hour() as f64 * 3600.0
             + now.minute() as f64 * 60.0

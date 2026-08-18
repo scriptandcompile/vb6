@@ -1,4 +1,4 @@
-import init, { build_debug_trace, clear_files, dump_env, dump_files, dump_settings, install_file, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, set_env } from "../../wasm/vb6interpret.js";
+import init, { build_debug_trace, clear_files, dump_clock, dump_env, dump_files, dump_settings, install_file, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, set_clock, set_env } from "../../wasm/vb6interpret.js";
 import { getDefaultExample, getExample } from "./examples.js";
 import * as Editor from "./editor.js";
 import { createZip } from "./zip.js";
@@ -40,6 +40,10 @@ const elements = {
     debugLocals: document.getElementById("debug-locals"),
     environmentTab: document.getElementById("environment-tab"),
     environmentStatus: document.getElementById("environment-status"),
+    clockTable: document.getElementById("clock-table"),
+    clockSetForm: document.getElementById("clock-set-form"),
+    clockDate: document.getElementById("clock-date"),
+    clockTime: document.getElementById("clock-time"),
     envTable: document.getElementById("env-table"),
     envAddForm: document.getElementById("env-add-form"),
     envName: document.getElementById("env-name"),
@@ -169,6 +173,11 @@ async function initPlayground() {
         renderEnvironment();
         renderFiles();
         syncExecutionControls();
+        window.setInterval(() => {
+            if (state.wasmReady) {
+                renderClock();
+            }
+        }, 1000);
     } catch (error) {
         console.error("Failed to initialize wasm", error);
         elements.wasmStatus.textContent = "WebAssembly failed to load";
@@ -207,6 +216,7 @@ function bindEvents() {
     elements.resetButton.addEventListener("click", resetExecutionSession);
     elements.shareButton.addEventListener("click", shareCode);
     elements.clearButton.addEventListener("click", clearEditor);
+    elements.clockSetForm.addEventListener("submit", setClock);
     elements.envAddForm.addEventListener("submit", addEnvironmentVariable);
     elements.settingAddForm.addEventListener("submit", addSetting);
     elements.filesSaveButton.addEventListener("click", persistFilesToLocalStorage);
@@ -547,9 +557,47 @@ function renderEnvironment() {
     if (!state.wasmReady) {
         return;
     }
+    renderClock();
     renderEnvVars();
     renderSettings();
     syncEnvironmentControls();
+}
+
+function renderClock() {
+    const clock = dump_clock();
+    const container = elements.clockTable;
+    if (!container) {
+        return;
+    }
+    container.innerHTML = "";
+
+    if (!clock) {
+        const empty = document.createElement("div");
+        empty.className = "env-empty";
+        empty.textContent = "Clock not initialized.";
+        container.appendChild(empty);
+        return;
+    }
+
+    container.appendChild(buildEnvRow("Date", clock.date));
+    container.appendChild(buildEnvRow("Time", formatClockTime12Hour(clock.time)));
+
+    if (elements.clockDate && !elements.clockDate.value) {
+        elements.clockDate.value = clock.date;
+    }
+    if (elements.clockTime && !elements.clockTime.value) {
+        elements.clockTime.value = clock.time;
+    }
+}
+
+/// Convert a 24-hour `HH:MM:SS` string (as returned by `dump_clock`/consumed
+/// by `set_clock`) to a 12-hour `hh:mm:ss AM/PM` string for display.
+function formatClockTime12Hour(time24) {
+    const [hourStr, minute, second] = time24.split(":");
+    const hour24 = Number(hourStr);
+    const period = hour24 < 12 ? "AM" : "PM";
+    const hour12 = hour24 % 12 || 12;
+    return `${String(hour12).padStart(2, "0")}:${minute}:${second} ${period}`;
 }
 
 function renderEnvVars() {
@@ -607,13 +655,17 @@ function buildEnvRow(key, value, onRemove) {
     valueEl.textContent = value;
     valueEl.title = value;
 
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.className = "btn btn-secondary btn-sm env-remove";
-    remove.textContent = "Remove";
-    remove.addEventListener("click", onRemove);
+    row.append(keyEl, valueEl);
 
-    row.append(keyEl, valueEl, remove);
+    if (onRemove) {
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "btn btn-secondary btn-sm env-remove";
+        remove.textContent = "Remove";
+        remove.addEventListener("click", onRemove);
+        row.append(remove);
+    }
+
     return row;
 }
 
@@ -880,6 +932,25 @@ function buildStatItem(label, value) {
 
     item.append(labelEl, valueEl);
     return item;
+}
+
+function setClock(event) {
+    event.preventDefault();
+    if (state.hasExecutionState) {
+        return;
+    }
+    const date = elements.clockDate.value;
+    const time = elements.clockTime.value || "00:00:00";
+    if (!date) {
+        return;
+    }
+    try {
+        set_clock(date, time);
+    } catch (error) {
+        console.error("Failed to set clock", error);
+        return;
+    }
+    renderEnvironment();
 }
 
 function addEnvironmentVariable(event) {

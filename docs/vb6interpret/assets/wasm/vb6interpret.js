@@ -56,6 +56,32 @@ export function debug_vb6_code(code, pause_after_steps) {
 }
 
 /**
+ * The current mock clock date and time, for the Clock section of the
+ * Environment tab. Displayed in the system's local time zone, matching
+ * what VB6's `Now`/`Date`/`Time` functions would report.
+ *
+ * `time` is 24-hour (`HH:MM:SS`) so it round-trips with [`set_clock`] and
+ * native `<input type="time">` elements; the browser formats it for
+ * display (e.g. 12-hour with AM/PM).
+ * @returns {any}
+ */
+export function dump_clock() {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.dump_clock(retptr);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
  * Every environment variable currently in the snapshot, for display and
  * persisting back to `localStorage`.
  * @returns {any}
@@ -260,6 +286,33 @@ export function remove_setting(appname, section, key) {
 }
 
 /**
+ * Set the in-memory clock to `date` (`YYYY-MM-DD`) and `time` (`HH:MM:SS`)
+ * in the system's local time zone.
+ *
+ * This rewrites the memory clock backend directly; it never touches (and is
+ * never echoed back to) the real system clock.
+ * @param {string} date
+ * @param {string} time
+ */
+export function set_clock(date, time) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(date, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(time, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len1 = WASM_VECTOR_LEN;
+        wasm.set_clock(retptr, ptr0, len0, ptr1, len1);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        if (r1) {
+            throw takeObject(r0);
+        }
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
  * Set (or replace) the value of environment variable `name` in the snapshot.
  *
  * The webassembly host has no process environment, so the snapshot starts
@@ -330,6 +383,14 @@ function __wbg_get_imports() {
             getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
             getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
         },
+        __wbg___wbindgen_string_get_d154f1e671052120: function(arg0, arg1) {
+            const obj = getObject(arg1);
+            const ret = typeof(obj) === 'string' ? obj : undefined;
+            var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+            var len1 = WASM_VECTOR_LEN;
+            getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+            getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+        },
         __wbg___wbindgen_throw_bb96b2010945f0bc: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
@@ -348,6 +409,18 @@ function __wbg_get_imports() {
             const ret = String.fromCodePoint(arg0 >>> 0);
             return addHeapObject(ret);
         }, arguments); },
+        __wbg_getTime_63fb0332e6c4ec17: function(arg0) {
+            const ret = getObject(arg0).getTime();
+            return ret;
+        },
+        __wbg_get_971a0c45d172643f: function() { return handleError(function (arg0, arg1) {
+            const ret = Reflect.get(getObject(arg0), getObject(arg1));
+            return addHeapObject(ret);
+        }, arguments); },
+        __wbg_new_0_f117d868b403dc07: function() {
+            const ret = new Date();
+            return addHeapObject(ret);
+        },
         __wbg_new_116be93542d39019: function() {
             const ret = new Array();
             return addHeapObject(ret);
@@ -356,8 +429,16 @@ function __wbg_get_imports() {
             const ret = new Error();
             return addHeapObject(ret);
         },
+        __wbg_new_5250d2a1445f7394: function(arg0, arg1) {
+            const ret = new Intl.DateTimeFormat(getObject(arg0), getObject(arg1));
+            return addHeapObject(ret);
+        },
         __wbg_new_ebe3e0f6837f0879: function() {
             const ret = new Object();
+            return addHeapObject(ret);
+        },
+        __wbg_resolvedOptions_7ec953686aa0bb09: function(arg0) {
+            const ret = getObject(arg0).resolvedOptions();
             return addHeapObject(ret);
         },
         __wbg_set_6be42768c690e380: function(arg0, arg1, arg2) {
@@ -516,6 +597,10 @@ let heap = new Array(1024).fill(undefined);
 heap.push(undefined, null, true, false);
 
 let heap_next = heap.length;
+
+function isLikeNone(x) {
+    return x === undefined || x === null;
+}
 
 function passArray8ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 1, 1) >>> 0;

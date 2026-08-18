@@ -185,6 +185,19 @@
                     </div>
                     <div class="output-scroll info-content">
                         <div class="info-section">
+                            <h4>Clock</h4>
+                            <p class="notes-text">Read by `Now`, `Date`, and `Time`. The browser has no OS clock, so the interpreter runs an in-memory clock seeded from your system time; setting it below only changes the in-memory clock and is never echoed back to your real system clock.</p>
+                            <div id="clock-table" class="env-table">
+                                <div class="env-empty">Clock not initialized.</div>
+                            </div>
+                            <form id="clock-set-form" class="env-add-form">
+                                <input id="clock-date" class="env-input env-name-input" type="date" autocomplete="off">
+                                <input id="clock-time" class="env-input" type="time" step="1" autocomplete="off">
+                                <button type="submit" class="btn btn-primary btn-sm">Set</button>
+                            </form>
+                        </div>
+
+                        <div class="info-section">
                             <h4>Environment Variables</h4>
                             <p class="notes-text">Read by `Environ$`. The browser has no OS environment, so these start empty and are remembered across page loads.</p>
                             <div id="env-table" class="env-table">

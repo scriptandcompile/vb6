@@ -2,20 +2,64 @@
 //!
 //! Two layers:
 //!
-//! - **System clock** — the real OS clock, readable everywhere and writable
-//!   on native targets (Linux/macOS/Windows).  On wasm the system clock is
-//!   read-only.
+//! - **System clock** — reads/writes go through a pluggable [`ClockBackend`],
+//!   switchable at runtime with [`set_backend`], mirroring
+//!   [`crate::state::file`]'s [`FileBackend`](crate::state::file::FileBackend)
+//!   and native/memory backends. The native backend is the real OS clock,
+//!   writable on native targets (Linux/macOS/Windows). The memory backend
+//!   (default on wasm) tracks a timestamp entirely in memory and is always
+//!   writable.
 //! - **Mock clock** — a signed offset ([`Span`]) applied on top of the
 //!   system clock.  When the offset is zero (the default), [`get`] returns
 //!   the real system timestamp.  When non-zero the mock clock advances in
 //!   real time from the set point.
 //!
 //! The `Date` and `Time` statements choose which layer to write based on
-//! the `allow_system_time` flag: `true` writes the real clock (native only);
-//! `false` writes the mock clock.
+//! the `allow_system_time` flag: `true` writes the real clock; `false`
+//! writes the mock clock.
+
+pub mod backend;
+pub mod memory;
+pub mod native;
 
 use jiff::{Span, Timestamp};
 use std::sync::{Mutex, OnceLock};
+
+pub use backend::{ClockBackend, SystemClockError};
+
+// ── Backend ──────────────────────────────────────────────────────────────
+
+/// The active clock backend.
+static BACKEND: OnceLock<Mutex<Box<dyn ClockBackend>>> = OnceLock::new();
+
+/// Get the active backend, initializing with default if needed.
+fn backend() -> &'static Mutex<Box<dyn ClockBackend>> {
+    BACKEND.get_or_init(|| Mutex::new(default_backend()))
+}
+
+/// Create the default backend for the current platform.
+fn default_backend() -> Box<dyn ClockBackend> {
+    if cfg!(target_arch = "wasm32") {
+        // Seed the in-memory clock with the real time; it then advances
+        // live on its own without further real-clock interaction.
+        Box::new(memory::MemoryBackend::new(jiff::Timestamp::now()))
+    } else {
+        Box::new(native::NativeBackend::new())
+    }
+}
+
+/// Set the active clock backend.
+///
+/// This is the primary way to switch clock backends at runtime.
+pub fn set_backend(new_backend: Box<dyn ClockBackend>) {
+    let mut backend_guard = backend().lock().unwrap_or_else(|e| e.into_inner());
+    *backend_guard = new_backend;
+}
+
+/// Reset to the default backend for the current platform.
+pub fn reset_backend() {
+    set_backend(default_backend());
+}
 
 // ── Mock clock ───────────────────────────────────────────────────────────
 
@@ -37,26 +81,28 @@ pub fn get() -> Timestamp {
     system_get() + offset
 }
 
-/// Shift the mock clock so that its civil date matches `date`, preserving
-/// the current mock time-of-day.
+/// Shift the mock clock so that its civil date matches `date` in the
+/// system's local time zone, preserving the current mock time-of-day.
 pub fn set_date(date: jiff::civil::Date) {
     let offset = *mock_lock();
     let current = system_get() + offset;
-    let current_zoned = jiff::Zoned::new(current, jiff::tz::TimeZone::UTC);
+    let tz = jiff::tz::TimeZone::system();
+    let current_zoned = jiff::Zoned::new(current, tz.clone());
     let t = current_zoned.time();
     let target = date.at(t.hour(), t.minute(), t.second(), t.subsec_nanosecond());
-    let target_zoned = target.in_tz("UTC").unwrap();
+    let target_zoned = target.to_zoned(tz).unwrap();
     let target_ts = target_zoned.timestamp();
     let now = system_get();
     *mock_lock() = target_ts - now;
 }
 
-/// Shift the mock clock so that its civil time matches `time`, preserving
-/// the current mock date.
+/// Shift the mock clock so that its civil time matches `time` in the
+/// system's local time zone, preserving the current mock date.
 pub fn set_time(time: jiff::civil::Time) {
     let offset = *mock_lock();
     let current = system_get() + offset;
-    let current_zoned = jiff::Zoned::new(current, jiff::tz::TimeZone::UTC);
+    let tz = jiff::tz::TimeZone::system();
+    let current_zoned = jiff::Zoned::new(current, tz.clone());
     let d = current_zoned.date();
     let target = d.at(
         time.hour(),
@@ -64,7 +110,7 @@ pub fn set_time(time: jiff::civil::Time) {
         time.second(),
         time.subsec_nanosecond(),
     );
-    let target_zoned = target.in_tz("UTC").unwrap();
+    let target_zoned = target.to_zoned(tz).unwrap();
     let target_ts = target_zoned.timestamp();
     let now = system_get();
     *mock_lock() = target_ts - now;
@@ -79,112 +125,21 @@ pub fn reset() {
 
 /// Read the current system clock as a [`Timestamp`].
 ///
-/// This is always the real OS time — the mock offset is **not** applied.
+/// This reads through the active [`ClockBackend`] — the real OS time for
+/// the native backend, or the in-memory value for the memory backend. The
+/// mock offset is **not** applied.
 pub fn system_get() -> Timestamp {
-    jiff::Timestamp::now()
+    backend().lock().unwrap_or_else(|e| e.into_inner()).now()
 }
 
-/// Write `ts` to the real system clock.
+/// Write `ts` to the active clock backend.
 ///
 /// # Errors
 ///
-/// Returns `Err` on wasm (no host clock access) or if the OS call fails.
+/// Returns `Err` if the backend cannot write the clock (e.g. the native
+/// backend without sufficient privileges) or the OS call fails.
 pub fn system_set(ts: Timestamp) -> Result<(), SystemClockError> {
-    #[cfg(target_arch = "wasm32")]
-    {
-        let _ = ts;
-        Err(SystemClockError::NotSupported)
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
-    system_set_native(ts)
-}
-
-/// Errors from system clock operations.
-#[derive(Debug, Clone)]
-pub enum SystemClockError {
-    /// The platform does not support setting the system clock (e.g. wasm).
-    NotSupported,
-    /// The OS rejected the clock change (insufficient privileges, etc.).
-    OsError(i32),
-}
-
-impl std::fmt::Display for SystemClockError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::NotSupported => write!(
-                f,
-                "setting the system clock is not supported on this platform"
-            ),
-            Self::OsError(code) => write!(f, "system clock set failed with OS error {code}"),
-        }
-    }
-}
-
-impl std::error::Error for SystemClockError {}
-
-// ── Native implementation ────────────────────────────────────────────────
-
-#[cfg(not(target_arch = "wasm32"))]
-fn system_set_native(ts: Timestamp) -> Result<(), SystemClockError> {
-    // jiff::Timestamp is seconds + subsec nanoseconds since Unix epoch.
-    let epoch_sec = ts.as_second();
-    let subsec_ns = ts.subsec_nanosecond();
-
-    #[cfg(unix)]
-    {
-        let ts = libc::timespec {
-            tv_sec: epoch_sec as libc::time_t,
-            tv_nsec: subsec_ns as libc::c_long,
-        };
-        // CLOCK_REALTIME = 0
-        let rc = unsafe { libc::clock_settime(0, &ts) };
-        if rc == 0 {
-            Ok(())
-        } else {
-            Err(SystemClockError::OsError(unsafe {
-                *libc::__errno_location()
-            }))
-        }
-    }
-
-    #[cfg(windows)]
-    {
-        use windows_sys::Win32::System::Time::{SetSystemTime, SYSTEMTIME};
-
-        // Convert Unix epoch to Windows FILETIME (100-ns intervals since 1601-01-01).
-        // Difference between 1601-01-01 and 1970-01-01 in 100-ns intervals:
-        const EPOCH_DIFF: u64 = 116_444_736_000_000_000;
-        let intervals = (epoch_sec as u64) * 10_000_000 + (subsec_ns as u64) / 100 + EPOCH_DIFF;
-
-        // FILETIME → SYSTEMTIME (UTC).
-        let ft_low = intervals as u32;
-        let ft_high = (intervals >> 32) as u32;
-        let mut st: SYSTEMTIME = unsafe { std::mem::zeroed() };
-        unsafe {
-            windows_sys::Win32::System::Time::FileTimeToSystemTime(
-                &windows_sys::Win32::Foundation::FILETIME {
-                    dwLowDateTime: ft_low,
-                    dwHighDateTime: ft_high,
-                },
-                &mut st,
-            );
-        }
-
-        let rc = unsafe { SetSystemTime(&st) };
-        if rc != 0 {
-            Ok(())
-        } else {
-            Err(SystemClockError::OsError(
-                unsafe { windows_sys::Win32::Foundation::GetLastError() } as i32,
-            ))
-        }
-    }
-
-    #[cfg(not(any(unix, windows)))]
-    {
-        Err(SystemClockError::NotSupported)
-    }
+    backend().lock().unwrap_or_else(|e| e.into_inner()).set(ts)
 }
 
 #[cfg(test)]
@@ -215,7 +170,7 @@ mod tests {
         set_date(target);
 
         let ts = get();
-        let zoned = jiff::Zoned::new(ts, jiff::tz::TimeZone::UTC);
+        let zoned = jiff::Zoned::new(ts, jiff::tz::TimeZone::system());
         assert_eq!(zoned.date(), target);
         reset();
     }
@@ -228,7 +183,7 @@ mod tests {
         set_time(target);
 
         let ts = get();
-        let zoned = jiff::Zoned::new(ts, jiff::tz::TimeZone::UTC);
+        let zoned = jiff::Zoned::new(ts, jiff::tz::TimeZone::system());
         let t = zoned.time();
         assert_eq!(t.hour(), target.hour());
         assert_eq!(t.minute(), target.minute());

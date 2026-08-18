@@ -72,7 +72,10 @@ rowan = "0.17.0"
 
 # Runtime / numeric / datetime (vb6runtime)
 num-traits = "0.2"
-jiff = "0.2.35"
+# `js` feature is required for `Timestamp::now()` to work on
+# wasm32-unknown-unknown (vb6interpret's wasm playground); it's a no-op on
+# other targets.
+jiff = { version = "0.2.35", features = ["js"] }
 
 # Platform-specific system clock (vb6runtime)
 libc = "0.2"

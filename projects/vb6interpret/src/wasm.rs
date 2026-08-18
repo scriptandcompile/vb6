@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
+use vb6runtime::state::clock as clock_state;
 use vb6runtime::state::environment as env_state;
 use vb6runtime::state::file as file_state;
 use vb6runtime::state::settings as settings_state;
@@ -284,8 +285,11 @@ pub fn interpret_vb6_code(code: &str) -> Result<JsValue, JsError> {
     };
 
     let mut interpreter = Interpreter::new();
-    // In wasm, use the memory backend for file operations.
+    // In wasm, use the memory backend for file and clock operations.
     interpreter.set_file_backend(Box::new(file_state::memory::MemoryBackend::new()));
+    interpreter.set_clock_backend(Box::new(clock_state::memory::MemoryBackend::new(
+        jiff::Timestamp::now(),
+    )));
     match interpreter.run_module(&module) {
         Ok(()) => Ok(to_value(&build_output(&interpreter, None))?),
         Err(error) => Ok(to_value(&build_output(
@@ -316,8 +320,11 @@ pub fn debug_vb6_code(code: &str, pause_after_steps: u32) -> Result<JsValue, JsE
     };
 
     let mut interpreter = Interpreter::new();
-    // In wasm, use the memory backend for file operations.
+    // In wasm, use the memory backend for file and clock operations.
     interpreter.set_file_backend(Box::new(file_state::memory::MemoryBackend::new()));
+    interpreter.set_clock_backend(Box::new(clock_state::memory::MemoryBackend::new(
+        jiff::Timestamp::now(),
+    )));
     interpreter.set_pause_after_steps(Some(u64::from(pause_after_steps)));
 
     match interpreter.run_module(&module) {
@@ -345,8 +352,11 @@ pub fn build_debug_trace(code: &str) -> Result<JsValue, JsError> {
     };
 
     let mut interpreter = Interpreter::new();
-    // In wasm, use the memory backend for file operations.
+    // In wasm, use the memory backend for file and clock operations.
     interpreter.set_file_backend(Box::new(file_state::memory::MemoryBackend::new()));
+    interpreter.set_clock_backend(Box::new(clock_state::memory::MemoryBackend::new(
+        jiff::Timestamp::now(),
+    )));
     interpreter.set_record_debug_snapshots(true);
 
     let error = match interpreter.run_module(&module) {
@@ -406,6 +416,16 @@ pub struct WasmSetting {
 pub struct WasmEnvEntry {
     pub name: String,
     pub value: String,
+}
+
+/// The mock clock's current date and time, for the Clock section of the
+/// Environment tab.
+#[derive(Clone, Serialize, Deserialize)]
+pub struct WasmClockState {
+    /// Current mock date (`YYYY-MM-DD`).
+    pub date: String,
+    /// Current mock time (`HH:MM:SS`).
+    pub time: String,
 }
 
 /// File information for the Files tab.
@@ -495,6 +515,52 @@ pub fn dump_settings() -> Result<JsValue, JsError> {
         })
         .collect();
     Ok(to_value(&settings)?)
+}
+
+/// The current mock clock date and time, for the Clock section of the
+/// Environment tab. Displayed in the system's local time zone, matching
+/// what VB6's `Now`/`Date`/`Time` functions would report.
+///
+/// `time` is 24-hour (`HH:MM:SS`) so it round-trips with [`set_clock`] and
+/// native `<input type="time">` elements; the browser formats it for
+/// display (e.g. 12-hour with AM/PM).
+#[wasm_bindgen]
+pub fn dump_clock() -> Result<JsValue, JsError> {
+    let zoned = jiff::Zoned::new(clock_state::get(), jiff::tz::TimeZone::system());
+    let date = zoned.date();
+    let time = zoned.time();
+    Ok(to_value(&WasmClockState {
+        date: format!("{:04}-{:02}-{:02}", date.year(), date.month(), date.day()),
+        time: format!(
+            "{:02}:{:02}:{:02}",
+            time.hour(),
+            time.minute(),
+            time.second()
+        ),
+    })?)
+}
+
+/// Set the in-memory clock to `date` (`YYYY-MM-DD`) and `time` (`HH:MM:SS`)
+/// in the system's local time zone.
+///
+/// This rewrites the memory clock backend directly; it never touches (and is
+/// never echoed back to) the real system clock.
+#[wasm_bindgen]
+pub fn set_clock(date: &str, time: &str) -> Result<(), JsError> {
+    let date: jiff::civil::Date = date
+        .parse()
+        .map_err(|e| JsError::new(&format!("invalid date: {e}")))?;
+    let time: jiff::civil::Time = time
+        .parse()
+        .map_err(|e| JsError::new(&format!("invalid time: {e}")))?;
+    let zoned = date
+        .at(time.hour(), time.minute(), time.second(), 0)
+        .to_zoned(jiff::tz::TimeZone::system())
+        .map_err(|e| JsError::new(&format!("invalid date/time: {e}")))?;
+    clock_state::system_set(zoned.timestamp())
+        .map_err(|e| JsError::new(&format!("failed to set clock: {e}")))?;
+    clock_state::reset();
+    Ok(())
 }
 
 /// Convert a file mode to a human-readable string.

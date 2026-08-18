@@ -484,7 +484,7 @@ pub fn date() -> VBResult<VBVariant> {
     use jiff::{SpanRelativeTo, Unit};
 
     let instant = crate::state::clock::get();
-    let zoned = jiff::Zoned::new(instant, jiff::tz::TimeZone::UTC);
+    let zoned = jiff::Zoned::new(instant, jiff::tz::TimeZone::system());
     let today = zoned.date();
     let base = Date::new(1899, 12, 30).expect("valid epoch");
     let serial = today
@@ -532,12 +532,12 @@ mod tests {
         crate::state::clock::reset();
         let before = {
             let ts = crate::state::clock::get();
-            jiff::Zoned::new(ts, jiff::tz::TimeZone::UTC).date()
+            jiff::Zoned::new(ts, jiff::tz::TimeZone::system()).date()
         };
         let value = date().unwrap();
         let after = {
             let ts = crate::state::clock::get();
-            jiff::Zoned::new(ts, jiff::tz::TimeZone::UTC).date()
+            jiff::Zoned::new(ts, jiff::tz::TimeZone::system()).date()
         };
         let VBVariant::Date(serial) = value else {
             panic!("expected a Date variant");
