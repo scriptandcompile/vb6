@@ -2,15 +2,27 @@
 //!
 //! `Environ$` reads from this snapshot instead of the live process environment
 //! so a host can install a controlled environment before a program runs. The
-//! snapshot is seeded from the real process environment on first access, and
-//! can be rebuilt with [`reset`] or amended with [`set_env`].
+//! snapshot is seeded from the active [`EnvironmentBackend`] on first access,
+//! and can be rebuilt with [`reset`] or amended with [`set_env`].
 //!
 //! The table keeps its entries in environment-table order so the numeric
 //! (by-position) form of `Environ$` enumerates deterministically. Variable
 //! names are matched case-insensitively, matching VB6 on Windows.
+//!
+//! The backend that seeds the snapshot can be switched at runtime with
+//! [`set_backend`]:
+//!
+//! - **Native**: [`native::NativeBackend`] seeds from the real process environment (default)
+//! - **WASM/tests**: [`memory::MemoryBackend`] seeds empty
+
+pub mod backend;
+pub mod memory;
+pub mod native;
 
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
+
+pub use backend::EnvironmentBackend;
 
 /// A `NAME`/`value` entry of the environment table.
 type Entry = (String, String);
@@ -24,16 +36,8 @@ struct EnvState {
 }
 
 impl EnvState {
-    /// Snapshot the current process environment.
-    fn from_process() -> Self {
-        // `std::env::vars` panics on targets that carry no environment
-        // (notably the browser's wasm32-unknown-unknown), so hosts there
-        // install variables with [`set_env`] instead.
-        #[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
-        let entries: Vec<Entry> = std::env::vars().collect();
-        #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
-        let entries: Vec<Entry> = Vec::new();
-
+    /// Build a snapshot from a backend's initial entries.
+    fn from_entries(entries: Vec<Entry>) -> Self {
         let index = entries
             .iter()
             .enumerate()
@@ -73,11 +77,30 @@ fn normalize_key(name: &str) -> String {
     name.to_ascii_lowercase()
 }
 
+/// The active backend.
+static BACKEND: OnceLock<Mutex<Box<dyn EnvironmentBackend>>> = OnceLock::new();
+
 static ENV: OnceLock<Mutex<EnvState>> = OnceLock::new();
 
-/// Access the shared snapshot, seeding it from the process environment first.
+/// Get the active backend, initializing with the default if needed.
+fn backend() -> &'static Mutex<Box<dyn EnvironmentBackend>> {
+    BACKEND.get_or_init(|| Mutex::new(default_backend()))
+}
+
+/// Create the default backend for the current platform.
+fn default_backend() -> Box<dyn EnvironmentBackend> {
+    Box::new(native::NativeBackend::new())
+}
+
+/// Access the shared snapshot, seeding it from the active backend first.
 fn snapshot() -> &'static Mutex<EnvState> {
-    ENV.get_or_init(|| Mutex::new(EnvState::from_process()))
+    ENV.get_or_init(|| {
+        let entries = backend()
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .load();
+        Mutex::new(EnvState::from_entries(entries))
+    })
 }
 
 /// Lock the snapshot, recovering from a poisoned mutex.
@@ -87,12 +110,33 @@ fn lock() -> std::sync::MutexGuard<'static, EnvState> {
         .unwrap_or_else(std::sync::PoisonError::into_inner)
 }
 
-/// Rebuild the snapshot from the process environment, discarding any values
+/// Set the active environment backend, reloading the snapshot from it.
+///
+/// This is the primary way to switch how the snapshot is seeded at runtime.
+pub fn set_backend(new_backend: Box<dyn EnvironmentBackend>) {
+    let entries = new_backend.load();
+    *backend()
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner) = new_backend;
+    *lock() = EnvState::from_entries(entries);
+}
+
+/// Reset to the default backend for the current platform, reloading the
+/// snapshot from it.
+pub fn reset_backend() {
+    set_backend(default_backend());
+}
+
+/// Rebuild the snapshot from the active backend, discarding any values
 /// installed with [`set_env`]. Useful when a host wants a fresh baseline;
 /// otherwise the snapshot is seeded once on first access and amended by
 /// [`set_env`].
 pub fn reset() {
-    *lock() = EnvState::from_process();
+    let entries = backend()
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .load();
+    *lock() = EnvState::from_entries(entries);
 }
 
 /// Set (or replace) the value of environment variable `name` in the snapshot.
