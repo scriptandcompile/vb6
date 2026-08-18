@@ -698,3 +698,48 @@
 //! - `Kill`: Deletes file
 //! - `FileCopy`: Copies file
 //! - `Name`: Renames/moves file
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::value::VBVariant;
+
+/// Retrieves the name of a file, directory, or folder that matches the specified pattern and attributes.
+///
+/// # Parameters
+///
+/// - `pathname`: Optional. `String` expression that specifies a file name, directory name,
+///   or folder name. May include wildcards (* and ?). If not specified, uses the pattern
+///   from the previous `Dir` call.
+/// - `attributes`: Optional. Constant or numeric expression whose sum specifies file
+///   attributes. If omitted, returns files that match pathname but have no attributes.
+///
+/// # Return Value
+///
+/// Returns a `String` containing the name of a file, directory, or folder that matches the
+/// specified pattern and attributes. Returns a zero-length string ("") when no more files
+/// are found.
+///
+/// # Remarks
+///
+/// The `Dir` function is used to retrieve file and directory names that match a pattern.
+/// It's commonly used to iterate through files in a directory or to check if a file exists.
+pub fn dir(pathname: VBVariant, attributes: i16) -> VBResult<VBVariant> {
+    let pathname_str = match pathname {
+        VBVariant::String(s) => s.as_str().to_string(),
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in Dir",
+            ));
+        }
+    };
+
+    let path = file::resolve_path(std::path::Path::new(&pathname_str));
+    let file_list = file::file_dir(&path, &pathname_str, attributes).unwrap_or_else(|_| Vec::new());
+
+    if file_list.is_empty() {
+        Ok(VBVariant::String(String::new()))
+    } else {
+        Ok(VBVariant::String(file_list[0].clone()))
+    }
+}

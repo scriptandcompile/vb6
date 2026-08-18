@@ -344,6 +344,59 @@ impl FileBackend for MemoryBackend {
         self.files.get(&path_str).map(|f| f.exists).unwrap_or(false)
     }
 
+    fn file_dir(
+        &mut self,
+        path: &std::path::Path,
+        pattern: &str,
+        attributes: i16,
+    ) -> io::Result<Vec<String>> {
+        let path_str = path.to_string_lossy().to_string();
+        let mut results = Vec::new();
+
+        // Check if path is a directory in memory
+        if self.directories.contains(&path_str) || path_str == "/" {
+            // List all files and directories
+            for (file_path, virtual_file) in &self.files {
+                if virtual_file.exists {
+                    let file_name = Path::new(file_path)
+                        .file_name()
+                        .unwrap_or_default()
+                        .to_string_lossy()
+                        .to_string();
+
+                    // Skip "." and ".."
+                    if file_name == "." || file_name == ".." {
+                        continue;
+                    }
+
+                    // Check pattern match using utility function
+                    let matches_pattern = crate::state::file::matches_wildcard(&file_name, pattern);
+
+                    // Get attributes
+                    let mut file_attrs: i16 = 0;
+                    if self.directories.contains(file_path) {
+                        file_attrs |= 16; // vbDirectory
+                    } else {
+                        file_attrs |= 32; // vbArchive (default for files)
+                    }
+
+                    // Match attributes if specified
+                    let attr_match = if attributes == 0 || attributes == file_attrs {
+                        true
+                    } else {
+                        (attributes & file_attrs) == attributes
+                    };
+
+                    if matches_pattern && attr_match {
+                        results.push(file_name);
+                    }
+                }
+            }
+        }
+
+        Ok(results)
+    }
+
     fn position(&self, file: &OpenFile) -> i64 {
         // VB6 positions are 1-based
         file.position + 1

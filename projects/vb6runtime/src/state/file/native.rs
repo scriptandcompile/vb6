@@ -186,6 +186,54 @@ impl FileBackend for NativeBackend {
         path.exists()
     }
 
+    fn file_dir(&mut self, path: &Path, pattern: &str, attributes: i16) -> io::Result<Vec<String>> {
+        let mut results = Vec::new();
+
+        if let Ok(entries) = std::fs::read_dir(path) {
+            for entry in entries.flatten() {
+                let file_name = entry
+                    .path()
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_string();
+
+                // Skip "." and ".."
+                if file_name == "." || file_name == ".." {
+                    continue;
+                }
+
+                // Check pattern match using utility function
+                let matches_pattern = crate::state::file::matches_wildcard(&file_name, pattern);
+
+                // Check attributes via filesystem metadata
+                let metadata = std::fs::metadata(entry.path());
+                let mut file_attrs: i16 = 0;
+                if let Ok(meta) = metadata {
+                    if meta.is_dir() {
+                        file_attrs |= 16; // vbDirectory
+                    }
+                    if meta.is_file() {
+                        file_attrs |= 32; // vbArchive
+                    }
+                }
+
+                // Match attributes if specified (vbNormal=0 means no attribute filter)
+                let attr_match = if attributes == 0 || attributes == file_attrs {
+                    true
+                } else {
+                    (attributes & file_attrs) == attributes
+                };
+
+                if matches_pattern && attr_match {
+                    results.push(file_name);
+                }
+            }
+        }
+
+        Ok(results)
+    }
+
     fn position(&self, file: &OpenFile) -> i64 {
         // VB6 positions are 1-based
         file.position + 1

@@ -110,6 +110,12 @@ pub trait FileBackend: Send {
     /// Check if a file exists.
     fn file_exists(&mut self, path: &Path) -> bool;
 
+    /// Enumerate files in a directory matching a pattern and attributes.
+    ///
+    /// Returns a list of file/directory names that match the specified pattern
+    /// and attributes. The caller is responsible for managing iteration state.
+    fn file_dir(&mut self, path: &Path, pattern: &str, attributes: i16) -> io::Result<Vec<String>>;
+
     /// Get the current position in a file (1-based for VB6).
     fn position(&self, file: &OpenFile) -> i64;
 

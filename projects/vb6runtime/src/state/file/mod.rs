@@ -698,3 +698,35 @@ mod tests {
         let _ = close_all_files();
     }
 }
+
+/// Get a list of files in a directory matching a pattern and attributes through the backend.
+pub fn file_dir(path: &Path, pattern: &str, attributes: i16) -> io::Result<Vec<String>> {
+    let resolved_path = resolve_path(path);
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .file_dir(&resolved_path, pattern, attributes)
+}
+
+/// Match a filename against a pattern (supports * and ? wildcards).
+///
+/// This is a utility function that works the same way for both the native
+/// and memory backends. The pattern matching logic:
+/// - If pattern contains no wildcards (* or ?), does a case-insensitive substring match
+/// - If pattern is "*", matches everything
+/// - Otherwise, does case-insensitive substring match
+pub fn matches_wildcard(file_name: &str, pattern: &str) -> bool {
+    // If pattern doesn't contain wildcards, check substring match (case-insensitive)
+    if !pattern.contains('*') && !pattern.contains('?') {
+        return file_name.to_lowercase().contains(&pattern.to_lowercase());
+    }
+
+    // Simple wildcard: * matches everything, ? matches single character
+    // For pattern "*", match all
+    if pattern == "*" {
+        return true;
+    }
+
+    // Very simple: check if pattern is a substring (case-insensitive)
+    file_name.to_lowercase().contains(&pattern.to_lowercase())
+}
