@@ -18,6 +18,7 @@ mod file;
 mod financial;
 mod logic;
 mod math;
+mod resources;
 mod string;
 mod type_checking;
 
@@ -99,6 +100,7 @@ fn registry() -> &'static Registry {
         logic::register(&mut registry);
         string::register(&mut registry);
         math::register(&mut registry);
+        resources::register(&mut registry);
         type_checking::register(&mut registry);
         registry
     })

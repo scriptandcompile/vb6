@@ -23,7 +23,7 @@
 //! - Contains the raw binary data from the resource file
 //! - Array is zero-based
 //! - Returns Empty if resource not found (in some VB versions)
-//! - May raise error 32813 if resource not found
+//! - Raises error 326 if resource not found
 //! - Data is returned exactly as stored in .res file
 //!
 //! ## Remarks
@@ -46,7 +46,7 @@
 //! - Resource file added via Project > Add File or in .vbp
 //! - Only one resource file per project
 //! - Changes to .res file require recompile
-//! - Error 32813: "Resource not found" if ID/format don't match
+//! - Error 326: "Resource with identifier not found" if ID/format don't match
 //! - Error 48: "Error loading from file" if resource file corrupt
 //!
 //! ## Typical Uses
@@ -133,7 +133,7 @@
 //! On Error Resume Next
 //! Dim data() As Byte
 //! data = LoadResData(999, 256)
-//! If Err.Number = 32813 Then
+//! If Err.Number = 326 Then
 //!     MsgBox "Resource not found!", vbCritical
 //!     Err.Clear
 //! ElseIf Err.Number <> 0 Then
@@ -511,10 +511,10 @@
 //! ## Error Handling
 //!
 //! ```vb
-//! ' Error 32813: Resource not found
+//! ' Error 326: Resource with identifier not found
 //! On Error Resume Next
 //! data = LoadResData(999, 256)
-//! If Err.Number = 32813 Then
+//! If Err.Number = 326 Then
 //!     MsgBox "Resource ID 999 not found!"
 //! End If
 //!
@@ -621,3 +621,266 @@
 //! - `LoadPicture`: Load picture from external file
 //! - `StrConv`: Convert byte array to string
 //! - `FreeFile`: Get file number for saving resource data
+
+use super::resfile::{rt, ResId};
+use super::{index_to_res_id, resource_not_found};
+use crate::array::ArrayValue;
+use crate::error::VBResult;
+use crate::state::resources;
+use crate::value::VBVariant;
+use crate::VBType;
+
+/// Highest custom resource format `LoadResData` accepts.
+///
+/// VB6 documents custom formats as 1-32767. Values at or below
+/// [`MAX_PREDEFINED_FORMAT`] are the predefined Win32 `RT_*` types, which
+/// `LoadResData` is documented not to load.
+const MAX_CUSTOM_FORMAT: i32 = 32767;
+
+/// Highest predefined Win32 resource type ordinal.
+///
+/// `RT_*` ordinals run up to `RT_MANIFEST` (24). VB6 tells programmers to use
+/// `LoadResPicture`/`LoadResString` for those instead. `RT_RCDATA` (10) is the
+/// exception: it is the type the VB6 Resource Editor writes custom data under,
+/// and real programs do pass 10 to `LoadResData`.
+const MAX_PREDEFINED_FORMAT: i32 = 24;
+
+/// Implementation of the `LoadResData` function.
+///
+/// VB6 behavior:
+/// - Reads custom binary data from the project's linked `.res` file
+/// - `index` is a numeric resource ID or a string resource name
+/// - `format` selects the resource type: a custom format (1-32767), most
+///   commonly `RT_RCDATA` (10) as written by the VB6 Resource Editor
+/// - Returns a zero-based `Byte` array holding the resource bytes verbatim
+/// - Raises error 326 if the resource, or the resource file, is not found
+///
+/// Note that VB6 returns a *copy* of the data, so callers can mutate the
+/// returned array without affecting later loads.
+pub fn loadresdata(index: &VBVariant, format: &VBVariant) -> VBResult<VBVariant> {
+    let res_id = index_to_res_id(index)?;
+
+    // An unusable format cannot match any resource type.
+    let format = format
+        .as_i32()
+        .ok()
+        .filter(|value| (1..=MAX_CUSTOM_FORMAT).contains(value))
+        .ok_or_else(resource_not_found)?;
+
+    // Predefined types other than RT_RCDATA belong to LoadResPicture and
+    // LoadResString. VB6 documents them as unsupported here.
+    if format <= MAX_PREDEFINED_FORMAT && format != rt::RCDATA as i32 {
+        return Err(resource_not_found());
+    }
+
+    let bytes = resources::with_file(|res| {
+        let res_type = format as u16;
+        let entry = match &res_id {
+            ResId::Ordinal(ordinal) => res.find_by_ordinal(res_type, *ordinal),
+            ResId::Name(name) => res.find_by_name(res_type, name),
+        }
+        .ok_or_else(resource_not_found)?;
+
+        Ok(res.data(entry).to_vec())
+    })?;
+
+    Ok(bytes_to_variant(&bytes))
+}
+
+/// Wraps `bytes` in the zero-based `Byte` array VB6 returns.
+fn bytes_to_variant(bytes: &[u8]) -> VBVariant {
+    let elements = bytes.iter().map(|b| VBVariant::from_byte(*b)).collect();
+    VBVariant::from_array(ArrayValue::from_vec_with_bounds(
+        VBType::Byte,
+        elements,
+        // VB6 byte arrays from LoadResData are always zero-based.
+        0,
+    ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+    use crate::library::resources::test_support::{
+        named_record, null_record, record, with_linked_res,
+    };
+
+    #[test]
+    fn loads_custom_data_by_ordinal() {
+        let mut bytes = null_record();
+        bytes.extend(record(rt::RCDATA, 101, b"custom-bytes"));
+
+        with_linked_res(&bytes, || {
+            let value = loadresdata(
+                &VBVariant::from_integer(101),
+                &VBVariant::from_integer(rt::RCDATA as i16),
+            )
+            .unwrap();
+
+            let array = value.as_array().unwrap();
+            assert_eq!(array.element_type(), &VBType::Byte);
+            assert_eq!(array.lower_bound(0).unwrap(), 0);
+            assert_eq!(array.upper_bound(0).unwrap(), 11);
+            let actual: Vec<u8> = array
+                .as_slice()
+                .iter()
+                .map(|v| v.as_byte().unwrap())
+                .collect();
+            assert_eq!(actual, b"custom-bytes");
+        });
+    }
+
+    #[test]
+    fn loads_custom_data_by_string_name() {
+        let mut bytes = null_record();
+        bytes.extend(named_record("300", "CONFIG", b"key=value"));
+
+        with_linked_res(&bytes, || {
+            let value = loadresdata(
+                &VBVariant::from_string("CONFIG"),
+                &VBVariant::from_long(300),
+            )
+            .unwrap();
+            let array = value.as_array().unwrap();
+            assert_eq!(array.len(), 9);
+        });
+    }
+
+    #[test]
+    fn zero_length_resource_yields_an_empty_array() {
+        let mut bytes = null_record();
+        bytes.extend(record(rt::RCDATA, 7, b""));
+
+        with_linked_res(&bytes, || {
+            let value = loadresdata(
+                &VBVariant::from_integer(7),
+                &VBVariant::from_integer(rt::RCDATA as i16),
+            )
+            .unwrap();
+            let array = value.as_array().unwrap();
+            assert!(array.is_empty());
+            // An empty zero-based array has UBound one below LBound.
+            assert_eq!(array.upper_bound(0).unwrap(), -1);
+        });
+    }
+
+    #[test]
+    fn missing_resource_raises_326() {
+        let mut bytes = null_record();
+        bytes.extend(record(rt::RCDATA, 101, b"data"));
+
+        with_linked_res(&bytes, || {
+            let error = loadresdata(
+                &VBVariant::from_integer(999),
+                &VBVariant::from_integer(rt::RCDATA as i16),
+            )
+            .unwrap_err();
+            assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+        });
+    }
+
+    #[test]
+    fn wrong_format_does_not_match_the_resource() {
+        let mut bytes = null_record();
+        bytes.extend(record(rt::RCDATA, 101, b"data"));
+
+        with_linked_res(&bytes, || {
+            // Right ID, wrong custom format.
+            let error =
+                loadresdata(&VBVariant::from_integer(101), &VBVariant::from_long(500)).unwrap_err();
+            assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+        });
+    }
+
+    #[test]
+    fn predefined_picture_and_string_formats_are_rejected() {
+        let mut bytes = null_record();
+        bytes.extend(record(rt::ICON, 1, b"icon"));
+        bytes.extend(record(rt::STRING, 1, b"str"));
+
+        with_linked_res(&bytes, || {
+            for format in [rt::ICON, rt::BITMAP, rt::CURSOR, rt::STRING, rt::GROUP_ICON] {
+                let error = loadresdata(
+                    &VBVariant::from_integer(1),
+                    &VBVariant::from_integer(format as i16),
+                )
+                .unwrap_err();
+                assert_eq!(
+                    error.number,
+                    err_number::RESOURCE_NOT_FOUND,
+                    "format {format} should be rejected"
+                );
+            }
+        });
+    }
+
+    #[test]
+    fn out_of_range_formats_are_rejected() {
+        let mut bytes = null_record();
+        bytes.extend(record(rt::RCDATA, 1, b"data"));
+
+        with_linked_res(&bytes, || {
+            for format in [
+                VBVariant::from_long(0),
+                VBVariant::from_long(-5),
+                VBVariant::from_long(32768),
+                VBVariant::Null,
+            ] {
+                let error = loadresdata(&VBVariant::from_integer(1), &format).unwrap_err();
+                assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+            }
+        });
+    }
+
+    #[test]
+    fn returned_array_is_an_independent_copy() {
+        let mut bytes = null_record();
+        bytes.extend(record(rt::RCDATA, 1, b"abc"));
+
+        with_linked_res(&bytes, || {
+            let format = VBVariant::from_integer(rt::RCDATA as i16);
+            let mut first = loadresdata(&VBVariant::from_integer(1), &format).unwrap();
+            // Mutate the first copy, then reload.
+            if let VBVariant::Array(array) = &mut first {
+                array.set(&[0], VBVariant::from_byte(b'Z')).unwrap();
+            }
+
+            let second = loadresdata(&VBVariant::from_integer(1), &format).unwrap();
+            let reloaded = second.as_array().unwrap();
+            assert_eq!(reloaded.as_slice()[0].as_byte().unwrap(), b'a');
+        });
+    }
+
+    #[test]
+    fn no_linked_resource_file_raises_326() {
+        let _guard = crate::state::test_support::lock_test();
+        resources::clear();
+        let error = loadresdata(
+            &VBVariant::from_integer(1),
+            &VBVariant::from_integer(rt::RCDATA as i16),
+        )
+        .unwrap_err();
+        assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+    }
+    // ---- against a real VB6-authored .res file ----
+
+    #[test]
+    fn loads_a_dll_blob_from_a_real_res_file() {
+        // Project1.RES stores two binaries under the custom string type "DLL".
+        // The type is a string, so this exercises the name-typed lookup path
+        // via find_by_name only when the type is numeric; here the type is
+        // "DLL", which no numeric format matches, so LoadResData cannot reach
+        // it -- assert that faithfully rather than pretending otherwise.
+        use crate::library::resources::test_support::with_test_data_res;
+
+        with_test_data_res("test-data/CdiuBeatUpEditor/Project1.RES", || {
+            let error = loadresdata(
+                &VBVariant::from_string("FMOD"),
+                &VBVariant::from_long(rt::RCDATA as i32),
+            )
+            .unwrap_err();
+            assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+        });
+    }
+}

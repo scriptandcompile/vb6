@@ -20,6 +20,7 @@ pub mod environment;
 pub mod err;
 pub mod file;
 pub mod random;
+pub mod resources;
 pub mod settings;
 
 #[cfg(test)]

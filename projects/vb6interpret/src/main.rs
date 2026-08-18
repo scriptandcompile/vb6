@@ -49,6 +49,10 @@ enum Commands {
         /// Execution timeout in seconds (0 = no timeout)
         #[arg(long, default_value = "0")]
         timeout: u64,
+
+        /// Resource (.res) file the LoadRes* functions read from
+        #[arg(long, value_name = "FILE")]
+        res: Option<PathBuf>,
     },
 
     /// Start interactive REPL
@@ -75,7 +79,12 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Some(Commands::Run { path, set, timeout }) => {
+        Some(Commands::Run {
+            path,
+            set,
+            timeout,
+            res,
+        }) => {
             let path = expand_tilde(&path);
             let source_file = read_source_file(&path)?;
             let module = ModuleFile::parse(&source_file).unwrap_or_fail();
@@ -83,6 +92,10 @@ fn main() -> Result<()> {
             let mut interpreter = Interpreter::new();
             if timeout > 0 {
                 interpreter.set_step_limit(u64::MAX);
+            }
+            // Link the project's resource file, as VB6's ResFile32= does.
+            if let Some(res) = &res {
+                interpreter.set_resource_file(expand_tilde(res).to_string_lossy().to_string());
             }
             for assignment in &set {
                 let (name, raw) = assignment.split_once('=').ok_or_else(|| {
