@@ -8,16 +8,38 @@
 export function build_debug_trace(code: string): any;
 
 /**
+ * Close every open file and wipe the in-memory file backend, restoring it to
+ * an empty filesystem.
+ */
+export function clear_files(): void;
+
+/**
  * Execute a single VB6 module up to `pause_after_steps` statements and return
  * a snapshot suitable for debugger-style stepping.
  */
 export function debug_vb6_code(code: string, pause_after_steps: number): any;
 
 /**
+ * The current mock clock date and time, for the Clock section of the
+ * Environment tab. Displayed in the system's local time zone, matching
+ * what VB6's `Now`/`Date`/`Time` functions would report.
+ *
+ * `time` is 24-hour (`HH:MM:SS`) so it round-trips with [`set_clock`] and
+ * native `<input type="time">` elements; the browser formats it for
+ * display (e.g. 12-hour with AM/PM).
+ */
+export function dump_clock(): any;
+
+/**
  * Every environment variable currently in the snapshot, for display and
  * persisting back to `localStorage`.
  */
 export function dump_env(): any;
+
+/**
+ * Snapshot of the memory file backend for the Files tab.
+ */
+export function dump_files(): any;
 
 /**
  * Every setting currently in the store, for persisting back to `localStorage`.
@@ -28,6 +50,12 @@ export function dump_settings(): any;
  * Initializes the panic hook for better error messages in the browser console.
  */
 export function init_panic_hook(): void;
+
+/**
+ * Create or replace the file at `path` with raw `content`, bypassing
+ * `Open`/`Close`. Used to restore a snapshot saved from the Files tab.
+ */
+export function install_file(path: string, content: Uint8Array): void;
 
 /**
  * Install or overwrite the setting `(appname, section, key)` with `value`.
@@ -73,6 +101,15 @@ export function remove_env(name: string): void;
 export function remove_setting(appname: string, section: string, key: string): void;
 
 /**
+ * Set the in-memory clock to `date` (`YYYY-MM-DD`) and `time` (`HH:MM:SS`)
+ * in the system's local time zone.
+ *
+ * This rewrites the memory clock backend directly; it never touches (and is
+ * never echoed back to) the real system clock.
+ */
+export function set_clock(date: string, time: string): void;
+
+/**
  * Set (or replace) the value of environment variable `name` in the snapshot.
  *
  * The webassembly host has no process environment, so the snapshot starts
@@ -103,19 +140,25 @@ export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly build_debug_trace: (a: number, b: number, c: number) => void;
     readonly debug_vb6_code: (a: number, b: number, c: number, d: number) => void;
+    readonly dump_clock: (a: number) => void;
     readonly dump_env: (a: number) => void;
+    readonly dump_files: (a: number) => void;
     readonly dump_settings: (a: number) => void;
+    readonly install_file: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly install_setting: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => void;
     readonly interpret_vb6_code: (a: number, b: number, c: number) => void;
     readonly remove_env: (a: number, b: number) => void;
     readonly remove_setting: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
+    readonly set_clock: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly set_env: (a: number, b: number, c: number, d: number) => void;
+    readonly clear_files: () => void;
     readonly parse_vb6_code: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly tokenize_vb6_code: (a: number, b: number, c: number) => void;
     readonly init_panic_hook: () => void;
     readonly __wbindgen_export: (a: number, b: number) => number;
     readonly __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_export3: (a: number, b: number, c: number) => void;
+    readonly __wbindgen_export4: (a: number) => void;
     readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
 }
 

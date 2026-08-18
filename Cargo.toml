@@ -87,8 +87,12 @@ indoc = "2.0"
 rustfmt-wrapper = "0.2"
 inkwell = { version = "0.10", default-features = false, features = ["llvm16-0"] }
 
-# Fuzzing (vb6grammarfuzz)
+# Fuzzing (vb6grammarfuzz) / modern random backend (vb6runtime)
 rand = "0.10.2"
+# `wasm_js` backend is required for OS entropy on wasm32-unknown-unknown
+# (vb6interpret's wasm playground); vb6interpret already depends
+# unconditionally on wasm-bindgen for that target, so enabling it there is safe.
+getrandom = "0.4.3"
 
 # REPL / tracing (vb6interpret)
 rustyline = "18.0.1"

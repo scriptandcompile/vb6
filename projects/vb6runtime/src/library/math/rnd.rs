@@ -692,7 +692,7 @@
 //! - `Timer`: Returns seconds since midnight (often used with Randomize)
 
 use crate::error::VBResult;
-use crate::state::random::{self, next_seed, normalize, seed_from_negative};
+use crate::state::random;
 use crate::value::VBVariant;
 
 /// Implementation of the `Rnd` function.
@@ -712,26 +712,20 @@ pub fn rnd(value: &VBVariant) -> VBResult<VBVariant> {
         return Ok(VBVariant::Null);
     }
 
-    let current = random::seed();
-
     if value.is_empty() {
         // An omitted argument behaves like any positive number.
-    } else {
-        let number = value.as_f32()?;
-        if number < 0.0 {
-            let seeded = seed_from_negative(number);
-            let next = next_seed(seeded);
-            random::set_seed(next);
-            return Ok(normalize(next));
-        }
-        if number == 0.0 {
-            return Ok(normalize(current));
-        }
+        return Ok(random::next());
     }
 
-    let next = next_seed(current);
-    random::set_seed(next);
-    Ok(normalize(next))
+    let number = value.as_f32()?;
+    if number < 0.0 {
+        return Ok(random::seed_from_rnd_argument(number));
+    }
+    if number == 0.0 {
+        return Ok(random::current());
+    }
+
+    Ok(random::next())
 }
 
 #[cfg(test)]
