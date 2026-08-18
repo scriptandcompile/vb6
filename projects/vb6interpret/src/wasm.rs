@@ -580,35 +580,32 @@ pub fn dump_files() -> Result<JsValue, JsError> {
 
     // Also include files that exist in the memory backend but aren't currently open.
     if let Ok(memory_files) = file_state::list_memory_files() {
-        let open_paths: std::collections::HashSet<String> = files
-            .iter()
-            .map(|f| f.path.clone())
-            .collect();
+        let open_paths: std::collections::HashSet<String> =
+            files.iter().map(|f| f.path.clone()).collect();
 
-        for (path, attrs, content) in memory_files {
-            if !open_paths.contains(&path) {
-                let is_text = content
-                    .as_ref()
-                    .and_then(|b| std::str::from_utf8(b).ok())
-                    .is_some();
+        for file in memory_files {
+            if !open_paths.contains(file.path()) {
+                let is_text = std::str::from_utf8(file.content()).is_ok();
 
-                let (content_text, content_base64) = match content {
-                    Some(bytes) => {
-                        if is_text {
-                            (Some(String::from_utf8_lossy(&bytes).to_string()), None)
-                        } else {
-                            let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
-                            (None, Some(b64))
-                        }
+                let (content_text, content_base64) = if file.exists() {
+                    if is_text {
+                        (
+                            Some(String::from_utf8_lossy(file.content()).to_string()),
+                            None,
+                        )
+                    } else {
+                        let b64 = base64::engine::general_purpose::STANDARD.encode(file.content());
+                        (None, Some(b64))
                     }
-                    None => (None, None),
+                } else {
+                    (None, None)
                 };
 
                 files.push(WasmFile {
-                    path,
+                    path: file.path().to_string(),
                     number: 0,
                     mode: "Closed".to_string(),
-                    attributes: attrs,
+                    attributes: file.attributes(),
                     content_text,
                     content_base64,
                 });

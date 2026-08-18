@@ -28,6 +28,8 @@ fn current_time() -> SystemTime {
 /// A virtual file stored in memory.
 #[derive(Debug, Clone)]
 pub struct VirtualFile {
+    /// Absolute path of the virtual file.
+    path: String,
     /// The file content.
     content: Vec<u8>,
     /// Whether the file exists.
@@ -39,6 +41,11 @@ pub struct VirtualFile {
 }
 
 impl VirtualFile {
+    /// Get the virtual file path.
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+
     /// Check if the file exists.
     pub fn exists(&self) -> bool {
         self.exists
@@ -104,6 +111,7 @@ impl MemoryBackend {
         files.insert(
             path.to_string(),
             VirtualFile {
+                path: path.to_string(),
                 content,
                 exists: true,
                 attributes: 0,
@@ -136,6 +144,7 @@ impl MemoryBackend {
         self.files.insert(
             path.to_string(),
             VirtualFile {
+                path: path.to_string(),
                 content,
                 exists: true,
                 attributes: 0,
@@ -188,6 +197,7 @@ impl FileBackend for MemoryBackend {
                 self.files.insert(
                     path_str.clone(),
                     VirtualFile {
+                        path: path_str.clone(),
                         content: Vec::new(),
                         exists: true,
                         attributes: 0,
@@ -201,6 +211,7 @@ impl FileBackend for MemoryBackend {
                     self.files.insert(
                         path_str.clone(),
                         VirtualFile {
+                            path: path_str.clone(),
                             content: Vec::new(),
                             exists: true,
                             attributes: 0,
@@ -215,6 +226,7 @@ impl FileBackend for MemoryBackend {
                     self.files.insert(
                         path_str.clone(),
                         VirtualFile {
+                            path: path_str.clone(),
                             content: Vec::new(),
                             exists: true,
                             attributes: 0,
