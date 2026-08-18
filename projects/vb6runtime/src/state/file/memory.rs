@@ -7,6 +7,7 @@
 
 use std::collections::{HashMap, HashSet};
 use std::io;
+use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
 use super::backend::{AccessMode, FileBackend, LockMode, OpenFile, OpenMode};
@@ -33,19 +34,34 @@ pub struct MemoryBackend {
     files: HashMap<String, VirtualFile>,
     /// Set of directory paths.
     directories: HashSet<String>,
+    /// Current working directory.
+    current_dir: PathBuf,
+    /// Current drive letter (tracked for VB6 semantics).
+    current_drive: char,
+    /// Per-drive current directories (VB6 tracks CWD per drive).
+    drive_dirs: HashMap<char, PathBuf>,
 }
 
 impl MemoryBackend {
     /// Create a new empty in-memory backend.
     pub fn new() -> Self {
+        let root = PathBuf::from("/");
+        let mut drive_dirs = HashMap::new();
+        drive_dirs.insert('C', root.clone());
         Self {
             files: HashMap::new(),
             directories: HashSet::new(),
+            current_dir: root.clone(),
+            current_drive: 'C',
+            drive_dirs,
         }
     }
 
     /// Create a pre-populated in-memory backend with a file.
     pub fn with_file(path: &str, content: Vec<u8>) -> Self {
+        let root = PathBuf::from("/");
+        let mut drive_dirs = HashMap::new();
+        drive_dirs.insert('C', root.clone());
         let mut files = HashMap::new();
         files.insert(
             path.to_string(),
@@ -59,6 +75,9 @@ impl MemoryBackend {
         Self {
             files,
             directories: HashSet::new(),
+            current_dir: root,
+            current_drive: 'C',
+            drive_dirs,
         }
     }
 
@@ -353,6 +372,44 @@ impl FileBackend for MemoryBackend {
             .filter(|f| f.exists)
             .map(|f| f.modified)
             .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "File not found"))
+    }
+
+    fn current_dir(&mut self) -> io::Result<PathBuf> {
+        Ok(self.current_dir.clone())
+    }
+
+    fn set_current_dir(&mut self, path: &Path) -> io::Result<()> {
+        let path_str = path.to_string_lossy().to_string();
+        // Validate the path exists as a directory (root always exists)
+        if path_str != "/" && !self.directories.contains(&path_str) {
+            return Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                format!("Path not found: {}", path_str),
+            ));
+        }
+        self.current_dir = path.to_path_buf();
+        self.drive_dirs.insert(self.current_drive, path.to_path_buf());
+        Ok(())
+    }
+
+    fn drives(&self) -> Vec<char> {
+        vec!['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    }
+
+    fn current_dir_for_drive(&mut self, drive: char) -> io::Result<PathBuf> {
+        self.drive_dirs
+            .get(&drive)
+            .cloned()
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Drive not available"))
+    }
+
+    fn set_current_drive(&mut self, drive: char) -> io::Result<()> {
+        self.current_drive = drive.to_ascii_uppercase();
+        // Ensure the drive has a directory entry
+        self.drive_dirs
+            .entry(self.current_drive)
+            .or_insert_with(|| PathBuf::from("/"));
+        Ok(())
     }
 }
 

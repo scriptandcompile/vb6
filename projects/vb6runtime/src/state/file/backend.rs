@@ -10,7 +10,7 @@
 //! manages file handle allocation and VB6-specific semantics.
 
 use std::io;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /// File open modes matching VB6's Open statement.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -139,4 +139,26 @@ pub trait FileBackend: Send {
 
     /// Get the last-modified time of a file as a `SystemTime`.
     fn file_datetime(&mut self, path: &Path) -> io::Result<std::time::SystemTime>;
+
+    // Current directory management
+
+    /// Get the current working directory.
+    fn current_dir(&mut self) -> io::Result<PathBuf>;
+
+    /// Set the current working directory.
+    fn set_current_dir(&mut self, path: &Path) -> io::Result<()>;
+
+    /// Get a list of available drive letters.
+    fn drives(&self) -> Vec<char>;
+
+    /// Get the current directory for a specific drive.
+    ///
+    /// On non-Windows, only the default drive is meaningful.
+    fn current_dir_for_drive(&mut self, drive: char) -> io::Result<PathBuf>;
+
+    /// Set the current drive letter.
+    ///
+    /// On non-Windows, this only changes the tracked drive; it does not
+    /// affect the actual process working directory.
+    fn set_current_drive(&mut self, drive: char) -> io::Result<()>;
 }

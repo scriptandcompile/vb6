@@ -401,6 +401,46 @@ pub fn file_datetime(path: &Path) -> io::Result<std::time::SystemTime> {
         .file_datetime(&resolved_path)
 }
 
+/// Get the current working directory through the backend.
+pub fn current_dir() -> io::Result<PathBuf> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .current_dir()
+}
+
+/// Set the current working directory through the backend.
+pub fn set_current_dir(path: &Path) -> io::Result<()> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .set_current_dir(path)
+}
+
+/// Get a list of available drive letters through the backend.
+pub fn drives() -> Vec<char> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .drives()
+}
+
+/// Get the current directory for a specific drive through the backend.
+pub fn current_dir_for_drive(drive: char) -> io::Result<PathBuf> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .current_dir_for_drive(drive)
+}
+
+/// Set the current drive through the backend.
+pub fn set_current_drive(drive: char) -> io::Result<()> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .set_current_drive(drive)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -5,7 +5,7 @@
 use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Seek, SeekFrom, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use super::backend::{AccessMode, FileBackend, LockMode, OpenFile, OpenMode};
 
@@ -13,13 +13,20 @@ use super::backend::{AccessMode, FileBackend, LockMode, OpenFile, OpenMode};
 pub struct NativeBackend {
     /// Map from path to the actual file handle.
     files: HashMap<String, File>,
+    /// Current working directory.
+    current_dir: PathBuf,
+    /// Current drive letter (tracked for VB6 semantics).
+    current_drive: char,
 }
 
 impl NativeBackend {
     /// Create a new native backend.
     pub fn new() -> Self {
+        let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("/"));
         Self {
             files: HashMap::new(),
+            current_dir: cwd,
+            current_drive: 'C',
         }
     }
 }
@@ -226,6 +233,46 @@ impl FileBackend for NativeBackend {
     fn file_datetime(&mut self, path: &Path) -> io::Result<std::time::SystemTime> {
         let metadata = std::fs::metadata(path)?;
         metadata.modified()
+    }
+
+    fn current_dir(&mut self) -> io::Result<PathBuf> {
+        Ok(self.current_dir.clone())
+    }
+
+    fn set_current_dir(&mut self, path: &Path) -> io::Result<()> {
+        // Resolve relative paths against the current directory
+        let target = if path.is_relative() {
+            self.current_dir.join(path)
+        } else {
+            path.to_path_buf()
+        };
+        // Verify the directory exists
+        if !target.is_dir() {
+            return Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                format!("Path not found: {}", path.display()),
+            ));
+        }
+        self.current_dir = target;
+        Ok(())
+    }
+
+    fn drives(&self) -> Vec<char> {
+        vec!['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    }
+
+    fn current_dir_for_drive(&mut self, drive: char) -> io::Result<PathBuf> {
+        if drive == self.current_drive {
+            Ok(self.current_dir.clone())
+        } else {
+            // Non-current drives: return root as default
+            Ok(PathBuf::from(format!("{drive}:\\")))
+        }
+    }
+
+    fn set_current_drive(&mut self, drive: char) -> io::Result<()> {
+        self.current_drive = drive.to_ascii_uppercase();
+        Ok(())
     }
 }
 
