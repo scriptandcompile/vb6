@@ -23,11 +23,6 @@ use std::sync::{Mutex, OnceLock};
 
 pub use backend::{AccessMode, FileBackend, LockMode, OpenFile, OpenMode};
 
-/// Convert an `io::Error` into a VB6 error (error 75: Path/File access error).
-pub fn io_to_vb(e: io::Error) -> vb6core::error::VBError {
-    vb6core::error::VBError::with_description(75, e.to_string())
-}
-
 /// Minimum valid file number for VB6 file I/O.
 pub const MIN_FILE_NUMBER: i16 = 1;
 /// Maximum valid file number for VB6 file I/O.

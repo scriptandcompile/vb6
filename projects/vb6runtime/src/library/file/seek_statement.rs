@@ -242,6 +242,7 @@ pub fn seek_statement(file_number: VBVariant, position: VBVariant) -> VBResult<(
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self, AccessMode, LockMode, OpenMode};
 
@@ -284,11 +285,11 @@ mod tests {
 
         let result = seek_statement(VBVariant::Long(0), VBVariant::Long(1));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 52);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
 
         let result = seek_statement(VBVariant::Long(512), VBVariant::Long(1));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 52);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
 
         let _ = file::close_all_files();
     }
@@ -314,11 +315,11 @@ mod tests {
 
         let result = seek_statement(VBVariant::Long(1), VBVariant::Long(0));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 63);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_RECORD_NUMBER);
 
         let result = seek_statement(VBVariant::Long(1), VBVariant::Long(-1));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 63);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_RECORD_NUMBER);
 
         let _ = file::close_all_files();
     }
@@ -330,7 +331,7 @@ mod tests {
 
         let result = seek_statement(VBVariant::Long(1), VBVariant::Long(1));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 52);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
 
         let _ = file::close_all_files();
     }

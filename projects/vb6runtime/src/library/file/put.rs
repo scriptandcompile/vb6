@@ -41,6 +41,7 @@
 //! [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/put-statement)
 
 use crate::error::{VBError, VBResult};
+use vb6core::error::err_number;
 use crate::state::file;
 
 /// Write data from a variable to an open file.
@@ -77,7 +78,7 @@ pub fn put_statement(
 
     // Get file info
     let file = file::get_file(file_number)
-        .ok_or_else(|| VBError::with_description(52, "File not open"))?;
+        .ok_or_else(|| VBError::with_description(err_number::BAD_FILE_NAME_OR_NUMBER, "File not open"))?;
 
     // Determine position
     let position = if let Some(rec) = record_number {
@@ -139,6 +140,7 @@ pub fn put_statement(
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self, AccessMode, LockMode, OpenMode};
     use crate::value::VBVariant;
@@ -210,7 +212,7 @@ mod tests {
 
         let result = put_statement(0, Some(1), &VBVariant::Long(42));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 52);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
 
         let _ = file::close_all_files();
     }
@@ -222,7 +224,7 @@ mod tests {
 
         let result = put_statement(1, Some(1), &VBVariant::Long(42));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 52);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
 
         let _ = file::close_all_files();
     }

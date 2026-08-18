@@ -842,6 +842,7 @@
 //! - `Format`: Formats date/time for display
 
 use std::time::SystemTime;
+use vb6core::error::err_number;
 
 use crate::error::{VBError, VBResult};
 use crate::state::file;
@@ -872,8 +873,8 @@ pub fn file_datetime(pathname: VBVariant) -> VBResult<VBVariant> {
     let modified = file::file_datetime(std::path::Path::new(&path_str)).map_err(|e| {
         VBError::with_description(
             match e.kind() {
-                std::io::ErrorKind::NotFound => 53, // File not found
-                _ => 57,                            // Device I/O error
+                std::io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND, // File not found
+                _ => err_number::DEVICE_IO_ERROR,                            // Device I/O error
             },
             e.to_string(),
         )
@@ -903,6 +904,7 @@ fn system_time_to_date_serial(time: SystemTime) -> f64 {
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
 
@@ -936,7 +938,7 @@ mod tests {
 
         let result = file_datetime(VBVariant::from_string("nonexistent.txt"));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 53);
+        assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
     }
 
     #[test]
@@ -945,6 +947,6 @@ mod tests {
 
         let result = file_datetime(VBVariant::Long(42));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 13);
+        assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }
 }

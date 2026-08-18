@@ -285,6 +285,7 @@ fn format_currency(v: i64) -> String {
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self, AccessMode, LockMode, OpenMode};
 
@@ -415,7 +416,7 @@ mod tests {
 
         let result = write_statement(0, &[VBVariant::from_string("test")]);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 52);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
 
         let _ = file::close_all_files();
     }
@@ -427,7 +428,7 @@ mod tests {
 
         let result = write_statement(1, &[VBVariant::from_string("test")]);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 52);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
 
         let _ = file::close_all_files();
     }
