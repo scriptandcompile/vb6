@@ -408,6 +408,36 @@ pub struct WasmEnvEntry {
     pub value: String,
 }
 
+/// File information for the Files tab.
+#[derive(Clone, Serialize, Deserialize)]
+pub struct WasmFile {
+    /// The file path.
+    pub path: String,
+    /// The file number (1-511) if open, 0 otherwise.
+    pub number: i16,
+    /// The open mode (Input, Output, Append, Random, Binary).
+    pub mode: String,
+    /// VB6-style attribute bitfield.
+    pub attributes: i16,
+    /// File content as a string (lossy UTF-8) for text files.
+    pub content_text: Option<String>,
+    /// File content as base64-encoded bytes for binary files.
+    pub content_base64: Option<String>,
+}
+
+/// Complete file state for the Files tab.
+#[derive(Clone, Serialize, Deserialize)]
+pub struct WasmFileState {
+    /// Current working directory.
+    pub current_dir: String,
+    /// Current drive letter.
+    pub current_drive: char,
+    /// List of currently open file numbers.
+    pub open_file_numbers: Vec<i16>,
+    /// All files in the memory backend.
+    pub files: Vec<WasmFile>,
+}
+
 /// Every environment variable currently in the snapshot, for display and
 /// persisting back to `localStorage`.
 #[wasm_bindgen]
@@ -465,4 +495,117 @@ pub fn dump_settings() -> Result<JsValue, JsError> {
         })
         .collect();
     Ok(to_value(&settings)?)
+}
+
+/// Convert a file mode to a human-readable string.
+fn open_mode_to_string(mode: file_state::OpenMode) -> String {
+    match mode {
+        file_state::OpenMode::Input => "Input".to_string(),
+        file_state::OpenMode::Output => "Output".to_string(),
+        file_state::OpenMode::Append => "Append".to_string(),
+        file_state::OpenMode::Random => "Random".to_string(),
+        file_state::OpenMode::Binary => "Binary".to_string(),
+    }
+}
+
+/// Snapshot of the memory file backend for the Files tab.
+#[wasm_bindgen]
+pub fn dump_files() -> Result<JsValue, JsError> {
+    use base64::Engine;
+
+    let current_dir = file_state::current_dir()
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_else(|_| "/".to_string());
+
+    let current_drive = file_state::current_dir()
+        .map(|p| {
+            p.to_string_lossy()
+                .chars()
+                .next()
+                .filter(|c| c.is_ascii_alphabetic())
+                .map(|c| c.to_ascii_uppercase())
+                .unwrap_or('C')
+        })
+        .unwrap_or('C');
+
+    let open_files: Vec<i16> = file_state::get_open_files()
+        .into_iter()
+        .map(|(num, _)| num)
+        .collect();
+
+    let mut files: Vec<WasmFile> = file_state::get_open_files()
+        .into_iter()
+        .map(|(num, open_file)| {
+            let content = file_state::read_file_to_vec(num).ok();
+            let (content_text, content_base64) = match content {
+                Some(bytes) => {
+                    let is_text = open_file.mode == file_state::OpenMode::Input
+                        || open_file.mode == file_state::OpenMode::Output
+                        || open_file.mode == file_state::OpenMode::Append;
+                    if is_text {
+                        let text = String::from_utf8_lossy(&bytes).to_string();
+                        (Some(text), None)
+                    } else {
+                        let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
+                        (None, Some(b64))
+                    }
+                }
+                None => (None, None),
+            };
+
+            WasmFile {
+                path: open_file.path.clone(),
+                number: num,
+                mode: open_mode_to_string(open_file.mode),
+                attributes: 0,
+                content_text,
+                content_base64,
+            }
+        })
+        .collect();
+
+    // Also include files that exist in the memory backend but aren't currently open.
+    if let Ok(memory_files) = file_state::list_memory_files() {
+        let open_paths: std::collections::HashSet<String> = files
+            .iter()
+            .map(|f| f.path.clone())
+            .collect();
+
+        for (path, attrs, content) in memory_files {
+            if !open_paths.contains(&path) {
+                let is_text = content
+                    .as_ref()
+                    .and_then(|b| std::str::from_utf8(b).ok())
+                    .is_some();
+
+                let (content_text, content_base64) = match content {
+                    Some(bytes) => {
+                        if is_text {
+                            (Some(String::from_utf8_lossy(&bytes).to_string()), None)
+                        } else {
+                            let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
+                            (None, Some(b64))
+                        }
+                    }
+                    None => (None, None),
+                };
+
+                files.push(WasmFile {
+                    path,
+                    number: 0,
+                    mode: "Closed".to_string(),
+                    attributes: attrs,
+                    content_text,
+                    content_base64,
+                });
+            }
+        }
+    }
+
+    Ok(to_value(&WasmFileState {
+        current_dir,
+        current_drive,
+        open_file_numbers: open_files,
+        files,
+    })?)
 }

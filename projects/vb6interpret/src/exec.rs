@@ -8,6 +8,8 @@
 use vb6core::error::{err_number, VBError, VBResult};
 use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
+use vb6runtime::library::file as filefn;
+use vb6runtime::state::file as file_state;
 use vb6runtime::{ArrayValue, VBVariant};
 
 use crate::error::{RunError, RunResult};
@@ -21,7 +23,9 @@ use crate::interpreter::{Flow, Interpreter};
 fn serial_to_timestamp(serial: f64) -> Option<jiff::Timestamp> {
     let base = jiff::civil::Date::new(1899, 12, 30).ok()?;
     let days = serial.floor();
-    let date = base.checked_add(jiff::SignedDuration::from_secs((days * 86400.0) as i64)).ok()?;
+    let date = base
+        .checked_add(jiff::SignedDuration::from_secs((days * 86400.0) as i64))
+        .ok()?;
     let fraction = serial.fract();
     let total_secs = (fraction * 86_400.0).round() as i64;
     let h = (total_secs / 3600) as i8;
@@ -128,6 +132,14 @@ impl Interpreter {
             SyntaxKind::CallStatement => self.exec_call(node),
             SyntaxKind::PrintStatement => {
                 self.print_node(node)?;
+                Ok(Flow::Next)
+            }
+            SyntaxKind::OpenStatement => {
+                self.exec_open(node)?;
+                Ok(Flow::Next)
+            }
+            SyntaxKind::CloseStatement => {
+                self.exec_close(node)?;
                 Ok(Flow::Next)
             }
             SyntaxKind::ExitStatement => self.exec_exit(node),
@@ -1156,20 +1168,50 @@ impl Interpreter {
 
     /// Emit `Debug.Print` / `Print` output.
     fn print_node(&mut self, node: &CstNode) -> RunResult<()> {
+        // `Print #filenumber, ...` writes to the file backend instead of the
+        // console buffer; the file number is a real expression node (unlike
+        // `Open`/`Close`, which are parsed as flat tokens).
+        let top_level: Vec<&CstNode> = node.significant_children().collect();
+        let file_number = match top_level
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::Octothorpe)
+        {
+            Some(hash_pos) => {
+                let expr = top_level
+                    .get(hash_pos + 1)
+                    .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+                let number = self
+                    .eval_expr(expr)?
+                    .as_i16()
+                    .map_err(|_| self.error_here(VBError::type_mismatch()))?;
+                Some(number)
+            }
+            None => None,
+        };
+
         let argument_list = node.first_child_by_kind(SyntaxKind::ArgumentList);
         let mut trailing_separator = false;
+        let mut file_values: Vec<VBVariant> = Vec::new();
         if let Some(list) = argument_list {
             let significant: Vec<&CstNode> = list.significant_children().collect();
             for child in &significant {
                 match child.kind() {
                     SyntaxKind::Argument => {
-                        if let Some(expr) = child.first_non_whitespace_child() {
-                            let value = self.eval_expr(expr)?;
-                            let text = value.as_string()?;
-                            self.current_output.push_str(&text);
+                        let value = match child.first_non_whitespace_child() {
+                            Some(expr) => self.eval_expr(expr)?,
+                            None => VBVariant::Empty,
+                        };
+                        if file_number.is_some() {
+                            file_values.push(value);
+                        } else {
+                            self.current_output.push_str(&value.as_string()?);
                         }
                     }
-                    SyntaxKind::Comma => self.current_output.push('\t'),
+                    SyntaxKind::Comma => {
+                        if file_number.is_none() {
+                            self.current_output.push('\t');
+                        }
+                    }
                     SyntaxKind::Semicolon => {}
                     _ => {}
                 }
@@ -1180,11 +1222,155 @@ impl Interpreter {
             );
         }
 
+        if let Some(number) = file_number {
+            filefn::print::print_statement(number, &file_values, !trailing_separator)
+                .map_err(|e| self.error_here(e))?;
+            return Ok(());
+        }
+
         if !trailing_separator {
             self.output.push(std::mem::take(&mut self.current_output));
         }
 
         Ok(())
+    }
+
+    /// Evaluate a bare literal or `Identifier` token, as found in the flat
+    /// token stream of `Open`/`Close` (which aren't parsed into nested
+    /// expression nodes like other statements).
+    fn eval_flat_token(&mut self, node: &CstNode) -> RunResult<VBVariant> {
+        if node.kind() == SyntaxKind::Identifier {
+            let name = node.text().trim().to_string();
+            return Ok(self.lookup(&name).cloned().unwrap_or(VBVariant::Empty));
+        }
+        self.eval_literal(node)
+    }
+
+    /// `Open pathname For mode [Access access] [lock] As [#]filenumber [Len=reclength]`.
+    fn exec_open(&mut self, node: &CstNode) -> RunResult<Flow> {
+        let children: Vec<&CstNode> = node.significant_children().collect();
+        let mut idx = 0;
+
+        if children.first().map(|c| c.kind()) == Some(SyntaxKind::OpenKeyword) {
+            idx += 1;
+        }
+
+        let path_tok = children
+            .get(idx)
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+        let path_value = self.eval_flat_token(path_tok)?;
+        idx += 1;
+
+        let mut mode = file_state::OpenMode::Random;
+        if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::ForKeyword) {
+            idx += 1;
+            if let Some(mode_tok) = children.get(idx) {
+                mode = match mode_tok.kind() {
+                    SyntaxKind::InputKeyword => file_state::OpenMode::Input,
+                    SyntaxKind::OutputKeyword => file_state::OpenMode::Output,
+                    SyntaxKind::AppendKeyword => file_state::OpenMode::Append,
+                    SyntaxKind::BinaryKeyword => file_state::OpenMode::Binary,
+                    _ => file_state::OpenMode::Random,
+                };
+                idx += 1;
+            }
+        }
+
+        let mut access = file_state::AccessMode::ReadWrite;
+        if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::AccessKeyword) {
+            idx += 1;
+            let mut can_read = false;
+            let mut can_write = false;
+            while idx < children.len() && children[idx].kind() != SyntaxKind::AsKeyword {
+                match children[idx].kind() {
+                    SyntaxKind::ReadKeyword => can_read = true,
+                    SyntaxKind::WriteKeyword => can_write = true,
+                    _ => {}
+                }
+                idx += 1;
+            }
+            access = match (can_read, can_write) {
+                (true, false) => file_state::AccessMode::Read,
+                (false, true) => file_state::AccessMode::Write,
+                _ => file_state::AccessMode::ReadWrite,
+            };
+        }
+
+        // Optional lock clause (`Shared`, `Lock Read`, `Lock Write`, `Lock Read Write`).
+        let mut lock = file_state::LockMode::Shared;
+        if idx < children.len() && children[idx].kind() != SyntaxKind::AsKeyword {
+            let mut locks_read = false;
+            let mut locks_write = false;
+            while idx < children.len() && children[idx].kind() != SyntaxKind::AsKeyword {
+                match children[idx].kind() {
+                    SyntaxKind::ReadKeyword => locks_read = true,
+                    SyntaxKind::WriteKeyword => locks_write = true,
+                    _ => {}
+                }
+                idx += 1;
+            }
+            lock = match (locks_read, locks_write) {
+                (true, true) => file_state::LockMode::LockReadWrite,
+                (true, false) => file_state::LockMode::LockRead,
+                (false, true) => file_state::LockMode::LockWrite,
+                _ => file_state::LockMode::Shared,
+            };
+        }
+
+        if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::AsKeyword) {
+            idx += 1;
+        }
+        if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::Octothorpe) {
+            idx += 1;
+        }
+        let number_tok = children
+            .get(idx)
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+        let file_number = self
+            .eval_flat_token(number_tok)?
+            .as_i16()
+            .map_err(|_| self.error_here(VBError::type_mismatch()))?;
+        idx += 1;
+
+        let mut record_length = 0i32;
+        if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::LenKeyword) {
+            idx += 1;
+            if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::EqualityOperator) {
+                idx += 1;
+            }
+            if let Some(len_tok) = children.get(idx) {
+                record_length = self.eval_flat_token(len_tok)?.as_i32().unwrap_or(0);
+            }
+        }
+
+        filefn::open::open_file(&path_value, mode, access, lock, file_number, record_length)
+            .map_err(|e| self.error_here(e))?;
+
+        Ok(Flow::Next)
+    }
+
+    /// `Close [[#]filenumber] [, [#]filenumber] ...`; closes all open files
+    /// if the list is empty.
+    fn exec_close(&mut self, node: &CstNode) -> RunResult<Flow> {
+        let children: Vec<&CstNode> = node.significant_children().collect();
+        let mut file_numbers: Vec<i16> = Vec::new();
+
+        for child in &children {
+            match child.kind() {
+                SyntaxKind::IntegerLiteral | SyntaxKind::Identifier => {
+                    let number = self
+                        .eval_flat_token(child)?
+                        .as_i16()
+                        .map_err(|_| self.error_here(VBError::type_mismatch()))?;
+                    file_numbers.push(number);
+                }
+                _ => {}
+            }
+        }
+
+        filefn::close::close_files(&file_numbers).map_err(|e| self.error_here(e))?;
+
+        Ok(Flow::Next)
     }
 
     /// Declare a variable in the current scope (globals at module level).

@@ -86,12 +86,14 @@ pub fn set_root(path: impl Into<PathBuf>) {
 
 /// Get the root directory for relative paths.
 ///
-/// Falls back to the current working directory if not set.
+/// Falls back to the current working directory if not set, or to `/` if the
+/// current working directory can't be queried (e.g. on `wasm32-unknown-unknown`,
+/// which has no OS-backed working directory).
 pub fn get_root() -> PathBuf {
     let root_guard = root().lock().unwrap_or_else(|e| e.into_inner());
-    root_guard.clone().unwrap_or_else(|| {
-        std::env::current_dir().expect("Failed to get current working directory")
-    })
+    root_guard
+        .clone()
+        .unwrap_or_else(|| std::env::current_dir().unwrap_or_else(|_| PathBuf::from("/")))
 }
 
 /// Resolve a file path, making it absolute if it's relative.
@@ -304,6 +306,68 @@ pub fn get_file(file_number: i16) -> Option<OpenFile> {
     OPEN_FILES.with(|files| files.borrow().get(&file_number).cloned())
 }
 
+/// Get all open files as a vector of (file_number, OpenFile) pairs.
+pub fn get_open_files() -> Vec<(i16, OpenFile)> {
+    OPEN_FILES.with(|files| {
+        files
+            .borrow()
+            .iter()
+            .map(|(&num, file)| (num, file.clone()))
+            .collect()
+    })
+}
+
+/// Read the entire content of an open file as a vector of bytes.
+pub fn read_file_to_vec(file_number: i16) -> io::Result<Vec<u8>> {
+    OPEN_FILES.with(|files| {
+        let files = files.borrow();
+        let file = files
+            .get(&file_number)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "File not open"))?;
+        let path = Path::new(&file.path);
+        let resolved = resolve_path(path);
+
+        // Read the file content through the backend
+        let mut backend = backend().lock().unwrap_or_else(|e| e.into_inner());
+
+        // Get the file length
+        let len = backend.file_len(&resolved)?;
+
+        // Create a buffer and read the content
+        let mut buf = vec![0u8; len as usize];
+        let mut file_clone = file.clone();
+        file_clone.position = 0;
+        let bytes_read = backend.read(&mut file_clone, &mut buf)?;
+        buf.truncate(bytes_read);
+        Ok(buf)
+    })
+}
+
+/// List all files in the memory backend with their attributes and content.
+/// Returns (path, attributes, content) for each file.
+pub fn list_memory_files() -> io::Result<Vec<(String, i16, Option<Vec<u8>>)>> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .as_any()
+        .downcast_ref::<memory::MemoryBackend>()
+        .map(|memory| {
+            memory
+                .files()
+                .iter()
+                .map(|(path, vfile)| {
+                    let content = if vfile.exists() {
+                        Some(vfile.content().to_vec())
+                    } else {
+                        None
+                    };
+                    (path.clone(), vfile.attributes(), content)
+                })
+                .collect()
+        })
+        .ok_or_else(|| io::Error::other("Backend is not a memory backend"))
+}
+
 /// Get the open file handle for a file number (mutable reference).
 pub fn with_file_mut<T>(file_number: i16, f: impl FnOnce(&mut OpenFile) -> T) -> io::Result<T> {
     OPEN_FILES.with(|files| {
@@ -419,10 +483,7 @@ pub fn set_current_dir(path: &Path) -> io::Result<()> {
 
 /// Get a list of available drive letters through the backend.
 pub fn drives() -> Vec<char> {
-    backend()
-        .lock()
-        .unwrap_or_else(|e| e.into_inner())
-        .drives()
+    backend().lock().unwrap_or_else(|e| e.into_inner()).drives()
 }
 
 /// Get the current directory for a specific drive through the backend.
