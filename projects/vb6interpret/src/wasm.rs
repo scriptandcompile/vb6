@@ -585,7 +585,18 @@ pub fn dump_files() -> Result<JsValue, JsError> {
 
         for file in memory_files {
             if !open_paths.contains(file.path()) {
-                let is_text = std::str::from_utf8(file.content()).is_ok();
+                // Prefer the mode the file was last opened with (persists across
+                // Close); fall back to a UTF-8 guess for files never opened via
+                // Open (e.g. installed/uploaded directly).
+                let is_text = match file.last_mode() {
+                    Some(file_state::OpenMode::Input)
+                    | Some(file_state::OpenMode::Output)
+                    | Some(file_state::OpenMode::Append) => true,
+                    Some(file_state::OpenMode::Random) | Some(file_state::OpenMode::Binary) => {
+                        false
+                    }
+                    None => std::str::from_utf8(file.content()).is_ok(),
+                };
 
                 let (content_text, content_base64) = if file.exists() {
                     if is_text {
