@@ -49,6 +49,7 @@
 //! [Name Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/name-statement)
 
 use crate::error::{VBError, VBResult};
+use vb6core::error::err_number;
 use crate::state::file;
 use crate::value::VBVariant;
 
@@ -109,9 +110,9 @@ pub fn name_statement(old_pathname: VBVariant, new_pathname: VBVariant) -> VBRes
     .map_err(|e| {
         VBError::with_description(
             match e.kind() {
-                std::io::ErrorKind::NotFound => 53,         // File not found
-                std::io::ErrorKind::PermissionDenied => 70, // Permission denied
-                _ => 75,                                    // Path/File access error
+                std::io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND,         // File not found
+                std::io::ErrorKind::PermissionDenied => err_number::PERMISSION_DENIED, // Permission denied
+                _ => err_number::PATH_FILE_ACCESS_ERROR,                                    // Path/File access error
             },
             e.to_string(),
         )
@@ -122,6 +123,7 @@ pub fn name_statement(old_pathname: VBVariant, new_pathname: VBVariant) -> VBRes
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
 
@@ -161,7 +163,7 @@ mod tests {
             VBVariant::from_string("new.txt"),
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 53);
+        assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
     }
 
     #[test]
@@ -179,7 +181,7 @@ mod tests {
             VBVariant::from_string("new.txt"),
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 75);
+        assert_eq!(result.unwrap_err().number, err_number::PATH_FILE_ACCESS_ERROR);
     }
 
     #[test]
@@ -188,10 +190,10 @@ mod tests {
 
         let result = name_statement(VBVariant::Long(42), VBVariant::from_string("new.txt"));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 13);
+        assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
 
         let result = name_statement(VBVariant::from_string("old.txt"), VBVariant::Long(42));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 13);
+        assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }
 }

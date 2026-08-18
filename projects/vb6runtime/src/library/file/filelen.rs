@@ -864,6 +864,7 @@ pub fn file_len(pathname: VBVariant) -> VBResult<VBLong> {
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
 
@@ -898,6 +899,6 @@ mod tests {
 
         let result = file_len(VBVariant::Long(42));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 13);
+        assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }
 }

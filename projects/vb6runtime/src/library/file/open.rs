@@ -56,6 +56,7 @@
 //! [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/open-statement)
 
 use std::io;
+use vb6core::error::err_number;
 use std::path::Path;
 
 use crate::error::{VBError, VBResult};
@@ -133,10 +134,10 @@ pub fn open_file(
     file::open_file(path, mode, access, lock, record_length, filenumber).map_err(|e| {
         VBError::with_description(
             match e.kind() {
-                io::ErrorKind::NotFound => 53,         // File not found
-                io::ErrorKind::PermissionDenied => 70, // Permission denied
-                io::ErrorKind::AlreadyExists => 55,    // File already open
-                _ => 57,                               // Device I/O error
+                io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND,         // File not found
+                io::ErrorKind::PermissionDenied => err_number::PERMISSION_DENIED, // Permission denied
+                io::ErrorKind::AlreadyExists => err_number::FILE_ALREADY_OPEN,    // File already open
+                _ => err_number::DEVICE_IO_ERROR,                               // Device I/O error
             },
             e.to_string(),
         )
@@ -195,6 +196,7 @@ pub fn parse_lock(lock: &str) -> VBResult<LockMode> {
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
     use super::*;
     use crate::state::file;
 
@@ -239,7 +241,7 @@ mod tests {
             0,
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 52);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
 
         let result = open_file(
             &path,
@@ -250,7 +252,7 @@ mod tests {
             0,
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 52);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
 
         let _ = file::close_all_files();
     }
@@ -283,7 +285,7 @@ mod tests {
             0,
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 55);
+        assert_eq!(result.unwrap_err().number, err_number::FILE_ALREADY_OPEN);
 
         let _ = file::close_all_files();
     }
@@ -302,7 +304,7 @@ mod tests {
             -1, // Invalid
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 59);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_RECORD_LENGTH);
 
         let result = open_file(
             &path,
@@ -313,7 +315,7 @@ mod tests {
             32768, // Invalid
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 59);
+        assert_eq!(result.unwrap_err().number, err_number::BAD_RECORD_LENGTH);
 
         let _ = file::close_all_files();
     }
@@ -335,7 +337,7 @@ mod tests {
             0,
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 53);
+        assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
 
         let _ = file::close_all_files();
     }

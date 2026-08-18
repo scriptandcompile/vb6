@@ -32,6 +32,32 @@ pub mod err_number {
     pub const OBJECT_DOESNT_SUPPORT_PROPERTY_OR_METHOD: i32 = 438;
     /// Wrong number of arguments or invalid property assignment.
     pub const WRONG_NUMBER_OF_ARGUMENTS: i32 = 450;
+
+    // File-related error numbers
+    /// Bad file name or number.
+    pub const BAD_FILE_NAME_OR_NUMBER: i32 = 52;
+    /// File not found.
+    pub const FILE_NOT_FOUND: i32 = 53;
+    /// Bad file mode.
+    pub const BAD_FILE_MODE: i32 = 54;
+    /// File already open.
+    pub const FILE_ALREADY_OPEN: i32 = 55;
+    /// Device I/O error.
+    pub const DEVICE_IO_ERROR: i32 = 57;
+    /// Bad record length.
+    pub const BAD_RECORD_LENGTH: i32 = 59;
+    /// Input past end of file.
+    pub const INPUT_PAST_END_OF_FILE: i32 = 62;
+    /// Bad record number.
+    pub const BAD_RECORD_NUMBER: i32 = 63;
+    /// Device unavailable.
+    pub const DEVICE_UNAVAILABLE: i32 = 68;
+    /// Permission denied.
+    pub const PERMISSION_DENIED: i32 = 70;
+    /// Path/File access error.
+    pub const PATH_FILE_ACCESS_ERROR: i32 = 75;
+    /// Path not found.
+    pub const PATH_NOT_FOUND: i32 = 76;
 }
 
 /// The built-in description for a given VB6 error number.
@@ -198,23 +224,23 @@ impl fmt::Display for VBError {
 impl From<std::io::Error> for VBError {
     fn from(err: std::io::Error) -> Self {
         let number = match err.kind() {
-            std::io::ErrorKind::NotFound => 53,       // File not found
-            std::io::ErrorKind::PermissionDenied => 70, // Permission denied
-            std::io::ErrorKind::AlreadyExists => 55,   // File already open
-            std::io::ErrorKind::WouldBlock => 55,      // Lock contention
-            std::io::ErrorKind::InvalidInput
-            | std::io::ErrorKind::InvalidData => 5,    // Invalid procedure call
-            std::io::ErrorKind::UnexpectedEof => 62,   // Input past end of file
-            std::io::ErrorKind::OutOfMemory => 7,      // Out of memory
-            std::io::ErrorKind::TimedOut => 71,        // Device not ready
-            std::io::ErrorKind::WriteZero
-            | std::io::ErrorKind::StorageFull => 61,   // Disk full
-            std::io::ErrorKind::Interrupted => 18,     // User interrupt
+            std::io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND,
+            std::io::ErrorKind::PermissionDenied => err_number::PERMISSION_DENIED,
+            std::io::ErrorKind::AlreadyExists => err_number::FILE_ALREADY_OPEN,
+            std::io::ErrorKind::WouldBlock => err_number::FILE_ALREADY_OPEN,
+            std::io::ErrorKind::InvalidInput | std::io::ErrorKind::InvalidData => {
+                err_number::INVALID_PROCEDURE_CALL
+            }
+            std::io::ErrorKind::UnexpectedEof => err_number::INPUT_PAST_END_OF_FILE,
+            std::io::ErrorKind::OutOfMemory => err_number::OUT_OF_MEMORY,
+            std::io::ErrorKind::TimedOut => 71, // Device not ready (no const yet)
+            std::io::ErrorKind::WriteZero | std::io::ErrorKind::StorageFull => 61, // Disk full (no const yet)
+            std::io::ErrorKind::Interrupted => 18, // User interrupt (no const yet)
             std::io::ErrorKind::ConnectionRefused
             | std::io::ErrorKind::ConnectionReset
             | std::io::ErrorKind::ConnectionAborted
-            | std::io::ErrorKind::NotConnected => 68,  // Device unavailable
-            _ => 57,                                   // Device I/O error (default)
+            | std::io::ErrorKind::NotConnected => err_number::DEVICE_UNAVAILABLE,
+            _ => err_number::DEVICE_IO_ERROR,
         };
         Self::with_description(number, err.to_string())
     }

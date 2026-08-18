@@ -790,6 +790,7 @@
 //! - `FileExists` - Checks if a file exists (custom function using Dir)
 
 use crate::error::{VBError, VBResult};
+use vb6core::error::err_number;
 use crate::state::file;
 use crate::value::{VBInteger, VBVariant};
 
@@ -833,8 +834,8 @@ pub fn getattr(pathname: VBVariant) -> VBResult<VBInteger> {
     let attrs = file::get_attrs(std::path::Path::new(&path_str)).map_err(|e| {
         VBError::with_description(
             match e.kind() {
-                std::io::ErrorKind::NotFound => 53, // File not found
-                _ => 57,                            // Device I/O error
+                std::io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND, // File not found
+                _ => err_number::DEVICE_IO_ERROR,                            // Device I/O error
             },
             e.to_string(),
         )
@@ -845,6 +846,7 @@ pub fn getattr(pathname: VBVariant) -> VBResult<VBInteger> {
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
 
@@ -885,7 +887,7 @@ mod tests {
 
         let result = getattr(VBVariant::from_string("nonexistent.txt"));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 53);
+        assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
     }
 
     #[test]
@@ -894,6 +896,6 @@ mod tests {
 
         let result = getattr(VBVariant::Long(42));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 13);
+        assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }
 }

@@ -28,6 +28,7 @@
 //! [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/filecopy-statement)
 
 use crate::error::{VBError, VBResult};
+use vb6core::error::err_number;
 use crate::state::file;
 use crate::value::VBVariant;
 
@@ -72,9 +73,9 @@ pub fn file_copy(source: VBVariant, destination: VBVariant) -> VBResult<()> {
     .map_err(|e| {
         VBError::with_description(
             match e.kind() {
-                std::io::ErrorKind::NotFound => 53,         // File not found
-                std::io::ErrorKind::PermissionDenied => 70, // Permission denied
-                _ => 57,                                    // Device I/O error
+                std::io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND,         // File not found
+                std::io::ErrorKind::PermissionDenied => err_number::PERMISSION_DENIED, // Permission denied
+                _ => err_number::DEVICE_IO_ERROR,                                    // Device I/O error
             },
             e.to_string(),
         )
@@ -85,6 +86,7 @@ pub fn file_copy(source: VBVariant, destination: VBVariant) -> VBResult<()> {
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
 
@@ -146,7 +148,7 @@ mod tests {
             VBVariant::from_string("dest.txt"),
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 53);
+        assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
     }
 
     #[test]
@@ -155,10 +157,10 @@ mod tests {
 
         let result = file_copy(VBVariant::Long(42), VBVariant::from_string("dest.txt"));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 13);
+        assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
 
         let result = file_copy(VBVariant::from_string("source.txt"), VBVariant::Long(42));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, 13);
+        assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }
 }
