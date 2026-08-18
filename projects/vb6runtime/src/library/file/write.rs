@@ -156,3 +156,279 @@
 //!     Close #1
 //! End Sub
 //! ```
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::value::VBVariant;
+
+/// Write expression list to a sequential file.
+///
+/// # Arguments
+///
+/// * `file_number` - The file number to write to.
+/// * `values` - The values to write.
+///
+/// # Returns
+///
+/// Returns `Ok(())` on success, or `Err(VBError)` on failure.
+pub fn write_statement(file_number: i16, values: &[VBVariant]) -> VBResult<()> {
+    // Check file number is valid
+    if !(file::MIN_FILE_NUMBER..=file::MAX_FILE_NUMBER).contains(&file_number) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("Bad file name or number: {}", file_number),
+        ));
+    }
+
+    // Check file is open
+    if !file::is_file_open(file_number) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("File not open: #{}", file_number),
+        ));
+    }
+
+    // Build the output string
+    let mut output = String::new();
+
+    for (i, value) in values.iter().enumerate() {
+        if i > 0 {
+            output.push(',');
+        }
+
+        match value {
+            VBVariant::Empty => {
+                // Empty values write nothing (but still have comma separator)
+            }
+            VBVariant::Null => {
+                output.push_str("#NULL#");
+            }
+            VBVariant::Boolean(b) => {
+                if *b {
+                    output.push_str("#TRUE#");
+                } else {
+                    output.push_str("#FALSE#");
+                }
+            }
+            VBVariant::Long(v) => {
+                output.push_str(&v.to_string());
+            }
+            VBVariant::Integer(v) => {
+                output.push_str(&v.to_string());
+            }
+            VBVariant::Byte(v) => {
+                output.push_str(&v.to_string());
+            }
+            VBVariant::Double(v) => {
+                output.push_str(&format!("{}", v));
+            }
+            VBVariant::Single(v) => {
+                output.push_str(&format!("{}", v));
+            }
+            VBVariant::Currency(v) => {
+                let formatted = format_currency(*v);
+                output.push_str(&formatted);
+            }
+            VBVariant::Date(v) => {
+                let formatted = crate::value::date_serial_to_string(*v);
+                output.push_str(&format!("#{}#", formatted));
+            }
+            VBVariant::String(s) => {
+                // Strings are enclosed in quotes
+                output.push('"');
+                // Escape any embedded quotes
+                for ch in s.as_str().chars() {
+                    if ch == '"' {
+                        output.push_str("\"\"");
+                    } else {
+                        output.push(ch);
+                    }
+                }
+                output.push('"');
+            }
+            VBVariant::Error(e) => {
+                output.push_str(&format!("#ERROR {}#", e.number));
+            }
+            _ => {
+                // Objects and arrays can't be written
+                return Err(VBError::with_description(
+                    13, // Type mismatch
+                    "Type mismatch in Write #",
+                ));
+            }
+        }
+    }
+
+    // Write # always adds a newline
+    output.push('\r');
+    output.push('\n');
+
+    // Write to file
+    file::write_file(file_number, output.as_bytes()).map_err(|e| {
+        VBError::with_description(
+            57, // Device I/O error
+            e.to_string(),
+        )
+    })?;
+
+    Ok(())
+}
+
+/// Format a currency value for VB6 Write # output.
+fn format_currency(v: i64) -> String {
+    let sign = if v < 0 { "-" } else { "" };
+    let abs_val = v.unsigned_abs();
+    let dollars = abs_val / 10000;
+    let cents = abs_val % 10000;
+    format!("{}{}.{:04}", sign, dollars, cents)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+
+    #[test]
+    fn write_string_with_quotes() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        write_statement(1, &[VBVariant::from_string("Hello")]).unwrap();
+        file::close_file(1).unwrap();
+
+        let content = std::fs::read_to_string(dir.path().join("test.txt")).unwrap();
+        assert_eq!(content, "\"Hello\"\r\n");
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn write_multiple_values() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        write_statement(
+            1,
+            &[
+                VBVariant::from_string("Name"),
+                VBVariant::Long(42),
+                VBVariant::Double(3.14),
+            ],
+        )
+        .unwrap();
+        file::close_file(1).unwrap();
+
+        let content = std::fs::read_to_string(dir.path().join("test.txt")).unwrap();
+        assert_eq!(content, "\"Name\",42,3.14\r\n");
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn write_booleans() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        write_statement(1, &[VBVariant::Boolean(true)]).unwrap();
+        write_statement(1, &[VBVariant::Boolean(false)]).unwrap();
+        file::close_file(1).unwrap();
+
+        let content = std::fs::read_to_string(dir.path().join("test.txt")).unwrap();
+        assert_eq!(content, "#TRUE#\r\n#FALSE#\r\n");
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn write_escapes_quotes() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        write_statement(1, &[VBVariant::from_string("He said \"Hello\"")]).unwrap();
+        file::close_file(1).unwrap();
+
+        let content = std::fs::read_to_string(dir.path().join("test.txt")).unwrap();
+        assert_eq!(content, "\"He said \"\"Hello\"\"\"\r\n");
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn write_rejects_invalid_file_number() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = write_statement(0, &[VBVariant::from_string("test")]);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn write_rejects_closed_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let result = write_statement(1, &[VBVariant::from_string("test")]);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+}

@@ -830,3 +830,74 @@
 //! - `GetAttr`: Returns file attributes
 //! - `FreeFile`: Returns next available file number
 //! - `Open`: Opens a file for reading or writing
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::value::{VBLong, VBVariant};
+
+/// Get the length of a file in bytes.
+///
+/// # Arguments
+///
+/// * `pathname` - The file path.
+///
+/// # Returns
+///
+/// Returns the file length in bytes, or 0 if the file doesn't exist.
+pub fn file_len(pathname: VBVariant) -> VBResult<VBLong> {
+    // Get the file path
+    let path_str = match pathname {
+        VBVariant::String(s) => s.as_str().to_string(),
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in FileLen",
+            ));
+        }
+    };
+
+    // Get the file length
+    let len = file::file_len(std::path::Path::new(&path_str)).unwrap_or(0);
+
+    Ok(VBLong::from(len as i32))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self};
+
+    #[test]
+    fn file_len_returns_file_size() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a file with known content
+        std::fs::write(dir.path().join("test.txt"), "Hello, World!").unwrap();
+
+        let len = file_len(VBVariant::from_string("test.txt")).unwrap();
+        assert_eq!(len.as_i32(), 13);
+    }
+
+    #[test]
+    fn file_len_returns_zero_for_nonexistent_file() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let len = file_len(VBVariant::from_string("nonexistent.txt")).unwrap();
+        assert_eq!(len.as_i32(), 0);
+    }
+
+    #[test]
+    fn file_len_rejects_non_string() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = file_len(VBVariant::Long(42));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 13);
+    }
+}

@@ -195,6 +195,31 @@ impl fmt::Display for VBError {
     }
 }
 
+impl From<std::io::Error> for VBError {
+    fn from(err: std::io::Error) -> Self {
+        let number = match err.kind() {
+            std::io::ErrorKind::NotFound => 53,       // File not found
+            std::io::ErrorKind::PermissionDenied => 70, // Permission denied
+            std::io::ErrorKind::AlreadyExists => 55,   // File already open
+            std::io::ErrorKind::WouldBlock => 55,      // Lock contention
+            std::io::ErrorKind::InvalidInput
+            | std::io::ErrorKind::InvalidData => 5,    // Invalid procedure call
+            std::io::ErrorKind::UnexpectedEof => 62,   // Input past end of file
+            std::io::ErrorKind::OutOfMemory => 7,      // Out of memory
+            std::io::ErrorKind::TimedOut => 71,        // Device not ready
+            std::io::ErrorKind::WriteZero
+            | std::io::ErrorKind::StorageFull => 61,   // Disk full
+            std::io::ErrorKind::Interrupted => 18,     // User interrupt
+            std::io::ErrorKind::ConnectionRefused
+            | std::io::ErrorKind::ConnectionReset
+            | std::io::ErrorKind::ConnectionAborted
+            | std::io::ErrorKind::NotConnected => 68,  // Device unavailable
+            _ => 57,                                   // Device I/O error (default)
+        };
+        Self::with_description(number, err.to_string())
+    }
+}
+
 impl std::error::Error for VBError {}
 
 #[cfg(test)]

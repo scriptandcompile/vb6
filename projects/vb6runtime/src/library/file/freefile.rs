@@ -629,3 +629,114 @@
 //! - `Print` - Writes data to a sequential file
 //! - `Get` - Reads data from a binary or random file
 //! - `Put` - Writes data to a binary or random file
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::value::{VBInteger, VBVariant};
+
+/// Get the next available file number.
+///
+/// # Arguments
+///
+/// * `range` - 0 for file numbers 1-255, 1 for 256-511.
+///
+/// # Returns
+///
+/// Returns the next available file number, or 0 if no files are available.
+pub fn free_file(range: VBVariant) -> VBResult<VBInteger> {
+    // Convert range to integer, default to 0
+    let range_num = match range {
+        VBVariant::Empty | VBVariant::Null => 0,
+        VBVariant::Long(v) => v,
+        VBVariant::Integer(v) => v as i32,
+        VBVariant::Byte(v) => v as i32,
+        VBVariant::Double(v) => v as i32,
+        VBVariant::Single(v) => v as i32,
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in FreeFile",
+            ));
+        }
+    };
+
+    // Validate range
+    if range_num != 0 && range_num != 1 {
+        return Err(VBError::with_description(
+            5, // Invalid procedure call or argument
+            "Invalid range number for FreeFile",
+        ));
+    }
+
+    let file_num = file::free_file(range_num as i16);
+    Ok(VBInteger::from(file_num))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+
+    #[test]
+    fn free_file_returns_lowest_available() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        assert_eq!(free_file(VBVariant::Empty).unwrap().as_i16(), 1);
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        assert_eq!(free_file(VBVariant::Empty).unwrap().as_i16(), 2);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn free_file_high_range() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        assert_eq!(free_file(VBVariant::Long(1)).unwrap().as_i16(), 256);
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            256,
+        )
+        .unwrap();
+
+        assert_eq!(free_file(VBVariant::Long(1)).unwrap().as_i16(), 257);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn free_file_rejects_invalid_range() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = free_file(VBVariant::Long(2));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 5);
+
+        let _ = file::close_all_files();
+    }
+}

@@ -766,3 +766,160 @@
 //! - `Input`: Reads data from file
 //! - `Get`: Reads data from random/binary file
 //! - `FreeFile`: Returns next available file number
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::state::file::{OpenMode, MAX_FILE_NUMBER, MIN_FILE_NUMBER};
+use crate::value::{VBBoolean, VBVariant};
+
+/// Check if the current position is at the end of file.
+///
+/// # Arguments
+///
+/// * `file_number` - The file number.
+///
+/// # Returns
+///
+/// Returns `true` if at end of file, `false` otherwise.
+pub fn eof(file_number: VBVariant) -> VBResult<VBBoolean> {
+    // Convert file number to integer
+    let file_num = match file_number {
+        VBVariant::Long(v) => v as i16,
+        VBVariant::Integer(v) => v,
+        VBVariant::Byte(v) => v as i16,
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in EOF",
+            ));
+        }
+    };
+
+    // Validate file number range
+    if !(MIN_FILE_NUMBER..=MAX_FILE_NUMBER).contains(&file_num) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("Bad file name or number: {}", file_num),
+        ));
+    }
+
+    // Check if file is open
+    let handle = file::get_file(file_num).ok_or_else(|| {
+        VBError::with_description(
+            52, // Bad file name or number
+            format!("File not open: #{}", file_num),
+        )
+    })?;
+
+    // For Output and Append modes, EOF is always False —
+    // the file is being written to, never at an "end" for reading.
+    if handle.mode == OpenMode::Output || handle.mode == OpenMode::Append {
+        return Ok(VBBoolean::from(false));
+    }
+    let pos = file::position_file(file_num).map_err(|e| {
+        VBError::with_description(
+            57, // Device I/O error
+            e.to_string(),
+        )
+    })?;
+
+    let len = file::lof_file(file_num).map_err(|e| {
+        VBError::with_description(
+            57, // Device I/O error
+            e.to_string(),
+        )
+    })?;
+
+    // EOF if position > length
+    Ok(VBBoolean::from(pos > len))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+
+    #[test]
+    fn eof_returns_false_for_new_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        assert!(!eof(VBVariant::Long(1)).unwrap().as_bool());
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn eof_returns_true_at_end() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a file with content
+        let path = std::path::PathBuf::from("test.txt");
+        std::fs::write(dir.path().join("test.txt"), "Hello").unwrap();
+
+        // Open for input
+        file::open_file(
+            &path,
+            OpenMode::Input,
+            AccessMode::Read,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        // Read all content
+        let mut buf = [0u8; 5];
+        file::read_file(1, &mut buf).unwrap();
+
+        // Should be at EOF now
+        assert!(eof(VBVariant::Long(1)).unwrap().as_bool());
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn eof_rejects_invalid_file_number() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = eof(VBVariant::Long(0));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let result = eof(VBVariant::Long(512));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn eof_rejects_closed_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let result = eof(VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+}

@@ -625,3 +625,143 @@
 //! - `Get`: Read from file (updates Loc)
 //! - `Put`: Write to file (updates Loc)
 //! - `FreeFile`: Get available file number
+
+use crate::error::{VBError, VBResult};
+use crate::state::file::{self, MAX_FILE_NUMBER, MIN_FILE_NUMBER};
+use crate::value::{VBLong, VBVariant};
+
+/// Get the current position in an open file.
+///
+/// # Arguments
+///
+/// * `file_number` - The file number.
+///
+/// # Returns
+///
+/// Returns the current position (1-based), or 0 if the file is not open.
+pub fn loc(file_number: VBVariant) -> VBResult<VBLong> {
+    // Convert file number to integer
+    let file_num = match file_number {
+        VBVariant::Long(v) => v as i16,
+        VBVariant::Integer(v) => v,
+        VBVariant::Byte(v) => v as i16,
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in LOC",
+            ));
+        }
+    };
+
+    // Validate file number range
+    if !(MIN_FILE_NUMBER..=MAX_FILE_NUMBER).contains(&file_num) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("Bad file name or number: {}", file_num),
+        ));
+    }
+
+    // Check if file is open
+    if !file::is_file_open(file_num) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("File not open: #{}", file_num),
+        ));
+    }
+
+    // Get the current position (already 1-based)
+    let pos = file::position_file(file_num).map_err(|e| {
+        VBError::with_description(
+            57, // Device I/O error
+            e.to_string(),
+        )
+    })?;
+
+    Ok(VBLong::from(pos as i32))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+
+    #[test]
+    fn loc_returns_current_position() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a file and write some data
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+        file::write_file(1, b"Hello").unwrap();
+
+        // Check LOC
+        let pos = loc(VBVariant::Long(1)).unwrap();
+        assert_eq!(pos.as_i32(), 6); // After writing 5 bytes, position is 6
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn loc_returns_one_for_empty_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        let pos = loc(VBVariant::Long(1)).unwrap();
+        assert_eq!(pos.as_i32(), 1); // Position 1 is the start
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn loc_rejects_invalid_file_number() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = loc(VBVariant::Long(0));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let result = loc(VBVariant::Long(512));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn loc_rejects_closed_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let result = loc(VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+}

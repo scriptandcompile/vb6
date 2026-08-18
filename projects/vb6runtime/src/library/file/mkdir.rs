@@ -44,3 +44,88 @@
 //! ## Reference
 //!
 //! [MkDir Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/mkdir-statement)
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::value::VBVariant;
+
+/// Create a new directory.
+///
+/// # Arguments
+///
+/// * `path` - The directory path to create.
+///
+/// # Returns
+///
+/// Returns `Ok(())` on success, or `Err(VBError)` on failure.
+pub fn mkdir(path: VBVariant) -> VBResult<()> {
+    // Get the path
+    let path_str = match path {
+        VBVariant::String(s) => s.as_str().to_string(),
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in MkDir",
+            ));
+        }
+    };
+
+    // Create the directory through the backend
+    file::create_dir(std::path::Path::new(&path_str)).map_err(|e| {
+        VBError::with_description(
+            match e.kind() {
+                std::io::ErrorKind::AlreadyExists => 75, // Path/File access error
+                std::io::ErrorKind::NotFound => 76,      // Path not found
+                std::io::ErrorKind::PermissionDenied => 70, // Permission denied
+                _ => 57,                                 // Device I/O error
+            },
+            e.to_string(),
+        )
+    })?;
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self};
+
+    #[test]
+    fn mkdir_creates_directory() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create directory
+        mkdir(VBVariant::from_string("newdir")).unwrap();
+
+        // Verify
+        assert!(dir.path().join("newdir").is_dir());
+    }
+
+    #[test]
+    fn mkdir_rejects_existing_directory() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create directory
+        std::fs::create_dir(dir.path().join("existing")).unwrap();
+
+        let result = mkdir(VBVariant::from_string("existing"));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 75);
+    }
+
+    #[test]
+    fn mkdir_rejects_non_string() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = mkdir(VBVariant::Long(42));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 13);
+    }
+}
