@@ -655,6 +655,7 @@
 //! - `App.Path`: Get application directory for relative paths
 
 use crate::error::{VBError, VBResult};
+use crate::state::file;
 use crate::value::VBVariant;
 use crate::StdPicture;
 use std::path::Path;
@@ -673,12 +674,22 @@ pub fn loadpicture(filename: Option<&str>) -> VBResult<VBVariant> {
         None => Ok(VBVariant::from_object(Box::new(StdPicture::new(0, 0)))),
         Some("") => Ok(VBVariant::nothing()),
         Some(path) => {
-            // TODO: This should actually be going through the VB6 file handling layer
             let path = Path::new(path);
-            if !path.exists() {
+
+            // Check if the file exists by attempting to get its attributes
+            // we would normally use `Path::exists`, but here we go through the VB6 file handling layer
+            // and VB6 does not have an 'exist' file check function. VB6 programmers have used bother
+            // getattrs as a workaround to check for file existence. 'dir' has also been suggested as
+            // an alternative but is not suggested because it may return directories as well as files
+            // and could lead to incorrect assumptions about file existence depending on other things
+            // happening during runtime.
+            // (ie, looping over dir then trying to use a 'exist' check would cause issues)
+            if file::get_attrs(path).is_err() {
                 return Err(VBError::new(53)); // File not found
             }
+
             // For now, create a StdPicture with the file's dimensions
+            // TODO: Actually parse the image file to get its real dimensions.
             // In a full implementation, we would actually load the image data
             // BMP header has: file type, file size, reserved, data offset, DIB header size,
             // width, height, color planes, bits per pixel, compression, image size, XPixelsPerMeter,
