@@ -28,9 +28,9 @@
 //! [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/lock-statement)
 
 use crate::error::{VBError, VBResult};
-use vb6core::error::err_number;
 use crate::state::file;
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Lock all or part of an open file for exclusive access.
 ///
@@ -127,9 +127,9 @@ use std::io;
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
+    use vb6core::error::err_number;
 
     #[test]
     fn lock_entire_file() {

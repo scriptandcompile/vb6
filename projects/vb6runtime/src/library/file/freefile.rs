@@ -674,9 +674,9 @@ pub fn free_file(range: VBVariant) -> VBResult<VBInteger> {
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+    use vb6core::error::err_number;
 
     #[test]
     fn free_file_returns_lowest_available() {
@@ -736,7 +736,10 @@ mod tests {
 
         let result = free_file(VBVariant::Long(2));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::INVALID_PROCEDURE_CALL);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
 
         let _ = file::close_all_files();
     }

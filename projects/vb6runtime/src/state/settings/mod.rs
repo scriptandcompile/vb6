@@ -94,9 +94,7 @@ fn default_store_root() -> Option<PathBuf> {
     } else {
         std::env::var_os("XDG_CONFIG_HOME")
             .map(PathBuf::from)
-            .or_else(|| {
-                std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".config"))
-            })
+            .or_else(|| std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".config")))
     };
     base.map(|base| base.join("vb6").join("settings"))
 }

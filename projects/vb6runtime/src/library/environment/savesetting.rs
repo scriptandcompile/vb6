@@ -232,9 +232,8 @@ mod tests {
     fn object_and_array_arguments_are_error_13() {
         with_temp_settings_store(|_| {
             let array = VBVariant::array_dynamic(vb6core::types::VBType::String);
-            let err =
-                save_setting(&array, &string("Section"), &string("Key"), &string("Value"))
-                    .unwrap_err();
+            let err = save_setting(&array, &string("Section"), &string("Key"), &string("Value"))
+                .unwrap_err();
             assert_eq!(err.number, crate::error::err_number::TYPE_MISMATCH);
         });
     }

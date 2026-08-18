@@ -874,7 +874,7 @@ pub fn file_datetime(pathname: VBVariant) -> VBResult<VBVariant> {
         VBError::with_description(
             match e.kind() {
                 std::io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND, // File not found
-                _ => err_number::DEVICE_IO_ERROR,                            // Device I/O error
+                _ => err_number::DEVICE_IO_ERROR,                           // Device I/O error
             },
             e.to_string(),
         )
@@ -904,9 +904,9 @@ fn system_time_to_date_serial(time: SystemTime) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
+    use vb6core::error::err_number;
 
     #[test]
     fn file_datetime_returns_valid_date() {

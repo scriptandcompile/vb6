@@ -43,10 +43,10 @@
 //! [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/get-statement)
 
 use crate::error::{VBError, VBResult};
-use vb6core::error::err_number;
 use crate::state::file;
 use crate::state::file::{MAX_FILE_NUMBER, MIN_FILE_NUMBER};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Read data from an open file into a variable.
 ///
@@ -81,8 +81,9 @@ pub fn get_statement(
     }
 
     // Get file info
-    let file = file::get_file(file_number)
-        .ok_or_else(|| VBError::with_description(err_number::BAD_FILE_NAME_OR_NUMBER, "File not open"))?;
+    let file = file::get_file(file_number).ok_or_else(|| {
+        VBError::with_description(err_number::BAD_FILE_NAME_OR_NUMBER, "File not open")
+    })?;
 
     // Determine position
     let position = if let Some(rec) = record_number {
@@ -189,16 +190,17 @@ pub fn get_statement(
 
 /// Get the record length for a file.
 pub fn get_record_length(file_number: i16) -> VBResult<i32> {
-    let file = file::get_file(file_number)
-        .ok_or_else(|| VBError::with_description(err_number::BAD_FILE_NAME_OR_NUMBER, "File not open"))?;
+    let file = file::get_file(file_number).ok_or_else(|| {
+        VBError::with_description(err_number::BAD_FILE_NAME_OR_NUMBER, "File not open")
+    })?;
     Ok(file.record_length)
 }
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+    use vb6core::error::err_number;
 
     #[test]
     fn get_long_from_binary_file() {
@@ -270,7 +272,10 @@ mod tests {
 
         let result = get_statement(0, Some(1), VBVariant::Long(0));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }
@@ -282,7 +287,10 @@ mod tests {
 
         let result = get_statement(1, Some(1), VBVariant::Long(0));
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }

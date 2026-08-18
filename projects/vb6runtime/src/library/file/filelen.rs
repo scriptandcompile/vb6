@@ -864,9 +864,9 @@ pub fn file_len(pathname: VBVariant) -> VBResult<VBLong> {
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
+    use vb6core::error::err_number;
 
     #[test]
     fn file_len_returns_file_size() {

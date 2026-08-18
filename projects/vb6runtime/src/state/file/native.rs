@@ -289,11 +289,7 @@ impl FileBackend for NativeBackend {
         Ok(())
     }
 
-    fn lock_file(
-        &mut self,
-        path: &Path,
-        record_range: Option<(i32, i32)>,
-    ) -> io::Result<()> {
+    fn lock_file(&mut self, path: &Path, record_range: Option<(i32, i32)>) -> io::Result<()> {
         let path_str = path.to_string_lossy().to_string();
         let existing = self.locks.entry(path_str).or_default();
 
@@ -323,24 +319,21 @@ impl FileBackend for NativeBackend {
         Ok(())
     }
 
-    fn unlock_file(
-        &mut self,
-        path: &Path,
-        record_range: Option<(i32, i32)>,
-    ) -> io::Result<()> {
+    fn unlock_file(&mut self, path: &Path, record_range: Option<(i32, i32)>) -> io::Result<()> {
         let path_str = path.to_string_lossy().to_string();
-        let existing = self.locks.get_mut(&path_str).ok_or_else(|| {
-            io::Error::new(io::ErrorKind::NotFound, "File not locked")
-        })?;
+        let existing = self
+            .locks
+            .get_mut(&path_str)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "File not locked"))?;
 
         // Find and remove the matching lock
-        let pos = existing.iter().position(|lock| {
-            match (lock, &record_range) {
+        let pos = existing
+            .iter()
+            .position(|lock| match (lock, &record_range) {
                 (None, None) => true,
                 (Some((a, b)), Some((c, d))) => a == c && b == d,
                 _ => false,
-            }
-        });
+            });
 
         match pos {
             Some(i) => {
@@ -350,10 +343,7 @@ impl FileBackend for NativeBackend {
                 }
                 Ok(())
             }
-            None => Err(io::Error::new(
-                io::ErrorKind::NotFound,
-                "File not locked",
-            )),
+            None => Err(io::Error::new(io::ErrorKind::NotFound, "File not locked")),
         }
     }
 }

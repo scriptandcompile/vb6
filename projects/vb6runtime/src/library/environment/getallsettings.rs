@@ -781,11 +781,11 @@
 //! - `Environ` - Returns the string associated with an operating system environment variable
 //! - `Command` - Returns the command-line arguments
 
+use crate::array::{ArrayDimension, ArrayValue};
 use crate::error::VBResult;
 use crate::state::settings;
 use crate::types::VBType;
 use crate::value::VBVariant;
-use crate::array::{ArrayDimension, ArrayValue};
 
 /// Returns every `(key, value)` pair stored under `(appname, section)`.
 ///
@@ -798,10 +798,7 @@ use crate::array::{ArrayDimension, ArrayValue};
 ///
 /// `Null` arguments raise error 94 (invalid use of `Null`); object and array
 /// arguments raise error 13 (type mismatch).
-pub fn get_all_settings(
-    appname: &VBVariant,
-    section: &VBVariant,
-) -> VBResult<VBVariant> {
+pub fn get_all_settings(appname: &VBVariant, section: &VBVariant) -> VBResult<VBVariant> {
     let appname = appname.as_string()?;
     let section = section.as_string()?;
 
@@ -813,10 +810,7 @@ pub fn get_all_settings(
 
     let count = pairs.len() as i32;
     // VB6 GetAllSettings returns a 0-based, 2D array: (0..count-1, 0..1).
-    let dims = [
-        ArrayDimension::new(0, count - 1),
-        ArrayDimension::new(0, 1),
-    ];
+    let dims = [ArrayDimension::new(0, count - 1), ArrayDimension::new(0, 1)];
     let mut arr = ArrayValue::new_fixed(VBType::String, &dims)?;
 
     for (i, (key, value)) in pairs.into_iter().enumerate() {

@@ -222,7 +222,11 @@ impl SettingsBackend for FileBackend {
             };
 
             for section_entry in section_entries.flatten() {
-                if !section_entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+                if !section_entry
+                    .file_type()
+                    .map(|t| t.is_dir())
+                    .unwrap_or(false)
+                {
                     continue;
                 }
                 let section = section_entry.file_name().to_string_lossy().into_owned();
@@ -283,7 +287,10 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let backend = create_test_backend(dir.path());
         backend.set("MyApp", "Startup", "Left", "150").unwrap();
-        assert_eq!(backend.get("MyApp", "Startup", "Left").as_deref(), Some("150"));
+        assert_eq!(
+            backend.get("MyApp", "Startup", "Left").as_deref(),
+            Some("150")
+        );
     }
 
     #[test]
@@ -291,8 +298,14 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let backend = create_test_backend(dir.path());
         backend.set("MyApp", "Window", "Width", "600").unwrap();
-        assert_eq!(backend.get("myapp", "window", "width").as_deref(), Some("600"));
-        assert_eq!(backend.get("MYAPP", "WINDOW", "WIDTH").as_deref(), Some("600"));
+        assert_eq!(
+            backend.get("myapp", "window", "width").as_deref(),
+            Some("600")
+        );
+        assert_eq!(
+            backend.get("MYAPP", "WINDOW", "WIDTH").as_deref(),
+            Some("600")
+        );
     }
 
     #[test]
@@ -313,7 +326,10 @@ mod tests {
         backend.set("MyApp", "Startup", "Top", "40").unwrap();
         backend.remove_key("MyApp", "Startup", "left").unwrap();
         assert_eq!(backend.get("MyApp", "Startup", "Left"), None);
-        assert_eq!(backend.get("MyApp", "Startup", "Top").as_deref(), Some("40"));
+        assert_eq!(
+            backend.get("MyApp", "Startup", "Top").as_deref(),
+            Some("40")
+        );
     }
 
     #[test]
@@ -353,7 +369,10 @@ mod tests {
                 ("Top".to_string(), "40".to_string()),
             ]
         );
-        assert_eq!(backend.get_all("myapp", "startup"), backend.get_all("MyApp", "Startup"));
+        assert_eq!(
+            backend.get_all("myapp", "startup"),
+            backend.get_all("MyApp", "Startup")
+        );
     }
 
     #[test]
@@ -400,12 +419,22 @@ mod tests {
         let loaded = backend.load_all();
         assert_eq!(loaded.len(), 2);
         assert_eq!(
-            loaded.get(&("myapp".to_string(), "startup".to_string(), "left".to_string()))
+            loaded
+                .get(&(
+                    "myapp".to_string(),
+                    "startup".to_string(),
+                    "left".to_string()
+                ))
                 .map(|e| e.value.as_str()),
             Some("150")
         );
         assert_eq!(
-            loaded.get(&("myapp".to_string(), "startup".to_string(), "top".to_string()))
+            loaded
+                .get(&(
+                    "myapp".to_string(),
+                    "startup".to_string(),
+                    "top".to_string()
+                ))
                 .map(|e| e.value.as_str()),
             Some("40")
         );

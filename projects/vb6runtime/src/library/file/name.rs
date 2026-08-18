@@ -49,9 +49,9 @@
 //! [Name Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/name-statement)
 
 use crate::error::{VBError, VBResult};
-use vb6core::error::err_number;
 use crate::state::file;
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Rename a file, directory, or folder.
 ///
@@ -110,9 +110,9 @@ pub fn name_statement(old_pathname: VBVariant, new_pathname: VBVariant) -> VBRes
     .map_err(|e| {
         VBError::with_description(
             match e.kind() {
-                std::io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND,         // File not found
+                std::io::ErrorKind::NotFound => err_number::FILE_NOT_FOUND, // File not found
                 std::io::ErrorKind::PermissionDenied => err_number::PERMISSION_DENIED, // Permission denied
-                _ => err_number::PATH_FILE_ACCESS_ERROR,                                    // Path/File access error
+                _ => err_number::PATH_FILE_ACCESS_ERROR, // Path/File access error
             },
             e.to_string(),
         )
@@ -123,9 +123,9 @@ pub fn name_statement(old_pathname: VBVariant, new_pathname: VBVariant) -> VBRes
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
+    use vb6core::error::err_number;
 
     #[test]
     fn name_renames_file() {
@@ -181,7 +181,10 @@ mod tests {
             VBVariant::from_string("new.txt"),
         );
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::PATH_FILE_ACCESS_ERROR);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::PATH_FILE_ACCESS_ERROR
+        );
     }
 
     #[test]

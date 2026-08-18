@@ -36,9 +36,9 @@
 //! [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/curdir-function)
 
 use crate::error::{VBError, VBResult};
-use vb6core::error::err_number;
 use crate::state::file;
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Return the current directory as a `Variant`.
 ///
@@ -94,9 +94,8 @@ pub(super) fn resolve_curdir(drive: VBVariant) -> VBResult<String> {
             )
         })?
     } else {
-        file::current_dir().map_err(|e| {
-            VBError::with_description(err_number::DEVICE_IO_ERROR, e.to_string())
-        })?
+        file::current_dir()
+            .map_err(|e| VBError::with_description(err_number::DEVICE_IO_ERROR, e.to_string()))?
     };
 
     // Convert to string, using platform separator
@@ -105,9 +104,9 @@ pub(super) fn resolve_curdir(drive: VBVariant) -> VBResult<String> {
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
+    use vb6core::error::err_number;
 
     #[test]
     fn curdir_returns_current_directory() {

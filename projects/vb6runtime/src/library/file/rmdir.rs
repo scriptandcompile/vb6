@@ -63,9 +63,9 @@
 //! [RmDir Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/rmdir-statement)
 
 use crate::error::{VBError, VBResult};
-use vb6core::error::err_number;
 use crate::state::file;
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Remove an existing directory.
 ///
@@ -92,9 +92,9 @@ pub fn rmdir(path: VBVariant) -> VBResult<()> {
     file::remove_dir(std::path::Path::new(&path_str)).map_err(|e| {
         VBError::with_description(
             match e.kind() {
-                std::io::ErrorKind::NotFound => err_number::PATH_NOT_FOUND,         // Path not found
+                std::io::ErrorKind::NotFound => err_number::PATH_NOT_FOUND, // Path not found
                 std::io::ErrorKind::PermissionDenied => err_number::PERMISSION_DENIED, // Permission denied
-                _ => err_number::PATH_FILE_ACCESS_ERROR,                                    // Path/File access error
+                _ => err_number::PATH_FILE_ACCESS_ERROR, // Path/File access error
             },
             e.to_string(),
         )
@@ -105,9 +105,9 @@ pub fn rmdir(path: VBVariant) -> VBResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self};
+    use vb6core::error::err_number;
 
     #[test]
     fn rmdir_removes_directory() {
