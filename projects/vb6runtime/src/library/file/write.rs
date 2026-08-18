@@ -188,6 +188,9 @@ pub fn write_statement(file_number: i16, values: &[VBVariant]) -> VBResult<()> {
         ));
     }
 
+    // Get the current width for this file (0 means no limit)
+    let width = file::with_file_mut(file_number, |file| file.width).unwrap_or(0);
+
     // Build the output string
     let mut output = String::new();
 
@@ -256,6 +259,14 @@ pub fn write_statement(file_number: i16, values: &[VBVariant]) -> VBResult<()> {
                     "Type mismatch in Write #",
                 ));
             }
+        }
+    }
+
+    // Check width and add newline if output would exceed the width limit
+    if width > 0 && !output.is_empty() {
+        // If output would exceed the width limit, start a new line
+        if output.len() > width as usize {
+            output.push('\n');
         }
     }
 
