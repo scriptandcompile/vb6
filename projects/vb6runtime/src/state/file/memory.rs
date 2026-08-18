@@ -129,6 +129,20 @@ impl MemoryBackend {
     pub fn files_mut(&mut self) -> &mut HashMap<String, VirtualFile> {
         &mut self.files
     }
+
+    /// Create or replace the file at `path` with `content`, bypassing
+    /// `Open`/`Close` semantics (e.g. for restoring a saved snapshot).
+    pub fn insert_file(&mut self, path: &str, content: Vec<u8>) {
+        self.files.insert(
+            path.to_string(),
+            VirtualFile {
+                content,
+                exists: true,
+                attributes: 0,
+                modified: current_time(),
+            },
+        );
+    }
 }
 
 impl Default for MemoryBackend {
@@ -139,6 +153,10 @@ impl Default for MemoryBackend {
 
 impl FileBackend for MemoryBackend {
     fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self
     }
 

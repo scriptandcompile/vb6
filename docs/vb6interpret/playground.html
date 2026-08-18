@@ -115,6 +115,9 @@
                 <button class="tab-btn" data-tab="environment">
                     <span class="tab-icon">🌍</span> Environment
                 </button>
+                <button class="tab-btn" data-tab="files">
+                    <span class="tab-icon">💾</span> Files
+                </button>
             </div>
 
             <div class="tab-content">
@@ -206,6 +209,53 @@
                                 <input id="setting-value" class="env-input" type="text" placeholder="Value" autocomplete="off" spellcheck="false">
                                 <button type="submit" class="btn btn-primary btn-sm">Add</button>
                             </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="files-tab" class="tab-pane">
+                    <div class="tab-toolbar">
+                        <span class="toggle-label helper-text">Snapshot of the in-memory file backend.</span>
+                        <div class="tab-toolbar-actions">
+                            <button id="files-save-btn" class="btn btn-secondary btn-sm" disabled>
+                                <span class="btn-icon">💾</span> Save
+                            </button>
+                            <button id="files-load-btn" class="btn btn-secondary btn-sm" disabled>
+                                <span class="btn-icon">📂</span> Load
+                            </button>
+                            <button id="files-download-btn" class="btn btn-secondary btn-sm" disabled>
+                                <span class="btn-icon">⬇</span> Download ZIP
+                            </button>
+                            <button id="files-clear-btn" class="btn btn-secondary btn-sm" disabled>
+                                <span class="btn-icon">🗑</span> Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div class="output-scroll info-content">
+                        <div class="info-section">
+                            <h4>File System</h4>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-label">Current Directory</span>
+                                    <span id="files-current-dir" class="stat-value">/</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Current Drive</span>
+                                    <span id="files-current-drive" class="stat-value">C</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Open File Numbers</span>
+                                    <span id="files-open-numbers" class="stat-value">None</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-section">
+                            <h4>Files</h4>
+                            <div id="files-list-nav" class="file-list-nav">
+                                <div class="env-empty">No files in the memory backend.</div>
+                            </div>
+                            <div id="files-detail" class="file-detail"></div>
                         </div>
                     </div>
                 </div>

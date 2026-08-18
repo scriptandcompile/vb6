@@ -508,6 +508,20 @@ fn open_mode_to_string(mode: file_state::OpenMode) -> String {
     }
 }
 
+/// Close every open file and wipe the in-memory file backend, restoring it to
+/// an empty filesystem.
+#[wasm_bindgen]
+pub fn clear_files() {
+    file_state::reset();
+}
+
+/// Create or replace the file at `path` with raw `content`, bypassing
+/// `Open`/`Close`. Used to restore a snapshot saved from the Files tab.
+#[wasm_bindgen]
+pub fn install_file(path: &str, content: &[u8]) -> Result<(), JsError> {
+    file_state::write_memory_file(path, content).map_err(|e| JsError::new(&e.to_string()))
+}
+
 /// Snapshot of the memory file backend for the Files tab.
 #[wasm_bindgen]
 pub fn dump_files() -> Result<JsValue, JsError> {
