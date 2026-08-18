@@ -38,6 +38,9 @@ pub struct VirtualFile {
     attributes: i16,
     /// Last-modified timestamp.
     modified: SystemTime,
+    /// The mode the file was last opened with, if any. Kept after `Close` so
+    /// the Files tab can still tell binary files from text files.
+    last_mode: Option<OpenMode>,
 }
 
 impl VirtualFile {
@@ -59,6 +62,11 @@ impl VirtualFile {
     /// Get the file attributes.
     pub fn attributes(&self) -> i16 {
         self.attributes
+    }
+
+    /// Get the mode the file was last opened with, if any.
+    pub fn last_mode(&self) -> Option<OpenMode> {
+        self.last_mode
     }
 
     /// Get the last-modified timestamp.
@@ -116,6 +124,7 @@ impl MemoryBackend {
                 exists: true,
                 attributes: 0,
                 modified: current_time(),
+                last_mode: None,
             },
         );
         Self {
@@ -149,6 +158,7 @@ impl MemoryBackend {
                 exists: true,
                 attributes: 0,
                 modified: current_time(),
+                last_mode: None,
             },
         );
     }
@@ -202,6 +212,7 @@ impl FileBackend for MemoryBackend {
                         exists: true,
                         attributes: 0,
                         modified: current_time(),
+                        last_mode: Some(mode),
                     },
                 );
             }
@@ -216,6 +227,7 @@ impl FileBackend for MemoryBackend {
                             exists: true,
                             attributes: 0,
                             modified: current_time(),
+                            last_mode: Some(mode),
                         },
                     );
                 }
@@ -231,6 +243,7 @@ impl FileBackend for MemoryBackend {
                             exists: true,
                             attributes: 0,
                             modified: current_time(),
+                            last_mode: Some(mode),
                         },
                     );
                 }
@@ -238,6 +251,12 @@ impl FileBackend for MemoryBackend {
             OpenMode::Input => {
                 // File must exist, already checked above
             }
+        }
+
+        // Remember the mode used, even for pre-existing files being reopened,
+        // so the Files tab can distinguish binary content from text after Close.
+        if let Some(virtual_file) = self.files.get_mut(&path_str) {
+            virtual_file.last_mode = Some(mode);
         }
 
         // Calculate initial position for Append mode
