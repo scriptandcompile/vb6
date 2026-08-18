@@ -48,6 +48,22 @@ Sub Main()
 End Sub
 `,
     },
+    files: {
+        name: "Files",
+        code: `Attribute VB_NAME = "FilesModule"
+
+Sub Main()
+    Dim i as Integer
+
+    Open "Test.txt" For Append As #1 
+        For i = 1 to 3
+            Print #1, i
+        Next i
+    Close #1
+
+End Sub
+`,
+    }
 };
 
 export function getExample(id) {
