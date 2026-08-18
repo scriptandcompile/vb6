@@ -524,6 +524,12 @@ function resetExecutionSession() {
     state.sessionComplete = false;
     Editor.clearExecutionHighlight();
     syncExecutionControls();
+    // Each run installs a fresh memory file backend, so a session reset
+    // should wipe it too and refresh the Files tab to match.
+    if (state.wasmReady) {
+        clear_files();
+        state.activeFilePath = null;
+    }
     renderOutput({
         successful: true,
         output_text: "Run a module to see Debug.Print output.",
