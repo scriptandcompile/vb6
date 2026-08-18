@@ -11,6 +11,15 @@ use vb6runtime::VBVariant;
 
 /// Register the file functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {
+    registry.insert(builtin!("dir", 0, 2, |args| {
+        let pathname = args.first().cloned().unwrap_or(VBVariant::Empty);
+        let attributes: i16 = args
+            .get(1)
+            .and_then(|v| v.as_i32().ok())
+            .map(|n| n as i16)
+            .unwrap_or(0);
+        filefn::dir::dir(pathname, attributes)
+    }));
     registry.insert(builtin!("freefile", 0, 1, |args| {
         let range = args.first().cloned().unwrap_or(VBVariant::Empty);
         filefn::freefile::free_file(range).map(VBVariant::from)
