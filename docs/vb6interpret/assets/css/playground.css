@@ -434,6 +434,14 @@ body {
     flex-wrap: wrap;
 }
 
+.tab-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex-wrap: wrap;
+}
+
 .output-scroll {
     flex: 1;
     overflow-y: auto;
@@ -624,6 +632,64 @@ body {
 
 #environment-status.status-edit-locked {
     color: var(--status-warning);
+}
+
+.file-list-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 16px;
+    background-color: var(--tab-bg);
+    border-bottom: 2px solid var(--panel-border);
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+}
+
+.file-tab-btn {
+    padding: 8px 16px;
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    background: none;
+    color: var(--text-color);
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.file-tab-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .file-tab-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.file-tab-btn.active {
+    background-color: var(--tab-active-bg);
+    border-bottom-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.file-detail .stats-grid {
+    margin-bottom: 16px;
+}
+
+.file-content-box {
+    max-height: 320px;
+    overflow: auto;
+    margin: 0;
+    padding: 14px 16px;
+    background-color: var(--editor-bg);
+    color: var(--editor-text);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 #run-status.status-pending {

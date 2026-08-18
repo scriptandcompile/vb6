@@ -1,6 +1,7 @@
-import init, { build_debug_trace, dump_env, dump_settings, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, set_env } from "../../wasm/vb6interpret.js";
+import init, { build_debug_trace, clear_files, dump_env, dump_files, dump_settings, install_file, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, set_env } from "../../wasm/vb6interpret.js";
 import { getDefaultExample, getExample } from "./examples.js";
 import * as Editor from "./editor.js";
+import { createZip } from "./zip.js";
 
 const state = {
     wasmReady: false,
@@ -12,6 +13,7 @@ const state = {
     lastDebugSource: "",
     hasExecutionState: false,
     sessionComplete: false,
+    activeFilePath: null,
 };
 
 const elements = {
@@ -48,6 +50,15 @@ const elements = {
     settingSection: document.getElementById("setting-section"),
     settingKey: document.getElementById("setting-key"),
     settingValue: document.getElementById("setting-value"),
+    filesCurrentDir: document.getElementById("files-current-dir"),
+    filesCurrentDrive: document.getElementById("files-current-drive"),
+    filesOpenNumbers: document.getElementById("files-open-numbers"),
+    filesListNav: document.getElementById("files-list-nav"),
+    filesDetail: document.getElementById("files-detail"),
+    filesSaveButton: document.getElementById("files-save-btn"),
+    filesLoadButton: document.getElementById("files-load-btn"),
+    filesDownloadButton: document.getElementById("files-download-btn"),
+    filesClearButton: document.getElementById("files-clear-btn"),
     tabButtons: Array.from(document.querySelectorAll(".tab-btn")),
     tabPanes: Array.from(document.querySelectorAll(".tab-pane")),
 };
@@ -61,6 +72,11 @@ const SETTINGS_STORAGE_PREFIX = "vb6interpret-settings:";
 /// `localStorage`. The browser has no OS environment, so this snapshot stands
 /// in for it.
 const ENV_STORAGE_PREFIX = "vb6interpret-env:";
+
+/// Key prefix under which memory-backend files are persisted in
+/// `localStorage` (base64-encoded content, one key per file path), saved and
+/// restored explicitly via the Files tab's Save/Load buttons.
+const FILES_STORAGE_PREFIX = "vb6interpret-files:";
 
 function settingsStorageKey(appname, section, key) {
     return `${SETTINGS_STORAGE_PREFIX}${appname}/${section}/${key}`;
@@ -151,6 +167,7 @@ async function initPlayground() {
         elements.wasmStatus.textContent = "WebAssembly ready";
         setStatus("Ready", "success");
         renderEnvironment();
+        renderFiles();
         syncExecutionControls();
     } catch (error) {
         console.error("Failed to initialize wasm", error);
@@ -192,6 +209,10 @@ function bindEvents() {
     elements.clearButton.addEventListener("click", clearEditor);
     elements.envAddForm.addEventListener("submit", addEnvironmentVariable);
     elements.settingAddForm.addEventListener("submit", addSetting);
+    elements.filesSaveButton.addEventListener("click", persistFilesToLocalStorage);
+    elements.filesLoadButton.addEventListener("click", loadFilesFromLocalStorage);
+    elements.filesDownloadButton.addEventListener("click", downloadFilesAsZip);
+    elements.filesClearButton.addEventListener("click", clearFiles);
 
     elements.tabButtons.forEach((button) => {
         button.addEventListener("click", () => setActiveTab(button.dataset.tab));
@@ -361,6 +382,7 @@ async function stepModule() {
 function renderOutput(result) {
     syncExecutionControls();
     renderEnvironment();
+    renderFiles();
     elements.stdout.textContent = result.output_text || "No output.";
     renderDebugState(
         result.debug ?? emptyDebugState(),
@@ -587,6 +609,271 @@ function buildEnvRow(key, value, onRemove) {
 
     row.append(keyEl, valueEl, remove);
     return row;
+}
+
+/// Encode raw bytes as base64, chunked to avoid blowing the call stack on
+/// `String.fromCharCode.apply` for large files.
+function bytesToBase64(bytes) {
+    let binary = "";
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+    }
+    return window.btoa(binary);
+}
+
+function base64ToBytes(base64) {
+    const binary = window.atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i += 1) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+}
+
+/// Get the raw content bytes of a `dump_files` entry, decoding whichever of
+/// `content_text`/`content_base64` is populated.
+function fileBytes(file) {
+    if (file.content_base64 != null) {
+        return base64ToBytes(file.content_base64);
+    }
+    return new TextEncoder().encode(file.content_text ?? "");
+}
+
+/// Briefly replace a button's label to confirm an action, then restore it.
+function flashButtonLabel(button, message) {
+    const original = button.innerHTML;
+    button.textContent = message;
+    window.setTimeout(() => {
+        button.innerHTML = original;
+    }, 1200);
+}
+
+/// Whether any file was previously saved with [`persistFilesToLocalStorage`].
+function hasSavedFiles() {
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+        if (window.localStorage.key(index)?.startsWith(FILES_STORAGE_PREFIX)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/// Save/Download/Clear only make sense with files in the memory backend;
+/// Load only makes sense when a saved snapshot exists in `localStorage`.
+function updateFileActionButtons(fileCount) {
+    const noFiles = fileCount === 0;
+    elements.filesSaveButton.disabled = noFiles;
+    elements.filesDownloadButton.disabled = noFiles;
+    elements.filesClearButton.disabled = noFiles;
+    elements.filesLoadButton.disabled = !hasSavedFiles();
+}
+
+/// Save every file currently in the memory backend to `localStorage`
+/// (base64-encoded), replacing whatever was previously saved there.
+function persistFilesToLocalStorage() {
+    if (!state.wasmReady) {
+        return;
+    }
+    const staleKeys = [];
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+        const storageKey = window.localStorage.key(index);
+        if (storageKey && storageKey.startsWith(FILES_STORAGE_PREFIX)) {
+            staleKeys.push(storageKey);
+        }
+    }
+    staleKeys.forEach((storageKey) => window.localStorage.removeItem(storageKey));
+
+    const files = dump_files().files || [];
+    files.forEach((file) => {
+        window.localStorage.setItem(
+            `${FILES_STORAGE_PREFIX}${file.path}`,
+            bytesToBase64(fileBytes(file)),
+        );
+    });
+    flashButtonLabel(elements.filesSaveButton, `Saved ${files.length}`);
+    updateFileActionButtons(files.length);
+}
+
+/// Restore every file previously saved with [`persistFilesToLocalStorage`]
+/// into the memory backend, then refresh the Files tab.
+function loadFilesFromLocalStorage() {
+    if (!state.wasmReady) {
+        return;
+    }
+    let loaded = 0;
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+        const storageKey = window.localStorage.key(index);
+        if (!storageKey || !storageKey.startsWith(FILES_STORAGE_PREFIX)) {
+            continue;
+        }
+        const path = storageKey.slice(FILES_STORAGE_PREFIX.length);
+        if (!path) {
+            continue;
+        }
+        try {
+            install_file(path, base64ToBytes(window.localStorage.getItem(storageKey)));
+            loaded += 1;
+        } catch (error) {
+            console.error(`Failed to restore file ${path}`, error);
+        }
+    }
+    flashButtonLabel(elements.filesLoadButton, `Loaded ${loaded}`);
+    renderFiles();
+}
+
+/// Close all open files and wipe the in-memory file backend back to empty.
+function clearFiles() {
+    if (!state.wasmReady) {
+        return;
+    }
+    clear_files();
+    state.activeFilePath = null;
+    flashButtonLabel(elements.filesClearButton, "Cleared");
+    renderFiles();
+}
+
+/// Bundle every file currently in the memory backend into a ZIP archive and
+/// trigger a browser download.
+function downloadFilesAsZip() {
+    if (!state.wasmReady) {
+        return;
+    }
+    const files = dump_files().files || [];
+    if (files.length === 0) {
+        flashButtonLabel(elements.filesDownloadButton, "No files");
+        return;
+    }
+
+    const entries = files.map((file) => ({
+        name: file.path.replace(/^\/+/, ""),
+        data: fileBytes(file),
+    }));
+    const blob = createZip(entries);
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "vb6interpret-files.zip";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+}
+
+/// Refresh the Files tab from the memory file backend: the current
+/// directory/drive, open file numbers, and every known file's attributes and
+/// content (text or base64-encoded binary).
+function renderFiles() {
+    if (!state.wasmReady) {
+        return;
+    }
+
+    const snapshot = dump_files();
+    elements.filesCurrentDir.textContent = snapshot.current_dir || "/";
+    elements.filesCurrentDrive.textContent = snapshot.current_drive || "C";
+    elements.filesOpenNumbers.textContent = snapshot.open_file_numbers?.length
+        ? snapshot.open_file_numbers.join(", ")
+        : "None";
+
+    const files = snapshot.files || [];
+    if (files.length === 0) {
+        state.activeFilePath = null;
+    } else if (!files.some((file) => file.path === state.activeFilePath)) {
+        state.activeFilePath = files[0].path;
+    }
+
+    renderFileListNav(files);
+    renderFileDetail(files);
+    updateFileActionButtons(files.length);
+}
+
+/// Drop the leading '/' for root-level files (e.g. "/foo.txt" -> "foo.txt");
+/// files in a subdirectory keep their full path (e.g. "/sub/foo.txt").
+function formatFilePath(path) {
+    if (path.startsWith("/") && !path.slice(1).includes("/")) {
+        return path.slice(1);
+    }
+    return path;
+}
+
+function renderFileListNav(files) {
+    const container = elements.filesListNav;
+    container.innerHTML = "";
+
+    if (files.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "env-empty";
+        empty.textContent = "No files in the memory backend.";
+        container.appendChild(empty);
+        return;
+    }
+
+    files.forEach((file) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "file-tab-btn";
+        button.classList.toggle("active", file.path === state.activeFilePath);
+        const displayPath = formatFilePath(file.path);
+        button.textContent = file.number > 0 ? `#${file.number} ${displayPath}` : displayPath;
+        button.addEventListener("click", () => {
+            state.activeFilePath = file.path;
+            renderFileListNav(files);
+            renderFileDetail(files);
+        });
+        container.appendChild(button);
+    });
+}
+
+function renderFileDetail(files) {
+    const container = elements.filesDetail;
+    container.innerHTML = "";
+
+    const file = files.find((candidate) => candidate.path === state.activeFilePath);
+    if (!file) {
+        const empty = document.createElement("div");
+        empty.className = "env-empty";
+        empty.textContent = "Select a file to inspect its contents.";
+        container.appendChild(empty);
+        return;
+    }
+
+    const isBinary = file.content_base64 != null;
+    const attrs = document.createElement("div");
+    attrs.className = "stats-grid";
+    attrs.append(
+        buildStatItem("File Name", formatFilePath(file.path)),
+        buildStatItem("File Number", file.number > 0 ? String(file.number) : "Closed"),
+        buildStatItem("Mode", file.mode),
+        buildStatItem("Content Type", isBinary ? "Binary" : "Text"),
+    );
+    container.appendChild(attrs);
+
+    const contentBox = document.createElement("div");
+    contentBox.className = "debug-scope-box file-content-box";
+    if (isBinary) {
+        contentBox.textContent = file.content_base64;
+    } else if (file.content_text != null) {
+        contentBox.textContent = file.content_text;
+    } else {
+        contentBox.textContent = "(empty)";
+    }
+    container.appendChild(contentBox);
+}
+
+function buildStatItem(label, value) {
+    const item = document.createElement("div");
+    item.className = "stat-item";
+
+    const labelEl = document.createElement("span");
+    labelEl.className = "stat-label";
+    labelEl.textContent = label;
+
+    const valueEl = document.createElement("span");
+    valueEl.className = "stat-value";
+    valueEl.textContent = value;
+
+    item.append(labelEl, valueEl);
+    return item;
 }
 
 function addEnvironmentVariable(event) {

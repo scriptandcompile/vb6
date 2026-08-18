@@ -368,6 +368,20 @@ pub fn list_memory_files() -> io::Result<Vec<(String, i16, Option<Vec<u8>>)>> {
         .ok_or_else(|| io::Error::other("Backend is not a memory backend"))
 }
 
+/// Write `content` directly into the memory backend at `path`, creating or
+/// replacing the file without going through `Open`/`Close` (e.g. to restore a
+/// saved snapshot). Fails if the active backend is not a memory backend.
+pub fn write_memory_file(path: &str, content: &[u8]) -> io::Result<()> {
+    let resolved_path = resolve_path(Path::new(path));
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .as_any_mut()
+        .downcast_mut::<memory::MemoryBackend>()
+        .map(|memory| memory.insert_file(&resolved_path.to_string_lossy(), content.to_vec()))
+        .ok_or_else(|| io::Error::other("Backend is not a memory backend"))
+}
+
 /// Get the open file handle for a file number (mutable reference).
 pub fn with_file_mut<T>(file_number: i16, f: impl FnOnce(&mut OpenFile) -> T) -> io::Result<T> {
     OPEN_FILES.with(|files| {

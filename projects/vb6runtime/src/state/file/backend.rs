@@ -78,6 +78,9 @@ pub trait FileBackend: Send {
     /// Get a reference to self as `Any` for downcasting.
     fn as_any(&self) -> &dyn std::any::Any;
 
+    /// Get a mutable reference to self as `Any` for downcasting.
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
+
     /// Open a file and return its handle.
     fn open(
         &mut self,
@@ -171,16 +174,8 @@ pub trait FileBackend: Send {
     ///
     /// `record_range` is `(start, end)` where `end >= start`. Both are 1-based.
     /// For Binary/Input/Output modes the entire file is locked regardless.
-    fn lock_file(
-        &mut self,
-        path: &Path,
-        record_range: Option<(i32, i32)>,
-    ) -> io::Result<()>;
+    fn lock_file(&mut self, path: &Path, record_range: Option<(i32, i32)>) -> io::Result<()>;
 
     /// Unlock a previously locked region.
-    fn unlock_file(
-        &mut self,
-        path: &Path,
-        record_range: Option<(i32, i32)>,
-    ) -> io::Result<()>;
+    fn unlock_file(&mut self, path: &Path, record_range: Option<(i32, i32)>) -> io::Result<()>;
 }
