@@ -161,4 +161,23 @@ pub trait FileBackend: Send {
     /// On non-Windows, this only changes the tracked drive; it does not
     /// affect the actual process working directory.
     fn set_current_drive(&mut self, drive: char) -> io::Result<()>;
+
+    // File locking
+
+    /// Lock a region (or entire file) for exclusive access.
+    ///
+    /// `record_range` is `(start, end)` where `end >= start`. Both are 1-based.
+    /// For Binary/Input/Output modes the entire file is locked regardless.
+    fn lock_file(
+        &mut self,
+        path: &Path,
+        record_range: Option<(i32, i32)>,
+    ) -> io::Result<()>;
+
+    /// Unlock a previously locked region.
+    fn unlock_file(
+        &mut self,
+        path: &Path,
+        record_range: Option<(i32, i32)>,
+    ) -> io::Result<()>;
 }

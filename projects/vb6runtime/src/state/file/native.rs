@@ -9,6 +9,9 @@ use std::path::{Path, PathBuf};
 
 use super::backend::{AccessMode, FileBackend, LockMode, OpenFile, OpenMode};
 
+/// A locked range: `(start, end)` inclusive, both 1-based.
+type LockRange = (i32, i32);
+
 /// Native file I/O backend using the real file system.
 pub struct NativeBackend {
     /// Map from path to the actual file handle.
@@ -17,6 +20,8 @@ pub struct NativeBackend {
     current_dir: PathBuf,
     /// Current drive letter (tracked for VB6 semantics).
     current_drive: char,
+    /// Locked regions per file path. `None` means the entire file is locked.
+    locks: HashMap<String, Vec<Option<LockRange>>>,
 }
 
 impl NativeBackend {
@@ -27,6 +32,7 @@ impl NativeBackend {
             files: HashMap::new(),
             current_dir: cwd,
             current_drive: 'C',
+            locks: HashMap::new(),
         }
     }
 }
@@ -273,6 +279,74 @@ impl FileBackend for NativeBackend {
     fn set_current_drive(&mut self, drive: char) -> io::Result<()> {
         self.current_drive = drive.to_ascii_uppercase();
         Ok(())
+    }
+
+    fn lock_file(
+        &mut self,
+        path: &Path,
+        record_range: Option<(i32, i32)>,
+    ) -> io::Result<()> {
+        let path_str = path.to_string_lossy().to_string();
+        let existing = self.locks.entry(path_str).or_default();
+
+        // Check for conflicts with existing locks
+        for existing_lock in existing.iter() {
+            match (existing_lock, &record_range) {
+                // Entire file is already locked
+                (None, _) | (_, None) => {
+                    return Err(io::Error::new(
+                        io::ErrorKind::PermissionDenied,
+                        "File already locked",
+                    ));
+                }
+                // Both are record ranges — check overlap
+                (Some((e_start, e_end)), Some((n_start, n_end))) => {
+                    if n_start <= e_end && n_end >= e_start {
+                        return Err(io::Error::new(
+                            io::ErrorKind::PermissionDenied,
+                            "File already locked",
+                        ));
+                    }
+                }
+            }
+        }
+
+        existing.push(record_range);
+        Ok(())
+    }
+
+    fn unlock_file(
+        &mut self,
+        path: &Path,
+        record_range: Option<(i32, i32)>,
+    ) -> io::Result<()> {
+        let path_str = path.to_string_lossy().to_string();
+        let existing = self.locks.get_mut(&path_str).ok_or_else(|| {
+            io::Error::new(io::ErrorKind::NotFound, "File not locked")
+        })?;
+
+        // Find and remove the matching lock
+        let pos = existing.iter().position(|lock| {
+            match (lock, &record_range) {
+                (None, None) => true,
+                (Some((a, b)), Some((c, d))) => a == c && b == d,
+                _ => false,
+            }
+        });
+
+        match pos {
+            Some(i) => {
+                existing.remove(i);
+                if existing.is_empty() {
+                    self.locks.remove(&path_str);
+                }
+                Ok(())
+            }
+            None => Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "File not locked",
+            )),
+        }
     }
 }
 
