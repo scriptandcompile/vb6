@@ -270,6 +270,32 @@ impl Interpreter {
         settings_state::reset_backend();
     }
 
+    /// Set the active file backend for this interpreter.
+    ///
+    /// Equivalent to [`vb6runtime::state::file::set_backend`], scoped
+    /// to the interpreter for convenience.
+    ///
+    /// # Examples
+    ///
+    /// ```ignore
+    /// use vb6interpret::Interpreter;
+    /// use vb6runtime::state::file::memory::MemoryBackend;
+    ///
+    /// let mut interp = Interpreter::new();
+    /// interp.set_file_backend(Box::new(MemoryBackend::new()));
+    /// ```
+    pub fn set_file_backend(&self, backend: Box<dyn vb6runtime::state::file::FileBackend>) {
+        vb6runtime::state::file::set_backend(backend);
+    }
+
+    /// Reset the file backend to the platform default.
+    ///
+    /// Equivalent to [`vb6runtime::state::file::reset_backend`], scoped
+    /// to the interpreter for convenience.
+    pub fn reset_file_backend(&self) {
+        vb6runtime::state::file::reset_backend();
+    }
+
     /// Reset all runtime state (globals, frames, output, program).
     pub fn clear(&mut self) {
         let step_limit = self.step_limit;

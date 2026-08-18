@@ -11,6 +11,7 @@ use serde_wasm_bindgen::to_value;
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
 use vb6runtime::state::environment as env_state;
+use vb6runtime::state::file as file_state;
 use vb6runtime::state::settings as settings_state;
 use wasm_bindgen::prelude::*;
 
@@ -283,6 +284,8 @@ pub fn interpret_vb6_code(code: &str) -> Result<JsValue, JsError> {
     };
 
     let mut interpreter = Interpreter::new();
+    // In wasm, use the memory backend for file operations.
+    interpreter.set_file_backend(Box::new(file_state::memory::MemoryBackend::new()));
     match interpreter.run_module(&module) {
         Ok(()) => Ok(to_value(&build_output(&interpreter, None))?),
         Err(error) => Ok(to_value(&build_output(
@@ -313,6 +316,8 @@ pub fn debug_vb6_code(code: &str, pause_after_steps: u32) -> Result<JsValue, JsE
     };
 
     let mut interpreter = Interpreter::new();
+    // In wasm, use the memory backend for file operations.
+    interpreter.set_file_backend(Box::new(file_state::memory::MemoryBackend::new()));
     interpreter.set_pause_after_steps(Some(u64::from(pause_after_steps)));
 
     match interpreter.run_module(&module) {
@@ -340,6 +345,8 @@ pub fn build_debug_trace(code: &str) -> Result<JsValue, JsError> {
     };
 
     let mut interpreter = Interpreter::new();
+    // In wasm, use the memory backend for file operations.
+    interpreter.set_file_backend(Box::new(file_state::memory::MemoryBackend::new()));
     interpreter.set_record_debug_snapshots(true);
 
     let error = match interpreter.run_module(&module) {
