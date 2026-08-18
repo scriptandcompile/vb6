@@ -441,6 +441,42 @@ pub fn set_current_drive(drive: char) -> io::Result<()> {
         .set_current_drive(drive)
 }
 
+/// Lock a region of an open file for exclusive access.
+///
+/// `file_number` is the VB6 file number. `record_range` is an optional
+/// `(start, end)` pair (1-based, inclusive). When `None`, the entire file
+/// is locked.
+pub fn lock_file(file_number: i16, record_range: Option<(i32, i32)>) -> io::Result<()> {
+    OPEN_FILES.with(|files| {
+        let files = files.borrow();
+        let file = files
+            .get(&file_number)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "File not open"))?;
+        let path = Path::new(&file.path);
+        let resolved = resolve_path(path);
+        backend()
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .lock_file(&resolved, record_range)
+    })
+}
+
+/// Unlock a region of an open file.
+pub fn unlock_file(file_number: i16, record_range: Option<(i32, i32)>) -> io::Result<()> {
+    OPEN_FILES.with(|files| {
+        let files = files.borrow();
+        let file = files
+            .get(&file_number)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "File not open"))?;
+        let path = Path::new(&file.path);
+        let resolved = resolve_path(path);
+        backend()
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .unlock_file(&resolved, record_range)
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
