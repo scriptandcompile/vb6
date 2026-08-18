@@ -780,9 +780,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "300e883d756b2e4ec94e02791f39b04b522276138852cfc41d9fb7e904106099"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "r-efi 6.0.0",
  "rand_core 0.10.1",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -2552,9 +2554,11 @@ dependencies = [
  "anyhow",
  "criterion",
  "encoding_rs",
+ "getrandom 0.4.3",
  "jiff",
  "libc",
  "num-traits",
+ "rand 0.10.2",
  "serde",
  "tempfile",
  "thiserror 2.0.20",

@@ -64,21 +64,8 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::error::VBResult;
-use crate::state::random::{seed, set_seed};
+use crate::state::random;
 use crate::value::VBVariant;
-
-/// Splice a value into the middle 16 bits of the current seed.
-///
-/// Matches VB6's `rtRandomize`/`rtRandomizeValue`: the low and high 16-bit
-/// words of `bits` are XORed together, shifted up 8 bits, and ORed into
-/// `current` while preserving its top and bottom bytes. `bits >> 16` is the
-/// C-style arithmetic shift, so a negative value's sign extension survives the
-/// XOR and can set the seed's top byte.
-fn splice(bits: u32, current: u32) -> u32 {
-    let l = bits as i32;
-    let mixed = ((l & 0xFFFF) ^ (l >> 16)) as u32;
-    (current & 0xFF00_00FF) | (mixed << 8)
-}
 
 /// `Single` seconds since midnight, as VB6's `GetTimer` produces it.
 ///
@@ -98,9 +85,9 @@ fn timer_bits() -> u32 {
 /// - an omitted argument (passed as `Empty`) reseeds from the system timer
 /// - `Randomize(number)` reseeds from `number` (coerced to `Double`)
 ///
-/// The generator's seed is replaced in place; the shared state is the same
-/// `SEED` used by the `Rnd` function, so `Rnd(0)` immediately after a
-/// `Randomize` reports the value VB6 would derive from the new seed.
+/// Reseeding is delegated to the active [`random`] backend, so `Rnd(0)`
+/// immediately after a `Randomize` reports the value that backend derives
+/// from the new seed material.
 pub fn randomize(value: Option<VBVariant>) -> VBResult<()> {
     let bits = match value {
         None | Some(VBVariant::Empty) => timer_bits(),
@@ -110,7 +97,7 @@ pub fn randomize(value: Option<VBVariant>) -> VBResult<()> {
         }
     };
 
-    set_seed(splice(bits, seed()));
+    random::randomize(bits);
     Ok(())
 }
 
