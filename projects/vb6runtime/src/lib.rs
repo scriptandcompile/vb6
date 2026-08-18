@@ -18,6 +18,7 @@
 pub mod array;
 pub mod library;
 pub mod state;
+pub mod stdpicture;
 pub mod value;
 
 /// `jiff` civil date/time types re-exported for consumers that need to pass
@@ -33,6 +34,8 @@ pub use vb6core::types;
 pub use array::{ArrayDimension, ArrayValue};
 pub use error::{VBError, VBResult};
 pub use types::VBType;
+
+pub use stdpicture::StdPicture;
 pub use value::{VBObject, VBVariant, CURRENCY_SCALE};
 
 /// Library version.
