@@ -50,6 +50,8 @@ pub mod err_number {
     pub const INPUT_PAST_END_OF_FILE: i32 = 62;
     /// Bad record number.
     pub const BAD_RECORD_NUMBER: i32 = 63;
+    /// Too many files.
+    pub const TOO_MANY_FILES: i32 = 67;
     /// Device unavailable.
     pub const DEVICE_UNAVAILABLE: i32 = 68;
     /// Permission denied.
@@ -58,6 +60,12 @@ pub mod err_number {
     pub const PATH_FILE_ACCESS_ERROR: i32 = 75;
     /// Path not found.
     pub const PATH_NOT_FOUND: i32 = 76;
+
+    // Resource-file error numbers
+    /// Invalid format in resource file.
+    pub const INVALID_FORMAT_IN_RESOURCE_FILE: i32 = 325;
+    /// Resource with identifier 'item' not found.
+    pub const RESOURCE_NOT_FOUND: i32 = 326;
 }
 
 /// The built-in description for a given VB6 error number.
@@ -92,6 +100,9 @@ pub fn default_description(number: i32) -> String {
         76 => "Path not found",
         91 => "Object variable or With block variable not set",
         94 => "Invalid use of Null",
+        321 => "Invalid file format",
+        325 => "Invalid format in resource file",
+        326 => "Resource with identifier not found",
         424 => "Object required",
         438 => "Object doesn't support this property or method",
         449 => "Argument not optional",
