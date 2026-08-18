@@ -133,10 +133,10 @@ fn parse_value(s: &str) -> VBVariant {
 
 #[cfg(test)]
 mod tests {
-    use vb6core::error::err_number;
     use super::*;
     use crate::state::file::{self, AccessMode, LockMode, OpenMode};
     use std::io::Write;
+    use vb6core::error::err_number;
 
     #[test]
     fn input_reads_comma_separated_values() {
@@ -148,7 +148,7 @@ mod tests {
 
         // Create a test file with comma-separated values
         let mut test_file = std::fs::File::create(dir.path().join("test.txt")).unwrap();
-        writeln!(test_file, "Hello,42,3.14").unwrap();
+        writeln!(test_file, "Hello,42,3.141592653589793").unwrap();
         drop(test_file);
 
         // Open for input
@@ -168,7 +168,7 @@ mod tests {
         assert_eq!(values.len(), 3);
         assert_eq!(values[0], VBVariant::from_string("Hello"));
         assert_eq!(values[1], VBVariant::Long(42));
-        assert_eq!(values[2], VBVariant::Double(3.14));
+        assert_eq!(values[2], VBVariant::Double(std::f64::consts::PI));
 
         let _ = file::close_all_files();
     }
@@ -213,7 +213,10 @@ mod tests {
 
         let result = input_statement(0);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }
@@ -225,7 +228,10 @@ mod tests {
 
         let result = input_statement(1);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_NAME_OR_NUMBER);
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
 
         let _ = file::close_all_files();
     }
