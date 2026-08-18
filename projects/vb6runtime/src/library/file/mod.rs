@@ -7,7 +7,7 @@ pub mod curdir;
 pub mod curdir_dollar;
 pub mod dir;
 pub mod eof;
-pub mod file_copy;
+pub mod filecopy;
 pub mod fileattr;
 pub mod filedatetime;
 pub mod filelen;

@@ -1,0 +1,486 @@
+//! In-memory file I/O backend for WASM.
+//!
+//! Stores files entirely in memory with no persistence. Used for:
+//!
+//! - **WASM**: The JS playground syncs to/from the host
+//! - **Tests**: Avoids filesystem side effects
+
+use std::collections::{HashMap, HashSet};
+use std::io;
+use std::time::SystemTime;
+
+use super::backend::{AccessMode, FileBackend, LockMode, OpenFile, OpenMode};
+
+/// A virtual file stored in memory.
+#[derive(Debug, Clone)]
+pub struct VirtualFile {
+    /// The file content.
+    content: Vec<u8>,
+    /// Whether the file exists.
+    exists: bool,
+    /// VB6-style attribute bitfield.
+    attributes: i16,
+    /// Last-modified timestamp.
+    modified: SystemTime,
+}
+
+/// In-memory file I/O backend.
+///
+/// All data is stored in a `HashMap`. This backend has no persistence;
+/// for WASM hosts, the JS layer is responsible for syncing files.
+pub struct MemoryBackend {
+    /// Virtual filesystem: path -> content.
+    files: HashMap<String, VirtualFile>,
+    /// Set of directory paths.
+    directories: HashSet<String>,
+}
+
+impl MemoryBackend {
+    /// Create a new empty in-memory backend.
+    pub fn new() -> Self {
+        Self {
+            files: HashMap::new(),
+            directories: HashSet::new(),
+        }
+    }
+
+    /// Create a pre-populated in-memory backend with a file.
+    pub fn with_file(path: &str, content: Vec<u8>) -> Self {
+        let mut files = HashMap::new();
+        files.insert(
+            path.to_string(),
+            VirtualFile {
+                content,
+                exists: true,
+                attributes: 0,
+                modified: SystemTime::now(),
+            },
+        );
+        Self {
+            files,
+            directories: HashSet::new(),
+        }
+    }
+
+    /// Get a reference to the virtual filesystem.
+    pub fn files(&self) -> &HashMap<String, VirtualFile> {
+        &self.files
+    }
+
+    /// Get a mutable reference to the virtual filesystem.
+    pub fn files_mut(&mut self) -> &mut HashMap<String, VirtualFile> {
+        &mut self.files
+    }
+}
+
+impl Default for MemoryBackend {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl FileBackend for MemoryBackend {
+    fn open(
+        &mut self,
+        path: &std::path::Path,
+        mode: OpenMode,
+        access: AccessMode,
+        lock: LockMode,
+        record_length: i32,
+    ) -> io::Result<OpenFile> {
+        let path_str = path.to_string_lossy().to_string();
+
+        // Check if file exists
+        let file_exists = self.files.contains_key(&path_str);
+
+        // For Input mode, file must exist
+        if mode == OpenMode::Input && !file_exists {
+            return Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                format!("File not found: {}", path_str),
+            ));
+        }
+
+        // Create or clear file based on mode
+        match mode {
+            OpenMode::Output => {
+                // Truncate existing file
+                self.files.insert(
+                    path_str.clone(),
+                    VirtualFile {
+                        content: Vec::new(),
+                        exists: true,
+                        attributes: 0,
+                        modified: SystemTime::now(),
+                    },
+                );
+            }
+            OpenMode::Append => {
+                // Create if doesn't exist, keep content if it does
+                if !file_exists {
+                    self.files.insert(
+                        path_str.clone(),
+                        VirtualFile {
+                            content: Vec::new(),
+                            exists: true,
+                            attributes: 0,
+                            modified: SystemTime::now(),
+                        },
+                    );
+                }
+            }
+            OpenMode::Random | OpenMode::Binary => {
+                // Create if doesn't exist
+                if !file_exists {
+                    self.files.insert(
+                        path_str.clone(),
+                        VirtualFile {
+                            content: Vec::new(),
+                            exists: true,
+                            attributes: 0,
+                            modified: SystemTime::now(),
+                        },
+                    );
+                }
+            }
+            OpenMode::Input => {
+                // File must exist, already checked above
+            }
+        }
+
+        // Calculate initial position for Append mode
+        let initial_position = if mode == OpenMode::Append {
+            self.files
+                .get(&path_str)
+                .map(|f| f.content.len() as i64)
+                .unwrap_or(0)
+        } else {
+            0
+        };
+
+        Ok(OpenFile {
+            number: 0, // Will be set by the caller
+            path: path_str,
+            mode,
+            access,
+            lock,
+            record_length,
+            position: initial_position,
+        })
+    }
+
+    fn close(&mut self, _file: &OpenFile) -> io::Result<()> {
+        // Nothing to do for memory backend
+        Ok(())
+    }
+
+    fn read(&mut self, file: &mut OpenFile, buf: &mut [u8]) -> io::Result<usize> {
+        let virtual_file = self
+            .files
+            .get(&file.path)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "File not open"))?;
+
+        let pos = file.position as usize;
+        if pos >= virtual_file.content.len() {
+            return Ok(0); // EOF
+        }
+
+        let available = virtual_file.content.len() - pos;
+        let to_read = buf.len().min(available);
+
+        buf[..to_read].copy_from_slice(&virtual_file.content[pos..pos + to_read]);
+        file.position += to_read as i64;
+
+        Ok(to_read)
+    }
+
+    fn write(&mut self, file: &mut OpenFile, buf: &[u8]) -> io::Result<usize> {
+        let virtual_file = self
+            .files
+            .get_mut(&file.path)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "File not open"))?;
+
+        let pos = file.position as usize;
+
+        // Ensure buffer is large enough
+        if pos + buf.len() > virtual_file.content.len() {
+            virtual_file.content.resize(pos + buf.len(), 0);
+        }
+
+        virtual_file.content[pos..pos + buf.len()].copy_from_slice(buf);
+        file.position += buf.len() as i64;
+
+        Ok(buf.len())
+    }
+
+    fn seek(&mut self, file: &mut OpenFile, position: i64) -> io::Result<i64> {
+        // Update the file's position
+        file.position = position;
+        Ok(file.position)
+    }
+
+    fn file_len(&mut self, path: &std::path::Path) -> io::Result<i64> {
+        let path_str = path.to_string_lossy().to_string();
+        self.files
+            .get(&path_str)
+            .filter(|f| f.exists)
+            .map(|f| f.content.len() as i64)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "File not found"))
+    }
+
+    fn file_exists(&mut self, path: &std::path::Path) -> bool {
+        let path_str = path.to_string_lossy().to_string();
+        self.files
+            .get(&path_str)
+            .map(|f| f.exists)
+            .unwrap_or(false)
+    }
+
+    fn position(&self, file: &OpenFile) -> i64 {
+        // VB6 positions are 1-based
+        file.position + 1
+    }
+
+    fn lof(&mut self, file: &OpenFile) -> io::Result<i64> {
+        self.files
+            .get(&file.path)
+            .filter(|f| f.exists)
+            .map(|f| f.content.len() as i64)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "File not open"))
+    }
+
+    fn copy_file(&mut self, src: &std::path::Path, dst: &std::path::Path) -> io::Result<()> {
+        let src_str = src.to_string_lossy().to_string();
+        let dst_str = dst.to_string_lossy().to_string();
+
+        let src_file = self
+            .files
+            .get(&src_str)
+            .filter(|f| f.exists)
+            .cloned()
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "File not found"))?;
+
+        self.files.insert(dst_str, src_file);
+        Ok(())
+    }
+
+    fn rename_file(
+        &mut self,
+        old_path: &std::path::Path,
+        new_path: &std::path::Path,
+    ) -> io::Result<()> {
+        let old_str = old_path.to_string_lossy().to_string();
+        let new_str = new_path.to_string_lossy().to_string();
+
+        let file = self
+            .files
+            .remove(&old_str)
+            .filter(|f| f.exists)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "File not found"))?;
+
+        self.files.insert(new_str, file);
+        Ok(())
+    }
+
+    fn remove_file(&mut self, path: &std::path::Path) -> io::Result<()> {
+        let path_str = path.to_string_lossy().to_string();
+        match self.files.remove(&path_str) {
+            Some(f) if f.exists => Ok(()),
+            _ => Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "File not found",
+            )),
+        }
+    }
+
+    fn create_dir(&mut self, path: &std::path::Path) -> io::Result<()> {
+        let path_str = path.to_string_lossy().to_string();
+        if self.directories.contains(&path_str) || self.files.contains_key(&path_str) {
+            return Err(io::Error::new(
+                io::ErrorKind::AlreadyExists,
+                "Directory already exists",
+            ));
+        }
+        self.directories.insert(path_str);
+        Ok(())
+    }
+
+    fn remove_dir(&mut self, path: &std::path::Path) -> io::Result<()> {
+        let path_str = path.to_string_lossy().to_string();
+        if !self.directories.remove(&path_str) {
+            return Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "Directory not found",
+            ));
+        }
+        Ok(())
+    }
+
+    fn get_attrs(&mut self, path: &std::path::Path) -> io::Result<i16> {
+        let path_str = path.to_string_lossy().to_string();
+
+        // Check if it's a directory
+        if self.directories.contains(&path_str) {
+            return Ok(16); // VB_DIRECTORY
+        }
+
+        // Check if it's a file
+        self.files
+            .get(&path_str)
+            .filter(|f| f.exists)
+            .map(|f| f.attributes)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "File not found"))
+    }
+
+    fn set_attrs(&mut self, path: &std::path::Path, attrs: i16) -> io::Result<()> {
+        let path_str = path.to_string_lossy().to_string();
+        match self.files.get_mut(&path_str) {
+            Some(f) if f.exists => {
+                f.attributes = attrs;
+                Ok(())
+            }
+            _ => Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "File not found",
+            )),
+        }
+    }
+
+    fn file_datetime(&mut self, path: &std::path::Path) -> io::Result<SystemTime> {
+        let path_str = path.to_string_lossy().to_string();
+        self.files
+            .get(&path_str)
+            .filter(|f| f.exists)
+            .map(|f| f.modified)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "File not found"))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn open_and_close_file() {
+        let mut backend = MemoryBackend::new();
+        let path = PathBuf::from("/test.txt");
+
+        let mut file = backend
+            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .unwrap();
+        file.number = 1;
+        backend.close(&file).unwrap();
+    }
+
+    #[test]
+    fn write_and_read_file() {
+        let mut backend = MemoryBackend::new();
+        let path = PathBuf::from("/test.txt");
+
+        // Write
+        let mut file = backend
+            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .unwrap();
+        file.number = 1;
+        backend.write(&mut file, b"Hello, World!").unwrap();
+
+        // Read
+        let mut file = backend
+            .open(&path, OpenMode::Input, AccessMode::Read, LockMode::Shared, 0)
+            .unwrap();
+        file.number = 1;
+        let mut buf = [0u8; 13];
+        let bytes_read = backend.read(&mut file, &mut buf).unwrap();
+        assert_eq!(bytes_read, 13);
+        assert_eq!(&buf, b"Hello, World!");
+    }
+
+    #[test]
+    fn file_exists_check() {
+        let mut backend = MemoryBackend::new();
+        let path = PathBuf::from("/test.txt");
+
+        assert!(!backend.file_exists(&path));
+
+        let file = backend
+            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .unwrap();
+        drop(file);
+
+        assert!(backend.file_exists(&path));
+    }
+
+    #[test]
+    fn file_len_returns_correct_size() {
+        let mut backend = MemoryBackend::new();
+        let path = PathBuf::from("/test.txt");
+
+        let mut file = backend
+            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .unwrap();
+        file.number = 1;
+        backend.write(&mut file, b"12345").unwrap();
+
+        let len = backend.file_len(&path).unwrap();
+        assert_eq!(len, 5);
+    }
+
+    #[test]
+    fn append_mode_preserves_content() {
+        let mut backend = MemoryBackend::new();
+        let path = PathBuf::from("/test.txt");
+
+        // Write initial content
+        let mut file = backend
+            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .unwrap();
+        file.number = 1;
+        backend.write(&mut file, b"Hello").unwrap();
+
+        // Append more content
+        let mut file = backend
+            .open(&path, OpenMode::Append, AccessMode::Write, LockMode::Shared, 0)
+            .unwrap();
+        file.number = 1;
+        backend.write(&mut file, b", World!").unwrap();
+
+        // Verify
+        let mut file = backend
+            .open(&path, OpenMode::Input, AccessMode::Read, LockMode::Shared, 0)
+            .unwrap();
+        file.number = 1;
+        let mut buf = [0u8; 13];
+        backend.read(&mut file, &mut buf).unwrap();
+        assert_eq!(&buf, b"Hello, World!");
+    }
+
+    #[test]
+    fn output_mode_truncates() {
+        let mut backend = MemoryBackend::new();
+        let path = PathBuf::from("/test.txt");
+
+        // Write initial content
+        let mut file = backend
+            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .unwrap();
+        file.number = 1;
+        backend.write(&mut file, b"Hello").unwrap();
+
+        // Open for output again (should truncate)
+        let mut file = backend
+            .open(&path, OpenMode::Output, AccessMode::Write, LockMode::Shared, 0)
+            .unwrap();
+        file.number = 1;
+        backend.write(&mut file, b"Hi").unwrap();
+
+        // Verify
+        let mut file = backend
+            .open(&path, OpenMode::Input, AccessMode::Read, LockMode::Shared, 0)
+            .unwrap();
+        file.number = 1;
+        let mut buf = [0u8; 2];
+        backend.read(&mut file, &mut buf).unwrap();
+        assert_eq!(&buf, b"Hi");
+    }
+}

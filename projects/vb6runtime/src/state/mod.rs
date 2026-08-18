@@ -18,6 +18,7 @@
 pub mod clock;
 pub mod environment;
 pub mod err;
+pub mod file;
 pub mod random;
 pub mod settings;
 
@@ -31,6 +32,11 @@ pub(crate) mod test_support {
     /// every test module that touches the environment snapshot, the settings
     /// store, or the RNG seed.
     pub(crate) static TEST_LOCK: Mutex<()> = Mutex::new(());
+
+    /// Acquire the test lock, recovering from poison if a prior test panicked.
+    pub(crate) fn lock_test() -> std::sync::MutexGuard<'static, ()> {
+        TEST_LOCK.lock().unwrap_or_else(|e| e.into_inner())
+    }
 
     /// Find the 1-based position of `name` in the environment snapshot.
     pub(crate) fn position_of(name: &str) -> usize {
@@ -50,7 +56,7 @@ pub(crate) mod test_support {
     /// afterwards so the user's real settings are never touched and later
     /// tests start from a clean baseline.
     pub(crate) fn with_temp_settings_store<T>(f: impl FnOnce(&Path) -> T) -> T {
-        let _guard = TEST_LOCK.lock().unwrap();
+        let _guard = lock_test();
         let dir = tempfile::tempdir().expect("failed to create temp dir");
         super::settings::set_store_root(dir.path());
         let result = f(dir.path());

@@ -771,3 +771,169 @@
 //! - `Seek`: Returns or sets current position in file
 //! - `EOF`: Returns whether end of file reached
 //! - `GetAttr`: Returns attributes of any file (readonly, hidden, etc.)
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::state::file::{OpenMode, MAX_FILE_NUMBER, MIN_FILE_NUMBER};
+use crate::value::{VBLong, VBVariant};
+
+/// Get the file mode or handle for an open file.
+///
+/// # Arguments
+///
+/// * `file_number` - The file number.
+/// * `return_type` - 1 for file mode, 2 for OS handle.
+///
+/// # Returns
+///
+/// Returns the file mode or OS handle.
+pub fn fileattr(file_number: VBVariant, return_type: VBVariant) -> VBResult<VBLong> {
+    // Convert file number to integer
+    let file_num = match file_number {
+        VBVariant::Long(v) => v as i16,
+        VBVariant::Integer(v) => v,
+        VBVariant::Byte(v) => v as i16,
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in FileAttr",
+            ));
+        }
+    };
+
+    // Convert return type to integer
+    let ret_type = match return_type {
+        VBVariant::Long(v) => v,
+        VBVariant::Integer(v) => v as i32,
+        VBVariant::Byte(v) => v as i32,
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in FileAttr",
+            ));
+        }
+    };
+
+    // Validate file number range
+    if !(MIN_FILE_NUMBER..=MAX_FILE_NUMBER).contains(&file_num) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("Bad file name or number: {}", file_num),
+        ));
+    }
+
+    // Check if file is open
+    if !file::is_file_open(file_num) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("File not open: #{}", file_num),
+        ));
+    }
+
+    // Get the file
+    let file =
+        file::get_file(file_num).ok_or_else(|| VBError::with_description(52, "File not open"))?;
+
+    match ret_type {
+        1 => {
+            // Return file mode
+            let mode = match file.mode {
+                OpenMode::Input => 1,
+                OpenMode::Output => 2,
+                OpenMode::Random => 4,
+                OpenMode::Append => 8,
+                OpenMode::Binary => 32,
+            };
+            Ok(VBLong::from(mode))
+        }
+        2 => {
+            // Return OS file handle (not applicable in our implementation)
+            // Return the VB6 file number as a stand-in
+            Ok(VBLong::from(file_num as i32))
+        }
+        _ => Err(VBError::with_description(
+            5, // Invalid procedure call or argument
+            "Invalid return type for FileAttr",
+        )),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+
+    #[test]
+    fn fileattr_returns_file_mode() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        let mode = fileattr(VBVariant::Long(1), VBVariant::Long(1)).unwrap();
+        assert_eq!(mode.as_i32(), 2); // Output mode
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn fileattr_rejects_invalid_file_number() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = fileattr(VBVariant::Long(0), VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn fileattr_rejects_closed_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let result = fileattr(VBVariant::Long(1), VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn fileattr_rejects_invalid_return_type() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        let result = fileattr(VBVariant::Long(1), VBVariant::Long(3));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 5);
+
+        let _ = file::close_all_files();
+    }
+}

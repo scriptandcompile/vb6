@@ -161,3 +161,177 @@
 //! ## References
 //!
 //! - [Seek Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/seek-statement)
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::value::VBVariant;
+
+/// Set the current position in an open file.
+///
+/// # Arguments
+///
+/// * `file_number` - The file number.
+/// * `position` - The new position (1-based).
+///
+/// # Returns
+///
+/// Returns `Ok(())` on success, or `Err(VBError)` on failure.
+pub fn seek_statement(file_number: VBVariant, position: VBVariant) -> VBResult<()> {
+    // Convert file number to integer
+    let file_num = match file_number {
+        VBVariant::Long(v) => v as i16,
+        VBVariant::Integer(v) => v,
+        VBVariant::Byte(v) => v as i16,
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in Seek statement",
+            ));
+        }
+    };
+
+    // Convert position to long
+    let pos = match position {
+        VBVariant::Long(v) => v,
+        VBVariant::Integer(v) => v as i32,
+        VBVariant::Byte(v) => v as i32,
+        VBVariant::Double(v) => v as i32,
+        VBVariant::Single(v) => v as i32,
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in Seek statement",
+            ));
+        }
+    };
+
+    // Validate file number range
+    if !(file::MIN_FILE_NUMBER..=file::MAX_FILE_NUMBER).contains(&file_num) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("Bad file name or number: {}", file_num),
+        ));
+    }
+
+    // Validate position
+    if pos < 1 {
+        return Err(VBError::with_description(
+            63, // Bad record number
+            "Bad record number",
+        ));
+    }
+
+    // Check if file is open
+    if !file::is_file_open(file_num) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("File not open: #{}", file_num),
+        ));
+    }
+
+    // Seek to the position (convert to 0-based for internal use)
+    file::seek_file(file_num, pos as i64).map_err(|e| {
+        VBError::with_description(
+            57, // Device I/O error
+            e.to_string(),
+        )
+    })?;
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+
+    #[test]
+    fn seek_sets_position() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a file with content
+        let path = std::path::PathBuf::from("test.txt");
+        std::fs::write(dir.path().join("test.txt"), "Hello, World!").unwrap();
+
+        // Open for input
+        file::open_file(
+            &path,
+            OpenMode::Input,
+            AccessMode::Read,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        // Seek to position 7
+        seek_statement(VBVariant::Long(1), VBVariant::Long(7)).unwrap();
+
+        // Check position
+        let pos = crate::library::file::seek::seek(VBVariant::Long(1)).unwrap();
+        assert_eq!(pos.as_i32(), 7);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn seek_rejects_invalid_file_number() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = seek_statement(VBVariant::Long(0), VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let result = seek_statement(VBVariant::Long(512), VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn seek_rejects_invalid_position() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        let result = seek_statement(VBVariant::Long(1), VBVariant::Long(0));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 63);
+
+        let result = seek_statement(VBVariant::Long(1), VBVariant::Long(-1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 63);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn seek_rejects_closed_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let result = seek_statement(VBVariant::Long(1), VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+}

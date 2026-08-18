@@ -840,3 +840,111 @@
 //! - `Date`: Returns current system date
 //! - `DateDiff`: Calculates difference between two dates
 //! - `Format`: Formats date/time for display
+
+use std::time::SystemTime;
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::value::VBVariant;
+
+/// Get the date and time a file was created or last modified.
+///
+/// # Arguments
+///
+/// * `pathname` - The file path.
+///
+/// # Returns
+///
+/// Returns a date serial value.
+pub fn file_datetime(pathname: VBVariant) -> VBResult<VBVariant> {
+    // Get the file path
+    let path_str = match pathname {
+        VBVariant::String(s) => s.as_str().to_string(),
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in FileDateTime",
+            ));
+        }
+    };
+
+    // Get the file datetime through the backend
+    let modified = file::file_datetime(std::path::Path::new(&path_str)).map_err(|e| {
+        VBError::with_description(
+            match e.kind() {
+                std::io::ErrorKind::NotFound => 53, // File not found
+                _ => 57,                            // Device I/O error
+            },
+            e.to_string(),
+        )
+    })?;
+
+    // Convert to VB6 date serial
+    let serial = system_time_to_date_serial(modified);
+
+    Ok(VBVariant::Date(serial))
+}
+
+/// Convert a SystemTime to a VB6 date serial.
+fn system_time_to_date_serial(time: SystemTime) -> f64 {
+    // VB6 date serial: days since December 30, 1899
+    // with fractional part for time of day
+
+    let duration = time
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap_or_default();
+
+    let seconds = duration.as_secs() as f64;
+    let days = seconds / 86400.0;
+
+    // Days from 1899-12-30 to 1970-01-01 = 25569
+    days + 25569.0
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self};
+
+    #[test]
+    fn file_datetime_returns_valid_date() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a file
+        std::fs::write(dir.path().join("test.txt"), "Hello").unwrap();
+
+        let result = file_datetime(VBVariant::from_string("test.txt"));
+        assert!(result.is_ok());
+
+        // The result should be a date serial (a positive number)
+        if let VBVariant::Date(serial) = result.unwrap() {
+            assert!(serial > 0.0);
+        } else {
+            panic!("Expected Date variant");
+        }
+    }
+
+    #[test]
+    fn file_datetime_rejects_nonexistent_file() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let result = file_datetime(VBVariant::from_string("nonexistent.txt"));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 53);
+    }
+
+    #[test]
+    fn file_datetime_rejects_non_string() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = file_datetime(VBVariant::Long(42));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 13);
+    }
+}

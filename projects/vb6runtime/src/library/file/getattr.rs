@@ -788,3 +788,112 @@
 //! - `FileDateTime` - Returns the date and time a file was created or last modified
 //! - `FileAttr` - Returns the file mode or file handle for an open file
 //! - `FileExists` - Checks if a file exists (custom function using Dir)
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::value::{VBInteger, VBVariant};
+
+// VB6 file attribute constants.
+
+/// Normal file (no special attributes).
+pub const VB_NORMAL: i16 = 0;
+/// Read-only file.
+pub const VB_READ_ONLY: i16 = 1;
+/// Hidden file.
+pub const VB_HIDDEN: i16 = 2;
+/// System file.
+pub const VB_SYSTEM: i16 = 4;
+/// Directory.
+pub const VB_DIRECTORY: i16 = 16;
+/// Archive flag.
+pub const VB_ARCHIVE: i16 = 32;
+
+/// Get the attributes of a file or directory.
+///
+/// # Arguments
+///
+/// * `pathname` - The file path.
+///
+/// # Returns
+///
+/// Returns the file attributes as an integer.
+pub fn getattr(pathname: VBVariant) -> VBResult<VBInteger> {
+    // Get the file path
+    let path_str = match pathname {
+        VBVariant::String(s) => s.as_str().to_string(),
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in GetAttr",
+            ));
+        }
+    };
+
+    // Get attributes through the backend
+    let attrs = file::get_attrs(std::path::Path::new(&path_str)).map_err(|e| {
+        VBError::with_description(
+            match e.kind() {
+                std::io::ErrorKind::NotFound => 53, // File not found
+                _ => 57,                            // Device I/O error
+            },
+            e.to_string(),
+        )
+    })?;
+
+    Ok(VBInteger::from(attrs))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self};
+
+    #[test]
+    fn getattr_returns_normal_for_file() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a file
+        std::fs::write(dir.path().join("test.txt"), "Hello").unwrap();
+
+        let attrs = getattr(VBVariant::from_string("test.txt")).unwrap();
+        assert_eq!(attrs.as_i16() & VB_DIRECTORY, 0);
+    }
+
+    #[test]
+    fn getattr_returns_directory_for_dir() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create directory
+        std::fs::create_dir(dir.path().join("testdir")).unwrap();
+
+        let attrs = getattr(VBVariant::from_string("testdir")).unwrap();
+        assert_ne!(attrs.as_i16() & VB_DIRECTORY, 0);
+    }
+
+    #[test]
+    fn getattr_rejects_nonexistent_file() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let result = getattr(VBVariant::from_string("nonexistent.txt"));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 53);
+    }
+
+    #[test]
+    fn getattr_rejects_non_string() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = getattr(VBVariant::Long(42));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 13);
+    }
+}

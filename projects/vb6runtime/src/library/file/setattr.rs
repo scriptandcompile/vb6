@@ -211,3 +211,122 @@
 //! ## References
 //!
 //! - [SetAttr Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/setattr-statement)
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::value::VBVariant;
+
+/// Set attributes for a file.
+///
+/// # Arguments
+///
+/// * `pathname` - The file path.
+/// * `attributes` - The attributes to set.
+///
+/// # Returns
+///
+/// Returns `Ok(())` on success, or `Err(VBError)` on failure.
+pub fn setattr(pathname: VBVariant, attributes: VBVariant) -> VBResult<()> {
+    // Get the file path
+    let path_str = match pathname {
+        VBVariant::String(s) => s.as_str().to_string(),
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in SetAttr",
+            ));
+        }
+    };
+
+    // Get attributes
+    let attrs = match attributes {
+        VBVariant::Long(v) => v as i16,
+        VBVariant::Integer(v) => v,
+        VBVariant::Byte(v) => v as i16,
+        _ => {
+            return Err(VBError::with_description(
+                13, // Type mismatch
+                "Type mismatch in SetAttr",
+            ));
+        }
+    };
+
+    // Set attributes through the backend
+    file::set_attrs(std::path::Path::new(&path_str), attrs).map_err(|e| {
+        VBError::with_description(
+            match e.kind() {
+                std::io::ErrorKind::NotFound => 53,         // File not found
+                std::io::ErrorKind::PermissionDenied => 70, // Permission denied
+                _ => 57,                                    // Device I/O error
+            },
+            e.to_string(),
+        )
+    })?;
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self};
+
+    #[test]
+    fn setattr_sets_readonly() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a file
+        std::fs::write(dir.path().join("test.txt"), "Hello").unwrap();
+
+        // Set readonly (VB_READ_ONLY = 1)
+        setattr(VBVariant::from_string("test.txt"), VBVariant::Long(1)).unwrap();
+
+        // Verify
+        let metadata = std::fs::metadata(dir.path().join("test.txt")).unwrap();
+        assert!(metadata.permissions().readonly());
+    }
+
+    #[test]
+    fn setattr_rejects_nonexistent_file() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let result = setattr(
+            VBVariant::from_string("nonexistent.txt"),
+            VBVariant::Long(0),
+        );
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 53);
+    }
+
+    #[test]
+    fn setattr_rejects_non_string_path() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = setattr(VBVariant::Long(42), VBVariant::Long(0));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 13);
+    }
+
+    #[test]
+    fn setattr_rejects_non_numeric_attrs() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        std::fs::write(dir.path().join("test.txt"), "Hello").unwrap();
+
+        let result = setattr(
+            VBVariant::from_string("test.txt"),
+            VBVariant::from_string("invalid"),
+        );
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 13);
+    }
+}

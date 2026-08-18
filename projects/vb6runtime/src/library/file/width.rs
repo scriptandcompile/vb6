@@ -115,3 +115,96 @@
 //! Print #1, "System Log - "; Now()
 //! Close #1
 //! ```
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+
+/// Set the line-output width for an open file.
+///
+/// # Arguments
+///
+/// * `file_number` - The file number.
+/// * `width` - The line width (0 means no limit).
+///
+/// # Returns
+///
+/// Returns `Ok(())` on success, or `Err(VBError)` on failure.
+pub fn width_statement(file_number: i16, _width: i16) -> VBResult<()> {
+    // Check file number is valid
+    if !(file::MIN_FILE_NUMBER..=file::MAX_FILE_NUMBER).contains(&file_number) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("Bad file name or number: {}", file_number),
+        ));
+    }
+
+    // Check file is open
+    if !file::is_file_open(file_number) {
+        return Err(VBError::with_description(
+            52, // Bad file name or number
+            format!("File not open: #{}", file_number),
+        ));
+    }
+
+    // Width is stored but not currently used by the runtime
+    // This is a placeholder for future implementation
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+
+    #[test]
+    fn width_succeeds_for_open_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        let result = width_statement(1, 80);
+        assert!(result.is_ok());
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn width_rejects_invalid_file_number() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = width_statement(0, 80);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let result = width_statement(512, 80);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn width_rejects_closed_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let result = width_statement(1, 80);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, 52);
+
+        let _ = file::close_all_files();
+    }
+}
