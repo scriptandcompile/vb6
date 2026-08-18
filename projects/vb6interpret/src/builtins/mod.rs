@@ -14,6 +14,7 @@ mod arrays;
 mod conversion;
 mod datetime;
 mod environment;
+mod file;
 mod financial;
 mod logic;
 mod math;
@@ -93,6 +94,7 @@ fn registry() -> &'static Registry {
         conversion::register(&mut registry);
         datetime::register(&mut registry);
         environment::register(&mut registry);
+        file::register(&mut registry);
         financial::register(&mut registry);
         logic::register(&mut registry);
         string::register(&mut registry);
