@@ -299,12 +299,8 @@ impl Interpreter {
         vb6runtime::state::file::reset_backend();
     }
 
-    /// Reset all runtime state (globals, frames, output, program).
-    ///
-    /// Also closes any files left open by a prior run, e.g. one that
-    /// stopped because of an error before reaching a `Close` statement.
+    /// Reset all interpreter state (globals, frames, output, program).
     pub fn clear(&mut self) {
-        let _ = vb6runtime::state::file::close_all_files();
         let step_limit = self.step_limit;
         let pause_after_steps = self.pause_after_steps;
         let record_debug_snapshots = self.record_debug_snapshots;

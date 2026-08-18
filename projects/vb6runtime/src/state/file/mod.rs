@@ -345,26 +345,13 @@ pub fn read_file_to_vec(file_number: i16) -> io::Result<Vec<u8>> {
 
 /// List all files in the memory backend with their attributes and content.
 /// Returns (path, attributes, content) for each file.
-pub fn list_memory_files() -> io::Result<Vec<(String, i16, Option<Vec<u8>>)>> {
+pub fn list_memory_files() -> io::Result<Vec<memory::VirtualFile>> {
     backend()
         .lock()
         .unwrap_or_else(|e| e.into_inner())
         .as_any()
         .downcast_ref::<memory::MemoryBackend>()
-        .map(|memory| {
-            memory
-                .files()
-                .iter()
-                .map(|(path, vfile)| {
-                    let content = if vfile.exists() {
-                        Some(vfile.content().to_vec())
-                    } else {
-                        None
-                    };
-                    (path.clone(), vfile.attributes(), content)
-                })
-                .collect()
-        })
+        .map(|memory| memory.files().values().cloned().collect())
         .ok_or_else(|| io::Error::other("Backend is not a memory backend"))
 }
 

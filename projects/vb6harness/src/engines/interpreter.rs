@@ -51,9 +51,10 @@ impl Engine for InterpreterEngine {
             .and_then(|files| {
                 files
                     .into_iter()
-                    .find(|(path, _, _)| path.ends_with(OUTPUT_FILE))
+                    .find(|file| file.path().ends_with(OUTPUT_FILE))
             })
-            .and_then(|(_, _, content)| content)
+            .filter(|file| file.exists())
+            .map(|file| file.content().to_vec())
             .unwrap_or_default();
 
         // Most corpus modules write via `Print #1` (opened above to mirror
