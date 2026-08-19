@@ -728,3 +728,111 @@
 //! - `Hex`: Converts numbers to hexadecimal strings
 //! - `LoadPicture`: Loads images with full color support
 //! - Color constants: `vbBlack`, `vbRed`, `vbGreen`, `vbBlue`, etc.
+
+use crate::{error::VBError, error::VBResult, value::VBVariant};
+use vb6core::error::err_number;
+
+/// Minimum valid color index for QBColor.
+pub const MIN_COLOR_INDEX: i32 = 0;
+/// Maximum valid color index for QBColor.
+pub const MAX_COLOR_INDEX: i32 = 15;
+
+/// Implementation of the QBColor function.
+///
+/// VB6 behavior:
+/// - Returns a Long representing the RGB color value for indices 0-15
+/// - Values outside 0-15 raise error 5 (Invalid procedure call or argument)
+/// - The returned value uses BGR byte order as is standard for Windows colors
+pub fn qbcolor(color: &VBVariant) -> VBResult<VBVariant> {
+    let idx = color.as_i32()?;
+
+    if !(MIN_COLOR_INDEX..=MAX_COLOR_INDEX).contains(&idx) {
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL)); // Invalid procedure call or argument
+    }
+
+    Ok(qbcolor_values().clone()[idx as usize].clone())
+}
+
+/// The QBColor palette lookup table.
+/// Returns the BGR Long value for each color index 0-15.
+fn qbcolor_values() -> [VBVariant; (MAX_COLOR_INDEX + 1) as usize] {
+    [
+        VBVariant::from_long(0x000000), // 0: Black - RGB(0, 0, 0)
+        VBVariant::from_long(0x800000), // 1: Blue - RGB(0, 0, 128)
+        VBVariant::from_long(0x008000), // 2: Green - RGB(0, 128, 0)
+        VBVariant::from_long(0x808000), // 3: Cyan - RGB(0, 128, 128)
+        VBVariant::from_long(0x000080), // 4: Red - RGB(128, 0, 0)
+        VBVariant::from_long(0x800080), // 5: Magenta - RGB(128, 0, 128)
+        VBVariant::from_long(0x008080), // 6: Yellow - RGB(128, 128, 0)
+        VBVariant::from_long(0xc0c0c0), // 7: White - RGB(192, 192, 192)
+        VBVariant::from_long(0x808080), // 8: Gray - RGB(128, 128, 128)
+        VBVariant::from_long(0xff0000), // 9: Light Blue - RGB(0, 0, 255)
+        VBVariant::from_long(0x00ff00), // 10: Light Green - RGB(0, 255, 0)
+        VBVariant::from_long(0xffff00), // 11: Light Cyan - RGB(0, 255, 255)
+        VBVariant::from_long(0x0000ff), // 12: Light Red - RGB(255, 0, 0)
+        VBVariant::from_long(0xff00ff), // 13: Light Magenta - RGB(255, 0, 255)
+        VBVariant::from_long(0x00ffff), // 14: Light Yellow - RGB(255, 255, 0)
+        VBVariant::from_long(0xffffff), // 15: Bright White - RGB(255, 255, 255)
+    ]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::qbcolor;
+    use crate::value::VBVariant;
+
+    #[test]
+    fn returns_black_for_zero() {
+        let result = qbcolor(&VBVariant::from_long(0)).unwrap();
+        assert_eq!(result, VBVariant::from_long(0x000000));
+    }
+
+    #[test]
+    fn returns_blue_for_one() {
+        let result = qbcolor(&VBVariant::from_long(1)).unwrap();
+        assert_eq!(result, VBVariant::from_long(0x800000));
+    }
+
+    #[test]
+    fn returns_white_for_seven() {
+        let result = qbcolor(&VBVariant::from_long(7)).unwrap();
+        assert_eq!(result, VBVariant::from_long(0xc0c0c0));
+    }
+
+    #[test]
+    fn returns_bright_white_for_fifteen() {
+        let result = qbcolor(&VBVariant::from_long(15)).unwrap();
+        assert_eq!(result, VBVariant::from_long(0xffffff));
+    }
+
+    #[test]
+    fn returns_error_for_negative_index() {
+        let result = qbcolor(&VBVariant::from_long(-1));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn returns_error_for_index_above_15() {
+        let result = qbcolor(&VBVariant::from_long(16));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn returns_error_for_non_numeric_values() {
+        let result = qbcolor(&VBVariant::from_string("not-a-number"));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn accepts_integer_types() {
+        // Integer values should work
+        let result = qbcolor(&VBVariant::from_integer(10)).unwrap();
+        assert_eq!(result, VBVariant::from_long(0x00ff00)); // Light Green
+    }
+
+    #[test]
+    fn accepts_byte_values() {
+        let result = qbcolor(&VBVariant::from_long(5)).unwrap();
+        assert_eq!(result, VBVariant::from_long(0x800080)); // Magenta
+    }
+}
