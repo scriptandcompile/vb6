@@ -6,6 +6,7 @@
 //! added as they are implemented.
 
 pub mod arrays;
+pub mod constants;
 pub mod conversion;
 pub mod datetime;
 pub mod environment;

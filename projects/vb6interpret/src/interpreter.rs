@@ -164,6 +164,37 @@ impl Interpreter {
         }
     }
 
+    /// Register the built-in VB6 data constants as globals.
+    ///
+    /// These constants (`vbCrLf`, `vbTab`, etc.) are available in every VB6
+    /// program without declaration.  They are registered as case-insensitive
+    /// globals so that VB6 source code referencing them resolves correctly.
+    fn register_builtin_constants(&mut self) {
+        use vb6runtime::library::constants::*;
+        self.globals.declare("vbcr", VBVariant::from_string(VB_CR));
+        self.globals
+            .declare("vbcrlf", VBVariant::from_string(VB_CRLF));
+        self.globals.declare("vblf", VBVariant::from_string(VB_LF));
+        self.globals
+            .declare("vbnewline", VBVariant::from_string(VB_NEW_LINE));
+        self.globals
+            .declare("vbnullchar", VBVariant::from_string(VB_NULL_CHAR));
+        self.globals
+            .declare("vbnullstring", VBVariant::from_string(VB_NULL_STRING));
+        self.globals
+            .declare("vbtab", VBVariant::from_string(VB_TAB));
+        self.globals
+            .declare("vbback", VBVariant::from_string(VB_BACK));
+        self.globals
+            .declare("vbformfeed", VBVariant::from_string(VB_FORM_FEED));
+        self.globals
+            .declare("vbverticaltab", VBVariant::from_string(VB_VERTICAL_TAB));
+        self.globals
+            .declare("vbunicode", VBVariant::from_long(VB_UNICODE));
+        self.globals
+            .declare("vbfromunicode", VBVariant::from_long(VB_FROM_UNICODE));
+    }
+
     /// Set the maximum number of statements the interpreter will execute
     /// before aborting (prevents infinite loops). Defaults to
     /// [`DEFAULT_STEP_LIMIT`].
@@ -484,6 +515,8 @@ impl Interpreter {
     /// Execute a parsed module.
     pub fn run_module(&mut self, module: &ModuleFile) -> RunResult<()> {
         self.clear();
+        // Register built-in VB6 data constants (vbCrLf, vbTab, etc.)
+        self.register_builtin_constants();
         // Apply the interpreter's environment overrides on top of the shared
         // runtime snapshot so `Environ$` sees them during this run.
         for (name, value) in &self.environment {
