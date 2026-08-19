@@ -50,6 +50,12 @@ use std::path::{Path, PathBuf};
 use vb6parse::parsers::SyntaxKind;
 use vb6parse::parsers::cst::CstNode;
 
+/// Built-in VB6 reference manifest for "OLE Automation".
+///
+/// Contains the VB6 data constants (`vbCrLf`, `vbTab`, etc.) that are
+/// available in every VB6 program without declaration.
+const DEFAULT_MANIFEST_JSON: &str = include_str!("../data/ole-automation.json");
+
 /// Main semantic analyzer that processes VB6 code
 pub struct SemanticAnalyzer {
     /// Scope manager for symbol resolution
@@ -224,6 +230,30 @@ impl SemanticAnalyzer {
         self.references.register(resolver);
     }
 
+    /// Register the built-in VB6 reference manifest.
+    ///
+    /// The manifest supplies symbol information for the "OLE Automation"
+    /// reference library, including VB6 data constants (`vbCrLf`, `vbTab`,
+    /// etc.) that are available in every VB6 program without declaration.
+    ///
+    /// This is a no-op if the manifest is already registered.  It is called
+    /// automatically during project analysis so callers do not normally need
+    /// to invoke it.
+    pub fn register_default_references(&mut self) -> Result<()> {
+        if self
+            .references
+            .resolvers()
+            .iter()
+            .any(|r| r.name() == "manifest")
+        {
+            return Ok(());
+        }
+        use crate::references::ManifestReferenceResolver;
+        let resolver = ManifestReferenceResolver::from_json(DEFAULT_MANIFEST_JSON)?;
+        self.references.register(Box::new(resolver));
+        Ok(())
+    }
+
     /// The list of registered reference resolvers
     pub fn reference_resolvers(&self) -> &ReferenceRegistry {
         &self.references
@@ -241,6 +271,13 @@ impl SemanticAnalyzer {
     fn resolve_project_references(&mut self, project: &vb6parse::files::ProjectFile) -> Result<()> {
         self.resolved_references.clear();
         self.unresolved_references.clear();
+
+        // Ensure built-in VB6 reference symbols (data constants, etc.)
+        // are registered.  This is a no-op if already present.
+        if let Err(error) = self.register_default_references() {
+            self.warnings
+                .push(format!("Failed to load default references: {error}"));
+        }
 
         let file = self
             .current_file
@@ -2360,7 +2397,7 @@ Option Explicit
 
         let project_source = format!(
             "Type=Exe\n\
-             Reference=*\\G{{00020430-0000-0000-C000-000000000046}}#2.0#0#C:\\Windows\\System32\\stdole2.tlb#OLE Automation\n\
+             Reference=*\\G{{4AC69860-FB10-11CF-86DA-00AA00608FCC}}#1.0#0#C:\\Program Files\\Common Files\\Microsoft Shared\\DAO\\dao360.dll#Microsoft DAO 3.6 Object Library\n\
              Module=Module1; {}\n",
             module_path.display()
         );
@@ -2381,7 +2418,7 @@ Option Explicit
         assert!(result.unresolved_references.len() == 1);
         assert_eq!(
             result.unresolved_references[0].display_name(),
-            "OLE Automation"
+            "Microsoft DAO 3.6 Object Library"
         );
         assert!(result.resolved_references.is_empty());
     }
