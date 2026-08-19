@@ -659,6 +659,7 @@ use crate::state::file;
 use crate::value::VBVariant;
 use crate::StdPicture;
 use std::path::Path;
+use vb6core::error::err_number;
 
 /// Implementation of the `LoadPicture` function.
 ///
@@ -685,7 +686,7 @@ pub fn loadpicture(filename: Option<&str>) -> VBResult<VBVariant> {
             // happening during runtime.
             // (ie, looping over dir then trying to use a 'exist' check would cause issues)
             if file::get_attrs(path).is_err() {
-                return Err(VBError::new(53)); // File not found
+                return Err(VBError::new(err_number::FILE_NOT_FOUND));
             }
 
             // For now, create a StdPicture with the file's dimensions
