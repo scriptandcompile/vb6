@@ -863,3 +863,180 @@
 //! - `IIf`: Returns one of two values based on a condition
 //! - `Format`: Formats values as strings with custom patterns
 //! - `InStr`: Searches for substring within a string (useful for parsing Partition results)
+
+use crate::{
+    error::{VBError, VBResult},
+    value::{VBLong, VBVariant},
+};
+
+/// Implementation of the Partition function.
+///
+/// VB6 behavior:
+/// - `start` must be >= 0
+/// - `stop` must be > `start`
+/// - `interval` must be >= 1
+/// - returns a String describing the range
+pub fn partition(
+    number: &VBVariant,
+    start: &VBLong,
+    stop: &VBLong,
+    interval: &VBLong,
+) -> VBResult<VBVariant> {
+    let start_val = start.as_i32();
+    let stop_val = stop.as_i32();
+    let interval_val = interval.as_i32();
+
+    if start_val < 0 || stop_val <= start_val || interval_val < 1 {
+        return Err(VBError::invalid_procedure_call());
+    }
+
+    let n = number.as_f64()?;
+
+    // Compute field width based on digits in stop
+    let width = digits_width(stop_val);
+
+    if n < start_val as f64 {
+        // Below start: "   : (start-1)" padded to width
+        let upper = start_val - 1;
+        let upper_str = format!("{}", upper);
+        let padded = format_pad(upper_str, width);
+        return Ok(VBVariant::from_string(format!(" :{}", padded)));
+    }
+
+    if n > stop_val as f64 {
+        // Above stop: "stop+1:   " padded to width
+        let lower = stop_val + 1;
+        let lower_str = format!("{}", lower);
+        let padded = format_pad(lower_str, width);
+        return Ok(VBVariant::from_string(format!("{}: ", padded)));
+    }
+
+    // Within range - compute which interval bucket
+    let idx = (n - start_val as f64) / interval_val as f64;
+    let idx = idx.floor();
+
+    let lower = start_val + idx as i32 * interval_val;
+    let upper = lower + interval_val - 1;
+    let upper = if upper > stop_val { stop_val } else { upper };
+
+    let lower_str = format!("{}", lower);
+    let upper_str = format!("{}", upper);
+    let padded_lower = format_pad(lower_str, width);
+    let padded_upper = format_pad(upper_str, width);
+
+    Ok(VBVariant::from_string(format!(
+        "{}:{}",
+        padded_lower, padded_upper
+    )))
+}
+
+/// Count the number of digits in a non-negative integer.
+fn digits_width(value: i32) -> usize {
+    value.to_string().len()
+}
+
+fn format_pad(s: String, width: usize) -> String {
+    if s.len() >= width {
+        s
+    } else {
+        let padding = " ".repeat(width - s.len());
+        format!("{}{}", padding, s)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::partition;
+    use crate::{
+        error::err_number,
+        value::{VBLong, VBVariant},
+    };
+
+    #[test]
+    fn within_range_returns_correct_string() {
+        let result = partition(
+            &VBVariant::from_integer(15),
+            &VBLong::from(0),
+            &VBLong::from(100),
+            &VBLong::from(10),
+        )
+        .unwrap();
+        let VBVariant::String(s) = result else {
+            panic!("expected String")
+        };
+        assert_eq!(s, " 10: 19");
+    }
+
+    #[test]
+    fn below_start_returns_special_range() {
+        let result = partition(
+            &VBVariant::from_integer(-5),
+            &VBLong::from(0),
+            &VBLong::from(100),
+            &VBLong::from(10),
+        )
+        .unwrap();
+        let VBVariant::String(s) = result else {
+            panic!("expected String")
+        };
+        assert!(s.contains(":"));
+        assert!(s.contains("-1"));
+    }
+
+    #[test]
+    fn above_stop_returns_special_range() {
+        let result = partition(
+            &VBVariant::from_integer(150),
+            &VBLong::from(0),
+            &VBLong::from(100),
+            &VBLong::from(10),
+        )
+        .unwrap();
+        let VBVariant::String(s) = result else {
+            panic!("expected String")
+        };
+        assert!(s.contains("101:"));
+    }
+
+    #[test]
+    fn rejects_invalid_parameters() {
+        let err = partition(
+            &VBVariant::from_integer(5),
+            &VBLong::from(-1),
+            &VBLong::from(100),
+            &VBLong::from(10),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+
+        let err = partition(
+            &VBVariant::from_integer(5),
+            &VBLong::from(100),
+            &VBLong::from(50),
+            &VBLong::from(10),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+
+        let err = partition(
+            &VBVariant::from_integer(5),
+            &VBLong::from(0),
+            &VBLong::from(100),
+            &VBLong::from(0),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn rejects_non_numeric_values() {
+        let err = partition(
+            &VBVariant::from_string("not-a-number"),
+            &VBLong::from(0),
+            &VBLong::from(100),
+            &VBLong::from(10),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+}
