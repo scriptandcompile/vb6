@@ -592,6 +592,8 @@ pub fn is_error(value: &VBVariant) -> VBResult<VBVariant> {
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
+
     use super::is_error;
     use crate::{error::VBError, value::VBVariant, ArrayDimension, VBObject, VBType};
 
@@ -617,7 +619,10 @@ mod tests {
             VBVariant::from_bool(true)
         );
         assert_eq!(
-            is_error(&VBVariant::from_error(VBError::new(450))).unwrap(),
+            is_error(&VBVariant::from_error(VBError::new(
+                err_number::WRONG_NUMBER_OF_ARGUMENTS
+            )))
+            .unwrap(),
             VBVariant::from_bool(true)
         );
     }

@@ -6,6 +6,7 @@
 
 use std::collections::HashMap;
 
+use vb6core::error::err_number;
 use vb6core::error::VBError;
 use vb6parse::files::ModuleFile;
 use vb6runtime::state::environment as env_state;
@@ -872,9 +873,10 @@ impl Interpreter {
                     if param.optional {
                         VBVariant::default_for_type(&param.ty)
                     } else {
-                        return Err(
-                            RunError::new(VBError::new(450)).at_line(self.current_stmt_line)
-                        );
+                        return Err(RunError::new(VBError::new(
+                            err_number::WRONG_NUMBER_OF_ARGUMENTS,
+                        ))
+                        .at_line(self.current_stmt_line));
                     }
                 }
             };
