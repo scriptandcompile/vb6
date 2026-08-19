@@ -852,7 +852,7 @@ impl Interpreter {
             .get(&name.to_lowercase())
             .cloned()
             .ok_or_else(|| {
-                RunError::new(VBError::new(35))
+                RunError::new(VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED))
                     .at_line(self.current_stmt_line)
                     .in_procedure(&self.current_procedure_name())
             })

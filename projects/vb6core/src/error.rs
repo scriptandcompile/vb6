@@ -22,6 +22,8 @@ pub mod err_number {
     pub const TYPE_MISMATCH: i32 = 13;
     /// Out of string space.
     pub const OUT_OF_STRING_SPACE: i32 = 14;
+    /// Sub, Function, or Property not defined.
+    pub const SUB_OR_FUNCTION_NOT_DEFINED: i32 = 35;
     /// Object variable or With block variable not set.
     pub const OBJECT_VARIABLE_NOT_SET: i32 = 91;
     /// Invalid use of Null.

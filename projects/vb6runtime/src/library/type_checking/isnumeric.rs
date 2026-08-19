@@ -660,6 +660,7 @@ pub fn is_numeric(value: &VBVariant) -> VBResult<VBVariant> {
 mod tests {
     use super::is_numeric;
     use crate::{value::VBVariant, ArrayDimension, VBObject, VBType};
+    use vb6core::error::err_number;
 
     #[derive(Debug)]
     struct TestObject(&'static str);
@@ -763,7 +764,10 @@ mod tests {
             VBVariant::from_bool(false)
         );
         assert_eq!(
-            is_numeric(&VBVariant::from_error(crate::error::VBError::new(13))).unwrap(),
+            is_numeric(&VBVariant::from_error(crate::error::VBError::new(
+                err_number::TYPE_MISMATCH
+            )))
+            .unwrap(),
             VBVariant::from_bool(false)
         );
         let array = VBVariant::array_fixed(VBType::Integer, &[ArrayDimension::new(1, 3)]).unwrap();

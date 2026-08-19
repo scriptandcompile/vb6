@@ -354,7 +354,9 @@ mod tests {
         assert_eq!(
             call_builtin(
                 "IsError",
-                &[VBVariant::from_error(vb6core::error::VBError::new(13))]
+                &[VBVariant::from_error(vb6core::error::VBError::new(
+                    err_number::TYPE_MISMATCH
+                ))]
             )
             .unwrap(),
             VBVariant::from_bool(true)
@@ -712,7 +714,7 @@ mod tests {
         );
         assert_eq!(
             call_builtin("CVErr", &[VBVariant::from_integer(13)]).unwrap(),
-            VBVariant::from_error(vb6core::error::VBError::new(13))
+            VBVariant::from_error(vb6core::error::VBError::new(err_number::TYPE_MISMATCH))
         );
     }
 

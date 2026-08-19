@@ -1140,7 +1140,7 @@ impl Interpreter {
                 Ok(Flow::Next)
             }
             "beep" => Ok(Flow::Next),
-            _ => Err(self.error_here(VBError::new(35))), // Sub or Function not defined
+            _ => Err(self.error_here(VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED))), // Sub or Function not defined
         }
     }
 

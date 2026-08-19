@@ -1335,6 +1335,8 @@ pub(crate) fn parse_time_part(s: &str) -> Option<f64> {
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
+
     use super::*;
     use crate::types::VBType;
 
@@ -1372,7 +1374,10 @@ mod tests {
         assert_eq!(VBVariant::Integer(5).var_type(), 2);
         assert_eq!(VBVariant::from_string("x").var_type(), 8);
         assert_eq!(VBVariant::Boolean(true).var_type(), 11);
-        assert_eq!(VBVariant::from_error(VBError::new(13)).var_type(), 10);
+        assert_eq!(
+            VBVariant::from_error(VBError::new(err_number::TYPE_MISMATCH)).var_type(),
+            10
+        );
         assert_eq!(
             VBVariant::array_dynamic(VBType::Double).var_type(),
             8192 + 5
@@ -1388,7 +1393,7 @@ mod tests {
         assert!(!VBVariant::Boolean(true).is_numeric());
         assert!(!VBVariant::Date(0.0).is_numeric());
         assert!(!VBVariant::from_string("1").is_numeric());
-        assert!(VBVariant::from_error(VBError::new(5)).is_error());
+        assert!(VBVariant::from_error(VBError::new(err_number::INVALID_PROCEDURE_CALL)).is_error());
         assert!(VBVariant::array_dynamic(VBType::Long).is_array());
     }
 
@@ -1414,7 +1419,9 @@ mod tests {
             "1.2345"
         );
         assert_eq!(
-            VBVariant::from_error(VBError::new(13)).as_string().unwrap(),
+            VBVariant::from_error(VBError::new(err_number::TYPE_MISMATCH))
+                .as_string()
+                .unwrap(),
             "Error 13"
         );
         assert_eq!(VBVariant::nothing().as_string().unwrap(), "Nothing");
@@ -1598,7 +1605,7 @@ mod tests {
             VBVariant::from_string("x"),
             VBVariant::Boolean(true),
             VBVariant::Date(1.0),
-            VBVariant::from_error(VBError::new(13)),
+            VBVariant::from_error(VBError::new(err_number::TYPE_MISMATCH)),
             VBVariant::array_dynamic(VBType::Long),
         ];
         for v in values {
