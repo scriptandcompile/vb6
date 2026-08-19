@@ -831,6 +831,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `Pmt` function.
 ///
@@ -849,7 +850,7 @@ pub fn pmt(
     let type_f = type_val.map(|v| v.as_f64().unwrap_or(0.0)).unwrap_or(0.0);
 
     if nper_f == 0.0 || rate_f == -1.0 {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     if rate_f == 0.0 {

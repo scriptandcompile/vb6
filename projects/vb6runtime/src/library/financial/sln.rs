@@ -696,6 +696,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `SLN` function.
 ///
@@ -714,7 +715,7 @@ pub fn sln(cost: &VBVariant, salvage: &VBVariant, life: &VBVariant) -> VBResult<
 
     // Validate inputs per VB6 behavior
     if life_val <= 0.0 || cost_val < 0.0 || salvage_val < 0.0 {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     Ok(VBVariant::from_double((cost_val - salvage_val) / life_val))

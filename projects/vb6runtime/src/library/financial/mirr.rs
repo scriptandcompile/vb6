@@ -734,6 +734,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `MIRR` function.
 ///
@@ -761,7 +762,7 @@ pub fn mirr(values: &VBVariant, finance_rate: f64, reinvest_rate: f64) -> VBResu
         .map_err(|_| VBError::type_mismatch())?;
 
     if cash_flows.is_empty() {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     // Validate that array contains at least one positive and one negative value
@@ -769,7 +770,7 @@ pub fn mirr(values: &VBVariant, finance_rate: f64, reinvest_rate: f64) -> VBResu
     let has_negative = cash_flows.iter().any(|&v| v < 0.0);
 
     if !has_positive || !has_negative {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     let n = cash_flows.len();

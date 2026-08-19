@@ -661,6 +661,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `SYD` function.
 ///
@@ -693,7 +694,7 @@ pub fn syd(
         || period_val > life_val
         || cost_val <= salvage_val
     {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     let depreciable_base = cost_val - salvage_val;

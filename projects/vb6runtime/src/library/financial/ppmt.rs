@@ -905,6 +905,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `PPmt` function.
 ///
@@ -936,11 +937,11 @@ pub fn ppmt(
 
     // Validate inputs per VB6 behavior
     if nper_val <= 0.0 {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     if per_val < 1.0 || per_val > nper_val {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     // Periodic payment (same formula as Pmt).

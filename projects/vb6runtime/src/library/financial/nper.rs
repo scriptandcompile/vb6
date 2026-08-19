@@ -740,6 +740,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `NPer` function.
 ///
@@ -773,7 +774,7 @@ pub fn nper(
 
     // Validate inputs per VB6 behavior
     if rate < 0.0 {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     // Special case: zero interest rate
@@ -781,11 +782,11 @@ pub fn nper(
     // But this requires pmt != 0
     if rate == 0.0 {
         if pmt == 0.0 {
-            return Err(VBError::new(5));
+            return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
         }
         let nper = -(pv + fv) / pmt;
         if nper.is_nan() || nper.is_infinite() {
-            return Err(VBError::new(5));
+            return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
         }
         return Ok(VBVariant::from_double(nper));
     }
@@ -807,7 +808,7 @@ pub fn nper(
     let log_base = base.ln();
 
     if log_base.abs() < f64::EPSILON {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     let nper_val = if type_ == 0 {
@@ -819,7 +820,7 @@ pub fn nper(
         let denominator = pv * rate + pmt;
 
         if denominator == 0.0 {
-            return Err(VBError::new(5));
+            return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
         }
 
         let ratio = numerator / denominator;
@@ -828,13 +829,13 @@ pub fn nper(
         if ratio <= 0.0 {
             // This case shouldn't normally happen in valid scenarios,
             // but handle it gracefully
-            return Err(VBError::new(5));
+            return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
         }
 
         let nper = ratio.ln() / log_base;
 
         if nper.is_nan() || nper.is_infinite() {
-            return Err(VBError::new(5));
+            return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
         }
         nper
     } else {
@@ -846,19 +847,19 @@ pub fn nper(
         let denominator = (pv * rate + pmt) * base;
 
         if denominator == 0.0 {
-            return Err(VBError::new(5));
+            return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
         }
 
         let ratio = numerator / denominator;
 
         if ratio <= 0.0 {
-            return Err(VBError::new(5));
+            return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
         }
 
         let nper = ratio.ln() / log_base;
 
         if nper.is_nan() || nper.is_infinite() {
-            return Err(VBError::new(5));
+            return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
         }
         nper
     };

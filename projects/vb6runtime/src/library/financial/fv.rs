@@ -678,6 +678,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `Fv` function.
 ///
@@ -706,7 +707,7 @@ pub fn fv(
 
     // Validate inputs per VB6 behavior
     if nper_val <= 0.0 {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     let fv_val = if rate_val == 0.0 {

@@ -588,6 +588,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `DDB` function.
 ///
@@ -617,7 +618,7 @@ pub fn ddb(
 
     // Validate inputs per VB6 behavior
     if life_val <= 0.0 || cost_val < 0.0 || salvage_val < 0.0 || period_val <= 0.0 {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL)); // Invalid procedure call
     }
 
     let rate = factor_val / life_val;
