@@ -616,6 +616,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `IRR` function.
 ///
@@ -640,7 +641,7 @@ pub fn irr(values: &VBVariant, guess: Option<&VBVariant>) -> VBResult<VBVariant>
         .map_err(|_| VBError::type_mismatch())?;
 
     if cash_flows.is_empty() {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     // Validate that array contains at least one positive and one negative value
@@ -648,7 +649,7 @@ pub fn irr(values: &VBVariant, guess: Option<&VBVariant>) -> VBResult<VBVariant>
     let has_negative = cash_flows.iter().any(|&v| v < 0.0);
 
     if !has_positive || !has_negative {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     // Newton-Raphson iteration to find IRR
@@ -661,7 +662,7 @@ pub fn irr(values: &VBVariant, guess: Option<&VBVariant>) -> VBResult<VBVariant>
         let derivative = calculate_npv_derivative(&cash_flows, rate);
 
         if derivative.abs() < f64::EPSILON {
-            return Err(VBError::new(5));
+            return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
         }
 
         let new_rate = rate - npv / derivative;

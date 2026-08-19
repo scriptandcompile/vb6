@@ -807,6 +807,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `NPV` function.
 ///
@@ -829,7 +830,7 @@ pub fn npv(rate: &VBVariant, values: &VBVariant) -> VBResult<VBVariant> {
         .map_err(|_| VBError::type_mismatch())?;
 
     if cash_flows.is_empty() {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     let rate = 1.0 + rate.as_f64()?;

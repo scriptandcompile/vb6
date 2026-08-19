@@ -740,6 +740,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::value::VBVariant;
+use vb6core::error::err_number;
 
 /// Implementation of the `Rate` function.
 ///
@@ -781,7 +782,7 @@ pub fn rate(
 
     // Validate inputs per VB6 behavior
     if nper_val <= 0.0 {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
     // Special case: zero interest rate.
@@ -804,7 +805,7 @@ pub fn rate(
     let type_f = f64::from(type_val);
     let denom = pv_val + pmt_val * type_f;
     if denom == 0.0 {
-        return Err(VBError::new(5));
+        return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
     let a = (pmt_val * (1.0 - type_f) - pv_val) / denom;
     let b = (fv_val - pmt_val * type_f) / denom;
