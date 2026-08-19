@@ -680,7 +680,7 @@ pub fn irr(values: &VBVariant, guess: Option<&VBVariant>) -> VBResult<VBVariant>
         return Ok(VBVariant::from_double(rate));
     }
 
-    Err(VBError::new(5))
+    Err(VBError::new(err_number::INVALID_PROCEDURE_CALL))
 }
 
 /// Calculate NPV for a given rate and cash flows.
@@ -706,6 +706,7 @@ fn calculate_npv_derivative(cash_flows: &[f64], rate: f64) -> f64 {
 mod tests {
     use super::irr;
     use crate::value::VBVariant;
+    use vb6core::error::err_number;
 
     fn make_array(values: &[f64]) -> VBVariant {
         VBVariant::Array(crate::array::ArrayValue::from_vec_with_bounds(
@@ -737,14 +738,14 @@ mod tests {
     fn irr_all_positive_raises_error_5() {
         let cash_flows = make_array(&[3000.0, 3500.0, 4000.0]);
         let err = irr(&cash_flows, None).unwrap_err();
-        assert_eq!(err.number, 5);
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
     }
 
     #[test]
     fn irr_all_negative_raises_error_5() {
         let cash_flows = make_array(&[-3000.0, -3500.0, -4000.0]);
         let err = irr(&cash_flows, None).unwrap_err();
-        assert_eq!(err.number, 5);
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
     }
 
     #[test]
@@ -761,6 +762,6 @@ mod tests {
     fn irr_empty_array_raises_error_5() {
         let cash_flows = make_array(&[]);
         let err = irr(&cash_flows, None).unwrap_err();
-        assert_eq!(err.number, 5);
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
     }
 }

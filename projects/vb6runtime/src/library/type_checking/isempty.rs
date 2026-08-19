@@ -532,6 +532,7 @@ pub fn is_empty(value: &VBVariant) -> VBResult<VBVariant> {
 mod tests {
     use super::is_empty;
     use crate::{value::VBVariant, ArrayDimension, VBObject, VBType};
+    use vb6core::error::err_number;
 
     #[derive(Debug)]
     struct TestObject(&'static str);
@@ -629,7 +630,10 @@ mod tests {
     #[test]
     fn returns_false_for_error_value() {
         assert_eq!(
-            is_empty(&VBVariant::from_error(crate::error::VBError::new(13))).unwrap(),
+            is_empty(&VBVariant::from_error(crate::error::VBError::new(
+                err_number::TYPE_MISMATCH
+            )))
+            .unwrap(),
             VBVariant::from_bool(false)
         );
     }

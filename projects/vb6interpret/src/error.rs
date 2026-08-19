@@ -6,7 +6,7 @@
 use std::fmt;
 
 use ariadne::{Config, Label, Report, ReportKind, Source};
-use vb6core::error::VBError;
+use vb6core::error::{err_number, VBError};
 
 /// An error raised during interpretation of VB6 code.
 #[derive(Debug, Clone)]
@@ -71,7 +71,7 @@ impl RunError {
 
     /// Error 35: Sub or Function not defined.
     pub fn sub_or_function_not_defined() -> Self {
-        Self::new(VBError::new(35))
+        Self::new(VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED))
     }
 
     /// Whether this error represents a debugger pause.
@@ -194,7 +194,7 @@ Sub Main()\n\
     x = 1 / 0\n\
 End Sub\n";
         // Body-relative line 3 (`x = 1 / 0`) plus the 1 stripped header line.
-        let error = RunError::new(VBError::new(11))
+        let error = RunError::new(VBError::new(err_number::DIVISION_BY_ZERO))
             .at_line(3)
             .in_procedure("Main");
         let report = render_error_report("scratch.bas", source, &error, 1).unwrap();
@@ -218,14 +218,14 @@ End Sub\n";
         let pause = RunError::debug_pause();
         assert!(render_error_report("m.bas", source, &pause, 0).is_none());
 
-        let no_line = RunError::new(VBError::new(13));
+        let no_line = RunError::new(VBError::new(err_number::TYPE_MISMATCH));
         assert!(render_error_report("m.bas", source, &no_line, 0).is_none());
     }
 
     #[test]
     fn report_is_none_when_line_is_out_of_range() {
         let source = "Sub Main()\nEnd Sub\n";
-        let error = RunError::new(VBError::new(13)).at_line(99);
+        let error = RunError::new(VBError::new(err_number::TYPE_MISMATCH)).at_line(99);
         assert!(render_error_report("m.bas", source, &error, 0).is_none());
     }
 

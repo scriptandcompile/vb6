@@ -592,6 +592,7 @@ pub fn is_object(value: &VBVariant) -> VBResult<VBVariant> {
 mod tests {
     use super::is_object;
     use crate::{value::VBVariant, ArrayDimension, VBObject, VBType};
+    use vb6core::error::err_number;
 
     #[derive(Debug)]
     struct TestObject(&'static str);
@@ -687,7 +688,10 @@ mod tests {
             VBVariant::from_bool(false)
         );
         assert_eq!(
-            is_object(&VBVariant::from_error(crate::error::VBError::new(13))).unwrap(),
+            is_object(&VBVariant::from_error(crate::error::VBError::new(
+                err_number::TYPE_MISMATCH
+            )))
+            .unwrap(),
             VBVariant::from_bool(false)
         );
     }

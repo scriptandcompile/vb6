@@ -284,6 +284,7 @@ pub fn var_type(value: &VBVariant) -> VBResult<VBVariant> {
 mod tests {
     use super::var_type;
     use crate::{ArrayDimension, VBObject, VBType, VBVariant};
+    use vb6core::error::err_number;
 
     #[derive(Debug)]
     struct TestObject(&'static str);
@@ -396,7 +397,10 @@ mod tests {
     #[test]
     fn vartype_error() {
         assert_eq!(
-            var_type(&VBVariant::from_error(crate::error::VBError::new(13))).unwrap(),
+            var_type(&VBVariant::from_error(crate::error::VBError::new(
+                err_number::TYPE_MISMATCH
+            )))
+            .unwrap(),
             VBVariant::from_long(10)
         );
     }
@@ -456,7 +460,10 @@ mod tests {
         assert!(var_type(&VBVariant::Empty).is_ok());
         assert!(var_type(&VBVariant::Null).is_ok());
         assert!(var_type(&VBVariant::Nothing).is_ok());
-        assert!(var_type(&VBVariant::from_error(crate::error::VBError::new(13))).is_ok());
+        assert!(var_type(&VBVariant::from_error(crate::error::VBError::new(
+            err_number::TYPE_MISMATCH
+        )))
+        .is_ok());
         assert!(var_type(&VBVariant::from_string("test")).is_ok());
     }
 }

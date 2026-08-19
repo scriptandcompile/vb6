@@ -615,7 +615,10 @@ mod tests {
     #[test]
     fn returns_true_for_error_value() {
         assert_eq!(
-            is_error(&VBVariant::from_error(VBError::new(13))).unwrap(),
+            is_error(&VBVariant::from_error(VBError::new(
+                err_number::TYPE_MISMATCH
+            )))
+            .unwrap(),
             VBVariant::from_bool(true)
         );
         assert_eq!(
