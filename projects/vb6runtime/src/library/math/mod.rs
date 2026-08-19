@@ -7,6 +7,7 @@ pub mod exp;
 pub mod fix;
 pub mod int;
 pub mod log;
+pub mod partition;
 pub mod randomize;
 pub mod rnd;
 pub mod round;
