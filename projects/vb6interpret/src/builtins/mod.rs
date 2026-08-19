@@ -25,7 +25,7 @@ mod type_checking;
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
-use vb6core::error::{VBError, VBResult};
+use vb6core::error::{err_number, VBError, VBResult};
 use vb6runtime::value::{VBLong, VBString, VBVariant};
 
 /// Build a [`Builtin`] registry entry from an adapter closure.
@@ -79,7 +79,7 @@ impl Registry {
     fn dispatch(&self, name: &str, args: &[VBVariant]) -> Option<VBResult<VBVariant>> {
         self.by_name.get(name).map(|builtin| {
             if args.len() < builtin.min_args || args.len() > builtin.max_args {
-                return Err(VBError::new(450));
+                return Err(VBError::new(err_number::WRONG_NUMBER_OF_ARGUMENTS));
             }
             (builtin.call)(args)
         })
@@ -128,7 +128,7 @@ pub(crate) fn call_builtin(name: &str, args: &[VBVariant]) -> VBResult<VBVariant
 /// absent (450) or does not convert to a string.
 fn arg_string(args: &[VBVariant], index: usize) -> VBResult<VBString> {
     args.get(index)
-        .ok_or_else(|| VBError::new(450))
+        .ok_or_else(|| VBError::new(err_number::WRONG_NUMBER_OF_ARGUMENTS))
         .and_then(VBString::try_from)
 }
 
@@ -136,7 +136,7 @@ fn arg_string(args: &[VBVariant], index: usize) -> VBResult<VBString> {
 /// absent (450) or does not convert to a `Long`.
 fn arg_long(args: &[VBVariant], index: usize) -> VBResult<VBLong> {
     args.get(index)
-        .ok_or_else(|| VBError::new(450))
+        .ok_or_else(|| VBError::new(err_number::WRONG_NUMBER_OF_ARGUMENTS))
         .and_then(VBLong::try_from)
 }
 

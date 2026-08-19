@@ -182,6 +182,8 @@ pub type RunResult<T> = Result<T, RunError>;
 
 #[cfg(test)]
 mod tests {
+    use vb6core::error::err_number;
+
     use super::*;
 
     #[test]
@@ -204,7 +206,7 @@ End Sub\n";
     #[test]
     fn report_includes_error_number_and_description() {
         let source = "Sub Main()\n    Debug.Print Missing()\nEnd Sub\n";
-        let error = RunError::new(VBError::new(450)).at_line(2);
+        let error = RunError::new(VBError::new(err_number::WRONG_NUMBER_OF_ARGUMENTS)).at_line(2);
         let report = render_error_report("m.bas", source, &error, 0).unwrap();
         assert!(report.contains("450"));
         assert!(report.contains("Wrong number of arguments"));
