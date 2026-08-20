@@ -568,7 +568,7 @@ mod tests {
     fn spc_large_number() {
         assert_eq!(
             spc(&VBLong::from(100)).unwrap(),
-            VBVariant::from_string(&" ".repeat(100))
+            VBVariant::from_string(" ".repeat(100))
         );
     }
 

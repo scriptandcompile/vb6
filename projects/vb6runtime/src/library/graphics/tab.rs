@@ -304,7 +304,7 @@ mod tests {
         let _dir = setup_test_file(1);
         let result = tab_next_zone(1).unwrap();
         // From column 1, next zone is 14, so 13 spaces
-        assert_eq!(result, VBVariant::from_string(&" ".repeat(13)));
+        assert_eq!(result, VBVariant::from_string(" ".repeat(13)));
         assert_eq!(file::get_print_column(1), 14);
     }
 
@@ -314,7 +314,7 @@ mod tests {
         file::advance_print_column(1, 5);
         let result = tab_next_zone(1).unwrap();
         // From column 6, next zone is 14, so 8 spaces
-        assert_eq!(result, VBVariant::from_string(&" ".repeat(8)));
+        assert_eq!(result, VBVariant::from_string(" ".repeat(8)));
         assert_eq!(file::get_print_column(1), 14);
     }
 
