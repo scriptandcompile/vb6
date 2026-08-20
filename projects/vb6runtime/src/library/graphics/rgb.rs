@@ -30,7 +30,8 @@
 //! Each color component must be in the range 0-255:
 //! - 0 represents no intensity (color is off)
 //! - 255 represents maximum intensity (color is fully on)
-//! - Values outside this range are automatically adjusted to fit within 0-255
+//! - Values greater than 255 are clamped to 255
+//! - Negative values cause a runtime error
 //!
 //! **Important Notes**:
 //! - The return value uses BGR byte order (not RGB order) for Windows compatibility
@@ -40,7 +41,7 @@
 //! - RGB(0, 255, 0) = Green (0x00FF00)
 //! - RGB(0, 0, 255) = Blue (0xFF0000 in BGR format)
 //! - Values greater than 255 are treated as 255 (saturated)
-//! - Negative values are treated as 0
+//! - Negative values cause a runtime error
 //!
 //! **Color Mixing**:
 //! - RGB(255, 0, 0) = Pure Red
@@ -703,19 +704,19 @@
 //!
 //! ## Error Handling
 //!
-//! The `RGB` function automatically handles out-of-range values:
+//! The `RGB` function handles out-of-range values as follows:
 //!
 //! - Values greater than 255 are treated as 255 (saturated)
-//! - Negative values are treated as 0
-//! - Non-integer values are rounded to integers
-//! - No error is raised for out-of-range values
-//!
-//! The function is very robust and rarely requires error handling:
+//! - Negative values cause a runtime error
+//! - Non-numeric values (String, Boolean, Date, Array, Object) cause a Type Mismatch error
 //!
 //! ```vb
-//! ' RGB automatically clamps values to valid range
+//! ' RGB clamps values above 255
 //! Dim color As Long
-//! color = RGB(300, -50, 150)  ' Treated as RGB(255, 0, 150)
+//! color = RGB(300, 128, 150)  ' Treated as RGB(255, 128, 150)
+//!
+//! ' RGB raises an error for negative values
+//! ' color = RGB(-1, 128, 150)  ' Runtime error: Invalid procedure call
 //! ```
 //!
 //! ## Performance Considerations
@@ -770,3 +771,184 @@
 //! - Predefined color constants: `vbBlack`, `vbRed`, `vbGreen`, `vbBlue`, `vbWhite`, etc.
 //! - `LoadPicture`: Loads images with full color support
 //! - `Point`: Returns the RGB color of a specified point on a form or picture box
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the RGB function.
+///
+/// VB6 behavior:
+/// - Returns a Long encoding the RGB color value in BGR byte order
+/// - Each component is clamped to 0-255 range
+/// - Values outside 0-255 are automatically adjusted
+pub fn rgb(red: &VBVariant, green: &VBVariant, blue: &VBVariant) -> VBResult<VBVariant> {
+    let r = clamp_component(value_to_byte(red))?;
+    let g = clamp_component(value_to_byte(green))?;
+    let b = clamp_component(value_to_byte(blue))?;
+
+    Ok(VBVariant::from_long(
+        (r as i32) | ((g as i32) << 8) | ((b as i32) << 16),
+    ))
+}
+
+fn value_to_byte(value: &VBVariant) -> VBResult<u8> {
+    match value {
+        VBVariant::Empty | VBVariant::Null | VBVariant::Nothing => {
+            Err(crate::error::VBError::type_mismatch())
+        }
+        VBVariant::Array(_) | VBVariant::Object(_) => Err(crate::error::VBError::type_mismatch()),
+        VBVariant::Boolean(_) => Err(crate::error::VBError::invalid_procedure_call()),
+        VBVariant::Date(_) => Err(crate::error::VBError::invalid_procedure_call()),
+        VBVariant::Error(e) => Err(e.clone()),
+        VBVariant::Byte(byte_value) => Ok(*byte_value),
+        VBVariant::Integer(int_value) => {
+            if *int_value < 0 {
+                return Err(crate::error::VBError::invalid_procedure_call());
+            }
+            Ok((*int_value).clamp(0, 255) as u8)
+        }
+        VBVariant::Long(long_value) => {
+            if *long_value < 0 {
+                return Err(crate::error::VBError::invalid_procedure_call());
+            }
+            Ok((*long_value).clamp(0, 255) as u8)
+        }
+        VBVariant::Double(double_value) => {
+            if *double_value < 0.0 {
+                return Err(crate::error::VBError::invalid_procedure_call());
+            }
+            Ok((*double_value).clamp(0.0, 255.0) as u8)
+        }
+        VBVariant::Single(single_value) => {
+            if *single_value < 0.0 {
+                return Err(crate::error::VBError::invalid_procedure_call());
+            }
+            Ok((*single_value).clamp(0.0, 255.0) as u8)
+        }
+        VBVariant::Currency(currency_value) => {
+            if *currency_value < 0 {
+                return Err(crate::error::VBError::invalid_procedure_call());
+            }
+            Ok((*currency_value).clamp(0, 255) as u8)
+        }
+        VBVariant::String(_) => Err(crate::error::VBError::type_mismatch()),
+    }
+}
+
+fn clamp_component(value: VBResult<u8>) -> VBResult<u8> {
+    value // clamped already in value_to_byte; kept for clarity
+}
+
+#[cfg(test)]
+mod tests {
+    use super::rgb;
+    use crate::value::VBVariant;
+
+    #[test]
+    fn returns_black_for_zero_components() {
+        let result = rgb(
+            &VBVariant::from_long(0),
+            &VBVariant::from_long(0),
+            &VBVariant::from_long(0),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0x000000));
+    }
+
+    #[test]
+    fn returns_white_for_max_components() {
+        let result = rgb(
+            &VBVariant::from_long(255),
+            &VBVariant::from_long(255),
+            &VBVariant::from_long(255),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0xffffff));
+    }
+
+    #[test]
+    fn returns_pure_red() {
+        let result = rgb(
+            &VBVariant::from_long(255),
+            &VBVariant::from_long(0),
+            &VBVariant::from_long(0),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0x0000ff));
+    }
+
+    #[test]
+    fn returns_pure_green() {
+        let result = rgb(
+            &VBVariant::from_long(0),
+            &VBVariant::from_long(255),
+            &VBVariant::from_long(0),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0x00ff00));
+    }
+
+    #[test]
+    fn returns_pure_blue() {
+        let result = rgb(
+            &VBVariant::from_long(0),
+            &VBVariant::from_long(0),
+            &VBVariant::from_long(255),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0xff0000));
+    }
+
+    #[test]
+    fn returns_yellow_for_red_and_green() {
+        let result = rgb(
+            &VBVariant::from_long(255),
+            &VBVariant::from_long(255),
+            &VBVariant::from_long(0),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0x00ffff));
+    }
+
+    #[test]
+    fn clamps_high_values_to_255() {
+        let result = rgb(
+            &VBVariant::from_long(300),
+            &VBVariant::from_long(400),
+            &VBVariant::from_long(500),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0xffffff));
+    }
+
+    #[test]
+    fn accepts_integer_types() {
+        let result = rgb(
+            &VBVariant::from_integer(128),
+            &VBVariant::from_integer(64),
+            &VBVariant::from_integer(192),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0xc04080));
+    }
+
+    #[test]
+    fn accepts_float_types() {
+        let result = rgb(
+            &VBVariant::from_double(100.5),
+            &VBVariant::from_double(200.7),
+            &VBVariant::from_double(50.3),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0x32c864));
+    }
+
+    #[test]
+    fn rejects_non_numeric_values() {
+        let result = rgb(
+            &VBVariant::from_string("not-a-number"),
+            &VBVariant::from_long(0),
+            &VBVariant::from_long(0),
+        );
+        assert!(result.is_err());
+    }
+}
