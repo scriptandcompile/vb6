@@ -7,6 +7,7 @@
 use super::{Builtin, Registry};
 use crate::builtin;
 use vb6core::error::VBResult;
+use vb6runtime::library::environment::delete_setting::delete_setting;
 use vb6runtime::library::environment::environ::environ;
 use vb6runtime::library::environment::environ_dollar::environ_dollar;
 use vb6runtime::library::environment::error::error;
@@ -38,6 +39,9 @@ pub(super) fn register(registry: &mut Registry) {
     }));
     registry.insert(builtin!("savesetting", 4, 4, |args| {
         save_setting(&args[0], &args[1], &args[2], &args[3])
+    }));
+    registry.insert(builtin!("deletesetting", 2, 3, |args| {
+        delete_setting(&args[0], &args[1], args.get(2).unwrap_or(&VBVariant::Empty))
     }));
     registry.insert(builtin!("imestatus", 0, 0, |_args| {
         vb6runtime::library::environment::imestatus::imestatus()
