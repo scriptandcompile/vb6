@@ -506,4 +506,77 @@
 //! - `Space`: Returns string of spaces (can be used anywhere)
 //! - `Print`: Statement that outputs data
 //! - `Width`: Statement that sets output line width
-//!
+
+use crate::error::{VBError, VBResult};
+use crate::value::{VBLong, VBVariant};
+
+/// Implementation of the `Spc` function.
+///
+/// Returns a `VBVariant` containing `n` space characters. This function is
+/// designed for use in `Print #` and `Debug.Print` statements to insert
+/// relative spacing, though at the implementation level it returns the same
+/// string as `Space(n)`.
+///
+/// VB6 behavior:
+/// - Returns `n` spaces when `n >= 0`
+/// - Raises error 5 (`Invalid procedure call or argument`) when `n < 0`
+/// - Returns an empty string when `n = 0`
+pub fn spc(n: &VBLong) -> VBResult<VBVariant> {
+    let count = n.as_i32();
+    if count < 0 {
+        return Err(VBError::invalid_procedure_call());
+    }
+    Ok(VBVariant::from_string(" ".repeat(count as usize)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn spc_returns_spaces() {
+        assert_eq!(
+            spc(&VBLong::from(5)).unwrap(),
+            VBVariant::from_string("     ")
+        );
+        assert_eq!(spc(&VBLong::from(1)).unwrap(), VBVariant::from_string(" "));
+    }
+
+    #[test]
+    fn spc_zero_returns_empty() {
+        assert_eq!(spc(&VBLong::from(0)).unwrap(), VBVariant::from_string(""));
+    }
+
+    #[test]
+    fn spc_rejects_negative_number() {
+        assert_eq!(
+            spc(&VBLong::from(-1)).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+
+    #[test]
+    fn spc_conversion_error() {
+        let non_numeric = VBVariant::from_string("abc");
+        let result = VBLong::try_from(&non_numeric);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn spc_large_number() {
+        assert_eq!(
+            spc(&VBLong::from(100)).unwrap(),
+            VBVariant::from_string(&" ".repeat(100))
+        );
+    }
+
+    #[test]
+    fn spc_string_conversion_to_long_fails() {
+        let non_numeric = VBVariant::from_string("hello");
+        let result = VBLong::try_from(&non_numeric);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
+    }
+}
