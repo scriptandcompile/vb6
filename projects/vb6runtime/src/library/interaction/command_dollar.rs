@@ -355,3 +355,27 @@
 //! - No built-in support for named parameters (must implement custom parsing)
 //! - Quote handling is system-dependent and may vary
 //! - Cannot distinguish between missing arguments and empty string argument
+
+use crate::state;
+use crate::value::VBString;
+use vb6core::error::VBResult;
+
+/// Implement VB6's `Command$` function.
+///
+/// Returns the command-line arguments as a `String`.
+pub fn command_dollar() -> VBResult<VBString> {
+    Ok(VBString::from(state::interaction::command_string()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::test_support::lock_test;
+
+    #[test]
+    fn command_dollar_returns_string() {
+        let _guard = lock_test();
+        let result = command_dollar().unwrap();
+        let _s: String = result.into_inner();
+    }
+}
