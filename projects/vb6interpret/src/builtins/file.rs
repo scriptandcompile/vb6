@@ -88,4 +88,12 @@ pub(super) fn register(registry: &mut Registry) {
         filefn::ch_drive::chdrive(args[0].clone())?;
         Ok(VBVariant::Empty)
     }));
+    registry.insert(builtin!("input", 2, 2, |args| {
+        let number = args[0].as_i32().map(vb6runtime::value::VBLong::from)
+            .map_err(|_| vb6core::error::VBError::with_description(
+                vb6core::error::err_number::TYPE_MISMATCH,
+                "Type mismatch in Input",
+            ))?;
+        filefn::input::input(number, args[1].clone())
+    }));
 }

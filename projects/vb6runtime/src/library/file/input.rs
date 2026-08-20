@@ -489,3 +489,333 @@
 //! - `Seek`: Function/statement for getting/setting file position
 //! - `Open`: Statement for opening files
 //! - `Close`: Statement for closing files
+
+use crate::error::{VBError, VBResult};
+use crate::state::file;
+use crate::state::file::{OpenMode, MAX_FILE_NUMBER, MIN_FILE_NUMBER};
+use crate::value::{VBLong, VBVariant};
+use vb6core::error::err_number;
+
+/// Read a specified number of characters from an open file.
+///
+/// # Arguments
+///
+/// * `number` - The number of characters to read.
+/// * `file_number` - The file number.
+///
+/// # Returns
+///
+/// Returns a `String` containing up to `number` characters read from the file.
+/// If fewer than `number` characters remain, returns all remaining characters.
+pub fn input(number: VBLong, file_number: VBVariant) -> VBResult<VBVariant> {
+    // Convert file number to integer
+    let file_num = match file_number {
+        VBVariant::Long(v) => v as i16,
+        VBVariant::Integer(v) => v,
+        VBVariant::Byte(v) => v as i16,
+        _ => {
+            return Err(VBError::with_description(
+                err_number::TYPE_MISMATCH,
+                "Type mismatch in Input",
+            ));
+        }
+    };
+
+    // Validate file number range
+    if !(MIN_FILE_NUMBER..=MAX_FILE_NUMBER).contains(&file_num) {
+        return Err(VBError::with_description(
+            err_number::BAD_FILE_NAME_OR_NUMBER,
+            format!("Bad file name or number: {}", file_num),
+        ));
+    }
+
+    // Check if file is open
+    let handle = file::get_file(file_num).ok_or_else(|| {
+        VBError::with_description(
+            err_number::BAD_FILE_NAME_OR_NUMBER,
+            format!("File not open: #{}", file_num),
+        )
+    })?;
+
+    // Check file mode — Input function works with Input and Binary modes
+    if handle.mode != OpenMode::Input && handle.mode != OpenMode::Binary {
+        return Err(VBError::with_description(
+            err_number::BAD_FILE_MODE,
+            format!("Bad file mode for Input function: {:?}", handle.mode),
+        ));
+    }
+
+    // Get the number of characters to read
+    let chars_to_read = number.as_i32() as usize;
+    if chars_to_read == 0 {
+        return Ok(VBVariant::from_string(String::new()));
+    }
+
+    // Read the specified number of bytes from the file
+    let mut buf = vec![0u8; chars_to_read];
+    let bytes_read = file::read_file(file_num, &mut buf)
+        .map_err(|e| VBError::with_description(err_number::DEVICE_IO_ERROR, e.to_string()))?;
+
+    // Convert bytes to string, using lossy conversion for invalid UTF-8
+    let s = String::from_utf8_lossy(&buf[..bytes_read]).to_string();
+    Ok(VBVariant::from_string(s))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::file::{self, AccessMode, LockMode};
+    use vb6core::error::err_number;
+
+    #[test]
+    fn input_reads_characters_from_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a test file with known content
+        let mut test_file = std::fs::File::create(dir.path().join("test.txt")).unwrap();
+        std::io::Write::write_all(&mut test_file, b"Hello, World!").unwrap();
+        drop(test_file);
+
+        // Open for input
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Input,
+            AccessMode::Read,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        // Read 5 characters
+        let result = input(VBLong::from(5), VBVariant::Long(1)).unwrap();
+        assert_eq!(result, VBVariant::from_string("Hello"));
+
+        // Read remaining characters
+        let result = input(VBLong::from(8), VBVariant::Long(1)).unwrap();
+        assert_eq!(result, VBVariant::from_string(", World!"));
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn input_returns_empty_string_for_zero_count() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a test file
+        let mut test_file = std::fs::File::create(dir.path().join("test.txt")).unwrap();
+        std::io::Write::write_all(&mut test_file, b"Hello").unwrap();
+        drop(test_file);
+
+        // Open for input
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Input,
+            AccessMode::Read,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        // Read 0 characters
+        let result = input(VBLong::from(0), VBVariant::Long(1)).unwrap();
+        assert_eq!(result, VBVariant::from_string(""));
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn input_reads_past_eof_returns_remaining() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a test file with short content
+        let mut test_file = std::fs::File::create(dir.path().join("test.txt")).unwrap();
+        std::io::Write::write_all(&mut test_file, b"Hi").unwrap();
+        drop(test_file);
+
+        // Open for input
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Input,
+            AccessMode::Read,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        // Try to read more characters than available
+        let result = input(VBLong::from(100), VBVariant::Long(1)).unwrap();
+        assert_eq!(result, VBVariant::from_string("Hi"));
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn input_works_with_binary_mode() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create a test file with binary content
+        let mut test_file = std::fs::File::create(dir.path().join("test.bin")).unwrap();
+        std::io::Write::write_all(&mut test_file, b"\x41\x42\x43\x44\x45").unwrap();
+        drop(test_file);
+
+        // Open for binary
+        let path = std::path::PathBuf::from("test.bin");
+        file::open_file(
+            &path,
+            OpenMode::Binary,
+            AccessMode::ReadWrite,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        // Read 3 bytes
+        let result = input(VBLong::from(3), VBVariant::Long(1)).unwrap();
+        assert_eq!(result, VBVariant::from_string("ABC"));
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn input_rejects_invalid_file_number() {
+        let _guard = crate::state::test_support::lock_test();
+
+        let result = input(VBLong::from(1), VBVariant::Long(0));
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
+
+        let result = input(VBLong::from(1), VBVariant::Long(512));
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn input_rejects_closed_file() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let result = input(VBLong::from(1), VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err().number,
+            err_number::BAD_FILE_NAME_OR_NUMBER
+        );
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn input_rejects_output_mode() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create and open file in output mode
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        // Try to read from output mode file
+        let result = input(VBLong::from(1), VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_MODE);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn input_rejects_append_mode() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create and open file in append mode
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Append,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        // Try to read from append mode file
+        let result = input(VBLong::from(1), VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_MODE);
+
+        let _ = file::close_all_files();
+    }
+
+    #[test]
+    fn input_rejects_random_mode() {
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        // Create and open file in random mode
+        let path = std::path::PathBuf::from("test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Random,
+            AccessMode::ReadWrite,
+            LockMode::Shared,
+            128,
+            1,
+        )
+        .unwrap();
+
+        // Try to read from random mode file
+        let result = input(VBLong::from(1), VBVariant::Long(1));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_MODE);
+
+        let _ = file::close_all_files();
+    }
+}
