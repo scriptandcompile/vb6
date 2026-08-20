@@ -246,6 +246,54 @@ use crate::{
     value::{VBLong, VBString, VBVariant},
 };
 
+/// Named numeric format identifiers recognized by `Format$`.
+///
+/// These correspond to the VB6 built-in named formats that can be passed as
+/// the format string (e.g. `"Currency"`, `"Fixed"`, ...).
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum NamedNumericFormat {
+    /// General Number: no thousand separator.
+    GeneralNumber,
+    /// Currency: thousand separator, two decimals, currency symbol.
+    Currency,
+    /// Fixed: at least one digit left, two right of decimal.
+    Fixed,
+    /// Standard: thousand separator, two decimals.
+    Standard,
+    /// Percent: multiplied by 100, percent sign, two decimals.
+    Percent,
+    /// Scientific: standard scientific notation.
+    Scientific,
+    /// Yes/No: "Yes" for non-zero, "No" for zero.
+    YesNo,
+    /// True/False: "True" for non-zero, "False" for zero.
+    TrueFalse,
+    /// On/Off: "On" for non-zero, "Off" for zero.
+    OnOff,
+}
+
+/// Named date/time format identifiers recognized by `Format$`.
+///
+/// These correspond to the VB6 built-in named formats that can be passed as
+/// the format string (e.g. `"Long Date"`, `"Short Time"`, ...).
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum NamedDateFormat {
+    /// General Date: date and time (time omitted when midnight).
+    GeneralDate,
+    /// Long Date: full day name, full month name, day, year.
+    LongDate,
+    /// Medium Date: dd-Mon-yy.
+    MediumDate,
+    /// Short Date: m/d/yyyy.
+    ShortDate,
+    /// Long Time: h:mm:ss AM/PM.
+    LongTime,
+    /// Medium Time: hh:mm AM/PM (no seconds).
+    MediumTime,
+    /// Short Time: hh:mm (24-hour).
+    ShortTime,
+}
+
 /// Returns a `String` containing the formatted representation of `expression`
 /// according to the instructions in `format`.
 ///
@@ -334,85 +382,85 @@ pub fn format_dollar(
 // Named formats
 // ---------------------------------------------------------------------------
 
-/// Maps a case-insensitive named numeric format to its canonical name.
-fn named_numeric_format_name(fmt: &str) -> Option<&'static str> {
+/// Maps a case-insensitive named numeric format string to its enum variant.
+fn named_numeric_format_name(fmt: &str) -> Option<NamedNumericFormat> {
     match fmt.trim().to_ascii_lowercase().as_str() {
-        "general number" => Some("general number"),
-        "currency" => Some("currency"),
-        "fixed" => Some("fixed"),
-        "standard" => Some("standard"),
-        "percent" => Some("percent"),
-        "scientific" => Some("scientific"),
-        "yes/no" => Some("yes/no"),
-        "true/false" => Some("true/false"),
-        "on/off" => Some("on/off"),
+        "general number" => Some(NamedNumericFormat::GeneralNumber),
+        "currency" => Some(NamedNumericFormat::Currency),
+        "fixed" => Some(NamedNumericFormat::Fixed),
+        "standard" => Some(NamedNumericFormat::Standard),
+        "percent" => Some(NamedNumericFormat::Percent),
+        "scientific" => Some(NamedNumericFormat::Scientific),
+        "yes/no" => Some(NamedNumericFormat::YesNo),
+        "true/false" => Some(NamedNumericFormat::TrueFalse),
+        "on/off" => Some(NamedNumericFormat::OnOff),
         _ => None,
     }
 }
 
 /// Formats `value` using one of the named numeric formats.
-fn format_named_numeric(name: &str, value: f64) -> VBResult<String> {
+fn format_named_numeric(name: NamedNumericFormat, value: f64) -> VBResult<String> {
     match name {
-        "general number" => Ok(general_number(value)),
-        "currency" => format_number_custom(value, "$#,##0.00;($#,##0.00)"),
-        "fixed" => format_number_custom(value, "0.00"),
-        "standard" => format_number_custom(value, "#,##0.00"),
-        "percent" => format_number_custom(value, "0.00%"),
-        "scientific" => format_number_custom(value, "0.00E+00"),
-        "yes/no" => Ok(if value == 0.0 { "No" } else { "Yes" }.to_string()),
-        "true/false" => Ok(if value == 0.0 { "False" } else { "True" }.to_string()),
-        "on/off" => Ok(if value == 0.0 { "Off" } else { "On" }.to_string()),
-        _ => Err(VBError::invalid_procedure_call()),
+        NamedNumericFormat::GeneralNumber => Ok(general_number(value)),
+        NamedNumericFormat::Currency => format_number_custom(value, "$#,##0.00;($#,##0.00)"),
+        NamedNumericFormat::Fixed => format_number_custom(value, "0.00"),
+        NamedNumericFormat::Standard => format_number_custom(value, "#,##0.00"),
+        NamedNumericFormat::Percent => format_number_custom(value, "0.00%"),
+        NamedNumericFormat::Scientific => format_number_custom(value, "0.00E+00"),
+        NamedNumericFormat::YesNo => Ok(if value == 0.0 { "No" } else { "Yes" }.to_string()),
+        NamedNumericFormat::TrueFalse => {
+            Ok(if value == 0.0 { "False" } else { "True" }.to_string())
+        }
+        NamedNumericFormat::OnOff => Ok(if value == 0.0 { "Off" } else { "On" }.to_string()),
     }
 }
 
-/// Maps a case-insensitive named date format to its canonical name.
-fn named_date_format_name(fmt: &str) -> Option<&'static str> {
+/// Maps a case-insensitive named date format string to its enum variant.
+fn named_date_format_name(fmt: &str) -> Option<NamedDateFormat> {
     match fmt.trim().to_ascii_lowercase().as_str() {
-        "general date" => Some("general date"),
-        "long date" => Some("long date"),
-        "medium date" => Some("medium date"),
-        "short date" => Some("short date"),
-        "long time" => Some("long time"),
-        "medium time" => Some("medium time"),
-        "short time" => Some("short time"),
+        "general date" => Some(NamedDateFormat::GeneralDate),
+        "long date" => Some(NamedDateFormat::LongDate),
+        "medium date" => Some(NamedDateFormat::MediumDate),
+        "short date" => Some(NamedDateFormat::ShortDate),
+        "long time" => Some(NamedDateFormat::LongTime),
+        "medium time" => Some(NamedDateFormat::MediumTime),
+        "short time" => Some(NamedDateFormat::ShortTime),
         _ => None,
     }
 }
 
 /// Formats `parts` using one of the named date/time formats.
-pub(crate) fn format_named_date(name: &str, parts: &DateParts) -> String {
+pub(crate) fn format_named_date(name: NamedDateFormat, parts: &DateParts) -> String {
     match name {
-        "general date" => general_date_string(parts),
-        "long date" => format!(
+        NamedDateFormat::GeneralDate => general_date_string(parts),
+        NamedDateFormat::LongDate => format!(
             "{}, {} {}, {}",
             DAY_NAMES[(parts.weekday - 1) as usize],
             MONTH_NAMES[(parts.month - 1) as usize],
             parts.day,
             parts.year
         ),
-        "medium date" => format!(
+        NamedDateFormat::MediumDate => format!(
             "{:02}-{}-{:02}",
             parts.day,
             &MONTH_NAMES[(parts.month - 1) as usize][..3],
             parts.year % 100
         ),
-        "short date" => format!("{}/{}/{}", parts.month, parts.day, parts.year),
-        "long time" => format!(
+        NamedDateFormat::ShortDate => format!("{}/{}/{}", parts.month, parts.day, parts.year),
+        NamedDateFormat::LongTime => format!(
             "{}:{:02}:{:02} {}",
             hour12(parts.hour),
             parts.minute,
             parts.second,
             ampm(parts.hour)
         ),
-        "medium time" => format!(
+        NamedDateFormat::MediumTime => format!(
             "{:02}:{:02} {}",
             hour12(parts.hour),
             parts.minute,
             ampm(parts.hour)
         ),
-        "short time" => format!("{:02}:{:02}", parts.hour, parts.minute),
-        _ => unreachable!("unknown named date format"),
+        NamedDateFormat::ShortTime => format!("{:02}:{:02}", parts.hour, parts.minute),
     }
 }
 
