@@ -14,7 +14,9 @@ use vb6runtime::VBVariant;
 
 /// Register the interaction functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {
-    registry.insert(builtin!("command", 0, 0, |_args| { command() }));
+    registry.insert(builtin!("command", 0, 0, |_args| {
+        Ok(VBVariant::from(command()?))
+    }));
     registry.insert(builtin!("command$", 0, 0, |_args| {
         Ok(VBVariant::from(command_dollar()?))
     }));
