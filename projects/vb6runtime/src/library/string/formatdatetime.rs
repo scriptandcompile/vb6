@@ -578,6 +578,8 @@ use crate::{
     value::{VBLong, VBVariant},
 };
 
+use super::format_dollar::{date_parts, format_named_date, NamedDateFormat};
+
 /// Returns a date/time value expressed as a string in the named format.
 ///
 /// `namedformat` selects the output style: `vbGeneralDate` (0, default),
@@ -596,24 +598,22 @@ pub fn formatdatetime(expression: &VBVariant, namedformat: Option<&VBLong>) -> V
         return Ok(VBVariant::Null);
     }
     let serial = expression.as_date_serial()?;
-    let parts = super::format_dollar::date_parts(serial).ok_or_else(VBError::type_mismatch)?;
+    let parts = date_parts(serial).ok_or_else(VBError::type_mismatch)?;
     let name = match namedformat.map(|v| v.as_i32()).unwrap_or(0) {
         0 => {
             if serial > 0.0 && serial < 1.0 {
-                "long time"
+                NamedDateFormat::LongTime
             } else {
-                "general date"
+                NamedDateFormat::GeneralDate
             }
         }
-        1 => "long date",
-        2 => "short date",
-        3 => "long time",
-        4 => "short time",
+        1 => NamedDateFormat::LongDate,
+        2 => NamedDateFormat::ShortDate,
+        3 => NamedDateFormat::LongTime,
+        4 => NamedDateFormat::ShortTime,
         _ => return Err(VBError::invalid_procedure_call()),
     };
-    Ok(VBVariant::from_string(
-        super::format_dollar::format_named_date(name, &parts),
-    ))
+    Ok(VBVariant::from_string(format_named_date(name, &parts)))
 }
 
 #[cfg(test)]
