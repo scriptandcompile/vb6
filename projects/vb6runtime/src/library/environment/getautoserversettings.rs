@@ -125,497 +125,6 @@
 //! End Sub
 //! ```
 //!
-//! ## 3. Server Discovery and Verification
-//!
-//! ```vb
-//! Function FindAvailableServer(progID As String, _
-//!                              clsID As String, _
-//!                              servers As Collection) As String
-//!     Dim server As Variant
-//!     Dim settings As Long
-//!     
-//!     For Each server In servers
-//!         On Error Resume Next
-//!         settings = GetAutoServerSettings(progID, clsID, CStr(server))
-//!         On Error GoTo 0
-//!         
-//!         If settings <> 0 Then
-//!             FindAvailableServer = CStr(server)
-//!             Exit Function
-//!         End If
-//!     Next server
-//!     
-//!     FindAvailableServer = ""
-//! End Function
-//!
-//! ' Usage
-//! Dim servers As New Collection
-//! servers.Add "PRIMARY-SERVER"
-//! servers.Add "BACKUP-SERVER"
-//! servers.Add "FAILOVER-SERVER"
-//!
-//! Dim activeServer As String
-//! activeServer = FindAvailableServer("MyApp.Service", _
-//!                                    "{FEDCBA98-7654-3210-FEDC-BA9876543210}", _
-//!                                    servers)
-//!
-//! If activeServer <> "" Then
-//!     Debug.Print "Using server: " & activeServer
-//! End If
-//! ```
-//!
-//! ## 4. Settings Comparison Across Servers
-//!
-//! ```vb
-//! Sub CompareServerSettings(progID As String, _
-//!                           clsID As String, _
-//!                           server1 As String, _
-//!                           server2 As String)
-//!     Dim settings1 As Long
-//!     Dim settings2 As Long
-//!     
-//!     settings1 = GetAutoServerSettings(progID, clsID, server1)
-//!     settings2 = GetAutoServerSettings(progID, clsID, server2)
-//!     
-//!     Debug.Print "Server: " & server1 & " - Settings: " & settings1
-//!     Debug.Print "Server: " & server2 & " - Settings: " & settings2
-//!     
-//!     If settings1 = settings2 Then
-//!         Debug.Print "Servers have identical settings"
-//!     Else
-//!         Debug.Print "Warning: Server settings differ"
-//!     End If
-//! End Sub
-//! ```
-//!
-//! ## 5. Dynamic Server Connection
-//!
-//! ```vb
-//! Function ConnectToServer(progID As String, _
-//!                          clsID As String, _
-//!                          preferredServer As String, _
-//!                          fallbackServer As String) As Object
-//!     Dim settings As Long
-//!     Dim targetServer As String
-//!     
-//!     ' Try preferred server first
-//!     settings = GetAutoServerSettings(progID, clsID, preferredServer)
-//!     
-//!     If settings <> 0 Then
-//!         targetServer = preferredServer
-//!     Else
-//!         ' Fall back to alternate server
-//!         settings = GetAutoServerSettings(progID, clsID, fallbackServer)
-//!         
-//!         If settings <> 0 Then
-//!             targetServer = fallbackServer
-//!         Else
-//!             Err.Raise vbObjectError + 1000, , "No available servers"
-//!         End If
-//!     End If
-//!     
-//!     Debug.Print "Connecting to: " & targetServer
-//!     Set ConnectToServer = CreateObject(progID, targetServer)
-//! End Function
-//! ```
-//!
-//! ## 6. Server Health Monitoring
-//!
-//! ```vb
-//! Type ServerStatus
-//!     ServerName As String
-//!     Settings As Long
-//!     LastChecked As Date
-//!     IsAvailable As Boolean
-//! End Type
-//!
-//! Function CheckServerHealth(progID As String, _
-//!                           clsID As String, _
-//!                           serverName As String) As ServerStatus
-//!     Dim status As ServerStatus
-//!     
-//!     status.ServerName = serverName
-//!     status.LastChecked = Now
-//!     
-//!     On Error Resume Next
-//!     status.Settings = GetAutoServerSettings(progID, clsID, serverName)
-//!     On Error GoTo 0
-//!     
-//!     status.IsAvailable = (status.Settings <> 0)
-//!     
-//!     CheckServerHealth = status
-//! End Function
-//!
-//! Sub MonitorServers()
-//!     Dim servers() As String
-//!     Dim i As Long
-//!     Dim status As ServerStatus
-//!     
-//!     servers = Array("SERVER-A", "SERVER-B", "SERVER-C")
-//!     
-//!     For i = LBound(servers) To UBound(servers)
-//!         status = CheckServerHealth("MyApp.Service", _
-//!                                   "{12345678-ABCD-EFGH-IJKL-123456789ABC}", _
-//!                                   servers(i))
-//!         
-//!         Debug.Print status.ServerName & ": " & _
-//!                     IIf(status.IsAvailable, "Online", "Offline") & _
-//!                     " (" & status.Settings & ")"
-//!     Next i
-//! End Sub
-//! ```
-//!
-//! ## 7. Configuration Auditing
-//!
-//! ```vb
-//! Sub AuditDCOMConfiguration(progID As String, clsID As String)
-//!     Dim servers() As String
-//!     Dim i As Long
-//!     Dim settings As Long
-//!     Dim fileNum As Integer
-//!     
-//!     servers = Array("PROD-01", "PROD-02", "TEST-01", "DEV-01")
-//!     
-//!     fileNum = FreeFile
-//!     Open "C:\Audit\DCOM_Audit.txt" For Output As #fileNum
-//!     
-//!     Print #fileNum, "DCOM Configuration Audit Report"
-//!     Print #fileNum, "Date: " & Now
-//!     Print #fileNum, "ProgID: " & progID
-//!     Print #fileNum, "CLSID: " & clsID
-//!     Print #fileNum, String(50, "=")
-//!     
-//!     For i = LBound(servers) To UBound(servers)
-//!         settings = GetAutoServerSettings(progID, clsID, servers(i))
-//!         
-//!         Print #fileNum, "Server: " & servers(i)
-//!         Print #fileNum, "  Settings Value: " & settings
-//!         Print #fileNum, "  Status: " & IIf(settings <> 0, "Available", "Unavailable")
-//!         Print #fileNum, ""
-//!     Next i
-//!     
-//!     Close #fileNum
-//!     Debug.Print "Audit complete"
-//! End Sub
-//! ```
-//!
-//! ## 8. Load Balancing Server Selection
-//!
-//! ```vb
-//! Function SelectLeastLoadedServer(progID As String, _
-//!                                  clsID As String, _
-//!                                  servers As Collection) As String
-//!     Dim server As Variant
-//!     Dim settings As Long
-//!     Dim minSettings As Long
-//!     Dim selectedServer As String
-//!     
-//!     minSettings = 2147483647  ' Max Long value
-//!     
-//!     For Each server In servers
-//!         On Error Resume Next
-//!         settings = GetAutoServerSettings(progID, clsID, CStr(server))
-//!         On Error GoTo 0
-//!         
-//!         If settings <> 0 And settings < minSettings Then
-//!             minSettings = settings
-//!             selectedServer = CStr(server)
-//!         End If
-//!     Next server
-//!     
-//!     SelectLeastLoadedServer = selectedServer
-//! End Function
-//! ```
-//!
-//! ## 9. Deployment Verification
-//!
-//! ```vb
-//! Function VerifyDeployment(progID As String, _
-//!                          clsID As String, _
-//!                          targetServers As Variant) As Boolean
-//!     Dim i As Long
-//!     Dim settings As Long
-//!     Dim allConfigured As Boolean
-//!     
-//!     allConfigured = True
-//!     
-//!     For i = LBound(targetServers) To UBound(targetServers)
-//!         settings = GetAutoServerSettings(progID, clsID, targetServers(i))
-//!         
-//!         If settings = 0 Then
-//!             Debug.Print "Deployment failed on: " & targetServers(i)
-//!             allConfigured = False
-//!         Else
-//!             Debug.Print "Deployment verified on: " & targetServers(i)
-//!         End If
-//!     Next i
-//!     
-//!     VerifyDeployment = allConfigured
-//! End Function
-//!
-//! ' Usage in deployment script
-//! Sub DeploymentCheck()
-//!     Dim productionServers As Variant
-//!     
-//!     productionServers = Array("WEB-01", "WEB-02", "APP-01", "APP-02")
-//!     
-//!     If VerifyDeployment("MyApp.BusinessLogic", _
-//!                        "{AAAABBBB-CCCC-DDDD-EEEE-FFFF00001111}", _
-//!                        productionServers) Then
-//!         MsgBox "Deployment successful on all servers"
-//!     Else
-//!         MsgBox "Deployment incomplete - check logs"
-//!     End If
-//! End Sub
-//! ```
-//!
-//! ## 10. Regional Server Discovery
-//!
-//! ```vb
-//! Type RegionalServer
-//!     Region As String
-//!     ServerName As String
-//!     Settings As Long
-//! End Type
-//!
-//! Function GetRegionalServer(progID As String, _
-//!                           clsID As String, _
-//!                           region As String) As String
-//!     Dim regionalServers(1 To 3) As RegionalServer
-//!     Dim i As Long
-//!     
-//!     ' Define regional servers
-//!     regionalServers(1).Region = "US-EAST"
-//!     regionalServers(1).ServerName = "US-EAST-SVR01"
-//!     
-//!     regionalServers(2).Region = "US-WEST"
-//!     regionalServers(2).ServerName = "US-WEST-SVR01"
-//!     
-//!     regionalServers(3).Region = "EUROPE"
-//!     regionalServers(3).ServerName = "EU-SVR01"
-//!     
-//!     ' Check settings for each regional server
-//!     For i = 1 To 3
-//!         regionalServers(i).Settings = GetAutoServerSettings(progID, _
-//!                                                              clsID, _
-//!                                                              regionalServers(i).ServerName)
-//!     Next i
-//!     
-//!     ' Find matching region
-//!     For i = 1 To 3
-//!         If regionalServers(i).Region = region And regionalServers(i).Settings <> 0 Then
-//!             GetRegionalServer = regionalServers(i).ServerName
-//!             Exit Function
-//!         End If
-//!     Next i
-//!     
-//!     GetRegionalServer = ""
-//! End Function
-//! ```
-//!
-//! # Advanced Usage
-//!
-//! ## 1. DCOM Server Manager Class
-//!
-//! ```vb
-//! ' Class: DCOMServerManager
-//! Private m_ProgID As String
-//! Private m_CLSID As String
-//! Private m_Servers As Collection
-//! Private m_CurrentServer As String
-//!
-//! Public Sub Initialize(progID As String, clsID As String)
-//!     m_ProgID = progID
-//!     m_CLSID = clsID
-//!     Set m_Servers = New Collection
-//! End Sub
-//!
-//! Public Sub AddServer(serverName As String)
-//!     m_Servers.Add serverName
-//! End Sub
-//!
-//! Public Function FindActiveServer() As String
-//!     Dim server As Variant
-//!     Dim settings As Long
-//!     
-//!     For Each server In m_Servers
-//!         On Error Resume Next
-//!         settings = GetAutoServerSettings(m_ProgID, m_CLSID, CStr(server))
-//!         On Error GoTo 0
-//!         
-//!         If settings <> 0 Then
-//!             m_CurrentServer = CStr(server)
-//!             FindActiveServer = m_CurrentServer
-//!             Exit Function
-//!         End If
-//!     Next server
-//!     
-//!     FindActiveServer = ""
-//! End Function
-//!
-//! Public Function GetServerSettings(serverName As String) As Long
-//!     GetServerSettings = GetAutoServerSettings(m_ProgID, m_CLSID, serverName)
-//! End Function
-//!
-//! Public Function ValidateAllServers() As Collection
-//!     Dim results As New Collection
-//!     Dim server As Variant
-//!     Dim settings As Long
-//!     Dim result As String
-//!     
-//!     For Each server In m_Servers
-//!         settings = GetAutoServerSettings(m_ProgID, m_CLSID, CStr(server))
-//!         result = CStr(server) & ":" & CStr(settings)
-//!         results.Add result
-//!     Next server
-//!     
-//!     Set ValidateAllServers = results
-//! End Function
-//! ```
-//!
-//! ## 2. Failover Connection Handler
-//!
-//! ```vb
-//! Type FailoverConfig
-//!     PrimaryServer As String
-//!     SecondaryServer As String
-//!     TertiaryServer As String
-//!     RetryCount As Integer
-//!     RetryDelay As Long
-//! End Type
-//!
-//! Function ConnectWithFailover(progID As String, _
-//!                              clsID As String, _
-//!                              config As FailoverConfig) As Object
-//!     Dim servers(1 To 3) As String
-//!     Dim i As Integer
-//!     Dim attempt As Integer
-//!     Dim settings As Long
-//!     
-//!     servers(1) = config.PrimaryServer
-//!     servers(2) = config.SecondaryServer
-//!     servers(3) = config.TertiaryServer
-//!     
-//!     For i = 1 To 3
-//!         For attempt = 1 To config.RetryCount
-//!             On Error Resume Next
-//!             settings = GetAutoServerSettings(progID, clsID, servers(i))
-//!             On Error GoTo 0
-//!             
-//!             If settings <> 0 Then
-//!                 Debug.Print "Connected to: " & servers(i)
-//!                 Set ConnectWithFailover = CreateObject(progID, servers(i))
-//!                 Exit Function
-//!             End If
-//!             
-//!             If attempt < config.RetryCount Then
-//!                 Sleep config.RetryDelay
-//!             End If
-//!         Next attempt
-//!     Next i
-//!     
-//!     Err.Raise vbObjectError + 1001, , "All servers unavailable"
-//! End Function
-//! ```
-//!
-//! ## 3. Configuration Cache Manager
-//!
-//! ```vb
-//! Type CachedServerInfo
-//!     ServerName As String
-//!     Settings As Long
-//!     CacheTime As Date
-//!     TTL As Long  ' Time to live in seconds
-//! End Type
-//!
-//! Private m_Cache As Collection
-//!
-//! Sub InitializeCache()
-//!     Set m_Cache = New Collection
-//! End Sub
-//!
-//! Function GetCachedServerSettings(progID As String, _
-//!                                  clsID As String, _
-//!                                  serverName As String, _
-//!                                  Optional cacheTTL As Long = 300) As Long
-//!     Dim cacheKey As String
-//!     Dim cached As CachedServerInfo
-//!     Dim i As Long
-//!     Dim found As Boolean
-//!     
-//!     cacheKey = serverName
-//!     
-//!     ' Check cache
-//!     For i = 1 To m_Cache.Count
-//!         cached = m_Cache(i)
-//!         If cached.ServerName = cacheKey Then
-//!             If DateDiff("s", cached.CacheTime, Now) < cached.TTL Then
-//!                 GetCachedServerSettings = cached.Settings
-//!                 Exit Function
-//!             Else
-//!                 m_Cache.Remove i
-//!                 Exit For
-//!             End If
-//!         End If
-//!     Next i
-//!     
-//!     ' Not in cache or expired, fetch fresh
-//!     cached.ServerName = serverName
-//!     cached.Settings = GetAutoServerSettings(progID, clsID, serverName)
-//!     cached.CacheTime = Now
-//!     cached.TTL = cacheTTL
-//!     
-//!     m_Cache.Add cached
-//!     GetCachedServerSettings = cached.Settings
-//! End Function
-//! ```
-//!
-//! ## 4. Server Pool Manager
-//!
-//! ```vb
-//! Type ServerPool
-//!     PoolName As String
-//!     Servers() As String
-//!     ProgID As String
-//!     CLSID As String
-//! End Type
-//!
-//! Function GetHealthyServersFromPool(pool As ServerPool) As Collection
-//!     Dim healthyServers As New Collection
-//!     Dim i As Long
-//!     Dim settings As Long
-//!     
-//!     For i = LBound(pool.Servers) To UBound(pool.Servers)
-//!         On Error Resume Next
-//!         settings = GetAutoServerSettings(pool.ProgID, pool.CLSID, pool.Servers(i))
-//!         On Error GoTo 0
-//!         
-//!         If settings <> 0 Then
-//!             healthyServers.Add pool.Servers(i)
-//!         End If
-//!     Next i
-//!     
-//!     Set GetHealthyServersFromPool = healthyServers
-//! End Function
-//!
-//! Function GetPoolStatistics(pool As ServerPool) As String
-//!     Dim total As Long
-//!     Dim healthy As Long
-//!     Dim i As Long
-//!     Dim settings As Long
-//!     
-//!     total = UBound(pool.Servers) - LBound(pool.Servers) + 1
-//!     healthy = 0
-//!     
-//!     For i = LBound(pool.Servers) To UBound(pool.Servers)
-//!         settings = GetAutoServerSettings(pool.ProgID, pool.CLSID, pool.Servers(i))
-//!         If settings <> 0 Then healthy = healthy + 1
-//!     Next i
-//!     
-//!     GetPoolStatistics = pool.PoolName & ": " & healthy & "/" & total & " servers available"
-//! End Function
-//! ```
-//!
 //! # Error Handling
 //!
 //! ```vb
@@ -649,48 +158,6 @@
 //! - **Error 70**: Permission denied - insufficient `DCOM` permissions.
 //! - **Error 5**: Invalid procedure call - invalid `ProgID` or `CLSID` format.
 //!
-//! # Performance Considerations
-//!
-//! - Network latency affects remote server queries
-//! - Consider caching results for frequently checked servers
-//! - Use timeouts for unresponsive servers
-//! - Parallel checks may improve performance for multiple servers
-//! - DCOM configuration on both client and server affects response time
-//! - Firewall settings can cause delays or failures
-//!
-//! # Best Practices
-//!
-//! 1. **Always use error handling** - network and `DCOM` issues are common
-//! 2. **Validate `ProgID` and `CLSID` format** before calling
-//! 3. **Use descriptive server names** for better diagnostics
-//! 4. **Implement retry logic** for transient failures
-//! 5. **Cache results** to reduce network overhead
-//! 6. **Log all queries** for auditing and troubleshooting
-//! 7. **Test connectivity** before production deployment
-//! 8. **Configure `DCOM` security** appropriately on all servers
-//!
-//! # Comparison with Other Functions
-//!
-//! ## `GetAutoServerSettings` vs `CreateObject`
-//!
-//! ```vb
-//! ' GetAutoServerSettings - Query server settings
-//! settings = GetAutoServerSettings(progID, clsID, serverName)
-//!
-//! ' CreateObject - Actually create server instance
-//! Set obj = CreateObject(progID, serverName)
-//! ```
-//!
-//! ## `GetAutoServerSettings` vs `GetObject`
-//!
-//! ```vb
-//! ' GetAutoServerSettings - Check DCOM configuration
-//! settings = GetAutoServerSettings(progID, clsID, serverName)
-//!
-//! ' GetObject - Connect to existing instance
-//! Set obj = GetObject(, progID)
-//! ```
-//!
 //! # Limitations
 //!
 //! - Windows-specific functionality (DCOM is Windows-only)
@@ -702,20 +169,95 @@
 //! - May not work with modern .NET components
 //! - Deprecated in favor of newer technologies (WCF, REST APIs)
 //!
-//! # DCOM Configuration
-//!
-//! For this function to work properly:
-//!
-//! 1. **Component Services** (dcomcnfg) must be configured
-//! 2. **DCOM permissions** must allow remote access
-//! 3. **Firewall rules** must permit DCOM traffic
-//! 4. **Authentication level** must be set appropriately
-//! 5. **Launch and activation permissions** must be granted
-//!
 //! # Related Functions
 //!
 //! - `CreateObject` - Creates an instance of a `COM` object
 //! - `GetObject` - Returns a reference to an `ActiveX` object
-//! - `CallByName` - Executes methods on objects dynamically
-//! - `TypeName` - Returns type information about an object
-//! - `GetSetting` - Retrieves application settings from registry
+
+use crate::error::VBResult;
+use crate::value::VBVariant;
+
+/// Returns security settings for a `DCOM` automation server.
+///
+/// This is a dummy implementation — `DCOM` is Windows-specific and not
+/// supported by this runtime.  The function always returns `0`, which is
+/// the value VB6 returns when no server settings can be retrieved (i.e.
+/// when the machine does not have a `DCOM` server set up or the current
+/// user lacks the necessary `DCOM` security configuration).
+pub fn get_auto_server_settings(
+    progid: &VBVariant,
+    clsid: &VBVariant,
+    machine: &VBVariant,
+) -> VBResult<VBVariant> {
+    // Validate argument types — all three must be convertible to String.
+    // VB6 raises a Type Mismatch error (13) if non-string values are passed.
+    let _progid = progid.as_string()?;
+    let _clsid = clsid.as_string()?;
+    let _machine = machine.as_string()?;
+
+    // DCOM is not supported on this platform.  Return 0 to indicate that no
+    // server settings could be retrieved — the same value VB6 returns when the
+    // server is not registered or the user lacks the correct DCOM permissions.
+    Ok(VBVariant::from_long(0))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn returns_zero() {
+        let result = get_auto_server_settings(
+            &VBVariant::from_string("MyServer.Application"),
+            &VBVariant::from_string("{12345678-1234-1234-1234-123456789012}"),
+            &VBVariant::from_string("SERVER01"),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0));
+    }
+
+    #[test]
+    fn accepts_any_string_arguments() {
+        let result = get_auto_server_settings(
+            &VBVariant::from_string(""),
+            &VBVariant::from_string(""),
+            &VBVariant::from_string(""),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_long(0));
+    }
+
+    #[test]
+    fn null_prog_id_is_error_94() {
+        let err = get_auto_server_settings(
+            &VBVariant::Null,
+            &VBVariant::from_string("clsid"),
+            &VBVariant::from_string("machine"),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn null_cls_id_is_error_94() {
+        let err = get_auto_server_settings(
+            &VBVariant::from_string("progid"),
+            &VBVariant::Null,
+            &VBVariant::from_string("machine"),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn null_machine_is_error_94() {
+        let err = get_auto_server_settings(
+            &VBVariant::from_string("progid"),
+            &VBVariant::from_string("clsid"),
+            &VBVariant::Null,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    }
+}
