@@ -181,6 +181,9 @@ pub fn print_statement(file_number: i16, values: &[VBVariant], newline: bool) ->
         }
     }
 
+    // Track the column position of what we're about to write
+    let char_count = output.chars().count();
+
     if newline {
         output.push('\r');
         output.push('\n');
@@ -193,6 +196,15 @@ pub fn print_statement(file_number: i16, values: &[VBVariant], newline: bool) ->
             e.to_string(),
         )
     })?;
+
+    // Update the print column tracking
+    if newline {
+        // After newline, reset to column 1
+        file::reset_print_column(file_number);
+    } else {
+        // Advance by the number of characters written
+        file::advance_print_column(file_number, char_count);
+    }
 
     Ok(())
 }

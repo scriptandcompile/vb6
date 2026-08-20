@@ -70,6 +70,8 @@ pub struct OpenFile {
     pub position: i64,
     /// Output line width (0 means no limit).
     pub width: i16,
+    /// Current print column (1-based) for Tab/Spc tracking.
+    pub print_column: usize,
 }
 
 /// Abstraction over file I/O operations.

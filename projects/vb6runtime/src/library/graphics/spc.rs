@@ -579,4 +579,49 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }
+
+    #[test]
+    fn spc_with_print_statement_tracks_column() {
+        use crate::library::file::print::print_statement;
+        use crate::state::file::{self, AccessMode, LockMode, OpenMode};
+
+        let _guard = crate::state::test_support::lock_test();
+        let _ = file::close_all_files();
+        let dir = tempfile::tempdir().unwrap();
+        file::set_root(dir.path());
+
+        let path = std::path::PathBuf::from("spc_test.txt");
+        file::open_file(
+            &path,
+            OpenMode::Output,
+            AccessMode::Write,
+            LockMode::Shared,
+            0,
+            1,
+        )
+        .unwrap();
+
+        // Verify starting column is 1
+        assert_eq!(file::get_print_column(1), 1);
+
+        // Print "Hello" (5 chars) without newline - should advance to column 6
+        print_statement(1, &[VBVariant::from_string("Hello")], false).unwrap();
+        assert_eq!(file::get_print_column(1), 6);
+
+        // Print Spc(3) - should add 3 spaces, advancing to column 9
+        let spc_value = spc(&VBLong::from(3)).unwrap();
+        print_statement(1, &[spc_value], false).unwrap();
+        assert_eq!(file::get_print_column(1), 9);
+
+        // Verify file contents
+        let content = std::fs::read_to_string(dir.path().join("spc_test.txt")).unwrap();
+        assert_eq!(content, "Hello   ");
+
+        // Now print with newline - should reset column to 1
+        print_statement(1, &[VBVariant::from_string("World")], true).unwrap();
+        assert_eq!(file::get_print_column(1), 1);
+
+        let content = std::fs::read_to_string(dir.path().join("spc_test.txt")).unwrap();
+        assert_eq!(content, "Hello   World\r\n");
+    }
 }

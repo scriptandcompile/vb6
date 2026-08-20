@@ -539,6 +539,56 @@ pub fn unlock_file(file_number: i16, record_range: Option<(i32, i32)>) -> io::Re
     })
 }
 
+// ── Print column tracking (for Tab/Spc) ──────────────────────────────────
+
+/// Get the current 1-based print column for `file_number`.
+///
+/// Returns 1 (start of line) if the file has no recorded position.
+pub fn get_print_column(file_number: i16) -> usize {
+    OPEN_FILES.with(|files| {
+        files
+            .borrow()
+            .get(&file_number)
+            .map(|f| f.print_column)
+            .unwrap_or(1)
+    })
+}
+
+/// Set the current 1-based print column for `file_number`.
+pub fn set_print_column(file_number: i16, column: usize) {
+    OPEN_FILES.with(|files| {
+        if let Some(file) = files.borrow_mut().get_mut(&file_number) {
+            file.print_column = column;
+        }
+    });
+}
+
+/// Advance the print column by `count` characters.
+///
+/// Called after emitting output so subsequent Tab/Spc calls see the correct position.
+pub fn advance_print_column(file_number: i16, count: usize) {
+    OPEN_FILES.with(|files| {
+        if let Some(file) = files.borrow_mut().get_mut(&file_number) {
+            file.print_column += count;
+        }
+    });
+}
+
+/// Reset the print column to 1 (start of line) for `file_number`.
+///
+/// Called after a newline is written.
+pub fn reset_print_column(file_number: i16) {
+    set_print_column(file_number, 1);
+}
+
+/// Default print zone width (columns between tab stops) — VB6 default is 14.
+pub const DEFAULT_ZONE_WIDTH: usize = 14;
+
+/// Return the default zone width (14 columns).
+pub fn zone_width() -> usize {
+    DEFAULT_ZONE_WIDTH
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -121,7 +121,8 @@ impl FileBackend for NativeBackend {
             lock,
             record_length,
             position: initial_position,
-            width: 0, // Default: no line length limit
+            width: 0,        // Default: no line length limit
+            print_column: 1, // Start of line
         })
     }
 
