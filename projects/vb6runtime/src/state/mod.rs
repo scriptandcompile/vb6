@@ -19,6 +19,7 @@ pub mod clock;
 pub mod environment;
 pub mod err;
 pub mod file;
+pub mod interaction;
 pub mod random;
 pub mod resources;
 pub mod settings;

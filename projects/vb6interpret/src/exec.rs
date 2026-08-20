@@ -151,7 +151,10 @@ impl Interpreter {
                 Ok(Flow::Terminate)
             }
             SyntaxKind::StopStatement => Ok(Flow::Next),
-            SyntaxKind::BeepStatement => Ok(Flow::Next),
+            SyntaxKind::BeepStatement => {
+                vb6runtime::library::interaction::beep::beep();
+                Ok(Flow::Next)
+            }
             SyntaxKind::OptionStatement
             | SyntaxKind::TypeStatement
             | SyntaxKind::EnumStatement

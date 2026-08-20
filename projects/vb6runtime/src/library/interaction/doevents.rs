@@ -653,3 +653,27 @@
 //! - `Wait`: Application-specific wait method (Excel VBA)
 //! - **Timer Control**: Asynchronous event-based processing
 //! - **Threading APIs**: True multithreading (advanced)
+
+use crate::state;
+use crate::value::VBVariant;
+use vb6core::error::VBResult;
+
+/// Implement VB6's `DoEvents` function.
+///
+/// Yields execution to the OS and returns the number of open forms (always 0).
+pub fn do_events() -> VBResult<VBVariant> {
+    Ok(VBVariant::from_integer(state::interaction::do_events()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::test_support::lock_test;
+
+    #[test]
+    fn do_events_returns_zero() {
+        let _guard = lock_test();
+        let result = do_events().unwrap();
+        assert_eq!(result.as_vbinteger().unwrap(), 0.into());
+    }
+}

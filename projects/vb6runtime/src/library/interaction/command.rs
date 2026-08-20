@@ -531,3 +531,27 @@
 //! - Command line length limits vary by Windows version
 //! - Unicode characters may require special handling
 //! - Some special characters may need escaping in batch files
+
+use crate::state;
+use crate::value::VBString;
+use vb6core::error::VBResult;
+
+/// Implement VB6's `Command$` function.
+///
+/// Returns the command-line arguments as a `String`.
+pub fn command() -> VBResult<VBString> {
+    Ok(VBString::from(state::interaction::command_string()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::test_support::lock_test;
+
+    #[test]
+    fn command_returns_string() {
+        let _guard = lock_test();
+        let result = command().unwrap();
+        let _s: String = result.into_inner();
+    }
+}

@@ -16,6 +16,7 @@ mod datetime;
 mod environment;
 mod file;
 mod financial;
+mod interaction;
 mod logic;
 mod math;
 mod resources;
@@ -98,6 +99,7 @@ fn registry() -> &'static Registry {
         file::register(&mut registry);
         financial::register(&mut registry);
         logic::register(&mut registry);
+        interaction::register(&mut registry);
         string::register(&mut registry);
         math::register(&mut registry);
         resources::register(&mut registry);
