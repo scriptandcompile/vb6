@@ -14,6 +14,7 @@ pub mod filelen;
 pub mod freefile;
 pub mod get;
 pub mod getattr;
+pub mod input;
 pub mod input_statement;
 pub mod kill;
 pub mod line_input;
