@@ -1571,7 +1571,6 @@ impl ControlKind {
     ///     println!("Child control: {}", child.name());
     /// };
     /// ```
-    #[must_use]
     pub fn descendants(&self) -> Box<dyn Iterator<Item = &Control> + '_> {
         Box::new(
             self.children()
@@ -1721,7 +1720,6 @@ impl Control {
     ///     println!("Descendant control: {}", descendant.name());
     /// }
     /// ```
-    #[must_use]
     pub fn descendants(&self) -> Box<dyn Iterator<Item = &Control> + '_> {
         Box::new(std::iter::once(self).chain(self.kind.descendants()))
     }
