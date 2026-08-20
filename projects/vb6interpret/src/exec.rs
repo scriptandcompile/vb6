@@ -1142,7 +1142,12 @@ impl Interpreter {
                 }
                 Ok(Flow::Next)
             }
-            "beep" => Ok(Flow::Next),
+            // `Beep` is a registered builtin Sub; a `Call` discards its
+            // (always `Empty`) return value.
+            "beep" => {
+                crate::builtins::call_builtin("beep", &args).map_err(|e| self.error_here(e))?;
+                Ok(Flow::Next)
+            }
             _ => Err(self.error_here(VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED))), // Sub or Function not defined
         }
     }
