@@ -1,4 +1,5 @@
 use vb6parse::files::resource::FormResourceFile;
+use vb6parse::files::resource::ResourceEntry;
 
 #[test]
 fn cdiu_beat_up_editor_chatbox_frx() {
@@ -11,7 +12,7 @@ fn cdiu_beat_up_editor_chatbox_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -25,7 +26,7 @@ fn cdiu_beat_up_editor_openroom_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -39,7 +40,7 @@ fn cdiu_beat_up_editor_systemread_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -53,5 +54,5 @@ fn cdiu_beat_up_editor_test_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }

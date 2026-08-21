@@ -1,4 +1,5 @@
 use vb6parse::files::resource::FormResourceFile;
+use vb6parse::files::resource::ResourceEntry;
 
 #[test]
 fn environment_avi_frx() {
@@ -11,7 +12,7 @@ fn environment_avi_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -25,7 +26,7 @@ fn environment_colordialog_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -39,7 +40,7 @@ fn environment_fileselectordialog_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -53,7 +54,7 @@ fn environment_fontdialog1_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -67,7 +68,7 @@ fn environment_frmabout_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -81,7 +82,7 @@ fn environment_guim2000_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -95,7 +96,7 @@ fn environment_help_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -109,7 +110,7 @@ fn environment_mform1_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -123,7 +124,7 @@ fn environment_neomsgbox_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -137,7 +138,7 @@ fn environment_small_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -151,7 +152,7 @@ fn environment_test_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -165,7 +166,7 @@ fn environment_textp0_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -179,5 +180,5 @@ fn environment_tweakprive_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
