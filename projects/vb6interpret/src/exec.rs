@@ -1148,10 +1148,10 @@ impl Interpreter {
 
         match name.to_lowercase().as_str() {
             "msgbox" => {
-                if let Some(first) = args.first() {
-                    let text = first.as_string()?;
-                    self.emit(text, true);
-                }
+                // Full `MsgBox` semantics: the interaction backend shows the
+                // dialog (or records it) and the return value is discarded
+                // because this form is a statement, not a function call.
+                crate::builtins::call_builtin("msgbox", &args).map_err(|e| self.error_here(e))?;
                 Ok(Flow::Next)
             }
             // `Beep` is a registered builtin Sub; a `Call` discards its

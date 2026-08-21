@@ -194,6 +194,79 @@ impl Interpreter {
             .declare("vbunicode", VBVariant::from_long(VB_UNICODE));
         self.globals
             .declare("vbfromunicode", VBVariant::from_long(VB_FROM_UNICODE));
+
+        // Message-box style constants (`VbMsgBoxStyle`).
+        self.globals
+            .declare("vbokonly", VBVariant::from_long(VB_OK_ONLY));
+        self.globals
+            .declare("vbokcancel", VBVariant::from_long(VB_OK_CANCEL));
+        self.globals.declare(
+            "vbabortretryignore",
+            VBVariant::from_long(VB_ABORT_RETRY_IGNORE),
+        );
+        self.globals
+            .declare("vbyesnocancel", VBVariant::from_long(VB_YES_NO_CANCEL));
+        self.globals
+            .declare("vbyesno", VBVariant::from_long(VB_YES_NO));
+        self.globals
+            .declare("vbretrycancel", VBVariant::from_long(VB_RETRY_CANCEL));
+        self.globals
+            .declare("vbcritical", VBVariant::from_long(VB_CRITICAL));
+        self.globals
+            .declare("vbquestion", VBVariant::from_long(VB_QUESTION));
+        self.globals
+            .declare("vbexclamation", VBVariant::from_long(VB_EXCLAMATION));
+        self.globals
+            .declare("vbinformation", VBVariant::from_long(VB_INFORMATION));
+        self.globals.declare(
+            "vbdefaultbutton1",
+            VBVariant::from_long(VB_DEFAULT_BUTTON_1),
+        );
+        self.globals.declare(
+            "vbdefaultbutton2",
+            VBVariant::from_long(VB_DEFAULT_BUTTON_2),
+        );
+        self.globals.declare(
+            "vbdefaultbutton3",
+            VBVariant::from_long(VB_DEFAULT_BUTTON_3),
+        );
+        self.globals.declare(
+            "vbdefaultbutton4",
+            VBVariant::from_long(VB_DEFAULT_BUTTON_4),
+        );
+        self.globals.declare(
+            "vbapplicationmodal",
+            VBVariant::from_long(VB_APPLICATION_MODAL),
+        );
+        self.globals
+            .declare("vbsystemmodal", VBVariant::from_long(VB_SYSTEM_MODAL));
+        self.globals.declare(
+            "vbmsgboxhelpbutton",
+            VBVariant::from_long(VB_MSG_BOX_HELP_BUTTON),
+        );
+        self.globals.declare(
+            "vbmsgboxsetforeground",
+            VBVariant::from_long(VB_MSG_BOX_SET_FOREGROUND),
+        );
+        self.globals
+            .declare("vbmsgboxright", VBVariant::from_long(VB_MSG_BOX_RIGHT));
+        self.globals.declare(
+            "vbmsgboxrtlreading",
+            VBVariant::from_long(VB_MSG_BOX_RTL_READING),
+        );
+
+        // Message-box result constants (`VbMsgBoxResult`).
+        self.globals.declare("vbok", VBVariant::from_long(VB_OK));
+        self.globals
+            .declare("vbcancel", VBVariant::from_long(VB_CANCEL));
+        self.globals
+            .declare("vbabort", VBVariant::from_long(VB_ABORT));
+        self.globals
+            .declare("vbretry", VBVariant::from_long(VB_RETRY));
+        self.globals
+            .declare("vbignore", VBVariant::from_long(VB_IGNORE));
+        self.globals.declare("vbyes", VBVariant::from_long(VB_YES));
+        self.globals.declare("vbno", VBVariant::from_long(VB_NO));
     }
 
     /// Set the maximum number of statements the interpreter will execute
@@ -402,6 +475,38 @@ impl Interpreter {
     /// to the interpreter for convenience.
     pub fn reset_clock_backend(&self) {
         vb6runtime::state::clock::reset_backend();
+    }
+
+    /// Set the active interaction backend for this interpreter.
+    ///
+    /// Equivalent to [`vb6runtime::state::interaction::set_backend`],
+    /// scoped to the interpreter for convenience. Hosts use this to install
+    /// a memory backend whose `MsgBox` dialogs are answered from a scripted
+    /// response list instead of showing real windows.
+    ///
+    /// # Examples
+    ///
+    /// ```ignore
+    /// use vb6interpret::Interpreter;
+    /// use vb6runtime::state::interaction::{memory::MemoryBackend, MsgBoxButton};
+    ///
+    /// let mut interp = Interpreter::new();
+    /// let backend = MemoryBackend::with_msgbox_responses([MsgBoxButton::Yes]);
+    /// interp.set_interaction_backend(Box::new(backend));
+    /// ```
+    pub fn set_interaction_backend(
+        &self,
+        backend: Box<dyn vb6runtime::state::interaction::InteractionBackend>,
+    ) {
+        vb6runtime::state::interaction::set_backend(backend);
+    }
+
+    /// Reset the interaction backend to the platform default.
+    ///
+    /// Equivalent to [`vb6runtime::state::interaction::reset_backend`],
+    /// scoped to the interpreter for convenience.
+    pub fn reset_interaction_backend(&self) {
+        vb6runtime::state::interaction::reset_backend();
     }
 
     /// Reset all interpreter state (globals, frames, output, program).
@@ -752,14 +857,6 @@ impl Interpreter {
             // Out of stack space
         }
         Ok(())
-    }
-
-    /// Write output text, honoring the in-progress line buffer.
-    pub(crate) fn emit(&mut self, text: String, newline: bool) {
-        self.current_output.push_str(&text);
-        if newline {
-            self.output.push(std::mem::take(&mut self.current_output));
-        }
     }
 
     /// Invoke a Sub procedure, returning its control-flow signal.
