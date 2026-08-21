@@ -4085,7 +4085,7 @@ End Sub
         // insta::assert_yaml_snapshot!(serializable);
 
         // Verify it's serializable by checking structure
-        assert!(!serializable.root.children().is_empty());
+        assert_ne!(serializable.root.children(), []);
     }
 
     #[test]

@@ -1,4 +1,5 @@
 use vb6parse::files::resource::FormResourceFile;
+use vb6parse::files::resource::ResourceEntry;
 
 #[test]
 fn endless_runner_game_vb6_0_desert_frx() {
@@ -13,7 +14,7 @@ fn endless_runner_game_vb6_0_desert_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -29,7 +30,7 @@ fn endless_runner_game_vb6_0_form10_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -45,7 +46,7 @@ fn endless_runner_game_vb6_0_form2_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -61,7 +62,7 @@ fn endless_runner_game_vb6_0_form3_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -77,7 +78,7 @@ fn endless_runner_game_vb6_0_form5_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -93,7 +94,7 @@ fn endless_runner_game_vb6_0_form9_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -109,7 +110,7 @@ fn endless_runner_game_vb6_0_frmsplash_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -125,7 +126,7 @@ fn endless_runner_game_vb6_0_howtoplay_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -141,7 +142,7 @@ fn endless_runner_game_vb6_0_jp2_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -157,7 +158,7 @@ fn endless_runner_game_vb6_0_jump4_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -173,5 +174,5 @@ fn endless_runner_game_vb6_0_jump_king_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }

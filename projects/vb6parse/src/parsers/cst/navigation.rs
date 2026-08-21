@@ -1106,6 +1106,7 @@ impl ConcreteSyntaxTree {
 
 #[cfg(test)]
 mod tests {
+    use crate::parsers::cst::navigation::CstNode;
     use crate::parsers::{ConcreteSyntaxTree, SyntaxKind};
 
     // Navigation method tests
@@ -1303,7 +1304,7 @@ mod tests {
         let non_tokens: Vec<_> = root.non_token_children().collect();
         let _tokens: Vec<_> = root.token_children().collect();
 
-        assert!(!non_tokens.is_empty());
+        assert_ne!(non_tokens, [] as [&CstNode; 0]);
         // Should include SubStatement but not Whitespace/Newline tokens
 
         let first_non_ws = root.first_non_whitespace_child();
@@ -1348,7 +1349,7 @@ mod tests {
 
         // The root typically has structural nodes as direct children
         let non_tokens: Vec<_> = cst.non_token_children().collect();
-        assert!(!non_tokens.is_empty());
+        assert_ne!(non_tokens, [] as [CstNode; 0]);
 
         // Verify non_tokens are indeed structural nodes
         assert!(non_tokens.iter().all(|n| !n.is_token));
@@ -1419,7 +1420,7 @@ mod tests {
 
         // Complex predicate: find all structural nodes with more than 2 children
         let complex_nodes = cst.find_all_if(|n| !n.is_token && n.children.len() > 2);
-        assert!(!complex_nodes.is_empty());
+        assert_ne!(complex_nodes, [] as [CstNode; 0]);
     }
 
     #[test]
@@ -1458,7 +1459,7 @@ mod tests {
         let root = cst.to_serializable().root;
 
         let all_nodes: Vec<_> = root.descendants().collect();
-        assert!(!all_nodes.is_empty());
+        assert_ne!(all_nodes, [] as [&CstNode; 0]);
         assert_eq!(all_nodes[0].kind(), SyntaxKind::Root);
 
         // Count specific node types
@@ -1483,7 +1484,7 @@ mod tests {
         let cst = cst_opt.expect("Failed to parse source");
 
         let all_nodes: Vec<_> = cst.descendants().collect();
-        assert!(!all_nodes.is_empty());
+        assert_ne!(all_nodes, [] as [CstNode; 0]);
 
         // Count specific node types
         let identifier_count = cst

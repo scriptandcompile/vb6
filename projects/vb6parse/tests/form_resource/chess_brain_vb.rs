@@ -1,4 +1,5 @@
 use vb6parse::files::resource::FormResourceFile;
+use vb6parse::files::resource::ResourceEntry;
 
 #[test]
 fn chess_brain_vb_debugmain_frx() {
@@ -13,7 +14,7 @@ fn chess_brain_vb_debugmain_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }
 
 #[test]
@@ -29,5 +30,5 @@ fn chess_brain_vb_main_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &ResourceEntry); 0]);
 }

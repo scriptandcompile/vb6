@@ -1,4 +1,5 @@
 use vb6parse::ConcreteSyntaxTree;
+use vb6parse::parsers::cst::NodeRange;
 
 fn overlaps(start_a: u32, end_a: u32, start_b: u32, end_b: u32) -> bool {
     start_a < end_b && start_b < end_a
@@ -53,6 +54,6 @@ End Function
     let (cst_opt, _failures, recovery_events) = result.unpack_with_recovery();
 
     let cst = cst_opt.expect("CST should be present.");
-    assert!(cst.error_recovery_ranges().is_empty());
+    assert_eq!(cst.error_recovery_ranges(), [] as [NodeRange; 0]);
     assert!(recovery_events.is_empty());
 }
