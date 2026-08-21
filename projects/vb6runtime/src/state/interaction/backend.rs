@@ -1,8 +1,8 @@
 //! Trait abstracting over platform-specific user interaction operations.
 //!
-//! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`, `MsgBox`) need
-//! a pluggable backend to support both native platforms and WASM
-//! environments:
+//! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`, `MsgBox`,
+//! `InputBox`) need a pluggable backend to support both native platforms and
+//! WASM environments:
 //!
 //! - **Windows/Linux/macOS**: [`NativeBackend`](super::native::NativeBackend)
 //!   uses the real process environment and OS primitives.
@@ -13,6 +13,7 @@
 
 use crate::error::VBResult;
 
+use super::inputbox::InputBoxRequest;
 use super::msgbox::{MsgBoxButton, MsgBoxRequest};
 
 /// Abstraction over user interaction operations.
@@ -59,6 +60,19 @@ pub trait InteractionBackend: Send {
     /// the request and return the request's default button rather than
     /// erroring, so programs stay runnable.
     fn msg_box(&self, request: &MsgBoxRequest) -> VBResult<MsgBoxButton>;
+
+    /// Show a modal input box and report the text the user entered.
+    ///
+    /// The `request` arrives fully assembled (see [`InputBoxRequest`]);
+    /// implementations display the prompt with a single-line edit box seeded
+    /// from `default_response`, and return the entered text. Accepting an
+    /// untouched box returns the default; Cancel (or Esc) returns `""`.
+    /// Arguments the platform cannot honor — `xpos`/`ypos` on browsers and
+    /// most window managers — are ignored rather than rejected.
+    /// Implementations that cannot collect input at all (headless machines)
+    /// should log the request and return `default_response` so programs stay
+    /// runnable.
+    fn input_box(&self, request: &InputBoxRequest) -> VBResult<String>;
 
     /// Access the concrete backend type for downcasting.
     ///

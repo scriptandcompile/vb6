@@ -536,3 +536,231 @@
 //! - `Input`: Read from files (different from `InputBox`)
 //! - Custom Forms: For complex input scenarios
 //! - `Shell`: Execute external programs for advanced input
+
+use crate::error::{err_number, VBError, VBResult};
+use crate::state;
+use crate::value::{VBLong, VBString, VBVariant};
+
+/// Implement VB6's `InputBox` function.
+///
+/// Enforces the helpfile/context pairing rule (raising error 5 when only
+/// one is supplied — neither reaches the backend since no platform has a
+/// Help system), assembles an [`InputBoxRequest`](crate::state::interaction::InputBoxRequest)
+/// from the remaining arguments, hands it to the active
+/// [`interaction backend`](crate::state::interaction), and returns the
+/// entered text (or `""` for Cancel) as a String.
+pub fn input_box(
+    prompt: &VBString,
+    title: Option<&VBString>,
+    default: Option<&VBString>,
+    xpos: Option<&VBLong>,
+    ypos: Option<&VBLong>,
+    helpfile: Option<&VBString>,
+    context: Option<&VBLong>,
+) -> VBResult<VBVariant> {
+    // VB6 requires helpfile and context to appear together.
+    if helpfile.is_some() != context.is_some() {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid procedure call or argument: InputBox requires helpfile and context \
+             to be provided together",
+        ));
+    }
+
+    let mut request = state::interaction::InputBoxRequest::new(prompt.as_str());
+
+    // An omitted or empty title means "show the application name"; hosts
+    // resolve that from `None`.
+    let title = title.and_then(|t| {
+        let t = t.as_str();
+        (!t.is_empty()).then(|| t.to_string())
+    });
+    request.title = title;
+
+    if let Some(default) = default {
+        request.default_response = default.as_str().to_string();
+    }
+    if let (Some(xpos), Some(ypos)) = (xpos.map(|v| v.as_i32()), ypos.map(|v| v.as_i32())) {
+        request.xpos = Some(xpos);
+        request.ypos = Some(ypos);
+    }
+
+    let answer = state::interaction::input_box(&request)?;
+    Ok(VBVariant::from_string(answer))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::interaction::{memory::MemoryBackend, InputBoxRecord};
+    use crate::state::test_support::lock_test;
+
+    fn set_backend(backend: MemoryBackend) {
+        state::interaction::set_backend(Box::new(backend));
+    }
+
+    #[test]
+    fn scripted_answer_is_returned_as_a_string() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::with_input_responses(["Arthur"]));
+        let result =
+            input_box(&VBString::from("name?"), None, None, None, None, None, None).unwrap();
+        assert_eq!(result, VBVariant::from_string("Arthur"));
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn scripted_answers_are_consumed_in_order_then_default_kicks_in() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::with_input_responses(["first", "second"]));
+        let default = VBString::from("fallback");
+
+        assert_eq!(
+            input_box(&VBString::from("?"), None, None, None, None, None, None).unwrap(),
+            VBVariant::from_string("first")
+        );
+        assert_eq!(
+            input_box(&VBString::from("?"), None, None, None, None, None, None).unwrap(),
+            VBVariant::from_string("second")
+        );
+        // Queue dry: the dialog's default response is returned.
+        assert_eq!(
+            input_box(
+                &VBString::from("?"),
+                None,
+                Some(&default),
+                None,
+                None,
+                None,
+                None
+            )
+            .unwrap(),
+            VBVariant::from_string("fallback")
+        );
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn omitted_default_and_exhausted_queue_yield_empty_string() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let result = input_box(&VBString::from("?"), None, None, None, None, None, None).unwrap();
+        assert_eq!(result, VBVariant::from_string(""));
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn queued_empty_string_scripts_a_cancel() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::with_input_responses([""]));
+        let result = input_box(&VBString::from("?"), None, None, None, None, None, None).unwrap();
+        assert_eq!(result, VBVariant::from_string(""));
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn helpfile_without_context_is_error_5() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let helpfile = VBString::from("help.hlp");
+        let err = input_box(
+            &VBString::from("?"),
+            None,
+            None,
+            None,
+            None,
+            Some(&helpfile),
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+
+        let context = VBLong::from(10);
+        let err = input_box(
+            &VBString::from("?"),
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(&context),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn paired_helpfile_and_context_are_accepted_but_ignored() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let helpfile = VBString::from("help.hlp");
+        let context = VBLong::from(10);
+        let result = input_box(
+            &VBString::from("?"),
+            None,
+            None,
+            None,
+            None,
+            Some(&helpfile),
+            Some(&context),
+        )
+        .unwrap();
+        assert_eq!(result, VBVariant::from_string(""));
+
+        // The Help arguments never reach the backend's record.
+        let requests: Vec<InputBoxRecord> =
+            state::interaction::with_memory_backend(|m| m.inputbox_requests()).unwrap();
+        assert_eq!(requests.len(), 1);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn every_argument_reaches_the_backend_record() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let title = VBString::from("Config");
+        let default = VBString::from("8080");
+        let xpos = VBLong::from(1440);
+        let ypos = VBLong::from(-2880);
+        input_box(
+            &VBString::from("port?"),
+            Some(&title),
+            Some(&default),
+            Some(&xpos),
+            Some(&ypos),
+            None,
+            None,
+        )
+        .unwrap();
+
+        let requests = state::interaction::with_memory_backend(|m| m.inputbox_requests()).unwrap();
+        assert_eq!(requests[0].prompt, "port?");
+        assert_eq!(requests[0].title.as_deref(), Some("Config"));
+        assert_eq!(requests[0].default_response, "8080");
+        assert_eq!(requests[0].xpos, Some(1440));
+        assert_eq!(requests[0].ypos, Some(-2880));
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn empty_title_falls_back_to_application_default() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let title = VBString::from("");
+        input_box(
+            &VBString::from("?"),
+            Some(&title),
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+        .unwrap();
+
+        let requests = state::interaction::with_memory_backend(|m| m.inputbox_requests()).unwrap();
+        assert_eq!(requests[0].title, None);
+        state::interaction::reset_backend();
+    }
+}
