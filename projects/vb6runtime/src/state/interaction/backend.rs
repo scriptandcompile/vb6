@@ -32,4 +32,13 @@ pub trait InteractionBackend: Send {
     /// On native platforms this writes the terminal bell character (`\x07`)
     /// to stderr. On WASM this is a no-op.
     fn beep(&self);
+
+    /// Signal a `Stop` statement break request.
+    ///
+    /// In the VB6 development environment `Stop` suspends execution and
+    /// enters break mode; hosts that can honor that (a debugger, the WASM
+    /// playground) observe this signal. Platforms with no debugger attached
+    /// treat it as a no-op — the interpreter then applies the compiled
+    /// `.exe` behavior instead (`Stop` acts like `End`).
+    fn stop(&self);
 }

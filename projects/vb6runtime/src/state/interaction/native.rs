@@ -37,6 +37,12 @@ impl InteractionBackend for NativeBackend {
         use std::io::Write;
         let _ = std::io::stderr().write_all(b"\x07");
     }
+
+    fn stop(&self) {
+        // No interactive debugger is attached for native batch runs; the
+        // interpreter falls back to the compiled-`.exe` behavior
+        // (`Stop` acts like `End`).
+    }
 }
 
 #[cfg(test)]

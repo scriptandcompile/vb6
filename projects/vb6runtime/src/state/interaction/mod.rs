@@ -88,6 +88,16 @@ pub fn beep() {
     backend().lock().unwrap_or_else(|e| e.into_inner()).beep()
 }
 
+/// Signal a `Stop` statement break request.
+///
+/// Backends with an attached debugger (the WASM playground) record the
+/// request so the host can enter break mode; platforms without one ignore
+/// it and the interpreter applies the compiled-`.exe` behavior instead.
+/// Corresponds to VB6's `Stop` statement.
+pub fn stop() {
+    backend().lock().unwrap_or_else(|e| e.into_inner()).stop()
+}
+
 /// Reset all interaction state (for testing).
 pub fn reset() {
     reset_backend();
@@ -137,6 +147,14 @@ mod tests {
         let _guard = lock_test();
         set_backend(Box::new(memory::MemoryBackend::new()));
         beep();
+        reset_backend();
+    }
+
+    #[test]
+    fn stop_does_not_panic() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::new()));
+        stop();
         reset_backend();
     }
 }
