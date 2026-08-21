@@ -1,16 +1,16 @@
 //! Process-global user interaction state for VB6.
 //!
-//! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`, `MsgBox`)
-//! delegate to a pluggable [`InteractionBackend`] so the same API works
-//! across platforms:
+//! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`, `MsgBox`,
+//! `InputBox`) delegate to a pluggable [`InteractionBackend`] so the same
+//! API works across platforms:
 //!
 //! - **Native** (default on Windows/Linux/macOS): reads real command-line
 //!   args, yields the thread, beeps via the terminal bell character, and
 //!   shows real dialogs (`MessageBoxW` on Windows, `osascript` on macOS,
 //!   `zenity` on Linux, browser `alert`/`confirm` on wasm32).
 //! - **Memory** (default on wasm32/tests): injectable, deterministic
-//!   behavior with no OS side effects — including a scripted response list
-//!   for `MsgBox`.
+//!   behavior with no OS side effects — including scripted response lists
+//!   for `MsgBox` and `InputBox`.
 //!
 //! The backend can be switched at runtime with [`set_backend`]; a WASM host
 //! that wants real modal dialogs installs
@@ -18,6 +18,7 @@
 //! wants scripted answers installs [`MemoryBackend`](memory::MemoryBackend).
 
 pub mod backend;
+pub mod inputbox;
 pub mod memory;
 pub mod msgbox;
 pub mod native;
@@ -25,6 +26,7 @@ pub mod native;
 use std::sync::{Mutex, OnceLock};
 
 pub use backend::InteractionBackend;
+pub use inputbox::{InputBoxRecord, InputBoxRequest};
 pub use msgbox::{
     MsgBoxButton, MsgBoxButtonSet, MsgBoxIcon, MsgBoxModality, MsgBoxRecord, MsgBoxRequest,
 };
@@ -121,6 +123,18 @@ pub fn msg_box(request: &MsgBoxRequest) -> crate::error::VBResult<MsgBoxButton> 
         .msg_box(request)
 }
 
+/// Show a modal input box and return the entered text (or `""` for Cancel).
+///
+/// The `request` must already be assembled (see [`InputBoxRequest::new`]);
+/// this only routes it to the active backend. Corresponds to VB6's
+/// `InputBox` function.
+pub fn input_box(request: &InputBoxRequest) -> crate::error::VBResult<String> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .input_box(request)
+}
+
 /// Run `f` with the active backend downcast to [`MemoryBackend`].
 ///
 /// Hosts and tests use this to reach the memory backend's scripting API
@@ -213,6 +227,26 @@ mod tests {
         // vbOKCancel: default button is OK.
         let request = MsgBoxRequest::parse("proceed?", 1).unwrap();
         assert_eq!(msg_box(&request).unwrap(), msgbox::MsgBoxButton::Ok);
+        reset_backend();
+    }
+
+    #[test]
+    fn input_box_routes_to_the_active_backend() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::with_input_responses([
+            "scripted",
+        ])));
+        let request = InputBoxRequest::new("value?").with_default("default");
+        assert_eq!(input_box(&request).unwrap(), "scripted");
+        reset_backend();
+    }
+
+    #[test]
+    fn input_box_defaults_without_scripted_responses() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::new()));
+        let request = InputBoxRequest::new("value?").with_default("fallback");
+        assert_eq!(input_box(&request).unwrap(), "fallback");
         reset_backend();
     }
 }

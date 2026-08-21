@@ -1,8 +1,8 @@
 //! In-memory interaction backend for WASM and tests.
 //!
-//! Stores injectable command-line arguments, records every `MsgBox`
-//! request a program makes, and answers those requests from a scripted
-//! response list — no OS side effects anywhere.
+//! Stores injectable command-line arguments, records every `MsgBox` and
+//! `InputBox` request a program makes, and answers those requests from
+//! scripted response lists — no OS side effects anywhere.
 
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
@@ -10,6 +10,7 @@ use std::collections::VecDeque;
 use crate::error::{err_number, VBError, VBResult};
 
 use super::backend::InteractionBackend;
+use super::inputbox::{InputBoxRecord, InputBoxRequest};
 use super::msgbox::{MsgBoxButton, MsgBoxRecord, MsgBoxRequest};
 
 /// In-memory interaction backend.
@@ -25,6 +26,12 @@ use super::msgbox::{MsgBoxButton, MsgBoxRecord, MsgBoxRequest};
 /// queue the dialog's default button is returned so programs keep running;
 /// a queued response that the dialog does not offer is reported as error 5
 /// instead of being silently coerced.
+///
+/// `InputBox` works the same way: requests land in the log (see
+/// [`inputbox_requests`](Self::inputbox_requests)) and are answered from the
+/// scripted list fed by [`push_input_response`](Self::push_input_response).
+/// An empty queue returns the dialog's default text; remember Cancel also
+/// reads as the empty string in VB6, so queueing `""` scripts a cancel.
 pub struct MemoryBackend {
     /// The injected command-line arguments.
     command_args: Vec<String>,
@@ -34,6 +41,10 @@ pub struct MemoryBackend {
     msgbox_responses: RefCell<VecDeque<MsgBoxButton>>,
     /// Every `MsgBox` request this backend has seen, in order.
     msgbox_requests: RefCell<Vec<MsgBoxRecord>>,
+    /// Scripted `InputBox` answers, consumed first-in first-out.
+    input_responses: RefCell<VecDeque<String>>,
+    /// Every `InputBox` request this backend has seen, in order.
+    input_requests: RefCell<Vec<InputBoxRecord>>,
 }
 
 impl MemoryBackend {
@@ -44,6 +55,8 @@ impl MemoryBackend {
             break_requested: Cell::new(false),
             msgbox_responses: RefCell::new(VecDeque::new()),
             msgbox_requests: RefCell::new(Vec::new()),
+            input_responses: RefCell::new(VecDeque::new()),
+            input_requests: RefCell::new(Vec::new()),
         }
     }
 
@@ -58,6 +71,19 @@ impl MemoryBackend {
     pub fn with_msgbox_responses(responses: impl IntoIterator<Item = MsgBoxButton>) -> Self {
         let mut backend = Self::new();
         backend.msgbox_responses = RefCell::new(responses.into_iter().collect());
+        backend
+    }
+
+    /// Create a backend whose `InputBox` dialogs are answered from `responses`.
+    pub fn with_input_responses(responses: impl IntoIterator<Item = impl Into<String>>) -> Self {
+        let mut backend = Self::new();
+        backend.input_responses = RefCell::new(
+            responses
+                .into_iter()
+                .map(Into::into)
+                .collect::<Vec<_>>()
+                .into(),
+        );
         backend
     }
 
@@ -103,6 +129,43 @@ impl MemoryBackend {
     /// Take the recorded `MsgBox` requests, leaving the log empty.
     pub fn take_msgbox_requests(&self) -> Vec<MsgBoxRecord> {
         std::mem::take(&mut *self.msgbox_requests.borrow_mut())
+    }
+
+    /// Queue a scripted answer for the next `InputBox` call.
+    ///
+    /// The string is returned verbatim, as if typed into the box; queue `""`
+    /// to simulate Cancel. Queue as many responses as the program will show
+    /// dialogs — once the list runs dry the dialog's default text is
+    /// returned instead.
+    pub fn push_input_response(&self, response: impl Into<String>) {
+        self.input_responses.borrow_mut().push_back(response.into());
+    }
+
+    /// Queue several scripted answers at once.
+    pub fn extend_input_responses(&self, responses: impl IntoIterator<Item = impl Into<String>>) {
+        self.input_responses
+            .borrow_mut()
+            .extend(responses.into_iter().map(Into::into));
+    }
+
+    /// Drop all queued (not yet consumed) `InputBox` responses.
+    pub fn clear_input_responses(&self) {
+        self.input_responses.borrow_mut().clear();
+    }
+
+    /// How many scripted answers are still queued.
+    pub fn pending_input_responses(&self) -> usize {
+        self.input_responses.borrow().len()
+    }
+
+    /// Snapshot of every `InputBox` request made so far, oldest first.
+    pub fn inputbox_requests(&self) -> Vec<InputBoxRecord> {
+        self.input_requests.borrow().clone()
+    }
+
+    /// Take the recorded `InputBox` requests, leaving the log empty.
+    pub fn take_inputbox_requests(&self) -> Vec<InputBoxRecord> {
+        std::mem::take(&mut *self.input_requests.borrow_mut())
     }
 }
 
@@ -153,6 +216,20 @@ impl InteractionBackend for MemoryBackend {
                 ),
             )),
         }
+    }
+
+    fn input_box(&self, request: &InputBoxRequest) -> VBResult<String> {
+        // Record what was shown before answering, so hosts can inspect the
+        // request even after the program moved on.
+        self.input_requests
+            .borrow_mut()
+            .push(InputBoxRecord::of(request));
+
+        Ok(self
+            .input_responses
+            .borrow_mut()
+            .pop_front()
+            .unwrap_or_else(|| request.default_response.clone()))
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
@@ -271,5 +348,65 @@ mod tests {
         assert_eq!(backend.pending_msgbox_responses(), 2);
         backend.clear_msgbox_responses();
         assert_eq!(backend.pending_msgbox_responses(), 0);
+    }
+
+    // ---- InputBox scripting ----
+
+    #[test]
+    fn empty_input_queue_answers_default_response() {
+        let backend = MemoryBackend::new();
+        let request = InputBoxRequest::new("name?").with_default("Arthur");
+        let answer = backend.input_box(&request).unwrap();
+        assert_eq!(answer, "Arthur");
+    }
+
+    #[test]
+    fn empty_input_queue_without_default_returns_empty_string() {
+        let backend = MemoryBackend::new();
+        let answer = backend.input_box(&InputBoxRequest::new("name?")).unwrap();
+        assert_eq!(answer, "");
+    }
+
+    #[test]
+    fn queued_input_responses_are_returned_in_order() {
+        let backend = MemoryBackend::with_input_responses(["first", "second", ""]);
+        let request = InputBoxRequest::new("value?").with_default("default");
+        assert_eq!(backend.input_box(&request).unwrap(), "first");
+        assert_eq!(backend.input_box(&request).unwrap(), "second");
+        assert_eq!(backend.input_box(&request).unwrap(), "");
+        // Queue exhausted: back to default answers.
+        assert_eq!(backend.input_box(&request).unwrap(), "default");
+    }
+
+    #[test]
+    fn input_requests_are_recorded() {
+        let backend = MemoryBackend::new();
+        backend
+            .input_box(
+                &InputBoxRequest::new("port?")
+                    .with_title(Some("Config".into()))
+                    .with_default("8080")
+                    .with_position(100, 200),
+            )
+            .unwrap();
+
+        let requests = backend.take_inputbox_requests();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].prompt, "port?");
+        assert_eq!(requests[0].title.as_deref(), Some("Config"));
+        assert_eq!(requests[0].default_response, "8080");
+        assert_eq!(requests[0].xpos, Some(100));
+        assert_eq!(requests[0].ypos, Some(200));
+        assert!(backend.inputbox_requests().is_empty());
+    }
+
+    #[test]
+    fn input_response_queue_helpers_round_trip() {
+        let backend = MemoryBackend::new();
+        backend.push_input_response("a");
+        backend.extend_input_responses(["b", "c"]);
+        assert_eq!(backend.pending_input_responses(), 3);
+        backend.clear_input_responses();
+        assert_eq!(backend.pending_input_responses(), 0);
     }
 }
