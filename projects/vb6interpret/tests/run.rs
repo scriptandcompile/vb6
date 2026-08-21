@@ -778,3 +778,98 @@ fn stop_enters_break_mode_with_a_debugger_attached() {
     );
     assert_eq!(interpreter.output(), vec!["before".to_string()]);
 }
+
+// ---- MsgBox ----
+
+use vb6runtime::state::interaction::{
+    self, memory::MemoryBackend as InteractionMemory, MsgBoxButton,
+};
+
+/// Run a module with a scripted interaction backend installed; returns the
+/// output lines and the recorded MsgBox requests.
+fn run_with_msgbox_responses(
+    body: &str,
+    responses: Vec<MsgBoxButton>,
+) -> (
+    Vec<String>,
+    Vec<vb6runtime::state::interaction::MsgBoxRecord>,
+) {
+    let source = format!("Attribute VB_Name = \"M\"\nSub Main()\n{}\nEnd Sub\n", body);
+    let source_file = SourceFile::from_string("scratch.bas", source);
+    let module = ModuleFile::parse(&source_file).unwrap_or_fail();
+    let mut interpreter = Interpreter::new();
+    interpreter.set_interaction_backend(Box::new(InteractionMemory::with_msgbox_responses(
+        responses,
+    )));
+    interpreter
+        .run_module(&module)
+        .expect("interpretation failed");
+    let out = interpreter.output().to_vec();
+    let requests = interaction::with_memory_backend(|m| m.take_msgbox_requests())
+        .expect("memory interaction backend installed");
+    interpreter.reset_interaction_backend();
+    (out, requests)
+}
+
+#[test]
+fn msgbox_function_returns_scripted_buttons_in_order() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let (out, requests) = run_with_msgbox_responses(
+        "    Dim r As Integer\n\
+         \x20   r = MsgBox(\"Save changes?\", vbYesNo + vbQuestion, \"Confirm\")\n\
+         \x20   Debug.Print \"r=\" & r\n\
+         \x20   r = MsgBox(\"Really quit?\", vbYesNo)\n\
+         \x20   Debug.Print \"r=\" & r\n",
+        vec![MsgBoxButton::Yes, MsgBoxButton::No],
+    );
+    assert_eq!(out, vec!["r=6", "r=7"]); // vbYes, then vbNo
+
+    // Both dialogs were recorded with their offered buttons.
+    assert_eq!(requests.len(), 2);
+    assert_eq!(requests[0].prompt, "Save changes?");
+    assert_eq!(requests[0].title.as_deref(), Some("Confirm"));
+    assert_eq!(
+        requests[0].offered_buttons,
+        vec![MsgBoxButton::Yes, MsgBoxButton::No]
+    );
+    assert_eq!(requests[1].prompt, "Really quit?");
+}
+
+#[test]
+fn msgbox_statement_defaults_without_scripting() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    // No queued responses: the dialog auto-answers with its default button
+    // so non-interactive runs keep going.
+    let (out, requests) = run_with_msgbox_responses(
+        "    MsgBox \"Done.\", vbInformation\n\
+         \x20   Debug.Print \"after\"\n",
+        vec![],
+    );
+    assert_eq!(out, vec!["after"]);
+    assert_eq!(requests.len(), 1);
+    assert_eq!(requests[0].default_button, MsgBoxButton::Ok);
+}
+
+#[test]
+fn msgbox_mismatched_scripted_response_is_a_runtime_error() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let source = "Attribute VB_Name = \"M\"\nSub Main()\n\
+         \x20   Dim r As Integer\n\
+         \x20   r = MsgBox(\"Overwrite file?\", vbYesNo)\n\
+         \x20   Debug.Print \"r=\" & r\n\
+         End Sub\n";
+    let source_file = SourceFile::from_string("scratch.bas", source);
+    let module = ModuleFile::parse(&source_file).unwrap_or_fail();
+    let mut interpreter = Interpreter::new();
+    // The dialog offers Yes/No but the script answers Cancel: error 5.
+    interpreter.set_interaction_backend(Box::new(InteractionMemory::with_msgbox_responses([
+        MsgBoxButton::Cancel,
+    ])));
+    let error = interpreter.run_module(&module).unwrap_err();
+    interpreter.reset_interaction_backend();
+
+    assert_eq!(error.error.number, 5);
+    assert!(error.error.description.contains("Cancel"));
+    // The program stopped before printing.
+    assert_eq!(interpreter.output(), Vec::<String>::new());
+}
