@@ -1,12 +1,19 @@
 //! Trait abstracting over platform-specific user interaction operations.
 //!
-//! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`) need a pluggable
-//! backend to support both native platforms and WASM environments:
+//! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`, `MsgBox`) need
+//! a pluggable backend to support both native platforms and WASM
+//! environments:
 //!
 //! - **Windows/Linux/macOS**: [`NativeBackend`](super::native::NativeBackend)
 //!   uses the real process environment and OS primitives.
-//! - **WASM/tests**: [`MemoryBackend`](super::memory::MemoryBackend)
+//! - **wasm32**: [`NativeBackend`](super::native::NativeBackend) shows the
+//!   browser's modal `alert`/`confirm` dialogs, while
+//!   [`MemoryBackend`](super::memory::MemoryBackend) (the wasm default)
 //!   provides injectable, deterministic behavior.
+
+use crate::error::VBResult;
+
+use super::msgbox::{MsgBoxButton, MsgBoxRequest};
 
 /// Abstraction over user interaction operations.
 ///
@@ -41,4 +48,22 @@ pub trait InteractionBackend: Send {
     /// treat it as a no-op — the interpreter then applies the compiled
     /// `.exe` behavior instead (`Stop` acts like `End`).
     fn stop(&self);
+
+    /// Show a modal message box and report which button was clicked.
+    ///
+    /// The `request` arrives fully decoded and validated (see
+    /// [`MsgBoxRequest::parse`](super::msgbox::MsgBoxRequest::parse));
+    /// implementations render it with whatever dialog facility the platform
+    /// offers and return the chosen button. Implementations that cannot show
+    /// a real dialog (headless machines, unsupported platforms) should log
+    /// the request and return the request's default button rather than
+    /// erroring, so programs stay runnable.
+    fn msg_box(&self, request: &MsgBoxRequest) -> VBResult<MsgBoxButton>;
+
+    /// Access the concrete backend type for downcasting.
+    ///
+    /// Hosts and tests install a backend they control and later need its
+    /// type-specific API back (e.g. the memory backend's scripted-response
+    /// queue); this makes the boxed trait object recoverable.
+    fn as_any(&self) -> &dyn std::any::Any;
 }
