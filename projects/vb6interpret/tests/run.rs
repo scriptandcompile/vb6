@@ -734,3 +734,47 @@ fn reset_settings_backend_restores_default() {
     // Reset backend (should restore default)
     interpreter.reset_settings_backend();
 }
+
+/// The `Stop` test module: a global is set and printed before `Stop`, and
+/// another print follows it (which must never run).
+const STOP_SOURCE: &str = "Attribute VB_Name = \"M\"\n\
+     Dim gX As Integer\n\
+     Sub Main()\n        \
+     gX = 42\n        \
+     Debug.Print \"before\"\n        \
+     Stop\n        \
+     Debug.Print \"after\"\n    \
+     End Sub\n";
+
+#[test]
+fn stop_terminates_like_end_outside_a_debugger() {
+    let source_file = SourceFile::from_string("scratch.bas", STOP_SOURCE);
+    let module = ModuleFile::parse(&source_file).unwrap_or_fail();
+    let mut interpreter = Interpreter::new();
+    interpreter.run_module(&module).unwrap();
+
+    // Compiled-`.exe` behavior: `Stop` acts like `End`.
+    assert!(interpreter.is_terminated());
+    assert_eq!(interpreter.output(), vec!["before".to_string()]);
+}
+
+#[test]
+fn stop_enters_break_mode_with_a_debugger_attached() {
+    let source_file = SourceFile::from_string("scratch.bas", STOP_SOURCE);
+    let module = ModuleFile::parse(&source_file).unwrap_or_fail();
+    let mut interpreter = Interpreter::new();
+    interpreter.set_record_debug_snapshots(true);
+    let error = interpreter.run_module(&module).unwrap_err();
+
+    // Development-environment behavior: suspend execution (break mode).
+    assert!(error.is_debug_pause());
+    assert_eq!(error.line, Some(5));
+    assert_eq!(error.procedure.as_deref(), Some("Main"));
+
+    // Unlike `End`, no files are closed and no variables cleared.
+    assert_eq!(
+        interpreter.global("gX").and_then(|v| v.as_i32().ok()),
+        Some(42)
+    );
+    assert_eq!(interpreter.output(), vec!["before".to_string()]);
+}

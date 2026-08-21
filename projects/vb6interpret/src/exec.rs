@@ -150,7 +150,19 @@ impl Interpreter {
                 self.terminated = true;
                 Ok(Flow::Terminate)
             }
-            SyntaxKind::StopStatement => Ok(Flow::Next),
+            SyntaxKind::StopStatement => {
+                vb6runtime::library::interaction::stop::stop();
+                if self.record_debug_snapshots {
+                    // Development environment: suspend execution (break
+                    // mode) without closing files or clearing variables.
+                    return Err(RunError::debug_pause()
+                        .at_line(line)
+                        .in_procedure(&self.current_procedure_name()));
+                }
+                // Compiled executable: `Stop` acts like `End`.
+                self.terminated = true;
+                Ok(Flow::Terminate)
+            }
             SyntaxKind::BeepStatement => {
                 vb6runtime::library::interaction::beep::beep();
                 Ok(Flow::Next)

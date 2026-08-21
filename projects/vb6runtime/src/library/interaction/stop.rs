@@ -231,3 +231,29 @@
 //! ## References
 //!
 //! - [Stop Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/stop-statement)
+
+use crate::state;
+
+/// Implement VB6's `Stop` statement.
+///
+/// Signals a break request to the active interaction backend. In the
+/// development environment (a debugger is attached, e.g. the WASM
+/// playground) the host enters break mode with all state preserved; in a
+/// plain run — like a compiled `.exe` — `Stop` acts like the `End`
+/// statement. The interpreter decides which behavior applies; this call
+/// only delivers the runtime-side signal.
+pub fn stop() {
+    state::interaction::stop();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::test_support::lock_test;
+
+    #[test]
+    fn stop_does_not_panic() {
+        let _guard = lock_test();
+        stop();
+    }
+}
