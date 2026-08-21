@@ -634,3 +634,186 @@
 //! parentheses), it may be parsed differently. This module exists primarily for documentation purposes
 //! to provide comprehensive reference material for VB6 developers working with user interaction and
 //! message display operations.
+
+use crate::error::{err_number, VBError, VBResult};
+use crate::state;
+use crate::value::{VBLong, VBString, VBVariant};
+
+/// Implement VB6's `MsgBox` function.
+///
+/// Decodes and validates the `buttons` argument (raising error 5 for
+/// invalid values, including a default-button index past the last displayed
+/// button), enforces the helpfile/context pairing rule, then hands the
+/// request to the active [`interaction backend`](crate::state::interaction)
+/// and returns the clicked button's `VbMsgBoxResult` value as an Integer.
+pub fn msg_box(
+    prompt: &VBString,
+    buttons: Option<&VBLong>,
+    title: Option<&VBString>,
+    helpfile: Option<&VBString>,
+    context: Option<&VBLong>,
+) -> VBResult<VBVariant> {
+    // VB6 requires helpfile and context to appear together.
+    if helpfile.is_some() != context.is_some() {
+        return Err(VBError::with_description(
+            err_number::INVALID_PROCEDURE_CALL,
+            "Invalid procedure call or argument: MsgBox requires helpfile and context \
+             to be provided together",
+        ));
+    }
+
+    let raw_buttons = buttons.map_or(0, |b| b.as_i32() as i64);
+    let mut request = state::interaction::MsgBoxRequest::parse(prompt.as_str(), raw_buttons)?;
+
+    // An omitted or empty title means "show the application name"; hosts
+    // resolve that from `None`.
+    let title = title.and_then(|t| {
+        let t = t.as_str();
+        (!t.is_empty()).then(|| t.to_string())
+    });
+    request.title = title;
+
+    let button = state::interaction::msg_box(&request)?;
+    Ok(VBVariant::from_integer(button.id()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::interaction::{memory::MemoryBackend, MsgBoxButton};
+    use crate::state::test_support::lock_test;
+
+    fn set_backend(backend: MemoryBackend) {
+        state::interaction::set_backend(Box::new(backend));
+    }
+
+    #[test]
+    fn plain_ok_dialog_returns_vbok() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let result = msg_box(&VBString::from("hello"), None, None, None, None).unwrap();
+        assert_eq!(result.as_vbinteger().unwrap(), 1.into()); // vbOK
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn scripted_yes_no_answers_in_order() {
+        let _guard = lock_test();
+        let backend = MemoryBackend::with_msgbox_responses([MsgBoxButton::Yes, MsgBoxButton::No]);
+        set_backend(backend);
+        let buttons = VBLong::from(4 + 32); // vbYesNo + vbQuestion
+
+        assert_eq!(
+            msg_box(&VBString::from("save?"), Some(&buttons), None, None, None).unwrap(),
+            VBVariant::from_integer(6) // vbYes
+        );
+        assert_eq!(
+            msg_box(&VBString::from("sure?"), Some(&buttons), None, None, None).unwrap(),
+            VBVariant::from_integer(7) // vbNo
+        );
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn incompatible_scripted_response_is_error_5() {
+        let _guard = lock_test();
+        // Dialog offers Yes/No but the scripted answer is Cancel.
+        set_backend(MemoryBackend::with_msgbox_responses([MsgBoxButton::Cancel]));
+        let buttons = VBLong::from(4); // vbYesNo
+        let err = msg_box(&VBString::from("go?"), Some(&buttons), None, None, None).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        assert!(err.description.contains("Cancel"));
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn invalid_buttons_value_is_error_5() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let buttons = VBLong::from(7); // button-set nibble out of range
+        let err = msg_box(&VBString::from("x"), Some(&buttons), None, None, None).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn default_button_past_last_displayed_is_error_5() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        // vbOKOnly + vbDefaultButton2: no second button exists.
+        let buttons = VBLong::from(256);
+        let err = msg_box(&VBString::from("x"), Some(&buttons), None, None, None).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn helpfile_without_context_is_error_5() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let helpfile = VBString::from("help.hlp");
+        let err = msg_box(&VBString::from("x"), None, None, Some(&helpfile), None).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+
+        let context = VBLong::from(10);
+        let err = msg_box(&VBString::from("x"), None, None, None, Some(&context)).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn paired_helpfile_and_context_are_accepted() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let helpfile = VBString::from("help.hlp");
+        let context = VBLong::from(10);
+        let result = msg_box(
+            &VBString::from("x"),
+            None,
+            None,
+            Some(&helpfile),
+            Some(&context),
+        )
+        .unwrap();
+        assert_eq!(result.as_vbinteger().unwrap(), 1.into());
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn empty_title_falls_back_to_application_default() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let title = VBString::from("");
+        msg_box(&VBString::from("x"), None, Some(&title), None, None).unwrap();
+
+        let requests = state::interaction::with_memory_backend(|m| m.msgbox_requests()).unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].title, None);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn title_and_prompt_reach_the_backend_record() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let buttons = VBLong::from(3); // vbYesNoCancel
+        let title = VBString::from("Confirm");
+        msg_box(
+            &VBString::from("Proceed?"),
+            Some(&buttons),
+            Some(&title),
+            None,
+            None,
+        )
+        .unwrap();
+
+        let requests = state::interaction::with_memory_backend(|m| m.msgbox_requests()).unwrap();
+        assert_eq!(requests[0].prompt, "Proceed?");
+        assert_eq!(requests[0].title.as_deref(), Some("Confirm"));
+        assert_eq!(
+            requests[0].offered_buttons,
+            vec![MsgBoxButton::Yes, MsgBoxButton::No, MsgBoxButton::Cancel]
+        );
+        state::interaction::reset_backend();
+    }
+}

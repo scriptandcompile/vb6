@@ -79,7 +79,9 @@ jiff = { version = "0.2.35", features = ["js"] }
 
 # Platform-specific system clock (vb6runtime)
 libc = "0.2"
-windows-sys = { version = "0.61.2", features = ["Win32_System_Time", "Win32_System_Registry"] }
+# Win32_UI_WindowsAndMessaging provides MessageBoxW for the native MsgBox
+# backend; Win32_Foundation is pulled in by that feature's types.
+windows-sys = { version = "0.61.2", features = ["Win32_System_Time", "Win32_System_Registry", "Win32_UI_WindowsAndMessaging", "Win32_Foundation"] }
 
 # Code generation (vb6compile, vb6codegen)
 heck = "0.5"

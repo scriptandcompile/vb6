@@ -1,22 +1,33 @@
 //! Process-global user interaction state for VB6.
 //!
-//! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`) delegate to a
-//! pluggable [`InteractionBackend`] so the same API works across platforms:
+//! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`, `MsgBox`)
+//! delegate to a pluggable [`InteractionBackend`] so the same API works
+//! across platforms:
 //!
-//! - **Native** (default): reads real command-line args, yields the thread,
-//!   and beeps via the terminal bell character.
-//! - **WASM/tests**: [`MemoryBackend`](memory::MemoryBackend) provides
-//!   injectable, deterministic behavior with no OS side effects.
+//! - **Native** (default on Windows/Linux/macOS): reads real command-line
+//!   args, yields the thread, beeps via the terminal bell character, and
+//!   shows real dialogs (`MessageBoxW` on Windows, `osascript` on macOS,
+//!   `zenity` on Linux, browser `alert`/`confirm` on wasm32).
+//! - **Memory** (default on wasm32/tests): injectable, deterministic
+//!   behavior with no OS side effects — including a scripted response list
+//!   for `MsgBox`.
 //!
-//! The backend can be switched at runtime with [`set_backend`].
+//! The backend can be switched at runtime with [`set_backend`]; a WASM host
+//! that wants real modal dialogs installs
+//! [`NativeBackend`](native::NativeBackend), and a native test harness that
+//! wants scripted answers installs [`MemoryBackend`](memory::MemoryBackend).
 
 pub mod backend;
 pub mod memory;
+pub mod msgbox;
 pub mod native;
 
 use std::sync::{Mutex, OnceLock};
 
 pub use backend::InteractionBackend;
+pub use msgbox::{
+    MsgBoxButton, MsgBoxButtonSet, MsgBoxIcon, MsgBoxModality, MsgBoxRecord, MsgBoxRequest,
+};
 
 /// The active interaction backend.
 static BACKEND: OnceLock<Mutex<Box<dyn InteractionBackend>>> = OnceLock::new();
@@ -98,6 +109,32 @@ pub fn stop() {
     backend().lock().unwrap_or_else(|e| e.into_inner()).stop()
 }
 
+/// Show a modal message box and report which button was clicked.
+///
+/// The `request` must already be validated (see
+/// [`MsgBoxRequest::parse`]); this only routes it to the active backend.
+/// Corresponds to VB6's `MsgBox` function.
+pub fn msg_box(request: &MsgBoxRequest) -> crate::error::VBResult<MsgBoxButton> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .msg_box(request)
+}
+
+/// Run `f` with the active backend downcast to [`MemoryBackend`].
+///
+/// Hosts and tests use this to reach the memory backend's scripting API
+/// (queued `MsgBox` responses, the request log) after installing it with
+/// [`set_backend`]. Returns `None` when the active backend is not the
+/// memory backend.
+pub fn with_memory_backend<R>(f: impl FnOnce(&memory::MemoryBackend) -> R) -> Option<R> {
+    let guard = backend().lock().unwrap_or_else(|e| e.into_inner());
+    guard
+        .as_any()
+        .downcast_ref::<memory::MemoryBackend>()
+        .map(f)
+}
+
 /// Reset all interaction state (for testing).
 pub fn reset() {
     reset_backend();
@@ -155,6 +192,27 @@ mod tests {
         let _guard = lock_test();
         set_backend(Box::new(memory::MemoryBackend::new()));
         stop();
+        reset_backend();
+    }
+
+    #[test]
+    fn msg_box_routes_to_the_active_backend() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::with_msgbox_responses([
+            msgbox::MsgBoxButton::Retry,
+        ])));
+        let request = MsgBoxRequest::parse("continue?", 5).unwrap();
+        assert_eq!(msg_box(&request).unwrap(), msgbox::MsgBoxButton::Retry);
+        reset_backend();
+    }
+
+    #[test]
+    fn msg_box_defaults_without_scripted_responses() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::new()));
+        // vbOKCancel: default button is OK.
+        let request = MsgBoxRequest::parse("proceed?", 1).unwrap();
+        assert_eq!(msg_box(&request).unwrap(), msgbox::MsgBoxButton::Ok);
         reset_backend();
     }
 }
