@@ -12,6 +12,7 @@ use vb6runtime::library::interaction::command::command;
 use vb6runtime::library::interaction::command_dollar::command_dollar;
 use vb6runtime::library::interaction::doevents::do_events;
 use vb6runtime::library::interaction::msgbox::msg_box;
+use vb6runtime::library::interaction::shell::shell;
 use vb6runtime::value::{VBLong, VBString};
 use vb6runtime::VBVariant;
 
@@ -43,6 +44,10 @@ pub(super) fn register(registry: &mut Registry) {
             helpfile.as_ref(),
             context.as_ref(),
         )
+    }));
+    registry.insert(builtin!("shell", 1, 2, |args| {
+        let pathname = arg_string(args, 0)?;
+        shell(&pathname, args.get(1))
     }));
 }
 
@@ -165,5 +170,48 @@ mod tests {
             .unwrap();
             assert_eq!(result.as_vbinteger().unwrap(), 1.into());
         });
+    }
+
+    #[test]
+    fn shell_dispatches_and_returns_a_double_task_id() {
+        let _guard = BACKEND_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        interaction::set_backend(Box::new(
+            vb6runtime::state::interaction::memory::MemoryBackend::with_shell_responses([4242.0]),
+        ));
+        let result = call_builtin(
+            "Shell",
+            &[
+                VBVariant::from_string("notepad.exe"),
+                VBVariant::from_long(1), // vbNormalFocus
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_f64().unwrap(), 4242.0);
+        interaction::reset_backend();
+    }
+
+    #[test]
+    fn shell_requires_a_pathname() {
+        let err = call_builtin("Shell", &[]).unwrap_err();
+        assert_eq!(
+            err.number,
+            vb6core::error::err_number::WRONG_NUMBER_OF_ARGUMENTS
+        );
+    }
+
+    #[test]
+    fn shell_rejects_undefined_window_styles() {
+        let _guard = BACKEND_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        interaction::set_backend(Box::new(
+            vb6runtime::state::interaction::memory::MemoryBackend::new(),
+        ));
+        // 5 is not a VbAppWinStyle value.
+        let err = call_builtin(
+            "Shell",
+            &[VBVariant::from_string("x"), VBVariant::from_long(5)],
+        )
+        .unwrap_err();
+        assert_eq!(err.number, 5);
+        interaction::reset_backend();
     }
 }

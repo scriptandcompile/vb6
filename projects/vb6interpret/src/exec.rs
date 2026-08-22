@@ -1194,6 +1194,13 @@ impl Interpreter {
                 crate::builtins::call_builtin("beep", &args).map_err(|e| self.error_here(e))?;
                 Ok(Flow::Next)
             }
+            // `Shell "prog"` statement form: the backend starts the program
+            // (or records the request) and the task ID is discarded because
+            // this form is a statement, not a function call.
+            "shell" => {
+                crate::builtins::call_builtin("shell", &args).map_err(|e| self.error_here(e))?;
+                Ok(Flow::Next)
+            }
             _ => Err(self.error_here(VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED))), // Sub or Function not defined
         }
     }
