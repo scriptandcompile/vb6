@@ -25,9 +25,25 @@
 //! - **Anything else / headless**: the request is logged to stderr and the
 //!   default response is returned, so programs remain runnable without a
 //!   GUI. Cancel always yields `""`, matching VB6.
+//!
+//! `AppActivate` follows it too:
+//!
+//! - **Windows**: `EnumWindows` matching captions by prefix (then suffix,
+//!   per VB6 rules; numeric titles additionally try Shell task IDs via
+//!   process id), raised with `SetForegroundWindow`.
+//! - **macOS**: `osascript` driving System Events (`frontmost`, window
+//!   raise).
+//! - **Linux (X11)**: `wmctrl -l -a`.
+//! - **Anything else / headless**: the request is logged to stderr and the
+//!   call succeeds, so programs remain runnable without a GUI.
+//!
+//! On every platform that *does* have a working window facility but no
+//! matching window, the statement raises VB6 error 5 ("Invalid procedure
+//! call or argument"), exactly as real VB6 does.
 
-use crate::error::VBResult;
+use crate::error::{err_number, VBError, VBResult};
 
+use super::appactivate::AppActivateRequest;
 use super::backend::InteractionBackend;
 use super::inputbox::InputBoxRequest;
 use super::msgbox::{MsgBoxButton, MsgBoxRequest};
@@ -77,6 +93,10 @@ impl InteractionBackend for NativeBackend {
 
     fn input_box(&self, request: &InputBoxRequest) -> VBResult<String> {
         show_input_dialog(request)
+    }
+
+    fn app_activate(&self, request: &AppActivateRequest) -> VBResult<()> {
+        activate_window(request)
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
@@ -173,6 +193,80 @@ fn input_fallback(request: &InputBoxRequest) -> String {
     request.default_response.clone()
 }
 
+/// Activate a matching window where the platform provides one; log-and-
+/// succeed everywhere else. Only a platform with a working window facility
+/// that cannot find the window raises VB6 error 5 — a headless machine has
+/// no windows to find, so failing every call would abort otherwise runnable
+/// programs.
+fn activate_window(request: &AppActivateRequest) -> VBResult<()> {
+    #[cfg(target_os = "windows")]
+    {
+        if windows::activate_window(request) {
+            Ok(())
+        } else {
+            Err(no_such_window(&request.title))
+        }
+    }
+    #[cfg(target_os = "macos")]
+    {
+        match macos::activate_window(request) {
+            Some(true) => Ok(()),
+            Some(false) => Err(no_such_window(&request.title)),
+            None => {
+                activate_fallback(request);
+                Ok(())
+            }
+        }
+    }
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        match linux::activate_window(request) {
+            Some(true) => Ok(()),
+            Some(false) => Err(no_such_window(&request.title)),
+            None => {
+                activate_fallback(request);
+                Ok(())
+            }
+        }
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        // Browsers (wasm32) and exotic targets expose no OS windows.
+        let _ = request;
+        activate_fallback(request);
+        Ok(())
+    }
+}
+
+/// Build the error 5 raised when a platform with real windows has none
+/// matching `title`.
+#[cfg_attr(
+    not(any(windows, unix)),
+    allow(dead_code) // exercised by tests; consumed by the platform backends
+)]
+fn no_such_window(title: &str) -> VBError {
+    VBError::with_description(
+        err_number::INVALID_PROCEDURE_CALL,
+        format!(
+            "Invalid procedure call or argument: AppActivate found no window titled \
+             \"{title}\""
+        ),
+    )
+}
+
+/// Log the request to stderr and report success.
+///
+/// Used when no window facility exists (headless machines, wasm32) so
+/// batch runs keep going instead of failing.
+#[cfg_attr(target_arch = "wasm32", allow(dead_code))] // still exercised by tests
+fn activate_fallback(request: &AppActivateRequest) {
+    if request.wait {
+        eprintln!("[AppActivate] {} [wait]", request.title);
+    } else {
+        eprintln!("[AppActivate] {}", request.title);
+    }
+}
+
 #[cfg(target_os = "windows")]
 mod windows {
     use std::cell::RefCell;
@@ -190,6 +284,7 @@ mod windows {
         WS_CHILD, WS_GROUP, WS_POPUP, WS_SYSMENU, WS_TABSTOP, WS_VISIBLE,
     };
 
+    use super::super::appactivate::AppActivateRequest;
     use super::super::inputbox::InputBoxRequest;
     use super::super::msgbox::{
         MsgBoxButton, MsgBoxButtonSet, MsgBoxIcon, MsgBoxModality, MsgBoxRequest,
@@ -252,6 +347,104 @@ mod windows {
         let result = unsafe { MessageBoxW(hwnd, text.as_ptr(), caption.as_ptr(), flags) };
 
         MsgBoxButton::from_id(result as i16).unwrap_or_else(|| request.default_button_value())
+    }
+
+    // ---- AppActivate ----
+
+    /// One top-level window seen by [`activate_window`]'s enumeration.
+    struct WindowInfo {
+        hwnd: isize,
+        title: String,
+        pid: u32,
+    }
+
+    /// Bring the window matching `request` to the foreground.
+    ///
+    /// Mirrors VB6 matching: numeric titles are tried as Shell task IDs
+    /// (process ids) first; otherwise an exact caption match wins over a
+    /// case-insensitive prefix match, which in turn wins over a
+    /// case-insensitive suffix match. Returns whether a window was found
+    /// and focused.
+    pub(super) fn activate_window(request: &AppActivateRequest) -> bool {
+        use windows_sys::Win32::UI::WindowsAndMessaging::{
+            EnumWindows, IsIconic, SetForegroundWindow, ShowWindow, SW_RESTORE,
+        };
+
+        unsafe extern "system" fn enum_proc(hwnd: HWND, lparam: LPARAM) -> windows_sys::core::BOOL {
+            use windows_sys::Win32::UI::WindowsAndMessaging::{
+                GetWindowTextLengthW, GetWindowTextW, GetWindowThreadProcessId, IsWindowVisible,
+            };
+
+            let windows = &mut *(lparam as *mut Vec<WindowInfo>);
+            if IsWindowVisible(hwnd) != 0 {
+                let mut title = String::new();
+                let len = GetWindowTextLengthW(hwnd);
+                if len > 0 {
+                    let mut buffer = vec![0u16; len as usize + 1];
+                    let copied =
+                        GetWindowTextW(hwnd, buffer.as_mut_ptr(), buffer.len() as i32) as usize;
+                    buffer.truncate(copied);
+                    title = String::from_utf16_lossy(&buffer);
+                }
+                let mut pid: u32 = 0;
+                GetWindowThreadProcessId(hwnd, &mut pid);
+                windows.push(WindowInfo {
+                    hwnd: hwnd as isize,
+                    title,
+                    pid,
+                });
+            }
+            1 // keep enumerating
+        }
+
+        let mut windows: Vec<WindowInfo> = Vec::new();
+        unsafe {
+            EnumWindows(Some(enum_proc), &mut windows as *mut _ as LPARAM);
+        }
+
+        let needle = request.title.to_lowercase();
+
+        // Task-id form (`AppActivate Shell(...)`) matches by process id;
+        // string form walks VB6's exact → prefix → suffix ladder.
+        let target = if let Some(task_id) = request.as_task_id() {
+            windows
+                .iter()
+                .find(|w| w.pid == task_id as u32)
+                .map(|w| w.hwnd)
+                .or_else(|| find_string_match(&windows, &needle))
+        } else {
+            find_string_match(&windows, &needle)
+        };
+
+        let Some(hwnd) = target else {
+            return false;
+        };
+
+        unsafe {
+            let hwnd = hwnd as HWND;
+            if IsIconic(hwnd) != 0 {
+                ShowWindow(hwnd, SW_RESTORE);
+            }
+            SetForegroundWindow(hwnd);
+        }
+        true
+    }
+
+    /// Walk the exact → prefix → suffix caption ladder for `needle`.
+    ///
+    /// Comparisons fold case, mirroring VB6's case-insensitive title
+    /// matching.
+    fn find_string_match(windows: &[WindowInfo], needle: &str) -> Option<isize> {
+        let folded: Vec<(isize, String)> = windows
+            .iter()
+            .map(|w| (w.hwnd, w.title.to_lowercase()))
+            .collect();
+        folded
+            .iter()
+            .find(|(_, title)| title == needle)
+            .or_else(|| folded.iter().find(|(_, title)| title.starts_with(needle)))
+            .or_else(|| folded.iter().find(|(_, title)| title.ends_with(needle)))
+            .map(|(hwnd, _)| *hwnd)
     }
 
     // ---- InputBox ----
@@ -503,6 +696,7 @@ mod windows {
 mod macos {
     use std::process::Command;
 
+    use super::super::appactivate::AppActivateRequest;
     use super::super::msgbox::{MsgBoxButton, MsgBoxIcon, MsgBoxRequest};
 
     /// Escape a string for embedding in a double-quoted AppleScript literal.
@@ -593,12 +787,66 @@ mod macos {
         let (_, value) = stdout.rsplit_once("text returned:")?;
         Some(value.strip_suffix('\n').unwrap_or(value).to_string())
     }
+
+    // ---- AppActivate ----
+
+    /// Bring a window whose title matches to the foreground via
+    /// `osascript` + System Events.
+    ///
+    /// Two passes mirror VB6 matching: process/window names that begin
+    /// with the requested title win first, ones that end with it second;
+    /// comparisons are case-insensitive. Returns:
+    ///
+    /// - `Some(true)` / `Some(false)` when osascript ran (match found or
+    ///   not),
+    /// - `None` when osascript is unavailable or refuses to run (headless
+    ///   machines, automation permissions), letting the caller fall back.
+    pub(super) fn activate_window(request: &AppActivateRequest) -> Option<bool> {
+        let title = escape(&request.title);
+
+        for comparison in ["begins with", "ends with"] {
+            let script = format!(
+                "tell application \"System Events\"\n\
+                 \x20 repeat with p in (every application process whose visible is true)\n\
+                 \x20   if name of p {comparison} \"{title}\" then\n\
+                 \x20     set frontmost of p to true\n\
+                 \x20     return \"activated\"\n\
+                 \x20   end if\n\
+                 \x20   try\n\
+                 \x20     repeat with w in (every window of p)\n\
+                 \x20       if name of w {comparison} \"{title}\" then\n\
+                 \x20         perform action \"AXRaise\" of w\n\
+                 \x20         set frontmost of p to true\n\
+                 \x20         return \"activated\"\n\
+                 \x20       end if\n\
+                 \x20     end repeat\n\
+                 \x20   end try\n\
+                 \x20 end repeat\n\
+                 end tell\n\
+                 return \"missing\""
+            );
+
+            let output = Command::new("osascript")
+                .arg("-e")
+                .arg(&script)
+                .output()
+                .ok()?;
+            if !output.status.success() {
+                return None;
+            }
+            if String::from_utf8_lossy(&output.stdout).trim() == "activated" {
+                return Some(true);
+            }
+        }
+        Some(false)
+    }
 }
 
 #[cfg(all(unix, not(target_os = "macos")))]
 mod linux {
     use std::process::Command;
 
+    use super::super::appactivate::AppActivateRequest;
     use super::super::inputbox::InputBoxRequest;
     use super::super::msgbox::{MsgBoxButton, MsgBoxIcon, MsgBoxRequest};
 
@@ -695,6 +943,53 @@ mod linux {
             text.pop();
         }
         Some(text)
+    }
+
+    /// Bring a window whose title matches to the foreground via `wmctrl`.
+    ///
+    /// The window list from `wmctrl -l` is matched in Rust so VB6's rules
+    /// apply exactly: case-insensitive prefix first, suffix second (exact
+    /// matches win inside both). Returns:
+    ///
+    /// - `Some(true)` / `Some(false)` when wmctrl ran (match found and
+    ///   activated, or no match),
+    /// - `None` when wmctrl is unavailable or cannot reach a display
+    ///   (headless machines, Wayland sessions without XWayland), letting
+    ///   the caller fall back.
+    pub(super) fn activate_window(request: &AppActivateRequest) -> Option<bool> {
+        let listing = Command::new("wmctrl").arg("-l").output().ok()?;
+        if !listing.status.success() {
+            return None;
+        }
+
+        let needle = request.title.to_lowercase();
+        let windows: Vec<(String, String)> = String::from_utf8_lossy(&listing.stdout)
+            .lines()
+            .filter_map(|line| {
+                let mut parts = line.splitn(4, char::is_whitespace);
+                let id = parts.next()?.to_string();
+                parts.next()?; // desktop number
+                parts.next()?; // hostname
+                Some((id, parts.next()?.to_lowercase()))
+            })
+            .collect();
+
+        let find = |predicate: &dyn Fn(&str) -> bool| -> Option<String> {
+            windows
+                .iter()
+                .find(|(_, title)| predicate(title))
+                .map(|(id, _)| id.clone())
+        };
+        let target = find(&|t| t == needle)
+            .or_else(|| find(&|t| t.starts_with(&needle)))
+            .or_else(|| find(&|t| t.ends_with(&needle)))?;
+
+        Command::new("wmctrl")
+            .args(["-i", "-a"])
+            .arg(target)
+            .status()
+            .ok()
+            .map(|status| status.success())
     }
 }
 
@@ -837,6 +1132,27 @@ mod tests {
     fn input_fallback_answers_default_response() {
         let request = InputBoxRequest::new("headless?").with_default("42");
         assert_eq!(input_fallback(&request), "42");
+    }
+
+    #[test]
+    fn no_such_window_is_error_5_describing_the_title() {
+        let err = no_such_window("Ghost Window");
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        assert!(
+            err.description.contains("Ghost Window"),
+            "{}",
+            err.description
+        );
+    }
+
+    #[test]
+    fn app_activate_does_not_panic() {
+        // Exercises whatever path this platform provides (real window
+        // facility, logging fallback) without asserting on OS state.
+        let backend = NativeBackend::new();
+        let _ = backend.app_activate(&AppActivateRequest::new(
+            "definitely-not-a-real-window-title-42",
+        ));
     }
 
     #[test]

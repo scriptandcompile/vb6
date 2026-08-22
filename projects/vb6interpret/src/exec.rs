@@ -167,6 +167,10 @@ impl Interpreter {
                 vb6runtime::library::interaction::beep::beep();
                 Ok(Flow::Next)
             }
+            SyntaxKind::AppActivateStatement => {
+                self.exec_app_activate(node)?;
+                Ok(Flow::Next)
+            }
             SyntaxKind::OptionStatement
             | SyntaxKind::TypeStatement
             | SyntaxKind::EnumStatement
@@ -418,6 +422,36 @@ impl Interpreter {
                 vb6runtime::state::clock::reset();
             }
         }
+        Ok(())
+    }
+
+    /// `AppActivate title[, wait]`: bring a matching window to the foreground.
+    ///
+    /// The title expression is converted to its string form (a numeric
+    /// Shell task ID becomes its decimal digits, which platform backends
+    /// may resolve to a window); `wait` defaults to `False`.
+    fn exec_app_activate(&mut self, node: &CstNode) -> RunResult<()> {
+        let significant: Vec<&CstNode> = node.significant_children().collect();
+        let args: Vec<&CstNode> = significant
+            .iter()
+            .skip(1) // the AppActivate keyword
+            .copied()
+            .filter(|c| c.kind() != SyntaxKind::Comma)
+            .collect();
+        if args.is_empty() || args.len() > 2 {
+            return Err(self.error_here(VBError::invalid_procedure_call()));
+        }
+        let title = self.eval_expr(args[0])?;
+        let wait = match args.get(1) {
+            Some(expr) => self.eval_expr(expr)?.as_bool()?,
+            None => false,
+        };
+        let title = title.as_string().map_err(|e| self.error_here(e))?;
+        vb6runtime::library::interaction::app_activate::app_activate(
+            &vb6runtime::value::VBString::from(title),
+            wait,
+        )
+        .map_err(|e| self.error_here(e))?;
         Ok(())
     }
 

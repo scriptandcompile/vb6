@@ -1,8 +1,8 @@
 //! Process-global user interaction state for VB6.
 //!
 //! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`, `MsgBox`,
-//! `InputBox`) delegate to a pluggable [`InteractionBackend`] so the same
-//! API works across platforms:
+//! `InputBox`, `AppActivate`) delegate to a pluggable [`InteractionBackend`]
+//! so the same API works across platforms:
 //!
 //! - **Native** (default on Windows/Linux/macOS): reads real command-line
 //!   args, yields the thread, beeps via the terminal bell character, and
@@ -10,13 +10,14 @@
 //!   `zenity` on Linux, browser `alert`/`confirm` on wasm32).
 //! - **Memory** (default on wasm32/tests): injectable, deterministic
 //!   behavior with no OS side effects — including scripted response lists
-//!   for `MsgBox` and `InputBox`.
+//!   for `MsgBox`, `InputBox`, and `AppActivate`.
 //!
 //! The backend can be switched at runtime with [`set_backend`]; a WASM host
 //! that wants real modal dialogs installs
 //! [`NativeBackend`](native::NativeBackend), and a native test harness that
 //! wants scripted answers installs [`MemoryBackend`](memory::MemoryBackend).
 
+pub mod appactivate;
 pub mod backend;
 pub mod inputbox;
 pub mod memory;
@@ -25,6 +26,7 @@ pub mod native;
 
 use std::sync::{Mutex, OnceLock};
 
+pub use appactivate::{AppActivateRecord, AppActivateRequest};
 pub use backend::InteractionBackend;
 pub use inputbox::{InputBoxRecord, InputBoxRequest};
 pub use msgbox::{
@@ -133,6 +135,19 @@ pub fn input_box(request: &InputBoxRequest) -> crate::error::VBResult<String> {
         .lock()
         .unwrap_or_else(|e| e.into_inner())
         .input_box(request)
+}
+
+/// Bring an application window to the foreground.
+///
+/// The `request` must already be assembled (see
+/// [`AppActivateRequest::new`]); this only routes it to the active backend.
+/// Corresponds to VB6's `AppActivate` statement: raises VB6 error 5 when a
+/// platform with real windows has no matching window.
+pub fn app_activate(request: &AppActivateRequest) -> crate::error::VBResult<()> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .app_activate(request)
 }
 
 /// Run `f` with the active backend downcast to [`MemoryBackend`].
@@ -247,6 +262,25 @@ mod tests {
         set_backend(Box::new(memory::MemoryBackend::new()));
         let request = InputBoxRequest::new("value?").with_default("fallback");
         assert_eq!(input_box(&request).unwrap(), "fallback");
+        reset_backend();
+    }
+
+    #[test]
+    fn app_activate_routes_to_the_active_backend() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::with_activate_responses([
+            false,
+        ])));
+        let request = AppActivateRequest::new("Calculator");
+        assert!(app_activate(&request).is_err());
+        reset_backend();
+    }
+
+    #[test]
+    fn app_activate_defaults_without_scripted_responses() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::new()));
+        assert!(app_activate(&AppActivateRequest::new("Calculator")).is_ok());
         reset_backend();
     }
 }
