@@ -35,8 +35,8 @@ libc.workspace = true
 [target.'cfg(target_os = "windows")'.dependencies]
 windows-sys.workspace = true
 
-# The native interaction backend shows real browser dialogs (`alert`/
-# `confirm`) when a host installs it on wasm32. The modern random backend
+# The native interaction backend (the default) shows real browser dialogs
+# (`alert`/`confirm`) on wasm32. The modern random backend
 # needs an OS entropy source; on wasm32-unknown-unknown that requires
 # getrandom's `wasm_js` backend.
 [target.'cfg(target_arch = "wasm32")'.dependencies]

@@ -4,12 +4,11 @@
 //! `InputBox`, `AppActivate`) need a pluggable backend to support both
 //! native platforms and WASM environments:
 //!
-//! - **Windows/Linux/macOS**: [`NativeBackend`](super::native::NativeBackend)
-//!   uses the real process environment and OS primitives.
-//! - **wasm32**: [`NativeBackend`](super::native::NativeBackend) shows the
-//!   browser's modal `alert`/`confirm` dialogs, while
-//!   [`MemoryBackend`](super::memory::MemoryBackend) (the wasm default)
-//!   provides injectable, deterministic behavior.
+//! - [`NativeBackend`](super::native::NativeBackend) (the default) uses the
+//!   real process environment and OS primitives, showing the browser's
+//!   modal `alert`/`confirm` dialogs on wasm32.
+//! - [`MemoryBackend`](super::memory::MemoryBackend) provides injectable,
+//!   deterministic behavior for tests.
 
 use crate::error::VBResult;
 

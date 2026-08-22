@@ -4,20 +4,19 @@
 //! `InputBox`, `AppActivate`, `Shell`) delegate to a pluggable
 //! [`InteractionBackend`] so the same API works across platforms:
 //!
-//! - **Native** (default on Windows/Linux/macOS): reads real command-line
-//!   args, yields the thread, beeps via the terminal bell character, shows
-//!   real dialogs (`MessageBoxW` on Windows, `osascript` on macOS,
-//!   `zenity` on Linux, browser `alert`/`confirm` on wasm32), and starts
-//!   real processes (`CreateProcessW` on Windows, detached spawns with
-//!   quoted command-line splitting on Linux/macOS).
-//! - **Memory** (default on wasm32/tests): injectable, deterministic
-//!   behavior with no OS side effects — including scripted response lists
-//!   for `MsgBox`, `InputBox`, `AppActivate`, and `Shell`.
+//! - **Native** (default everywhere): reads real command-line args, yields
+//!   the thread, beeps via the terminal bell character, shows real dialogs
+//!   (`MessageBoxW` on Windows, `osascript` on macOS, `zenity` on Linux,
+//!   browser `alert`/`confirm` on wasm32), and starts real processes
+//!   (`CreateProcessW` on Windows, detached spawns with quoted command-line
+//!   splitting on Linux/macOS).
+//! - **Memory** (tests): injectable, deterministic behavior with no OS side
+//!   effects — including scripted response lists for `MsgBox`, `InputBox`,
+//!   `AppActivate`, and `Shell`.
 //!
-//! The backend can be switched at runtime with [`set_backend`]; a WASM host
-//! that wants real modal dialogs installs
-//! [`NativeBackend`](native::NativeBackend), and a native test harness that
-//! wants scripted answers installs [`MemoryBackend`](memory::MemoryBackend).
+//! The backend can be switched at runtime with [`set_backend`]; test
+//! harnesses wanting deterministic, scripted answers install
+//! [`MemoryBackend`](memory::MemoryBackend).
 
 pub mod appactivate;
 pub mod backend;
@@ -47,18 +46,14 @@ fn backend() -> &'static Mutex<Box<dyn InteractionBackend>> {
 
 /// Create the default backend for the current platform.
 fn default_backend() -> Box<dyn InteractionBackend> {
-    if cfg!(target_arch = "wasm32") {
-        Box::new(memory::MemoryBackend::new())
-    } else {
-        Box::new(native::NativeBackend::new())
-    }
+    Box::new(native::NativeBackend::new())
 }
 
 /// Set the active interaction backend.
 ///
 /// This is the primary way to switch how interaction operations behave
-/// at runtime. Use [`MemoryBackend`](memory::MemoryBackend) for tests or
-/// WASM hosts that need injectable command-line arguments.
+/// at runtime. Use [`MemoryBackend`](memory::MemoryBackend) for tests
+/// needing deterministic, scripted responses.
 pub fn set_backend(new_backend: Box<dyn InteractionBackend>) {
     *backend().lock().unwrap_or_else(|e| e.into_inner()) = new_backend;
 }

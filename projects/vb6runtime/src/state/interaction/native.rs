@@ -1,7 +1,7 @@
 //! Native implementation of user interaction operations.
 //!
 //! Uses real process environment and OS primitives. Suitable for
-//! Windows, Linux, macOS, and (when a host installs it) wasm32.
+//! Windows, Linux, macOS, and wasm32 (where it is the default backend).
 //!
 //! `MsgBox` rendering is platform-specific:
 //!
