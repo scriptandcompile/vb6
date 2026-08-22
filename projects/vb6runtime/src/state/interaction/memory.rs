@@ -1,14 +1,15 @@
 //! In-memory interaction backend for WASM and tests.
 //!
-//! Stores injectable command-line arguments, records every `MsgBox` and
-//! `InputBox` request a program makes, and answers those requests from
-//! scripted response lists — no OS side effects anywhere.
+//! Stores injectable command-line arguments, records every `MsgBox`,
+//! `InputBox`, and `AppActivate` request a program makes, and answers those
+//! requests from scripted response lists — no OS side effects anywhere.
 
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
 
 use crate::error::{err_number, VBError, VBResult};
 
+use super::appactivate::{AppActivateRecord, AppActivateRequest};
 use super::backend::InteractionBackend;
 use super::inputbox::{InputBoxRecord, InputBoxRequest};
 use super::msgbox::{MsgBoxButton, MsgBoxRecord, MsgBoxRequest};
@@ -32,6 +33,14 @@ use super::msgbox::{MsgBoxButton, MsgBoxRecord, MsgBoxRequest};
 /// scripted list fed by [`push_input_response`](Self::push_input_response).
 /// An empty queue returns the dialog's default text; remember Cancel also
 /// reads as the empty string in VB6, so queueing `""` scripts a cancel.
+///
+/// `AppActivate` is scripted too: requests land in the log (see
+/// [`appactivate_requests`](Self::appactivate_requests)) and are answered
+/// from the success flags queued by
+/// [`push_activate_response`](Self::push_activate_response) — `true` means a
+/// matching window was found and activated, `false` fails the statement with
+/// VB6 error 5, exactly as when no window matches. An empty queue succeeds,
+/// so programs keep running.
 pub struct MemoryBackend {
     /// The injected command-line arguments.
     command_args: Vec<String>,
@@ -45,6 +54,11 @@ pub struct MemoryBackend {
     input_responses: RefCell<VecDeque<String>>,
     /// Every `InputBox` request this backend has seen, in order.
     input_requests: RefCell<Vec<InputBoxRecord>>,
+    /// Scripted `AppActivate` outcomes (`true` = activated), consumed
+    /// first-in first-out.
+    activate_responses: RefCell<VecDeque<bool>>,
+    /// Every `AppActivate` request this backend has seen, in order.
+    activate_requests: RefCell<Vec<AppActivateRecord>>,
 }
 
 impl MemoryBackend {
@@ -57,6 +71,8 @@ impl MemoryBackend {
             msgbox_requests: RefCell::new(Vec::new()),
             input_responses: RefCell::new(VecDeque::new()),
             input_requests: RefCell::new(Vec::new()),
+            activate_responses: RefCell::new(VecDeque::new()),
+            activate_requests: RefCell::new(Vec::new()),
         }
     }
 
@@ -84,6 +100,14 @@ impl MemoryBackend {
                 .collect::<Vec<_>>()
                 .into(),
         );
+        backend
+    }
+
+    /// Create a backend whose `AppActivate` calls succeed or fail per
+    /// `responses` (`true` = activated, `false` = no matching window).
+    pub fn with_activate_responses(responses: impl IntoIterator<Item = bool>) -> Self {
+        let mut backend = Self::new();
+        backend.activate_responses = RefCell::new(responses.into_iter().collect());
         backend
     }
 
@@ -167,6 +191,42 @@ impl MemoryBackend {
     pub fn take_inputbox_requests(&self) -> Vec<InputBoxRecord> {
         std::mem::take(&mut *self.input_requests.borrow_mut())
     }
+
+    /// Queue the outcome of the next `AppActivate` call.
+    ///
+    /// `true` scripts a successful activation; `false` makes the statement
+    /// fail with VB6 error 5 ("Invalid procedure call or argument"), as it
+    /// does when no window matches. Queue as many outcomes as the program
+    /// will call `AppActivate` — once the list runs dry every activation
+    /// succeeds instead.
+    pub fn push_activate_response(&self, activated: bool) {
+        self.activate_responses.borrow_mut().push_back(activated);
+    }
+
+    /// Queue several scripted outcomes at once.
+    pub fn extend_activate_responses(&self, responses: impl IntoIterator<Item = bool>) {
+        self.activate_responses.borrow_mut().extend(responses);
+    }
+
+    /// Drop all queued (not yet consumed) `AppActivate` outcomes.
+    pub fn clear_activate_responses(&self) {
+        self.activate_responses.borrow_mut().clear();
+    }
+
+    /// How many scripted outcomes are still queued.
+    pub fn pending_activate_responses(&self) -> usize {
+        self.activate_responses.borrow().len()
+    }
+
+    /// Snapshot of every `AppActivate` request made so far, oldest first.
+    pub fn appactivate_requests(&self) -> Vec<AppActivateRecord> {
+        self.activate_requests.borrow().clone()
+    }
+
+    /// Take the recorded `AppActivate` requests, leaving the log empty.
+    pub fn take_appactivate_requests(&self) -> Vec<AppActivateRecord> {
+        std::mem::take(&mut *self.activate_requests.borrow_mut())
+    }
 }
 
 impl Default for MemoryBackend {
@@ -230,6 +290,28 @@ impl InteractionBackend for MemoryBackend {
             .borrow_mut()
             .pop_front()
             .unwrap_or_else(|| request.default_response.clone()))
+    }
+
+    fn app_activate(&self, request: &AppActivateRequest) -> VBResult<()> {
+        // Record what was requested before answering, so even a failing call
+        // leaves a trace of the offending request.
+        self.activate_requests
+            .borrow_mut()
+            .push(AppActivateRecord::of(request));
+
+        match self.activate_responses.borrow_mut().pop_front() {
+            // Nothing scripted: report success so non-interactive runs
+            // (WASM playground, batch tests) proceed.
+            None | Some(true) => Ok(()),
+            Some(false) => Err(VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                format!(
+                    "Invalid procedure call or argument: AppActivate found no window \
+                     titled \"{}\"",
+                    request.title,
+                ),
+            )),
+        }
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
@@ -408,5 +490,61 @@ mod tests {
         assert_eq!(backend.pending_input_responses(), 3);
         backend.clear_input_responses();
         assert_eq!(backend.pending_input_responses(), 0);
+    }
+
+    // ---- AppActivate scripting ----
+
+    #[test]
+    fn empty_activate_queue_succeeds() {
+        let backend = MemoryBackend::new();
+        assert!(backend
+            .app_activate(&AppActivateRequest::new("Calculator"))
+            .is_ok());
+    }
+
+    #[test]
+    fn queued_activate_outcomes_are_returned_in_order() {
+        let backend = MemoryBackend::with_activate_responses([true, false, true]);
+        let request = AppActivateRequest::new("Notepad");
+        assert!(backend.app_activate(&request).is_ok());
+        assert!(backend.app_activate(&request).is_err());
+        assert!(backend.app_activate(&request).is_ok());
+        // Queue exhausted: back to success.
+        assert!(backend.app_activate(&request).is_ok());
+    }
+
+    #[test]
+    fn failed_activation_is_error_5_describing_the_title() {
+        let backend = MemoryBackend::with_activate_responses([false]);
+        let request = AppActivateRequest::new("Missing Window").with_wait(true);
+        let err = backend.app_activate(&request).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        assert!(
+            err.description.contains("Missing Window"),
+            "{}",
+            err.description
+        );
+    }
+
+    #[test]
+    fn activate_requests_are_recorded_even_when_rejected() {
+        let backend = MemoryBackend::with_activate_responses([false]);
+        let _ = backend.app_activate(&AppActivateRequest::new("Calc"));
+
+        let requests = backend.take_appactivate_requests();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].title, "Calc");
+        assert!(!requests[0].wait);
+        assert!(backend.appactivate_requests().is_empty());
+    }
+
+    #[test]
+    fn activate_response_queue_helpers_round_trip() {
+        let backend = MemoryBackend::new();
+        backend.push_activate_response(true);
+        backend.extend_activate_responses([false, true]);
+        assert_eq!(backend.pending_activate_responses(), 3);
+        backend.clear_activate_responses();
+        assert_eq!(backend.pending_activate_responses(), 0);
     }
 }

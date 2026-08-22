@@ -1,8 +1,8 @@
 //! Trait abstracting over platform-specific user interaction operations.
 //!
 //! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`, `MsgBox`,
-//! `InputBox`) need a pluggable backend to support both native platforms and
-//! WASM environments:
+//! `InputBox`, `AppActivate`) need a pluggable backend to support both
+//! native platforms and WASM environments:
 //!
 //! - **Windows/Linux/macOS**: [`NativeBackend`](super::native::NativeBackend)
 //!   uses the real process environment and OS primitives.
@@ -13,6 +13,7 @@
 
 use crate::error::VBResult;
 
+use super::appactivate::AppActivateRequest;
 use super::inputbox::InputBoxRequest;
 use super::msgbox::{MsgBoxButton, MsgBoxRequest};
 
@@ -73,6 +74,18 @@ pub trait InteractionBackend: Send {
     /// should log the request and return `default_response` so programs stay
     /// runnable.
     fn input_box(&self, request: &InputBoxRequest) -> VBResult<String>;
+
+    /// Bring an application window to the foreground.
+    ///
+    /// The `request` arrives fully decoded (see
+    /// [`AppActivateRequest`](super::appactivate::AppActivateRequest));
+    /// implementations locate the matching window — by caption prefix,
+    /// then suffix, per VB6 rules — and give it the focus. Implementations
+    /// must raise VB6 error 5 ("Invalid procedure call or argument") when
+    /// no window matches but a window facility exists; where there is no
+    /// window facility at all (headless machines) they should log the
+    /// request and succeed so programs stay runnable.
+    fn app_activate(&self, request: &AppActivateRequest) -> VBResult<()>;
 
     /// Access the concrete backend type for downcasting.
     ///
