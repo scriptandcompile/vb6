@@ -1,8 +1,9 @@
 //! In-memory interaction backend for WASM and tests.
 //!
 //! Stores injectable command-line arguments, records every `MsgBox`,
-//! `InputBox`, and `AppActivate` request a program makes, and answers those
-//! requests from scripted response lists — no OS side effects anywhere.
+//! `InputBox`, `AppActivate`, and `Shell` request a program makes, and
+//! answers those requests from scripted response lists — no OS side
+//! effects anywhere.
 
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
@@ -13,6 +14,7 @@ use super::appactivate::{AppActivateRecord, AppActivateRequest};
 use super::backend::InteractionBackend;
 use super::inputbox::{InputBoxRecord, InputBoxRequest};
 use super::msgbox::{MsgBoxButton, MsgBoxRecord, MsgBoxRequest};
+use super::shell::{ShellRecord, ShellRequest};
 
 /// In-memory interaction backend.
 ///
@@ -41,6 +43,13 @@ use super::msgbox::{MsgBoxButton, MsgBoxRecord, MsgBoxRequest};
 /// matching window was found and activated, `false` fails the statement with
 /// VB6 error 5, exactly as when no window matches. An empty queue succeeds,
 /// so programs keep running.
+///
+/// `Shell` follows suit without touching the OS: requests land in the log
+/// (see [`shell_requests`](Self::shell_requests)) and each call pops the
+/// next task ID from the list fed by
+/// [`push_shell_response`](Self::push_shell_response) — "the value responses
+/// are stored in a list and returned as requested". An empty queue hands out
+/// synthetic IDs (1.0, 2.0, ...) so non-interactive runs proceed.
 pub struct MemoryBackend {
     /// The injected command-line arguments.
     command_args: Vec<String>,
@@ -59,6 +68,13 @@ pub struct MemoryBackend {
     activate_responses: RefCell<VecDeque<bool>>,
     /// Every `AppActivate` request this backend has seen, in order.
     activate_requests: RefCell<Vec<AppActivateRecord>>,
+    /// Scripted `Shell` task IDs, consumed first-in first-out.
+    shell_responses: RefCell<VecDeque<f64>>,
+    /// Every `Shell` request this backend has seen, in order.
+    shell_requests: RefCell<Vec<ShellRecord>>,
+    /// Source of synthetic task IDs once the scripted list runs dry;
+    /// starts at 1.0 because 0 reads as failure in VB6.
+    next_task_id: Cell<f64>,
 }
 
 impl MemoryBackend {
@@ -73,6 +89,9 @@ impl MemoryBackend {
             input_requests: RefCell::new(Vec::new()),
             activate_responses: RefCell::new(VecDeque::new()),
             activate_requests: RefCell::new(Vec::new()),
+            shell_responses: RefCell::new(VecDeque::new()),
+            shell_requests: RefCell::new(Vec::new()),
+            next_task_id: Cell::new(1.0),
         }
     }
 
@@ -108,6 +127,13 @@ impl MemoryBackend {
     pub fn with_activate_responses(responses: impl IntoIterator<Item = bool>) -> Self {
         let mut backend = Self::new();
         backend.activate_responses = RefCell::new(responses.into_iter().collect());
+        backend
+    }
+
+    /// Create a backend whose `Shell` calls return task IDs from `responses`.
+    pub fn with_shell_responses(responses: impl IntoIterator<Item = f64>) -> Self {
+        let mut backend = Self::new();
+        backend.shell_responses = RefCell::new(responses.into_iter().collect());
         backend
     }
 
@@ -227,6 +253,43 @@ impl MemoryBackend {
     pub fn take_appactivate_requests(&self) -> Vec<AppActivateRecord> {
         std::mem::take(&mut *self.activate_requests.borrow_mut())
     }
+
+    // ---- Shell scripting ----
+
+    /// Queue the task ID the next `Shell` call returns.
+    ///
+    /// Values are returned verbatim, as if the program had really started;
+    /// queue as many as the program will shell out — once the list runs dry
+    /// synthetic IDs (1.0, 2.0, ...) are handed out instead so programs keep
+    /// running.
+    pub fn push_shell_response(&self, task_id: f64) {
+        self.shell_responses.borrow_mut().push_back(task_id);
+    }
+
+    /// Queue several scripted task IDs at once.
+    pub fn extend_shell_responses(&self, responses: impl IntoIterator<Item = f64>) {
+        self.shell_responses.borrow_mut().extend(responses);
+    }
+
+    /// Drop all queued (not yet consumed) `Shell` responses.
+    pub fn clear_shell_responses(&self) {
+        self.shell_responses.borrow_mut().clear();
+    }
+
+    /// How many scripted task IDs are still queued.
+    pub fn pending_shell_responses(&self) -> usize {
+        self.shell_responses.borrow().len()
+    }
+
+    /// Snapshot of every `Shell` request made so far, oldest first.
+    pub fn shell_requests(&self) -> Vec<ShellRecord> {
+        self.shell_requests.borrow().clone()
+    }
+
+    /// Take the recorded `Shell` requests, leaving the log empty.
+    pub fn take_shell_requests(&self) -> Vec<ShellRecord> {
+        std::mem::take(&mut *self.shell_requests.borrow_mut())
+    }
 }
 
 impl Default for MemoryBackend {
@@ -314,6 +377,26 @@ impl InteractionBackend for MemoryBackend {
         }
     }
 
+    fn shell(&self, request: &ShellRequest) -> VBResult<f64> {
+        // Record what was requested before answering, so hosts can inspect
+        // the command line and window style even after the program moved on.
+        self.shell_requests
+            .borrow_mut()
+            .push(ShellRecord::of(request));
+
+        Ok(self
+            .shell_responses
+            .borrow_mut()
+            .pop_front()
+            .unwrap_or_else(|| {
+                // Nothing scripted: hand out a synthetic task ID so
+                // non-interactive runs (WASM playground, batch tests) proceed.
+                let task_id = self.next_task_id.get();
+                self.next_task_id.set(task_id + 1.0);
+                task_id
+            }))
+    }
+
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
@@ -330,6 +413,7 @@ fn offered_list(buttons: &[MsgBoxButton]) -> String {
 
 #[cfg(test)]
 mod tests {
+    use super::super::shell::WindowStyle;
     use super::*;
 
     #[test]
@@ -546,5 +630,64 @@ mod tests {
         assert_eq!(backend.pending_activate_responses(), 3);
         backend.clear_activate_responses();
         assert_eq!(backend.pending_activate_responses(), 0);
+    }
+
+    // ---- Shell scripting ----
+
+    #[test]
+    fn empty_shell_queue_hands_out_synthetic_task_ids() {
+        let backend = MemoryBackend::new();
+        let request = ShellRequest::new("notepad.exe");
+        assert_eq!(backend.shell(&request).unwrap(), 1.0);
+        assert_eq!(backend.shell(&request).unwrap(), 2.0);
+        // IDs never repeat and never read as failure (0).
+        assert!(backend.shell(&request).unwrap() > 0.0);
+    }
+
+    #[test]
+    fn queued_shell_responses_are_returned_in_order() {
+        let backend = MemoryBackend::with_shell_responses([4242.0, 7.0]);
+        let request = ShellRequest::new("calc.exe");
+        assert_eq!(backend.shell(&request).unwrap(), 4242.0);
+        assert_eq!(backend.shell(&request).unwrap(), 7.0);
+        // List exhausted: back to synthetic IDs.
+        assert_eq!(backend.shell(&request).unwrap(), 1.0);
+    }
+
+    #[test]
+    fn shell_requests_are_recorded() {
+        let backend = MemoryBackend::with_shell_responses([99.0]);
+        backend
+            .shell(
+                &ShellRequest::new(r#""C:\Program Files\App.exe" /flag"#)
+                    .with_window_style(WindowStyle::MaximizedFocus),
+            )
+            .unwrap();
+
+        let requests = backend.take_shell_requests();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].pathname, r#""C:\Program Files\App.exe" /flag"#);
+        assert_eq!(requests[0].window_style, WindowStyle::MaximizedFocus);
+        assert!(backend.shell_requests().is_empty());
+    }
+
+    #[test]
+    fn shell_requests_are_recorded_even_with_an_empty_list() {
+        let backend = MemoryBackend::new();
+        let _ = backend.shell(&ShellRequest::new("backup.bat"));
+        let requests = backend.shell_requests();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].pathname, "backup.bat");
+        assert_eq!(requests[0].window_style, WindowStyle::MinimizedFocus);
+    }
+
+    #[test]
+    fn shell_response_queue_helpers_round_trip() {
+        let backend = MemoryBackend::new();
+        backend.push_shell_response(10.0);
+        backend.extend_shell_responses([20.0, 30.0]);
+        assert_eq!(backend.pending_shell_responses(), 3);
+        backend.clear_shell_responses();
+        assert_eq!(backend.pending_shell_responses(), 0);
     }
 }

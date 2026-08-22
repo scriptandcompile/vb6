@@ -16,6 +16,7 @@ use crate::error::VBResult;
 use super::appactivate::AppActivateRequest;
 use super::inputbox::InputBoxRequest;
 use super::msgbox::{MsgBoxButton, MsgBoxRequest};
+use super::shell::ShellRequest;
 
 /// Abstraction over user interaction operations.
 ///
@@ -86,6 +87,17 @@ pub trait InteractionBackend: Send {
     /// window facility at all (headless machines) they should log the
     /// request and succeed so programs stay runnable.
     fn app_activate(&self, request: &AppActivateRequest) -> VBResult<()>;
+
+    /// Run an executable program asynchronously and report its task ID.
+    ///
+    /// The `request` arrives fully validated (see [`ShellRequest`]);
+    /// implementations start the program without waiting for it to finish
+    /// (VB6's `Shell` is asynchronous) and return a task ID — the process id
+    /// on native platforms — usable with `AppActivate`. Implementations must
+    /// raise VB6 error 53 ("File not found") when the program cannot be
+    /// started; window styles the platform cannot honor are ignored rather
+    /// than rejected.
+    fn shell(&self, request: &ShellRequest) -> VBResult<f64>;
 
     /// Access the concrete backend type for downcasting.
     ///
