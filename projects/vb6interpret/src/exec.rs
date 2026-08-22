@@ -176,6 +176,10 @@ impl Interpreter {
                 self.exec_send_keys(node)?;
                 Ok(Flow::Next)
             }
+            SyntaxKind::SavePictureStatement => {
+                self.exec_save_picture(node)?;
+                Ok(Flow::Next)
+            }
             SyntaxKind::OptionStatement
             | SyntaxKind::TypeStatement
             | SyntaxKind::EnumStatement
@@ -540,6 +544,26 @@ impl Interpreter {
             wait,
         )
         .map_err(|e| self.error_here(e))?;
+        Ok(())
+    }
+
+    /// `SavePicture picture, filename`: save a picture object to a bitmap
+    /// file, overwriting any existing file.
+    fn exec_save_picture(&mut self, node: &CstNode) -> RunResult<()> {
+        let significant: Vec<&CstNode> = node.significant_children().collect();
+        let args: Vec<&CstNode> = significant
+            .iter()
+            .skip(1) // the SavePicture keyword
+            .copied()
+            .filter(|c| c.kind() != SyntaxKind::Comma)
+            .collect();
+        if args.len() != 2 {
+            return Err(self.error_here(VBError::invalid_procedure_call()));
+        }
+        let picture = self.eval_expr(args[0])?;
+        let filename = self.eval_expr(args[1])?;
+        vb6runtime::library::graphics::savepicture::save_picture(&picture, &filename)
+            .map_err(|e| self.error_here(e))?;
         Ok(())
     }
 

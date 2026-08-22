@@ -1070,3 +1070,98 @@ fn appactivate_accepts_a_bare_true_wait_argument() {
     assert_eq!(requests[0].title, "Calculator");
     assert!(requests[0].wait);
 }
+
+// ---- SavePicture ----
+
+use vb6runtime::state::file as file_state;
+
+/// A minimal valid 1x1 24-bit BMP, as `SavePicture` itself would produce.
+fn one_pixel_bmp() -> Vec<u8> {
+    let mut bytes = Vec::new();
+    bytes.extend_from_slice(b"BM");
+    bytes.extend_from_slice(&58u32.to_le_bytes()); // file size
+    bytes.extend_from_slice(&0u32.to_le_bytes()); // reserved
+    bytes.extend_from_slice(&54u32.to_le_bytes()); // pixel data offset
+    bytes.extend_from_slice(&40u32.to_le_bytes()); // info header size
+    bytes.extend_from_slice(&1u32.to_le_bytes()); // width
+    bytes.extend_from_slice(&1u32.to_le_bytes()); // height
+    bytes.extend_from_slice(&1u16.to_le_bytes()); // planes
+    bytes.extend_from_slice(&24u16.to_le_bytes()); // bpp
+    bytes.extend_from_slice(&0u32.to_le_bytes()); // compression
+    bytes.extend_from_slice(&4u32.to_le_bytes()); // image size
+    bytes.extend_from_slice(&2835u32.to_le_bytes());
+    bytes.extend_from_slice(&2835u32.to_le_bytes());
+    bytes.extend_from_slice(&0u32.to_le_bytes());
+    bytes.extend_from_slice(&0u32.to_le_bytes());
+    bytes.extend_from_slice(&[0xFF, 0xFF, 0xFF, 0x00]); // padded pixel row
+    bytes
+}
+
+/// Installs a temporary directory as the file root for the duration of `f`,
+/// serialized against the other shared-snapshot tests.
+fn with_temp_file_root<T>(f: impl FnOnce(&std::path::Path) -> T) -> T {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let dir = tempfile::tempdir().expect("failed to create temp dir");
+    file_state::reset_with_root(dir.path());
+    let result = f(dir.path());
+    file_state::reset();
+    result
+}
+
+#[test]
+fn savepicture_statement_writes_a_bitmap_file() {
+    with_temp_file_root(|dir| {
+        std::fs::write(dir.join("in.bmp"), one_pixel_bmp()).unwrap();
+
+        let out = run(
+            "    Dim p As Object\n\
+             \x20   Set p = LoadPicture(\"in.bmp\")\n\
+             \x20   SavePicture p, \"out.bmp\"\n\
+             \x20   Debug.Print Dir(\"out.bmp\") <> \"\"\n",
+        );
+        assert_eq!(out, vec!["True"]);
+
+        let bytes = std::fs::read(dir.join("out.bmp")).unwrap();
+        assert_eq!(&bytes[0..2], b"BM");
+        assert_eq!(bytes.len(), 54 + 8 * 3); // header + 3 padded rows of 2 px
+    });
+}
+
+#[test]
+fn savepicture_statement_overwrites_an_existing_file() {
+    with_temp_file_root(|dir| {
+        std::fs::write(dir.join("in.bmp"), one_pixel_bmp()).unwrap();
+        std::fs::write(dir.join("out.bmp"), b"stale").unwrap();
+
+        let out = run("    Dim p As Object\n\
+             \x20   Set p = LoadPicture(\"in.bmp\")\n\
+             \x20   SavePicture p, \"out.bmp\"\n\
+             \x20   Debug.Print FileLen(\"out.bmp\") > 4\n");
+        assert_eq!(out, vec!["True"]);
+    });
+}
+
+#[test]
+fn savepicture_statement_with_a_non_picture_value_is_a_type_mismatch() {
+    let source = "Attribute VB_Name = \"M\"\nSub Main()\n\
+         \x20   SavePicture 42, \"out.bmp\"\n\
+         \x20   Debug.Print \"after\"\n\
+         End Sub\n";
+    let error = vb6interpret::run_source(source).unwrap_err();
+
+    assert_eq!(error.error.number, 13);
+}
+
+#[test]
+fn savepicture_statement_with_nothing_raises_object_variable_not_set() {
+    with_temp_file_root(|_| {
+        let source = "Attribute VB_Name = \"M\"\nSub Main()\n\
+             \x20   Dim p As Object\n\
+             \x20   SavePicture p, \"out.bmp\"\n\
+             \x20   Debug.Print \"after\"\n\
+             End Sub\n";
+        let error = vb6interpret::run_source(source).unwrap_err();
+
+        assert_eq!(error.error.number, 91);
+    });
+}

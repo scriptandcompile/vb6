@@ -94,6 +94,7 @@ pub(crate) fn is_statement_kind(kind: SyntaxKind) -> bool {
             | SyntaxKind::RandomizeStatement
             | SyntaxKind::AppActivateStatement
             | SyntaxKind::SendKeysStatement
+            | SyntaxKind::SavePictureStatement
             | SyntaxKind::OptionStatement
             | SyntaxKind::DeclareStatement
             | SyntaxKind::AttributeStatement
