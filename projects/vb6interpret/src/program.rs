@@ -85,6 +85,7 @@ pub(crate) fn is_statement_kind(kind: SyntaxKind) -> bool {
             | SyntaxKind::TypeStatement
             | SyntaxKind::EnumStatement
             | SyntaxKind::MidStatement
+            | SyntaxKind::MidBStatement
             | SyntaxKind::LSetStatement
             | SyntaxKind::RSetStatement
             | SyntaxKind::DateStatement

@@ -165,6 +165,42 @@ fn rset_statement_keeps_exact_fit_unchanged() {
 }
 
 #[test]
+fn mid_statement_replaces_with_explicit_length() {
+    let out = run("    Dim s As String\n\
+         s = \"Hello World\"\n\
+         Mid(s, 7, 5) = \"VB6!!\"\n\
+         Debug.Print s\n");
+    assert_eq!(out, vec!["Hello VB6!!"]);
+}
+
+#[test]
+fn mid_statement_without_length_replaces_to_the_end() {
+    let out = run("    Dim s As String\n\
+         s = \"ABCDEFGH\"\n\
+         Mid(s, 3) = \"123\"\n\
+         Debug.Print s\n");
+    assert_eq!(out, vec!["AB123FGH"]);
+}
+
+#[test]
+fn mid_statement_shorter_replacement_keeps_the_tail() {
+    let out = run("    Dim s As String\n\
+         s = \"Test\"\n\
+         Mid(s, 2, 2) = \"XX\"\n\
+         Debug.Print s\n");
+    assert_eq!(out, vec!["TXXt"]);
+}
+
+#[test]
+fn midb_statement_replaces_bytes() {
+    let out = run("    Dim s As String\n\
+         s = \"ABCDEFGH\"\n\
+         MidB(s, 3, 4) = \"12\"\n\
+         Debug.Print s\n");
+    assert_eq!(out, vec!["A12DEFGH"]);
+}
+
+#[test]
 fn math_functions() {
     let out = run("    Debug.Print Abs(-5)\n\
          Debug.Print Sqr(16)\n\

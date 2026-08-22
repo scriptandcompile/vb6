@@ -9,7 +9,9 @@ pub mod ansi;
 pub mod lset_statement;
 pub use lset_statement::lset_statement;
 pub mod mid_statement;
+pub use mid_statement::mid_statement;
 pub mod midb_statement;
+pub use midb_statement::midb_statement;
 pub mod rset_statement;
 pub use rset_statement::rset_statement;
 
