@@ -1,3 +1,5 @@
+/* @ts-self-types="./vb6interpret.d.ts" */
+
 /**
  * Build a full statement-boundary execution trace that the browser can use
  * for true resume-from-current-state stepping.
@@ -394,6 +396,13 @@ function __wbg_get_imports() {
         __wbg___wbindgen_throw_bb96b2010945f0bc: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
+        __wbg_alert_b130179dd111598f: function(arg0, arg1) {
+            window.alert(getStringFromWasm0(arg0, arg1));
+        },
+        __wbg_confirm_db2384b7feba37d4: function(arg0, arg1) {
+            const ret = window.confirm(getStringFromWasm0(arg0, arg1));
+            return ret;
+        },
         __wbg_error_757e9472f8410341: function(arg0, arg1) {
             let deferred0_0;
             let deferred0_1;
@@ -436,6 +445,13 @@ function __wbg_get_imports() {
         __wbg_new_ebe3e0f6837f0879: function() {
             const ret = new Object();
             return addHeapObject(ret);
+        },
+        __wbg_prompt_fcd930ff20c43412: function(arg0, arg1, arg2, arg3, arg4) {
+            const ret = window.prompt(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
+            var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+            var len1 = WASM_VECTOR_LEN;
+            getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+            getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
         },
         __wbg_resolvedOptions_7ec953686aa0bb09: function(arg0) {
             const ret = getObject(arg0).resolvedOptions();
