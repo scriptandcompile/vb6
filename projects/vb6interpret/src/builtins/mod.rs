@@ -611,6 +611,32 @@ mod tests {
     }
 
     #[test]
+    fn rset_dispatch_right_aligns_within_the_target_width() {
+        assert_eq!(
+            call_builtin(
+                "RSet",
+                &[
+                    VBVariant::from_string("XXXXX"),
+                    VBVariant::from_string("ab")
+                ]
+            )
+            .unwrap(),
+            VBVariant::from_string("   ab")
+        );
+        assert_eq!(
+            call_builtin(
+                "RSet",
+                &[
+                    VBVariant::from_string("XXX"),
+                    VBVariant::from_string("abcdef")
+                ]
+            )
+            .unwrap(),
+            VBVariant::from_string("def")
+        );
+    }
+
+    #[test]
     fn environ_dollar_dispatch_reads_the_snapshot() {
         use vb6runtime::state::environment as env_state;
 

@@ -10,7 +10,8 @@ pub mod lset_statement;
 pub use lset_statement::lset_statement;
 pub mod mid_statement;
 pub mod midb_statement;
-pub mod rset;
+pub mod rset_statement;
+pub use rset_statement::rset_statement;
 
 pub mod asc;
 pub use asc::asc;

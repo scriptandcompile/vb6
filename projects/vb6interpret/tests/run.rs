@@ -127,6 +127,44 @@ fn lset_statement_keeps_exact_fit_unchanged() {
 }
 
 #[test]
+fn rset_statement_pads_on_the_left() {
+    let out = run("    Dim s As String\n\
+         s = String(10, \"X\")\n\
+         RSet s = \"Right\"\n\
+         Debug.Print \"[\" & s & \"]\"\n");
+    assert_eq!(out, vec!["[     Right]"]);
+}
+
+#[test]
+fn rset_statement_truncates_long_sources() {
+    let out = run("    Dim s As String\n\
+         s = \"ABCDEFGH\"\n\
+         RSet s = \"1234567890\"\n\
+         Debug.Print s\n");
+    assert_eq!(out, vec!["34567890"]);
+}
+
+#[test]
+fn rset_statement_accepts_a_variable_source() {
+    let out = run("    Dim s As String\n\
+         Dim t As String\n\
+         s = String(6, \"*\")\n\
+         t = \"abc\"\n\
+         RSet s = t\n\
+         Debug.Print \"[\" & s & \"]\"\n");
+    assert_eq!(out, vec!["[   abc]"]);
+}
+
+#[test]
+fn rset_statement_keeps_exact_fit_unchanged() {
+    let out = run("    Dim s As String\n\
+         s = \"abc\"\n\
+         RSet s = \"xyz\"\n\
+         Debug.Print s\n");
+    assert_eq!(out, vec!["xyz"]);
+}
+
+#[test]
 fn math_functions() {
     let out = run("    Debug.Print Abs(-5)\n\
          Debug.Print Sqr(16)\n\

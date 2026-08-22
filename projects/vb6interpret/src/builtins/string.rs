@@ -57,6 +57,13 @@ pub(super) fn register(registry: &mut Registry) {
         let string = arg_string(args, 1)?;
         strfn::lset_statement(&stringvar, &string).map(VBVariant::from)
     }));
+    // `RSet` mirrors `LSet`: statement syntax wired in `exec`, with this
+    // registry entry exposing the right-alignment primitive.
+    registry.insert(builtin!("rset", 2, 2, |args| {
+        let stringvar = arg_string(args, 0)?;
+        let string = arg_string(args, 1)?;
+        strfn::rset_statement(&stringvar, &string).map(VBVariant::from)
+    }));
     registry.insert(builtin!("lcase$", 1, 1, |args| {
         strfn::lcase_dollar(&arg_string(args, 0)?).map(VBVariant::from)
     }));
