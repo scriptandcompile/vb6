@@ -1,9 +1,9 @@
 //! In-memory interaction backend for WASM and tests.
 //!
 //! Stores injectable command-line arguments, records every `MsgBox`,
-//! `InputBox`, `AppActivate`, and `Shell` request a program makes, and
-//! answers those requests from scripted response lists — no OS side
-//! effects anywhere.
+//! `InputBox`, `AppActivate`, `Shell`, and `SendKeys` request a program
+//! makes, and answers those requests from scripted response lists — no OS
+//! side effects anywhere.
 
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
@@ -14,6 +14,7 @@ use super::appactivate::{AppActivateRecord, AppActivateRequest};
 use super::backend::InteractionBackend;
 use super::inputbox::{InputBoxRecord, InputBoxRequest};
 use super::msgbox::{MsgBoxButton, MsgBoxRecord, MsgBoxRequest};
+use super::sendkeys::{SendKeysRecord, SendKeysRequest};
 use super::shell::{ShellRecord, ShellRequest};
 
 /// In-memory interaction backend.
@@ -50,6 +51,15 @@ use super::shell::{ShellRecord, ShellRequest};
 /// [`push_shell_response`](Self::push_shell_response) — "the value responses
 /// are stored in a list and returned as requested". An empty queue hands out
 /// synthetic IDs (1.0, 2.0, ...) so non-interactive runs proceed.
+///
+/// `SendKeys` is the same dummy: nothing reaches a real keyboard. Every
+/// invocation is appended to the log (see
+/// [`sendkeys_requests`](Self::sendkeys_requests)) — the sent keystrokes are
+/// the stored values, returned to whoever asks — and, like `AppActivate`,
+/// delivery can be scripted: outcomes queued via
+/// [`push_sendkeys_response`](Self::push_sendkeys_response) decide whether
+/// the statement succeeds or fails with VB6 error 5, and an empty queue
+/// always succeeds.
 pub struct MemoryBackend {
     /// The injected command-line arguments.
     command_args: Vec<String>,
@@ -72,6 +82,12 @@ pub struct MemoryBackend {
     shell_responses: RefCell<VecDeque<f64>>,
     /// Every `Shell` request this backend has seen, in order.
     shell_requests: RefCell<Vec<ShellRecord>>,
+    /// Scripted `SendKeys` outcomes (`true` = delivered), consumed
+    /// first-in first-out.
+    sendkeys_responses: RefCell<VecDeque<bool>>,
+    /// Every `SendKeys` request this backend has seen, in order — the
+    /// keystrokes a program "typed", stored in a list.
+    sendkeys_requests: RefCell<Vec<SendKeysRecord>>,
     /// Source of synthetic task IDs once the scripted list runs dry;
     /// starts at 1.0 because 0 reads as failure in VB6.
     next_task_id: Cell<f64>,
@@ -91,6 +107,8 @@ impl MemoryBackend {
             activate_requests: RefCell::new(Vec::new()),
             shell_responses: RefCell::new(VecDeque::new()),
             shell_requests: RefCell::new(Vec::new()),
+            sendkeys_responses: RefCell::new(VecDeque::new()),
+            sendkeys_requests: RefCell::new(Vec::new()),
             next_task_id: Cell::new(1.0),
         }
     }
@@ -134,6 +152,14 @@ impl MemoryBackend {
     pub fn with_shell_responses(responses: impl IntoIterator<Item = f64>) -> Self {
         let mut backend = Self::new();
         backend.shell_responses = RefCell::new(responses.into_iter().collect());
+        backend
+    }
+
+    /// Create a backend whose `SendKeys` calls succeed or fail per
+    /// `responses` (`true` = delivered, `false` = error 5).
+    pub fn with_sendkeys_responses(responses: impl IntoIterator<Item = bool>) -> Self {
+        let mut backend = Self::new();
+        backend.sendkeys_responses = RefCell::new(responses.into_iter().collect());
         backend
     }
 
@@ -290,6 +316,45 @@ impl MemoryBackend {
     pub fn take_shell_requests(&self) -> Vec<ShellRecord> {
         std::mem::take(&mut *self.shell_requests.borrow_mut())
     }
+
+    // ---- SendKeys scripting ----
+
+    /// Queue the outcome of the next `SendKeys` call.
+    ///
+    /// `true` scripts a successful delivery; `false` makes the statement
+    /// fail with VB6 error 5 ("Invalid procedure call or argument"), as it
+    /// does when the keys cannot reach the active window. Queue as many
+    /// outcomes as the program will call `SendKeys` — once the list runs
+    /// dry every delivery succeeds instead.
+    pub fn push_sendkeys_response(&self, delivered: bool) {
+        self.sendkeys_responses.borrow_mut().push_back(delivered);
+    }
+
+    /// Queue several scripted outcomes at once.
+    pub fn extend_sendkeys_responses(&self, responses: impl IntoIterator<Item = bool>) {
+        self.sendkeys_responses.borrow_mut().extend(responses);
+    }
+
+    /// Drop all queued (not yet consumed) `SendKeys` outcomes.
+    pub fn clear_sendkeys_responses(&self) {
+        self.sendkeys_responses.borrow_mut().clear();
+    }
+
+    /// How many scripted outcomes are still queued.
+    pub fn pending_sendkeys_responses(&self) -> usize {
+        self.sendkeys_responses.borrow().len()
+    }
+
+    /// Snapshot of every `SendKeys` request made so far, oldest first —
+    /// the keystrokes the program has "typed", in order.
+    pub fn sendkeys_requests(&self) -> Vec<SendKeysRecord> {
+        self.sendkeys_requests.borrow().clone()
+    }
+
+    /// Take the recorded `SendKeys` requests, leaving the list empty.
+    pub fn take_sendkeys_requests(&self) -> Vec<SendKeysRecord> {
+        std::mem::take(&mut *self.sendkeys_requests.borrow_mut())
+    }
 }
 
 impl Default for MemoryBackend {
@@ -395,6 +460,27 @@ impl InteractionBackend for MemoryBackend {
                 self.next_task_id.set(task_id + 1.0);
                 task_id
             }))
+    }
+
+    fn send_keys(&self, request: &SendKeysRequest) -> VBResult<()> {
+        // Record what was "typed" before answering, so even a failing call
+        // leaves a trace of the offending request.
+        self.sendkeys_requests
+            .borrow_mut()
+            .push(SendKeysRecord::of(request));
+
+        match self.sendkeys_responses.borrow_mut().pop_front() {
+            // Nothing scripted: report success so non-interactive runs
+            // (WASM playground, batch tests) proceed.
+            None | Some(true) => Ok(()),
+            Some(false) => Err(VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                format!(
+                    "Invalid procedure call or argument: SendKeys could not deliver \"{}\"",
+                    request.keys,
+                ),
+            )),
+        }
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
@@ -689,5 +775,76 @@ mod tests {
         assert_eq!(backend.pending_shell_responses(), 3);
         backend.clear_shell_responses();
         assert_eq!(backend.pending_shell_responses(), 0);
+    }
+
+    // ---- SendKeys scripting ----
+
+    #[test]
+    fn empty_sendkeys_queue_succeeds_without_touching_the_os() {
+        let backend = MemoryBackend::new();
+        assert!(backend
+            .send_keys(&SendKeysRequest::parse("Hello{ENTER}", false).unwrap())
+            .is_ok());
+    }
+
+    #[test]
+    fn sent_keys_are_stored_in_a_list_and_returned_as_requested() {
+        let backend = MemoryBackend::new();
+        backend
+            .send_keys(&SendKeysRequest::parse("User{TAB}", true).unwrap())
+            .unwrap();
+        backend
+            .send_keys(&SendKeysRequest::parse("{ENTER}", false).unwrap())
+            .unwrap();
+
+        let requests = backend.take_sendkeys_requests();
+        assert_eq!(requests.len(), 2);
+        assert_eq!(requests[0].keys, "User{TAB}");
+        assert!(requests[0].wait);
+        assert_eq!(requests[1].keys, "{ENTER}");
+        assert!(!requests[1].wait);
+        // Taken: the list is empty afterwards.
+        assert!(backend.sendkeys_requests().is_empty());
+    }
+
+    #[test]
+    fn queued_sendkeys_outcomes_are_returned_in_order() {
+        let backend = MemoryBackend::with_sendkeys_responses([true, false, true]);
+        let request = SendKeysRequest::parse("^c", false).unwrap();
+        assert!(backend.send_keys(&request).is_ok());
+        assert!(backend.send_keys(&request).is_err());
+        assert!(backend.send_keys(&request).is_ok());
+        // Queue exhausted: back to success.
+        assert!(backend.send_keys(&request).is_ok());
+    }
+
+    #[test]
+    fn failed_delivery_is_error_5_describing_the_keys() {
+        let backend = MemoryBackend::with_sendkeys_responses([false]);
+        let request = SendKeysRequest::parse("%{F4}", true).unwrap();
+        let err = backend.send_keys(&request).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        assert!(err.description.contains("%{F4}"), "{}", err.description);
+    }
+
+    #[test]
+    fn sendkeys_requests_are_recorded_even_when_rejected() {
+        let backend = MemoryBackend::with_sendkeys_responses([false]);
+        let _ = backend.send_keys(&SendKeysRequest::parse("hi", false).unwrap());
+
+        let requests = backend.take_sendkeys_requests();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].keys, "hi");
+        assert!(!requests[0].wait);
+    }
+
+    #[test]
+    fn sendkeys_response_queue_helpers_round_trip() {
+        let backend = MemoryBackend::new();
+        backend.push_sendkeys_response(true);
+        backend.extend_sendkeys_responses([false, true]);
+        assert_eq!(backend.pending_sendkeys_responses(), 3);
+        backend.clear_sendkeys_responses();
+        assert_eq!(backend.pending_sendkeys_responses(), 0);
     }
 }

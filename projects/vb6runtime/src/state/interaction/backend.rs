@@ -15,6 +15,7 @@ use crate::error::VBResult;
 use super::appactivate::AppActivateRequest;
 use super::inputbox::InputBoxRequest;
 use super::msgbox::{MsgBoxButton, MsgBoxRequest};
+use super::sendkeys::SendKeysRequest;
 use super::shell::ShellRequest;
 
 /// Abstraction over user interaction operations.
@@ -86,6 +87,19 @@ pub trait InteractionBackend: Send {
     /// window facility at all (headless machines) they should log the
     /// request and succeed so programs stay runnable.
     fn app_activate(&self, request: &AppActivateRequest) -> VBResult<()>;
+
+    /// Deliver keystrokes to the active window as if typed at the keyboard.
+    ///
+    /// The `request` arrives fully decoded (see
+    /// [`SendKeysRequest`](super::sendkeys::SendKeysRequest)): its
+    /// `strokes` list is the expanded key sequence, ready for synthesis.
+    /// Implementations feed each stroke to the platform's input injector —
+    /// `SendInput` on Windows, `xdotool` on Linux, System Events on macOS.
+    /// Platforms with no keyboard facility at all (headless machines,
+    /// browsers) should log the request and succeed so programs stay
+    /// runnable; there is deliberately no error path beyond malformed
+    /// strings, which [`SendKeysRequest::parse`] rejects up front.
+    fn send_keys(&self, request: &SendKeysRequest) -> VBResult<()>;
 
     /// Run an executable program asynchronously and report its task ID.
     ///

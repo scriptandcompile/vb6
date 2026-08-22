@@ -1,18 +1,19 @@
 //! Process-global user interaction state for VB6.
 //!
 //! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`, `MsgBox`,
-//! `InputBox`, `AppActivate`, `Shell`) delegate to a pluggable
+//! `InputBox`, `AppActivate`, `SendKeys`, `Shell`) delegate to a pluggable
 //! [`InteractionBackend`] so the same API works across platforms:
 //!
 //! - **Native** (default everywhere): reads real command-line args, yields
 //!   the thread, beeps via the terminal bell character, shows real dialogs
 //!   (`MessageBoxW` on Windows, `osascript` on macOS, `zenity` on Linux,
-//!   browser `alert`/`confirm` on wasm32), and starts real processes
+//!   browser `alert`/`confirm` on wasm32), starts real processes
 //!   (`CreateProcessW` on Windows, detached spawns with quoted command-line
-//!   splitting on Linux/macOS).
+//!   splitting on Linux/macOS), and injects real keystrokes (`SendInput` on
+//!   Windows, System Events via `osascript` on macOS, `xdotool` on Linux).
 //! - **Memory** (tests): injectable, deterministic behavior with no OS side
 //!   effects — including scripted response lists for `MsgBox`, `InputBox`,
-//!   `AppActivate`, and `Shell`.
+//!   `AppActivate`, `Shell`, and `SendKeys`.
 //!
 //! The backend can be switched at runtime with [`set_backend`]; test
 //! harnesses wanting deterministic, scripted answers install
@@ -24,6 +25,7 @@ pub mod inputbox;
 pub mod memory;
 pub mod msgbox;
 pub mod native;
+pub mod sendkeys;
 pub mod shell;
 
 use std::sync::{Mutex, OnceLock};
@@ -34,6 +36,7 @@ pub use inputbox::{InputBoxRecord, InputBoxRequest};
 pub use msgbox::{
     MsgBoxButton, MsgBoxButtonSet, MsgBoxIcon, MsgBoxModality, MsgBoxRecord, MsgBoxRequest,
 };
+pub use sendkeys::{Keystroke, SendKey, SendKeysRecord, SendKeysRequest};
 pub use shell::{ShellRecord, ShellRequest, WindowStyle};
 
 /// The active interaction backend.
@@ -147,6 +150,19 @@ pub fn app_activate(request: &AppActivateRequest) -> crate::error::VBResult<()> 
         .lock()
         .unwrap_or_else(|e| e.into_inner())
         .app_activate(request)
+}
+
+/// Send keystrokes to the active window as if typed at the keyboard.
+///
+/// The `request` must already be decoded (see
+/// [`SendKeysRequest::parse`]); this only routes it to the active backend.
+/// Corresponds to VB6's `SendKeys` statement: the keystrokes go to
+/// whichever window currently has the focus, so pair it with `AppActivate`.
+pub fn send_keys(request: &SendKeysRequest) -> crate::error::VBResult<()> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .send_keys(request)
 }
 
 /// Start a program asynchronously and return its task ID.
@@ -294,6 +310,48 @@ mod tests {
         let _guard = lock_test();
         set_backend(Box::new(memory::MemoryBackend::new()));
         assert!(app_activate(&AppActivateRequest::new("Calculator")).is_ok());
+        reset_backend();
+    }
+
+    #[test]
+    fn send_keys_routes_to_the_active_backend() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::with_sendkeys_responses([
+            false,
+        ])));
+        let request = SendKeysRequest::parse("^c", true).unwrap();
+        assert!(send_keys(&request).is_err());
+        reset_backend();
+    }
+
+    #[test]
+    fn send_keys_defaults_without_scripted_responses() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::new()));
+        let request = SendKeysRequest::parse("Hello{ENTER}", false).unwrap();
+        assert!(send_keys(&request).is_ok());
+        assert_eq!(
+            with_memory_backend(|backend| backend.sendkeys_requests().len()),
+            Some(1)
+        );
+        reset_backend();
+    }
+
+    #[test]
+    fn send_keys_rejects_malformed_strings_before_reaching_the_backend() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::new()));
+        assert_eq!(
+            SendKeysRequest::parse("{NOT-A-KEY}", false)
+                .unwrap_err()
+                .number,
+            5
+        );
+        // Nothing was recorded: the request never became one.
+        assert_eq!(
+            with_memory_backend(|backend| backend.sendkeys_requests().len()),
+            Some(0)
+        );
         reset_backend();
     }
 

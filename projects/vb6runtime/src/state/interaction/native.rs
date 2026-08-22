@@ -59,6 +59,20 @@
 //! A spawn failure raises VB6 error 53 ("File not found") when the program
 //! does not exist and error 70 ("Permission denied") when it cannot be
 //! executed, matching VB6's trappable errors.
+//!
+//! `SendKeys` completes the set:
+//!
+//! - **Windows**: `SendInput` feeding one key-down/key-up pair per decoded
+//!   stroke, with Shift/Ctrl/Alt pressed around it; characters resolve
+//!   through the active keyboard layout (`VkKeyScanW`) so `^c` reaches the
+//!   target as a genuine Ctrl+C, falling back to `KEYEVENTF_UNICODE` events
+//!   for characters the layout cannot produce.
+//! - **macOS**: a single `osascript` driving System Events (`keystroke` for
+//!   text, `key code` for named keys, `using {…down}` for modifiers).
+//! - **Linux (X11)**: `xdotool` — `type` for literal character runs,
+//!   `key --clearmodifiers` for named keys and modifier combinations.
+//! - **Anything else / headless**: the request is logged to stderr and the
+//!   call succeeds, so programs remain runnable without an input injector.
 
 use crate::error::{err_number, VBError, VBResult};
 
@@ -66,6 +80,7 @@ use super::appactivate::AppActivateRequest;
 use super::backend::InteractionBackend;
 use super::inputbox::InputBoxRequest;
 use super::msgbox::{MsgBoxButton, MsgBoxRequest};
+use super::sendkeys::SendKeysRequest;
 use super::shell::ShellRequest;
 
 /// Native interaction backend using real OS facilities.
@@ -117,6 +132,10 @@ impl InteractionBackend for NativeBackend {
 
     fn app_activate(&self, request: &AppActivateRequest) -> VBResult<()> {
         activate_window(request)
+    }
+
+    fn send_keys(&self, request: &SendKeysRequest) -> VBResult<()> {
+        deliver_keystrokes(request)
     }
 
     fn shell(&self, request: &ShellRequest) -> VBResult<f64> {
@@ -297,6 +316,56 @@ fn activate_fallback(request: &AppActivateRequest) {
         eprintln!("[AppActivate] {} [wait]", request.title);
     } else {
         eprintln!("[AppActivate] {}", request.title);
+    }
+}
+
+// ---- SendKeys ----
+
+/// Synthesize `request`'s keystrokes into the active window.
+///
+/// Platform dispatch for `SendKeys`: a real input injector where the OS
+/// provides one (`SendInput` on Windows, System Events via `osascript` on
+/// macOS, `xdotool` on Linux), log-and-succeed elsewhere so a headless or
+/// browser run cannot abort a program that merely sends keys. Malformed key
+/// strings never reach this far — [`SendKeysRequest::parse`] rejects them —
+/// so delivery itself has no error path.
+fn deliver_keystrokes(request: &SendKeysRequest) -> VBResult<()> {
+    #[cfg(target_os = "windows")]
+    {
+        windows::send_keys(request);
+    }
+    #[cfg(target_os = "macos")]
+    {
+        if !macos::send_keys(request) {
+            sendkeys_fallback(request);
+        }
+    }
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        if !linux::send_keys(request) {
+            sendkeys_fallback(request);
+        }
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        // Browsers (wasm32) and exotic targets cannot inject keystrokes
+        // into an OS input queue that does not exist.
+        let _ = request;
+        sendkeys_fallback(request);
+    }
+    Ok(())
+}
+
+/// Log the request to stderr and report success.
+///
+/// Used when no keyboard facility exists (headless machines, wasm32) so
+/// batch runs keep going instead of failing.
+#[cfg_attr(target_arch = "wasm32", allow(dead_code))] // still exercised by tests
+fn sendkeys_fallback(request: &SendKeysRequest) {
+    if request.wait {
+        eprintln!("[SendKeys] {} [wait]", request.keys);
+    } else {
+        eprintln!("[SendKeys] {}", request.keys);
     }
 }
 
@@ -516,6 +585,184 @@ mod windows {
             .or_else(|| folded.iter().find(|(_, title)| title.starts_with(needle)))
             .or_else(|| folded.iter().find(|(_, title)| title.ends_with(needle)))
             .map(|(hwnd, _)| *hwnd)
+    }
+
+    // ---- SendKeys ----
+
+    /// Inject every decoded stroke with `SendInput`.
+    ///
+    /// Each [`Keystroke`](super::super::sendkeys::Keystroke) becomes a
+    /// modifier-down / key-down / key-up / modifier-up event group, so
+    /// VB6's per-stroke modifiers (`^c`, `%{F4}`) reach the focused window
+    /// exactly as if typed.
+    pub(super) fn send_keys(request: &SendKeysRequest) {
+        use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
+            KEYEVENTF_KEYUP, VK_CONTROL, VK_MENU, VK_SHIFT,
+        };
+
+        let mut inputs: Vec<windows_sys::Win32::UI::Input::KeyboardAndMouse::INPUT> = Vec::new();
+        for stroke in &request.strokes {
+            // Modifiers explicitly requested by the notation go first.
+            let mut held: Vec<u16> = Vec::new();
+            if stroke.shift {
+                held.push(VK_SHIFT);
+            }
+            if stroke.ctrl {
+                held.push(VK_CONTROL);
+            }
+            if stroke.alt {
+                held.push(VK_MENU);
+            }
+
+            let key_event = match stroke.key {
+                SendKey::Char(c) => {
+                    // Resolve through the live keyboard layout so the
+                    // receiving application sees real shortcut keys; the
+                    // layout may itself require Shift (e.g. 'A'), which
+                    // joins the held set.
+                    match layout_key(c) {
+                        Some((vk_code, layout_shift)) => {
+                            if layout_shift && !stroke.shift {
+                                held.push(VK_SHIFT);
+                            }
+                            Event::Virtual(vk_code)
+                        }
+                        None => Event::Unicode(c),
+                    }
+                }
+                named => Event::Virtual(virtual_key_code(named)),
+            };
+
+            for vk in &held {
+                inputs.push(key_input(*vk, 0, 0));
+            }
+            match key_event {
+                Event::Virtual(vk) => {
+                    inputs.push(key_input(vk, 0, 0));
+                    inputs.push(key_input(vk, 0, KEYEVENTF_KEYUP));
+                }
+                Event::Unicode(c) => push_unicode(&mut inputs, c),
+            }
+            for vk in held.iter().rev() {
+                inputs.push(key_input(*vk, 0, KEYEVENTF_KEYUP));
+            }
+        }
+
+        if inputs.is_empty() {
+            return;
+        }
+        let sent = unsafe {
+            use windows_sys::Win32::UI::Input::KeyboardAndMouse::SendInput;
+            SendInput(
+                inputs.len() as u32,
+                inputs.as_mut_ptr(),
+                std::mem::size_of::<windows_sys::Win32::UI::Input::KeyboardAndMouse::INPUT>()
+                    as i32,
+            )
+        };
+        if sent != inputs.len() as u32 {
+            eprintln!(
+                "[SendKeys] SendInput delivered {sent} of {} events",
+                inputs.len()
+            );
+        }
+    }
+
+    /// One synthesized event: a virtual key code or a Unicode character.
+    enum Event {
+        Virtual(u16),
+        Unicode(char),
+    }
+
+    /// Map `c` onto this layout's virtual key plus required Shift state;
+    /// `None` when the layout cannot type it at all.
+    fn layout_key(c: char) -> Option<(u16, bool)> {
+        use windows_sys::Win32::UI::Input::KeyboardAndMouse::VkKeyScanW;
+
+        let scanned = unsafe { VkKeyScanW(c as u16) };
+        if scanned == -1 {
+            return None;
+        }
+        let vk_code = (scanned & 0xFF) as u16;
+        if vk_code == 0xFF {
+            return None;
+        }
+        let shift_state = ((scanned >> 8) & 0xFF) as u8;
+        Some((vk_code, shift_state & 1 != 0))
+    }
+
+    /// Characters the layout cannot produce ride in as Unicode events
+    /// (surrogate pairs split into their two UTF-16 units).
+    fn push_unicode(
+        inputs: &mut Vec<windows_sys::Win32::UI::Input::KeyboardAndMouse::INPUT>,
+        c: char,
+    ) {
+        use windows_sys::Win32::UI::Input::KeyboardAndMouse::{KEYEVENTF_KEYUP, KEYEVENTF_UNICODE};
+
+        let mut units = [0u16; 2];
+        let count = c.encode_utf16(&mut units).len();
+        for unit in &units[..count] {
+            inputs.push(key_input(0, *unit, KEYEVENTF_UNICODE));
+            inputs.push(key_input(0, *unit, KEYEVENTF_UNICODE | KEYEVENTF_KEYUP));
+        }
+    }
+
+    /// Assemble one `KEYBDINPUT` event.
+    fn key_input(
+        wvk: u16,
+        scan: u16,
+        flags: u32,
+    ) -> windows_sys::Win32::UI::Input::KeyboardAndMouse::INPUT {
+        use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
+            INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT,
+        };
+        INPUT {
+            r#type: INPUT_KEYBOARD,
+            Anonymous: INPUT_0 {
+                ki: KEYBDINPUT {
+                    wVk: wvk,
+                    wScan: scan,
+                    dwFlags: flags,
+                    time: 0,
+                    dwExtraInfo: 0,
+                },
+            },
+        }
+    }
+
+    /// Map a decoded key name onto its Win32 virtual-key code.
+    fn virtual_key_code(key: SendKey) -> u16 {
+        use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
+            VK_BACK, VK_CANCEL, VK_CAPITAL, VK_DELETE, VK_DOWN, VK_END, VK_ESCAPE, VK_F1, VK_HELP,
+            VK_HOME, VK_INSERT, VK_LEFT, VK_NEXT, VK_NUMLOCK, VK_PRIOR, VK_RETURN, VK_RIGHT,
+            VK_SCROLL, VK_SNAPSHOT, VK_TAB, VK_UP,
+        };
+        match key {
+            SendKey::Backspace => VK_BACK,
+            SendKey::Break => VK_CANCEL,
+            SendKey::CapsLock => VK_CAPITAL,
+            SendKey::Delete => VK_DELETE,
+            SendKey::Down => VK_DOWN,
+            SendKey::End => VK_END,
+            SendKey::Enter => VK_RETURN,
+            SendKey::Esc => VK_ESCAPE,
+            SendKey::Help => VK_HELP,
+            SendKey::Home => VK_HOME,
+            SendKey::Insert => VK_INSERT,
+            SendKey::Left => VK_LEFT,
+            SendKey::NumLock => VK_NUMLOCK,
+            SendKey::PageDown => VK_NEXT,
+            SendKey::PageUp => VK_PRIOR,
+            SendKey::PrintScreen => VK_SNAPSHOT,
+            SendKey::Right => VK_RIGHT,
+            SendKey::ScrollLock => VK_SCROLL,
+            SendKey::Tab => VK_TAB,
+            SendKey::Up => VK_UP,
+            SendKey::Function(n) => VK_F1 + (n.max(1).min(24) as u16 - 1),
+            // Characters never reach here: they resolve through the layout
+            // (or Unicode events) inside `send_keys`.
+            SendKey::Char(_) => unreachable!("character keys are handled by the layout mapping"),
+        }
     }
 
     // ---- InputBox ----
@@ -982,6 +1229,140 @@ mod macos {
         }
         Some(false)
     }
+
+    // ---- SendKeys ----
+
+    /// macOS virtual key codes for the decoded key names.
+    ///
+    /// Keys with no macOS equivalent (`BREAK`, `{PRTSC}`, `{SCROLLLOCK}`,
+    /// `{INSERT}`) are skipped with a note rather than mis-synthesized.
+    fn macos_key_code(key: SendKey) -> Option<i32> {
+        let code = match key {
+            SendKey::Backspace => 51,
+            SendKey::Delete => 117, // forward delete
+            SendKey::Tab => 48,
+            SendKey::Enter => 36,
+            SendKey::Esc => 53,
+            SendKey::Home => 115,
+            SendKey::End => 119,
+            SendKey::PageUp => 116,
+            SendKey::PageDown => 121,
+            SendKey::Up => 126,
+            SendKey::Down => 125,
+            SendKey::Left => 123,
+            SendKey::Right => 124,
+            SendKey::Help => 114,
+            SendKey::CapsLock => 57,
+            SendKey::NumLock => 71, // Clear
+            SendKey::Function(n) => match n {
+                1 => 122,
+                2 => 120,
+                3 => 99,
+                4 => 118,
+                5 => 96,
+                6 => 97,
+                7 => 98,
+                8 => 100,
+                9 => 101,
+                10 => 109,
+                11 => 103,
+                12 => 111,
+                13 => 105,
+                14 => 107,
+                15 => 113,
+                _ => 106, // F16
+            },
+            SendKey::Break | SendKey::PrintScreen | SendKey::ScrollLock | SendKey::Insert => {
+                return None
+            }
+            SendKey::Char(_) => return None, // handled by `keystroke`
+        };
+        Some(code)
+    }
+
+    /// AppleScript name of a notation modifier.
+    fn modifier_clause(stroke: &super::super::sendkeys::Keystroke) -> String {
+        let mut names = Vec::new();
+        if stroke.shift {
+            names.push("shift down");
+        }
+        if stroke.ctrl {
+            names.push("control down");
+        }
+        if stroke.alt {
+            names.push("option down");
+        }
+        if names.is_empty() {
+            String::new()
+        } else {
+            format!(" using {{{}}}", names.join(", "))
+        }
+    }
+
+    /// Deliver every decoded stroke via one System Events script.
+    ///
+    /// Unmodified characters accumulate into a single `keystroke "text"`
+    /// statement (so typing stays fast and Unicode-safe); modified
+    /// characters and named keys become one `keystroke`/`key code`
+    /// statement apiece. Returns whether osascript ran the script; a
+    /// failure (no osascript, no automation permission) lets the caller
+    /// fall back to logging.
+    pub(super) fn send_keys(request: &SendKeysRequest) -> bool {
+        use super::super::sendkeys::SendKey;
+
+        let mut lines: Vec<String> = Vec::new();
+        let mut text_run = String::new();
+        for stroke in &request.strokes {
+            match stroke.key {
+                SendKey::Char(c) if !stroke.shift && !stroke.ctrl && !stroke.alt => {
+                    text_run.push(c);
+                }
+                SendKey::Char(c) => {
+                    if !text_run.is_empty() {
+                        lines.push(format!("keystroke \"{}\"", escape(&text_run)));
+                        text_run.clear();
+                    }
+                    lines.push(format!(
+                        "keystroke \"{}\"{}",
+                        escape(&c.to_string()),
+                        modifier_clause(stroke)
+                    ));
+                }
+                named => {
+                    if !text_run.is_empty() {
+                        lines.push(format!("keystroke \"{}\"", escape(&text_run)));
+                        text_run.clear();
+                    }
+                    match macos_key_code(named) {
+                        Some(code) => {
+                            lines.push(format!("key code {code}{}", modifier_clause(stroke)))
+                        }
+                        None => eprintln!(
+                            "[SendKeys] {} has no macOS equivalent; skipped",
+                            named.name()
+                        ),
+                    }
+                }
+            }
+        }
+        if !text_run.is_empty() {
+            lines.push(format!("keystroke \"{}\"", escape(&text_run)));
+        }
+        if lines.is_empty() {
+            return true;
+        }
+
+        let script = format!(
+            "tell application \"System Events\"\n{}\nend tell",
+            lines.join("\n")
+        );
+        Command::new("osascript")
+            .arg("-e")
+            .arg(&script)
+            .output()
+            .map(|output| output.status.success())
+            .unwrap_or(false)
+    }
 }
 
 #[cfg(all(unix, not(target_os = "macos")))]
@@ -991,6 +1372,7 @@ mod linux {
     use super::super::appactivate::AppActivateRequest;
     use super::super::inputbox::InputBoxRequest;
     use super::super::msgbox::{MsgBoxButton, MsgBoxIcon, MsgBoxRequest};
+    use super::super::sendkeys::{Keystroke, SendKey, SendKeysRequest};
 
     /// Whether no display server is reachable, so GUI dialogs would either
     /// fail slowly or hang; headless runs (CI, SSH sessions) go straight to
@@ -1132,6 +1514,111 @@ mod linux {
             .status()
             .ok()
             .map(|status| status.success())
+    }
+
+    // ---- SendKeys ----
+
+    /// Deliver every decoded stroke via `xdotool`.
+    ///
+    /// Runs of unmodified characters go through `xdotool type` (which
+    /// handles layout and Unicode); named keys and modifier combinations go
+    /// through `xdotool key --clearmodifiers`, one invocation each, so
+    /// VB6's per-stroke modifiers apply exactly (`^c`, `%{F4}`). Returns
+    /// whether at least one xdotool invocation ran successfully; a missing
+    /// tool or no reachable display lets the caller fall back.
+    pub(super) fn send_keys(request: &SendKeysRequest) -> bool {
+        /// Type an accumulated run of plain characters.
+        fn flush_type(run: &mut String, ran_any: &mut bool) {
+            if run.is_empty() {
+                return;
+            }
+            let ok = Command::new("xdotool")
+                .arg("type")
+                .arg(std::mem::take(run))
+                .status()
+                .map(|status| status.success())
+                .unwrap_or(false);
+            *ran_any |= ok;
+        }
+
+        /// Synthesize one named-key or modified-character stroke.
+        fn press(stroke: &Keystroke, ran_any: &mut bool) {
+            let mut parts: Vec<String> = Vec::new();
+            if stroke.shift {
+                parts.push("shift".into());
+            }
+            if stroke.ctrl {
+                parts.push("ctrl".into());
+            }
+            if stroke.alt {
+                parts.push("alt".into());
+            }
+            parts.push(xdotool_key_name(stroke.key));
+            let ok = Command::new("xdotool")
+                .arg("key")
+                .arg("--clearmodifiers")
+                .arg(parts.join("+"))
+                .status()
+                .map(|status| status.success())
+                .unwrap_or(false);
+            *ran_any |= ok;
+        }
+
+        if headless() {
+            return false;
+        }
+
+        let mut ran_any = false;
+        let mut text_run = String::new();
+        for stroke in &request.strokes {
+            if let SendKey::Char(c) = stroke.key {
+                if !stroke.shift && !stroke.ctrl && !stroke.alt {
+                    // Plain typing accumulates so one `type` call carries
+                    // the whole run.
+                    text_run.push(c);
+                    continue;
+                }
+            }
+            flush_type(&mut text_run, &mut ran_any);
+            press(stroke, &mut ran_any);
+        }
+        flush_type(&mut text_run, &mut ran_any);
+        ran_any
+    }
+
+    /// Keysym spelling of a decoded key for `xdotool key`.
+    ///
+    /// Printable ASCII doubles as its own keysym name; other characters use
+    /// xdotool's `Uxxxx` codepoint form; named keys use their X keysyms.
+    fn xdotool_key_name(key: SendKey) -> String {
+        match key {
+            SendKey::Char(' ') => "space".into(),
+            SendKey::Char('\t') => "Tab".into(),
+            SendKey::Char('\n' | '\r') => "Return".into(),
+            SendKey::Char(c) if c.is_ascii_graphic() => c.to_string(),
+            SendKey::Char(c) => format!("U{:04x}", c as u32),
+            SendKey::Backspace => "BackSpace".into(),
+            SendKey::Break => "Break".into(),
+            SendKey::CapsLock => "Caps_Lock".into(),
+            SendKey::Delete => "Delete".into(),
+            SendKey::Down => "Down".into(),
+            SendKey::End => "End".into(),
+            SendKey::Enter => "Return".into(),
+            SendKey::Esc => "Escape".into(),
+            SendKey::Help => "Help".into(),
+            SendKey::Home => "Home".into(),
+            SendKey::Insert => "Insert".into(),
+            SendKey::Left => "Left".into(),
+            SendKey::NumLock => "Num_Lock".into(),
+            SendKey::PageDown => "Next".into(),
+            SendKey::PageUp => "Prior".into(),
+            SendKey::PrintScreen => "Print".into(),
+            SendKey::Right => "Right".into(),
+            SendKey::ScrollLock => "Scroll_Lock".into(),
+            SendKey::Tab => "Tab".into(),
+            SendKey::Up => "Up".into(),
+            SendKey::Function(n) => format!("F{n}"),
+        }
     }
 }
 
@@ -1381,6 +1868,19 @@ mod tests {
         let _ = backend.app_activate(&AppActivateRequest::new(
             "definitely-not-a-real-window-title-42",
         ));
+    }
+
+    #[test]
+    fn send_keys_does_not_panic() {
+        // Exercises whatever path this platform provides (real input
+        // injector, logging fallback) without asserting on OS state.
+        let backend = NativeBackend::new();
+        backend
+            .send_keys(
+                &SendKeysRequest::parse("definitely-not-typed-anywhere-42{TAB}^c%{F4}", true)
+                    .unwrap(),
+            )
+            .unwrap();
     }
 
     #[test]
