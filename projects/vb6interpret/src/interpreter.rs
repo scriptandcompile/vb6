@@ -267,6 +267,22 @@ impl Interpreter {
             .declare("vbignore", VBVariant::from_long(VB_IGNORE));
         self.globals.declare("vbyes", VBVariant::from_long(VB_YES));
         self.globals.declare("vbno", VBVariant::from_long(VB_NO));
+
+        // Shell window-style constants (`VbAppWinStyle`).
+        self.globals
+            .declare("vbhide", VBVariant::from_long(VB_HIDE));
+        self.globals
+            .declare("vbnormalfocus", VBVariant::from_long(VB_NORMAL_FOCUS));
+        self.globals
+            .declare("vbminimizedfocus", VBVariant::from_long(VB_MINIMIZED_FOCUS));
+        self.globals
+            .declare("vbmaximizedfocus", VBVariant::from_long(VB_MAXIMIZED_FOCUS));
+        self.globals
+            .declare("vbnormalnofocus", VBVariant::from_long(VB_NORMAL_NO_FOCUS));
+        self.globals.declare(
+            "vbminimizednofocus",
+            VBVariant::from_long(VB_MINIMIZED_NO_FOCUS),
+        );
     }
 
     /// Set the maximum number of statements the interpreter will execute
