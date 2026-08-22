@@ -873,3 +873,88 @@ fn msgbox_mismatched_scripted_response_is_a_runtime_error() {
     // The program stopped before printing.
     assert_eq!(interpreter.output(), Vec::<String>::new());
 }
+
+// ---- SendKeys ----
+
+use vb6runtime::state::interaction::SendKeysRecord;
+
+/// Run a module with a scripted interaction backend installed; returns the
+/// output lines and the recorded `SendKeys` requests.
+fn run_with_sendkeys(body: &str, responses: Vec<bool>) -> (Vec<String>, Vec<SendKeysRecord>) {
+    let source = format!("Attribute VB_Name = \"M\"\nSub Main()\n{}\nEnd Sub\n", body);
+    let source_file = SourceFile::from_string("scratch.bas", source);
+    let module = ModuleFile::parse(&source_file).unwrap_or_fail();
+    let mut interpreter = Interpreter::new();
+    interpreter.set_interaction_backend(Box::new(InteractionMemory::with_sendkeys_responses(
+        responses,
+    )));
+    interpreter
+        .run_module(&module)
+        .expect("interpretation failed");
+    let out = interpreter.output().to_vec();
+    let requests = interaction::with_memory_backend(|m| m.take_sendkeys_requests())
+        .expect("memory interaction backend installed");
+    interpreter.reset_interaction_backend();
+    (out, requests)
+}
+
+#[test]
+fn sendkeys_statement_reaches_the_memory_backend_verbatim() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let (out, requests) = run_with_sendkeys(
+        "    AppActivate \"Notepad\"\n\
+         \x20   SendKeys \"John Doe{TAB}555-1234{ENTER}\", True\n\
+         \x20   SendKeys \"^s\"\n\
+         \x20   Debug.Print \"sent\"\n",
+        vec![],
+    );
+    assert_eq!(out, vec!["sent"]);
+
+    assert_eq!(requests.len(), 2);
+    assert_eq!(requests[0].keys, "John Doe{TAB}555-1234{ENTER}");
+    assert!(requests[0].wait);
+    assert_eq!(requests[1].keys, "^s");
+    assert!(!requests[1].wait);
+}
+
+#[test]
+fn sendkeys_malformed_key_string_is_a_runtime_error() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let source = "Attribute VB_Name = \"M\"\nSub Main()\n\
+         \x20   SendKeys \"{BOGUS}\"\n\
+         \x20   Debug.Print \"after\"\n\
+         End Sub\n";
+    let source_file = SourceFile::from_string("scratch.bas", source);
+    let module = ModuleFile::parse(&source_file).unwrap_or_fail();
+    let mut interpreter = Interpreter::new();
+    interpreter.set_interaction_backend(Box::new(InteractionMemory::new()));
+    let error = interpreter.run_module(&module).unwrap_err();
+    interpreter.reset_interaction_backend();
+
+    assert_eq!(error.error.number, 5);
+    assert!(error.error.description.contains("{BOGUS}"));
+    // The program stopped before printing.
+    assert_eq!(interpreter.output(), Vec::<String>::new());
+}
+
+#[test]
+fn appactivate_accepts_a_bare_true_wait_argument() {
+    let _guard = ENV_TEST_LOCK.lock().unwrap();
+    let source = "Attribute VB_Name = \"M\"\nSub Main()\n\
+         \x20   AppActivate \"Calculator\", True\n\
+         End Sub\n";
+    let source_file = SourceFile::from_string("scratch.bas", source);
+    let module = ModuleFile::parse(&source_file).unwrap_or_fail();
+    let mut interpreter = Interpreter::new();
+    interpreter.set_interaction_backend(Box::new(InteractionMemory::new()));
+    interpreter
+        .run_module(&module)
+        .expect("interpretation failed");
+    let requests = interaction::with_memory_backend(|m| m.take_appactivate_requests())
+        .expect("memory interaction backend installed");
+    interpreter.reset_interaction_backend();
+
+    assert_eq!(requests.len(), 1);
+    assert_eq!(requests[0].title, "Calculator");
+    assert!(requests[0].wait);
+}

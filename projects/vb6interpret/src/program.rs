@@ -89,6 +89,8 @@ pub(crate) fn is_statement_kind(kind: SyntaxKind) -> bool {
             | SyntaxKind::TimeStatement
             | SyntaxKind::ErrorStatement
             | SyntaxKind::RandomizeStatement
+            | SyntaxKind::AppActivateStatement
+            | SyntaxKind::SendKeysStatement
             | SyntaxKind::OptionStatement
             | SyntaxKind::DeclareStatement
             | SyntaxKind::AttributeStatement

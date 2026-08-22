@@ -188,3 +188,73 @@
 //! ## References
 //!
 //! - [SendKeys Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/sendkeys-statement)
+
+use crate::error::VBResult;
+use crate::state;
+use crate::value::VBString;
+
+/// Implement VB6's `SendKeys` statement.
+///
+/// Decodes the keystroke string once (VB6 notation: `+`/`^`/`%` modifiers,
+/// `{ENTER}`-style names, `{RIGHT 5}` repeats) and hands the expanded
+/// sequence to the active [`interaction
+/// backend`](crate::state::interaction), which synthesizes it into whatever
+/// window has the focus. Malformed strings fail with error 5; on platforms
+/// with no input injector the request is logged instead so programs stay
+/// runnable.
+pub fn send_keys(keys: &VBString, wait: bool) -> VBResult<()> {
+    let request = state::interaction::SendKeysRequest::parse(keys.as_str(), wait)?;
+    state::interaction::send_keys(&request)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::interaction::{memory::MemoryBackend, SendKeysRecord};
+    use crate::state::test_support::lock_test;
+
+    #[test]
+    fn delivery_succeeds_by_default_and_is_recorded() {
+        let _guard = lock_test();
+        crate::state::interaction::set_backend(Box::new(MemoryBackend::new()));
+        send_keys(&VBString::from("User{TAB}Pass{ENTER}"), true).unwrap();
+        assert_eq!(
+            crate::state::interaction::with_memory_backend(|backend| {
+                backend.take_sendkeys_requests()
+            }),
+            Some(vec![SendKeysRecord {
+                keys: "User{TAB}Pass{ENTER}".into(),
+                wait: true,
+            }]),
+        );
+        crate::state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn scripted_failure_is_error_5_with_the_keys_named() {
+        let _guard = lock_test();
+        let backend = MemoryBackend::new();
+        backend.push_sendkeys_response(false);
+        crate::state::interaction::set_backend(Box::new(backend));
+
+        let err = send_keys(&VBString::from("^c"), false).unwrap_err();
+        assert_eq!(err.number, 5);
+        assert!(err.description.contains("^c"), "{}", err.description);
+        crate::state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn malformed_key_string_is_error_5_before_any_delivery() {
+        let _guard = lock_test();
+        crate::state::interaction::set_backend(Box::new(MemoryBackend::new()));
+        let err = send_keys(&VBString::from("{BOGUS}"), false).unwrap_err();
+        assert_eq!(err.number, 5);
+        assert_eq!(
+            crate::state::interaction::with_memory_backend(|backend| backend
+                .sendkeys_requests()
+                .len()),
+            Some(0),
+        );
+        crate::state::interaction::reset_backend();
+    }
+}

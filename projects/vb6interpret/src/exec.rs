@@ -171,6 +171,10 @@ impl Interpreter {
                 self.exec_app_activate(node)?;
                 Ok(Flow::Next)
             }
+            SyntaxKind::SendKeysStatement => {
+                self.exec_send_keys(node)?;
+                Ok(Flow::Next)
+            }
             SyntaxKind::OptionStatement
             | SyntaxKind::TypeStatement
             | SyntaxKind::EnumStatement
@@ -443,12 +447,67 @@ impl Interpreter {
         }
         let title = self.eval_expr(args[0])?;
         let wait = match args.get(1) {
-            Some(expr) => self.eval_expr(expr)?.as_bool()?,
+            Some(expr) => {
+                // Simple builtin statements keep their arguments unwrapped,
+                // so a literal `True`/`False` arrives as a bare keyword
+                // token rather than an expression node.
+                let value = if matches!(
+                    expr.kind(),
+                    SyntaxKind::TrueKeyword | SyntaxKind::FalseKeyword
+                ) {
+                    self.eval_literal(expr)?
+                } else {
+                    self.eval_expr(expr)?
+                };
+                value.as_bool()?
+            }
             None => false,
         };
         let title = title.as_string().map_err(|e| self.error_here(e))?;
         vb6runtime::library::interaction::app_activate::app_activate(
             &vb6runtime::value::VBString::from(title),
+            wait,
+        )
+        .map_err(|e| self.error_here(e))?;
+        Ok(())
+    }
+
+    /// `SendKeys string[, wait]`: send keystrokes to the active window.
+    ///
+    /// The keystroke expression is converted to its string form; `wait`
+    /// defaults to `False`. Malformed key strings raise VB6 error 5.
+    fn exec_send_keys(&mut self, node: &CstNode) -> RunResult<()> {
+        let significant: Vec<&CstNode> = node.significant_children().collect();
+        let args: Vec<&CstNode> = significant
+            .iter()
+            .skip(1) // the SendKeys keyword
+            .copied()
+            .filter(|c| c.kind() != SyntaxKind::Comma)
+            .collect();
+        if args.is_empty() || args.len() > 2 {
+            return Err(self.error_here(VBError::invalid_procedure_call()));
+        }
+        let keys = self.eval_expr(args[0])?;
+        let wait = match args.get(1) {
+            Some(expr) => {
+                // Simple builtin statements keep their arguments unwrapped,
+                // so a literal `True`/`False` arrives as a bare keyword
+                // token rather than an expression node.
+                let value = if matches!(
+                    expr.kind(),
+                    SyntaxKind::TrueKeyword | SyntaxKind::FalseKeyword
+                ) {
+                    self.eval_literal(expr)?
+                } else {
+                    self.eval_expr(expr)?
+                };
+                value.as_bool()?
+            }
+            None => false,
+        };
+        let keys = keys.as_string().map_err(|e| self.error_here(e))?;
+        vb6runtime::library::interaction::sendkeys::send_keys(
+            &vb6runtime::value::VBString::from(keys),
             wait,
         )
         .map_err(|e| self.error_here(e))?;
