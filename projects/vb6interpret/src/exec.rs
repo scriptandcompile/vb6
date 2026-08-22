@@ -10,7 +10,7 @@ use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
 use vb6runtime::library::file as filefn;
 use vb6runtime::state::file as file_state;
-use vb6runtime::value::VBString;
+use vb6runtime::value::{VBLong, VBString};
 use vb6runtime::{ArrayValue, VBVariant};
 
 use crate::error::{RunError, RunResult};
@@ -203,6 +203,20 @@ impl Interpreter {
                 self.exec_alignment_set(
                     node,
                     vb6runtime::library::string::rset_statement::rset_statement,
+                )?;
+                Ok(Flow::Next)
+            }
+            SyntaxKind::MidStatement => {
+                self.exec_mid_set(
+                    node,
+                    vb6runtime::library::string::mid_statement::mid_statement,
+                )?;
+                Ok(Flow::Next)
+            }
+            SyntaxKind::MidBStatement => {
+                self.exec_mid_set(
+                    node,
+                    vb6runtime::library::string::midb_statement::midb_statement,
                 )?;
                 Ok(Flow::Next)
             }
@@ -594,6 +608,87 @@ impl Interpreter {
         };
         let aligned = align(&current, &value).map_err(|e| self.error_here(e))?;
         self.set_variable(&name, VBVariant::from(aligned));
+        Ok(())
+    }
+
+    /// `Mid(target, start[, length]) = string` and the byte-oriented `MidB`
+    /// form: overwrite the target variable in place via `apply` and store
+    /// the result back.
+    ///
+    /// Like other simple builtin statements, operands arrive as flat tokens,
+    /// shaped exactly like the `Mid` function call followed by an
+    /// assignment: a parenthesized argument list naming the target variable,
+    /// its start position, and optional length, then the replacement
+    /// expression.
+    fn exec_mid_set(
+        &mut self,
+        node: &CstNode,
+        apply: fn(&VBString, &VBLong, Option<&VBLong>, &VBString) -> VBResult<VBString>,
+    ) -> RunResult<()> {
+        const ARITY_MESSAGE: &str = "Mid expects Mid(target, start[, length]) = string";
+        let significant: Vec<&CstNode> = node.significant_children().collect();
+        let eq_index = significant
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::EqualityOperator)
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+        let lhs = &significant[1..eq_index];
+        if lhs.len() < 2
+            || lhs[0].kind() != SyntaxKind::LeftParenthesis
+            || lhs[lhs.len() - 1].kind() != SyntaxKind::RightParenthesis
+        {
+            return Err(self.error_here(VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                ARITY_MESSAGE,
+            )));
+        }
+        let inner = &lhs[1..lhs.len() - 1];
+
+        // Split the argument list on commas into `target, start[, length]`.
+        let mut parts: Vec<Vec<&CstNode>> = vec![Vec::new()];
+        for child in inner {
+            if child.kind() == SyntaxKind::Comma {
+                parts.push(Vec::new());
+            } else {
+                parts.last_mut().expect("parts is never empty").push(child);
+            }
+        }
+        if !(2..=3).contains(&parts.len()) || parts.iter().any(|part| part.len() != 1) {
+            return Err(self.error_here(VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                ARITY_MESSAGE,
+            )));
+        }
+        // First argument names the target variable.
+        let target = parts[0][0];
+        if !is_identifier_like(target) {
+            return Err(self.error_here(VBError::invalid_procedure_call()));
+        }
+        let name = target.text().trim().to_string();
+        let start = VBLong::try_from(&self.eval_flat_operand(parts[1][0])?)
+            .map_err(|e| self.error_here(e))?;
+        let length = match parts.get(2) {
+            Some(part) => Some(
+                VBLong::try_from(&self.eval_flat_operand(part[0])?)
+                    .map_err(|e| self.error_here(e))?,
+            ),
+            None => None,
+        };
+
+        if significant.len() != eq_index + 2 {
+            return Err(self.error_here(VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                "Mid/MidB support only a single source expression",
+            )));
+        }
+        let value = self.eval_flat_operand(significant[eq_index + 1])?;
+        let value = VBString::try_from(&value).map_err(|e| self.error_here(e))?;
+        let current = match self.lookup(&name) {
+            Some(current) => VBString::try_from(current).map_err(|e| self.error_here(e))?,
+            None => VBString::from(""),
+        };
+        let updated =
+            apply(&current, &start, length.as_ref(), &value).map_err(|e| self.error_here(e))?;
+        self.set_variable(&name, VBVariant::from(updated));
         Ok(())
     }
 
