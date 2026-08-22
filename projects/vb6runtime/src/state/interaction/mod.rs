@@ -1,16 +1,18 @@
 //! Process-global user interaction state for VB6.
 //!
 //! VB6 interaction functions (`Command$`, `DoEvents`, `Beep`, `MsgBox`,
-//! `InputBox`, `AppActivate`) delegate to a pluggable [`InteractionBackend`]
-//! so the same API works across platforms:
+//! `InputBox`, `AppActivate`, `Shell`) delegate to a pluggable
+//! [`InteractionBackend`] so the same API works across platforms:
 //!
 //! - **Native** (default on Windows/Linux/macOS): reads real command-line
-//!   args, yields the thread, beeps via the terminal bell character, and
-//!   shows real dialogs (`MessageBoxW` on Windows, `osascript` on macOS,
-//!   `zenity` on Linux, browser `alert`/`confirm` on wasm32).
+//!   args, yields the thread, beeps via the terminal bell character, shows
+//!   real dialogs (`MessageBoxW` on Windows, `osascript` on macOS,
+//!   `zenity` on Linux, browser `alert`/`confirm` on wasm32), and starts
+//!   real processes (`CreateProcessW` on Windows, detached spawns with
+//!   quoted command-line splitting on Linux/macOS).
 //! - **Memory** (default on wasm32/tests): injectable, deterministic
 //!   behavior with no OS side effects — including scripted response lists
-//!   for `MsgBox`, `InputBox`, and `AppActivate`.
+//!   for `MsgBox`, `InputBox`, `AppActivate`, and `Shell`.
 //!
 //! The backend can be switched at runtime with [`set_backend`]; a WASM host
 //! that wants real modal dialogs installs
@@ -23,6 +25,7 @@ pub mod inputbox;
 pub mod memory;
 pub mod msgbox;
 pub mod native;
+pub mod shell;
 
 use std::sync::{Mutex, OnceLock};
 
@@ -32,6 +35,7 @@ pub use inputbox::{InputBoxRecord, InputBoxRequest};
 pub use msgbox::{
     MsgBoxButton, MsgBoxButtonSet, MsgBoxIcon, MsgBoxModality, MsgBoxRecord, MsgBoxRequest,
 };
+pub use shell::{ShellRecord, ShellRequest, WindowStyle};
 
 /// The active interaction backend.
 static BACKEND: OnceLock<Mutex<Box<dyn InteractionBackend>>> = OnceLock::new();
@@ -148,6 +152,20 @@ pub fn app_activate(request: &AppActivateRequest) -> crate::error::VBResult<()> 
         .lock()
         .unwrap_or_else(|e| e.into_inner())
         .app_activate(request)
+}
+
+/// Start a program asynchronously and return its task ID.
+///
+/// The `request` must already be validated (see [`ShellRequest::parse`]);
+/// this only routes it to the active backend. Corresponds to VB6's `Shell`
+/// function: the returned task ID is the child's process id on native
+/// platforms, and a program that cannot be started raises VB6 error 53
+/// ("File not found") or 70 ("Permission denied").
+pub fn shell(request: &ShellRequest) -> crate::error::VBResult<f64> {
+    backend()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .shell(request)
 }
 
 /// Run `f` with the active backend downcast to [`MemoryBackend`].
@@ -281,6 +299,27 @@ mod tests {
         let _guard = lock_test();
         set_backend(Box::new(memory::MemoryBackend::new()));
         assert!(app_activate(&AppActivateRequest::new("Calculator")).is_ok());
+        reset_backend();
+    }
+
+    #[test]
+    fn shell_routes_to_the_active_backend() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::with_shell_responses([
+            31337.0,
+        ])));
+        assert_eq!(shell(&ShellRequest::new("calc.exe")).unwrap(), 31337.0);
+        reset_backend();
+    }
+
+    #[test]
+    fn shell_synthesizes_task_ids_without_scripted_responses() {
+        let _guard = lock_test();
+        set_backend(Box::new(memory::MemoryBackend::new()));
+        let first = shell(&ShellRequest::new("notepad.exe")).unwrap();
+        let second = shell(&ShellRequest::new("calc.exe")).unwrap();
+        assert!(first > 0.0);
+        assert_ne!(first, second);
         reset_backend();
     }
 }

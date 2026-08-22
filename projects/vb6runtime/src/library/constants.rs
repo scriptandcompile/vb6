@@ -143,6 +143,31 @@ pub const VB_YES: i32 = 6;
 /// `MsgBox` result — No button was clicked (`vbNo`).
 pub const VB_NO: i32 = 7;
 
+// Shell window-style constants (`VbAppWinStyle`)
+//
+/// `Shell` style — window is hidden and focus is passed to the hidden
+/// window (`vbHide`).
+pub const VB_HIDE: i32 = 0;
+
+/// `Shell` style — window has focus and is restored to its original size
+/// and position (`vbNormalFocus`).
+pub const VB_NORMAL_FOCUS: i32 = 1;
+
+/// `Shell` style — window is displayed as an icon with focus
+/// (`vbMinimizedFocus`).
+pub const VB_MINIMIZED_FOCUS: i32 = 2;
+
+/// `Shell` style — window is maximized with focus (`vbMaximizedFocus`).
+pub const VB_MAXIMIZED_FOCUS: i32 = 3;
+
+/// `Shell` style — window is restored to its most recent size and position;
+/// the currently active window remains active (`vbNormalNoFocus`).
+pub const VB_NORMAL_NO_FOCUS: i32 = 4;
+
+/// `Shell` style — window is displayed as an icon; the currently active
+/// window remains active (`vbMinimizedNoFocus`).
+pub const VB_MINIMIZED_NO_FOCUS: i32 = 6;
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------

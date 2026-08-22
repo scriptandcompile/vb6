@@ -755,4 +755,142 @@
 //! - `SendKeys`: Sends keystrokes to active window
 //! - `Dir`: Verifies file existence before shelling
 //! - `Environ`: Gets environment variables for path construction
-//!
+
+use crate::error::VBResult;
+use crate::state;
+use crate::value::{VBLong, VBString, VBVariant};
+
+/// Implement VB6's `Shell` function.
+///
+/// Validates the optional `windowstyle` argument against the six documented
+/// `VbAppWinStyle` constants (error 5 otherwise; a Null argument raises
+/// error 94), then hands the request to the active
+/// [`interaction backend`](crate::state::interaction) and returns the task
+/// ID as a Variant (Double). The backend decides what "start a program"
+/// means here: the native backends launch a real detached process (the task
+/// ID is its process id), while the memory backend answers from a scripted
+/// response list without touching the OS.
+pub fn shell(pathname: &VBString, window_style: Option<&VBVariant>) -> VBResult<VBVariant> {
+    let raw_style = match window_style {
+        // VB6's documented default for an omitted argument:
+        // "the program is started minimized with focus".
+        None => state::interaction::WindowStyle::default().id(),
+        Some(style) => i64::from(VBLong::try_from(style)?.as_i32()),
+    };
+    let request = state::interaction::ShellRequest::parse(pathname.as_str(), raw_style)?;
+    let task_id = state::interaction::shell(&request)?;
+    Ok(VBVariant::from_double(task_id))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+    use crate::state::interaction::{memory::MemoryBackend, WindowStyle};
+    use crate::state::test_support::lock_test;
+
+    fn set_backend(backend: MemoryBackend) {
+        state::interaction::set_backend(Box::new(backend));
+    }
+
+    #[test]
+    fn returns_the_task_id_as_a_double() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::with_shell_responses([4242.0]));
+        let result = shell(&VBString::from("notepad.exe"), None).unwrap();
+        assert_eq!(result.as_f64().unwrap(), 4242.0);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn omitted_style_defaults_to_minimized_with_focus() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        shell(&VBString::from("notepad.exe"), None).unwrap();
+
+        let requests = state::interaction::with_memory_backend(|m| m.shell_requests()).unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].pathname, "notepad.exe");
+        assert_eq!(requests[0].window_style, WindowStyle::MinimizedFocus);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn explicit_styles_flow_through_to_the_backend() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        shell(
+            &VBString::from("calc.exe"),
+            Some(&VBVariant::from_long(3)), // vbMaximizedFocus
+        )
+        .unwrap();
+        shell(
+            &VBString::from("backup.bat"),
+            Some(&VBVariant::from_integer(0)), // vbHide
+        )
+        .unwrap();
+
+        let requests = state::interaction::with_memory_backend(|m| m.shell_requests()).unwrap();
+        assert_eq!(requests[0].window_style, WindowStyle::MaximizedFocus);
+        assert_eq!(requests[1].window_style, WindowStyle::Hide);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn undefined_window_style_is_error_5() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        // 5 sits between vbNormalNoFocus (4) and vbMinimizedNoFocus (6).
+        let err = shell(&VBString::from("x"), Some(&VBVariant::from_long(5))).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+        assert!(
+            err.description.contains("vbMinimizedNoFocus"),
+            "{}",
+            err.description
+        );
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn null_window_style_is_invalid_use_of_null() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let err = shell(&VBString::from("x"), Some(&VBVariant::Null)).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn non_numeric_window_style_is_type_mismatch() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::new());
+        let err = shell(
+            &VBString::from("x"),
+            Some(&VBVariant::from_string("normal")),
+        )
+        .unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+        state::interaction::reset_backend();
+    }
+
+    #[test]
+    fn scripted_responses_are_returned_in_request_order() {
+        let _guard = lock_test();
+        set_backend(MemoryBackend::with_shell_responses([111.0, 222.0]));
+        assert_eq!(
+            shell(&VBString::from("a.exe"), None)
+                .unwrap()
+                .as_f64()
+                .unwrap(),
+            111.0
+        );
+        assert_eq!(
+            shell(&VBString::from("b.exe"), None)
+                .unwrap()
+                .as_f64()
+                .unwrap(),
+            222.0
+        );
+        state::interaction::reset_backend();
+    }
+}

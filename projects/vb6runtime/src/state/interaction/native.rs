@@ -40,6 +40,25 @@
 //! On every platform that *does* have a working window facility but no
 //! matching window, the statement raises VB6 error 5 ("Invalid procedure
 //! call or argument"), exactly as real VB6 does.
+//!
+//! `Shell` follows the same philosophy:
+//!
+//! - **Windows**: `CreateProcessW` passing the command line through intact,
+//!   with the requested window style applied via `STARTF_USESHOWWINDOW`
+//!   (`SW_HIDE` ... `SW_SHOWMINNOACTIVE`) — exact VB6 parity. The returned
+//!   task ID is the new process id, which is also what `AppActivate`'s
+//!   numeric form matches against.
+//! - **Linux/macOS**: the command line is split into program + arguments
+//!   (double quotes honored), then spawned detached in its own process
+//!   group with its standard streams disconnected; the window style has no
+//!   equivalent and is ignored.
+//! - **wasm32**: browsers cannot start processes, so the request is logged
+//!   to stderr and a synthetic task ID is returned so programs remain
+//!   runnable.
+//!
+//! A spawn failure raises VB6 error 53 ("File not found") when the program
+//! does not exist and error 70 ("Permission denied") when it cannot be
+//! executed, matching VB6's trappable errors.
 
 use crate::error::{err_number, VBError, VBResult};
 
@@ -47,6 +66,7 @@ use super::appactivate::AppActivateRequest;
 use super::backend::InteractionBackend;
 use super::inputbox::InputBoxRequest;
 use super::msgbox::{MsgBoxButton, MsgBoxRequest};
+use super::shell::ShellRequest;
 
 /// Native interaction backend using real OS facilities.
 pub struct NativeBackend;
@@ -97,6 +117,19 @@ impl InteractionBackend for NativeBackend {
 
     fn app_activate(&self, request: &AppActivateRequest) -> VBResult<()> {
         activate_window(request)
+    }
+
+    fn shell(&self, request: &ShellRequest) -> VBResult<f64> {
+        launch(request).map_err(|err| {
+            // The OS error alone ("No such file or directory (os error 2)")
+            // never names the program; real VB6's error 53 is understood to
+            // be about the pathname that was passed, so include it.
+            let mapped = VBError::from(err);
+            VBError::with_description(
+                mapped.number,
+                format!("\"{}\": {}", request.pathname, mapped.description),
+            )
+        })
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
@@ -264,6 +297,44 @@ fn activate_fallback(request: &AppActivateRequest) {
         eprintln!("[AppActivate] {} [wait]", request.title);
     } else {
         eprintln!("[AppActivate] {}", request.title);
+    }
+}
+
+// ---- Shell ----
+
+/// Source of task IDs on platforms that cannot start processes at all;
+/// monotonically increasing so successive launches stay distinguishable
+/// (and truthy — VB6 uses 0/absence to mean failure).
+#[cfg(not(any(windows, unix)))]
+static SYNTHETIC_TASK_IDS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+/// Next synthetic task ID for platforms without process creation.
+#[cfg(not(any(windows, unix)))]
+fn next_synthetic_task_id() -> f64 {
+    use std::sync::atomic::Ordering;
+    1.0 + SYNTHETIC_TASK_IDS.fetch_add(1, Ordering::Relaxed) as f64
+}
+
+/// Start `request`'s program without waiting for it and report its task ID.
+///
+/// Platform dispatch for `Shell`: real process creation where the OS
+/// provides one, log-and-synthesize elsewhere so a browser run cannot crash
+/// a program that merely shells out. The returned task ID is the child's
+/// process id, which is what `AppActivate`'s numeric form matches against.
+fn launch(request: &ShellRequest) -> std::io::Result<f64> {
+    #[cfg(target_os = "windows")]
+    {
+        windows::spawn_process(request)
+    }
+    #[cfg(unix)]
+    {
+        posix::spawn_process(request)
+    }
+    #[cfg(not(any(windows, unix)))]
+    {
+        let _ = request;
+        eprintln!("[Shell] {}", request.pathname);
+        Ok(next_synthetic_task_id())
     }
 }
 
@@ -690,6 +761,77 @@ mod windows {
             self.words
         }
     }
+
+    // ---- Shell ----
+
+    /// Spawn `request.pathname` via `CreateProcessW` and return the new
+    /// process id as its task ID.
+    ///
+    /// The command line is passed through intact — VB6 lets `Shell` carry
+    /// arguments, so Windows' own parser splits it. The requested window
+    /// style rides in `STARTUPINFOW` (`STARTF_USESHOWWINDOW`), giving the
+    /// child exactly the show state VB6 promises; a failed spawn surfaces
+    /// the OS error so callers map it onto error 53/70.
+    pub(super) fn spawn_process(request: &ShellRequest) -> std::io::Result<f64> {
+        use windows_sys::Win32::Foundation::CloseHandle;
+        use windows_sys::Win32::System::Threading::{
+            CreateProcessW, CREATE_UNICODE_ENVIRONMENT, PROCESS_INFORMATION, STARTF_USESHOWWINDOW,
+            STARTUPINFOW,
+        };
+
+        // NUL-terminated UTF-16 command line; CreateProcessW may write back
+        // a normalized form into this buffer, hence mutability.
+        let mut command_line: Vec<u16> = std::ffi::OsStr::new(&request.pathname)
+            .encode_wide()
+            .chain(std::iter::once(0))
+            .collect();
+
+        let mut startup: STARTUPINFOW = unsafe { std::mem::zeroed() };
+        startup.cb = std::mem::size_of::<STARTUPINFOW>() as u32;
+        startup.dwFlags = STARTF_USESHOWWINDOW;
+        startup.wShowWindow = show_window_flag(request.window_style);
+        let mut process: PROCESS_INFORMATION = unsafe { std::mem::zeroed() };
+
+        let started = unsafe {
+            CreateProcessW(
+                std::ptr::null(), // derive application name from the command line
+                command_line.as_mut_ptr(),
+                std::ptr::null(),
+                std::ptr::null(),
+                0, // no handle inheritance: Shell shares nothing with the child
+                CREATE_UNICODE_ENVIRONMENT,
+                std::ptr::null(), // inherit our environment block
+                std::ptr::null(), // inherit our current directory
+                &startup,
+                &mut process,
+            )
+        };
+        if started == 0 {
+            return Err(std::io::Error::last_os_error());
+        }
+
+        // The task ID outlives these handles; dropping them releases our
+        // interest without disturbing the running child.
+        unsafe {
+            CloseHandle(process.hThread);
+            CloseHandle(process.hProcess);
+        }
+        Ok(f64::from(process.dwProcessId))
+    }
+
+    /// Map a VB6 window style onto the Win32 `SW_*` constant that requests
+    /// the same initial show state.
+    fn show_window_flag(style: super::super::shell::WindowStyle) -> u16 {
+        use super::super::shell::WindowStyle;
+        match style {
+            WindowStyle::Hide => 0,             // SW_HIDE
+            WindowStyle::NormalFocus => 1,      // SW_SHOWNORMAL
+            WindowStyle::MinimizedFocus => 2,   // SW_SHOWMINIMIZED
+            WindowStyle::MaximizedFocus => 3,   // SW_SHOWMAXIMIZED
+            WindowStyle::NormalNoFocus => 4,    // SW_SHOWNOACTIVATE
+            WindowStyle::MinimizedNoFocus => 7, // SW_SHOWMINNOACTIVE
+        }
+    }
 }
 
 #[cfg(target_os = "macos")]
@@ -993,6 +1135,92 @@ mod linux {
     }
 }
 
+/// Shell process creation shared by Linux and macOS.
+///
+/// POSIX has no single-command-line spawn: the program and its arguments
+/// are separate. VB6 programs are written against Windows' command-line
+/// conventions, so this module splits the line itself (double quotes
+/// honored) before spawning.
+#[cfg(unix)]
+mod posix {
+    use std::process::{Command, Stdio};
+
+    use super::super::shell::ShellRequest;
+
+    /// Spawn `request.pathname` detached and return its process id.
+    ///
+    /// The child runs in its own process group so it outlives our signal
+    /// delivery; its standard streams are disconnected because VB6's Shell
+    /// offers no way to capture them anyway; and a background thread reaps
+    /// the exit status so short-lived programs do not linger as zombies
+    /// while a host keeps running. The requested window style has no POSIX
+    /// equivalent and is ignored, mirroring how `InputBox` ignores
+    /// unsupported positioning.
+    pub(super) fn spawn_process(request: &ShellRequest) -> std::io::Result<f64> {
+        let (program, arguments) = split_command_line(&request.pathname);
+        let mut command = Command::new(program);
+        command.args(arguments);
+        command
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null());
+
+        use std::os::unix::process::CommandExt;
+        command.process_group(0);
+
+        let mut child = command.spawn()?;
+        let pid = child.id();
+
+        // Shell never waits (VB6 launches asynchronously), but an unreaped
+        // child would hold a zombie entry until the interpreter exits.
+        std::thread::spawn(move || {
+            let _ = child.wait();
+        });
+        Ok(f64::from(pid))
+    }
+
+    /// Split a command line into its program and arguments.
+    ///
+    /// Whitespace separates tokens unless enclosed in double quotes; quote
+    /// characters themselves do not reach the argument values. An empty or
+    /// all-whitespace line yields an empty program name, which the spawn
+    /// then reports as "file not found" — the same error real VB6 raises
+    /// for `Shell ""`.
+    pub(super) fn split_command_line(line: &str) -> (String, Vec<String>) {
+        let mut tokens: Vec<String> = Vec::new();
+        let mut current = String::new();
+        let mut in_quotes = false;
+        let mut token_started = false;
+        for ch in line.chars() {
+            match ch {
+                '"' => {
+                    in_quotes = !in_quotes;
+                    token_started = true;
+                }
+                c if c.is_whitespace() && !in_quotes => {
+                    if token_started {
+                        tokens.push(std::mem::take(&mut current));
+                        token_started = false;
+                    }
+                }
+                c => {
+                    current.push(c);
+                    token_started = true;
+                }
+            }
+        }
+        if token_started {
+            tokens.push(current);
+        }
+        if tokens.is_empty() {
+            return (String::new(), Vec::new());
+        }
+
+        let program = tokens.drain(..1).next().unwrap_or_default();
+        (program, tokens)
+    }
+}
+
 /// Compose the message for a one-button (`alert`) or first-step
 /// (`confirm`) browser dialog: browsers have no title bar, so the title is
 /// prepended to the prompt.
@@ -1153,6 +1381,42 @@ mod tests {
         let _ = backend.app_activate(&AppActivateRequest::new(
             "definitely-not-a-real-window-title-42",
         ));
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn shell_spawns_a_program_and_reports_its_task_id() {
+        // `true` exists on every Unix CI runner and exits immediately.
+        let task_id = launch(&ShellRequest::new("true")).unwrap();
+        assert!(task_id > 0.0);
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn shell_missing_program_is_file_not_found() {
+        let err = NativeBackend::new()
+            .shell(&ShellRequest::new("definitely-not-a-program-42"))
+            .unwrap_err();
+        assert_eq!(err.number, err_number::FILE_NOT_FOUND);
+        assert!(err.description.contains("definitely-not-a-program-42"));
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn command_line_splitting_honors_double_quotes() {
+        let (program, args) = posix::split_command_line(
+            r#""C:\Program Files\App.exe" /flag "my file.txt"   trailing"#,
+        );
+        assert_eq!(program, r"C:\Program Files\App.exe");
+        assert_eq!(args, vec!["/flag", "my file.txt", "trailing"]);
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn empty_command_lines_split_to_an_empty_program() {
+        let (program, args) = posix::split_command_line("   ");
+        assert_eq!(program, "");
+        assert!(args.is_empty());
     }
 
     #[test]
