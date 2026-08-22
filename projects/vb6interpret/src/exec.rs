@@ -10,6 +10,7 @@ use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
 use vb6runtime::library::file as filefn;
 use vb6runtime::state::file as file_state;
+use vb6runtime::value::VBString;
 use vb6runtime::{ArrayValue, VBVariant};
 
 use crate::error::{RunError, RunResult};
@@ -189,6 +190,10 @@ impl Interpreter {
             }
             SyntaxKind::TimeStatement => {
                 self.exec_time_statement(node)?;
+                Ok(Flow::Next)
+            }
+            SyntaxKind::LSetStatement => {
+                self.exec_lset(node)?;
                 Ok(Flow::Next)
             }
             SyntaxKind::OnErrorStatement
@@ -537,6 +542,66 @@ impl Interpreter {
             }
         }
         Ok(())
+    }
+
+    /// `LSet stringvar = string`: left-align `string` within `stringvar`
+    /// and store the result back.
+    ///
+    /// Like `Open`/`Close`, this statement keeps its operands as flat
+    /// tokens rather than nested expression nodes, so the source may be a
+    /// single identifier-like token, a literal, or a wrapped expression;
+    /// compound flat-token expressions are not evaluated. The alignment
+    /// width is the target's current length.
+    fn exec_lset(&mut self, node: &CstNode) -> RunResult<()> {
+        let significant: Vec<&CstNode> = node.significant_children().collect();
+        let eq_index = significant
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::EqualityOperator)
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+        // Target variable: the first identifier-like token after the `LSet`
+        // keyword (index 0) and before the `=`.
+        let target = significant[1..eq_index]
+            .iter()
+            .find(|c| is_identifier_like(c))
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+        let name = target.text().trim().to_string();
+        if significant.len() != eq_index + 2 {
+            return Err(self.error_here(VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                "LSet supports only a single source expression",
+            )));
+        }
+        let value = self.eval_flat_operand(significant[eq_index + 1])?;
+        let value = VBString::try_from(&value).map_err(|e| self.error_here(e))?;
+        let current = match self.lookup(&name) {
+            Some(current) => VBString::try_from(current).map_err(|e| self.error_here(e))?,
+            None => VBString::from(""),
+        };
+        let aligned = vb6runtime::library::string::lset_statement::lset_statement(&current, &value)
+            .map_err(|e| self.error_here(e))?;
+        self.set_variable(&name, VBVariant::from(aligned));
+        Ok(())
+    }
+
+    /// Evaluate one operand of a flat-token statement: an identifier-like
+    /// token names a variable (`Empty` when undeclared, literal keywords
+    /// such as `True` included), anything else evaluates as an expression
+    /// node.
+    fn eval_flat_operand(&mut self, node: &CstNode) -> RunResult<VBVariant> {
+        if is_identifier_like(node) {
+            let name = node.text().trim();
+            if let Some(value) = self.lookup(name) {
+                return Ok(value.clone());
+            }
+            return match node.kind() {
+                SyntaxKind::TrueKeyword => Ok(VBVariant::Boolean(true)),
+                SyntaxKind::FalseKeyword => Ok(VBVariant::Boolean(false)),
+                SyntaxKind::NullKeyword => Ok(VBVariant::Null),
+                SyntaxKind::NothingKeyword => Ok(VBVariant::Nothing),
+                _ => Ok(VBVariant::Empty),
+            };
+        }
+        self.eval_expr(node)
     }
 
     /// Assignment, `Set`, or `Let`: `lhs = rhs`.

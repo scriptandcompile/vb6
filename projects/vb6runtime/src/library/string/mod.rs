@@ -6,7 +6,8 @@
 
 pub mod ansi;
 
-pub mod lset;
+pub mod lset_statement;
+pub use lset_statement::lset_statement;
 pub mod mid_statement;
 pub mod midb_statement;
 pub mod rset;

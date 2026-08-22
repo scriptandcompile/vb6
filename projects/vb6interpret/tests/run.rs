@@ -89,6 +89,44 @@ fn string_function_suffix_variants() {
 }
 
 #[test]
+fn lset_statement_pads_on_the_right() {
+    let out = run("    Dim s As String\n\
+         s = String(10, \"X\")\n\
+         LSet s = \"Left\"\n\
+         Debug.Print \"[\" & s & \"]\"\n");
+    assert_eq!(out, vec!["[Left      ]"]);
+}
+
+#[test]
+fn lset_statement_truncates_long_sources() {
+    let out = run("    Dim s As String\n\
+         s = \"ABCDEFGH\"\n\
+         LSet s = \"1234567890\"\n\
+         Debug.Print s\n");
+    assert_eq!(out, vec!["12345678"]);
+}
+
+#[test]
+fn lset_statement_accepts_a_variable_source() {
+    let out = run("    Dim s As String\n\
+         Dim t As String\n\
+         s = String(6, \"*\")\n\
+         t = \"abc\"\n\
+         LSet s = t\n\
+         Debug.Print \"[\" & s & \"]\"\n");
+    assert_eq!(out, vec!["[abc   ]"]);
+}
+
+#[test]
+fn lset_statement_keeps_exact_fit_unchanged() {
+    let out = run("    Dim s As String\n\
+         s = \"abc\"\n\
+         LSet s = \"xyz\"\n\
+         Debug.Print s\n");
+    assert_eq!(out, vec!["xyz"]);
+}
+
+#[test]
 fn math_functions() {
     let out = run("    Debug.Print Abs(-5)\n\
          Debug.Print Sqr(16)\n\

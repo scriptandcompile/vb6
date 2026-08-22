@@ -50,6 +50,13 @@ pub(super) fn register(registry: &mut Registry) {
     registry.insert(builtin!("trim", 1, 1, |args| { strfn::trim(&args[0]) }));
     registry.insert(builtin!("ltrim", 1, 1, |args| { strfn::ltrim(&args[0]) }));
     registry.insert(builtin!("rtrim", 1, 1, |args| { strfn::rtrim(&args[0]) }));
+    // `LSet` is a statement; the registry entry exposes the alignment
+    // primitive `(stringvar, string) -> aligned string` for dispatch.
+    registry.insert(builtin!("lset", 2, 2, |args| {
+        let stringvar = arg_string(args, 0)?;
+        let string = arg_string(args, 1)?;
+        strfn::lset_statement(&stringvar, &string).map(VBVariant::from)
+    }));
     registry.insert(builtin!("lcase$", 1, 1, |args| {
         strfn::lcase_dollar(&arg_string(args, 0)?).map(VBVariant::from)
     }));
