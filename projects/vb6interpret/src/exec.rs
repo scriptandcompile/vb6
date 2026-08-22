@@ -193,7 +193,17 @@ impl Interpreter {
                 Ok(Flow::Next)
             }
             SyntaxKind::LSetStatement => {
-                self.exec_lset(node)?;
+                self.exec_alignment_set(
+                    node,
+                    vb6runtime::library::string::lset_statement::lset_statement,
+                )?;
+                Ok(Flow::Next)
+            }
+            SyntaxKind::RSetStatement => {
+                self.exec_alignment_set(
+                    node,
+                    vb6runtime::library::string::rset_statement::rset_statement,
+                )?;
                 Ok(Flow::Next)
             }
             SyntaxKind::OnErrorStatement
@@ -544,22 +554,27 @@ impl Interpreter {
         Ok(())
     }
 
-    /// `LSet stringvar = string`: left-align `string` within `stringvar`
-    /// and store the result back.
+    /// `LSet stringvar = string` / `RSet stringvar = string`: align `string`
+    /// within `stringvar` (left or right per `align`) and store the result
+    /// back.
     ///
-    /// Like `Open`/`Close`, this statement keeps its operands as flat
+    /// Like `Open`/`Close`, these statements keep their operands as flat
     /// tokens rather than nested expression nodes, so the source may be a
     /// single identifier-like token, a literal, or a wrapped expression;
     /// compound flat-token expressions are not evaluated. The alignment
     /// width is the target's current length.
-    fn exec_lset(&mut self, node: &CstNode) -> RunResult<()> {
+    fn exec_alignment_set(
+        &mut self,
+        node: &CstNode,
+        align: fn(&VBString, &VBString) -> VBResult<VBString>,
+    ) -> RunResult<()> {
         let significant: Vec<&CstNode> = node.significant_children().collect();
         let eq_index = significant
             .iter()
             .position(|c| c.kind() == SyntaxKind::EqualityOperator)
             .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
-        // Target variable: the first identifier-like token after the `LSet`
-        // keyword (index 0) and before the `=`.
+        // Target variable: the first identifier-like token after the
+        // statement keyword (index 0) and before the `=`.
         let target = significant[1..eq_index]
             .iter()
             .find(|c| is_identifier_like(c))
@@ -568,7 +583,7 @@ impl Interpreter {
         if significant.len() != eq_index + 2 {
             return Err(self.error_here(VBError::with_description(
                 err_number::INVALID_PROCEDURE_CALL,
-                "LSet supports only a single source expression",
+                "LSet/RSet support only a single source expression",
             )));
         }
         let value = self.eval_flat_operand(significant[eq_index + 1])?;
@@ -577,8 +592,7 @@ impl Interpreter {
             Some(current) => VBString::try_from(current).map_err(|e| self.error_here(e))?,
             None => VBString::from(""),
         };
-        let aligned = vb6runtime::library::string::lset_statement::lset_statement(&current, &value)
-            .map_err(|e| self.error_here(e))?;
+        let aligned = align(&current, &value).map_err(|e| self.error_here(e))?;
         self.set_variable(&name, VBVariant::from(aligned));
         Ok(())
     }
