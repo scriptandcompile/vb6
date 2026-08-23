@@ -153,10 +153,8 @@ pub(super) fn register(registry: &mut Registry) {
     ));
     registry.insert(typed_builtin!("lenb", 1, 1, (input: string),
         strfn::lenb(&input).map(VBVariant::from)));
-    registry.insert(builtin!("leftb", 2, 2, |args| {
-        let length = VBLong::try_from(&args[1])?;
-        strfn::leftb(&args[0], &length)
-    }));
+    registry.insert(typed_builtin!("leftb", 2, 2, (input: string, length: long),
+        strfn::leftb(&input, &length)));
     registry.insert(
         typed_builtin!("leftb$", 2, 2, (input: string, length: long),
         strfn::leftb_dollar(&input, &length).map(VBVariant::from)),
