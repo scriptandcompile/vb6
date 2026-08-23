@@ -714,7 +714,7 @@
 
 use crate::{
     error::VBResult,
-    value::{VBLong, VBVariant},
+    value::{VBLong, VBString, VBVariant},
 };
 
 use super::right_dollar::right_dollar;
@@ -731,11 +731,8 @@ use super::right_dollar::right_dollar;
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
-pub fn right(input: &VBVariant, length: &VBLong) -> VBResult<VBVariant> {
-    if input.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    right_dollar(&input.as_vbstring()?, length).map(VBVariant::from)
+pub fn right(input: &VBString, length: &VBLong) -> VBResult<VBVariant> {
+    right_dollar(input, length).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -746,11 +743,11 @@ mod tests {
     #[test]
     fn returns_rightmost_characters() {
         assert_eq!(
-            right(&VBVariant::from_string("Hello"), &VBLong::from(3)).unwrap(),
+            right(&VBString::from("Hello"), &VBLong::from(3)).unwrap(),
             VBVariant::from_string("llo")
         );
         assert_eq!(
-            right(&VBVariant::from_string("Hello"), &VBLong::from(0)).unwrap(),
+            right(&VBString::from("Hello"), &VBLong::from(0)).unwrap(),
             VBVariant::from_string("")
         );
     }
@@ -758,7 +755,7 @@ mod tests {
     #[test]
     fn length_greater_than_string_returns_all() {
         assert_eq!(
-            right(&VBVariant::from_string("Hello"), &VBLong::from(10)).unwrap(),
+            right(&VBString::from("Hello"), &VBLong::from(10)).unwrap(),
             VBVariant::from_string("Hello")
         );
     }
@@ -766,7 +763,7 @@ mod tests {
     #[test]
     fn handles_unicode() {
         assert_eq!(
-            right(&VBVariant::from_string("héllo"), &VBLong::from(2)).unwrap(),
+            right(&VBString::from("héllo"), &VBLong::from(2)).unwrap(),
             VBVariant::from_string("lo")
         );
     }
@@ -774,18 +771,10 @@ mod tests {
     #[test]
     fn rejects_negative_length() {
         assert_eq!(
-            right(&VBVariant::from_string("Hello"), &VBLong::from(-1))
+            right(&VBString::from("Hello"), &VBLong::from(-1))
                 .unwrap_err()
                 .number,
             err_number::INVALID_PROCEDURE_CALL
-        );
-    }
-
-    #[test]
-    fn propagates_null() {
-        assert_eq!(
-            right(&VBVariant::Null, &VBLong::from(3)).unwrap(),
-            VBVariant::Null
         );
     }
 }
