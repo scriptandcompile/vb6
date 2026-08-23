@@ -555,7 +555,7 @@
 
 use crate::{
     error::VBResult,
-    value::{VBLong, VBVariant},
+    value::{VBLong, VBString, VBVariant},
 };
 
 use super::left_dollar::left_dollar;
@@ -572,11 +572,8 @@ use super::left_dollar::left_dollar;
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
-pub fn left(input: &VBVariant, length: &VBLong) -> VBResult<VBVariant> {
-    if input.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    left_dollar(&input.as_vbstring()?, length).map(VBVariant::from)
+pub fn left(input: &VBString, length: &VBLong) -> VBResult<VBVariant> {
+    left_dollar(input, length).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -587,11 +584,11 @@ mod tests {
     #[test]
     fn returns_leftmost_characters() {
         assert_eq!(
-            left(&VBVariant::from_string("Hello"), &VBLong::from(3)).unwrap(),
+            left(&VBString::from("Hello"), &VBLong::from(3)).unwrap(),
             VBVariant::from_string("Hel")
         );
         assert_eq!(
-            left(&VBVariant::from_string("Hello"), &VBLong::from(0)).unwrap(),
+            left(&VBString::from("Hello"), &VBLong::from(0)).unwrap(),
             VBVariant::from_string("")
         );
     }
@@ -599,11 +596,11 @@ mod tests {
     #[test]
     fn length_greater_than_string_returns_all() {
         assert_eq!(
-            left(&VBVariant::from_string("Hello"), &VBLong::from(10)).unwrap(),
+            left(&VBString::from("Hello"), &VBLong::from(10)).unwrap(),
             VBVariant::from_string("Hello")
         );
         assert_eq!(
-            left(&VBVariant::from_string("Hello"), &VBLong::from(5)).unwrap(),
+            left(&VBString::from("Hello"), &VBLong::from(5)).unwrap(),
             VBVariant::from_string("Hello")
         );
     }
@@ -611,7 +608,7 @@ mod tests {
     #[test]
     fn handles_unicode() {
         assert_eq!(
-            left(&VBVariant::from_string("héllo"), &VBLong::from(2)).unwrap(),
+            left(&VBString::from("héllo"), &VBLong::from(2)).unwrap(),
             VBVariant::from_string("hé")
         );
     }
@@ -619,18 +616,10 @@ mod tests {
     #[test]
     fn rejects_negative_length() {
         assert_eq!(
-            left(&VBVariant::from_string("Hello"), &VBLong::from(-1))
+            left(&VBString::from("Hello"), &VBLong::from(-1))
                 .unwrap_err()
                 .number,
             err_number::INVALID_PROCEDURE_CALL
-        );
-    }
-
-    #[test]
-    fn propagates_null() {
-        assert_eq!(
-            left(&VBVariant::Null, &VBLong::from(3)).unwrap(),
-            VBVariant::Null
         );
     }
 }
