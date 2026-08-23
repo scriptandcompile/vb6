@@ -356,6 +356,54 @@ End Sub\n";
     assert!(error.to_string().contains("line 3"));
 }
 
+/// Plan C1: a boundary conversion failure raised while dispatching an
+/// *expression-position* builtin (`eval::call_builtin` -> `error_at`) must
+/// report the offending source line. `CVErr` produces an Error variant that
+/// the `Long` conversion of `Chr$` re-raises verbatim.
+#[test]
+fn expression_builtin_conversion_failure_reports_line() {
+    let source = "Attribute VB_Name = \"M\"\n\
+Sub Main()\n\
+    Debug.Print Chr$(CVErr(31337))\n\
+End Sub\n";
+    let error = run_source(source).expect_err("expected CVErr propagation");
+    assert_eq!(error.error.number, 31337);
+    assert!(error.to_string().contains("line 2"));
+}
+
+/// Plan C1: same guarantee for the statement-execution path (`exec_mid_set`
+/// converts the `start` operand to `Long` and wraps failures with
+/// `error_here`). The Error variant arrives through a variable because Mid
+/// operands are flat tokens.
+#[test]
+fn statement_conversion_failure_reports_line() {
+    let source = "Attribute VB_Name = \"M\"\n\
+Sub Main()\n\
+    Dim s As String\n\
+    Dim v As Variant\n\
+    v = CVErr(4242)\n\
+    Mid(s, v) = \"x\"\n\
+End Sub\n";
+    let error = run_source(source).expect_err("expected CVErr propagation");
+    assert_eq!(error.error.number, 4242);
+    assert!(error.to_string().contains("line 5"));
+}
+
+/// Plan C1: same guarantee for the flat token-run fallback
+/// (`eval_flat_expression` -> `call_builtin` -> `error_here`), reachable via
+/// `Set` statements whose right-hand side is dispatched from raw tokens.
+#[test]
+fn flat_statement_builtin_conversion_failure_reports_line() {
+    let source = "Attribute VB_Name = \"M\"\n\
+Sub Main()\n\
+    Dim v As Variant\n\
+    Set v = Chr$(CVErr(777))\n\
+End Sub\n";
+    let error = run_source(source).expect_err("expected CVErr propagation");
+    assert_eq!(error.error.number, 777);
+    assert!(error.to_string().contains("line 3"));
+}
+
 #[test]
 fn print_separators() {
     let out = run("    Debug.Print \"a\"; \"b\"\n    Debug.Print \"c\"\n    Debug.Print \"x\";\n    Debug.Print \"y\"\n");

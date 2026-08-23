@@ -32,9 +32,13 @@ use std::collections::HashMap;
 use std::sync::OnceLock;
 
 use vb6core::error::{err_number, VBError, VBResult};
-use vb6runtime::value::{VBLong, VBString, VBVariant};
+use vb6runtime::value::{VBString, VBVariant};
 
 /// Build a [`Builtin`] registry entry from an adapter closure.
+///
+/// Transitional form: prefer [`typed_builtin!`] for functions whose runtime
+/// implementation already declares typed parameters; this closure form remains
+/// for entries with Variant passthrough or arity-dependent argument positions.
 ///
 /// The closure receives the evaluated argument slice and must return a
 /// `VBVariant`. Argument-count validation is performed by [`Registry::dispatch`]
@@ -48,6 +52,134 @@ macro_rules! builtin {
             max_args: $max,
             call: |$args: &[VBVariant]| -> VBResult<VBVariant> { $body },
         }
+    };
+}
+
+/// Declarative builtin signature spec (plan B2).
+///
+/// One line declares a function's name, arity bounds, and every parameter's
+/// kind; the expansion emits the `&[VBVariant] -> typed-call` glue, converting
+/// arguments left-to-right through [`vb6runtime::boundary`] so coercion logic
+/// exists once (in the generator + boundary helpers), not per entry. The
+/// legacy [`builtin!`] form remains only for entries whose runtime
+/// implementation is not typed yet (plan phases 1..N migrate them over).
+///
+/// Parameter kinds map to VB6 declared types and to the wrapper converted at
+/// the boundary:
+///
+/// | kind          | VB6 type      | value produced            |
+/// |---------------|---------------|---------------------------|
+/// | `variant`     | `As Variant`  | `&VBVariant` (no coerce)  |
+/// | `opt_variant` | optional Var. | `Option<&VBVariant>`      |
+/// | `string`      | `As String`   | `VBString`                |
+/// | `long`        | `As Long`     | `VBLong`                  |
+/// | `integer`     | `As Integer`  | `VBInteger`               |
+/// | `byte`        | `As Byte`     | `VBByte`                  |
+/// | `boolean`     | `As Boolean`  | `VBBoolean`               |
+/// | `single`      | `As Single`   | `VBSingle`                |
+/// | `double`      | `As Double`   | `VBDouble`                |
+/// | `currency`    | `As Currency` | `VBCurrency`              |
+/// | `date`        | `As Date`     | `VBDate`                  |
+/// | `opt_<t>`     | optional `t`  | `None` when absent        |
+///
+/// The body receives one binding per declared parameter (in order) and must
+/// produce `VBResult<VBVariant>` (map wrapper returns with `VBVariant::from`).
+///
+/// ```ignore
+/// registry.insert(typed_builtin!("left$", 2, 2,
+///     (input: string, length: long),
+///     strfn::left_dollar(&input, &length).map(VBVariant::from)));
+/// ```
+#[macro_export]
+macro_rules! typed_builtin {
+    ($name:literal, $min:expr, $max:expr,
+     ($($param:ident : $kind:ident),* $(,)?),
+     $body:expr) => {
+        Builtin {
+            name: $name,
+            min_args: $min,
+            max_args: $max,
+            call: |args: &[::vb6runtime::VBVariant]| -> ::vb6core::error::VBResult<::vb6runtime::VBVariant> {
+                // Left-to-right conversion order (plan A9): one statement per
+                // declared parameter, each converting the argument at the
+                // running index, so the leftmost offending argument errors
+                // first.
+                let mut __arg_index = 0usize;
+                $(
+                    let $param =
+                        $crate::__convert_arg!(args, __arg_index, $kind)?;
+                    __arg_index += 1;
+                )*
+                $body
+            },
+        }
+    };
+}
+
+/// Kind dispatch for [`typed_builtin!`]: converts the argument at `$index`
+/// according to the declared parameter kind. Internal — do not invoke directly.
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __convert_arg {
+    ($args:ident, $index:expr, variant) => {
+        ::vb6runtime::boundary::variant_arg($args, $index)
+    };
+    ($args:ident, $index:expr, opt_variant) => {
+        Ok::<_, ::vb6core::error::VBError>(::vb6runtime::boundary::opt_variant_arg($args, $index))
+    };
+    ($args:ident, $index:expr, string) => {
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBString>($args, $index)
+    };
+    ($args:ident, $index:expr, long) => {
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBLong>($args, $index)
+    };
+    ($args:ident, $index:expr, integer) => {
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBInteger>($args, $index)
+    };
+    ($args:ident, $index:expr, byte) => {
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBByte>($args, $index)
+    };
+    ($args:ident, $index:expr, boolean) => {
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBBoolean>($args, $index)
+    };
+    ($args:ident, $index:expr, single) => {
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBSingle>($args, $index)
+    };
+    ($args:ident, $index:expr, double) => {
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBDouble>($args, $index)
+    };
+    ($args:ident, $index:expr, currency) => {
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBCurrency>($args, $index)
+    };
+    ($args:ident, $index:expr, date) => {
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBDate>($args, $index)
+    };
+    ($args:ident, $index:expr, opt_string) => {
+        ::vb6runtime::boundary::opt_arg::<::vb6runtime::value::VBString>($args, $index)
+    };
+    ($args:ident, $index:expr, opt_long) => {
+        ::vb6runtime::boundary::opt_arg::<::vb6runtime::value::VBLong>($args, $index)
+    };
+    ($args:ident, $index:expr, opt_integer) => {
+        ::vb6runtime::boundary::opt_arg::<::vb6runtime::value::VBInteger>($args, $index)
+    };
+    ($args:ident, $index:expr, opt_byte) => {
+        ::vb6runtime::boundary::opt_arg::<::vb6runtime::value::VBByte>($args, $index)
+    };
+    ($args:ident, $index:expr, opt_boolean) => {
+        ::vb6runtime::boundary::opt_arg::<::vb6runtime::value::VBBoolean>($args, $index)
+    };
+    ($args:ident, $index:expr, opt_single) => {
+        ::vb6runtime::boundary::opt_arg::<::vb6runtime::value::VBSingle>($args, $index)
+    };
+    ($args:ident, $index:expr, opt_double) => {
+        ::vb6runtime::boundary::opt_arg::<::vb6runtime::value::VBDouble>($args, $index)
+    };
+    ($args:ident, $index:expr, opt_currency) => {
+        ::vb6runtime::boundary::opt_arg::<::vb6runtime::value::VBCurrency>($args, $index)
+    };
+    ($args:ident, $index:expr, opt_date) => {
+        ::vb6runtime::boundary::opt_arg::<::vb6runtime::value::VBDate>($args, $index)
     };
 }
 
@@ -139,14 +271,6 @@ fn arg_string(args: &[VBVariant], index: usize) -> VBResult<VBString> {
     args.get(index)
         .ok_or_else(|| VBError::new(err_number::WRONG_NUMBER_OF_ARGUMENTS))
         .and_then(VBString::try_from)
-}
-
-/// Extract the argument at `index` as a `Long`, erroring when the argument is
-/// absent (450) or does not convert to a `Long`.
-fn arg_long(args: &[VBVariant], index: usize) -> VBResult<VBLong> {
-    args.get(index)
-        .ok_or_else(|| VBError::new(err_number::WRONG_NUMBER_OF_ARGUMENTS))
-        .and_then(VBLong::try_from)
 }
 
 /// Normalize a builtin name for case-insensitive lookup: lowercase, and strip
