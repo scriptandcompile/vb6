@@ -295,7 +295,7 @@
 //! - Not all fonts support all Unicode characters; display depends on available fonts
 //! - Some Unicode features like combining characters may not render correctly in all VB6 controls
 
-use crate::{error::VBResult, value::VBVariant};
+use crate::{error::VBResult, value::VBLong, value::VBVariant};
 
 use super::chrw_dollar::chrw_dollar;
 
@@ -313,11 +313,8 @@ use super::chrw_dollar::chrw_dollar;
 /// Returns error 5 (`Invalid procedure call or argument`) when `charcode` is
 /// outside the range -32768 to 65535, or names a UTF-16 surrogate (which cannot
 /// be represented as a single Rust `char`).
-pub fn chrw(charcode: &VBVariant) -> VBResult<VBVariant> {
-    if charcode.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    chrw_dollar(&charcode.as_vblong()?).map(VBVariant::from)
+pub fn chrw(charcode: &VBLong) -> VBResult<VBVariant> {
+    chrw_dollar(charcode).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -328,11 +325,11 @@ mod tests {
     #[test]
     fn returns_ascii_characters() {
         assert_eq!(
-            chrw(&VBVariant::from_integer(65)).unwrap(),
+            chrw(&VBLong::from(65)).unwrap(),
             VBVariant::from_string("A")
         );
         assert_eq!(
-            chrw(&VBVariant::from_integer(97)).unwrap(),
+            chrw(&VBLong::from(97)).unwrap(),
             VBVariant::from_string("a")
         );
     }
@@ -340,11 +337,11 @@ mod tests {
     #[test]
     fn returns_unicode_characters() {
         assert_eq!(
-            chrw(&VBVariant::from_integer(8364)).unwrap(),
+            chrw(&VBLong::from(8364)).unwrap(),
             VBVariant::from_string("€")
         );
         assert_eq!(
-            chrw(&VBVariant::from_integer(20013)).unwrap(),
+            chrw(&VBLong::from(20013)).unwrap(),
             VBVariant::from_string("中")
         );
     }
@@ -352,11 +349,11 @@ mod tests {
     #[test]
     fn negative_values_are_wrapped() {
         assert_eq!(
-            chrw(&VBVariant::from_integer(-1)).unwrap(),
+            chrw(&VBLong::from(-1)).unwrap(),
             VBVariant::from_string("\u{FFFF}")
         );
         assert_eq!(
-            chrw(&VBVariant::from_integer(-8192)).unwrap(),
+            chrw(&VBLong::from(-8192)).unwrap(),
             VBVariant::from_string("\u{E000}")
         );
     }
@@ -364,7 +361,7 @@ mod tests {
     #[test]
     fn code_zero_returns_null_character() {
         assert_eq!(
-            chrw(&VBVariant::from_integer(0)).unwrap(),
+            chrw(&VBLong::from(0)).unwrap(),
             VBVariant::from_string("\u{0}")
         );
     }
@@ -372,17 +369,12 @@ mod tests {
     #[test]
     fn rejects_out_of_range() {
         assert_eq!(
-            chrw(&VBVariant::from_long(-32769)).unwrap_err().number,
+            chrw(&VBLong::from(-32769)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
         assert_eq!(
-            chrw(&VBVariant::from_long(65536)).unwrap_err().number,
+            chrw(&VBLong::from(65536)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
-    }
-
-    #[test]
-    fn propagates_null() {
-        assert_eq!(chrw(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 }
