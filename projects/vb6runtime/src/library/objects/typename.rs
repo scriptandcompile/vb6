@@ -232,3 +232,160 @@
 //! - Returns "Unknown" for unsupported types
 //! - Not for compile-time type checking
 //! - May return user-defined type/class names
+
+use crate::{error::VBResult, value::VBVariant};
+
+/// Implementation of the `TypeName` function.
+///
+/// VB6 behavior:
+/// - returns `"Empty"` for uninitialized `Variant`s and `"Null"` for `Null`
+/// - returns `"Nothing"` for an object reference that is not set
+/// - returns the object's class name (e.g. `"Collection"`) for object references
+/// - returns the element type name followed by `()` for arrays
+///   (e.g. `"Integer()"`, `"Variant()"`)
+/// - never raises an error, regardless of the input value
+pub fn type_name(value: &VBVariant) -> VBResult<VBVariant> {
+    let name = match value {
+        VBVariant::Empty => "Empty",
+        VBVariant::Null => "Null",
+        VBVariant::Nothing => "Nothing",
+        VBVariant::Byte(_) => "Byte",
+        VBVariant::Integer(_) => "Integer",
+        VBVariant::Long(_) => "Long",
+        VBVariant::Single(_) => "Single",
+        VBVariant::Double(_) => "Double",
+        VBVariant::Currency(_) => "Currency",
+        VBVariant::Date(_) => "Date",
+        VBVariant::String(_) => "String",
+        VBVariant::Boolean(_) => "Boolean",
+        VBVariant::Error(_) => "Error",
+        VBVariant::Object(object) => object.type_name(),
+        VBVariant::Array(array) => {
+            return Ok(VBVariant::from_string(format!(
+                "{}()",
+                array.element_type().name()
+            )));
+        }
+    };
+    Ok(VBVariant::from_string(name))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::type_name;
+    use crate::{value::VBVariant, ArrayDimension, ArrayValue, VBType};
+    use vb6core::error::err_number;
+
+    #[derive(Debug)]
+    struct TestObject(&'static str);
+
+    impl crate::VBObject for TestObject {
+        fn type_name(&self) -> &str {
+            self.0
+        }
+        fn as_any(&self) -> &dyn std::any::Any {
+            self
+        }
+        fn clone_box(&self) -> Box<dyn crate::VBObject> {
+            Box::new(TestObject(self.0))
+        }
+    }
+
+    #[test]
+    fn names_for_value_states() {
+        assert_eq!(
+            type_name(&VBVariant::Empty).unwrap(),
+            VBVariant::from_string("Empty")
+        );
+        assert_eq!(
+            type_name(&VBVariant::Null).unwrap(),
+            VBVariant::from_string("Null")
+        );
+        assert_eq!(
+            type_name(&VBVariant::Nothing).unwrap(),
+            VBVariant::from_string("Nothing")
+        );
+    }
+
+    #[test]
+    fn names_for_primitives() {
+        assert_eq!(
+            type_name(&VBVariant::from_byte(0)).unwrap(),
+            VBVariant::from_string("Byte")
+        );
+        assert_eq!(
+            type_name(&VBVariant::from_integer(-5)).unwrap(),
+            VBVariant::from_string("Integer")
+        );
+        assert_eq!(
+            type_name(&VBVariant::from_long(12345)).unwrap(),
+            VBVariant::from_string("Long")
+        );
+        assert_eq!(
+            type_name(&VBVariant::from_single(1.5)).unwrap(),
+            VBVariant::from_string("Single")
+        );
+        assert_eq!(
+            type_name(&VBVariant::from_double(-2.5)).unwrap(),
+            VBVariant::from_string("Double")
+        );
+        assert_eq!(
+            type_name(&VBVariant::from_currency_scaled(-12_345)).unwrap(),
+            VBVariant::from_string("Currency")
+        );
+        assert_eq!(
+            type_name(&VBVariant::from_date_serial(0.0)).unwrap(),
+            VBVariant::from_string("Date")
+        );
+        assert_eq!(
+            type_name(&VBVariant::from_string("")).unwrap(),
+            VBVariant::from_string("String")
+        );
+        assert_eq!(
+            type_name(&VBVariant::from_bool(false)).unwrap(),
+            VBVariant::from_string("Boolean")
+        );
+        assert_eq!(
+            type_name(&VBVariant::from_error(crate::error::VBError::new(
+                err_number::TYPE_MISMATCH
+            )))
+            .unwrap(),
+            VBVariant::from_string("Error")
+        );
+    }
+
+    #[test]
+    fn names_object_by_its_class() {
+        assert_eq!(
+            type_name(&VBVariant::from_object(Box::new(TestObject("Collection")))).unwrap(),
+            VBVariant::from_string("Collection")
+        );
+    }
+
+    #[test]
+    fn appends_parentheses_for_arrays() {
+        let fixed = VBVariant::array_fixed(VBType::Integer, &[ArrayDimension::new(1, 3)]).unwrap();
+        assert_eq!(
+            type_name(&fixed).unwrap(),
+            VBVariant::from_string("Integer()")
+        );
+        assert_eq!(
+            type_name(&VBVariant::array_dynamic(VBType::String)).unwrap(),
+            VBVariant::from_string("String()")
+        );
+        let variant_array =
+            VBVariant::from_array(ArrayValue::from_vec(VBType::Variant, Vec::new()));
+        assert_eq!(
+            type_name(&variant_array).unwrap(),
+            VBVariant::from_string("Variant()")
+        );
+    }
+
+    #[test]
+    fn never_errors() {
+        assert!(type_name(&VBVariant::Empty).is_ok());
+        assert!(type_name(&VBVariant::Null).is_ok());
+        assert!(type_name(&VBVariant::Nothing).is_ok());
+        assert!(type_name(&VBVariant::from_string("test")).is_ok());
+    }
+}
