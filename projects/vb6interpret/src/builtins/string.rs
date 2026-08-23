@@ -25,11 +25,10 @@ pub(super) fn register(registry: &mut Registry) {
         strfn::left(&input, &length)));
     registry.insert(typed_builtin!("right", 2, 2, (input: string, length: long),
         strfn::right(&input, &length)));
-    registry.insert(builtin!("mid", 2, 3, |args| {
-        let start = VBLong::try_from(&args[1])?;
-        let length = args.get(2).map(VBLong::try_from).transpose()?;
-        strfn::mid(&args[0], &start, length.as_ref())
-    }));
+    registry.insert(
+        typed_builtin!("mid", 2, 3, (input: string, start: long, length: opt_long),
+        strfn::mid(&input, &start, length.as_ref())),
+    );
     registry.insert(
         typed_builtin!("right$", 2, 2, (input: string, length: long),
         strfn::right_dollar(&input, &length).map(VBVariant::from)),

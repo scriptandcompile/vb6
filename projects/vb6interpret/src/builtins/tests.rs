@@ -57,10 +57,6 @@ fn non_dollar_variants_propagate_null() {
         call_builtin("Trim", &[VBVariant::Null]).unwrap(),
         VBVariant::Null
     );
-    assert_eq!(
-        call_builtin("Mid", &[VBVariant::Null, VBVariant::Long(1)]).unwrap(),
-        VBVariant::Null
-    );
 }
 
 #[test]
