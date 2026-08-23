@@ -6,7 +6,8 @@
 /// VB6 `Like` pattern match, case-insensitive (the interpreter's default
 /// `Option Compare`). Supports `?`, `*`, `#`, and `[charlist]` / `[!charlist]`
 /// classes with `a-z` ranges. A literal `[`, `?`, `*`, or `#` is matched by
-/// enclosing it in brackets (e.g. `[[]`, `[?]`).
+/// enclosing it in brackets (e.g. `[[]`, `[?]`), and a `]` first in the
+/// class is a literal member (e.g. `[]]`).
 pub(crate) fn like_match(pattern: &str, text: &str) -> bool {
     let pat: Vec<char> = pattern.chars().collect();
     let txt: Vec<char> = text.chars().collect();
@@ -33,10 +34,9 @@ fn like_match_at(
         (like_match_at(pat, txt, pat_idx + 1, text_idx, memo))
             || (text_idx < txt.len() && like_match_at(pat, txt, pat_idx, text_idx + 1, memo))
     } else if pat[pat_idx] == '[' {
-        let closed = pat[pat_idx + 1..].iter().position(|&ch| ch == ']');
-        match closed {
+        match class_close(pat, pat_idx) {
             Some(close) if text_idx < txt.len() => {
-                let (matched, next) = match_class(pat, pat_idx, pat_idx + 1 + close, txt[text_idx]);
+                let (matched, next) = match_class(pat, pat_idx, close, txt[text_idx]);
                 matched && like_match_at(pat, txt, next, text_idx + 1, memo)
             }
             // No closing bracket: treat `[` as a literal character.
@@ -58,6 +58,25 @@ fn like_match_at(
     };
     memo[pat_idx][text_idx] = Some(result);
     result
+}
+
+/// Find the index of the closing `]` of the class opened at `open`.
+///
+/// A `]` immediately after `[` or `[!` is a literal class member (the
+/// classic VB6 idiom for matching a bracket), not the closer — so `[]]`
+/// denotes the one-element class `{]}` and `[!]]` its negation.
+fn class_close(pat: &[char], open: usize) -> Option<usize> {
+    let mut start = open + 1;
+    if start < pat.len() && pat[start] == '!' {
+        start += 1;
+    }
+    if start < pat.len() && pat[start] == ']' {
+        start += 1;
+    }
+    pat[start..]
+        .iter()
+        .position(|&ch| ch == ']')
+        .map(|offset| start + offset)
 }
 
 /// Match a single character against a `[charlist]` class spanning
@@ -135,10 +154,19 @@ mod tests {
         assert!(like_match("[A-Za-z0-9]", "5"));
         assert!(like_match("[!abc]", "d"));
         assert!(!like_match("[!abc]", "a"));
-        // The class closes at the FIRST `]`, so `[]]` is an empty class that
-        // matches nothing (unlike classic VB6, which treats a leading `]`
-        // as a literal member).
-        assert!(!like_match("[]]", "]"));
+    }
+
+    #[test]
+    fn leading_bracket_is_a_literal_class_member() {
+        // The classic VB6 idiom for a literal `]` inside a class.
+        assert!(like_match("[]]", "]"));
+        assert!(like_match("[]x]", "x"));
+        assert!(!like_match("[]x]", "y"));
+        // Negated form: anything except `]`.
+        assert!(like_match("[!]]", "a"));
+        assert!(!like_match("[!]]", "]"));
+        // The closer still closes when not first: `[a]` is `{a}`.
+        assert!(!like_match("[a]", "]"));
     }
 
     #[test]
