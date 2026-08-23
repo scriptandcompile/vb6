@@ -51,7 +51,7 @@
 
 use crate::{
     error::VBResult,
-    value::{VBLong, VBVariant},
+    value::{VBLong, VBString, VBVariant},
 };
 
 use super::midb_dollar::midb_dollar;
@@ -63,11 +63,8 @@ use super::midb_dollar::midb_dollar;
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `start` is less
 /// than 1 or `length` is negative.
-pub fn midb(input: &VBVariant, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBVariant> {
-    if input.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    midb_dollar(&input.as_vbstring()?, start, length).map(VBVariant::from)
+pub fn midb(input: &VBString, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBVariant> {
+    midb_dollar(input, start, length).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -75,10 +72,10 @@ mod tests {
     use super::*;
 
     #[test]
-    fn propagates_null() {
+    fn propagates_characters() {
         assert_eq!(
-            midb(&VBVariant::Null, &VBLong::from(3), None).unwrap(),
-            VBVariant::Null
+            midb(&VBString::from(""), &VBLong::from(3), None).unwrap(),
+            VBVariant::from_string("")
         );
     }
 }

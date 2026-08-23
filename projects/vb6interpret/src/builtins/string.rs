@@ -167,11 +167,10 @@ pub(super) fn register(registry: &mut Registry) {
         typed_builtin!("rightb$", 2, 2, (input: string, length: long),
         strfn::rightb_dollar(&input, &length).map(VBVariant::from)),
     );
-    registry.insert(builtin!("midb", 2, 3, |args| {
-        let start = VBLong::try_from(&args[1])?;
-        let length = args.get(2).map(VBLong::try_from).transpose()?;
-        strfn::midb(&args[0], &start, length.as_ref())
-    }));
+    registry.insert(
+        typed_builtin!("midb", 2, 3, (input: string, start: long, length: opt_long),
+        strfn::midb(&input, &start, length.as_ref())),
+    );
     registry.insert(
         typed_builtin!("midb$", 2, 3, (input: string, start: long, length: opt_long),
         strfn::midb_dollar(&input, &start, length.as_ref()).map(VBVariant::from)),
