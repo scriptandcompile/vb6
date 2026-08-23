@@ -414,7 +414,7 @@
 //! - `AscW`: Returns the Unicode character code
 //! - `AscB`: Returns the byte value
 
-use crate::{error::VBResult, value::VBVariant};
+use crate::{error::VBResult, value::VBLong, value::VBVariant};
 
 use super::chr_dollar::chr_dollar;
 
@@ -430,11 +430,8 @@ use super::chr_dollar::chr_dollar;
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `charcode` is
 /// outside the range 0-255.
-pub fn chr(charcode: &VBVariant) -> VBResult<VBVariant> {
-    if charcode.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    chr_dollar(&charcode.as_vblong()?).map(VBVariant::from)
+pub fn chr(charcode: &VBLong) -> VBResult<VBVariant> {
+    chr_dollar(charcode).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -444,16 +441,10 @@ mod tests {
 
     #[test]
     fn returns_ascii_characters() {
+        assert_eq!(chr(&VBLong::from(65)).unwrap(), VBVariant::from_string("A"));
+        assert_eq!(chr(&VBLong::from(97)).unwrap(), VBVariant::from_string("a"));
         assert_eq!(
-            chr(&VBVariant::from_integer(65)).unwrap(),
-            VBVariant::from_string("A")
-        );
-        assert_eq!(
-            chr(&VBVariant::from_integer(97)).unwrap(),
-            VBVariant::from_string("a")
-        );
-        assert_eq!(
-            chr(&VBVariant::from_integer(34)).unwrap(),
+            chr(&VBLong::from(34)).unwrap(),
             VBVariant::from_string("\"")
         );
     }
@@ -461,11 +452,11 @@ mod tests {
     #[test]
     fn returns_ansi_extended_characters() {
         assert_eq!(
-            chr(&VBVariant::from_integer(128)).unwrap(),
+            chr(&VBLong::from(128)).unwrap(),
             VBVariant::from_string("€")
         );
         assert_eq!(
-            chr(&VBVariant::from_integer(233)).unwrap(),
+            chr(&VBLong::from(233)).unwrap(),
             VBVariant::from_string("é")
         );
     }
@@ -473,7 +464,7 @@ mod tests {
     #[test]
     fn code_zero_returns_null_character() {
         assert_eq!(
-            chr(&VBVariant::from_integer(0)).unwrap(),
+            chr(&VBLong::from(0)).unwrap(),
             VBVariant::from_string("\u{0}")
         );
     }
@@ -481,17 +472,12 @@ mod tests {
     #[test]
     fn rejects_out_of_range() {
         assert_eq!(
-            chr(&VBVariant::from_integer(-1)).unwrap_err().number,
+            chr(&VBLong::from(-1)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
         assert_eq!(
-            chr(&VBVariant::from_integer(256)).unwrap_err().number,
+            chr(&VBLong::from(256)).unwrap_err().number,
             err_number::INVALID_PROCEDURE_CALL
         );
-    }
-
-    #[test]
-    fn propagates_null() {
-        assert_eq!(chr(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 }
