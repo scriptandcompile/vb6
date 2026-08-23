@@ -77,7 +77,8 @@ pub(super) fn register(registry: &mut Registry) {
         strfn::ascw(&input).map(VBVariant::from)));
     registry.insert(typed_builtin!("ascb", 1, 1, (input: string),
         strfn::ascb(&input).map(VBVariant::from)));
-    registry.insert(builtin!("chr", 1, 1, |args| { strfn::chr(&args[0]) }));
+    registry.insert(typed_builtin!("chr", 1, 1, (charcode: long),
+        strfn::chr(&charcode)));
     registry.insert(typed_builtin!("chr$", 1, 1, (charcode: long),
         strfn::chr_dollar(&charcode).map(VBVariant::from)));
     registry.insert(builtin!("chrw", 1, 1, |args| { strfn::chrw(&args[0]) }));
