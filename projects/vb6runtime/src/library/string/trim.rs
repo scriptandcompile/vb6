@@ -721,7 +721,7 @@
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
 
-use crate::{error::VBResult, value::VBVariant};
+use crate::{error::VBResult, value::VBString, value::VBVariant};
 
 use super::trim_dollar::trim_dollar;
 
@@ -732,11 +732,8 @@ use super::trim_dollar::trim_dollar;
 ///
 /// `Trim` is the Variant-returning counterpart of `Trim$`; a `Null` input
 /// propagates as `Null`.
-pub fn trim(input: &VBVariant) -> VBResult<VBVariant> {
-    if input.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    trim_dollar(&input.as_vbstring()?).map(VBVariant::from)
+pub fn trim(input: &VBString) -> VBResult<VBVariant> {
+    trim_dollar(input).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -746,11 +743,35 @@ mod tests {
     #[test]
     fn trims_both_ends() {
         assert_eq!(
-            trim(&VBVariant::from_string("  Hello World  ")).unwrap(),
+            trim(&VBString::from("  Hello World  ")).unwrap(),
             VBVariant::from_string("Hello World")
         );
         assert_eq!(
-            trim(&VBVariant::from_string("Hello")).unwrap(),
+            trim(&VBString::from("Hello")).unwrap(),
+            VBVariant::from_string("Hello")
+        );
+    }
+
+    #[test]
+    fn trims_leading_spaces() {
+        assert_eq!(
+            trim(&VBString::from("  Hello World")).unwrap(),
+            VBVariant::from_string("Hello World")
+        );
+        assert_eq!(
+            trim(&VBString::from(" Hello")).unwrap(),
+            VBVariant::from_string("Hello")
+        );
+    }
+
+    #[test]
+    fn trims_trailing_spaces() {
+        assert_eq!(
+            trim(&VBString::from("Hello World  ")).unwrap(),
+            VBVariant::from_string("Hello World")
+        );
+        assert_eq!(
+            trim(&VBString::from("Hello ")).unwrap(),
             VBVariant::from_string("Hello")
         );
     }
@@ -758,11 +779,11 @@ mod tests {
     #[test]
     fn handles_empty_and_all_spaces() {
         assert_eq!(
-            trim(&VBVariant::from_string("")).unwrap(),
+            trim(&VBString::from("")).unwrap(),
             VBVariant::from_string("")
         );
         assert_eq!(
-            trim(&VBVariant::from_string("   ")).unwrap(),
+            trim(&VBString::from("   ")).unwrap(),
             VBVariant::from_string("")
         );
     }
@@ -770,17 +791,20 @@ mod tests {
     #[test]
     fn preserves_inner_and_other_whitespace() {
         assert_eq!(
-            trim(&VBVariant::from_string("  a b  ")).unwrap(),
+            trim(&VBString::from("  a b  ")).unwrap(),
             VBVariant::from_string("a b")
         );
         assert_eq!(
-            trim(&VBVariant::from_string("\tHello\t")).unwrap(),
+            trim(&VBString::from("\tHello\t")).unwrap(),
             VBVariant::from_string("\tHello\t")
         );
     }
 
     #[test]
-    fn propagates_null() {
-        assert_eq!(trim(&VBVariant::Null).unwrap(), VBVariant::Null);
+    fn empty_string_preserved() {
+        assert_eq!(
+            trim(&VBString::from("")).unwrap(),
+            VBVariant::from_string("")
+        );
     }
 }

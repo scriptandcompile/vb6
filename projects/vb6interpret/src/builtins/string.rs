@@ -41,7 +41,8 @@ pub(super) fn register(registry: &mut Registry) {
         strfn::lcase(&input)));
     registry.insert(typed_builtin!("ucase", 1, 1, (input: string),
         strfn::ucase(&input)));
-    registry.insert(builtin!("trim", 1, 1, |args| { strfn::trim(&args[0]) }));
+    registry.insert(typed_builtin!("trim", 1, 1, (input: string),
+        strfn::trim(&input)));
     registry.insert(builtin!("ltrim", 1, 1, |args| { strfn::ltrim(&args[0]) }));
     registry.insert(builtin!("rtrim", 1, 1, |args| { strfn::rtrim(&args[0]) }));
     // `LSet` is a statement; the registry entry exposes the alignment
