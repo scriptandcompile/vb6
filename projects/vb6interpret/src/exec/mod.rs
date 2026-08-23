@@ -4,17 +4,23 @@
 //! the tree. Line numbers are tracked by counting newlines: each block walks
 //! its raw children, so nested bodies receive accurate start lines without
 //! accumulating loop iterations.
+//!
+//! Submodules hold the statement families; this file keeps the dispatch loop,
+//! shared helpers, and the statement kinds that are not yet split out.
+
+mod call;
+mod declarations;
+mod file_io;
+mod print;
 
 use vb6core::error::{err_number, VBError, VBResult};
 use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
-use vb6runtime::library::file as filefn;
-use vb6runtime::state::file as file_state;
 use vb6runtime::value::{VBLong, VBString};
-use vb6runtime::{ArrayValue, VBVariant};
+use vb6runtime::VBVariant;
 
 use crate::error::{RunError, RunResult};
-use crate::eval::ArithmaticOperator;
+use crate::eval::{arith, ArithmeticOperator};
 use crate::interpreter::{Flow, Interpreter};
 
 /// Convert a VB6 date serial (days since 1899-12-30) to a [`jiff::Timestamp`].
@@ -55,7 +61,7 @@ fn time_serial_to_timestamp(serial: f64) -> Option<jiff::Timestamp> {
     let zoned = dt.to_zoned(tz).ok()?;
     Some(zoned.timestamp())
 }
-use crate::program::{identifier_name, is_identifier_like, is_statement_kind, type_from_keyword};
+use crate::program::{identifier_name, is_identifier_like, is_statement_kind};
 
 /// Number of `\n` characters in a node's text span.
 pub(crate) fn count_newlines(node: &CstNode) -> usize {
@@ -237,205 +243,6 @@ impl Interpreter {
             | SyntaxKind::OnGoSubStatement => Err(self.unsupported(node, "control-flow statement")),
             other => Err(self.unsupported(node, &format!("statement {other:?}"))),
         }
-    }
-
-    /// `Dim` / `Const` declaration, including array bounds and multiple
-    /// declarations separated by commas.
-    fn exec_dim(&mut self, node: &CstNode) -> RunResult<()> {
-        let significant: Vec<&CstNode> = node.significant_children().collect();
-        let is_const = significant
-            .first()
-            .is_some_and(|c| c.kind() == SyntaxKind::ConstKeyword);
-
-        let mut index = 1; //if is_const { 1 } else { 1 }; // skip Dim/Const keyword
-
-        let mut first = true;
-        while index < significant.len() {
-            if !first {
-                // Skip separator commas between declarations.
-                if significant[index].kind() == SyntaxKind::Comma {
-                    index += 1;
-                }
-            }
-            first = false;
-
-            if index >= significant.len() || !is_identifier_like(significant[index]) {
-                break;
-            }
-            let name = significant[index].text().trim().to_string();
-            index += 1;
-
-            // Optional array bounds: `name ( ... )`.
-            let mut bounds: Vec<vb6runtime::ArrayDimension> = Vec::new();
-            if index < significant.len() && significant[index].kind() == SyntaxKind::LeftParenthesis
-            {
-                index += 1;
-                while index < significant.len()
-                    && significant[index].kind() != SyntaxKind::RightParenthesis
-                {
-                    let mut dim_parts = Vec::new();
-                    while index < significant.len()
-                        && significant[index].kind() != SyntaxKind::Comma
-                        && significant[index].kind() != SyntaxKind::RightParenthesis
-                    {
-                        dim_parts.push(significant[index]);
-                        index += 1;
-                    }
-                    bounds.push(self.parse_dimension(&dim_parts)?);
-                    if index < significant.len() && significant[index].kind() == SyntaxKind::Comma {
-                        index += 1;
-                    }
-                }
-                if index < significant.len() {
-                    index += 1; // RightParenthesis
-                }
-            }
-
-            // Optional `As <type>`.
-            let mut ty = vb6core::types::VBType::Variant;
-            if index < significant.len() && significant[index].kind() == SyntaxKind::AsKeyword {
-                index += 1;
-                if index < significant.len() {
-                    if let Some(parsed) = type_from_keyword(significant[index]) {
-                        ty = parsed;
-                    }
-                    index += 1;
-                }
-            }
-
-            if is_const {
-                // `Const name [As type] = value`
-                let eq = significant[index..]
-                    .iter()
-                    .position(|c| c.kind() == SyntaxKind::EqualityOperator);
-                if let Some(eq) = eq {
-                    let value_idx = index + eq + 1;
-                    if let Some(value_node) = significant.get(value_idx) {
-                        let value = self.eval_expr(value_node)?;
-                        let value = coerce(value, &ty);
-                        self.declare_in(&name, value);
-                    }
-                }
-            } else if !bounds.is_empty() {
-                let array =
-                    ArrayValue::new_fixed(ty.clone(), &bounds).map_err(|e| self.error_here(e))?;
-                self.declare_in(&name, VBVariant::Array(array));
-            } else {
-                let value = VBVariant::default_for_type(&ty);
-                self.declare_in(&name, value);
-            }
-
-            if index < significant.len() && significant[index].kind() == SyntaxKind::Comma {
-                index += 1;
-            }
-        }
-        Ok(())
-    }
-
-    /// `ReDim name(bounds) [As type]`, rebuilding the array.
-    fn exec_redim(&mut self, node: &CstNode) -> RunResult<()> {
-        let significant: Vec<&CstNode> = node.significant_children().collect();
-        let mut index = 0;
-        if significant
-            .first()
-            .is_some_and(|c| c.kind() == SyntaxKind::ReDimKeyword)
-        {
-            index = 1;
-        }
-        if index >= significant.len() || !is_identifier_like(significant[index]) {
-            return Ok(());
-        }
-        let name = significant[index].text().trim().to_string();
-        index += 1;
-
-        let mut bounds: Vec<vb6runtime::ArrayDimension> = Vec::new();
-        if index < significant.len() && significant[index].kind() == SyntaxKind::LeftParenthesis {
-            index += 1;
-            while index < significant.len()
-                && significant[index].kind() != SyntaxKind::RightParenthesis
-            {
-                if significant[index].kind() == SyntaxKind::PreserveKeyword {
-                    index += 1;
-                    continue;
-                }
-                let mut dim_parts = Vec::new();
-                while index < significant.len()
-                    && significant[index].kind() != SyntaxKind::Comma
-                    && significant[index].kind() != SyntaxKind::RightParenthesis
-                {
-                    dim_parts.push(significant[index]);
-                    index += 1;
-                }
-                bounds.push(self.parse_dimension(&dim_parts)?);
-                if index < significant.len() && significant[index].kind() == SyntaxKind::Comma {
-                    index += 1;
-                }
-            }
-            if index < significant.len() {
-                index += 1; // RightParenthesis
-            }
-        }
-
-        // Keep the existing element type unless a new type is declared.
-        let mut ty = self
-            .lookup(&name)
-            .and_then(|v| v.as_array().ok())
-            .map(|a| a.element_type().clone())
-            .unwrap_or(vb6core::types::VBType::Variant);
-        if index < significant.len() && significant[index].kind() == SyntaxKind::AsKeyword {
-            index += 1;
-            if index < significant.len() {
-                if let Some(parsed) = type_from_keyword(significant[index]) {
-                    ty = parsed;
-                }
-            }
-        }
-
-        let array = ArrayValue::new_fixed(ty, &bounds).map_err(|e| self.error_here(e))?;
-        self.set_variable(&name, VBVariant::Array(array));
-        Ok(())
-    }
-
-    /// Parse one dimension's bounds: `expr` or `expr To expr`.
-    fn parse_dimension(&mut self, parts: &[&CstNode]) -> RunResult<vb6runtime::ArrayDimension> {
-        if parts.is_empty() {
-            return Err(self.error_here(VBError::invalid_procedure_call()));
-        }
-        if let Some(to_index) = parts
-            .iter()
-            .position(|part| part.kind() == SyntaxKind::ToKeyword)
-        {
-            let lower = parts[..to_index]
-                .last()
-                .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
-            let upper = parts[to_index + 1..]
-                .first()
-                .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
-            let lo = self.eval_expr(lower)?.as_i32()?;
-            let hi = self.eval_expr(upper)?.as_i32()?;
-            Ok(vb6runtime::ArrayDimension::new(lo, hi))
-        } else {
-            let upper = parts
-                .last()
-                .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
-            let hi = self.eval_expr(upper)?.as_i32()?;
-            // A single bound uses 0-based indexing (`Dim a(5)` -> 0 To 5).
-            Ok(vb6runtime::ArrayDimension::new(0, hi))
-        }
-    }
-
-    /// `Erase name`: release a dynamic array (fixed arrays reset to defaults).
-    fn exec_erase(&mut self, node: &CstNode) -> RunResult<()> {
-        let name = node
-            .first_child_by_kind(SyntaxKind::Identifier)
-            .map(|t| t.text().trim().to_string())
-            .unwrap_or_default();
-        if let Some(VBVariant::Array(array)) = self.lookup(&name) {
-            let element_type = array.element_type().clone();
-            let dynamic = ArrayValue::new_dynamic(element_type);
-            self.set_variable(&name, VBVariant::Array(dynamic));
-        }
-        Ok(())
     }
 
     /// `Date = expr`: set the system date.
@@ -1194,7 +1001,8 @@ impl Interpreter {
             }
             self.current_stmt_line = next_line;
             self.step_marked(next_cursor)?;
-            counter_value = self.arith(counter_value, step.clone(), ArithmaticOperator::Add)?;
+            counter_value = arith(counter_value, step.clone(), ArithmeticOperator::Add)
+                .map_err(|e| self.error_here(e))?;
         }
         self.set_variable(&name, counter_value);
         Ok(Flow::Next)
@@ -1541,62 +1349,6 @@ impl Interpreter {
         })
     }
 
-    /// `Call` statement: `Debug.Print`, sub-procedure calls, and `MsgBox`.
-    fn exec_call(&mut self, node: &CstNode) -> RunResult<Flow> {
-        // Debug.Print ...
-        let is_debug = node
-            .first_child_by_kind(SyntaxKind::Identifier)
-            .is_some_and(|i| i.text().trim().eq_ignore_ascii_case("debug"))
-            && node.contains_kind(SyntaxKind::PrintKeyword);
-        if is_debug {
-            self.print_node(node)?;
-            return Ok(Flow::Next);
-        }
-
-        let name = node
-            .children()
-            .iter()
-            .find(|c| is_identifier_like(c) && c.kind() != SyntaxKind::CallKeyword)
-            .map(|t| t.text().trim().to_string())
-            .unwrap_or_default();
-
-        let argument_list = node.first_child_by_kind(SyntaxKind::ArgumentList);
-        let args = match argument_list {
-            Some(list) => self.eval_args(list)?,
-            None => Vec::new(),
-        };
-
-        // User-defined Sub.
-        if self.procedures.contains_key(&name.to_lowercase()) {
-            let flow = self.call_sub(&name, args)?;
-            return Ok(flow);
-        }
-
-        match name.to_lowercase().as_str() {
-            "msgbox" => {
-                // Full `MsgBox` semantics: the interaction backend shows the
-                // dialog (or records it) and the return value is discarded
-                // because this form is a statement, not a function call.
-                crate::builtins::call_builtin("msgbox", &args).map_err(|e| self.error_here(e))?;
-                Ok(Flow::Next)
-            }
-            // `Beep` is a registered builtin Sub; a `Call` discards its
-            // (always `Empty`) return value.
-            "beep" => {
-                crate::builtins::call_builtin("beep", &args).map_err(|e| self.error_here(e))?;
-                Ok(Flow::Next)
-            }
-            // `Shell "prog"` statement form: the backend starts the program
-            // (or records the request) and the task ID is discarded because
-            // this form is a statement, not a function call.
-            "shell" => {
-                crate::builtins::call_builtin("shell", &args).map_err(|e| self.error_here(e))?;
-                Ok(Flow::Next)
-            }
-            _ => Err(self.error_here(VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED))), // Sub or Function not defined
-        }
-    }
-
     /// `Exit Sub|Function|For|Do|While`.
     fn exec_exit(&mut self, node: &CstNode) -> RunResult<Flow> {
         let significant: Vec<&CstNode> = node.significant_children().collect();
@@ -1620,213 +1372,6 @@ impl Interpreter {
             Some(SyntaxKind::SubKeyword | SyntaxKind::FunctionKeyword) => Flow::Return,
             _ => Flow::Next,
         })
-    }
-
-    /// Emit `Debug.Print` / `Print` output.
-    fn print_node(&mut self, node: &CstNode) -> RunResult<()> {
-        // `Print #filenumber, ...` writes to the file backend instead of the
-        // console buffer; the file number is a real expression node (unlike
-        // `Open`/`Close`, which are parsed as flat tokens).
-        let top_level: Vec<&CstNode> = node.significant_children().collect();
-        let file_number = match top_level
-            .iter()
-            .position(|c| c.kind() == SyntaxKind::Octothorpe)
-        {
-            Some(hash_pos) => {
-                let expr = top_level
-                    .get(hash_pos + 1)
-                    .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
-                let number = self
-                    .eval_expr(expr)?
-                    .as_i16()
-                    .map_err(|_| self.error_here(VBError::type_mismatch()))?;
-                Some(number)
-            }
-            None => None,
-        };
-
-        let argument_list = node.first_child_by_kind(SyntaxKind::ArgumentList);
-        let mut trailing_separator = false;
-        let mut file_values: Vec<VBVariant> = Vec::new();
-        if let Some(list) = argument_list {
-            let significant: Vec<&CstNode> = list.significant_children().collect();
-            for child in &significant {
-                match child.kind() {
-                    SyntaxKind::Argument => {
-                        let value = match child.first_non_whitespace_child() {
-                            Some(expr) => self.eval_expr(expr)?,
-                            None => VBVariant::Empty,
-                        };
-                        if file_number.is_some() {
-                            file_values.push(value);
-                        } else {
-                            self.current_output.push_str(&value.as_string()?);
-                        }
-                    }
-                    SyntaxKind::Comma => {
-                        if file_number.is_none() {
-                            self.current_output.push('\t');
-                        }
-                    }
-                    SyntaxKind::Semicolon => {}
-                    _ => {}
-                }
-            }
-            trailing_separator = matches!(
-                significant.last().map(|c| c.kind()),
-                Some(SyntaxKind::Comma | SyntaxKind::Semicolon)
-            );
-        }
-
-        if let Some(number) = file_number {
-            filefn::print::print_statement(number, &file_values, !trailing_separator)
-                .map_err(|e| self.error_here(e))?;
-            return Ok(());
-        }
-
-        if !trailing_separator {
-            self.output.push(std::mem::take(&mut self.current_output));
-        }
-
-        Ok(())
-    }
-
-    /// Evaluate a bare literal or `Identifier` token, as found in the flat
-    /// token stream of `Open`/`Close` (which aren't parsed into nested
-    /// expression nodes like other statements).
-    fn eval_flat_token(&mut self, node: &CstNode) -> RunResult<VBVariant> {
-        if node.kind() == SyntaxKind::Identifier {
-            let name = node.text().trim().to_string();
-            return Ok(self.lookup(&name).cloned().unwrap_or(VBVariant::Empty));
-        }
-        self.eval_literal(node)
-    }
-
-    /// `Open pathname For mode [Access access] [lock] As [#]filenumber [Len=reclength]`.
-    fn exec_open(&mut self, node: &CstNode) -> RunResult<Flow> {
-        let children: Vec<&CstNode> = node.significant_children().collect();
-        let mut idx = 0;
-
-        if children.first().map(|c| c.kind()) == Some(SyntaxKind::OpenKeyword) {
-            idx += 1;
-        }
-
-        let path_tok = children
-            .get(idx)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
-        let path_value = self.eval_flat_token(path_tok)?;
-        idx += 1;
-
-        let mut mode = file_state::OpenMode::Random;
-        if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::ForKeyword) {
-            idx += 1;
-            if let Some(mode_tok) = children.get(idx) {
-                mode = match mode_tok.kind() {
-                    SyntaxKind::InputKeyword => file_state::OpenMode::Input,
-                    SyntaxKind::OutputKeyword => file_state::OpenMode::Output,
-                    SyntaxKind::AppendKeyword => file_state::OpenMode::Append,
-                    SyntaxKind::BinaryKeyword => file_state::OpenMode::Binary,
-                    _ => file_state::OpenMode::Random,
-                };
-                idx += 1;
-            }
-        }
-
-        let mut access = file_state::AccessMode::ReadWrite;
-        if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::AccessKeyword) {
-            idx += 1;
-            let mut can_read = false;
-            let mut can_write = false;
-            while idx < children.len() && children[idx].kind() != SyntaxKind::AsKeyword {
-                match children[idx].kind() {
-                    SyntaxKind::ReadKeyword => can_read = true,
-                    SyntaxKind::WriteKeyword => can_write = true,
-                    _ => {}
-                }
-                idx += 1;
-            }
-            access = match (can_read, can_write) {
-                (true, false) => file_state::AccessMode::Read,
-                (false, true) => file_state::AccessMode::Write,
-                _ => file_state::AccessMode::ReadWrite,
-            };
-        }
-
-        // Optional lock clause (`Shared`, `Lock Read`, `Lock Write`, `Lock Read Write`).
-        let mut lock = file_state::LockMode::Shared;
-        if idx < children.len() && children[idx].kind() != SyntaxKind::AsKeyword {
-            let mut locks_read = false;
-            let mut locks_write = false;
-            while idx < children.len() && children[idx].kind() != SyntaxKind::AsKeyword {
-                match children[idx].kind() {
-                    SyntaxKind::ReadKeyword => locks_read = true,
-                    SyntaxKind::WriteKeyword => locks_write = true,
-                    _ => {}
-                }
-                idx += 1;
-            }
-            lock = match (locks_read, locks_write) {
-                (true, true) => file_state::LockMode::LockReadWrite,
-                (true, false) => file_state::LockMode::LockRead,
-                (false, true) => file_state::LockMode::LockWrite,
-                _ => file_state::LockMode::Shared,
-            };
-        }
-
-        if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::AsKeyword) {
-            idx += 1;
-        }
-        if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::Octothorpe) {
-            idx += 1;
-        }
-        let number_tok = children
-            .get(idx)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
-        let file_number = self
-            .eval_flat_token(number_tok)?
-            .as_i16()
-            .map_err(|_| self.error_here(VBError::type_mismatch()))?;
-        idx += 1;
-
-        let mut record_length = 0i32;
-        if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::LenKeyword) {
-            idx += 1;
-            if children.get(idx).map(|c| c.kind()) == Some(SyntaxKind::EqualityOperator) {
-                idx += 1;
-            }
-            if let Some(len_tok) = children.get(idx) {
-                record_length = self.eval_flat_token(len_tok)?.as_i32().unwrap_or(0);
-            }
-        }
-
-        filefn::open::open_file(&path_value, mode, access, lock, file_number, record_length)
-            .map_err(|e| self.error_here(e))?;
-
-        Ok(Flow::Next)
-    }
-
-    /// `Close [[#]filenumber] [, [#]filenumber] ...`; closes all open files
-    /// if the list is empty.
-    fn exec_close(&mut self, node: &CstNode) -> RunResult<Flow> {
-        let children: Vec<&CstNode> = node.significant_children().collect();
-        let mut file_numbers: Vec<i16> = Vec::new();
-
-        for child in &children {
-            match child.kind() {
-                SyntaxKind::IntegerLiteral | SyntaxKind::Identifier => {
-                    let number = self
-                        .eval_flat_token(child)?
-                        .as_i16()
-                        .map_err(|_| self.error_here(VBError::type_mismatch()))?;
-                    file_numbers.push(number);
-                }
-                _ => {}
-            }
-        }
-
-        filefn::close::close_files(&file_numbers).map_err(|e| self.error_here(e))?;
-
-        Ok(Flow::Next)
     }
 
     /// Declare a variable in the current scope (globals at module level).
