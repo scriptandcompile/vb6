@@ -20,6 +20,7 @@ mod graphics;
 mod interaction;
 mod logic;
 mod math;
+mod objects;
 mod resources;
 mod string;
 mod type_checking;
@@ -104,6 +105,7 @@ fn registry() -> &'static Registry {
         interaction::register(&mut registry);
         string::register(&mut registry);
         math::register(&mut registry);
+        objects::register(&mut registry);
         resources::register(&mut registry);
         type_checking::register(&mut registry);
         registry
@@ -771,6 +773,18 @@ mod tests {
         assert_eq!(
             call_builtin("CVErr", &[VBVariant::from_integer(13)]).unwrap(),
             VBVariant::from_error(vb6core::error::VBError::new(err_number::TYPE_MISMATCH))
+        );
+    }
+
+    #[test]
+    fn objects_functions_dispatch() {
+        assert_eq!(
+            call_builtin("TypeName", &[VBVariant::from_integer(-5)]).unwrap(),
+            VBVariant::from_string("Integer")
+        );
+        assert_eq!(
+            call_builtin("TypeName", &[VBVariant::Null]).unwrap(),
+            VBVariant::from_string("Null")
         );
     }
 
