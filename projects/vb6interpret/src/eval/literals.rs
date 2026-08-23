@@ -91,19 +91,21 @@ fn parse_long(raw: &str) -> Option<VBVariant> {
 }
 
 /// Parse a radix-prefixed literal, honoring VB6's wrap of 32-bit values.
+///
+/// Values above `i32::MAX` but within `u32::MAX` wrap to their two's
+/// complement Long (so `&HFFFFFFFF` is -1). Values beyond 32 bits widen to
+/// Double, and digits that overflow even `u32`/`u64` produce no value.
 fn radix_value(digits: &str, radix: u32) -> Option<VBVariant> {
     let digits = digits.trim().trim_end_matches('%').trim_end_matches('&');
     if digits.is_empty() {
         return None;
     }
-    if let Ok(v) = i64::from_str_radix(digits, radix) {
-        return Some(VBVariant::from_i64(v));
-    }
+    let v = i64::from_str_radix(digits, radix).ok()?;
     // `&HFFFFFFFF` wraps to -1 Long in VB6.
-    if let Ok(v) = u32::from_str_radix(digits, radix) {
+    if v > i32::MAX as i64 && v <= u32::MAX as i64 {
         return Some(VBVariant::Long(v as i32));
     }
-    None
+    Some(VBVariant::from_i64(v))
 }
 
 #[cfg(test)]
@@ -167,13 +169,36 @@ mod tests {
     }
 
     #[test]
+    fn radix_literals_wrap_at_32_bits_like_vb6() {
+        // VB6 interprets 32-bit hex/octal literals as two's-complement Longs.
+        assert_eq!(
+            literal_value("&HFFFFFFFF", SyntaxKind::IntegerLiteral).unwrap(),
+            VBVariant::Long(-1)
+        );
+        assert_eq!(
+            literal_value("&HFFFFFFFF&", SyntaxKind::LongLiteral).unwrap(),
+            VBVariant::Long(-1)
+        );
+        assert_eq!(
+            literal_value("&O37777777777", SyntaxKind::IntegerLiteral).unwrap(),
+            VBVariant::Long(-1)
+        );
+        assert_eq!(
+            literal_value("&H80000000", SyntaxKind::IntegerLiteral).unwrap(),
+            VBVariant::Long(i32::MIN)
+        );
+        assert_eq!(
+            literal_value("&H7FFFFFFF", SyntaxKind::IntegerLiteral).unwrap(),
+            VBVariant::Long(i32::MAX)
+        );
+    }
+
+    #[test]
     fn radix_literals_wider_than_32_bits_fall_back_to_double() {
-        // `&HFFFFFFFF` does NOT wrap to -1 here: it parses as i64 (4294967295)
-        // and `from_i64` widens values beyond Long range to Double. (The
-        // u32-wrap branch in `radix_value` only sees digits that overflow
-        // i64 in the given radix, where u32 parsing fails too.)
-        let value = literal_value("&HFFFFFFFF", SyntaxKind::IntegerLiteral).unwrap();
-        assert!(matches!(value, VBVariant::Double(v) if v == 4294967295.0));
+        // Values beyond 32 bits are outside the wrap range and widen to
+        // Double via `from_i64`, as before.
+        let value = literal_value("&H100000000", SyntaxKind::IntegerLiteral).unwrap();
+        assert!(matches!(value, VBVariant::Double(v) if v == 4294967296.0));
     }
 
     #[test]
