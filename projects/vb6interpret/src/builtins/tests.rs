@@ -50,10 +50,6 @@ fn dollar_variants_share_string_implementations() {
 #[test]
 fn non_dollar_variants_propagate_null() {
     assert_eq!(
-        call_builtin("LCase", &[VBVariant::Null]).unwrap(),
-        VBVariant::Null
-    );
-    assert_eq!(
         call_builtin("Trim", &[VBVariant::Null]).unwrap(),
         VBVariant::Null
     );

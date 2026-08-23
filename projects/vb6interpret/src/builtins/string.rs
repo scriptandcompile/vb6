@@ -37,7 +37,8 @@ pub(super) fn register(registry: &mut Registry) {
         typed_builtin!("mid$", 2, 3, (input: string, start: long, length: opt_long),
         strfn::mid_dollar(&input, &start, length.as_ref()).map(VBVariant::from)),
     );
-    registry.insert(builtin!("lcase", 1, 1, |args| { strfn::lcase(&args[0]) }));
+    registry.insert(typed_builtin!("lcase", 1, 1, (input: string),
+        strfn::lcase(&input)));
     registry.insert(builtin!("ucase", 1, 1, |args| { strfn::ucase(&args[0]) }));
     registry.insert(builtin!("trim", 1, 1, |args| { strfn::trim(&args[0]) }));
     registry.insert(builtin!("ltrim", 1, 1, |args| { strfn::ltrim(&args[0]) }));

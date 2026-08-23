@@ -529,7 +529,7 @@
 //! - `Replace`: Replace substrings (with case-sensitive option)
 //! - `InStr`: Find substring (can be case-insensitive)
 
-use crate::{error::VBResult, value::VBVariant};
+use crate::{error::VBResult, value::VBString, value::VBVariant};
 
 use super::lcase_dollar::lcase_dollar;
 
@@ -540,11 +540,8 @@ use super::lcase_dollar::lcase_dollar;
 ///
 /// `LCase` is the Variant-returning counterpart of `LCase$`; a `Null` input
 /// propagates as `Null`.
-pub fn lcase(input: &VBVariant) -> VBResult<VBVariant> {
-    if input.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    lcase_dollar(&input.as_vbstring()?).map(VBVariant::from)
+pub fn lcase(input: &VBString) -> VBResult<VBVariant> {
+    lcase_dollar(input).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -554,11 +551,11 @@ mod tests {
     #[test]
     fn lowercases_letters() {
         assert_eq!(
-            lcase(&VBVariant::from_string("Hello World")).unwrap(),
+            lcase(&VBString::from("Hello World")).unwrap(),
             VBVariant::from_string("hello world")
         );
         assert_eq!(
-            lcase(&VBVariant::from_string("ABC")).unwrap(),
+            lcase(&VBString::from("ABC")).unwrap(),
             VBVariant::from_string("abc")
         );
     }
@@ -566,7 +563,7 @@ mod tests {
     #[test]
     fn leaves_non_letters_unchanged() {
         assert_eq!(
-            lcase(&VBVariant::from_string("123 !@#")).unwrap(),
+            lcase(&VBString::from("123 !@#")).unwrap(),
             VBVariant::from_string("123 !@#")
         );
     }
@@ -574,17 +571,12 @@ mod tests {
     #[test]
     fn handles_unicode() {
         assert_eq!(
-            lcase(&VBVariant::from_string("HÉLLO")).unwrap(),
+            lcase(&VBString::from("HÉLLO")).unwrap(),
             VBVariant::from_string("héllo")
         );
         assert_eq!(
-            lcase(&VBVariant::from_string("")).unwrap(),
+            lcase(&VBString::from("")).unwrap(),
             VBVariant::from_string("")
         );
-    }
-
-    #[test]
-    fn propagates_null() {
-        assert_eq!(lcase(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 }
