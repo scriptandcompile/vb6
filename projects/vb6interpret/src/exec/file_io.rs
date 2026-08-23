@@ -9,23 +9,11 @@ use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
 use vb6runtime::library::file as filefn;
 use vb6runtime::state::file as file_state;
-use vb6runtime::VBVariant;
 
 use crate::error::RunResult;
 use crate::interpreter::{Flow, Interpreter};
 
 impl Interpreter {
-    /// Evaluate a bare literal or `Identifier` token, as found in the flat
-    /// token stream of `Open`/`Close` (which aren't parsed into nested
-    /// expression nodes like other statements).
-    fn eval_flat_token(&mut self, node: &CstNode) -> RunResult<VBVariant> {
-        if node.kind() == SyntaxKind::Identifier {
-            let name = node.text().trim().to_string();
-            return Ok(self.lookup(&name).cloned().unwrap_or(VBVariant::Empty));
-        }
-        self.eval_literal(node)
-    }
-
     /// `Open pathname For mode [Access access] [lock] As [#]filenumber [Len=reclength]`.
     pub(crate) fn exec_open(&mut self, node: &CstNode) -> RunResult<Flow> {
         let children: Vec<&CstNode> = node.significant_children().collect();
