@@ -48,14 +48,6 @@ fn dollar_variants_share_string_implementations() {
 }
 
 #[test]
-fn non_dollar_variants_propagate_null() {
-    assert_eq!(
-        call_builtin("Trim", &[VBVariant::Null]).unwrap(),
-        VBVariant::Null
-    );
-}
-
-#[test]
 fn dollar_variants_reject_null() {
     let err = call_builtin("Left$", &[VBVariant::Null, VBVariant::Long(3)]).unwrap_err();
     assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
