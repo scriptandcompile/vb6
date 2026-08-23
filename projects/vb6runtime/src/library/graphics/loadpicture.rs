@@ -655,7 +655,7 @@
 //! - `App.Path`: Get application directory for relative paths
 
 use crate::error::{VBError, VBResult};
-use crate::state::file;
+use crate::state::file::{self, AccessMode, LockMode, OpenMode};
 use crate::value::VBVariant;
 use crate::StdPicture;
 use std::path::Path;
@@ -689,24 +689,66 @@ pub fn loadpicture(filename: Option<&str>) -> VBResult<VBVariant> {
                 return Err(VBError::new(err_number::FILE_NOT_FOUND));
             }
 
-            // For now, create a StdPicture with the file's dimensions
-            // TODO: Actually parse the image file to get its real dimensions.
-            // In a full implementation, we would actually load the image data
-            // BMP header has: file type, file size, reserved, data offset, DIB header size,
-            // width, height, color planes, bits per pixel, compression, image size, XPixelsPerMeter,
-            // YPixelsPerMeter, colors used, colors important
-            // For a minimal runtime representation, we'll use stub dimensions
-            // based on file extension recognition
+            // Bitmaps carry their pixel dimensions in the header; other
+            // formats keep typical stub sizes.
             let (width, height) = match path.extension().and_then(|e| e.to_str()) {
-                Some("bmp") | Some("dib") => (100, 200), // Stub size
-                Some("ico") | Some("cur") => (32, 32),   // Typical icon/cursor size
+                Some(ext) if ext.eq_ignore_ascii_case("bmp") || ext.eq_ignore_ascii_case("dib") => {
+                    read_bitmap_dimensions(path).unwrap_or((100, 200))
+                }
+                Some("ico") | Some("cur") => (32, 32), // Typical icon/cursor size
                 Some("wmf") | Some("emf") => (200, 150), // Stub size for metafiles
-                _ => (100, 100),                         // Default stub size
+                _ => (100, 100),                       // Default stub size
             };
             Ok(VBVariant::from_object(Box::new(StdPicture::new(
                 width, height,
             ))))
         }
+    }
+}
+
+/// Read a bitmap file through the file backend and pull its pixel
+/// dimensions from the info header. Returns `None` for anything that does
+/// not look like a well-formed bitmap, letting the caller fall back to
+/// stub dimensions.
+fn read_bitmap_dimensions(path: &Path) -> Option<(i32, i32)> {
+    let number = file::free_file(0);
+    if number == 0 {
+        return None;
+    }
+
+    let opened = file::open_file(
+        path,
+        OpenMode::Binary,
+        AccessMode::Read,
+        LockMode::Shared,
+        0,
+        number,
+    );
+    if opened.is_err() {
+        return None;
+    }
+
+    // Read to the end even if it fails, so the file number is never leaked.
+    let read = file::read_file_to_vec(number);
+    let closed = file::close_file(number);
+    let bytes = read.ok()?;
+    closed.ok()?;
+
+    // A `.bmp` starts with the 14-byte BITMAPFILEHEADER (`BM`, sizes, data
+    // offset); a raw `.dib` begins at the info header directly. In both
+    // layouts the signed width and height sit 4 and 8 bytes into the info
+    // header. A negative height marks a top-down bitmap.
+    let header: &[u8] = if bytes.starts_with(b"BM") {
+        bytes.get(14..)?
+    } else {
+        &bytes[..]
+    };
+    let width = i32::from_le_bytes(header.get(4..8)?.try_into().ok()?);
+    let height = i32::from_le_bytes(header.get(8..12)?.try_into().ok()?);
+    if width > 0 && height != 0 {
+        Some((width, height.abs()))
+    } else {
+        None
     }
 }
 

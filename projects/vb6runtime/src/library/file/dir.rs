@@ -702,6 +702,7 @@
 use crate::error::{VBError, VBResult};
 use crate::state::file;
 use crate::value::VBVariant;
+use std::path::Path;
 
 /// Retrieves the name of a file, directory, or folder that matches the specified pattern and attributes.
 ///
@@ -734,8 +735,24 @@ pub fn dir(pathname: VBVariant, attributes: i16) -> VBResult<VBVariant> {
         }
     };
 
-    let path = file::resolve_path(std::path::Path::new(&pathname_str));
-    let file_list = file::file_dir(&path, &pathname_str, attributes).unwrap_or_else(|_| Vec::new());
+    let path = Path::new(&pathname_str);
+
+    // Split into the directory to enumerate and the entry-name pattern:
+    // `Dir("report.txt")` checks one file in the current directory, while
+    // `Dir("C:\data\*.txt")` enumerates `C:\data`. Passing the full path
+    // as the enumeration directory would fail `read_dir` on a file.
+    let (search_dir, pattern) = match path.file_name() {
+        Some(name) => (
+            path.parent().unwrap_or_else(|| Path::new(".")),
+            name.to_string_lossy().into_owned(),
+        ),
+        // A path without a file name (e.g. `C:\`) enumerates itself.
+        None => (path, pathname_str.clone()),
+    };
+
+    // Resolved against the file-state root by the backend layer, so any
+    // backend (native, memory, ...) sees the same relative-path semantics.
+    let file_list = file::file_dir(search_dir, &pattern, attributes).unwrap_or_else(|_| Vec::new());
 
     if file_list.is_empty() {
         Ok(VBVariant::String(String::new()))

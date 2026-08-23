@@ -1113,17 +1113,15 @@ fn savepicture_statement_writes_a_bitmap_file() {
     with_temp_file_root(|dir| {
         std::fs::write(dir.join("in.bmp"), one_pixel_bmp()).unwrap();
 
-        let out = run(
-            "    Dim p As Object\n\
+        let out = run("    Dim p As Object\n\
              \x20   Set p = LoadPicture(\"in.bmp\")\n\
              \x20   SavePicture p, \"out.bmp\"\n\
-             \x20   Debug.Print Dir(\"out.bmp\") <> \"\"\n",
-        );
+             \x20   Debug.Print Dir(\"out.bmp\") <> \"\"\n");
         assert_eq!(out, vec!["True"]);
 
         let bytes = std::fs::read(dir.join("out.bmp")).unwrap();
         assert_eq!(&bytes[0..2], b"BM");
-        assert_eq!(bytes.len(), 54 + 8 * 3); // header + 3 padded rows of 2 px
+        assert_eq!(bytes.len(), 54 + 4); // header + 1 padded row of 1 px
     });
 }
 
