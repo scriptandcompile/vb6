@@ -4,6 +4,7 @@
 //!
 //! - [`VBType`] - the single source of truth for VB6 static types
 //! - [`VBVariant`] - runtime values with VB6-exact conversion semantics
+//! - [`boundary`] - typed-argument conversion at the host/library boundary
 //! - [`ArrayValue`] - VB6 arrays with arbitrary bounds
 //! - [`VBError`] - runtime errors mirroring the `Err` object
 //!
@@ -16,6 +17,7 @@
 #![warn(rust_2018_idioms)]
 
 pub mod array;
+pub mod boundary;
 pub mod library;
 pub mod state;
 pub mod stdpicture;
