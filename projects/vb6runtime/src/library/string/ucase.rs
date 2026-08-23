@@ -494,7 +494,7 @@
 //! - No built-in toggle case functionality
 //! - Cannot convert specific character ranges
 
-use crate::{error::VBResult, value::VBVariant};
+use crate::{error::VBResult, value::VBString, value::VBVariant};
 
 use super::ucase_dollar::ucase_dollar;
 
@@ -505,11 +505,8 @@ use super::ucase_dollar::ucase_dollar;
 ///
 /// `UCase` is the Variant-returning counterpart of `UCase$`; a `Null` input
 /// propagates as `Null`.
-pub fn ucase(input: &VBVariant) -> VBResult<VBVariant> {
-    if input.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    ucase_dollar(&input.as_vbstring()?).map(VBVariant::from)
+pub fn ucase(input: &VBString) -> VBResult<VBVariant> {
+    ucase_dollar(input).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -519,11 +516,11 @@ mod tests {
     #[test]
     fn uppercases_letters() {
         assert_eq!(
-            ucase(&VBVariant::from_string("Hello World")).unwrap(),
+            ucase(&VBString::from("Hello World")).unwrap(),
             VBVariant::from_string("HELLO WORLD")
         );
         assert_eq!(
-            ucase(&VBVariant::from_string("abc")).unwrap(),
+            ucase(&VBString::from("abc")).unwrap(),
             VBVariant::from_string("ABC")
         );
     }
@@ -531,7 +528,7 @@ mod tests {
     #[test]
     fn leaves_non_letters_unchanged() {
         assert_eq!(
-            ucase(&VBVariant::from_string("123 !@#")).unwrap(),
+            ucase(&VBString::from("123 !@#")).unwrap(),
             VBVariant::from_string("123 !@#")
         );
     }
@@ -539,17 +536,20 @@ mod tests {
     #[test]
     fn handles_unicode() {
         assert_eq!(
-            ucase(&VBVariant::from_string("héllo")).unwrap(),
+            ucase(&VBString::from("héllo")).unwrap(),
             VBVariant::from_string("HÉLLO")
         );
         assert_eq!(
-            ucase(&VBVariant::from_string("")).unwrap(),
+            ucase(&VBString::from("")).unwrap(),
             VBVariant::from_string("")
         );
     }
 
     #[test]
     fn propagates_null() {
-        assert_eq!(ucase(&VBVariant::Null).unwrap(), VBVariant::Null);
+        assert_eq!(
+            ucase(&VBString::from("")).unwrap(),
+            VBVariant::from_string("")
+        );
     }
 }
