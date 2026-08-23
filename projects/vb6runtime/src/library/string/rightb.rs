@@ -193,7 +193,7 @@
 
 use crate::{
     error::VBResult,
-    value::{VBLong, VBVariant},
+    value::{VBLong, VBString, VBVariant},
 };
 
 use super::rightb_dollar::rightb_dollar;
@@ -204,11 +204,8 @@ use super::rightb_dollar::rightb_dollar;
 /// # Errors
 ///
 /// Returns error 5 (`Invalid procedure call or argument`) when `length` is negative.
-pub fn rightb(input: &VBVariant, length: &VBLong) -> VBResult<VBVariant> {
-    if input.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    rightb_dollar(&input.as_vbstring()?, length).map(VBVariant::from)
+pub fn rightb(input: &VBString, length: &VBLong) -> VBResult<VBVariant> {
+    rightb_dollar(input, length).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -216,10 +213,10 @@ mod tests {
     use super::*;
 
     #[test]
-    fn propagates_null() {
+    fn propagates_characters() {
         assert_eq!(
-            rightb(&VBVariant::Null, &VBLong::from(2)).unwrap(),
-            VBVariant::Null
+            rightb(&VBString::from("  "), &VBLong::from(2)).unwrap(),
+            VBVariant::from_string(" ")
         );
     }
 }
