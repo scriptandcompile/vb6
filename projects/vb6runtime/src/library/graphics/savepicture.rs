@@ -187,7 +187,7 @@ fn bitmap_bytes(width: i32, height: i32) -> Vec<u8> {
     let width = width.max(1) as usize;
     let height = height.max(1) as usize;
     // Rows are stored bottom-up and padded to 4-byte boundaries.
-    let row_size = (width * 3).div_ceil(4);
+    let row_size = (width * 3).div_ceil(4) * 4;
     let pixel_size = row_size * height;
     let data_offset: u32 = 54; // BITMAPFILEHEADER (14) + BITMAPINFOHEADER (40)
     let file_size = data_offset as usize + pixel_size;

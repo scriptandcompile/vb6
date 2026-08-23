@@ -115,8 +115,12 @@ impl Interpreter {
                 self.exec_assignment(node)?;
                 Ok(Flow::Next)
             }
-            SyntaxKind::LetStatement | SyntaxKind::SetStatement => {
+            SyntaxKind::LetStatement => {
                 self.exec_assignment(node)?;
+                Ok(Flow::Next)
+            }
+            SyntaxKind::SetStatement => {
+                self.exec_set_statement(node)?;
                 Ok(Flow::Next)
             }
             SyntaxKind::DimStatement | SyntaxKind::ConstStatement => {
@@ -560,8 +564,8 @@ impl Interpreter {
         if args.len() != 2 {
             return Err(self.error_here(VBError::invalid_procedure_call()));
         }
-        let picture = self.eval_expr(args[0])?;
-        let filename = self.eval_expr(args[1])?;
+        let picture = self.eval_simple_operand(args[0])?;
+        let filename = self.eval_simple_operand(args[1])?;
         vb6runtime::library::graphics::savepicture::save_picture(&picture, &filename)
             .map_err(|e| self.error_here(e))?;
         Ok(())
@@ -767,17 +771,7 @@ impl Interpreter {
         match lhs.kind() {
             SyntaxKind::IdentifierExpression => {
                 let name = identifier_name(lhs);
-
-                // Assigning to the Function's name sets its return value.
-                if let Some(frame) = self.frames.last() {
-                    if frame.is_function && name.to_lowercase() == frame.name.to_lowercase() {
-                        if let Some(frame) = self.frames.last_mut() {
-                            frame.return_value = Some(value);
-                        }
-                        return Ok(());
-                    }
-                }
-                self.set_variable(&name, value);
+                self.assign_to_name(&name, value);
                 Ok(())
             }
             SyntaxKind::CallExpression => {
@@ -812,6 +806,147 @@ impl Interpreter {
                 }
             }
             SyntaxKind::MemberAccessExpression => Err(self.unsupported(lhs, "member assignment")),
+            _ => Err(self.error_here(VBError::invalid_procedure_call())),
+        }
+    }
+
+    /// Store into a named variable, or into the enclosing function's return
+    /// slot when the name matches the function itself.
+    fn assign_to_name(&mut self, name: &str, value: VBVariant) {
+        // Assigning to the Function's name sets its return value.
+        if let Some(frame) = self.frames.last() {
+            if frame.is_function && name.to_lowercase() == frame.name.to_lowercase() {
+                if let Some(frame) = self.frames.last_mut() {
+                    frame.return_value = Some(value);
+                }
+                return;
+            }
+        }
+        self.set_variable(name, value);
+    }
+
+    /// `Set obj = expr`: object-reference assignment.
+    ///
+    /// The parser keeps `Set` statements as flat token runs (unlike `Let`,
+    /// which builds real expression nodes), so both sides are interpreted
+    /// from raw tokens here: the target is an identifier and the source is
+    /// evaluated by [`Interpreter::eval_flat_expression`].
+    fn exec_set_statement(&mut self, node: &CstNode) -> RunResult<()> {
+        let significant: Vec<&CstNode> = node.significant_children().collect();
+        let eq_index = significant
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::EqualityOperator)
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+
+        // Target: the identifier between `Set` and `=`. Member targets
+        // (`Set Form1.Picture = ...`) need object support.
+        let target = &significant[1..eq_index];
+        if target.len() != 1 || !is_identifier_like(target[0]) {
+            return Err(self.error_here(VBError::invalid_procedure_call()));
+        }
+        let name = target[0].text().trim().to_string();
+
+        let value = self.eval_flat_expression(&significant[eq_index + 1..])?;
+        self.assign_to_name(&name, value);
+        Ok(())
+    }
+
+    /// Evaluate a flat token run (a statement parsed without expression
+    /// nodes). Handles single atoms, `New` (unsupported), and direct calls
+    /// `Name(arg, ...)` whose arguments are themselves flat expressions.
+    fn eval_flat_expression(&mut self, tokens: &[&CstNode]) -> RunResult<VBVariant> {
+        let Some((first, rest)) = tokens.split_first() else {
+            return Err(self.error_here(VBError::invalid_procedure_call()));
+        };
+        if rest.is_empty() {
+            return self.eval_flat_atom(first);
+        }
+        match first.kind() {
+            SyntaxKind::Identifier => {
+                if rest[0].kind() != SyntaxKind::LeftParenthesis
+                    || rest
+                        .last()
+                        .is_none_or(|t| t.kind() != SyntaxKind::RightParenthesis)
+                {
+                    return Err(self.error_here(VBError::invalid_procedure_call()));
+                }
+                let inner = &rest[1..rest.len() - 1];
+                let args = self.eval_flat_arguments(inner)?;
+                let name = first.text().trim();
+                // Same dispatch as `eval_call`: user function first, then
+                // builtins (which raise error 35 for unknown names).
+                if self.procedures.contains_key(&crate::scope::normalize(name)) {
+                    return self.call_function(name, args);
+                }
+                crate::builtins::call_builtin(name, &args).map_err(|e| self.error_here(e))
+            }
+            SyntaxKind::NewKeyword => Err(self.error_here(VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                "New object creation is not implemented yet",
+            ))),
+            _ => Err(self.error_here(VBError::invalid_procedure_call())),
+        }
+    }
+
+    /// Split a flat token run on top-level commas and evaluate each part.
+    fn eval_flat_arguments(&mut self, tokens: &[&CstNode]) -> RunResult<Vec<VBVariant>> {
+        let mut parts: Vec<Vec<&CstNode>> = Vec::new();
+        let mut depth = 0usize;
+        for token in tokens {
+            match token.kind() {
+                SyntaxKind::LeftParenthesis => depth += 1,
+                SyntaxKind::RightParenthesis => depth = depth.saturating_sub(1),
+                SyntaxKind::Comma if depth == 0 => {
+                    parts.push(Vec::new());
+                    continue;
+                }
+                _ => {}
+            }
+            match parts.last_mut() {
+                Some(part) => part.push(token),
+                None => parts.push(vec![token]),
+            }
+        }
+        parts
+            .into_iter()
+            .map(|part| self.eval_flat_expression(&part))
+            .collect()
+    }
+
+    /// Evaluate one operand of a simple builtin statement. These statements
+    /// keep raw tokens, so a bare identifier must be resolved directly
+    /// instead of through `eval_expr`.
+    fn eval_simple_operand(&mut self, node: &CstNode) -> RunResult<VBVariant> {
+        if node.kind() == SyntaxKind::Identifier {
+            self.eval_flat_atom(node)
+        } else {
+            self.eval_expr(node)
+        }
+    }
+
+    /// Evaluate a single-token flat expression: literals, the special
+    /// keywords, or a variable reference.
+    fn eval_flat_atom(&mut self, node: &CstNode) -> RunResult<VBVariant> {
+        match node.kind() {
+            SyntaxKind::NothingKeyword => Ok(VBVariant::Nothing),
+            SyntaxKind::NullKeyword => Ok(VBVariant::Null),
+            SyntaxKind::EmptyKeyword => Ok(VBVariant::Empty),
+            SyntaxKind::Identifier => {
+                let name = node.text().trim();
+                match self.lookup(name) {
+                    Some(value) => Ok(value.clone()),
+                    None => Ok(VBVariant::Empty),
+                }
+            }
+            SyntaxKind::StringLiteral
+            | SyntaxKind::IntegerLiteral
+            | SyntaxKind::LongLiteral
+            | SyntaxKind::SingleLiteral
+            | SyntaxKind::DoubleLiteral
+            | SyntaxKind::CurrencyLiteral
+            | SyntaxKind::DateLiteral
+            | SyntaxKind::TrueKeyword
+            | SyntaxKind::FalseKeyword => self.eval_literal(node),
             _ => Err(self.error_here(VBError::invalid_procedure_call())),
         }
     }
