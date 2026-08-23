@@ -45,7 +45,8 @@ pub(super) fn register(registry: &mut Registry) {
         strfn::trim(&input)));
     registry.insert(typed_builtin!("ltrim", 1, 1, (input: string),  
         strfn::ltrim(&input)));
-    registry.insert(builtin!("rtrim", 1, 1, |args| { strfn::rtrim(&args[0]) }));
+    registry.insert(typed_builtin!("rtrim", 1, 1, (input: string),
+        strfn::rtrim(&input)));
     // `LSet` is a statement; the registry entry exposes the alignment
     // primitive `(stringvar, string) -> aligned string` for dispatch.
     registry.insert(

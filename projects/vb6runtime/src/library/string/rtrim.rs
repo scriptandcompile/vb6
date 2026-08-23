@@ -654,7 +654,7 @@
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
 
-use crate::{error::VBResult, value::VBVariant};
+use crate::{error::VBResult, value::VBString, value::VBVariant};
 
 use super::rtrim_dollar::rtrim_dollar;
 
@@ -665,11 +665,8 @@ use super::rtrim_dollar::rtrim_dollar;
 ///
 /// `RTrim` is the Variant-returning counterpart of `RTrim$`; a `Null` input
 /// propagates as `Null`.
-pub fn rtrim(input: &VBVariant) -> VBResult<VBVariant> {
-    if input.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    rtrim_dollar(&input.as_vbstring()?).map(VBVariant::from)
+pub fn rtrim(input: &VBString) -> VBResult<VBVariant> {
+    rtrim_dollar(input).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -679,11 +676,11 @@ mod tests {
     #[test]
     fn trims_trailing_spaces() {
         assert_eq!(
-            rtrim(&VBVariant::from_string("  Hello World  ")).unwrap(),
+            rtrim(&VBString::from("  Hello World  ")).unwrap(),
             VBVariant::from_string("  Hello World")
         );
         assert_eq!(
-            rtrim(&VBVariant::from_string("Hello")).unwrap(),
+            rtrim(&VBString::from("Hello")).unwrap(),
             VBVariant::from_string("Hello")
         );
     }
@@ -691,17 +688,12 @@ mod tests {
     #[test]
     fn handles_empty_and_all_spaces() {
         assert_eq!(
-            rtrim(&VBVariant::from_string("")).unwrap(),
+            rtrim(&VBString::from("")).unwrap(),
             VBVariant::from_string("")
         );
         assert_eq!(
-            rtrim(&VBVariant::from_string("   ")).unwrap(),
+            rtrim(&VBString::from("   ")).unwrap(),
             VBVariant::from_string("")
         );
-    }
-
-    #[test]
-    fn propagates_null() {
-        assert_eq!(rtrim(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 }
