@@ -135,6 +135,96 @@ fn abs_preserves_argument_type() {
 }
 
 #[test]
+fn datetime_functions_propagate_null_at_the_boundary() {
+    // Extractors document "If date contains Null, Null is returned" —
+    // `propdate` short-circuits before the typed runtime sees the value.
+    for name in ["Year", "Month", "Day", "Hour", "Minute", "Second"] {
+        let result = call_builtin(name, &[VBVariant::Null]);
+        match result {
+            Ok(VBVariant::Null) => {}
+            other => panic!("{name}(Null) should propagate Null, got {other:?}"),
+        }
+    }
+    // DateAdd propagates Null from any of its three parameters.
+    let result = call_builtin(
+        "DateAdd",
+        &[
+            VBVariant::from_string("d"),
+            VBVariant::Long(1),
+            VBVariant::Null,
+        ],
+    );
+    assert_eq!(result.unwrap(), VBVariant::Null);
+    let result = call_builtin(
+        "DateAdd",
+        &[
+            VBVariant::Null,
+            VBVariant::Long(1),
+            VBVariant::from_date_serial(45_000.0),
+        ],
+    );
+    assert_eq!(result.unwrap(), VBVariant::Null);
+    // Weekday propagates its date but rejects a Null firstdayofweek.
+    let result = call_builtin("Weekday", &[VBVariant::Null]);
+    assert_eq!(result.unwrap(), VBVariant::Null);
+    let err = call_builtin(
+        "Weekday",
+        &[VBVariant::from_date_serial(45_000.0), VBVariant::Null],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+}
+
+#[test]
+fn datetime_null_policies_differ_per_function() {
+    // DatePart propagates only the date: a Null interval is error 94,
+    // a Null date still returns Null (VB6 documented table).
+    let err = call_builtin(
+        "DatePart",
+        &[VBVariant::Null, VBVariant::from_date_serial(45_000.0)],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+    let result = call_builtin(
+        "DatePart",
+        &[VBVariant::from_string("yyyy"), VBVariant::Null],
+    );
+    assert_eq!(result.unwrap(), VBVariant::Null);
+
+    // DateDiff has no propagation at all: every Null reaches coercion and
+    // fails with 94 instead of returning Null.
+    let err = call_builtin(
+        "DateDiff",
+        &[
+            VBVariant::from_string("d"),
+            VBVariant::Null,
+            VBVariant::from_date_serial(45_000.0),
+        ],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+
+    // DateSerial/TimeSerial never propagated either: Null year is 94.
+    let err = call_builtin(
+        "DateSerial",
+        &[VBVariant::Null, VBVariant::Long(1), VBVariant::Long(1)],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+
+    // MonthName keeps strict Long semantics: a Null month is 94, while
+    // CVErr re-raises through propdate-style wrappers too.
+    let err = call_builtin("MonthName", &[VBVariant::Null]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+    let err = call_builtin(
+        "Year",
+        &[VBVariant::from_error(vb6core::error::VBError::new(31337))],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, 31337);
+}
+
+#[test]
 fn math_functions_dispatch() {
     assert_eq!(
         call_builtin("Abs", &[VBVariant::from_integer(-5)]).unwrap(),

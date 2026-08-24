@@ -574,7 +574,7 @@
 //! - `Format`: Formats a date as a string (alternative for custom formatting)
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBVariant};
+use crate::value::{date_serial_to_datetime, VBDate, VBLong, VBString, VBVariant};
 
 /// Implementation of the `DatePart` function.
 ///
@@ -591,20 +591,16 @@ use crate::value::{date_serial_to_datetime, VBVariant};
 /// - an unknown interval raises error 5 (invalid procedure call); a non-date
 ///   value raises error 13 (type mismatch)
 pub fn date_part(
-    interval: &VBVariant,
-    date: &VBVariant,
-    first_day_of_week: Option<&VBVariant>,
-    first_week_of_year: Option<&VBVariant>,
+    interval: &VBString,
+    date: &VBDate,
+    first_day_of_week: Option<&VBLong>,
+    first_week_of_year: Option<&VBLong>,
 ) -> VBResult<VBVariant> {
-    if date.is_null() {
-        return Ok(VBVariant::Null);
-    }
-
     let fdow = first_day(first_day_of_week)?;
     let fwoy = match first_week_of_year {
         None => 1,
         Some(v) => {
-            let n = v.as_i32()?;
+            let n = v.as_i32();
             if !(0..=3).contains(&n) {
                 return Err(VBError::invalid_procedure_call());
             }
@@ -612,8 +608,8 @@ pub fn date_part(
         }
     };
 
-    let interval = interval.as_string()?.to_ascii_lowercase();
-    let serial = date.as_date_serial()?;
+    let interval = interval.as_str().to_ascii_lowercase();
+    let serial = date.as_f64();
     let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
 
     let result = match interval.as_str() {
@@ -634,11 +630,11 @@ pub fn date_part(
 }
 
 /// The `firstdayofweek` constant, normalized to a 1=Sunday..7=Saturday offset.
-pub(crate) fn first_day(first_day_of_week: Option<&VBVariant>) -> VBResult<i32> {
+pub(crate) fn first_day(first_day_of_week: Option<&VBLong>) -> VBResult<i32> {
     match first_day_of_week {
         None => Ok(1),
         Some(v) => {
-            let n = v.as_i32()?;
+            let n = v.as_i32();
             match n {
                 0 | 1 => Ok(1),
                 2..=7 => Ok(n),
@@ -705,12 +701,12 @@ fn day_serial(date: jiff::civil::Date) -> f64 {
 mod tests {
     use super::date_part;
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBDate, VBLong, VBString, VBVariant};
 
     fn part(interval: &str, date: &str) -> i16 {
         let result = date_part(
-            &VBVariant::from_string(interval),
-            &VBVariant::from_string(date),
+            &VBString::from(interval),
+            &VBDate::try_from(&VBVariant::from_string(date)).unwrap(),
             None,
             None,
         )
@@ -723,10 +719,10 @@ mod tests {
 
     fn part_opts(interval: &str, date: &str, fdow: i32, fwoy: i32) -> i16 {
         let result = date_part(
-            &VBVariant::from_string(interval),
-            &VBVariant::from_string(date),
-            Some(&VBVariant::from_long(fdow)),
-            Some(&VBVariant::from_long(fwoy)),
+            &VBString::from(interval),
+            &VBDate::try_from(&VBVariant::from_string(date)).unwrap(),
+            Some(&VBLong::from(fdow)),
+            Some(&VBLong::from(fwoy)),
         )
         .unwrap();
         let VBVariant::Integer(n) = result else {
@@ -810,22 +806,10 @@ mod tests {
     }
 
     #[test]
-    fn null_date_returns_null() {
-        let result = date_part(
-            &VBVariant::from_string("yyyy"),
-            &VBVariant::Null,
-            None,
-            None,
-        )
-        .unwrap();
-        assert!(result.is_null());
-    }
-
-    #[test]
     fn invalid_interval_is_error_5() {
         let err = date_part(
-            &VBVariant::from_string("bogus"),
-            &VBVariant::from_string("1/15/2025"),
+            &VBString::from("bogus"),
+            &VBDate::try_from(&VBVariant::from_string("1/15/2025")).unwrap(),
             None,
             None,
         )
@@ -835,22 +819,16 @@ mod tests {
 
     #[test]
     fn non_date_parameter_is_error_13() {
-        let err = date_part(
-            &VBVariant::from_string("yyyy"),
-            &VBVariant::from_string("not a date"),
-            None,
-            None,
-        )
-        .unwrap_err();
+        let err = VBDate::try_from(&VBVariant::from_string("not a date")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 
     #[test]
     fn invalid_first_day_of_week_is_error_5() {
         let err = date_part(
-            &VBVariant::from_string("d"),
-            &VBVariant::from_string("1/15/2025"),
-            Some(&VBVariant::from_long(9)),
+            &VBString::from("d"),
+            &VBDate::try_from(&VBVariant::from_string("1/15/2025")).unwrap(),
+            Some(&VBLong::from(9)),
             None,
         )
         .unwrap_err();
@@ -860,10 +838,10 @@ mod tests {
     #[test]
     fn invalid_first_week_of_year_is_error_5() {
         let err = date_part(
-            &VBVariant::from_string("d"),
-            &VBVariant::from_string("1/15/2025"),
+            &VBString::from("d"),
+            &VBDate::try_from(&VBVariant::from_string("1/15/2025")).unwrap(),
             None,
-            Some(&VBVariant::from_long(9)),
+            Some(&VBLong::from(9)),
         )
         .unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);

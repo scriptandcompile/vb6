@@ -696,7 +696,7 @@
 //! working with date calculations and month extraction operations.
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBVariant};
+use crate::value::{date_serial_to_datetime, VBDate, VBVariant};
 
 /// Implementation of the `Month` function.
 ///
@@ -707,11 +707,8 @@ use crate::value::{date_serial_to_datetime, VBVariant};
 /// - the result is an `Integer` from 1 (January) to 12 (December)
 /// - a value that cannot be interpreted as a date raises error 13 (type
 ///   mismatch)
-pub fn month(date: &VBVariant) -> VBResult<VBVariant> {
-    if date.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    let serial = date.as_date_serial()?;
+pub fn month(date: &VBDate) -> VBResult<VBVariant> {
+    let serial = date.as_f64();
     let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
     Ok(VBVariant::from_integer(dt.month() as i16))
 }
@@ -720,10 +717,11 @@ pub fn month(date: &VBVariant) -> VBResult<VBVariant> {
 mod tests {
     use super::month;
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBDate, VBVariant};
+    use std::convert::TryFrom;
 
     fn m(input: &VBVariant) -> i16 {
-        let result = month(input).unwrap();
+        let result = month(&VBDate::try_from(input).unwrap()).unwrap();
         let VBVariant::Integer(v) = result else {
             panic!("expected an Integer variant");
         };
@@ -768,13 +766,8 @@ mod tests {
     }
 
     #[test]
-    fn null_returns_null() {
-        assert_eq!(month(&VBVariant::Null).unwrap(), VBVariant::Null);
-    }
-
-    #[test]
     fn non_date_value_is_error_13() {
-        let err = month(&VBVariant::from_string("hello")).unwrap_err();
+        let err = VBDate::try_from(&VBVariant::from_string("hello")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 }

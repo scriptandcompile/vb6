@@ -48,26 +48,26 @@ Classes:
 |---|---|---|---|---|
 | `date` | 0..0 | `fn() -> VBResult<VBVariant>` | typed | raises 94 |
 | `date$` | 0..0 | `fn() -> VBResult<VBString>` | $-strict | raises 94 |
-| `dateadd` | 3..3 | `fn(interval: &VBVariant, number: &VBVariant, date: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `datediff` | 3..5 | `fn(interval: &VBVariant, date1: &VBVariant, date2: &VBVariant, first_day_of_week: Option<&VBVariant>, first_week_of_year: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `datepart` | 2..4 | `fn(interval: &VBVariant, date: &VBVariant, first_day_of_week: Option<&VBVariant>, first_week_of_year: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `dateserial` | 3..3 | `fn(year: &VBVariant, month: &VBVariant, day: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `dateadd` | 3..3 | `fn(interval: &VBString, number: &VBDouble, date: &VBDate) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `datediff` | 3..5 | `fn(interval: &VBString, date1: &VBDate, date2: &VBDate, first_day_of_week: Option<&VBLong>, first_week_of_year: Option<&VBLong>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `datepart` | 2..4 | `fn(interval: &VBString, date: &VBDate, first_day_of_week: Option<&VBLong>, first_week_of_year: Option<&VBLong>) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `dateserial` | 3..3 | `fn(year: &VBLong, month: &VBLong, day: &VBLong) -> VBResult<VBVariant>` | typed | raises 94 |
 | `datevalue` | 1..1 | `fn(date: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `day` | 1..1 | `fn(date: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `hour` | 1..1 | `fn(time: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `minute` | 1..1 | `fn(time: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `month` | 1..1 | `fn(date: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `monthname` | 1..2 | `fn(month: &VBVariant, abbreviate: Option<&VBVariant>) -> VBResult<VBString>` | variant-input | propagates Null |
+| `day` | 1..1 | `fn(date: &VBDate) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `hour` | 1..1 | `fn(time: &VBDate) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `minute` | 1..1 | `fn(time: &VBDate) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `month` | 1..1 | `fn(date: &VBDate) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `monthname` | 1..2 | `fn(month: &VBLong, abbreviate: Option<&VBBoolean>) -> VBResult<VBString>` | typed | raises 94 |
 | `now` | 0..0 | `fn() -> VBResult<VBVariant>` | typed | raises 94 |
-| `second` | 1..1 | `fn(time: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `second` | 1..1 | `fn(time: &VBDate) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `time` | 0..0 | `fn() -> VBResult<VBVariant>` | typed | raises 94 |
 | `time$` | 0..0 | `fn() -> VBResult<VBString>` | $-strict | raises 94 |
 | `timer` | 0..0 | `fn() -> VBResult<VBVariant>` | typed | raises 94 |
-| `timeserial` | 3..3 | `fn(hour: &VBVariant, minute: &VBVariant, second: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `timeserial` | 3..3 | `fn(hour: &VBLong, minute: &VBLong, second: &VBLong) -> VBResult<VBVariant>` | typed | raises 94 |
 | `timevalue` | 1..1 | `fn(time: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `weekday` | 1..2 | `fn(date: &VBVariant, firstdayofweek: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `weekdayname` | 1..3 | `fn(weekday: &VBVariant, abbreviate: Option<&VBVariant>, firstdayofweek: Option<&VBVariant>) -> VBResult<VBString>` | variant-input | propagates Null |
-| `year` | 1..1 | `fn(date: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `weekday` | 1..2 | `fn(date: &VBDate, firstdayofweek: Option<&VBLong>) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `weekdayname` | 1..3 | `fn(weekday: &VBLong, abbreviate: Option<&VBBoolean>, firstdayofweek: Option<&VBLong>) -> VBResult<VBString>` | typed | raises 94 |
+| `year` | 1..1 | `fn(date: &VBDate) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 
 ## `environment`
 

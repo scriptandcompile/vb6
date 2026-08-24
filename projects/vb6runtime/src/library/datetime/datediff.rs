@@ -12,7 +12,8 @@
 //!
 //! - **interval**: Required. `String` expression that is the interval of time you want to use
 //!   to calculate the difference between date1 and date2. See Interval Settings for values.
-//! - **date1**, **date2**: Required. `Variant` (`Date`) values that you want to use in the calculation.
+//! - **date1**, **date2**: Required. `Variant` (`Date`) values that you want to use
+//!   in the calculation.
 //! - **firstdayofweek**: Optional. Constant that specifies the first day of the week.
 //!   If not specified, Sunday is assumed. See `FirstDayOfWeek` Constants.
 //! - **firstweekofyear**: Optional. Constant that specifies the first week of the year.
@@ -561,7 +562,7 @@
 //! - `Time`: Returns current time
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBVariant};
+use crate::value::{date_serial_to_datetime, VBDate, VBLong, VBString, VBVariant};
 
 /// Implementation of the `DateDiff` function.
 ///
@@ -579,22 +580,22 @@ use crate::value::{date_serial_to_datetime, VBVariant};
 ///   5 (invalid procedure call)
 /// - results outside the Long range raise error 6 (overflow)
 pub fn date_diff(
-    interval: &VBVariant,
-    date1: &VBVariant,
-    date2: &VBVariant,
-    first_day_of_week: Option<&VBVariant>,
-    first_week_of_year: Option<&VBVariant>,
+    interval: &VBString,
+    date1: &VBDate,
+    date2: &VBDate,
+    first_day_of_week: Option<&VBLong>,
+    first_week_of_year: Option<&VBLong>,
 ) -> VBResult<VBVariant> {
     if let Some(v) = first_week_of_year {
-        let n = v.as_i32()?;
+        let n = v.as_i32();
         if !(0..=3).contains(&n) {
             return Err(VBError::invalid_procedure_call());
         }
     }
 
-    let interval = interval.as_string()?.to_ascii_lowercase();
-    let serial1 = date1.as_date_serial()?;
-    let serial2 = date2.as_date_serial()?;
+    let interval = interval.as_str().to_ascii_lowercase();
+    let serial1 = date1.as_f64();
+    let serial2 = date2.as_f64();
     let fdow = first_day(first_day_of_week)?;
 
     let result = match interval.as_str() {
@@ -650,11 +651,11 @@ fn week_diff(serial1: f64, serial2: f64, fdow: i64) -> VBResult<i32> {
 }
 
 /// The `firstdayofweek` constant as a day-serial modulo offset.
-fn first_day(first_day_of_week: Option<&VBVariant>) -> VBResult<i64> {
+fn first_day(first_day_of_week: Option<&VBLong>) -> VBResult<i64> {
     match first_day_of_week {
         None => Ok(1),
         Some(v) => {
-            let n = v.as_i32()?;
+            let n = v.as_i32();
             match n {
                 0 | 1 => Ok(1),
                 2..=7 => Ok(n as i64),
@@ -677,13 +678,13 @@ fn to_long(v: f64) -> VBResult<i32> {
 mod tests {
     use super::date_diff;
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBDate, VBLong, VBString, VBVariant};
 
     fn diff(interval: &str, date1: &str, date2: &str) -> i32 {
         let result = date_diff(
-            &VBVariant::from_string(interval),
-            &VBVariant::from_string(date1),
-            &VBVariant::from_string(date2),
+            &VBString::from(interval),
+            &VBDate::try_from(&VBVariant::from_string(date1)).unwrap(),
+            &VBDate::try_from(&VBVariant::from_string(date2)).unwrap(),
             None,
             None,
         )
@@ -696,10 +697,10 @@ mod tests {
 
     fn diff_fdow(interval: &str, date1: &str, date2: &str, fdow: i32) -> i32 {
         let result = date_diff(
-            &VBVariant::from_string(interval),
-            &VBVariant::from_string(date1),
-            &VBVariant::from_string(date2),
-            Some(&VBVariant::from_long(fdow)),
+            &VBString::from(interval),
+            &VBDate::try_from(&VBVariant::from_string(date1)).unwrap(),
+            &VBDate::try_from(&VBVariant::from_string(date2)).unwrap(),
+            Some(&VBLong::from(fdow)),
             None,
         )
         .unwrap();
@@ -797,11 +798,11 @@ mod tests {
     #[test]
     fn first_week_of_year_is_validated() {
         let result = date_diff(
-            &VBVariant::from_string("d"),
-            &VBVariant::from_string("1/1/2025"),
-            &VBVariant::from_string("1/2/2025"),
+            &VBString::from("d"),
+            &VBDate::try_from(&VBVariant::from_string("1/1/2025")).unwrap(),
+            &VBDate::try_from(&VBVariant::from_string("1/2/2025")).unwrap(),
             None,
-            Some(&VBVariant::from_long(3)),
+            Some(&VBLong::from(3)),
         )
         .unwrap();
         let VBVariant::Long(n) = result else {
@@ -810,11 +811,11 @@ mod tests {
         assert_eq!(n, 1);
 
         let err = date_diff(
-            &VBVariant::from_string("d"),
-            &VBVariant::from_string("1/1/2025"),
-            &VBVariant::from_string("1/2/2025"),
+            &VBString::from("d"),
+            &VBDate::try_from(&VBVariant::from_string("1/1/2025")).unwrap(),
+            &VBDate::try_from(&VBVariant::from_string("1/2/2025")).unwrap(),
             None,
-            Some(&VBVariant::from_long(9)),
+            Some(&VBLong::from(9)),
         )
         .unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
@@ -823,10 +824,10 @@ mod tests {
     #[test]
     fn invalid_first_day_of_week_is_error_5() {
         let err = date_diff(
-            &VBVariant::from_string("d"),
-            &VBVariant::from_string("1/1/2025"),
-            &VBVariant::from_string("1/2/2025"),
-            Some(&VBVariant::from_long(9)),
+            &VBString::from("d"),
+            &VBDate::try_from(&VBVariant::from_string("1/1/2025")).unwrap(),
+            &VBDate::try_from(&VBVariant::from_string("1/2/2025")).unwrap(),
+            Some(&VBLong::from(9)),
             None,
         )
         .unwrap_err();
@@ -834,24 +835,11 @@ mod tests {
     }
 
     #[test]
-    fn null_date_is_error_94() {
-        let err = date_diff(
-            &VBVariant::from_string("d"),
-            &VBVariant::Null,
-            &VBVariant::from_string("1/2/2025"),
-            None,
-            None,
-        )
-        .unwrap_err();
-        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
-    }
-
-    #[test]
     fn invalid_interval_is_error_5() {
         let err = date_diff(
-            &VBVariant::from_string("bogus"),
-            &VBVariant::from_string("1/1/2025"),
-            &VBVariant::from_string("1/2/2025"),
+            &VBString::from("bogus"),
+            &VBDate::try_from(&VBVariant::from_string("1/1/2025")).unwrap(),
+            &VBDate::try_from(&VBVariant::from_string("1/2/2025")).unwrap(),
             None,
             None,
         )
@@ -861,23 +849,28 @@ mod tests {
 
     #[test]
     fn non_date_parameter_is_error_13() {
-        let err = date_diff(
-            &VBVariant::from_string("d"),
-            &VBVariant::from_string("not a date"),
-            &VBVariant::from_string("1/2/2025"),
+        let err = VBDate::try_from(&VBVariant::from_string("not a date")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+
+        let result = date_diff(
+            &VBString::from("d"),
+            &VBDate::try_from(&VBVariant::from_string("1/1/2025")).unwrap(),
+            &VBDate::try_from(&VBVariant::from_string("1/2/2025")).unwrap(),
             None,
             None,
         )
-        .unwrap_err();
-        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+        .unwrap();
+        let VBVariant::Long(_) = result else {
+            panic!("expected a Long variant");
+        };
     }
 
     #[test]
     fn result_outside_long_range_is_overflow() {
         let err = date_diff(
-            &VBVariant::from_string("s"),
-            &VBVariant::from_string("1/1/2025"),
-            &VBVariant::from_string("1/1/9999"),
+            &VBString::from("s"),
+            &VBDate::try_from(&VBVariant::from_string("1/1/2025")).unwrap(),
+            &VBDate::try_from(&VBVariant::from_string("1/1/9999")).unwrap(),
             None,
             None,
         )

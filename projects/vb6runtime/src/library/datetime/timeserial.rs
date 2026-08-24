@@ -501,7 +501,7 @@
 //! - Normalization may produce unexpected results if not understood
 
 use crate::error::VBResult;
-use crate::value::VBVariant;
+use crate::value::{VBLong, VBVariant};
 
 /// Implementation of the `TimeSerial` function.
 ///
@@ -512,14 +512,10 @@ use crate::value::VBVariant;
 /// - the date portion is always midnight of 12/30/1899 (serial 0)
 /// - non-numeric arguments raise error 13 (type mismatch); `Null` raises
 ///   error 94 (invalid use of Null)
-pub fn time_serial(
-    hour: &VBVariant,
-    minute: &VBVariant,
-    second: &VBVariant,
-) -> VBResult<VBVariant> {
-    let hour = hour.as_i32()?;
-    let minute = minute.as_i32()?;
-    let second = second.as_i32()?;
+pub fn time_serial(hour: &VBLong, minute: &VBLong, second: &VBLong) -> VBResult<VBVariant> {
+    let hour = hour.as_i32();
+    let minute = minute.as_i32();
+    let second = second.as_i32();
 
     let total_seconds = hour as i64 * 3_600 + minute as i64 * 60 + second as i64;
     let serial = total_seconds.rem_euclid(86_400) as f64 / 86_400.0;
@@ -530,15 +526,11 @@ pub fn time_serial(
 mod tests {
     use super::time_serial;
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBLong, VBVariant};
+    use std::convert::TryFrom;
 
     fn ts(h: i32, m: i32, s: i32) -> f64 {
-        let result = time_serial(
-            &VBVariant::from_long(h),
-            &VBVariant::from_long(m),
-            &VBVariant::from_long(s),
-        )
-        .unwrap();
+        let result = time_serial(&VBLong::from(h), &VBLong::from(m), &VBLong::from(s)).unwrap();
         let VBVariant::Date(serial) = result else {
             panic!("expected a Date variant");
         };
@@ -595,23 +587,13 @@ mod tests {
 
     #[test]
     fn non_numeric_argument_is_error_13() {
-        let err = time_serial(
-            &VBVariant::from_string("abc"),
-            &VBVariant::from_long(0),
-            &VBVariant::from_long(0),
-        )
-        .unwrap_err();
+        let err = VBLong::try_from(&VBVariant::from_string("abc")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 
     #[test]
     fn null_argument_is_error_94() {
-        let err = time_serial(
-            &VBVariant::Null,
-            &VBVariant::from_long(0),
-            &VBVariant::from_long(0),
-        )
-        .unwrap_err();
+        let err = VBLong::try_from(&VBVariant::Null).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
     }
 }

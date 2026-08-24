@@ -62,10 +62,12 @@ def parse_registry():
                     if bm.group(1) not in NON_TARGET_CALLEES:
                         target = bm.group(1)
                         break
-            # Detect `propstring` kinds inside THIS entry's declared
+            # Detect `prop*` kinds inside THIS entry's declared
             # parameter list only (cut at the next registry entry).
             head = re.split(r"(?:typed_)?builtin!\(", tail, maxsplit=2)[0]
-            propagating_kind = "propstring" in head or "propdouble" in head
+            propagating_kind = any(
+                k in head for k in ("propstring", "propdouble", "propdate")
+            )
             entries.append((category, name, mn, mx, target, propagating_kind))
     return entries
 

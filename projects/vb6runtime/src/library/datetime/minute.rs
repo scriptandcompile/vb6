@@ -699,7 +699,7 @@
 //! - `Format`: Formats date/time as string
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBVariant};
+use crate::value::{date_serial_to_datetime, VBDate, VBVariant};
 
 /// Implementation of the `Minute` function.
 ///
@@ -709,11 +709,8 @@ use crate::value::{date_serial_to_datetime, VBVariant};
 /// - the result is an `Integer` from 0 (start of the hour) to 59
 /// - a value that cannot be interpreted as a date raises error 13 (type
 ///   mismatch)
-pub fn minute(time: &VBVariant) -> VBResult<VBVariant> {
-    if time.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    let serial = time.as_date_serial()?;
+pub fn minute(time: &VBDate) -> VBResult<VBVariant> {
+    let serial = time.as_f64();
     let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
     Ok(VBVariant::from_integer(dt.minute() as i16))
 }
@@ -722,10 +719,11 @@ pub fn minute(time: &VBVariant) -> VBResult<VBVariant> {
 mod tests {
     use super::minute;
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBDate, VBVariant};
+    use std::convert::TryFrom;
 
     fn m(input: &VBVariant) -> i16 {
-        let result = minute(input).unwrap();
+        let result = minute(&VBDate::try_from(input).unwrap()).unwrap();
         let VBVariant::Integer(v) = result else {
             panic!("expected an Integer variant");
         };
@@ -767,13 +765,8 @@ mod tests {
     }
 
     #[test]
-    fn null_returns_null() {
-        assert_eq!(minute(&VBVariant::Null).unwrap(), VBVariant::Null);
-    }
-
-    #[test]
     fn non_date_value_is_error_13() {
-        let err = minute(&VBVariant::from_string("hello")).unwrap_err();
+        let err = VBDate::try_from(&VBVariant::from_string("hello")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 }

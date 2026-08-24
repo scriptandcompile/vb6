@@ -562,7 +562,7 @@
 //! - `Hour`, `Minute`, `Second`: Extract time components
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBVariant};
+use crate::value::{date_serial_to_datetime, VBDate, VBVariant};
 
 /// Implementation of the `Day` function.
 ///
@@ -573,11 +573,8 @@ use crate::value::{date_serial_to_datetime, VBVariant};
 /// - the result is an `Integer` from 1 to 31
 /// - a value that cannot be interpreted as a date raises error 13 (type
 ///   mismatch)
-pub fn day(date: &VBVariant) -> VBResult<VBVariant> {
-    if date.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    let serial = date.as_date_serial()?;
+pub fn day(date: &VBDate) -> VBResult<VBVariant> {
+    let serial = date.as_f64();
     let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
     Ok(VBVariant::from_integer(dt.day() as i16))
 }
@@ -586,10 +583,11 @@ pub fn day(date: &VBVariant) -> VBResult<VBVariant> {
 mod tests {
     use super::day;
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBDate, VBVariant};
+    use std::convert::TryFrom;
 
     fn d(input: &VBVariant) -> i16 {
-        let result = day(input).unwrap();
+        let result = day(&VBDate::try_from(input).unwrap()).unwrap();
         let VBVariant::Integer(v) = result else {
             panic!("expected an Integer variant");
         };
@@ -628,13 +626,8 @@ mod tests {
     }
 
     #[test]
-    fn null_returns_null() {
-        assert_eq!(day(&VBVariant::Null).unwrap(), VBVariant::Null);
-    }
-
-    #[test]
     fn non_date_value_is_error_13() {
-        let err = day(&VBVariant::from_string("hello")).unwrap_err();
+        let err = VBDate::try_from(&VBVariant::from_string("hello")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 }

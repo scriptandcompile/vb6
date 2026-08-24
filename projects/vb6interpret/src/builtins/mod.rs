@@ -87,6 +87,9 @@ macro_rules! builtin {
 /// | `propdouble`  | propagating number | like `string`→`VBDouble`: a `Null`
 ///   argument short-circuits to `Null`; anything else coerces with `CDbl`
 ///   semantics |
+/// | `propdate`    | propagating date   | like `string`→`VBDate`: a `Null`
+///   argument short-circuits to `Null`; anything else coerces with
+///   `as_date_serial` semantics |
 ///
 /// The body receives one binding per declared parameter (in order) and must
 /// produce `VBResult<VBVariant>` (map wrapper returns with `VBVariant::from`).
@@ -105,7 +108,7 @@ macro_rules! typed_builtin {
             name: $name,
             min_args: $min,
             max_args: $max,
-            call: |args: &[::vb6runtime::VBVariant]| -> ::vb6core::error::VBResult<::vb6runtime::VBVariant> {
+            call: |_args: &[::vb6runtime::VBVariant]| -> ::vb6core::error::VBResult<::vb6runtime::VBVariant> {
                 // Left-to-right conversion order (plan A9): one statement per
                 // declared parameter, each converting the argument at the
                 // running index, so the leftmost offending argument errors
@@ -113,7 +116,7 @@ macro_rules! typed_builtin {
                 let mut __arg_index = 0usize;
                 $(
                     let $param =
-                        $crate::__convert_arg!(args, __arg_index, $kind)?;
+                        $crate::__convert_arg!(_args, __arg_index, $kind)?;
                     __arg_index += 1;
                 )*
                 $body
@@ -147,6 +150,12 @@ macro_rules! __convert_arg {
             return Ok(::vb6runtime::VBVariant::Null);
         }
         ::vb6runtime::boundary::arg::<::vb6runtime::value::VBDouble>($args, $index)
+    }};
+    ($args:ident, $index:expr, propdate) => {{
+        if matches!($args.get($index), Some(::vb6runtime::VBVariant::Null)) {
+            return Ok(::vb6runtime::VBVariant::Null);
+        }
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBDate>($args, $index)
     }};
     ($args:ident, $index:expr, long) => {
         ::vb6runtime::boundary::arg::<::vb6runtime::value::VBLong>($args, $index)

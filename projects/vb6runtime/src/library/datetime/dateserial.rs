@@ -543,7 +543,7 @@
 //! - `CDate`: Converts an expression to a Date
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBVariant};
+use crate::value::{date_serial_to_datetime, VBLong, VBVariant};
 
 /// Implementation of the `DateSerial` function.
 ///
@@ -556,10 +556,10 @@ use crate::value::{date_serial_to_datetime, VBVariant};
 /// - a year outside 100-9999 (after the two-digit mapping) raises error 5
 ///   (invalid procedure call); a result outside the supported range raises
 ///   error 6 (overflow); non-numeric arguments raise error 13 (type mismatch)
-pub fn date_serial(year: &VBVariant, month: &VBVariant, day: &VBVariant) -> VBResult<VBVariant> {
-    let year = year.as_i32()?;
-    let month = month.as_i32()?;
-    let day = day.as_i32()?;
+pub fn date_serial(year: &VBLong, month: &VBLong, day: &VBLong) -> VBResult<VBVariant> {
+    let year = year.as_i32();
+    let month = month.as_i32();
+    let day = day.as_i32();
 
     let year = if (0..=99).contains(&year) {
         if year <= 29 {
@@ -606,15 +606,11 @@ fn days_from_civil(y: i64, m: i64, d: i64) -> i64 {
 mod tests {
     use super::date_serial;
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBLong, VBVariant};
+    use std::convert::TryFrom;
 
     fn ds(y: i32, m: i32, d: i32) -> f64 {
-        let result = date_serial(
-            &VBVariant::from_long(y),
-            &VBVariant::from_long(m),
-            &VBVariant::from_long(d),
-        )
-        .unwrap();
+        let result = date_serial(&VBLong::from(y), &VBLong::from(m), &VBLong::from(d)).unwrap();
         let VBVariant::Date(serial) = result else {
             panic!("expected a Date variant");
         };
@@ -680,37 +676,19 @@ mod tests {
 
     #[test]
     fn year_outside_range_is_error_5() {
-        let err = date_serial(
-            &VBVariant::from_long(10_000),
-            &VBVariant::from_long(1),
-            &VBVariant::from_long(1),
-        )
-        .unwrap_err();
+        let err =
+            date_serial(&VBLong::from(10_000), &VBLong::from(1), &VBLong::from(1)).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
-        let err = date_serial(
-            &VBVariant::from_long(-1),
-            &VBVariant::from_long(1),
-            &VBVariant::from_long(1),
-        )
-        .unwrap_err();
+        let err = date_serial(&VBLong::from(-1), &VBLong::from(1), &VBLong::from(1)).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
     }
 
     #[test]
     fn result_outside_range_is_overflow() {
-        let err = date_serial(
-            &VBVariant::from_long(100),
-            &VBVariant::from_long(1),
-            &VBVariant::from_long(0),
-        )
-        .unwrap_err();
+        let err = date_serial(&VBLong::from(100), &VBLong::from(1), &VBLong::from(0)).unwrap_err();
         assert_eq!(err.number, err_number::OVERFLOW);
-        let err = date_serial(
-            &VBVariant::from_long(9999),
-            &VBVariant::from_long(12),
-            &VBVariant::from_long(32),
-        )
-        .unwrap_err();
+        let err =
+            date_serial(&VBLong::from(9999), &VBLong::from(12), &VBLong::from(32)).unwrap_err();
         assert_eq!(err.number, err_number::OVERFLOW);
     }
 
@@ -722,23 +700,13 @@ mod tests {
 
     #[test]
     fn non_numeric_argument_is_error_13() {
-        let err = date_serial(
-            &VBVariant::from_string("abc"),
-            &VBVariant::from_long(1),
-            &VBVariant::from_long(1),
-        )
-        .unwrap_err();
+        let err = VBLong::try_from(&VBVariant::from_string("abc")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 
     #[test]
     fn null_argument_is_error_94() {
-        let err = date_serial(
-            &VBVariant::Null,
-            &VBVariant::from_long(1),
-            &VBVariant::from_long(1),
-        )
-        .unwrap_err();
+        let err = VBLong::try_from(&VBVariant::Null).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
     }
 

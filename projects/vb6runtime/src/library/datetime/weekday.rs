@@ -590,7 +590,7 @@
 
 use super::datepart::{first_day, weekday as weekday_offset};
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBVariant};
+use crate::value::{date_serial_to_datetime, VBDate, VBLong, VBVariant};
 
 /// Implementation of the `Weekday` function.
 ///
@@ -604,12 +604,9 @@ use crate::value::{date_serial_to_datetime, VBVariant};
 ///   any other value raises error 5 (invalid procedure call)
 /// - a value that cannot be interpreted as a date raises error 13 (type
 ///   mismatch)
-pub fn weekday(date: &VBVariant, firstdayofweek: Option<&VBVariant>) -> VBResult<VBVariant> {
-    if date.is_null() {
-        return Ok(VBVariant::Null);
-    }
+pub fn weekday(date: &VBDate, firstdayofweek: Option<&VBLong>) -> VBResult<VBVariant> {
     let fdow = first_day(firstdayofweek)?;
-    let serial = date.as_date_serial()?;
+    let serial = date.as_f64();
     let dt = date_serial_to_datetime(serial).ok_or_else(VBError::type_mismatch)?;
     Ok(VBVariant::from_integer(weekday_offset(&dt, fdow) as i16))
 }
@@ -618,10 +615,12 @@ pub fn weekday(date: &VBVariant, firstdayofweek: Option<&VBVariant>) -> VBResult
 mod tests {
     use super::weekday;
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBDate, VBLong, VBVariant};
+    use std::convert::TryFrom;
 
     fn w(input: &VBVariant, fdow: Option<&VBVariant>) -> i16 {
-        let result = weekday(input, fdow).unwrap();
+        let fdow = fdow.map(|v| VBLong::try_from(v).unwrap());
+        let result = weekday(&VBDate::try_from(input).unwrap(), fdow.as_ref()).unwrap();
         let VBVariant::Integer(v) = result else {
             panic!("expected an Integer variant");
         };
@@ -688,24 +687,16 @@ mod tests {
     }
 
     #[test]
-    fn null_returns_null() {
-        assert_eq!(weekday(&VBVariant::Null, None).unwrap(), VBVariant::Null);
-    }
-
-    #[test]
     fn non_date_value_is_error_13() {
-        let err = weekday(&VBVariant::from_string("hello"), None).unwrap_err();
+        let err = VBDate::try_from(&VBVariant::from_string("hello")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 
     #[test]
     fn invalid_first_day_of_week_is_error_5() {
         for fdow in [8, -1] {
-            let err = weekday(
-                &VBVariant::from_date_serial(45_672.0),
-                Some(&VBVariant::from_integer(fdow)),
-            )
-            .unwrap_err();
+            let err =
+                weekday(&VBDate::from(45_672.0), Some(VBLong::from(fdow)).as_ref()).unwrap_err();
             assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
         }
     }

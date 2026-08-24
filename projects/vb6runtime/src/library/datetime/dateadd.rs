@@ -506,7 +506,7 @@
 //! - `Time`: Returns current time
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBVariant};
+use crate::value::{date_serial_to_datetime, VBDate, VBDouble, VBString, VBVariant};
 
 /// Implementation of the `DateAdd` function.
 ///
@@ -519,14 +519,10 @@ use crate::value::{date_serial_to_datetime, VBVariant};
 /// - the time portion is preserved for month/quarter/year additions
 /// - results outside the 100-9999 AD range raise error 6 (overflow)
 /// - an unknown interval raises error 5 (invalid procedure call)
-pub fn date_add(interval: &VBVariant, number: &VBVariant, date: &VBVariant) -> VBResult<VBVariant> {
-    if interval.is_null() || number.is_null() || date.is_null() {
-        return Ok(VBVariant::Null);
-    }
-
-    let interval = interval.as_string()?.to_ascii_lowercase();
-    let number = number.as_f64()?;
-    let serial = date.as_date_serial()?;
+pub fn date_add(interval: &VBString, number: &VBDouble, date: &VBDate) -> VBResult<VBVariant> {
+    let interval = interval.as_str().to_ascii_lowercase();
+    let number = number.as_f64();
+    let serial = date.as_f64();
 
     let result = match interval.as_str() {
         "yyyy" => add_months(serial, number * 12.0)?,
@@ -599,13 +595,13 @@ fn validated(serial: f64) -> VBResult<f64> {
 mod tests {
     use super::date_add;
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBDate, VBDouble, VBString, VBVariant};
 
     fn add(interval: &str, number: f64, date: &str) -> f64 {
         let result = date_add(
-            &VBVariant::from_string(interval),
-            &VBVariant::from_double(number),
-            &VBVariant::from_string(date),
+            &VBString::from(interval),
+            &VBDouble::from(number),
+            &VBDate::try_from(&VBVariant::from_string(date)).unwrap(),
         )
         .unwrap();
         let VBVariant::Date(serial) = result else {
@@ -721,36 +717,11 @@ mod tests {
     }
 
     #[test]
-    fn null_parameter_returns_null() {
-        let result = date_add(
-            &VBVariant::Null,
-            &VBVariant::from_double(1.0),
-            &VBVariant::from_string("1/15/2025"),
-        )
-        .unwrap();
-        assert!(result.is_null());
-        let result = date_add(
-            &VBVariant::from_string("d"),
-            &VBVariant::Null,
-            &VBVariant::from_string("1/15/2025"),
-        )
-        .unwrap();
-        assert!(result.is_null());
-        let result = date_add(
-            &VBVariant::from_string("d"),
-            &VBVariant::from_double(1.0),
-            &VBVariant::Null,
-        )
-        .unwrap();
-        assert!(result.is_null());
-    }
-
-    #[test]
     fn invalid_interval_is_error_5() {
         let err = date_add(
-            &VBVariant::from_string("bogus"),
-            &VBVariant::from_double(1.0),
-            &VBVariant::from_string("1/15/2025"),
+            &VBString::from("bogus"),
+            &VBDouble::from(1.0),
+            &VBDate::try_from(&VBVariant::from_string("1/15/2025")).unwrap(),
         )
         .unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
@@ -759,9 +730,9 @@ mod tests {
     #[test]
     fn out_of_range_result_is_overflow() {
         let err = date_add(
-            &VBVariant::from_string("yyyy"),
-            &VBVariant::from_double(10_000.0),
-            &VBVariant::from_string("1/15/2025"),
+            &VBString::from("yyyy"),
+            &VBDouble::from(10_000.0),
+            &VBDate::try_from(&VBVariant::from_string("1/15/2025")).unwrap(),
         )
         .unwrap_err();
         assert_eq!(err.number, err_number::OVERFLOW);

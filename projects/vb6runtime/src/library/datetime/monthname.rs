@@ -602,7 +602,7 @@
 //! working with date formatting and display operations requiring localized month names.
 
 use crate::error::{VBError, VBResult};
-use crate::value::{VBString, VBVariant};
+use crate::value::{VBBoolean, VBLong, VBString};
 
 const FULL_NAMES: [&str; 12] = [
     "January",
@@ -630,15 +630,12 @@ const ABBREVIATED_NAMES: [&str; 12] = [
 /// - the `abbreviate` argument is optional and defaults to False (full name)
 /// - a non-numeric month raises error 13 (type mismatch); `Null` raises
 ///   error 94 (invalid use of Null)
-pub fn month_name(month: &VBVariant, abbreviate: Option<&VBVariant>) -> VBResult<VBString> {
-    let month = month.as_i32()?;
+pub fn month_name(month: &VBLong, abbreviate: Option<&VBBoolean>) -> VBResult<VBString> {
+    let month = month.as_i32();
     if !(1..=12).contains(&month) {
         return Err(VBError::invalid_procedure_call());
     }
-    let abbreviate = match abbreviate {
-        None => false,
-        Some(v) => v.as_bool()?,
-    };
+    let abbreviate = abbreviate.is_some_and(|v| v.as_bool());
     let index = (month - 1) as usize;
     let name = if abbreviate {
         ABBREVIATED_NAMES[index]
@@ -652,17 +649,24 @@ pub fn month_name(month: &VBVariant, abbreviate: Option<&VBVariant>) -> VBResult
 mod tests {
     use super::{month_name, ABBREVIATED_NAMES, FULL_NAMES};
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBBoolean, VBLong, VBVariant};
+    use std::convert::TryFrom;
 
     fn n(input: &VBVariant) -> String {
-        month_name(input, None).unwrap().as_str().to_string()
-    }
-
-    fn na(input: &VBVariant, abbreviate: &VBVariant) -> String {
-        month_name(input, Some(abbreviate))
+        month_name(&VBLong::try_from(input).unwrap(), None)
             .unwrap()
             .as_str()
             .to_string()
+    }
+
+    fn na(input: &VBVariant, abbreviate: &VBVariant) -> String {
+        month_name(
+            &VBLong::try_from(input).unwrap(),
+            Some(&VBBoolean::try_from(abbreviate).unwrap()),
+        )
+        .unwrap()
+        .as_str()
+        .to_string()
     }
 
     #[test]
@@ -721,26 +725,26 @@ mod tests {
     #[test]
     fn month_out_of_range_is_error_5() {
         for bad in [0, -1, 13] {
-            let err = month_name(&VBVariant::from_long(bad), None).unwrap_err();
+            let err = month_name(&VBLong::from(bad), None).unwrap_err();
             assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
         }
     }
 
     #[test]
     fn null_month_is_error_94() {
-        let err = month_name(&VBVariant::Null, None).unwrap_err();
+        let err = VBLong::try_from(&VBVariant::Null).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
     }
 
     #[test]
     fn non_numeric_month_is_error_13() {
-        let err = month_name(&VBVariant::from_string("abc"), None).unwrap_err();
+        let err = VBLong::try_from(&VBVariant::from_string("abc")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 
     #[test]
     fn returns_vbstring() {
-        let result = month_name(&VBVariant::from_long(12), None).unwrap();
+        let result = month_name(&VBLong::from(12), None).unwrap();
         assert_eq!(result.as_str(), "December");
     }
 }
