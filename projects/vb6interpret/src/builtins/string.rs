@@ -177,9 +177,8 @@ pub(super) fn register(registry: &mut Registry) {
     );
     registry.insert(typed_builtin!("str", 1, 1, (number: variant),
         strfn::str(number)));
-    registry.insert(builtin!("str$", 1, 1, |args| {
-        strfn::str_dollar(&args[0]).map(VBVariant::from)
-    }));
+    registry.insert(typed_builtin!("str$", 1, 1, (number: variant),
+        strfn::str_dollar(number).map(VBVariant::from)));
     registry.insert(
         typed_builtin!("string", 2, 2, (number: long, character: variant),
         strfn::string_function(&number, character)),
