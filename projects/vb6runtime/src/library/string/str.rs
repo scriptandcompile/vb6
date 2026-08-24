@@ -585,9 +585,6 @@ use super::str_dollar::str_dollar;
 /// Returns error 13 (`Type mismatch`) when `number` is a non-numeric string or
 /// an object.
 pub fn str(number: &VBVariant) -> VBResult<VBVariant> {
-    if number.is_null() {
-        return Ok(VBVariant::Null);
-    }
     str_dollar(number).map(VBVariant::from)
 }
 
@@ -605,10 +602,5 @@ mod tests {
             str(&VBVariant::Long(-456)).unwrap(),
             VBVariant::from_string("-456")
         );
-    }
-
-    #[test]
-    fn propagates_null() {
-        assert_eq!(str(&VBVariant::Null).unwrap(), VBVariant::Null);
     }
 }

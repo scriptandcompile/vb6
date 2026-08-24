@@ -175,7 +175,8 @@ pub(super) fn register(registry: &mut Registry) {
         typed_builtin!("midb$", 2, 3, (input: string, start: long, length: opt_long),
         strfn::midb_dollar(&input, &start, length.as_ref()).map(VBVariant::from)),
     );
-    registry.insert(builtin!("str", 1, 1, |args| { strfn::str(&args[0]) }));
+    registry.insert(typed_builtin!("str", 1, 1, (number: variant),
+        strfn::str(number)));
     registry.insert(builtin!("str$", 1, 1, |args| {
         strfn::str_dollar(&args[0]).map(VBVariant::from)
     }));
