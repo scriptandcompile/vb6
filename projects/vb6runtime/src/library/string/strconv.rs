@@ -612,7 +612,7 @@
 use super::strconv_dollar;
 use crate::{
     error::VBResult,
-    value::{VBLong, VBVariant},
+    value::{VBLong, VBString, VBVariant},
 };
 
 /// Converts a string to the format specified by `conversion`.
@@ -625,14 +625,11 @@ use crate::{
 /// Returns error 5 (`Invalid procedure call or argument`) when `conversion` is
 /// not one of the supported values.
 pub fn strconv(
-    string: &VBVariant,
+    string: &VBString,
     conversion: &VBLong,
     lcid: Option<&VBLong>,
 ) -> VBResult<VBVariant> {
-    if string.is_null() {
-        return Ok(VBVariant::Null);
-    }
-    strconv_dollar(&string.as_vbstring()?, conversion, lcid).map(VBVariant::from)
+    strconv_dollar(string, conversion, lcid).map(VBVariant::from)
 }
 
 #[cfg(test)]
@@ -643,21 +640,11 @@ mod tests {
     #[test]
     fn upper_and_lower_case() {
         assert_eq!(
-            strconv(
-                &VBVariant::from_string("Hello World"),
-                &VBLong::from(1),
-                None
-            )
-            .unwrap(),
+            strconv(&VBString::from("Hello World"), &VBLong::from(1), None).unwrap(),
             VBVariant::from_string("HELLO WORLD")
         );
         assert_eq!(
-            strconv(
-                &VBVariant::from_string("Hello World"),
-                &VBLong::from(2),
-                None
-            )
-            .unwrap(),
+            strconv(&VBString::from("Hello World"), &VBLong::from(2), None).unwrap(),
             VBVariant::from_string("hello world")
         );
     }
@@ -665,21 +652,11 @@ mod tests {
     #[test]
     fn proper_case_capitalizes_words() {
         assert_eq!(
-            strconv(
-                &VBVariant::from_string("HELLO MY FRIEND"),
-                &VBLong::from(3),
-                None
-            )
-            .unwrap(),
+            strconv(&VBString::from("HELLO MY FRIEND"), &VBLong::from(3), None).unwrap(),
             VBVariant::from_string("Hello My Friend")
         );
         assert_eq!(
-            strconv(
-                &VBVariant::from_string("hello-world"),
-                &VBLong::from(3),
-                None
-            )
-            .unwrap(),
+            strconv(&VBString::from("hello-world"), &VBLong::from(3), None).unwrap(),
             VBVariant::from_string("Hello-World")
         );
     }
@@ -687,18 +664,10 @@ mod tests {
     #[test]
     fn unsupported_conversion_errors() {
         assert_eq!(
-            strconv(&VBVariant::from_string("x"), &VBLong::from(64), None)
+            strconv(&VBString::from("x"), &VBLong::from(64), None)
                 .unwrap_err()
                 .number,
             err_number::INVALID_PROCEDURE_CALL
-        );
-    }
-
-    #[test]
-    fn null_propagation() {
-        assert_eq!(
-            strconv(&VBVariant::Null, &VBLong::from(1), None).unwrap(),
-            VBVariant::Null
         );
     }
 }

@@ -190,11 +190,10 @@ pub(super) fn register(registry: &mut Registry) {
     registry.insert(typed_builtin!("strcomp", 2, 3,
         (string1: string, string2: string, compare: opt_long),
         strfn::strcomp(&string1, &string2, compare.as_ref()).map(VBVariant::from)));
-    registry.insert(builtin!("strconv", 2, 3, |args| {
-        let conversion = VBLong::try_from(&args[1])?;
-        let lcid = args.get(2).map(VBLong::try_from).transpose()?;
-        strfn::strconv(&args[0], &conversion, lcid.as_ref())
-    }));
+    registry.insert(
+        typed_builtin!("strconv", 2, 3, (input: string, conversion: long, lcid: opt_long),
+        strfn::strconv(&input, &conversion, lcid.as_ref())),
+    );
     registry.insert(typed_builtin!("strconv$", 2, 3,
         (input: string, conversion: long, lcid: opt_long),
         strfn::strconv_dollar(&input, &conversion, lcid.as_ref()).map(VBVariant::from)));
