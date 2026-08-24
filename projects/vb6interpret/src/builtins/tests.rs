@@ -671,6 +671,43 @@ fn conversion_functions_dispatch() {
 }
 
 #[test]
+fn hex_oct_keep_variant_semantics() {
+    // Type-aware bit widths require the raw variant (Integer -> u16,
+    // Long -> u32); a typed Double parameter would erase the distinction.
+    assert_eq!(
+        call_builtin("Hex", &[VBVariant::Integer(-2)]).unwrap(),
+        VBVariant::from_string("FFFE")
+    );
+    assert_eq!(
+        call_builtin("Hex", &[VBVariant::Long(-2)]).unwrap(),
+        VBVariant::from_string("FFFFFFFE")
+    );
+    // Fractional arguments round half-to-even before formatting.
+    assert_eq!(
+        call_builtin("Hex", &[VBVariant::from_double(2.5)]).unwrap(),
+        VBVariant::from_string("2")
+    );
+    assert_eq!(
+        call_builtin("Hex", &[VBVariant::from_double(3.5)]).unwrap(),
+        VBVariant::from_string("4")
+    );
+    // Null propagation for the Variant-returning forms, 94 for `$` forms.
+    assert_eq!(
+        call_builtin("Hex", &[VBVariant::Null]).unwrap(),
+        VBVariant::Null
+    );
+    let err = call_builtin("Hex$", &[VBVariant::Null]).unwrap_err();
+    assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
+    // CVErr re-raise survives the boundary passthrough.
+    let err = call_builtin(
+        "Hex",
+        &[VBVariant::from_error(vb6core::error::VBError::new(7))],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, 7);
+}
+
+#[test]
 fn objects_functions_dispatch() {
     assert_eq!(
         call_builtin("TypeName", &[VBVariant::from_integer(-5)]).unwrap(),
