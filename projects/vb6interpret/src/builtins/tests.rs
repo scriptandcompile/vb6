@@ -135,6 +135,59 @@ fn abs_preserves_argument_type() {
 }
 
 #[test]
+fn logic_functions_propagate_null_at_the_boundary() {
+    // Logic functions propagate through their prop* kinds: IIf's condition
+    // and Choose's index short-circuit to Null before coercion, while the
+    // parts/choices stay untyped passthroughs.
+    let result = call_builtin(
+        "IIf",
+        &[
+            VBVariant::Null,
+            VBVariant::from_long(1),
+            VBVariant::from_long(2),
+        ],
+    );
+    assert_eq!(result.unwrap(), VBVariant::Null);
+    let result = call_builtin("Choose", &[VBVariant::Null, VBVariant::from_string("a")]);
+    assert_eq!(result.unwrap(), VBVariant::Null);
+    // The parts are returned unchanged even when they are Null themselves.
+    let result = call_builtin(
+        "IIf",
+        &[
+            VBVariant::Boolean(true),
+            VBVariant::Null,
+            VBVariant::from_long(2),
+        ],
+    );
+    assert_eq!(result.unwrap(), VBVariant::Null);
+    // Switch keeps its raw slice and stops at the first True condition, so
+    // a Null condition in a later (unevaluated) pair never surfaces.
+    let result = call_builtin(
+        "Switch",
+        &[
+            VBVariant::Boolean(false),
+            VBVariant::from_string("no"),
+            VBVariant::Boolean(true),
+            VBVariant::from_string("yes"),
+            VBVariant::Null,
+            VBVariant::from_string("skipped"),
+        ],
+    );
+    assert_eq!(result.unwrap(), VBVariant::from_string("yes"));
+    // An evaluated Null condition returns Null immediately.
+    let result = call_builtin(
+        "Switch",
+        &[
+            VBVariant::Boolean(false),
+            VBVariant::from_string("no"),
+            VBVariant::Null,
+            VBVariant::from_string("skipped"),
+        ],
+    );
+    assert_eq!(result.unwrap(), VBVariant::Null);
+}
+
+#[test]
 fn datetime_functions_propagate_null_at_the_boundary() {
     // Extractors document "If date contains Null, Null is returned" —
     // `propdate` short-circuits before the typed runtime sees the value.

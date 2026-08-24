@@ -16,7 +16,8 @@ PREDICATES = {
     "isarray", "isdate", "isempty", "iserror", "ismissing", "isnull",
     "isnumeric", "isobject", "typename", "vartype",
 }
-STRUCTURAL_PARAM_NAMES = {"sourcearray", "values", "choices", "valuearray", "array"}
+STRUCTURAL_PARAM_NAMES = {"sourcearray", "values", "choices", "valuearray", "array",
+                          "arguments"}
 # Names that appear as plain calls inside adapters but are not runtime targets.
 NON_TARGET_CALLEES = {
     "map", "ok_or_else", "unwrap_or_else", "with_description", "expect",
@@ -46,8 +47,12 @@ def parse_registry():
         m = re.search(r"use vb6runtime::library::\w+ as (\w+);", text)
         if m:
             alias = m.group(1)
-        for m in re.finditer(r'(?:typed_)?builtin!\(\s*"([^"]+)",\s*(\d+),\s*(\d+)', text):
-            name, mn, mx = m.group(1), int(m.group(2)), int(m.group(3))
+        for m in re.finditer(
+            r'(?:typed_)?builtin!\(\s*"([^"]+)",\s*([\d]+|usize::MAX),\s*([\d]+|usize::MAX)', text
+        ):
+            name = m.group(1)
+            mn, mx = m.group(2), m.group(3)
+            mx = "∞" if mx == "usize::MAX" else mx
             tail = text[m.end():m.end() + 2500]
             target = None
             if alias:
@@ -66,7 +71,8 @@ def parse_registry():
             # parameter list only (cut at the next registry entry).
             head = re.split(r"(?:typed_)?builtin!\(", tail, maxsplit=2)[0]
             propagating_kind = any(
-                k in head for k in ("propstring", "propdouble", "propdate")
+                k in head
+                for k in ("propstring", "propdouble", "propdate", "propboolean", "proplong")
             )
             entries.append((category, name, mn, mx, target, propagating_kind))
     return entries

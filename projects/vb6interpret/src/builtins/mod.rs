@@ -90,6 +90,15 @@ macro_rules! builtin {
 /// | `propdate`    | propagating date   | like `string`→`VBDate`: a `Null`
 ///   argument short-circuits to `Null`; anything else coerces with
 ///   `as_date_serial` semantics |
+/// | `propboolean` | propagating bool   | like `string`→`VBBoolean`: a `Null`
+///   argument short-circuits to `Null`; anything else coerces with `CBool`
+///   semantics |
+/// | `proplong`    | propagating long   | like `string`→`VBLong`: a `Null`
+///   argument short-circuits to `Null`; anything else coerces with `CLng`
+///   semantics |
+///
+/// A trailing `rest $name: variants` clause (after the parameter tuple)
+/// binds the remaining arguments as `&[VBVariant]` for variadic functions.
 ///
 /// The body receives one binding per declared parameter (in order) and must
 /// produce `VBResult<VBVariant>` (map wrapper returns with `VBVariant::from`).
@@ -119,6 +128,29 @@ macro_rules! typed_builtin {
                         $crate::__convert_arg!(_args, __arg_index, $kind)?;
                     __arg_index += 1;
                 )*
+                $body
+            },
+        }
+    };
+    // Variadic-tail form: after the fixed parameters, `rest $name: variants`
+    // binds every remaining argument as an unconverted slice (for functions
+    // like Switch whose evaluation semantics walk the raw argument list).
+    ($name:literal, $min:expr, $max:expr,
+     ($($param:ident : $kind:ident),* $(,)?),
+     rest $rest:ident : variants,
+     $body:expr) => {
+        Builtin {
+            name: $name,
+            min_args: $min,
+            max_args: $max,
+            call: |_args: &[::vb6runtime::VBVariant]| -> ::vb6core::error::VBResult<::vb6runtime::VBVariant> {
+                let mut __arg_index = 0usize;
+                $(
+                    let $param =
+                        $crate::__convert_arg!(_args, __arg_index, $kind)?;
+                    __arg_index += 1;
+                )*
+                let $rest = &_args[__arg_index..];
                 $body
             },
         }
@@ -156,6 +188,18 @@ macro_rules! __convert_arg {
             return Ok(::vb6runtime::VBVariant::Null);
         }
         ::vb6runtime::boundary::arg::<::vb6runtime::value::VBDate>($args, $index)
+    }};
+    ($args:ident, $index:expr, propboolean) => {{
+        if matches!($args.get($index), Some(::vb6runtime::VBVariant::Null)) {
+            return Ok(::vb6runtime::VBVariant::Null);
+        }
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBBoolean>($args, $index)
+    }};
+    ($args:ident, $index:expr, proplong) => {{
+        if matches!($args.get($index), Some(::vb6runtime::VBVariant::Null)) {
+            return Ok(::vb6runtime::VBVariant::Null);
+        }
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBLong>($args, $index)
     }};
     ($args:ident, $index:expr, long) => {
         ::vb6runtime::boundary::arg::<::vb6runtime::value::VBLong>($args, $index)

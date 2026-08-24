@@ -25,6 +25,7 @@ Classes:
 
 | Function | Arity | Runtime signature | Class | Null |
 |---|---|---|---|---|
+| `array` | 0..∞ | `fn(elements: &[VBVariant]) -> VBVariant` | typed | raises 94 |
 | `filter` | 2..4 | `fn(sourcearray: &VBVariant, match_string: &str, include: Option<bool>, compare: Option<i32>) -> VBResult<VBVariant>` | structural | propagates Null |
 | `join` | 1..2 | `fn(sourcearray: &VBVariant, delimiter: Option<&str>) -> VBResult<String>` | structural | propagates Null |
 | `lbound` | 1..2 | `fn(array: &VBVariant, dimension: Option<i32>) -> VBResult<VBVariant>` | structural | propagates Null |
@@ -149,7 +150,9 @@ Classes:
 
 | Function | Arity | Runtime signature | Class | Null |
 |---|---|---|---|---|
-| `iif` | 3..3 | `fn(condition: &VBVariant, truepart: &VBVariant, falsepart: &VBVariant) -> VBResult<VBVariant>` | structural | propagates Null |
+| `choose` | 2..∞ | `fn(index: &VBLong, choices: &[VBVariant]) -> VBResult<VBVariant>` | structural | propagates Null (dispatch) |
+| `iif` | 3..3 | `fn(condition: &VBBoolean, truepart: &VBVariant, falsepart: &VBVariant) -> VBResult<VBVariant>` | structural | propagates Null (dispatch) |
+| `switch` | 2..∞ | `fn(arguments: &[VBVariant]) -> VBResult<VBVariant>` | structural | propagates Null |
 
 ## `math`
 
