@@ -190,11 +190,11 @@ Classes:
 | `asc` | 1..1 | `fn(input: &VBString) -> VBResult<VBLong>` | typed | raises 94 |
 | `ascb` | 1..1 | `fn(input: &VBString) -> VBResult<VBLong>` | typed | raises 94 |
 | `ascw` | 1..1 | `fn(input: &VBString) -> VBResult<VBLong>` | typed | raises 94 |
-| `chr` | 1..1 | `fn(charcode: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `chr` | 1..1 | `fn(charcode: &VBLong) -> VBResult<VBVariant>` | typed | raises 94 |
 | `chr$` | 1..1 | `fn(charcode: &VBLong) -> VBResult<VBString>` | $-strict | raises 94 |
-| `chrb` | 1..1 | `fn(charcode: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `chrb` | 1..1 | `fn(charcode: &VBLong) -> VBResult<VBVariant>` | typed | raises 94 |
 | `chrb$` | 1..1 | `fn(charcode: &VBLong) -> VBResult<VBString>` | $-strict | raises 94 |
-| `chrw` | 1..1 | `fn(charcode: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `chrw` | 1..1 | `fn(charcode: &VBLong) -> VBResult<VBVariant>` | typed | raises 94 |
 | `chrw$` | 1..1 | `fn(charcode: &VBLong) -> VBResult<VBString>` | $-strict | raises 94 |
 | `format` | 1..4 | `fn(expression: &VBVariant, format: Option<&VBString>, firstdayofweek: Option<&VBLong>, firstweekofyear: Option<&VBLong>) -> VBResult<VBVariant>` | variant-input | propagates Null |
 | `format$` | 1..4 | `fn(expression: &VBVariant, format: Option<&VBString>, firstdayofweek: Option<&VBLong>, firstweekofyear: Option<&VBLong>) -> VBResult<VBString>` | $-strict | raises 94 |
@@ -202,44 +202,44 @@ Classes:
 | `formatdatetime` | 1..2 | `fn(expression: &VBVariant, namedformat: Option<&VBLong>) -> VBResult<VBVariant>` | variant-input | propagates Null |
 | `formatnumber` | 1..5 | `fn(expression: &VBVariant, numdigitsafterdecimal: Option<&VBLong>, includeleadingdigit: Option<&VBLong>, useparensfornegativenumbers: Option<&VBLong>, groupdigits: Option<&VBLong>) -> VBResult<VBVariant>` | variant-input | propagates Null |
 | `formatpercent` | 1..5 | `fn(expression: &VBVariant, numdigitsafterdecimal: Option<&VBLong>, includeleadingdigit: Option<&VBLong>, useparensfornegativenumbers: Option<&VBLong>, groupdigits: Option<&VBLong>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `instr` | 2..4 | `fn(start: Option<&VBLong>, string1: &VBString, string2: &VBString, compare: Option<&VBLong>) -> VBResult<VBLong>` | typed | raises 94 |
+| `instr` | 2..4 | `fn(start: Option<&VBLong>, string1: &VBString, string2: &VBString, compare: Option<&VBLong>) -> VBResult<VBLong>` | typed | propagates Null (dispatch) |
 | `instrrev` | 2..4 | `fn(stringcheck: &VBString, stringmatch: &VBString, start: Option<&VBLong>, compare: Option<&VBLong>) -> VBResult<VBLong>` | typed | raises 94 |
-| `lcase` | 1..1 | `fn(input: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `lcase` | 1..1 | `fn(input: &VBString) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `lcase$` | 1..1 | `fn(input: &VBString) -> VBResult<VBString>` | $-strict | raises 94 |
-| `left` | 2..2 | `fn(input: &VBVariant, length: &VBLong) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `left` | 2..2 | `fn(input: &VBString, length: &VBLong) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `left$` | 2..2 | `fn(input: &VBString, length: &VBLong) -> VBResult<VBString>` | $-strict | raises 94 |
-| `leftb` | 2..2 | `fn(input: &VBVariant, length: &VBLong) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `leftb` | 2..2 | `fn(input: &VBString, length: &VBLong) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `leftb$` | 2..2 | `fn(input: &VBString, length: &VBLong) -> VBResult<VBString>` | $-strict | raises 94 |
 | `len` | 1..1 | `fn(input: &VBString) -> VBResult<VBLong>` | typed | raises 94 |
 | `lenb` | 1..1 | `fn(input: &VBString) -> VBResult<VBLong>` | typed | raises 94 |
 | `lset` | 2..2 | `fn(stringvar: &VBString, string: &VBString) -> VBResult<VBString>` | typed | raises 94 |
-| `ltrim` | 1..1 | `fn(input: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `ltrim` | 1..1 | `fn(input: &VBString) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `ltrim$` | 1..1 | `fn(input: &VBString) -> VBResult<VBString>` | $-strict | raises 94 |
-| `mid` | 2..3 | `fn(input: &VBVariant, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `mid` | 2..3 | `fn(input: &VBString, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `mid$` | 2..3 | `fn(input: &VBString, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBString>` | $-strict | raises 94 |
-| `midb` | 2..3 | `fn(input: &VBVariant, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `midb` | 2..3 | `fn(input: &VBString, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `midb$` | 2..3 | `fn(input: &VBString, start: &VBLong, length: Option<&VBLong>) -> VBResult<VBString>` | $-strict | raises 94 |
 | `replace` | 3..6 | `fn(expression: &VBVariant, find: &VBVariant, replace: &VBVariant, start: Option<&VBLong>, count: Option<&VBLong>, compare: Option<&VBLong>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `right` | 2..2 | `fn(input: &VBVariant, length: &VBLong) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `right` | 2..2 | `fn(input: &VBString, length: &VBLong) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `right$` | 2..2 | `fn(input: &VBString, length: &VBLong) -> VBResult<VBString>` | $-strict | raises 94 |
-| `rightb` | 2..2 | `fn(input: &VBVariant, length: &VBLong) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `rightb` | 2..2 | `fn(input: &VBString, length: &VBLong) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `rightb$` | 2..2 | `fn(input: &VBString, length: &VBLong) -> VBResult<VBString>` | $-strict | raises 94 |
 | `rset` | 2..2 | `fn(stringvar: &VBString, string: &VBString) -> VBResult<VBString>` | typed | raises 94 |
-| `rtrim` | 1..1 | `fn(input: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `rtrim` | 1..1 | `fn(input: &VBString) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `rtrim$` | 1..1 | `fn(input: &VBString) -> VBResult<VBString>` | $-strict | raises 94 |
 | `space` | 1..1 | `fn(number: &VBLong) -> VBResult<VBVariant>` | typed | raises 94 |
 | `space$` | 1..1 | `fn(number: &VBLong) -> VBResult<VBString>` | $-strict | raises 94 |
 | `str` | 1..1 | `fn(number: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
 | `str$` | 1..1 | `fn(number: &VBVariant) -> VBResult<VBString>` | $-strict | raises 94 |
 | `strcomp` | 2..3 | `fn(string1: &VBString, string2: &VBString, compare: Option<&VBLong>) -> VBResult<VBInteger>` | typed | raises 94 |
-| `strconv` | 2..3 | `fn(string: &VBVariant, conversion: &VBLong, lcid: Option<&VBLong>) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `strconv` | 2..3 | `fn(string: &VBString, conversion: &VBLong, lcid: Option<&VBLong>) -> VBResult<VBVariant>` | typed | raises 94 |
 | `strconv$` | 2..3 | `fn(string: &VBString, conversion: &VBLong, _lcid: Option<&VBLong>) -> VBResult<VBString>` | $-strict | raises 94 |
 | `string` | 2..2 | `fn(number: &VBLong, character: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
 | `string$` | 2..2 | `fn(number: &VBLong, character: &VBVariant) -> VBResult<VBString>` | variant-input | propagates Null |
-| `strreverse` | 1..1 | `fn(input: &VBString) -> VBResult<VBString>` | typed | raises 94 |
-| `trim` | 1..1 | `fn(input: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `strreverse` | 1..1 | `fn(input: &VBString) -> VBResult<VBString>` | typed | propagates Null (dispatch) |
+| `trim` | 1..1 | `fn(input: &VBString) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `trim$` | 1..1 | `fn(input: &VBString) -> VBResult<VBString>` | $-strict | raises 94 |
-| `ucase` | 1..1 | `fn(input: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `ucase` | 1..1 | `fn(input: &VBString) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 | `ucase$` | 1..1 | `fn(input: &VBString) -> VBResult<VBString>` | $-strict | raises 94 |
 
 ## `type_checking`

@@ -29,6 +29,12 @@ OVERRIDES = {
     ("string", "string$"): "variant-input",  # character param propagates Null
 }
 
+# Entries whose dispatch adapter propagates Null without a `propstring`
+# declaration (hand-written adapters implementing documented tables).
+PROPAGATING = {
+    ("string", "instr"),  # InStr docs: string1/string2 Null -> Null
+}
+
 def parse_registry():
     entries = []
     for path in sorted(BUILTINS.glob("*.rs")):
@@ -56,7 +62,11 @@ def parse_registry():
                     if bm.group(1) not in NON_TARGET_CALLEES:
                         target = bm.group(1)
                         break
-            entries.append((category, name, mn, mx, target))
+            # Detect `propstring` kinds inside THIS entry's declared
+            # parameter list only (cut at the next registry entry).
+            head = re.split(r"(?:typed_)?builtin!\(", tail, maxsplit=2)[0]
+            entries.append((category, name, mn, mx, target,
+                            "propstring" in head))
     return entries
 
 def parse_signatures():
@@ -122,12 +132,12 @@ def main():
     ]
     missing = []
     by_cat = {}
-    for cat, name, mn, mx, target in registry:
-        by_cat.setdefault(cat, []).append((name, mn, mx, target))
+    for cat, name, mn, mx, target, propagating in registry:
+        by_cat.setdefault(cat, []).append((name, mn, mx, target, propagating))
     counts = {}
     for cat in sorted(by_cat):
         lines += [f"## `{cat}`", "", "| Function | Arity | Runtime signature | Class | Null |", "|---|---|---|---|---|"]
-        for name, mn, mx, target in sorted(by_cat[cat]):
+        for name, mn, mx, target, propagating in sorted(by_cat[cat], key=lambda e: e[0]):
             if target and target in sigs:
                 params, ret = sigs[target]
             else:
@@ -140,6 +150,8 @@ def main():
                 null = "propagates Null" if "variant" in cls or cls == "structural" else "raises 94"
             else:
                 cls, null = classify(name, params)
+            if propagating or (cat, name) in PROPAGATING:
+                null = "propagates Null (dispatch)" 
             counts[cls] = counts.get(cls, 0) + 1
             sig = f"`fn({params}) -> {ret}`" if ret else "*(adapter-built, no runtime target)*"
             lines.append(f"| `{name}` | {mn}..{mx} | {sig} | {cls} | {null} |")

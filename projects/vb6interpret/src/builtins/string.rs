@@ -1,11 +1,11 @@
 //! VB6 string function registry.
 //!
-//! One registry entry per string function. Entries wrap the typed
-//! `vb6runtime::library::string` implementation; those with already-typed
-//! runtime parameters use the declarative [`typed_builtin!`](crate::typed_builtin)
-//! spec, while entries still passing raw variants through (non-`$` forms whose
-//! runtime side takes `&VBVariant`, and `instr`'s arity-dependent positions)
-//! keep hand-written adapters until plan phase 1 migrates them.
+//! One registry entry per string function, declared with the declarative
+//! [`typed_builtin!`](crate::typed_builtin) spec. Parameters documented by
+//! VB6 to propagate Null (the non-`$` string-input family) use the
+//! `propstring` kind; everything else converts strictly at the boundary.
+//! The only hand-written adapter left is `instr`, whose argument positions
+//! depend on arity.
 
 use super::{arg_string, Builtin, Registry};
 use crate::builtin;
@@ -21,12 +21,16 @@ pub(super) fn register(registry: &mut Registry) {
         strfn::len(&input).map(VBVariant::from)));
     registry.insert(typed_builtin!("left$", 2, 2, (input: string, length: long),
         strfn::left_dollar(&input, &length).map(VBVariant::from)));
-    registry.insert(typed_builtin!("left", 2, 2, (input: string, length: long),
-        strfn::left(&input, &length)));
-    registry.insert(typed_builtin!("right", 2, 2, (input: string, length: long),
-        strfn::right(&input, &length)));
     registry.insert(
-        typed_builtin!("mid", 2, 3, (input: string, start: long, length: opt_long),
+        typed_builtin!("left", 2, 2, (input: propstring, length: long),
+        strfn::left(&input, &length)),
+    );
+    registry.insert(
+        typed_builtin!("right", 2, 2, (input: propstring, length: long),
+        strfn::right(&input, &length)),
+    );
+    registry.insert(
+        typed_builtin!("mid", 2, 3, (input: propstring, start: long, length: opt_long),
         strfn::mid(&input, &start, length.as_ref())),
     );
     registry.insert(
@@ -37,15 +41,15 @@ pub(super) fn register(registry: &mut Registry) {
         typed_builtin!("mid$", 2, 3, (input: string, start: long, length: opt_long),
         strfn::mid_dollar(&input, &start, length.as_ref()).map(VBVariant::from)),
     );
-    registry.insert(typed_builtin!("lcase", 1, 1, (input: string),
+    registry.insert(typed_builtin!("lcase", 1, 1, (input: propstring),
         strfn::lcase(&input)));
-    registry.insert(typed_builtin!("ucase", 1, 1, (input: string),
+    registry.insert(typed_builtin!("ucase", 1, 1, (input: propstring),
         strfn::ucase(&input)));
-    registry.insert(typed_builtin!("trim", 1, 1, (input: string),
+    registry.insert(typed_builtin!("trim", 1, 1, (input: propstring),
         strfn::trim(&input)));
-    registry.insert(typed_builtin!("ltrim", 1, 1, (input: string),  
+    registry.insert(typed_builtin!("ltrim", 1, 1, (input: propstring),  
         strfn::ltrim(&input)));
-    registry.insert(typed_builtin!("rtrim", 1, 1, (input: string),
+    registry.insert(typed_builtin!("rtrim", 1, 1, (input: propstring),
         strfn::rtrim(&input)));
     // `LSet` is a statement; the registry entry exposes the alignment
     // primitive `(stringvar, string) -> aligned string` for dispatch.
@@ -69,7 +73,7 @@ pub(super) fn register(registry: &mut Registry) {
         strfn::ltrim_dollar(&input).map(VBVariant::from)));
     registry.insert(typed_builtin!("rtrim$", 1, 1, (input: string),
         strfn::rtrim_dollar(&input).map(VBVariant::from)));
-    registry.insert(typed_builtin!("strreverse", 1, 1, (input: string),
+    registry.insert(typed_builtin!("strreverse", 1, 1, (input: propstring),
         strfn::strreverse(&input).map(VBVariant::from)));
     registry.insert(typed_builtin!("asc", 1, 1, (input: string),
         strfn::asc(&input).map(VBVariant::from)));
@@ -85,13 +89,17 @@ pub(super) fn register(registry: &mut Registry) {
         strfn::chrw(&charcode)));
     registry.insert(typed_builtin!("chrw$", 1, 1, (charcode: long),
         strfn::chrw_dollar(&charcode).map(VBVariant::from)));
-    registry.insert(builtin!("chrb", 1, 1, |args| { strfn::chrb(&args[0]) }));
+    registry.insert(typed_builtin!("chrb", 1, 1, (charcode: long),
+        strfn::chrb(&charcode)));
     registry.insert(typed_builtin!("chrb$", 1, 1, (charcode: long),
         strfn::chrb_dollar(&charcode).map(VBVariant::from)));
     registry.insert(typed_builtin!("space", 1, 1, (number: long),
         strfn::space(&number)));
     registry.insert(typed_builtin!("space$", 1, 1, (number: long),
         strfn::space_dollar(&number).map(VBVariant::from)));
+    // `instr` stays hand-written: which argument occupies which position
+    // depends on arity. Null propagation follows the documented InStr table
+    // (`string1`/`string2` Null → Null); `start` stays strict like a Long.
     registry.insert(builtin!("instr", 2, 4, |args| {
         let start: Option<VBLong>;
         let s1_idx;
@@ -116,6 +124,11 @@ pub(super) fn register(registry: &mut Registry) {
                 s2_idx = 1;
                 cmp_idx = None;
             }
+        }
+        if matches!(args.get(s1_idx), Some(VBVariant::Null))
+            || matches!(args.get(s2_idx), Some(VBVariant::Null))
+        {
+            return Ok(VBVariant::Null);
         }
         let s1 = arg_string(args, s1_idx)?;
         let s2 = arg_string(args, s2_idx)?;
@@ -153,14 +166,16 @@ pub(super) fn register(registry: &mut Registry) {
     ));
     registry.insert(typed_builtin!("lenb", 1, 1, (input: string),
         strfn::lenb(&input).map(VBVariant::from)));
-    registry.insert(typed_builtin!("leftb", 2, 2, (input: string, length: long),
-        strfn::leftb(&input, &length)));
+    registry.insert(
+        typed_builtin!("leftb", 2, 2, (input: propstring, length: long),
+        strfn::leftb(&input, &length)),
+    );
     registry.insert(
         typed_builtin!("leftb$", 2, 2, (input: string, length: long),
         strfn::leftb_dollar(&input, &length).map(VBVariant::from)),
     );
     registry.insert(
-        typed_builtin!("rightb", 2, 2, (input: string, length: long),
+        typed_builtin!("rightb", 2, 2, (input: propstring, length: long),
         strfn::rightb(&input, &length)),
     );
     registry.insert(
@@ -168,7 +183,7 @@ pub(super) fn register(registry: &mut Registry) {
         strfn::rightb_dollar(&input, &length).map(VBVariant::from)),
     );
     registry.insert(
-        typed_builtin!("midb", 2, 3, (input: string, start: long, length: opt_long),
+        typed_builtin!("midb", 2, 3, (input: propstring, start: long, length: opt_long),
         strfn::midb(&input, &start, length.as_ref())),
     );
     registry.insert(

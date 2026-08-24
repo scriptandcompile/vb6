@@ -58,6 +58,44 @@ fn dollar_variants_reject_null() {
 }
 
 #[test]
+fn non_dollar_string_functions_propagate_null() {
+    // The non-`$` string family documents "If string contains Null, Null is
+    // returned" — propagation happens at the dispatch boundary before any
+    // typed conversion runs (plan F1, `propstring` kind).
+    for name in ["LCase", "UCase", "Trim", "LTrim", "RTrim"] {
+        let result = call_builtin(name, &[VBVariant::Null]);
+        match result {
+            Ok(VBVariant::Null) => {}
+            other => panic!("{name}(Null) should propagate Null, got {other:?}"),
+        }
+    }
+    for name in ["Left", "Right"] {
+        let result = call_builtin(name, &[VBVariant::Null, VBVariant::Long(2)]);
+        match result {
+            Ok(VBVariant::Null) => {}
+            other => panic!("{name}(Null, 2) should propagate Null, got {other:?}"),
+        }
+    }
+    let result = call_builtin("Mid", &[VBVariant::Null, VBVariant::Long(1)]);
+    assert_eq!(result.unwrap(), VBVariant::Null);
+    // InStr's documented table: string1/string2 Null → Null.
+    let result = call_builtin("InStr", &[VBVariant::from_string("a"), VBVariant::Null]);
+    assert_eq!(result.unwrap(), VBVariant::Null);
+}
+
+#[test]
+fn null_propagation_is_parameter_scoped() {
+    // Only the parameters marked propagating short-circuit; auxiliary
+    // numeric parameters and `$` forms still reject Null with error 94.
+    let err = call_builtin("Left", &[VBVariant::from_string("abc"), VBVariant::Null]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+    let err = call_builtin("Mid", &[VBVariant::from_string("abc"), VBVariant::Null]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+    let err = call_builtin("Chrb", &[VBVariant::Null]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+}
+
+#[test]
 fn math_functions_dispatch() {
     assert_eq!(
         call_builtin("Abs", &[VBVariant::from_integer(-5)]).unwrap(),

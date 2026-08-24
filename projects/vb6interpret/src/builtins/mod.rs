@@ -81,6 +81,9 @@ macro_rules! builtin {
 /// | `currency`    | `As Currency` | `VBCurrency`              |
 /// | `date`        | `As Date`     | `VBDate`                  |
 /// | `opt_<t>`     | optional `t`  | `None` when absent        |
+/// | `propstring`  | propagating string | like `string`, but a `Null`
+///   argument short-circuits the call to a `Null` result (plan F1: VB6
+///   documents Null propagation for the non-`$` forms) |
 ///
 /// The body receives one binding per declared parameter (in order) and must
 /// produce `VBResult<VBVariant>` (map wrapper returns with `VBVariant::from`).
@@ -130,6 +133,12 @@ macro_rules! __convert_arg {
     ($args:ident, $index:expr, string) => {
         ::vb6runtime::boundary::arg::<::vb6runtime::value::VBString>($args, $index)
     };
+    ($args:ident, $index:expr, propstring) => {{
+        if matches!($args.get($index), Some(::vb6runtime::VBVariant::Null)) {
+            return Ok(::vb6runtime::VBVariant::Null);
+        }
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBString>($args, $index)
+    }};
     ($args:ident, $index:expr, long) => {
         ::vb6runtime::boundary::arg::<::vb6runtime::value::VBLong>($args, $index)
     };
