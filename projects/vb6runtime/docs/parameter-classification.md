@@ -156,18 +156,18 @@ Classes:
 | Function | Arity | Runtime signature | Class | Null |
 |---|---|---|---|---|
 | `abs` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `atn` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `cos` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `exp` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `fix` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `int` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `log` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `rnd` | 0..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `round` | 1..2 | `fn(expression: &VBVariant, numdecimalplaces: Option<&VBLong>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `sgn` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `sin` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `sqr` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `tan` | 1..1 | `fn(value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `atn` | 1..1 | `fn(value: &VBDouble) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `cos` | 1..1 | `fn(value: &VBDouble) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `exp` | 1..1 | `fn(value: &VBDouble) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `fix` | 1..1 | `fn(value: &VBDouble) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `int` | 1..1 | `fn(value: &VBDouble) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `log` | 1..1 | `fn(value: &VBDouble) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `rnd` | 0..1 | `fn(number: Option<&VBSingle>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `round` | 1..2 | `fn(expression: &VBDouble, numdecimalplaces: Option<&VBLong>) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `sgn` | 1..1 | `fn(value: &VBDouble) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `sin` | 1..1 | `fn(value: &VBDouble) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `sqr` | 1..1 | `fn(value: &VBDouble) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
+| `tan` | 1..1 | `fn(value: &VBDouble) -> VBResult<VBVariant>` | typed | propagates Null (dispatch) |
 
 ## `objects`
 

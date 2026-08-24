@@ -608,7 +608,7 @@
 
 use crate::{
     error::{VBError, VBResult},
-    value::VBVariant,
+    value::{VBDouble, VBVariant},
 };
 
 /// Implementation of the square root (Sqr) function.
@@ -616,12 +616,8 @@ use crate::{
 /// VB6 behavior:
 /// - `Sqr(Null)` returns `Null`
 /// - other values are coerced with numeric conversion rules and return `Double`
-pub fn sqr(value: &VBVariant) -> VBResult<VBVariant> {
-    if value.is_null() {
-        return Ok(VBVariant::Null);
-    }
-
-    let numeric = value.as_f64()?;
+pub fn sqr(value: &VBDouble) -> VBResult<VBVariant> {
+    let numeric = value.as_f64();
 
     if numeric < 0.0 {
         return Err(VBError::invalid_procedure_call());
@@ -633,7 +629,10 @@ pub fn sqr(value: &VBVariant) -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::sqr;
-    use crate::{error::err_number, value::VBVariant};
+    use crate::{
+        error::err_number,
+        value::{VBDouble, VBVariant},
+    };
 
     fn assert_approx_eq(actual: f64, expected: f64) {
         if (actual == f64::INFINITY && expected == f64::INFINITY)
@@ -650,72 +649,49 @@ mod tests {
     }
 
     #[test]
-    fn returns_null_for_null() {
-        assert_eq!(sqr(&VBVariant::Null).unwrap(), VBVariant::Null);
-    }
+    fn computes_expected_doubles() {
+        let result = sqr(&VBDouble::from(5.0)).unwrap();
+        assert_eq!(result, VBVariant::from_double((5.0_f64).sqrt()));
 
-    #[test]
-    fn returns_zero_for_empty() {
-        assert_eq!(
-            sqr(&VBVariant::Empty).unwrap(),
-            VBVariant::from_double((0.0_f64).sqrt())
-        );
-    }
-
-    #[test]
-    fn returns_double_for_numeric_inputs() {
-        let result = sqr(&VBVariant::from_byte(5)).unwrap();
-        assert_eq!(result, VBVariant::from_double((5_f64).sqrt()));
-
-        let result = sqr(&VBVariant::from_integer(123)).unwrap();
-        assert_eq!(result, VBVariant::from_double((123.0_f64).sqrt()));
-
-        let result = sqr(&VBVariant::from_long(12345)).unwrap();
-        assert_eq!(result, VBVariant::from_double((12345.0_f64).sqrt()));
-
-        let result = sqr(&VBVariant::from_single(12.5)).unwrap();
+        let result = sqr(&VBDouble::from(12.5)).unwrap();
         assert_eq!(result, VBVariant::from_double((12.5_f64).sqrt()));
-
-        let result = sqr(&VBVariant::from_double(12.5)).unwrap();
-        assert_eq!(result, VBVariant::from_double((12.5_f64).sqrt()));
-
-        let result = sqr(&VBVariant::from_currency_scaled(12_345)).unwrap();
-        assert_eq!(result, VBVariant::from_double((1.2345_f64).sqrt()));
     }
 
     #[test]
     fn returns_expected_values() {
-        let VBVariant::Double(v) = sqr(&VBVariant::from_double(0.0)).unwrap() else {
+        let VBVariant::Double(v) = sqr(&VBDouble::from(0.0)).unwrap() else {
             panic!("expected Double")
         };
         assert_approx_eq(v, (0.0_f64).sqrt());
 
-        let VBVariant::Double(v) = sqr(&VBVariant::from_double(1.0)).unwrap() else {
+        let VBVariant::Double(v) = sqr(&VBDouble::from(1.0)).unwrap() else {
             panic!("expected Double")
         };
         assert_approx_eq(v, (1.0_f64).sqrt());
 
-        let VBVariant::Double(v) = sqr(&VBVariant::from_double(10.0)).unwrap() else {
+        let VBVariant::Double(v) = sqr(&VBDouble::from(10.0)).unwrap() else {
             panic!("expected Double")
         };
         assert_approx_eq(v, (10.0_f64).sqrt());
     }
 
     #[test]
-    fn rejects_non_numeric_values() {
-        let err = sqr(&VBVariant::from_string("not-a-number")).unwrap_err();
+    fn conversion_rejects_non_numeric_values() {
+        let err = VBDouble::try_from(&VBVariant::from_string("not-a-number")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 
     #[test]
     fn rejects_negative_numeric_values() {
-        let err = sqr(&VBVariant::from_integer(-123)).unwrap_err();
+        let err = sqr(&VBDouble::from(-123.0)).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
     }
 
     #[test]
-    fn accepts_numeric_strings() {
-        let result = sqr(&VBVariant::from_string("1.5")).unwrap();
-        assert_eq!(result, VBVariant::from_double((1.5_f64).sqrt()));
+    fn conversion_accepts_numeric_strings() {
+        assert_eq!(
+            VBDouble::try_from(&VBVariant::from_string("1.5")).unwrap(),
+            VBDouble::from(1.5)
+        );
     }
 }

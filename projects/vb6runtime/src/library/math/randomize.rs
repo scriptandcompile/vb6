@@ -108,6 +108,7 @@ mod tests {
     use crate::library::math::rnd::rnd;
     use crate::state::random::{seed, set_seed, MODULUS};
     use crate::state::test_support::TEST_LOCK;
+    use crate::value::VBSingle;
     use crate::value::VBVariant;
 
     /// The exact `Single` value produced by a given seed, `seed / 2^24`.
@@ -130,7 +131,7 @@ mod tests {
         randomize(Some(VBVariant::from_double(42.0))).unwrap();
         assert_eq!(seed(), 0x0040_4500);
 
-        let next = as_single(rnd(&VBVariant::Empty).unwrap());
+        let next = as_single(rnd(None).unwrap());
         assert_eq!(next, f32::from_bits(0x3EAD_9F86));
     }
 
@@ -153,12 +154,12 @@ mod tests {
 
         // Rnd(0) normalizes the raw stored seed (VB6-faithful; it can be >= 1).
         assert_eq!(
-            as_single(rnd(&VBVariant::from_single(0.0)).unwrap()),
+            as_single(rnd(Some(&VBSingle::from(0.0))).unwrap()),
             expected(0xFFBF_F000)
         );
 
         // Advancing still keeps the sequence 24-bit and in [0, 1).
-        let next = as_single(rnd(&VBVariant::Empty).unwrap());
+        let next = as_single(rnd(None).unwrap());
         assert_eq!(next, f32::from_bits(0x3E87_9D86));
         assert!((0.0..1.0).contains(&next));
     }
@@ -174,7 +175,7 @@ mod tests {
         // The low byte of the previous seed survives the splice.
         assert_eq!(reseeded & 0xFF, 0x78);
 
-        let value = as_single(rnd(&VBVariant::Empty).unwrap());
+        let value = as_single(rnd(None).unwrap());
         assert!((0.0..1.0).contains(&value));
     }
 

@@ -332,26 +332,28 @@
 //! - `Abs`: Absolute value (often used with `Fix`)
 //! - `Sgn`: Sign of number (often used with `Fix`)
 
-use crate::{error::VBResult, value::VBVariant};
+use crate::{
+    error::VBResult,
+    value::{VBDouble, VBVariant},
+};
 
 /// Implementation of the truncate (Fix) function.
 ///
 /// VB6 behavior:
 /// - `Fix(Null)` returns `Null`
 /// - other values are coerced with numeric conversion rules and return `Double`
-pub fn fix(value: &VBVariant) -> VBResult<VBVariant> {
-    if value.is_null() {
-        return Ok(VBVariant::Null);
-    }
-
-    let numeric = value.as_f64()?;
+pub fn fix(value: &VBDouble) -> VBResult<VBVariant> {
+    let numeric = value.as_f64();
     Ok(VBVariant::from_double(numeric.trunc()))
 }
 
 #[cfg(test)]
 mod tests {
     use super::fix;
-    use crate::{error::err_number, value::VBVariant};
+    use crate::{
+        error::err_number,
+        value::{VBDouble, VBVariant},
+    };
 
     fn assert_approx_eq(actual: f64, expected: f64) {
         if (actual == f64::INFINITY && expected == f64::INFINITY)
@@ -368,68 +370,48 @@ mod tests {
     }
 
     #[test]
-    fn returns_null_for_null() {
-        assert_eq!(fix(&VBVariant::Null).unwrap(), VBVariant::Null);
-    }
+    fn computes_expected_doubles() {
+        let result = fix(&VBDouble::from(5.0)).unwrap();
+        assert_eq!(result, VBVariant::from_double((5.0_f64).trunc()));
 
-    #[test]
-    fn returns_zero_for_empty() {
-        assert_eq!(fix(&VBVariant::Empty).unwrap(), VBVariant::from_double(0.0));
-    }
-
-    #[test]
-    fn returns_double_for_numeric_inputs() {
-        let result = fix(&VBVariant::from_byte(5)).unwrap();
-        assert_eq!(result, VBVariant::from_double((5_f64).trunc()));
-
-        let result = fix(&VBVariant::from_integer(-123)).unwrap();
-        assert_eq!(result, VBVariant::from_double((-123.0_f64).trunc()));
-
-        let result = fix(&VBVariant::from_long(-12345)).unwrap();
-        assert_eq!(result, VBVariant::from_double((-12345.0_f64).trunc()));
-
-        let result = fix(&VBVariant::from_single(-12.5)).unwrap();
+        let result = fix(&VBDouble::from(-12.5)).unwrap();
         assert_eq!(result, VBVariant::from_double((-12.5_f64).trunc()));
-
-        let result = fix(&VBVariant::from_double(-12.5)).unwrap();
-        assert_eq!(result, VBVariant::from_double((-12.5_f64).trunc()));
-
-        let result = fix(&VBVariant::from_currency_scaled(-12_345)).unwrap();
-        assert_eq!(result, VBVariant::from_double((-1.2345_f64).trunc()));
     }
 
     #[test]
     fn returns_expected_values() {
-        let VBVariant::Double(v) = fix(&VBVariant::from_double(0.0)).unwrap() else {
+        let VBVariant::Double(v) = fix(&VBDouble::from(0.0)).unwrap() else {
             panic!("expected Double")
         };
         assert_approx_eq(v, (0.0_f64).trunc());
 
-        let VBVariant::Double(v) = fix(&VBVariant::from_double(1.0)).unwrap() else {
+        let VBVariant::Double(v) = fix(&VBDouble::from(1.0)).unwrap() else {
             panic!("expected Double")
         };
         assert_approx_eq(v, (1.0_f64).trunc());
 
-        let VBVariant::Double(v) = fix(&VBVariant::from_double(-1.0)).unwrap() else {
+        let VBVariant::Double(v) = fix(&VBDouble::from(-1.0)).unwrap() else {
             panic!("expected Double")
         };
         assert_approx_eq(v, (-1.0_f64).trunc());
 
-        let VBVariant::Double(v) = fix(&VBVariant::from_double(-8.4)).unwrap() else {
+        let VBVariant::Double(v) = fix(&VBDouble::from(-8.4)).unwrap() else {
             panic!("expected Double")
         };
         assert_approx_eq(v, (-8.4_f64).trunc());
     }
 
     #[test]
-    fn rejects_non_numeric_values() {
-        let err = fix(&VBVariant::from_string("not-a-number")).unwrap_err();
+    fn conversion_rejects_non_numeric_values() {
+        let err = VBDouble::try_from(&VBVariant::from_string("not-a-number")).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 
     #[test]
-    fn accepts_numeric_strings() {
-        let result = fix(&VBVariant::from_string("1.5")).unwrap();
-        assert_eq!(result, VBVariant::from_double(1.5_f64.trunc()));
+    fn conversion_accepts_numeric_strings() {
+        assert_eq!(
+            VBDouble::try_from(&VBVariant::from_string("1.5")).unwrap(),
+            VBDouble::from(1.5)
+        );
     }
 }

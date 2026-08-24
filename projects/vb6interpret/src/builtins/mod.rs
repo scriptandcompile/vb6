@@ -84,6 +84,9 @@ macro_rules! builtin {
 /// | `propstring`  | propagating string | like `string`, but a `Null`
 ///   argument short-circuits the call to a `Null` result (plan F1: VB6
 ///   documents Null propagation for the non-`$` forms) |
+/// | `propdouble`  | propagating number | like `string`→`VBDouble`: a `Null`
+///   argument short-circuits to `Null`; anything else coerces with `CDbl`
+///   semantics |
 ///
 /// The body receives one binding per declared parameter (in order) and must
 /// produce `VBResult<VBVariant>` (map wrapper returns with `VBVariant::from`).
@@ -138,6 +141,12 @@ macro_rules! __convert_arg {
             return Ok(::vb6runtime::VBVariant::Null);
         }
         ::vb6runtime::boundary::arg::<::vb6runtime::value::VBString>($args, $index)
+    }};
+    ($args:ident, $index:expr, propdouble) => {{
+        if matches!($args.get($index), Some(::vb6runtime::VBVariant::Null)) {
+            return Ok(::vb6runtime::VBVariant::Null);
+        }
+        ::vb6runtime::boundary::arg::<::vb6runtime::value::VBDouble>($args, $index)
     }};
     ($args:ident, $index:expr, long) => {
         ::vb6runtime::boundary::arg::<::vb6runtime::value::VBLong>($args, $index)

@@ -1,33 +1,49 @@
 //! VB6 math function registry.
 //!
-//! One [`Builtin`](super::Builtin) entry per math function, each wrapping the
-//! typed `vb6runtime::library::math` implementation.
+//! One registry entry per math function, declared with the declarative
+//! [`typed_builtin!`](crate::typed_builtin) spec. Numeric arguments use the
+//! `propdouble` kind (documented Null propagation, `CDbl` coercion at the
+//! boundary); `abs` stays a Variant passthrough because it preserves the
+//! input's numeric type (Integer overflow must stay error 6).
 
 use super::{Builtin, Registry};
-use crate::builtin;
-use vb6core::error::VBResult;
+use crate::typed_builtin;
 use vb6runtime::library::math as mathfn;
-use vb6runtime::value::VBLong;
-use vb6runtime::VBVariant;
 
 /// Register the math functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {
-    registry.insert(builtin!("abs", 1, 1, |args| { mathfn::abs::abs(&args[0]) }));
-    registry.insert(builtin!("atn", 1, 1, |args| { mathfn::atn::atn(&args[0]) }));
-    registry.insert(builtin!("cos", 1, 1, |args| { mathfn::cos::cos(&args[0]) }));
-    registry.insert(builtin!("exp", 1, 1, |args| { mathfn::exp::exp(&args[0]) }));
-    registry.insert(builtin!("fix", 1, 1, |args| { mathfn::fix::fix(&args[0]) }));
-    registry.insert(builtin!("int", 1, 1, |args| { mathfn::int::int(&args[0]) }));
-    registry.insert(builtin!("log", 1, 1, |args| { mathfn::log::log(&args[0]) }));
-    registry.insert(builtin!("rnd", 0, 1, |args| {
-        mathfn::rnd::rnd(args.first().unwrap_or(&VBVariant::Empty))
-    }));
-    registry.insert(builtin!("round", 1, 2, |args| {
-        let places = args.get(1).map(VBLong::try_from).transpose()?;
-        mathfn::round::round(&args[0], places.as_ref())
-    }));
-    registry.insert(builtin!("sgn", 1, 1, |args| { mathfn::sgn::sgn(&args[0]) }));
-    registry.insert(builtin!("sin", 1, 1, |args| { mathfn::sin::sin(&args[0]) }));
-    registry.insert(builtin!("sqr", 1, 1, |args| { mathfn::sqr::sqr(&args[0]) }));
-    registry.insert(builtin!("tan", 1, 1, |args| { mathfn::tan::tan(&args[0]) }));
+    // `abs` preserves its argument's numeric type (Byte/Integer/Long ...),
+    // so the whole Variant still reaches the runtime body.
+    registry.insert(typed_builtin!("abs", 1, 1, (value: variant),
+        mathfn::abs::abs(value)));
+    registry.insert(typed_builtin!("atn", 1, 1, (number: propdouble),
+        mathfn::atn::atn(&number)));
+    registry.insert(typed_builtin!("cos", 1, 1, (number: propdouble),
+        mathfn::cos::cos(&number)));
+    registry.insert(typed_builtin!("exp", 1, 1, (number: propdouble),
+        mathfn::exp::exp(&number)));
+    registry.insert(typed_builtin!("fix", 1, 1, (number: propdouble),
+        mathfn::fix::fix(&number)));
+    registry.insert(typed_builtin!("int", 1, 1, (number: propdouble),
+        mathfn::int::int(&number)));
+    registry.insert(typed_builtin!("log", 1, 1, (number: propdouble),
+        mathfn::log::log(&number)));
+    // `rnd` keeps a hand-rolled body because the omitted argument (`None`)
+    // is distinct from an explicit `0` (repeat last value). A present `Null`
+    // argument rejects with error 94 at the boundary, matching VB6's typed
+    // `Rnd(number)` declaration.
+    registry.insert(typed_builtin!("rnd", 0, 1, (number: opt_single),
+        mathfn::rnd::rnd(number.as_ref())));
+    registry.insert(
+        typed_builtin!("round", 1, 2, (expression: propdouble, numdecimalplaces: opt_long),
+        mathfn::round::round(&expression, numdecimalplaces.as_ref())),
+    );
+    registry.insert(typed_builtin!("sgn", 1, 1, (number: propdouble),
+        mathfn::sgn::sgn(&number)));
+    registry.insert(typed_builtin!("sin", 1, 1, (number: propdouble),
+        mathfn::sin::sin(&number)));
+    registry.insert(typed_builtin!("sqr", 1, 1, (number: propdouble),
+        mathfn::sqr::sqr(&number)));
+    registry.insert(typed_builtin!("tan", 1, 1, (number: propdouble),
+        mathfn::tan::tan(&number)));
 }

@@ -96,6 +96,45 @@ fn null_propagation_is_parameter_scoped() {
 }
 
 #[test]
+fn math_functions_propagate_null_at_the_boundary() {
+    for name in ["Sqr", "Sin", "Fix", "Int", "Sgn", "Log"] {
+        let result = call_builtin(name, &[VBVariant::Null]);
+        match result {
+            Ok(VBVariant::Null) => {}
+            other => panic!("{name}(Null) should propagate Null, got {other:?}"),
+        }
+    }
+    let result = call_builtin("Round", &[VBVariant::Null, VBVariant::Long(2)]);
+    assert_eq!(result.unwrap(), VBVariant::Null);
+}
+
+#[test]
+fn math_conversion_failures_report_at_the_boundary() {
+    // Non-numeric strings fail with 13 during boundary coercion.
+    let err = call_builtin("Sqr", &[VBVariant::from_string("abc")]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::TYPE_MISMATCH);
+    // CVErr arguments re-raise their inner error through the wrapper.
+    let err = call_builtin(
+        "Sin",
+        &[VBVariant::from_error(vb6core::error::VBError::new(31337))],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, 31337);
+}
+
+#[test]
+fn abs_preserves_argument_type() {
+    // `abs` is deliberately a Variant passthrough: Abs(Integer) stays
+    // Integer, so the Integer-min overflow must be error 6.
+    let err = call_builtin("Abs", &[VBVariant::Integer(i16::MIN)]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::OVERFLOW);
+    assert_eq!(
+        call_builtin("Abs", &[VBVariant::Integer(-5)]).unwrap(),
+        VBVariant::Integer(5)
+    );
+}
+
+#[test]
 fn math_functions_dispatch() {
     assert_eq!(
         call_builtin("Abs", &[VBVariant::from_integer(-5)]).unwrap(),
