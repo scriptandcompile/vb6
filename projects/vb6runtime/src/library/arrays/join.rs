@@ -511,7 +511,7 @@
 //! ```
 
 use crate::error::{err_number, VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBString, VBVariant};
 
 /// Implementation of the `Join` function.
 ///
@@ -525,7 +525,7 @@ use crate::value::VBVariant;
 /// - Empty or undimensioned arrays return an empty string
 /// - Raises error 94 if `sourcearray` is `Null`
 /// - Raises error 13 if `sourcearray` is not an array or is multi-dimensional
-pub fn join(sourcearray: &VBVariant, delimiter: Option<&str>) -> VBResult<String> {
+pub fn join(sourcearray: &VBVariant, delimiter: Option<&VBString>) -> VBResult<String> {
     // Validate sourcearray is not Null
     if sourcearray.is_null() {
         return Err(VBError::with_description(
@@ -552,7 +552,7 @@ pub fn join(sourcearray: &VBVariant, delimiter: Option<&str>) -> VBResult<String
         ));
     }
 
-    let delimiter = delimiter.unwrap_or(" ");
+    let delimiter = delimiter.map_or(" ", VBString::as_str);
 
     let lower = arr.lower_bound(0).unwrap();
     let upper = arr.upper_bound(0).unwrap();
@@ -581,7 +581,7 @@ mod tests {
     use crate::array::{ArrayDimension, ArrayValue};
     use crate::error::err_number;
     use crate::types::VBType;
-    use crate::value::VBVariant;
+    use crate::value::{VBString, VBVariant};
 
     fn make_string_array(strings: &[&str]) -> VBVariant {
         let data: Vec<VBVariant> = strings.iter().map(|s| VBVariant::from_string(*s)).collect();
@@ -598,28 +598,28 @@ mod tests {
     #[test]
     fn join_with_comma_space_delimiter() {
         let source = make_string_array(&["apple", "banana", "cherry"]);
-        let result = join(&source, Some(", ")).unwrap();
+        let result = join(&source, Some(&VBString::from(", "))).unwrap();
         assert_eq!(result, "apple, banana, cherry");
     }
 
     #[test]
     fn join_with_custom_delimiter() {
         let source = make_string_array(&["one", "two", "three"]);
-        let result = join(&source, Some(" | ")).unwrap();
+        let result = join(&source, Some(&VBString::from(" | "))).unwrap();
         assert_eq!(result, "one | two | three");
     }
 
     #[test]
     fn join_with_empty_delimiter() {
         let source = make_string_array(&["a", "b", "c"]);
-        let result = join(&source, Some("")).unwrap();
+        let result = join(&source, Some(&VBString::from(""))).unwrap();
         assert_eq!(result, "abc");
     }
 
     #[test]
     fn join_single_element() {
         let source = make_string_array(&["single"]);
-        let result = join(&source, Some(",")).unwrap();
+        let result = join(&source, Some(&VBString::from(","))).unwrap();
         assert_eq!(result, "single");
     }
 
@@ -630,28 +630,28 @@ mod tests {
             Vec::new(),
             0,
         ));
-        let result = join(&source, Some(",")).unwrap();
+        let result = join(&source, Some(&VBString::from(","))).unwrap();
         assert_eq!(result, "");
     }
 
     #[test]
     fn join_undimensioned_array_returns_empty_string() {
         let source = VBVariant::Array(ArrayValue::new_dynamic(VBType::String));
-        let result = join(&source, Some(",")).unwrap();
+        let result = join(&source, Some(&VBString::from(","))).unwrap();
         assert_eq!(result, "");
     }
 
     #[test]
     fn join_preserves_order() {
         let source = make_string_array(&["first", "second", "third"]);
-        let result = join(&source, Some("-")).unwrap();
+        let result = join(&source, Some(&VBString::from("-"))).unwrap();
         assert_eq!(result, "first-second-third");
     }
 
     #[test]
     fn join_handles_empty_strings_in_array() {
         let source = make_string_array(&["hello", "", "world"]);
-        let result = join(&source, Some(" ")).unwrap();
+        let result = join(&source, Some(&VBString::from(" "))).unwrap();
         assert_eq!(result, "hello  world");
     }
 
@@ -688,7 +688,7 @@ mod tests {
             VBVariant::from_string("C"),
         ];
         let source = VBVariant::Array(ArrayValue::from_vec(VBType::String, data));
-        let result = join(&source, Some(",")).unwrap();
+        let result = join(&source, Some(&VBString::from(","))).unwrap();
         assert_eq!(result, "A,B,C");
     }
 
@@ -700,14 +700,14 @@ mod tests {
             VBVariant::from_string("z"),
         ];
         let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::String, data, -1));
-        let result = join(&source, Some("-")).unwrap();
+        let result = join(&source, Some(&VBString::from("-"))).unwrap();
         assert_eq!(result, "x-y-z");
     }
 
     #[test]
     fn join_preserves_whitespace_in_delimiter() {
         let source = make_string_array(&["a", "b", "c"]);
-        let result = join(&source, Some("  ")).unwrap();
+        let result = join(&source, Some(&VBString::from("  "))).unwrap();
         assert_eq!(result, "a  b  c");
     }
 
@@ -731,7 +731,7 @@ mod tests {
             VBVariant::from_string("text"),
         ];
         let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
-        let result = join(&source, Some("-")).unwrap();
+        let result = join(&source, Some(&VBString::from("-"))).unwrap();
         assert_eq!(result, "123-456-text");
     }
 

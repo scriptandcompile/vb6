@@ -734,7 +734,7 @@
 use crate::array::ArrayValue;
 use crate::error::{err_number, VBError, VBResult};
 use crate::types::VBType;
-use crate::value::VBVariant;
+use crate::value::{VBLong, VBString, VBVariant};
 
 /// Implementation of the `Split` function.
 ///
@@ -754,11 +754,15 @@ use crate::value::VBVariant;
 /// - Raises error 13 if `expression` is not a string value
 /// - Raises error 5 if `limit` is negative (other than -1)
 pub fn split(
-    expression: &str,
-    delimiter: Option<&str>,
-    limit: Option<i32>,
-    compare: Option<i32>,
+    expression: &VBString,
+    delimiter: Option<&VBString>,
+    limit: Option<&VBLong>,
+    compare: Option<&VBLong>,
 ) -> VBResult<VBVariant> {
+    let expression = expression.as_str();
+    let delimiter = delimiter.map(VBString::as_str);
+    let compare = compare.map(|c| c.as_i32());
+
     // Validate compare parameter
     let text_compare = match compare {
         None => false,
@@ -767,7 +771,7 @@ pub fn split(
     };
 
     // Validate limit parameter
-    let limit = match limit {
+    let limit = match limit.map(|n| n.as_i32()) {
         None | Some(-1) => i32::MAX,
         Some(n) if n <= 0 => {
             return Err(VBError::with_description(
@@ -839,7 +843,7 @@ pub fn split(
 mod tests {
     use super::split;
     use crate::error::err_number;
-    use crate::value::VBVariant;
+    use crate::value::{VBLong, VBString, VBVariant};
 
     fn extract_strings(variant: &VBVariant) -> Vec<String> {
         match variant {
@@ -858,77 +862,131 @@ mod tests {
 
     #[test]
     fn split_with_comma_delimiter() {
-        let result = split("apple,banana,cherry", Some(","), None, None).unwrap();
+        let result = split(
+            &VBString::from("apple,banana,cherry"),
+            Some(&VBString::from(",")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["apple", "banana", "cherry"]);
     }
 
     #[test]
     fn split_with_default_delimiter() {
-        let result = split("The quick brown fox", None, None, None).unwrap();
+        let result = split(&VBString::from("The quick brown fox"), None, None, None).unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["The", "quick", "brown", "fox"]);
     }
 
     #[test]
     fn split_with_custom_delimiter() {
-        let result = split("one|two|three", Some("|"), None, None).unwrap();
+        let result = split(
+            &VBString::from("one|two|three"),
+            Some(&VBString::from("|")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["one", "two", "three"]);
     }
 
     #[test]
     fn split_with_empty_delimiter_returns_single_element() {
-        let result = split("hello", Some(""), None, None).unwrap();
+        let result = split(
+            &VBString::from("hello"),
+            Some(&VBString::from("")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["hello"]);
     }
 
     #[test]
     fn split_empty_expression_returns_empty_array() {
-        let result = split("", Some(","), None, None).unwrap();
+        let result = split(&VBString::from(""), Some(&VBString::from(",")), None, None).unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, Vec::<String>::new());
     }
 
     #[test]
     fn split_with_limit() {
-        let result = split("one,two,three,four,five", Some(","), Some(3), None).unwrap();
+        let result = split(
+            &VBString::from("one,two,three,four,five"),
+            Some(&VBString::from(",")),
+            Some(&VBLong::from(3)),
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["one", "two", "three,four,five"]);
     }
 
     #[test]
     fn split_with_limit_one() {
-        let result = split("one,two,three", Some(","), Some(1), None).unwrap();
+        let result = split(
+            &VBString::from("one,two,three"),
+            Some(&VBString::from(",")),
+            Some(&VBLong::from(1)),
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["one,two,three"]);
     }
 
     #[test]
     fn split_single_element() {
-        let result = split("single", Some(","), None, None).unwrap();
+        let result = split(
+            &VBString::from("single"),
+            Some(&VBString::from(",")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["single"]);
     }
 
     #[test]
     fn split_preserves_order() {
-        let result = split("first-second-third", Some("-"), None, None).unwrap();
+        let result = split(
+            &VBString::from("first-second-third"),
+            Some(&VBString::from("-")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["first", "second", "third"]);
     }
 
     #[test]
     fn split_handles_empty_strings_between_delimiters() {
-        let result = split("a,,b", Some(","), None, None).unwrap();
+        let result = split(
+            &VBString::from("a,,b"),
+            Some(&VBString::from(",")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["a", "", "b"]);
     }
 
     #[test]
     fn split_multiple_consecutive_delimiters() {
-        let result = split("a,,,b", Some(","), None, None).unwrap();
+        let result = split(
+            &VBString::from("a,,,b"),
+            Some(&VBString::from(",")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["a", "", "", "b"]);
     }
@@ -936,21 +994,39 @@ mod tests {
     #[test]
     fn split_multiline_text() {
         let text = "Line 1\nLine 2\nLine 3";
-        let result = split(text, Some("\n"), None, None).unwrap();
+        let result = split(
+            &VBString::from(text),
+            Some(&VBString::from("\n")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["Line 1", "Line 2", "Line 3"]);
     }
 
     #[test]
     fn split_with_limit_at_boundary() {
-        let result = split("a,b,c", Some(","), Some(2), None).unwrap();
+        let result = split(
+            &VBString::from("a,b,c"),
+            Some(&VBString::from(",")),
+            Some(&VBLong::from(2)),
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["a", "b,c"]);
     }
 
     #[test]
     fn split_returns_zero_based_array() {
-        let result = split("a,b,c", Some(","), None, None).unwrap();
+        let result = split(
+            &VBString::from("a,b,c"),
+            Some(&VBString::from(",")),
+            None,
+            None,
+        )
+        .unwrap();
         let arr = result.as_array().unwrap();
         assert_eq!(arr.lower_bound(0).unwrap(), 0);
         assert_eq!(arr.upper_bound(0).unwrap(), 2);
@@ -958,94 +1034,178 @@ mod tests {
 
     #[test]
     fn split_limit_minus_one_means_no_limit() {
-        let result = split("a,b,c,d,e", Some(","), Some(-1), None).unwrap();
+        let result = split(
+            &VBString::from("a,b,c,d,e"),
+            Some(&VBString::from(",")),
+            Some(&VBLong::from(-1)),
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["a", "b", "c", "d", "e"]);
     }
 
     #[test]
     fn split_limit_zero_is_error_5() {
-        let err = split("a,b,c", Some(","), Some(0), None).unwrap_err();
+        let err = split(
+            &VBString::from("a,b,c"),
+            Some(&VBString::from(",")),
+            Some(&VBLong::from(0)),
+            None,
+        )
+        .unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
     }
 
     #[test]
     fn split_negative_limit_other_than_minus_one_is_error_5() {
-        let err = split("a,b,c", Some(","), Some(-2), None).unwrap_err();
+        let err = split(
+            &VBString::from("a,b,c"),
+            Some(&VBString::from(",")),
+            Some(&VBLong::from(-2)),
+            None,
+        )
+        .unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
     }
 
     #[test]
     fn split_text_compare_case_insensitive() {
-        let result = split("A,B,a,b", Some(","), None, Some(1)).unwrap();
+        let result = split(
+            &VBString::from("A,B,a,b"),
+            Some(&VBString::from(",")),
+            None,
+            Some(&VBLong::from(1)),
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["A", "B", "a", "b"]);
     }
 
     #[test]
     fn split_binary_compare_case_sensitive() {
-        let result = split("A,B,a,b", Some(","), None, Some(0)).unwrap();
+        let result = split(
+            &VBString::from("A,B,a,b"),
+            Some(&VBString::from(",")),
+            None,
+            Some(&VBLong::from(0)),
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["A", "B", "a", "b"]);
     }
 
     #[test]
     fn split_invalid_compare_is_error_5() {
-        let err = split("a,b,c", Some(","), None, Some(3)).unwrap_err();
+        let err = split(
+            &VBString::from("a,b,c"),
+            Some(&VBString::from(",")),
+            None,
+            Some(&VBLong::from(3)),
+        )
+        .unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
     }
 
     #[test]
     fn split_preserves_whitespace_in_parts() {
-        let result = split("hello   world", Some("  "), None, None).unwrap();
+        let result = split(
+            &VBString::from("hello   world"),
+            Some(&VBString::from("  ")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["hello", " world"]);
     }
 
     #[test]
     fn split_delimiter_not_found_returns_single_element() {
-        let result = split("hello world", Some(","), None, None).unwrap();
+        let result = split(
+            &VBString::from("hello world"),
+            Some(&VBString::from(",")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["hello world"]);
     }
 
     #[test]
     fn split_preserves_original_casing_with_text_compare() {
-        let result = split("Hello World TEST", Some(","), None, Some(1)).unwrap();
+        let result = split(
+            &VBString::from("Hello World TEST"),
+            Some(&VBString::from(",")),
+            None,
+            Some(&VBLong::from(1)),
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["Hello World TEST"]);
     }
 
     #[test]
     fn split_use_option_compare_defaults_to_binary() {
-        let result = split("a,b,c", Some(","), None, Some(-1)).unwrap();
+        let result = split(
+            &VBString::from("a,b,c"),
+            Some(&VBString::from(",")),
+            None,
+            Some(&VBLong::from(-1)),
+        )
+        .unwrap();
         assert!(!extract_strings(&result).is_empty());
     }
 
     #[test]
     fn split_database_compare_defaults_to_binary() {
-        let result = split("a,b,c", Some(","), None, Some(2)).unwrap();
+        let result = split(
+            &VBString::from("a,b,c"),
+            Some(&VBString::from(",")),
+            None,
+            Some(&VBLong::from(2)),
+        )
+        .unwrap();
         assert!(!extract_strings(&result).is_empty());
     }
 
     #[test]
     fn split_multiline_with_crlf() {
         let text = "Line 1\r\nLine 2\r\nLine 3";
-        let result = split(text, Some("\r\n"), None, None).unwrap();
+        let result = split(
+            &VBString::from(text),
+            Some(&VBString::from("\r\n")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["Line 1", "Line 2", "Line 3"]);
     }
 
     #[test]
     fn split_path_components() {
-        let result = split("a/b/c/d", Some("/"), None, None).unwrap();
+        let result = split(
+            &VBString::from("a/b/c/d"),
+            Some(&VBString::from("/")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["a", "b", "c", "d"]);
     }
 
     #[test]
     fn split_empty_delimiter_on_non_empty_expression() {
-        let result = split("anything", Some(""), None, None).unwrap();
+        let result = split(
+            &VBString::from("anything"),
+            Some(&VBString::from("")),
+            None,
+            None,
+        )
+        .unwrap();
         let parts = extract_strings(&result);
         assert_eq!(parts, vec!["anything"]);
     }

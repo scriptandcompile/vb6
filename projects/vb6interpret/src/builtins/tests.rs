@@ -790,6 +790,34 @@ fn filter_dispatch() {
 }
 
 #[test]
+fn arrays_boundary_rejects_null_optionals_and_reports_structural_failures() {
+    // Optional scalar parameters are typed: a present Null is error 94.
+    let err = call_builtin("Split", &[VBVariant::from_string("a,b"), VBVariant::Null]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+    let err = call_builtin(
+        "Filter",
+        &[
+            call_builtin("Array", &[VBVariant::from_string("x")]).unwrap(),
+            VBVariant::from_string("x"),
+            VBVariant::Null,
+        ],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+
+    // `sourcearray` stays structural: Null and non-arrays both fail the
+    // Array-ness check with error 13 (no in-body propagation here).
+    let err = call_builtin("LBound", &[VBVariant::Null]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::TYPE_MISMATCH);
+    let err = call_builtin("LBound", &[VBVariant::from_long(7)]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::TYPE_MISMATCH);
+
+    // Array() stores elements unconverted — even a Null element.
+    let arr = call_builtin("Array", &[VBVariant::from_long(1), VBVariant::Null]).unwrap();
+    assert!(matches!(arr, VBVariant::Array(_)));
+}
+
+#[test]
 fn conversion_functions_dispatch() {
     assert_eq!(
         call_builtin("Hex", &[VBVariant::from_long(255)]).unwrap(),

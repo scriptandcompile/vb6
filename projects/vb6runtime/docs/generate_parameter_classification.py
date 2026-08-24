@@ -17,7 +17,7 @@ PREDICATES = {
     "isnumeric", "isobject", "typename", "vartype",
 }
 STRUCTURAL_PARAM_NAMES = {"sourcearray", "values", "choices", "valuearray", "array",
-                          "arguments"}
+                          "arguments", "elements"}
 # Names that appear as plain calls inside adapters but are not runtime targets.
 NON_TARGET_CALLEES = {
     "map", "ok_or_else", "unwrap_or_else", "with_description", "expect",

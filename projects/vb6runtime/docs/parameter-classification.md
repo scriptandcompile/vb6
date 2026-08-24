@@ -25,12 +25,12 @@ Classes:
 
 | Function | Arity | Runtime signature | Class | Null |
 |---|---|---|---|---|
-| `array` | 0..∞ | `fn(elements: &[VBVariant]) -> VBVariant` | typed | raises 94 |
-| `filter` | 2..4 | `fn(sourcearray: &VBVariant, match_string: &str, include: Option<bool>, compare: Option<i32>) -> VBResult<VBVariant>` | structural | propagates Null |
-| `join` | 1..2 | `fn(sourcearray: &VBVariant, delimiter: Option<&str>) -> VBResult<String>` | structural | propagates Null |
-| `lbound` | 1..2 | `fn(array: &VBVariant, dimension: Option<i32>) -> VBResult<VBVariant>` | structural | propagates Null |
-| `split` | 1..4 | `fn(expression: &str, delimiter: Option<&str>, limit: Option<i32>, compare: Option<i32>) -> VBResult<VBVariant>` | typed | raises 94 |
-| `ubound` | 1..2 | `fn(array: &VBVariant, dimension: Option<i32>) -> VBResult<VBVariant>` | structural | propagates Null |
+| `array` | 0..∞ | `fn(elements: &[VBVariant]) -> VBVariant` | structural | propagates Null |
+| `filter` | 2..4 | `fn(sourcearray: &VBVariant, match_string: &VBString, include: Option<&VBBoolean>, compare: Option<&VBLong>) -> VBResult<VBVariant>` | structural | propagates Null |
+| `join` | 1..2 | `fn(sourcearray: &VBVariant, delimiter: Option<&VBString>) -> VBResult<String>` | structural | propagates Null |
+| `lbound` | 1..2 | `fn(array: &VBVariant, dimension: Option<&VBLong>) -> VBResult<VBVariant>` | structural | propagates Null |
+| `split` | 1..4 | `fn(expression: &VBString, delimiter: Option<&VBString>, limit: Option<&VBLong>, compare: Option<&VBLong>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `ubound` | 1..2 | `fn(array: &VBVariant, dimension: Option<&VBLong>) -> VBResult<VBVariant>` | structural | propagates Null |
 
 ## `conversion`
 

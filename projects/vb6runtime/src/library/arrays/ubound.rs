@@ -618,7 +618,7 @@
 //! - Does not work with jagged arrays (arrays of arrays) directly
 
 use crate::error::{VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBLong, VBVariant};
 
 /// Implementation of the `UBound` function.
 ///
@@ -631,11 +631,11 @@ use crate::value::VBVariant;
 /// - Raises error 9 (Subscript out of range) if the array is not initialized
 ///   or if `dimension` exceeds the number of array dimensions
 /// - Raises error 9 if `dimension` is less than 1
-pub fn ubound(array: &VBVariant, dimension: Option<i32>) -> VBResult<VBVariant> {
+pub fn ubound(array: &VBVariant, dimension: Option<&VBLong>) -> VBResult<VBVariant> {
     // The dimension parameter is 1-based in VB6; convert to 0-based index
     let dim_index = match dimension {
         None => 0,
-        Some(d) if d >= 1 => (d - 1) as usize,
+        Some(d) if d.as_i32() >= 1 => (d.as_i32() - 1) as usize,
         Some(_) => return Err(VBError::subscript_out_of_range()),
     };
 
@@ -654,7 +654,7 @@ mod tests {
     use crate::array::{ArrayDimension, ArrayValue};
     use crate::error::err_number;
     use crate::types::VBType;
-    use crate::value::VBVariant;
+    use crate::value::{VBLong, VBVariant};
 
     fn make_array(bounds: (i32, i32)) -> VBVariant {
         let (lower, upper) = bounds;
@@ -673,7 +673,7 @@ mod tests {
     #[test]
     fn explicit_first_dimension() {
         let arr = make_array((0, 5));
-        let result = ubound(&arr, Some(1)).unwrap();
+        let result = ubound(&arr, Some(&VBLong::from(1))).unwrap();
         assert_eq!(result, VBVariant::Long(5));
     }
 
@@ -703,7 +703,7 @@ mod tests {
     fn multi_dimensional_second_dim() {
         let dims = [ArrayDimension::new(1, 5), ArrayDimension::new(0, 3)];
         let arr = VBVariant::Array(ArrayValue::new_fixed(VBType::Long, &dims).unwrap());
-        let result = ubound(&arr, Some(2)).unwrap();
+        let result = ubound(&arr, Some(&VBLong::from(2))).unwrap();
         assert_eq!(result, VBVariant::Long(3));
     }
 
@@ -711,21 +711,21 @@ mod tests {
     fn dimension_out_of_range() {
         let dims = [ArrayDimension::new(1, 5), ArrayDimension::new(0, 3)];
         let arr = VBVariant::Array(ArrayValue::new_fixed(VBType::Long, &dims).unwrap());
-        let err = ubound(&arr, Some(3)).unwrap_err();
+        let err = ubound(&arr, Some(&VBLong::from(3))).unwrap_err();
         assert_eq!(err.number, err_number::SUBSCRIPT_OUT_OF_RANGE);
     }
 
     #[test]
     fn zero_dimension_is_error() {
         let arr = make_array((0, 5));
-        let err = ubound(&arr, Some(0)).unwrap_err();
+        let err = ubound(&arr, Some(&VBLong::from(0))).unwrap_err();
         assert_eq!(err.number, err_number::SUBSCRIPT_OUT_OF_RANGE);
     }
 
     #[test]
     fn negative_dimension_is_error() {
         let arr = make_array((0, 5));
-        let err = ubound(&arr, Some(-1)).unwrap_err();
+        let err = ubound(&arr, Some(&VBLong::from(-1))).unwrap_err();
         assert_eq!(err.number, err_number::SUBSCRIPT_OUT_OF_RANGE);
     }
 

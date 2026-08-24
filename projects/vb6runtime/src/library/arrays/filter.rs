@@ -793,7 +793,7 @@
 use crate::array::ArrayValue;
 use crate::error::{err_number, VBError, VBResult};
 use crate::types::VBType;
-use crate::value::VBVariant;
+use crate::value::{VBBoolean, VBLong, VBString, VBVariant};
 
 /// Implementation of the `Filter` function.
 ///
@@ -821,9 +821,9 @@ use crate::value::VBVariant;
 /// - Raises error 5 if `sourcearray` is multi-dimensional
 pub fn filter(
     sourcearray: &VBVariant,
-    match_string: &str,
-    include: Option<bool>,
-    compare: Option<i32>,
+    match_string: &VBString,
+    include: Option<&VBBoolean>,
+    compare: Option<&VBLong>,
 ) -> VBResult<VBVariant> {
     // Validate sourcearray is not Null
     if sourcearray.is_null() {
@@ -855,8 +855,8 @@ pub fn filter(
         ));
     }
 
-    let include = include.unwrap_or(true);
-    let text_compare = match compare {
+    let include = include.is_none_or(|b| b.as_bool());
+    let text_compare = match compare.map(|c| c.as_i32()) {
         None => false,
         Some(mode) if (-1..=2).contains(&mode) => mode == 1,
         Some(_) => return Err(VBError::invalid_procedure_call()),
@@ -878,9 +878,9 @@ pub fn filter(
         let contains = if text_compare {
             element_str
                 .to_lowercase()
-                .contains(&match_string.to_lowercase())
+                .contains(&match_string.as_str().to_lowercase())
         } else {
-            element_str.contains(match_string)
+            element_str.contains(match_string.as_str())
         };
 
         if (include && contains) || (!include && !contains) {
@@ -902,7 +902,7 @@ mod tests {
     use crate::array::{ArrayDimension, ArrayValue};
     use crate::error::err_number;
     use crate::types::VBType;
-    use crate::value::VBVariant;
+    use crate::value::{VBBoolean, VBLong, VBString, VBVariant};
 
     fn make_string_array(strings: &[&str]) -> VBVariant {
         let data: Vec<VBVariant> = strings.iter().map(|s| VBVariant::from_string(*s)).collect();
@@ -925,7 +925,7 @@ mod tests {
     #[test]
     fn basic_filter_includes_matches() {
         let source = make_string_array(&["Apple", "Banana", "Cherry", "Date", "Elderberry"]);
-        let result = filter(&source, "e", None, None).unwrap();
+        let result = filter(&source, &VBString::from("e"), None, None).unwrap();
         let matches = extract_strings(&result);
 
         assert_eq!(matches, vec!["Apple", "Cherry", "Date", "Elderberry"]);
@@ -934,7 +934,13 @@ mod tests {
     #[test]
     fn filter_excludes_matches() {
         let source = make_string_array(&["Apple", "Banana", "Cherry", "Date", "Elderberry"]);
-        let result = filter(&source, "e", Some(false), None).unwrap();
+        let result = filter(
+            &source,
+            &VBString::from("e"),
+            Some(&VBBoolean::from(false)),
+            None,
+        )
+        .unwrap();
         let matches = extract_strings(&result);
 
         assert_eq!(matches, vec!["Banana"]);
@@ -943,7 +949,7 @@ mod tests {
     #[test]
     fn text_compare_is_case_insensitive() {
         let source = make_string_array(&["Apple", "Banana", "Cherry"]);
-        let result = filter(&source, "a", None, Some(1)).unwrap();
+        let result = filter(&source, &VBString::from("a"), None, Some(&VBLong::from(1))).unwrap();
         let matches = extract_strings(&result);
 
         assert_eq!(matches, vec!["Apple", "Banana"]);
@@ -952,7 +958,7 @@ mod tests {
     #[test]
     fn binary_compare_is_case_sensitive() {
         let source = make_string_array(&["Apple", "apple", "BANANA"]);
-        let result = filter(&source, "a", None, Some(0)).unwrap();
+        let result = filter(&source, &VBString::from("a"), None, Some(&VBLong::from(0))).unwrap();
         let matches = extract_strings(&result);
 
         assert_eq!(matches, vec!["apple"]);
@@ -961,7 +967,7 @@ mod tests {
     #[test]
     fn empty_match_includes_all() {
         let source = make_string_array(&["a", "b", "c"]);
-        let result = filter(&source, "", None, None).unwrap();
+        let result = filter(&source, &VBString::from(""), None, None).unwrap();
         let matches = extract_strings(&result);
 
         assert_eq!(matches, vec!["a", "b", "c"]);
@@ -970,7 +976,13 @@ mod tests {
     #[test]
     fn empty_match_excludes_none() {
         let source = make_string_array(&["a", "b", "c"]);
-        let result = filter(&source, "", Some(false), None).unwrap();
+        let result = filter(
+            &source,
+            &VBString::from(""),
+            Some(&VBBoolean::from(false)),
+            None,
+        )
+        .unwrap();
         let matches = extract_strings(&result);
 
         // Empty string is contained in every string, so excluding gives empty result
@@ -980,7 +992,7 @@ mod tests {
     #[test]
     fn no_matches_returns_empty_array() {
         let source = make_string_array(&["Apple", "Banana", "Cherry"]);
-        let result = filter(&source, "xyz", None, None).unwrap();
+        let result = filter(&source, &VBString::from("xyz"), None, None).unwrap();
         let matches = extract_strings(&result);
 
         assert_eq!(matches, Vec::<String>::new());
@@ -989,7 +1001,7 @@ mod tests {
     #[test]
     fn returns_zero_based_array() {
         let source = make_string_array(&["a", "b", "c"]);
-        let result = filter(&source, "a", None, None).unwrap();
+        let result = filter(&source, &VBString::from("a"), None, None).unwrap();
         let arr = result.as_array().unwrap();
 
         assert_eq!(arr.lower_bound(0).unwrap(), 0);
@@ -997,20 +1009,32 @@ mod tests {
 
     #[test]
     fn null_source_is_error_94() {
-        let err = filter(&VBVariant::Null, "test", None, None).unwrap_err();
+        let err = filter(&VBVariant::Null, &VBString::from("test"), None, None).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
     }
 
     #[test]
     fn non_array_is_error_13() {
-        let err = filter(&VBVariant::from_string("not an array"), "test", None, None).unwrap_err();
+        let err = filter(
+            &VBVariant::from_string("not an array"),
+            &VBString::from("test"),
+            None,
+            None,
+        )
+        .unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 
     #[test]
     fn preserves_original_strings() {
         let source = make_string_array(&["Hello World", "HELLO WORLD", "hello world"]);
-        let result = filter(&source, "world", None, Some(1)).unwrap();
+        let result = filter(
+            &source,
+            &VBString::from("world"),
+            None,
+            Some(&VBLong::from(1)),
+        )
+        .unwrap();
         let matches = extract_strings(&result);
 
         // Text compare finds all three, original casing preserved
@@ -1025,7 +1049,7 @@ mod tests {
             VBVariant::from_string("Cherry"),
         ];
         let source = VBVariant::Array(ArrayValue::from_vec(VBType::String, data));
-        let result = filter(&source, "e", None, None).unwrap();
+        let result = filter(&source, &VBString::from("e"), None, None).unwrap();
         assert_eq!(extract_strings(&result), vec!["Apple", "Cherry"]);
     }
 
@@ -1037,7 +1061,7 @@ mod tests {
             VBVariant::from_string("c"),
         ];
         let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::String, data, -2));
-        let result = filter(&source, "b", None, None).unwrap();
+        let result = filter(&source, &VBString::from("b"), None, None).unwrap();
         assert_eq!(extract_strings(&result), vec!["bb"]);
         // Result is zero-based even though the source was not
         assert_eq!(result.as_array().unwrap().lower_bound(0).unwrap(), 0);
@@ -1051,7 +1075,7 @@ mod tests {
             VBVariant::from_string("Cherry"),
         ];
         let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
-        let err = filter(&source, "e", None, None).unwrap_err();
+        let err = filter(&source, &VBString::from("e"), None, None).unwrap_err();
         assert_eq!(err.number, err_number::TYPE_MISMATCH);
     }
 
@@ -1063,7 +1087,7 @@ mod tests {
             VBVariant::from_string("Cherry"),
         ];
         let source = VBVariant::Array(ArrayValue::from_vec_with_bounds(VBType::Variant, data, 0));
-        let err = filter(&source, "e", None, None).unwrap_err();
+        let err = filter(&source, &VBString::from("e"), None, None).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
     }
 
@@ -1071,7 +1095,13 @@ mod tests {
     fn invalid_compare_is_error_5() {
         let source = make_string_array(&["Apple", "Banana"]);
         for compare in [3, 5, -2, 100] {
-            let err = filter(&source, "a", None, Some(compare)).unwrap_err();
+            let err = filter(
+                &source,
+                &VBString::from("a"),
+                None,
+                Some(&VBLong::from(compare)),
+            )
+            .unwrap_err();
             assert_eq!(
                 err.number,
                 err_number::INVALID_PROCEDURE_CALL,
@@ -1083,28 +1113,28 @@ mod tests {
     #[test]
     fn use_option_compare_defaults_to_binary() {
         let source = make_string_array(&["Apple", "apple"]);
-        let result = filter(&source, "a", None, Some(-1)).unwrap();
+        let result = filter(&source, &VBString::from("a"), None, Some(&VBLong::from(-1))).unwrap();
         assert_eq!(extract_strings(&result), vec!["apple"]);
     }
 
     #[test]
     fn database_compare_defaults_to_binary() {
         let source = make_string_array(&["Apple", "apple"]);
-        let result = filter(&source, "a", None, Some(2)).unwrap();
+        let result = filter(&source, &VBString::from("a"), None, Some(&VBLong::from(2))).unwrap();
         assert_eq!(extract_strings(&result), vec!["apple"]);
     }
 
     #[test]
     fn explicit_binary_compare_is_case_sensitive() {
         let source = make_string_array(&["Apple", "apple"]);
-        let result = filter(&source, "a", None, Some(0)).unwrap();
+        let result = filter(&source, &VBString::from("a"), None, Some(&VBLong::from(0))).unwrap();
         assert_eq!(extract_strings(&result), vec!["apple"]);
     }
 
     #[test]
     fn undimensioned_array_returns_empty() {
         let source = VBVariant::Array(ArrayValue::new_dynamic(VBType::String));
-        let result = filter(&source, "x", None, None).unwrap();
+        let result = filter(&source, &VBString::from("x"), None, None).unwrap();
         assert!(extract_strings(&result).is_empty());
     }
 
@@ -1115,7 +1145,7 @@ mod tests {
             Vec::new(),
             0,
         ));
-        let result = filter(&source, "x", None, None).unwrap();
+        let result = filter(&source, &VBString::from("x"), None, None).unwrap();
         assert!(extract_strings(&result).is_empty());
     }
 
@@ -1128,14 +1158,14 @@ mod tests {
             )
             .unwrap(),
         );
-        let err = filter(&source, "x", None, None).unwrap_err();
+        let err = filter(&source, &VBString::from("x"), None, None).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
     }
 
     #[test]
     fn result_bounds_reflect_match_count() {
         let source = make_string_array(&["Apple", "Banana", "Cherry"]);
-        let result = filter(&source, "e", None, None).unwrap();
+        let result = filter(&source, &VBString::from("e"), None, None).unwrap();
         let arr = result.as_array().unwrap();
         assert_eq!(arr.lower_bound(0).unwrap(), 0);
         assert_eq!(arr.upper_bound(0).unwrap(), 1);
@@ -1145,14 +1175,20 @@ mod tests {
     #[test]
     fn substring_match_is_not_whole_word() {
         let source = make_string_array(&["banana", "band", "apple"]);
-        let result = filter(&source, "ban", None, None).unwrap();
+        let result = filter(&source, &VBString::from("ban"), None, None).unwrap();
         assert_eq!(extract_strings(&result), vec!["banana", "band"]);
     }
 
     #[test]
     fn exclude_preserves_order() {
         let source = make_string_array(&["a", "b", "c", "d"]);
-        let result = filter(&source, "b", Some(false), None).unwrap();
+        let result = filter(
+            &source,
+            &VBString::from("b"),
+            Some(&VBBoolean::from(false)),
+            None,
+        )
+        .unwrap();
         assert_eq!(extract_strings(&result), vec!["a", "c", "d"]);
     }
 }
