@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/string_manipulation/mid.rs
+source: projects/vb6parse/src/syntax/library/statements/string_manipulation/mid.rs
 expression: tree
 ---
 root:
@@ -33,20 +33,34 @@ root:
                   text: Mid
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: buffer
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: pos
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "10"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: buffer
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: pos
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "10"
                 - kind: RightParenthesis
                   text: )
                 - kind: Whitespace
@@ -55,14 +69,16 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: data
-                - kind: Whitespace
-                  text: " "
-                - kind: EndOfLineComment
-                  text: "' Replace 10 characters"
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: data
+            - kind: Whitespace
+              text: " "
+            - kind: EndOfLineComment
+              text: "' Replace 10 characters"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

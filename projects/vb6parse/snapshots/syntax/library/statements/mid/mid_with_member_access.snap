@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/string_manipulation/mid.rs
+source: projects/vb6parse/src/syntax/library/statements/string_manipulation/mid.rs
 expression: tree
 ---
 root:
@@ -33,24 +33,38 @@ root:
                   text: Mid
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: obj
-                - kind: PeriodOperator
-                  text: "."
-                - kind: NameKeyword
-                  text: Name
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "1"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "10"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: Identifier
+                              text: obj
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: NameKeyword
+                              text: Name
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "1"
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "10"
                 - kind: RightParenthesis
                   text: )
                 - kind: Whitespace
@@ -59,10 +73,12 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: newName
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: newName
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/string_manipulation/mid.rs
+source: projects/vb6parse/src/syntax/library/statements/string_manipulation/mid.rs
 expression: tree
 ---
 root:
@@ -33,14 +33,24 @@ root:
                   text: Mid
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: line1
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "5"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: line1
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "5"
                 - kind: RightParenthesis
                   text: )
                 - kind: Whitespace
@@ -49,10 +59,12 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"HELLO\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"HELLO\""
+            - kind: Newline
+              text: "\n"
             - kind: MidStatement
               children:
                 - kind: Whitespace
@@ -61,20 +73,34 @@ root:
                   text: Mid
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: line2
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "1"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "3"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: line2
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "1"
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "3"
                 - kind: RightParenthesis
                   text: )
                 - kind: Whitespace
@@ -83,10 +109,12 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"ABC\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"ABC\""
+            - kind: Newline
+              text: "\n"
             - kind: MidStatement
               children:
                 - kind: Whitespace
@@ -95,20 +123,34 @@ root:
                   text: Mid
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: line3
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "2"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "4"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: line3
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "2"
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "4"
                 - kind: RightParenthesis
                   text: )
                 - kind: Whitespace
@@ -117,10 +159,12 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"TEST\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"TEST\""
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

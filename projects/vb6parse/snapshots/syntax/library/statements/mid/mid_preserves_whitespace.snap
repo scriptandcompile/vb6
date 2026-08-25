@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/string_manipulation/mid.rs
+source: projects/vb6parse/src/syntax/library/statements/string_manipulation/mid.rs
 expression: tree
 ---
 root:
@@ -15,28 +15,42 @@ root:
           text: "  "
         - kind: LeftParenthesis
           text: (
-        - kind: Whitespace
-          text: "  "
-        - kind: Identifier
-          text: myString
-        - kind: Whitespace
-          text: "  "
-        - kind: Comma
-          text: ","
-        - kind: Whitespace
-          text: "  "
-        - kind: IntegerLiteral
-          text: "3"
-        - kind: Whitespace
-          text: "  "
-        - kind: Comma
-          text: ","
-        - kind: Whitespace
-          text: "  "
-        - kind: IntegerLiteral
-          text: "2"
-        - kind: Whitespace
-          text: "  "
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: Whitespace
+                  text: "  "
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: myString
+            - kind: Whitespace
+              text: "  "
+            - kind: Comma
+              text: ","
+            - kind: Whitespace
+              text: "  "
+            - kind: Argument
+              children:
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "3"
+            - kind: Whitespace
+              text: "  "
+            - kind: Comma
+              text: ","
+            - kind: Whitespace
+              text: "  "
+            - kind: Argument
+              children:
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "2"
+            - kind: Whitespace
+              text: "  "
         - kind: RightParenthesis
           text: )
         - kind: Whitespace
@@ -45,9 +59,11 @@ root:
           text: "="
         - kind: Whitespace
           text: "  "
-        - kind: StringLiteral
-          text: "\"XX\""
-        - kind: Whitespace
-          text: "    "
-        - kind: Newline
-          text: "\n"
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"XX\""
+    - kind: Whitespace
+      text: "    "
+    - kind: Newline
+      text: "\n"
