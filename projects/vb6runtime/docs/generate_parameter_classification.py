@@ -23,11 +23,22 @@ NON_TARGET_CALLEES = {
     "map", "ok_or_else", "unwrap_or_else", "with_description", "expect",
     "transpose", "and_then", "as_str", "as_i32",
 }
-# Manual overrides where naming rules are not enough: (category, name) -> class.
+# Manual overrides where naming rules are not enough: (category, name) -> class,
+# or -> (class, null) when the Null policy needs an exact value.
 OVERRIDES = {
     ("logic", "iif"): "structural",
     ("string", "string"): "variant-input",
     ("string", "string$"): "variant-input",  # character param propagates Null
+    # Environ's single argument is a genuine union (String name | numeric
+    # table position), so no single wrapper can coerce it; the `$` sibling
+    # shares the raw view and rejects Null with error 5 in-body.
+    ("environment", "environ"): "variant-input",
+    ("environment", "environ$"): ("variant-input", "raises 5"),
+    # Error's optional number keeps a raw optional-Variant view because VB6
+    # documents an explicit Empty argument as "the current error number",
+    # which must stay distinct from a coercible Long; Null raises 94 in-body.
+    ("environment", "error"): ("variant-input", "raises 94"),
+    ("environment", "error$"): ("variant-input", "raises 94"),
 }
 
 # Entries whose dispatch adapter propagates Null without a `propstring`
@@ -154,8 +165,16 @@ def main():
                 missing.append((cat, name, target))
                 params, ret = "", ""
             if (cat, name) in OVERRIDES:
-                cls = OVERRIDES[(cat, name)]
-                null = "propagates Null" if "variant" in cls or cls == "structural" else "raises 94"
+                override = OVERRIDES[(cat, name)]
+                if isinstance(override, tuple):
+                    cls, null = override
+                else:
+                    cls = override
+                    null = (
+                        "propagates Null"
+                        if "variant" in cls or cls == "structural"
+                        else "raises 94"
+                    )
             else:
                 cls, null = classify(name, params)
             if propagating or (cat, name) in PROPAGATING:

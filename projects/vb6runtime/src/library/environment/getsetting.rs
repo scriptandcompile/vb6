@@ -317,7 +317,7 @@
 
 use crate::error::VBResult;
 use crate::state::settings;
-use crate::value::VBVariant;
+use crate::value::{VBString, VBVariant};
 
 /// Returns the value stored for `(appname, section, key)` under the VB6
 /// settings store, or `default` when no value is stored.
@@ -327,16 +327,13 @@ use crate::value::VBVariant;
 /// is `Empty` (omitted). `Null` arguments raise error 94 (invalid use of
 /// `Null`); object and array arguments raise error 13 (type mismatch).
 pub fn get_setting(
-    appname: &VBVariant,
-    section: &VBVariant,
-    key: &VBVariant,
-    default: &VBVariant,
+    appname: &VBString,
+    section: &VBString,
+    key: &VBString,
+    default: Option<&VBString>,
 ) -> VBResult<VBVariant> {
-    let appname = appname.as_string()?;
-    let section = section.as_string()?;
-    let key = key.as_string()?;
-    let default = default.as_string()?;
-    let value = settings::get(&appname, &section, &key).unwrap_or(default);
+    let value = settings::get(appname.as_str(), section.as_str(), key.as_str())
+        .unwrap_or_else(|| default.map(|d| d.as_str().to_owned()).unwrap_or_default());
     Ok(VBVariant::from_string(value))
 }
 
@@ -356,10 +353,10 @@ mod tests {
             settings_state::set("MyApp", "Window", "Left", "150").unwrap();
             assert_eq!(
                 get_setting(
-                    &string("MyApp"),
-                    &string("Window"),
-                    &string("Left"),
-                    &string("0"),
+                    &VBString::from("MyApp"),
+                    &VBString::from("Window"),
+                    &VBString::from("Left"),
+                    Some(&VBString::from("0")),
                 )
                 .unwrap(),
                 string("150")
@@ -372,10 +369,10 @@ mod tests {
         with_temp_settings_store(|_| {
             assert_eq!(
                 get_setting(
-                    &string("MyApp"),
-                    &string("Window"),
-                    &string("Missing"),
-                    &string("42"),
+                    &VBString::from("MyApp"),
+                    &VBString::from("Window"),
+                    &VBString::from("Missing"),
+                    Some(&VBString::from("42")),
                 )
                 .unwrap(),
                 string("42")
@@ -388,10 +385,10 @@ mod tests {
         with_temp_settings_store(|_| {
             assert_eq!(
                 get_setting(
-                    &string("MyApp"),
-                    &string("Window"),
-                    &string("Missing"),
-                    &VBVariant::Empty,
+                    &VBString::from("MyApp"),
+                    &VBString::from("Window"),
+                    &VBString::from("Missing"),
+                    None,
                 )
                 .unwrap(),
                 string("")
@@ -405,10 +402,10 @@ mod tests {
             settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
             assert_eq!(
                 get_setting(
-                    &string("myapp"),
-                    &string("startup"),
-                    &string("LEFT"),
-                    &string("0")
+                    &VBString::from("myapp"),
+                    &VBString::from("startup"),
+                    &VBString::from("LEFT"),
+                    Some(&VBString::from("0"))
                 )
                 .unwrap(),
                 string("150")
@@ -426,47 +423,15 @@ mod tests {
             ] {
                 assert_eq!(
                     get_setting(
-                        &string(appname),
-                        &string(section),
-                        &string(key),
-                        &string("fallback"),
+                        &VBString::from(appname),
+                        &VBString::from(section),
+                        &VBString::from(key),
+                        Some(&VBString::from("fallback")),
                     )
                     .unwrap(),
                     string("fallback")
                 );
             }
-        });
-    }
-
-    #[test]
-    fn null_arguments_are_error_94() {
-        with_temp_settings_store(|_| {
-            let err = get_setting(
-                &VBVariant::Null,
-                &string("Section"),
-                &string("Key"),
-                &string(""),
-            )
-            .unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
-            let err = get_setting(
-                &string("App"),
-                &string("Section"),
-                &string("Key"),
-                &VBVariant::Null,
-            )
-            .unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
-        });
-    }
-
-    #[test]
-    fn object_and_array_arguments_are_error_13() {
-        with_temp_settings_store(|_| {
-            let array = VBVariant::array_dynamic(vb6core::types::VBType::String);
-            let err =
-                get_setting(&array, &string("Section"), &string("Key"), &string("")).unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::TYPE_MISMATCH);
         });
     }
 
@@ -477,10 +442,10 @@ mod tests {
             settings_state::reset();
             assert_eq!(
                 get_setting(
-                    &string("MyApp"),
-                    &string("Startup"),
-                    &string("Left"),
-                    &string("0")
+                    &VBString::from("MyApp"),
+                    &VBString::from("Startup"),
+                    &VBString::from("Left"),
+                    Some(&VBString::from("0"))
                 )
                 .unwrap(),
                 string("150")

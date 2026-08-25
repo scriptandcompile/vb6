@@ -240,10 +240,12 @@ use crate::value::VBVariant;
 ///
 /// Returns error 94 (invalid use of Null) for a `Null` argument and error 13
 /// (type mismatch) for a value that does not convert to a number.
-pub fn error_dollar(arg: &VBVariant) -> VBResult<VBVariant> {
+pub fn error_dollar(arg: Option<&VBVariant>) -> VBResult<VBVariant> {
     let number = match arg {
-        VBVariant::Empty => err_state::current_number(),
-        _ => arg.as_i32()?,
+        // Both a missing argument and an explicit `Empty` mean "the current
+        // runtime error number" (documented VB6 behavior).
+        None | Some(VBVariant::Empty) => err_state::current_number(),
+        Some(value) => value.as_i32()?,
     };
     let description = if number == 0 {
         String::new()
@@ -262,15 +264,15 @@ mod tests {
     fn returns_message_for_known_number() {
         let _guard = TEST_LOCK.lock().unwrap();
         assert_eq!(
-            error_dollar(&VBVariant::from_integer(5)).unwrap(),
+            error_dollar(Some(&VBVariant::from_integer(5))).unwrap(),
             VBVariant::from_string("Invalid procedure call or argument")
         );
         assert_eq!(
-            error_dollar(&VBVariant::from_integer(11)).unwrap(),
+            error_dollar(Some(&VBVariant::from_integer(11))).unwrap(),
             VBVariant::from_string("Division by zero")
         );
         assert_eq!(
-            error_dollar(&VBVariant::from_integer(53)).unwrap(),
+            error_dollar(Some(&VBVariant::from_integer(53))).unwrap(),
             VBVariant::from_string("File not found")
         );
     }
@@ -279,7 +281,7 @@ mod tests {
     fn error_number_zero_returns_empty_string() {
         let _guard = TEST_LOCK.lock().unwrap();
         assert_eq!(
-            error_dollar(&VBVariant::from_integer(0)).unwrap(),
+            error_dollar(Some(&VBVariant::from_integer(0))).unwrap(),
             VBVariant::from_string("")
         );
     }
@@ -288,11 +290,11 @@ mod tests {
     fn unknown_number_returns_generic_message() {
         let _guard = TEST_LOCK.lock().unwrap();
         assert_eq!(
-            error_dollar(&VBVariant::from_long(999)).unwrap(),
+            error_dollar(Some(&VBVariant::from_long(999))).unwrap(),
             VBVariant::from_string("Application-defined or object-defined error")
         );
         assert_eq!(
-            error_dollar(&VBVariant::from_integer(-100)).unwrap(),
+            error_dollar(Some(&VBVariant::from_integer(-100))).unwrap(),
             VBVariant::from_string("Application-defined or object-defined error")
         );
     }
@@ -301,11 +303,11 @@ mod tests {
     fn fractional_number_is_rounded() {
         let _guard = TEST_LOCK.lock().unwrap();
         assert_eq!(
-            error_dollar(&VBVariant::from_double(5.4)).unwrap(),
+            error_dollar(Some(&VBVariant::from_double(5.4))).unwrap(),
             VBVariant::from_string("Invalid procedure call or argument")
         );
         assert_eq!(
-            error_dollar(&VBVariant::from_double(10.6)).unwrap(),
+            error_dollar(Some(&VBVariant::from_double(10.6))).unwrap(),
             VBVariant::from_string("Division by zero")
         );
     }
@@ -315,7 +317,18 @@ mod tests {
         let _guard = TEST_LOCK.lock().unwrap();
         err_state::set_number(53);
         assert_eq!(
-            error_dollar(&VBVariant::Empty).unwrap(),
+            error_dollar(None).unwrap(),
+            VBVariant::from_string("File not found")
+        );
+        err_state::clear();
+    }
+
+    #[test]
+    fn explicit_empty_argument_also_uses_the_current_error_number() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        err_state::set_number(53);
+        assert_eq!(
+            error_dollar(Some(&VBVariant::Empty)).unwrap(),
             VBVariant::from_string("File not found")
         );
         err_state::clear();
@@ -326,7 +339,7 @@ mod tests {
         let _guard = TEST_LOCK.lock().unwrap();
         err_state::clear();
         assert_eq!(
-            error_dollar(&VBVariant::Empty).unwrap(),
+            error_dollar(Some(&VBVariant::Empty)).unwrap(),
             VBVariant::from_string("")
         );
     }
@@ -335,7 +348,7 @@ mod tests {
     fn null_is_invalid_use_of_null() {
         let _guard = TEST_LOCK.lock().unwrap();
         assert_eq!(
-            error_dollar(&VBVariant::Null).unwrap_err().number,
+            error_dollar(Some(&VBVariant::Null)).unwrap_err().number,
             crate::error::err_number::INVALID_USE_OF_NULL
         );
     }
@@ -344,7 +357,7 @@ mod tests {
     fn non_numeric_string_is_type_mismatch() {
         let _guard = TEST_LOCK.lock().unwrap();
         assert_eq!(
-            error_dollar(&VBVariant::from_string("some text"))
+            error_dollar(Some(&VBVariant::from_string("some text")))
                 .unwrap_err()
                 .number,
             crate::error::err_number::TYPE_MISMATCH

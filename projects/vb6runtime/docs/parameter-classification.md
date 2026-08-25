@@ -74,16 +74,16 @@ Classes:
 
 | Function | Arity | Runtime signature | Class | Null |
 |---|---|---|---|---|
-| `deletesetting` | 2..3 | `fn(appname: &VBVariant, section: &VBVariant, key: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `deletesetting` | 2..3 | `fn(appname: &VBString, section: &VBString, key: Option<&VBString>) -> VBResult<VBVariant>` | typed | raises 94 |
 | `environ` | 1..1 | `fn(arg: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `environ$` | 1..1 | `fn(arg: &VBVariant) -> VBResult<VBVariant>` | $-strict | raises 94 |
-| `error` | 0..1 | `fn(arg: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `error$` | 0..1 | `fn(arg: &VBVariant) -> VBResult<VBVariant>` | $-strict | raises 94 |
-| `getallsettings` | 2..2 | `fn(appname: &VBVariant, section: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `getautoserversettings` | 3..3 | `fn(progid: &VBVariant, clsid: &VBVariant, machine: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `getsetting` | 3..4 | `fn(appname: &VBVariant, section: &VBVariant, key: &VBVariant, default: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `environ$` | 1..1 | `fn(arg: &VBVariant) -> VBResult<VBVariant>` | variant-input | raises 5 |
+| `error` | 0..1 | `fn(arg: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | raises 94 |
+| `error$` | 0..1 | `fn(arg: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | raises 94 |
+| `getallsettings` | 2..2 | `fn(appname: &VBString, section: &VBString) -> VBResult<VBVariant>` | typed | raises 94 |
+| `getautoserversettings` | 3..3 | `fn(progid: &VBString, clsid: &VBString, machine: &VBString) -> VBResult<VBVariant>` | typed | raises 94 |
+| `getsetting` | 3..4 | `fn(appname: &VBString, section: &VBString, key: &VBString, default: Option<&VBString>) -> VBResult<VBVariant>` | typed | raises 94 |
 | `imestatus` | 0..0 | `fn() -> VBResult<VBVariant>` | typed | raises 94 |
-| `savesetting` | 4..4 | `fn(appname: &VBVariant, section: &VBVariant, key: &VBVariant, value: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `savesetting` | 4..4 | `fn(appname: &VBString, section: &VBString, key: &VBString, value: &VBString) -> VBResult<VBVariant>` | typed | raises 94 |
 
 ## `file`
 

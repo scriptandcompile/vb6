@@ -123,7 +123,7 @@
 
 use crate::error::VBResult;
 use crate::state::settings;
-use crate::value::VBVariant;
+use crate::value::{VBString, VBVariant};
 
 /// Saves or creates a setting in the VB6 settings store.
 ///
@@ -131,17 +131,18 @@ use crate::value::VBVariant;
 /// Windows registry. `Null` arguments raise error 94 (invalid use of `Null`);
 /// object and array arguments raise error 13 (type mismatch).
 pub fn save_setting(
-    appname: &VBVariant,
-    section: &VBVariant,
-    key: &VBVariant,
-    value: &VBVariant,
+    appname: &VBString,
+    section: &VBString,
+    key: &VBString,
+    value: &VBString,
 ) -> VBResult<VBVariant> {
-    let appname = appname.as_string()?;
-    let section = section.as_string()?;
-    let key = key.as_string()?;
-    let value = value.as_string()?;
-    settings::set(&appname, &section, &key, &value)
-        .map_err(|e| crate::error::VBError::with_description(5, e.to_string()))?;
+    settings::set(
+        appname.as_str(),
+        section.as_str(),
+        key.as_str(),
+        value.as_str(),
+    )
+    .map_err(|e| crate::error::VBError::with_description(5, e.to_string()))?;
     Ok(VBVariant::Empty)
 }
 
@@ -151,18 +152,14 @@ mod tests {
     use crate::state::settings as settings_state;
     use crate::state::test_support::with_temp_settings_store;
 
-    fn string(value: &str) -> VBVariant {
-        VBVariant::from_string(value)
-    }
-
     #[test]
     fn stores_and_retrieves_a_value() {
         with_temp_settings_store(|_| {
             save_setting(
-                &string("MyApp"),
-                &string("Window"),
-                &string("Left"),
-                &string("150"),
+                &VBString::from("MyApp"),
+                &VBString::from("Window"),
+                &VBString::from("Left"),
+                &VBString::from("150"),
             )
             .unwrap();
             assert_eq!(
@@ -177,10 +174,10 @@ mod tests {
         with_temp_settings_store(|_| {
             settings_state::set("MyApp", "Window", "Left", "100").unwrap();
             save_setting(
-                &string("MyApp"),
-                &string("Window"),
-                &string("Left"),
-                &string("200"),
+                &VBString::from("MyApp"),
+                &VBString::from("Window"),
+                &VBString::from("Left"),
+                &VBString::from("200"),
             )
             .unwrap();
             assert_eq!(
@@ -191,61 +188,13 @@ mod tests {
     }
 
     #[test]
-    fn null_arguments_are_error_94() {
-        with_temp_settings_store(|_| {
-            let err = save_setting(
-                &VBVariant::Null,
-                &string("Section"),
-                &string("Key"),
-                &string("Value"),
-            )
-            .unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
-            let err = save_setting(
-                &string("App"),
-                &VBVariant::Null,
-                &string("Key"),
-                &string("Value"),
-            )
-            .unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
-            let err = save_setting(
-                &string("App"),
-                &string("Section"),
-                &VBVariant::Null,
-                &string("Value"),
-            )
-            .unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
-            let err = save_setting(
-                &string("App"),
-                &string("Section"),
-                &string("Key"),
-                &VBVariant::Null,
-            )
-            .unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
-        });
-    }
-
-    #[test]
-    fn object_and_array_arguments_are_error_13() {
-        with_temp_settings_store(|_| {
-            let array = VBVariant::array_dynamic(vb6core::types::VBType::String);
-            let err = save_setting(&array, &string("Section"), &string("Key"), &string("Value"))
-                .unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::TYPE_MISMATCH);
-        });
-    }
-
-    #[test]
     fn returns_empty_variant() {
         with_temp_settings_store(|_| {
             let result = save_setting(
-                &string("MyApp"),
-                &string("Section"),
-                &string("Key"),
-                &string("Value"),
+                &VBString::from("MyApp"),
+                &VBString::from("Section"),
+                &VBString::from("Key"),
+                &VBString::from("Value"),
             )
             .unwrap();
             assert_eq!(result, VBVariant::Empty);

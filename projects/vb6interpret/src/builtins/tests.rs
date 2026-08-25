@@ -762,6 +762,129 @@ fn error_and_error_dollar_dispatch() {
 }
 
 #[test]
+fn settings_functions_dispatch_and_reject_null_at_the_boundary() {
+    use vb6runtime::state::settings as settings_state;
+
+    // Serialize against the shared settings store and reset it afterwards.
+    static SETTINGS_DISPATCH_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    let _guard = SETTINGS_DISPATCH_LOCK.lock().unwrap();
+    settings_state::reset();
+
+    // SaveSetting returns Empty; GetSetting round-trips the stored value.
+    assert_eq!(
+        call_builtin(
+            "SaveSetting",
+            &[
+                VBVariant::from_string("DispatchApp"),
+                VBVariant::from_string("Window"),
+                VBVariant::from_string("Left"),
+                VBVariant::from_string("150"),
+            ],
+        )
+        .unwrap(),
+        VBVariant::Empty
+    );
+    assert_eq!(
+        call_builtin(
+            "GetSetting",
+            &[
+                VBVariant::from_string("DispatchApp"),
+                VBVariant::from_string("Window"),
+                VBVariant::from_string("Left"),
+            ],
+        )
+        .unwrap(),
+        VBVariant::from_string("150")
+    );
+
+    // A present Null on a typed string parameter is error 94.
+    let err = call_builtin(
+        "GetSetting",
+        &[
+            VBVariant::Null,
+            VBVariant::from_string("S"),
+            VBVariant::from_string("K"),
+        ],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+
+    // Two-argument DeleteSetting (omitted key) deletes the whole section.
+    call_builtin(
+        "DeleteSetting",
+        &[
+            VBVariant::from_string("DispatchApp"),
+            VBVariant::from_string("Window"),
+        ],
+    )
+    .unwrap();
+    assert_eq!(
+        call_builtin(
+            "GetAllSettings",
+            &[
+                VBVariant::from_string("DispatchApp"),
+                VBVariant::from_string("Window")
+            ],
+        )
+        .unwrap(),
+        VBVariant::Empty
+    );
+
+    settings_state::reset();
+}
+
+#[test]
+fn environment_boundary_pins_optional_null_and_error_number_policy() {
+    // Optional parameters keep present-Null → 94: DeleteSetting with an
+    // omitted (or empty) key removes the whole section, but an explicit Null
+    // rejects at the boundary before any store access.
+    let err = call_builtin(
+        "DeleteSetting",
+        &[
+            VBVariant::from_string("App"),
+            VBVariant::from_string("Section"),
+            VBVariant::Null,
+        ],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+
+    // GetAutoServerSettings' parameters are declared As String: Null → 94.
+    let err = call_builtin(
+        "GetAutoServerSettings",
+        &[
+            VBVariant::from_string("progid"),
+            VBVariant::from_string("clsid"),
+            VBVariant::Null,
+        ],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+
+    // Error's optional number keeps a raw optional-Variant view: an explicit
+    // Empty means "the current error number" while an explicit Null is
+    // invalid use of Null.
+    let _guard = ENV_DISPATCH_LOCK.lock().unwrap();
+    vb6runtime::state::err::set_number(53);
+    assert_eq!(
+        call_builtin("Error", &[VBVariant::Empty]).unwrap(),
+        VBVariant::from_string("File not found")
+    );
+    vb6runtime::state::err::clear();
+    let err = call_builtin("Error$", &[VBVariant::Null]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+
+    // A CVErr argument re-raises its embedded error instead of being read as
+    // a number or stringified (plan A4).
+    let err = call_builtin(
+        "Error",
+        &[VBVariant::from_error(vb6core::error::VBError::new(31337))],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, 31337);
+}
+
+#[test]
 fn filter_dispatch() {
     let arr = call_builtin(
         "Filter",

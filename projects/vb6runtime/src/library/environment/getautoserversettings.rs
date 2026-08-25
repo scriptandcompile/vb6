@@ -175,7 +175,7 @@
 //! - `GetObject` - Returns a reference to an `ActiveX` object
 
 use crate::error::VBResult;
-use crate::value::VBVariant;
+use crate::value::{VBString, VBVariant};
 
 /// Returns security settings for a `DCOM` automation server.
 ///
@@ -185,17 +185,14 @@ use crate::value::VBVariant;
 /// when the machine does not have a `DCOM` server set up or the current
 /// user lacks the necessary `DCOM` security configuration).
 pub fn get_auto_server_settings(
-    progid: &VBVariant,
-    clsid: &VBVariant,
-    machine: &VBVariant,
+    progid: &VBString,
+    clsid: &VBString,
+    machine: &VBString,
 ) -> VBResult<VBVariant> {
-    // Validate argument types — all three must be convertible to String.
-    // VB6 raises a Type Mismatch error (13) if non-string values are passed.
-    let _progid = progid.as_string()?;
-    let _clsid = clsid.as_string()?;
-    let _machine = machine.as_string()?;
-
-    // DCOM is not supported on this platform.  Return 0 to indicate that no
+    // The arguments are validated by the typed boundary; their values are
+    // intentionally unread below. DCOM is not supported on this platform.
+    let _ = (progid, clsid, machine);
+    // Return 0 to indicate that no
     // server settings could be retrieved — the same value VB6 returns when the
     // server is not registered or the user lacks the correct DCOM permissions.
     Ok(VBVariant::from_long(0))
@@ -204,14 +201,14 @@ pub fn get_auto_server_settings(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::error::err_number;
+    use crate::value::VBString;
 
     #[test]
     fn returns_zero() {
         let result = get_auto_server_settings(
-            &VBVariant::from_string("MyServer.Application"),
-            &VBVariant::from_string("{12345678-1234-1234-1234-123456789012}"),
-            &VBVariant::from_string("SERVER01"),
+            &VBString::from("MyServer.Application"),
+            &VBString::from("{12345678-1234-1234-1234-123456789012}"),
+            &VBString::from("SERVER01"),
         )
         .unwrap();
         assert_eq!(result, VBVariant::from_long(0));
@@ -220,44 +217,11 @@ mod tests {
     #[test]
     fn accepts_any_string_arguments() {
         let result = get_auto_server_settings(
-            &VBVariant::from_string(""),
-            &VBVariant::from_string(""),
-            &VBVariant::from_string(""),
+            &VBString::from(""),
+            &VBString::from(""),
+            &VBString::from(""),
         )
         .unwrap();
         assert_eq!(result, VBVariant::from_long(0));
-    }
-
-    #[test]
-    fn null_prog_id_is_error_94() {
-        let err = get_auto_server_settings(
-            &VBVariant::Null,
-            &VBVariant::from_string("clsid"),
-            &VBVariant::from_string("machine"),
-        )
-        .unwrap_err();
-        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
-    }
-
-    #[test]
-    fn null_cls_id_is_error_94() {
-        let err = get_auto_server_settings(
-            &VBVariant::from_string("progid"),
-            &VBVariant::Null,
-            &VBVariant::from_string("machine"),
-        )
-        .unwrap_err();
-        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
-    }
-
-    #[test]
-    fn null_machine_is_error_94() {
-        let err = get_auto_server_settings(
-            &VBVariant::from_string("progid"),
-            &VBVariant::from_string("clsid"),
-            &VBVariant::Null,
-        )
-        .unwrap_err();
-        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
     }
 }

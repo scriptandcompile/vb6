@@ -702,7 +702,7 @@ use super::error_dollar::error_dollar;
 /// `Error` is the Variant-returning counterpart of `Error$`; its runtime
 /// semantics are otherwise identical (per the VBAL specification, the two
 /// functions differ only in the declared type of the return value).
-pub fn error(arg: &VBVariant) -> VBResult<VBVariant> {
+pub fn error(arg: Option<&VBVariant>) -> VBResult<VBVariant> {
     error_dollar(arg)
 }
 
@@ -716,11 +716,11 @@ mod tests {
     fn returns_message_for_known_number() {
         let _guard = TEST_LOCK.lock().unwrap();
         assert_eq!(
-            error(&VBVariant::from_integer(6)).unwrap(),
+            error(Some(&VBVariant::from_integer(6))).unwrap(),
             VBVariant::from_string("Overflow")
         );
         assert_eq!(
-            error(&VBVariant::from_integer(13)).unwrap(),
+            error(Some(&VBVariant::from_integer(13))).unwrap(),
             VBVariant::from_string("Type mismatch")
         );
     }
@@ -729,7 +729,7 @@ mod tests {
     fn error_number_zero_returns_empty_string() {
         let _guard = TEST_LOCK.lock().unwrap();
         assert_eq!(
-            error(&VBVariant::from_integer(0)).unwrap(),
+            error(Some(&VBVariant::from_integer(0))).unwrap(),
             VBVariant::from_string("")
         );
     }
@@ -738,7 +738,7 @@ mod tests {
     fn unknown_number_returns_generic_message() {
         let _guard = TEST_LOCK.lock().unwrap();
         assert_eq!(
-            error(&VBVariant::from_long(999)).unwrap(),
+            error(Some(&VBVariant::from_long(999))).unwrap(),
             VBVariant::from_string("Application-defined or object-defined error")
         );
     }
@@ -748,18 +748,9 @@ mod tests {
         let _guard = TEST_LOCK.lock().unwrap();
         err_state::set_number(11);
         assert_eq!(
-            error(&VBVariant::Empty).unwrap(),
+            error(None).unwrap(),
             VBVariant::from_string("Division by zero")
         );
         err_state::clear();
-    }
-
-    #[test]
-    fn null_is_invalid_use_of_null() {
-        let _guard = TEST_LOCK.lock().unwrap();
-        assert_eq!(
-            error(&VBVariant::Null).unwrap_err().number,
-            crate::error::err_number::INVALID_USE_OF_NULL
-        );
     }
 }

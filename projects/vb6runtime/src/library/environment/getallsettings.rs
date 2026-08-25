@@ -785,7 +785,7 @@ use crate::array::{ArrayDimension, ArrayValue};
 use crate::error::VBResult;
 use crate::state::settings;
 use crate::types::VBType;
-use crate::value::VBVariant;
+use crate::value::{VBString, VBVariant};
 
 /// Returns every `(key, value)` pair stored under `(appname, section)`.
 ///
@@ -798,11 +798,8 @@ use crate::value::VBVariant;
 ///
 /// `Null` arguments raise error 94 (invalid use of `Null`); object and array
 /// arguments raise error 13 (type mismatch).
-pub fn get_all_settings(appname: &VBVariant, section: &VBVariant) -> VBResult<VBVariant> {
-    let appname = appname.as_string()?;
-    let section = section.as_string()?;
-
-    let pairs = settings::get_all(&appname, &section);
+pub fn get_all_settings(appname: &VBString, section: &VBString) -> VBResult<VBVariant> {
+    let pairs = settings::get_all(appname.as_str(), section.as_str());
 
     if pairs.is_empty() {
         return Ok(VBVariant::Empty);
@@ -835,7 +832,8 @@ mod tests {
     #[test]
     fn returns_empty_when_no_settings_exist() {
         with_temp_settings_store(|_| {
-            let result = get_all_settings(&string("MyApp"), &string("Section")).unwrap();
+            let result =
+                get_all_settings(&VBString::from("MyApp"), &VBString::from("Section")).unwrap();
             assert!(result.is_empty());
         });
     }
@@ -846,7 +844,8 @@ mod tests {
             settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
             settings_state::set("MyApp", "Startup", "Top", "40").unwrap();
 
-            let result = get_all_settings(&string("MyApp"), &string("Startup")).unwrap();
+            let result =
+                get_all_settings(&VBString::from("MyApp"), &VBString::from("Startup")).unwrap();
             let arr = result.as_array().unwrap();
 
             // Should be a 2D array with 2 rows and 2 columns
@@ -869,7 +868,8 @@ mod tests {
         with_temp_settings_store(|_| {
             settings_state::set("MyApp", "Window", "Width", "600").unwrap();
 
-            let result = get_all_settings(&string("myapp"), &string("window")).unwrap();
+            let result =
+                get_all_settings(&VBString::from("myapp"), &VBString::from("window")).unwrap();
             let arr = result.as_array().unwrap();
 
             assert_eq!(arr.get(&[0, 0]).unwrap(), &string("Width"));
@@ -883,7 +883,8 @@ mod tests {
             settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
             settings_state::set("MyApp", "Other", "Top", "40").unwrap();
 
-            let result = get_all_settings(&string("MyApp"), &string("Startup")).unwrap();
+            let result =
+                get_all_settings(&VBString::from("MyApp"), &VBString::from("Startup")).unwrap();
             let arr = result.as_array().unwrap();
 
             assert_eq!(arr.upper_bound(0).unwrap(), 0); // Only 1 row
@@ -893,32 +894,13 @@ mod tests {
     }
 
     #[test]
-    fn null_arguments_are_error_94() {
-        with_temp_settings_store(|_| {
-            let err = get_all_settings(&VBVariant::Null, &string("Section")).unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
-
-            let err = get_all_settings(&string("App"), &VBVariant::Null).unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::INVALID_USE_OF_NULL);
-        });
-    }
-
-    #[test]
-    fn object_and_array_arguments_are_error_13() {
-        with_temp_settings_store(|_| {
-            let array = VBVariant::array_dynamic(vb6core::types::VBType::String);
-            let err = get_all_settings(&array, &string("Section")).unwrap_err();
-            assert_eq!(err.number, crate::error::err_number::TYPE_MISMATCH);
-        });
-    }
-
-    #[test]
     fn values_survive_a_reload_from_disk() {
         with_temp_settings_store(|_| {
             settings_state::set("MyApp", "Startup", "Left", "150").unwrap();
             settings_state::reset();
 
-            let result = get_all_settings(&string("MyApp"), &string("Startup")).unwrap();
+            let result =
+                get_all_settings(&VBString::from("MyApp"), &VBString::from("Startup")).unwrap();
             let arr = result.as_array().unwrap();
 
             assert_eq!(arr.get(&[0, 0]).unwrap(), &string("Left"));
