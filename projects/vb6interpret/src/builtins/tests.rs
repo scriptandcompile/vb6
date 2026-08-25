@@ -62,7 +62,7 @@ fn dollar_variants_reject_null() {
 fn non_dollar_string_functions_propagate_null() {
     // The non-`$` string family documents "If string contains Null, Null is
     // returned" — propagation happens at the dispatch boundary before any
-    // typed conversion runs (plan F1, `propstring` kind).
+    // typed conversion runs (propstring kind).
     for name in ["LCase", "UCase", "Trim", "LTrim", "RTrim"] {
         let result = call_builtin(name, &[VBVariant::Null]);
         match result {
@@ -944,7 +944,7 @@ fn environment_boundary_pins_optional_null_and_error_number_policy() {
     assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
 
     // A CVErr argument re-raises its embedded error instead of being read as
-    // a number or stringified (plan A4).
+    // a number or stringified.
     let err = call_builtin(
         "Error",
         &[VBVariant::from_error(vb6core::error::VBError::new(31337))],

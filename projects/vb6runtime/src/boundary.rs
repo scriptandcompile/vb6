@@ -1,4 +1,4 @@
-//! Typed-argument boundary helpers (plan F6/B1).
+//! Typed-argument boundary helpers.
 //!
 //! The single conversion point between the untyped `[VBVariant]` argument
 //! slices that hosts receive and the typed wrappers (`VBString`, `VBLong`, ...)
@@ -8,7 +8,7 @@
 //! invalid use of Null (error 94) — so behavior cannot drift between call sites,
 //! and a `CVErr` value re-raises its inner error instead of being misread.
 //!
-//! Evaluation order is canonical (plan A9): presence first (error 450), then
+//! Evaluation order is canonical: presence first (error 450), then
 //! left-to-right conversion via `?` at the call site, so the leftmost offending
 //! argument wins. [`Nullable`] is the explicit representation for parameters of
 //! Variant-returning functions that propagate Null instead of raising 94
@@ -61,7 +61,7 @@ pub fn opt_variant_arg(args: &[VBVariant], index: usize) -> Option<&VBVariant> {
     args.get(index)
 }
 
-/// A parameter value that may be VB6 `Null` (plan A2/F1).
+/// A parameter value that may be VB6 `Null`.
 ///
 /// Converting a `Null` variant yields [`Nullable::Null`] instead of raising
 /// error 94; every other value coerces through `T`. Function bodies propagate

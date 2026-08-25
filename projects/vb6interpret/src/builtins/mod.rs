@@ -34,7 +34,7 @@ use std::sync::OnceLock;
 use vb6core::error::{err_number, VBError, VBResult};
 use vb6runtime::value::VBVariant;
 
-/// Declarative builtin signature spec (plan B2).
+/// Declarative builtin signature spec.
 ///
 /// One line declares a function's name, arity bounds, and every parameter's
 /// kind; the expansion emits the `&[VBVariant] -> typed-call` glue, converting
@@ -59,8 +59,8 @@ use vb6runtime::value::VBVariant;
 /// | `date`        | `As Date`     | `VBDate`                  |
 /// | `opt_<t>`     | optional `t`  | `None` when absent        |
 /// | `propstring`  | propagating string | like `string`, but a `Null`
-///   argument short-circuits the call to a `Null` result (plan F1: VB6
-///   documents Null propagation for the non-`$` forms) |
+///   argument short-circuits the call to a `Null` result (VB6 documents Null
+///   propagation for the non-`$` forms) |
 /// | `propdouble`  | propagating number | like `string`→`VBDouble`: a `Null`
 ///   argument short-circuits to `Null`; anything else coerces with `CDbl`
 ///   semantics |
@@ -95,7 +95,7 @@ macro_rules! typed_builtin {
             min_args: $min,
             max_args: $max,
             call: |_args: &[::vb6runtime::VBVariant]| -> ::vb6core::error::VBResult<::vb6runtime::VBVariant> {
-                // Left-to-right conversion order (plan A9): one statement per
+                // Left-to-right conversion order: one statement per
                 // declared parameter, each converting the argument at the
                 // running index, so the leftmost offending argument errors
                 // first.
