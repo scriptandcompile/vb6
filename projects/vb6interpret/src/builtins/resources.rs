@@ -1,26 +1,32 @@
 //! VB6 resource function registry.
 //!
-//! One [`Builtin`](super::Builtin) entry per resource function, each wrapping
-//! the `vb6runtime::library::resources` implementation. All three read from the
-//! single `.res` file bound via `vb6runtime::state::resources`.
+//! One [`typed_builtin!`](crate::typed_builtin) entry per resource function.
+//! All three read from the single `.res` file bound via
+//! `vb6runtime::state::resources`.
+//!
+//! Every parameter stays raw by design: `LoadRes*` indexes are a union
+//! (numeric ordinal | String name) that no single wrapper can coerce, and
+//! both the index and the `format` arguments report an unusable value —
+//! `Null`, `Empty`, uncoercible, out-of-range — as error 326 (resource not
+//! found) rather than 94, because nothing that cannot name a resource can
+//! ever match one.
 
 use super::{Builtin, Registry};
-use crate::builtin;
-use vb6core::error::VBResult;
+use crate::typed_builtin;
 use vb6runtime::library::resources as resourcefn;
-use vb6runtime::VBVariant;
 
 /// Register the resource functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {
-    registry.insert(builtin!("loadresdata", 2, 2, |args| {
-        resourcefn::loadresdata::loadresdata(&args[0], &args[1])
-    }));
-    registry.insert(builtin!("loadrespicture", 2, 2, |args| {
-        resourcefn::loadrespicture::loadrespicture(&args[0], &args[1])
-    }));
-    registry.insert(builtin!("loadresstring", 1, 1, |args| {
-        resourcefn::loadresstring::loadresstring(&args[0])
-    }));
+    registry.insert(
+        typed_builtin!("loadresdata", 2, 2, (index: variant, format: variant),
+        resourcefn::loadresdata::loadresdata(index, format)),
+    );
+    registry.insert(
+        typed_builtin!("loadrespicture", 2, 2, (index: variant, format: variant),
+        resourcefn::loadrespicture::loadrespicture(index, format)),
+    );
+    registry.insert(typed_builtin!("loadresstring", 1, 1, (index: variant),
+        resourcefn::loadresstring::loadresstring(index)));
 }
 
 #[cfg(test)]
@@ -28,6 +34,7 @@ mod tests {
     use std::sync::Mutex;
 
     use crate::builtins::call_builtin;
+    use vb6core::error::err_number;
     use vb6runtime::state::{file, resources};
     use vb6runtime::VBVariant;
 
@@ -142,5 +149,38 @@ mod tests {
         )
         .unwrap_err();
         assert_eq!(error.number, 450);
+    }
+
+    #[test]
+    fn unusable_raw_variants_report_resource_not_found() {
+        // Neither 94 nor propagation: an argument that cannot name (or type)
+        // a resource simply finds none. These run before any file access, so
+        // no linked `.res` fixture is needed.
+        let error = call_builtin("LoadResString", &[VBVariant::Null]).unwrap_err();
+        assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+
+        let error = call_builtin("LoadResString", &[VBVariant::Empty]).unwrap_err();
+        assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+
+        let error = call_builtin(
+            "LoadResData",
+            &[VBVariant::Null, VBVariant::from_integer(10)],
+        )
+        .unwrap_err();
+        assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+
+        let error = call_builtin(
+            "LoadResData",
+            &[VBVariant::from_integer(101), VBVariant::Null],
+        )
+        .unwrap_err();
+        assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
+
+        let error = call_builtin(
+            "LoadResPicture",
+            &[VBVariant::from_string("LOGO"), VBVariant::Null],
+        )
+        .unwrap_err();
+        assert_eq!(error.number, err_number::RESOURCE_NOT_FOUND);
     }
 }

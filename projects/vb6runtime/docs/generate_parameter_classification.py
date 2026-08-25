@@ -39,6 +39,13 @@ OVERRIDES = {
     # which must stay distinct from a coercible Long; Null raises 94 in-body.
     ("environment", "error"): ("variant-input", "raises 94"),
     ("environment", "error$"): ("variant-input", "raises 94"),
+    # LoadRes* indexes are a genuine union (numeric ordinal | String name),
+    # and both the index and format arguments report an unusable value
+    # (Null, Empty, uncoercible, out-of-range) as error 326 rather than 94:
+    # nothing that cannot name a resource can ever match one.
+    ("resources", "loadresdata"): ("variant-input", "raises 326"),
+    ("resources", "loadrespicture"): ("variant-input", "raises 326"),
+    ("resources", "loadresstring"): ("variant-input", "raises 326"),
 }
 
 # Entries whose dispatch adapter propagates Null without a `propstring`

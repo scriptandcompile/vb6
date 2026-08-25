@@ -182,9 +182,9 @@ Classes:
 
 | Function | Arity | Runtime signature | Class | Null |
 |---|---|---|---|---|
-| `loadresdata` | 2..2 | `fn(index: &VBVariant, format: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `loadrespicture` | 2..2 | `fn(index: &VBVariant, format: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `loadresstring` | 1..1 | `fn(index: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `loadresdata` | 2..2 | `fn(index: &VBVariant, format: &VBVariant) -> VBResult<VBVariant>` | variant-input | raises 326 |
+| `loadrespicture` | 2..2 | `fn(index: &VBVariant, format: &VBVariant) -> VBResult<VBVariant>` | variant-input | raises 326 |
+| `loadresstring` | 1..1 | `fn(index: &VBVariant) -> VBResult<VBVariant>` | variant-input | raises 326 |
 
 ## `string`
 
