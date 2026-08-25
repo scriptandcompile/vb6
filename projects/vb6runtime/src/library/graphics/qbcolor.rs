@@ -729,7 +729,8 @@
 //! - `LoadPicture`: Loads images with full color support
 //! - Color constants: `vbBlack`, `vbRed`, `vbGreen`, `vbBlue`, etc.
 
-use crate::{error::VBError, error::VBResult, value::VBVariant};
+use crate::value::{VBLong, VBVariant};
+use crate::{error::VBError, error::VBResult};
 use vb6core::error::err_number;
 
 /// Minimum valid color index for QBColor.
@@ -743,8 +744,8 @@ pub const MAX_COLOR_INDEX: i32 = 15;
 /// - Returns a Long representing the RGB color value for indices 0-15
 /// - Values outside 0-15 raise error 5 (Invalid procedure call or argument)
 /// - The returned value uses BGR byte order as is standard for Windows colors
-pub fn qbcolor(color: &VBVariant) -> VBResult<VBVariant> {
-    let idx = color.as_i32()?;
+pub fn qbcolor(color: &VBLong) -> VBResult<VBVariant> {
+    let idx = color.as_i32();
 
     if !(MIN_COLOR_INDEX..=MAX_COLOR_INDEX).contains(&idx) {
         return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL)); // Invalid procedure call or argument
@@ -779,60 +780,54 @@ fn qbcolor_values() -> [VBVariant; (MAX_COLOR_INDEX + 1) as usize] {
 #[cfg(test)]
 mod tests {
     use super::qbcolor;
-    use crate::value::VBVariant;
+    use crate::value::{VBLong, VBVariant};
 
     #[test]
     fn returns_black_for_zero() {
-        let result = qbcolor(&VBVariant::from_long(0)).unwrap();
+        let result = qbcolor(&VBLong::from(0)).unwrap();
         assert_eq!(result, VBVariant::from_long(0x000000));
     }
 
     #[test]
     fn returns_blue_for_one() {
-        let result = qbcolor(&VBVariant::from_long(1)).unwrap();
+        let result = qbcolor(&VBLong::from(1)).unwrap();
         assert_eq!(result, VBVariant::from_long(0x800000));
     }
 
     #[test]
     fn returns_white_for_seven() {
-        let result = qbcolor(&VBVariant::from_long(7)).unwrap();
+        let result = qbcolor(&VBLong::from(7)).unwrap();
         assert_eq!(result, VBVariant::from_long(0xc0c0c0));
     }
 
     #[test]
     fn returns_bright_white_for_fifteen() {
-        let result = qbcolor(&VBVariant::from_long(15)).unwrap();
+        let result = qbcolor(&VBLong::from(15)).unwrap();
         assert_eq!(result, VBVariant::from_long(0xffffff));
     }
 
     #[test]
     fn returns_error_for_negative_index() {
-        let result = qbcolor(&VBVariant::from_long(-1));
+        let result = qbcolor(&VBLong::from(-1));
         assert!(result.is_err());
     }
 
     #[test]
     fn returns_error_for_index_above_15() {
-        let result = qbcolor(&VBVariant::from_long(16));
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn returns_error_for_non_numeric_values() {
-        let result = qbcolor(&VBVariant::from_string("not-a-number"));
+        let result = qbcolor(&VBLong::from(16));
         assert!(result.is_err());
     }
 
     #[test]
     fn accepts_integer_types() {
         // Integer values should work
-        let result = qbcolor(&VBVariant::from_integer(10)).unwrap();
+        let result = qbcolor(&VBLong::from(10)).unwrap();
         assert_eq!(result, VBVariant::from_long(0x00ff00)); // Light Green
     }
 
     #[test]
     fn accepts_byte_values() {
-        let result = qbcolor(&VBVariant::from_long(5)).unwrap();
+        let result = qbcolor(&VBLong::from(5)).unwrap();
         assert_eq!(result, VBVariant::from_long(0x800080)); // Magenta
     }
 }

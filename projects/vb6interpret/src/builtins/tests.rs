@@ -885,6 +885,23 @@ fn environment_boundary_pins_optional_null_and_error_number_policy() {
 }
 
 #[test]
+fn loadpicture_boundary_pins_optional_and_null_policy() {
+    // The omitted argument means "an empty picture": a zero-sized StdPicture.
+    let value = call_builtin("LoadPicture", &[]).unwrap();
+    assert!(value.is_object());
+    let pic = value.as_object().unwrap();
+    assert_eq!(pic.type_name(), "StdPicture");
+
+    // An explicit empty path unloads the picture: the result is Nothing.
+    let value = call_builtin("LoadPicture", &[VBVariant::from_string("")]).unwrap();
+    assert!(value.is_nothing());
+
+    // A present Null rejects with 94 at the boundary (As String parameter).
+    let err = call_builtin("LoadPicture", &[VBVariant::Null]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+}
+
+#[test]
 fn filter_dispatch() {
     let arr = call_builtin(
         "Filter",

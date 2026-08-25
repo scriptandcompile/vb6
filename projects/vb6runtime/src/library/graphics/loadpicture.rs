@@ -656,7 +656,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::state::file::{self, AccessMode, LockMode, OpenMode};
-use crate::value::VBVariant;
+use crate::value::{VBString, VBVariant};
 use crate::StdPicture;
 use std::path::Path;
 use vb6core::error::err_number;
@@ -670,12 +670,12 @@ use vb6core::error::err_number;
 /// - `LoadPicture()` with no arguments returns empty picture object
 /// - Returns error 53 if file not found
 /// - Returns error 481 if invalid picture format
-pub fn loadpicture(filename: Option<&str>) -> VBResult<VBVariant> {
+pub fn loadpicture(filename: Option<&VBString>) -> VBResult<VBVariant> {
     match filename {
         None => Ok(VBVariant::from_object(Box::new(StdPicture::new(0, 0)))),
-        Some("") => Ok(VBVariant::nothing()),
+        Some(path) if path.as_str().is_empty() => Ok(VBVariant::nothing()),
         Some(path) => {
-            let path = Path::new(path);
+            let path = Path::new(path.as_str());
 
             // Check if the file exists by attempting to get its attributes
             // we would normally use `Path::exists`, but here we go through the VB6 file handling layer
@@ -766,7 +766,7 @@ mod tests {
 
     #[test]
     fn loadpicture_empty_string_returns_nothing() {
-        let value = loadpicture(Some("")).unwrap();
+        let value = loadpicture(Some(&VBString::from(""))).unwrap();
         assert!(value.is_nothing());
     }
 
@@ -774,7 +774,7 @@ mod tests {
     fn loadpicture_valid_path_returns_stdpicture() {
         // Use a path that doesn't exist to test the error case,
         // or a dummy path
-        let result = loadpicture(Some("nonexistent.bmp"));
+        let result = loadpicture(Some(&VBString::from("nonexistent.bmp")));
         // Should return an error or a StdPicture - depends on implementation
         // For now, just verify it doesn't panic
         assert!(result.is_ok() || result.is_err());

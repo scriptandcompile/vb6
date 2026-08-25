@@ -133,7 +133,7 @@ Classes:
 
 | Function | Arity | Runtime signature | Class | Null |
 |---|---|---|---|---|
-| `loadpicture` | 0..1 | `fn(filename: Option<&str>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `loadpicture` | 0..1 | `fn(filename: Option<&VBString>) -> VBResult<VBVariant>` | typed | raises 94 |
 
 ## `interaction`
 
