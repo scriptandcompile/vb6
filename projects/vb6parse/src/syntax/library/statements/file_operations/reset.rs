@@ -16,7 +16,13 @@ impl Parser<'_> {
     //
     // [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/reset-statement)
     pub(crate) fn parse_reset_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::ResetStatement);
+        self.builder.start_node(SyntaxKind::ResetStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        self.builder.finish_node();
     }
 }
 

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/reset.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/reset.rs
 expression: tree
 ---
 root:
@@ -31,8 +31,8 @@ root:
                   text: "    "
                 - kind: ResetKeyword
                   text: Reset
-                - kind: Newline
-                  text: "\n"
+            - kind: Newline
+              text: "\n"
             - kind: Whitespace
               text: "    "
             - kind: CallStatement
@@ -47,8 +47,8 @@ root:
                   text: "    "
                 - kind: ResetKeyword
                   text: Reset
-                - kind: Newline
-                  text: "\n"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace
