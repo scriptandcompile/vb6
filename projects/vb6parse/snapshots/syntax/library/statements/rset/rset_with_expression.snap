@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/string_manipulation/rset.rs
+source: projects/vb6parse/src/syntax/library/statements/string_manipulation/rset.rs
 expression: tree
 ---
 root:
@@ -33,30 +33,48 @@ root:
                   text: RSet
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: buffer
-                - kind: Whitespace
-                  text: " "
-                - kind: EqualityOperator
-                  text: "="
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: Left$
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: inputStr
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "5"
-                - kind: RightParenthesis
-                  text: )
-                - kind: Newline
-                  text: "\n"
+                - kind: BinaryExpression
+                  children:
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: buffer
+                    - kind: Whitespace
+                      text: " "
+                    - kind: EqualityOperator
+                      text: "="
+                    - kind: Whitespace
+                      text: " "
+                    - kind: CallExpression
+                      children:
+                        - kind: Identifier
+                          text: Left$
+                        - kind: LeftParenthesis
+                          text: (
+                        - kind: ArgumentList
+                          children:
+                            - kind: Argument
+                              children:
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: inputStr
+                            - kind: Comma
+                              text: ","
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Argument
+                              children:
+                                - kind: NumericLiteralExpression
+                                  children:
+                                    - kind: IntegerLiteral
+                                      text: "5"
+                        - kind: RightParenthesis
+                          text: )
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Newline
+                      text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

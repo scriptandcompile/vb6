@@ -75,7 +75,36 @@ use crate::parsers::syntaxkind::SyntaxKind;
 /// - [RSet Statement (Visual Basic 6.0)](https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa266258(v=vs.60))
 impl Parser<'_> {
     pub(crate) fn parse_rset_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::RSetStatement);
+        self.parsing_header = false;
+
+        self.builder.start_node(SyntaxKind::RSetStatement.to_raw());
+
+        self.consume_whitespace();
+
+        if let Some((text, _)) = self.tokens.get(self.pos) {
+            self.builder.token(SyntaxKind::RSetKeyword.to_raw(), text);
+            self.pos += 1;
+        }
+
+        self.consume_whitespace();
+
+        self.parse_expression();
+
+        self.consume_whitespace();
+
+        if let Some((text, token)) = self.tokens.get(self.pos) {
+            let kind = SyntaxKind::from(*token);
+            if kind == SyntaxKind::EqualityOperator {
+                self.builder.token(kind.to_raw(), text);
+                self.pos += 1;
+            }
+        }
+
+        self.consume_whitespace();
+
+        self.parse_expression();
+
+        self.builder.finish_node();
     }
 }
 
