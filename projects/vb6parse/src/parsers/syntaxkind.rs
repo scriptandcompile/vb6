@@ -258,6 +258,8 @@ pub enum SyntaxKind {
     Argument,
     /// Block of code/statements
     StatementList,
+    /// Expression clause (wraps an expression in a named clause context)
+    ExpressionClause,
 
     // Token kinds - map from Token
     // We start these at a higher offset to avoid conflicts
