@@ -7,12 +7,9 @@
 //! The only hand-written adapter left is `instr`, whose argument positions
 //! depend on arity.
 
-use super::{arg_string, Builtin, Registry};
-use crate::builtin;
+use super::{Builtin, Registry};
 use crate::typed_builtin;
-use vb6core::error::VBResult;
 use vb6runtime::library::string as strfn;
-use vb6runtime::value::VBLong;
 use vb6runtime::VBVariant;
 
 /// Register the string functions in `registry`.
@@ -97,47 +94,13 @@ pub(super) fn register(registry: &mut Registry) {
         strfn::space(&number)));
     registry.insert(typed_builtin!("space$", 1, 1, (number: long),
         strfn::space_dollar(&number).map(VBVariant::from)));
-    // `instr` stays hand-written: which argument occupies which position
-    // depends on arity. Null propagation follows the documented InStr table
-    // (`string1`/`string2` Null → Null); `start` stays strict like a Long.
-    registry.insert(builtin!("instr", 2, 4, |args| {
-        let start: Option<VBLong>;
-        let s1_idx;
-        let s2_idx;
-        let cmp_idx: Option<usize>;
-        match args.len() {
-            4 => {
-                start = Some(VBLong::try_from(&args[0])?);
-                s1_idx = 1;
-                s2_idx = 2;
-                cmp_idx = Some(3);
-            }
-            3 => {
-                start = Some(VBLong::try_from(&args[0])?);
-                s1_idx = 1;
-                s2_idx = 2;
-                cmp_idx = None;
-            }
-            _ => {
-                start = None;
-                s1_idx = 0;
-                s2_idx = 1;
-                cmp_idx = None;
-            }
-        }
-        if matches!(args.get(s1_idx), Some(VBVariant::Null))
-            || matches!(args.get(s2_idx), Some(VBVariant::Null))
-        {
-            return Ok(VBVariant::Null);
-        }
-        let s1 = arg_string(args, s1_idx)?;
-        let s2 = arg_string(args, s2_idx)?;
-        let compare = cmp_idx
-            .and_then(|index| args.get(index))
-            .map(VBLong::try_from)
-            .transpose()?;
-        strfn::instr(start.as_ref(), &s1, &s2, compare.as_ref()).map(VBVariant::from)
-    }));
+    // `instr`'s argument positions depend on arity: the two-argument form has
+    // no `start`, and a trailing `compare` rides after the two strings. The
+    // raw tail is therefore bound here and dispatched next to the
+    // implementation, which owns the documented conversion order.
+    registry.insert(typed_builtin!("instr", 2, 4,
+        (), rest args: variants,
+        strfn::instr::instr_dispatch(args)));
     registry.insert(typed_builtin!(
         "instrrev", 2, 4,
         (s1: string, s2: string, start: opt_long, compare: opt_long),

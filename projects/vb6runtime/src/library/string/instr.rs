@@ -510,7 +510,7 @@
 
 use crate::{
     error::{err_number, VBError, VBResult},
-    value::{VBLong, VBString},
+    value::{VBLong, VBString, VBVariant},
 };
 
 /// Returns the 1-based position of the first occurrence of `string2` within
@@ -571,6 +571,56 @@ pub fn instr(
         }
     }
     Ok(VBLong::from(0))
+}
+
+/// Dispatch `InStr` from its raw argument list.
+///
+/// Which argument occupies which position depends on arity: the two-argument
+/// form has no `start`, while the three- and four-argument forms take
+/// `start` first and an optional trailing `compare` rides after the two
+/// strings. That arity-dependent layout cannot be expressed as a fixed
+/// positional signature, so this entry point owns the conversion order —
+/// `start` (strict Long), then the Null check, then the strings, then
+/// `compare` — exactly as a declarative positional signature would.
+pub fn instr_dispatch(args: &[VBVariant]) -> VBResult<VBVariant> {
+    let start: Option<VBLong>;
+    let s1_idx;
+    let s2_idx;
+    let cmp_idx: Option<usize>;
+    match args.len() {
+        4 => {
+            start = Some(crate::boundary::arg(args, 0)?);
+            s1_idx = 1;
+            s2_idx = 2;
+            cmp_idx = Some(3);
+        }
+        3 => {
+            start = Some(crate::boundary::arg(args, 0)?);
+            s1_idx = 1;
+            s2_idx = 2;
+            cmp_idx = None;
+        }
+        _ => {
+            start = None;
+            s1_idx = 0;
+            s2_idx = 1;
+            cmp_idx = None;
+        }
+    }
+
+    // Documented InStr table: a Null string1 or string2 yields Null.
+    if matches!(args.get(s1_idx), Some(VBVariant::Null))
+        || matches!(args.get(s2_idx), Some(VBVariant::Null))
+    {
+        return Ok(VBVariant::Null);
+    }
+    let string1 = crate::boundary::arg::<VBString>(args, s1_idx)?;
+    let string2 = crate::boundary::arg::<VBString>(args, s2_idx)?;
+    let compare = cmp_idx
+        .and_then(|index| args.get(index))
+        .map(VBLong::try_from)
+        .transpose()?;
+    instr(start.as_ref(), &string1, &string2, compare.as_ref()).map(VBVariant::from)
 }
 
 #[cfg(test)]

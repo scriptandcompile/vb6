@@ -5,6 +5,7 @@
 //! visible through `use super::*` exactly as when the suite was inline.
 
 use super::*;
+use vb6runtime::value::VBString;
 use vb6runtime::ArrayValue;
 
 /// Serializes dispatch tests that read or write the shared environment
@@ -81,6 +82,74 @@ fn non_dollar_string_functions_propagate_null() {
     // InStr's documented table: string1/string2 Null → Null.
     let result = call_builtin("InStr", &[VBVariant::from_string("a"), VBVariant::Null]);
     assert_eq!(result.unwrap(), VBVariant::Null);
+}
+
+#[test]
+fn instr_dispatch_keeps_arity_dependent_positions() {
+    // Two-argument form: no `start`, search begins at 1.
+    let result = call_builtin(
+        "InStr",
+        &[VBVariant::from_string("Hello"), VBVariant::from_string("l")],
+    )
+    .unwrap();
+    assert_eq!(result, VBVariant::Long(3));
+    // Three-argument form: first argument is the strict `start`.
+    let result = call_builtin(
+        "InStr",
+        &[
+            VBVariant::Long(4),
+            VBVariant::from_string("Hello"),
+            VBVariant::from_string("l"),
+        ],
+    )
+    .unwrap();
+    assert_eq!(result, VBVariant::Long(4));
+    // Four-argument form: trailing `compare` switches to text comparison.
+    let result = call_builtin(
+        "InStr",
+        &[
+            VBVariant::Long(1),
+            VBVariant::from_string("abc"),
+            VBVariant::from_string("B"),
+            VBVariant::Long(1),
+        ],
+    )
+    .unwrap();
+    assert_eq!(result, VBVariant::Long(2));
+    // `start` converts like any Long parameter (CLng): numeric strings coerce.
+    let result = call_builtin(
+        "InStr",
+        &[
+            VBVariant::from_string("4"),
+            VBVariant::from_string("Hello"),
+            VBVariant::from_string("o"),
+        ],
+    )
+    .unwrap();
+    assert_eq!(result, VBVariant::Long(5));
+    // Non-numeric starts are type mismatches...
+    let err = call_builtin(
+        "InStr",
+        &[
+            VBVariant::from_string("abc"),
+            VBVariant::from_string("Hello"),
+            VBVariant::from_string("l"),
+        ],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::TYPE_MISMATCH);
+    // ...and Null in the auxiliary position rejects (94) instead of
+    // propagating: only string1/string2 follow the propagation table.
+    let err = call_builtin(
+        "InStr",
+        &[
+            VBVariant::Null,
+            VBVariant::from_string("Hello"),
+            VBVariant::from_string("l"),
+        ],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
 }
 
 #[test]

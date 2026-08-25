@@ -32,37 +32,14 @@ use std::collections::HashMap;
 use std::sync::OnceLock;
 
 use vb6core::error::{err_number, VBError, VBResult};
-use vb6runtime::value::{VBString, VBVariant};
-
-/// Build a [`Builtin`] registry entry from an adapter closure.
-///
-/// Transitional form: prefer [`typed_builtin!`] for functions whose runtime
-/// implementation already declares typed parameters; this closure form remains
-/// for entries with Variant passthrough or arity-dependent argument positions.
-///
-/// The closure receives the evaluated argument slice and must return a
-/// `VBVariant`. Argument-count validation is performed by [`Registry::dispatch`]
-/// using `min_args`/`max_args`.
-#[macro_export]
-macro_rules! builtin {
-    ($name:literal, $min:expr, $max:expr, |$args:ident| $body:block) => {
-        Builtin {
-            name: $name,
-            min_args: $min,
-            max_args: $max,
-            call: |$args: &[VBVariant]| -> VBResult<VBVariant> { $body },
-        }
-    };
-}
+use vb6runtime::value::VBVariant;
 
 /// Declarative builtin signature spec (plan B2).
 ///
 /// One line declares a function's name, arity bounds, and every parameter's
 /// kind; the expansion emits the `&[VBVariant] -> typed-call` glue, converting
 /// arguments left-to-right through [`vb6runtime::boundary`] so coercion logic
-/// exists once (in the generator + boundary helpers), not per entry. The
-/// legacy [`builtin!`] form remains only for entries whose runtime
-/// implementation is not typed yet (plan phases 1..N migrate them over).
+/// exists once (in the generator + boundary helpers), not per entry.
 ///
 /// Parameter kinds map to VB6 declared types and to the wrapper converted at
 /// the boundary:
@@ -332,16 +309,6 @@ pub(crate) fn call_builtin(name: &str, args: &[VBVariant]) -> VBResult<VBVariant
                 format!("Function '{name}' is not implemented yet"),
             ))
         })
-}
-
-// ---- Argument helpers ----
-
-/// Extract the argument at `index` as a string, erroring when the argument is
-/// absent (450) or does not convert to a string.
-fn arg_string(args: &[VBVariant], index: usize) -> VBResult<VBString> {
-    args.get(index)
-        .ok_or_else(|| VBError::new(err_number::WRONG_NUMBER_OF_ARGUMENTS))
-        .and_then(VBString::try_from)
 }
 
 /// Normalize a builtin name for case-insensitive lookup: lowercase, and strip
