@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/src/syntax/library/functions/graphics/spc.rs
-assertion_line: 580
 expression: tree
 ---
 root:
@@ -74,28 +73,36 @@ root:
                   text: Open
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"test.txt\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"test.txt\""
                 - kind: Whitespace
                   text: " "
                 - kind: ForKeyword
                   text: For
                 - kind: Whitespace
                   text: " "
-                - kind: OutputKeyword
-                  text: Output
+                - kind: KeywordClause
+                  children:
+                    - kind: OutputKeyword
+                      text: Output
                 - kind: Whitespace
                   text: " "
-                - kind: AsKeyword
-                  text: As
-                - kind: Whitespace
-                  text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: Identifier
-                  text: fileNum
-                - kind: Newline
-                  text: "\n"
+                - kind: ExpressionClause
+                  children:
+                    - kind: AsKeyword
+                      text: As
+                    - kind: Whitespace
+                      text: " "
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Octothorpe
+                          text: "#"
+                        - kind: Identifier
+                          text: fileNum
+            - kind: Newline
+              text: "\n"
             - kind: PrintStatement
               children:
                 - kind: Whitespace

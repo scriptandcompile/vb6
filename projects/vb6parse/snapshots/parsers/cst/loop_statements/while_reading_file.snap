@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/parsers/cst/loop_statements.rs
+source: projects/vb6parse/src/parsers/cst/loop_statements.rs
 expression: tree
 ---
 root:
@@ -33,28 +33,36 @@ root:
                   text: Open
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"data.txt\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"data.txt\""
                 - kind: Whitespace
                   text: " "
                 - kind: ForKeyword
                   text: For
                 - kind: Whitespace
                   text: " "
-                - kind: InputKeyword
-                  text: Input
+                - kind: KeywordClause
+                  children:
+                    - kind: InputKeyword
+                      text: Input
                 - kind: Whitespace
                   text: " "
-                - kind: AsKeyword
-                  text: As
-                - kind: Whitespace
-                  text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
-                - kind: Newline
-                  text: "\n"
+                - kind: ExpressionClause
+                  children:
+                    - kind: AsKeyword
+                      text: As
+                    - kind: Whitespace
+                      text: " "
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Octothorpe
+                          text: "#"
+                        - kind: IntegerLiteral
+                          text: "1"
+            - kind: Newline
+              text: "\n"
             - kind: WhileStatement
               children:
                 - kind: Whitespace

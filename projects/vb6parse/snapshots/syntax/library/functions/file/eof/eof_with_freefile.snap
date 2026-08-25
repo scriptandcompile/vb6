@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/file/eof.rs
+source: projects/vb6parse/src/syntax/library/functions/file/eof.rs
 expression: tree
 ---
 root:
@@ -31,28 +31,36 @@ root:
           text: Open
         - kind: Whitespace
           text: " "
-        - kind: Identifier
-          text: path
+        - kind: IdentifierExpression
+          children:
+            - kind: Identifier
+              text: path
         - kind: Whitespace
           text: " "
         - kind: ForKeyword
           text: For
         - kind: Whitespace
           text: " "
-        - kind: InputKeyword
-          text: Input
+        - kind: KeywordClause
+          children:
+            - kind: InputKeyword
+              text: Input
         - kind: Whitespace
           text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: Octothorpe
-          text: "#"
-        - kind: Identifier
-          text: fileNum
-        - kind: Newline
-          text: "\n"
+        - kind: ExpressionClause
+          children:
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IdentifierExpression
+              children:
+                - kind: Octothorpe
+                  text: "#"
+                - kind: Identifier
+                  text: fileNum
+    - kind: Newline
+      text: "\n"
     - kind: DoStatement
       children:
         - kind: DoKeyword

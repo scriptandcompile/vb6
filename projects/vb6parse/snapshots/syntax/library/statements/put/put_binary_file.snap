@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/put.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/put.rs
 expression: tree
 ---
 root:
@@ -33,28 +33,36 @@ root:
                   text: Open
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"binary.bin\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"binary.bin\""
                 - kind: Whitespace
                   text: " "
                 - kind: ForKeyword
                   text: For
                 - kind: Whitespace
                   text: " "
-                - kind: BinaryKeyword
-                  text: Binary
+                - kind: KeywordClause
+                  children:
+                    - kind: BinaryKeyword
+                      text: Binary
                 - kind: Whitespace
                   text: " "
-                - kind: AsKeyword
-                  text: As
-                - kind: Whitespace
-                  text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
-                - kind: Newline
-                  text: "\n"
+                - kind: ExpressionClause
+                  children:
+                    - kind: AsKeyword
+                      text: As
+                    - kind: Whitespace
+                      text: " "
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Octothorpe
+                          text: "#"
+                        - kind: IntegerLiteral
+                          text: "1"
+            - kind: Newline
+              text: "\n"
             - kind: PutStatement
               children:
                 - kind: Whitespace

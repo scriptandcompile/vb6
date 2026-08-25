@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/open.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/open.rs
 expression: tree
 ---
 root:
@@ -33,40 +33,52 @@ root:
                   text: Open
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"TESTFILE\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"TESTFILE\""
                 - kind: Whitespace
                   text: " "
                 - kind: ForKeyword
                   text: For
                 - kind: Whitespace
                   text: " "
-                - kind: RandomKeyword
-                  text: Random
+                - kind: KeywordClause
+                  children:
+                    - kind: RandomKeyword
+                      text: Random
                 - kind: Whitespace
                   text: " "
-                - kind: AsKeyword
-                  text: As
+                - kind: ExpressionClause
+                  children:
+                    - kind: AsKeyword
+                      text: As
+                    - kind: Whitespace
+                      text: " "
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Octothorpe
+                          text: "#"
+                        - kind: IntegerLiteral
+                          text: "1"
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
-                - kind: Whitespace
-                  text: " "
-                - kind: LenKeyword
-                  text: Len
-                - kind: Whitespace
-                  text: " "
-                - kind: EqualityOperator
-                  text: "="
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "512"
-                - kind: Newline
-                  text: "\n"
+                - kind: ExpressionClause
+                  children:
+                    - kind: LenKeyword
+                      text: Len
+                    - kind: Whitespace
+                      text: " "
+                    - kind: EqualityOperator
+                      text: "="
+                    - kind: Whitespace
+                      text: " "
+                    - kind: NumericLiteralExpression
+                      children:
+                        - kind: IntegerLiteral
+                          text: "512"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

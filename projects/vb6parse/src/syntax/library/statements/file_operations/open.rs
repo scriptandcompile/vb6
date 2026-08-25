@@ -1,5 +1,6 @@
 use crate::parsers::SyntaxKind;
 
+use crate::Token;
 use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
@@ -57,7 +58,152 @@ impl Parser<'_> {
     //
     // [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/open-statement)
     pub(crate) fn parse_open_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::OpenStatement);
+        self.parsing_header = false;
+
+        self.builder.start_node(SyntaxKind::OpenStatement.to_raw());
+
+        // Consume the Open keyword
+        self.consume_whitespace();
+        self.consume_token();
+
+        // Parse pathname expression
+        self.consume_whitespace();
+        self.parse_expression();
+
+        // Parse "For mode" - consume For keyword, then mode in KeywordClause
+        self.consume_whitespace();
+        self.consume_token(); // For
+
+        self.consume_whitespace();
+        self.try_parse_mode_keyword();
+
+        // Optional: Access [Read|Write|ReadWrite]
+        self.consume_whitespace();
+        if self.at_token(Token::AccessKeyword) {
+            self.parse_access_clause();
+        }
+
+        // Optional: Lock [Read|Write|ReadWrite] or Shared
+        self.consume_whitespace();
+        if self.at_token(Token::LockKeyword) || self.is_shared_keyword() {
+            self.parse_lock_clause();
+        }
+
+        // Optional: "As [#]filenumber"
+        self.consume_whitespace();
+        if self.at_token(Token::AsKeyword) {
+            self.parse_filenumber_clause();
+        }
+
+        // Optional: "Len = expression"
+        self.consume_whitespace();
+        self.parse_len_clause();
+
+        self.builder.finish_node();
+    }
+
+    /// Try to parse a mode keyword (Input, Output, Append, Binary, Random) as `KeywordClause`.
+    fn try_parse_mode_keyword(&mut self) {
+        let modes = [
+            SyntaxKind::InputKeyword,
+            SyntaxKind::OutputKeyword,
+            SyntaxKind::AppendKeyword,
+            SyntaxKind::BinaryKeyword,
+            SyntaxKind::RandomKeyword,
+        ];
+        for &mode in &modes {
+            let Some((_text, token)) = self.tokens.get(self.pos) else {
+                return;
+            };
+            if SyntaxKind::from(*token) == mode {
+                self.parse_keyword_clause(mode);
+                return;
+            }
+        }
+    }
+
+    /// Parse Access clause: Access [Read|Write|ReadWrite]
+    fn parse_access_clause(&mut self) {
+        self.builder.start_node(SyntaxKind::KeywordClause.to_raw());
+        self.consume_token(); // Access
+        loop {
+            self.consume_whitespace();
+            if self.at_token(Token::ReadKeyword) || self.at_token(Token::WriteKeyword) {
+                self.consume_token();
+            } else {
+                break;
+            }
+        }
+        self.builder.finish_node();
+    }
+
+    /// Parse Lock clause: Lock [Read|Write|ReadWrite] or Shared
+    fn parse_lock_clause(&mut self) {
+        self.builder.start_node(SyntaxKind::KeywordClause.to_raw());
+        if self.at_token(Token::LockKeyword) {
+            self.consume_token(); // Lock
+            loop {
+                self.consume_whitespace();
+                if self.at_token(Token::ReadKeyword) || self.at_token(Token::WriteKeyword) {
+                    self.consume_token();
+                } else {
+                    break;
+                }
+            }
+        } else {
+            // Shared
+            if let Some((text, _)) = self.tokens.get(self.pos) {
+                self.builder.token(SyntaxKind::Identifier.to_raw(), text);
+                self.pos += 1;
+            }
+        }
+        self.builder.finish_node();
+    }
+
+    /// Parse filenumber clause: As [#]filenumber
+    fn parse_filenumber_clause(&mut self) {
+        self.builder
+            .start_node(SyntaxKind::ExpressionClause.to_raw());
+        let (text, token) = (
+            self.tokens[self.pos].0,
+            SyntaxKind::from(self.tokens[self.pos].1),
+        );
+        self.builder.token(token.to_raw(), text);
+        self.pos += 1;
+        self.parse_expression();
+        self.builder.finish_node();
+    }
+
+    /// Parse Len clause: Len = expression
+    fn parse_len_clause(&mut self) {
+        if let Some((text, token)) = self.tokens.get(self.pos) {
+            let kind = SyntaxKind::from(*token);
+            if kind != SyntaxKind::LenKeyword {
+                return;
+            }
+            self.builder
+                .start_node(SyntaxKind::ExpressionClause.to_raw());
+            self.builder.token(kind.to_raw(), text);
+            self.pos += 1;
+            self.consume_whitespace();
+            if let Some((eq_text, eq_token)) = self.tokens.get(self.pos) {
+                let eq_kind = SyntaxKind::from(*eq_token);
+                if eq_kind == SyntaxKind::EqualityOperator {
+                    self.builder.token(eq_kind.to_raw(), eq_text);
+                    self.pos += 1;
+                }
+            }
+            self.consume_whitespace();
+            self.parse_expression();
+            self.builder.finish_node();
+        }
+    }
+
+    /// Check if the current token is "Shared" (case-insensitive identifier in Open context)
+    fn is_shared_keyword(&self) -> bool {
+        self.tokens
+            .get(self.pos)
+            .is_some_and(|(text, _)| text.to_uppercase() == "SHARED")
     }
 }
 

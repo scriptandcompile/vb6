@@ -1,5 +1,6 @@
 ---
-source: src/syntax/library/statements/file_operations/open.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/open.rs
+assertion_line: 659
 expression: tree
 ---
 root:
@@ -11,23 +12,31 @@ root:
           text: Open
         - kind: Whitespace
           text: " "
-        - kind: StringLiteral
-          text: "\"TESTFILE\""
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"TESTFILE\""
         - kind: Whitespace
           text: " "
         - kind: ForKeyword
           text: For
         - kind: Whitespace
           text: " "
-        - kind: InputKeyword
-          text: Input
+        - kind: KeywordClause
+          children:
+            - kind: InputKeyword
+              text: Input
         - kind: Whitespace
           text: " "
-        - kind: AsKeyword
-          text: As
-        - kind: Whitespace
-          text: " "
-        - kind: Octothorpe
-          text: "#"
-        - kind: IntegerLiteral
-          text: "1"
+        - kind: ExpressionClause
+          children:
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IdentifierExpression
+              children:
+                - kind: Octothorpe
+                  text: "#"
+                - kind: IntegerLiteral
+                  text: "1"

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/lock.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/lock.rs
 expression: tree
 ---
 root:
@@ -33,28 +33,38 @@ root:
                   text: Open
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"data.dat\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"data.dat\""
                 - kind: Whitespace
                   text: " "
                 - kind: ForKeyword
                   text: For
                 - kind: Whitespace
                   text: " "
-                - kind: RandomKeyword
-                  text: Random
+                - kind: KeywordClause
+                  children:
+                    - kind: RandomKeyword
+                      text: Random
                 - kind: Whitespace
                   text: " "
-                - kind: AsKeyword
-                  text: As
+                - kind: ExpressionClause
+                  children:
+                    - kind: AsKeyword
+                      text: As
+                    - kind: Whitespace
+                      text: " "
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Octothorpe
+                          text: "#"
+                        - kind: IntegerLiteral
+                          text: "1"
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
-                - kind: Whitespace
-                  text: " "
+            - kind: CallStatement
+              children:
                 - kind: Identifier
                   text: Shared
                 - kind: Newline

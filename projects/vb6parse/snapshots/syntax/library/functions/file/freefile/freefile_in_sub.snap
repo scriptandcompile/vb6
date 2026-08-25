@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/file/freefile.rs
+source: projects/vb6parse/src/syntax/library/functions/file/freefile.rs
 expression: tree
 ---
 root:
@@ -71,28 +71,36 @@ root:
                   text: Open
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"log.txt\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"log.txt\""
                 - kind: Whitespace
                   text: " "
                 - kind: ForKeyword
                   text: For
                 - kind: Whitespace
                   text: " "
-                - kind: AppendKeyword
-                  text: Append
+                - kind: KeywordClause
+                  children:
+                    - kind: AppendKeyword
+                      text: Append
                 - kind: Whitespace
                   text: " "
-                - kind: AsKeyword
-                  text: As
-                - kind: Whitespace
-                  text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: Identifier
-                  text: fileNum
-                - kind: Newline
-                  text: "\n"
+                - kind: ExpressionClause
+                  children:
+                    - kind: AsKeyword
+                      text: As
+                    - kind: Whitespace
+                      text: " "
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Octothorpe
+                          text: "#"
+                        - kind: Identifier
+                          text: fileNum
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

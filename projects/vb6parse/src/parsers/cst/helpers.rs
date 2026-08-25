@@ -27,7 +27,8 @@ impl Parser<'_> {
         expr_kind: SyntaxKind,
     ) {
         let Some((text, token)) = self.tokens.get(self.pos) else {
-            self.builder.start_node(SyntaxKind::ExpressionClause.to_raw());
+            self.builder
+                .start_node(SyntaxKind::ExpressionClause.to_raw());
             self.builder.finish_node();
             return;
         };
@@ -89,11 +90,7 @@ impl Parser<'_> {
     /// # Arguments
     /// * `separator` - The separator token between items (e.g. `Token::Comma`)
     /// * `child_kind` - The `SyntaxKind` for the wrapper node (e.g. `SyntaxKind::ArgumentList`)
-    pub(crate) fn parse_separated_expressions(
-        &mut self,
-        separator: Token,
-        child_kind: SyntaxKind,
-    ) {
+    pub(crate) fn parse_separated_expressions(&mut self, separator: Token, child_kind: SyntaxKind) {
         self.builder.start_node(child_kind.to_raw());
 
         // Parse the first expression wrapped in Argument

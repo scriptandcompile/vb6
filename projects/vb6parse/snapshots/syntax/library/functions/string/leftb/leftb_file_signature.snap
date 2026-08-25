@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/functions/string/leftb.rs
+source: projects/vb6parse/src/syntax/library/functions/string/leftb.rs
 expression: tree
 ---
 root:
@@ -71,28 +71,36 @@ root:
                   text: Open
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: fileName
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: fileName
                 - kind: Whitespace
                   text: " "
                 - kind: ForKeyword
                   text: For
                 - kind: Whitespace
                   text: " "
-                - kind: BinaryKeyword
-                  text: Binary
+                - kind: KeywordClause
+                  children:
+                    - kind: BinaryKeyword
+                      text: Binary
                 - kind: Whitespace
                   text: " "
-                - kind: AsKeyword
-                  text: As
-                - kind: Whitespace
-                  text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
-                - kind: Newline
-                  text: "\n"
+                - kind: ExpressionClause
+                  children:
+                    - kind: AsKeyword
+                      text: As
+                    - kind: Whitespace
+                      text: " "
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Octothorpe
+                          text: "#"
+                        - kind: IntegerLiteral
+                          text: "1"
+            - kind: Newline
+              text: "\n"
             - kind: Whitespace
               text: "    "
             - kind: AssignmentStatement
