@@ -208,10 +208,13 @@ impl Interpreter {
 
     /// Unsupported-construct error.
     pub(crate) fn unsupported(&self, _node: &CstNode, what: &str) -> RunError {
-        self.error_here(VBError::with_description(
-            err_number::INVALID_PROCEDURE_CALL,
-            format!("{what} is not supported yet"),
-        ), None)
+        self.error_here(
+            VBError::with_description(
+                err_number::INVALID_PROCEDURE_CALL,
+                format!("{what} is not supported yet"),
+            ),
+            None,
+        )
     }
 
     /// Build an error tagged with the current source location.

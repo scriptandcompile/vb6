@@ -89,8 +89,8 @@ impl Interpreter {
                     }
                 }
             } else if !bounds.is_empty() {
-                let array =
-                    ArrayValue::new_fixed(ty.clone(), &bounds).map_err(|e| self.error_here(e, None))?;
+                let array = ArrayValue::new_fixed(ty.clone(), &bounds)
+                    .map_err(|e| self.error_here(e, None))?;
                 self.declare_in(&name, VBVariant::Array(array));
             } else {
                 let value = VBVariant::default_for_type(&ty);

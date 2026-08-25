@@ -34,7 +34,7 @@ use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
 use vb6runtime::VBVariant;
 
-use crate::error::RunResult;
+use crate::error::{BuiltinCallInfo, RunResult};
 use crate::interpreter::Interpreter;
 use crate::program::is_identifier_like;
 
@@ -80,6 +80,13 @@ impl Interpreter {
                     return Err(self.error_here(VBError::invalid_procedure_call(), None));
                 }
                 let inner = &rest[1..rest.len() - 1];
+                let arg_byte_ranges: Vec<(u32, u32)> = inner
+                    .iter()
+                    .map(|t| {
+                        let r = t.byte_range();
+                        (r.0, r.1)
+                    })
+                    .collect();
                 let args = self.eval_flat_arguments(inner)?;
                 let name = first.text().trim();
                 // Same dispatch as `eval_call`: user function first, then
@@ -87,12 +94,25 @@ impl Interpreter {
                 if self.procedures.contains_key(&crate::scope::normalize(name)) {
                     return self.call_function(name, args);
                 }
-                crate::builtins::call_builtin(name, &args).map_err(|e| self.error_here(e, None))
+                crate::builtins::call_builtin(name, &args).map_err(|e| {
+                    let param_info = e
+                        .param_index
+                        .map(|idx| (idx, e.param_name.clone().unwrap_or_default()));
+                    let call_info = param_info.map(|(param_index, param_name)| BuiltinCallInfo {
+                        param_index,
+                        param_name,
+                        arg_byte_ranges: Some(arg_byte_ranges.clone()),
+                    });
+                    self.error_here(e, call_info)
+                })
             }
-            SyntaxKind::NewKeyword => Err(self.error_here(VBError::with_description(
-                err_number::INVALID_PROCEDURE_CALL,
-                "New object creation is not implemented yet",
-            ), None)),
+            SyntaxKind::NewKeyword => Err(self.error_here(
+                VBError::with_description(
+                    err_number::INVALID_PROCEDURE_CALL,
+                    "New object creation is not implemented yet",
+                ),
+                None,
+            )),
             _ => Err(self.error_here(VBError::invalid_procedure_call(), None)),
         }
     }

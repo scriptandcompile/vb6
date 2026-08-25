@@ -57,12 +57,10 @@ impl Interpreter {
                     let param_info = e
                         .param_index
                         .map(|idx| (idx, e.param_name.clone().unwrap_or_default()));
-                    let call_info = param_info.map(|(param_index, param_name)| {
-                        BuiltinCallInfo {
-                            param_index,
-                            param_name,
-                            arg_byte_ranges: arg_byte_ranges.clone(),
-                        }
+                    let call_info = param_info.map(|(param_index, param_name)| BuiltinCallInfo {
+                        param_index,
+                        param_name,
+                        arg_byte_ranges: arg_byte_ranges.clone(),
                     });
                     self.error_here(e, call_info)
                 })?;
@@ -75,12 +73,10 @@ impl Interpreter {
                     let param_info = e
                         .param_index
                         .map(|idx| (idx, e.param_name.clone().unwrap_or_default()));
-                    let call_info = param_info.map(|(param_index, param_name)| {
-                        BuiltinCallInfo {
-                            param_index,
-                            param_name,
-                            arg_byte_ranges: arg_byte_ranges.clone(),
-                        }
+                    let call_info = param_info.map(|(param_index, param_name)| BuiltinCallInfo {
+                        param_index,
+                        param_name,
+                        arg_byte_ranges: arg_byte_ranges.clone(),
                     });
                     self.error_here(e, call_info)
                 })?;
@@ -94,21 +90,16 @@ impl Interpreter {
                     let param_info = e
                         .param_index
                         .map(|idx| (idx, e.param_name.clone().unwrap_or_default()));
-                    let call_info = param_info.map(|(param_index, param_name)| {
-                        BuiltinCallInfo {
-                            param_index,
-                            param_name,
-                            arg_byte_ranges: arg_byte_ranges.clone(),
-                        }
+                    let call_info = param_info.map(|(param_index, param_name)| BuiltinCallInfo {
+                        param_index,
+                        param_name,
+                        arg_byte_ranges: arg_byte_ranges.clone(),
                     });
                     self.error_here(e, call_info)
                 })?;
                 Ok(Flow::Next)
             }
-            _ => Err(self.error_here(
-                VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED),
-                None,
-            )), // Sub or Function not defined
+            _ => Err(self.error_here(VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED), None)), // Sub or Function not defined
         }
     }
 }
