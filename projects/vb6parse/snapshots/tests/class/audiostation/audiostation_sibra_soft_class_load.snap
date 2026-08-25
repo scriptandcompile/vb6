@@ -3564,28 +3564,36 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: File
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: File
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: OutputKeyword
-                    text: Output
+                  - kind: KeywordClause
+                    children:
+                      - kind: OutputKeyword
+                        text: Output
                   - kind: Whitespace
                     text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: iFileNo
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Octothorpe
+                            text: "#"
+                          - kind: Identifier
+                            text: iFileNo
+              - kind: Newline
+                text: "\n"
               - kind: PrintStatement
                 children:
                   - kind: Whitespace
@@ -3620,12 +3628,18 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: iFileNo
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: Identifier
+                                text: iFileNo
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -3738,28 +3752,36 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: File
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: File
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: InputKeyword
-                    text: Input
+                  - kind: KeywordClause
+                    children:
+                      - kind: InputKeyword
+                        text: Input
                   - kind: Whitespace
                     text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: intFile
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Octothorpe
+                            text: "#"
+                          - kind: Identifier
+                            text: intFile
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -3822,12 +3844,18 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: intFile
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: Identifier
+                                text: intFile
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

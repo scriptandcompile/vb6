@@ -2987,28 +2987,36 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: sBookFile
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: sBookFile
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: InputKeyword
-                    text: Input
+                  - kind: KeywordClause
+                    children:
+                      - kind: InputKeyword
+                        text: Input
                   - kind: Whitespace
                     text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: h
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Octothorpe
+                            text: "#"
+                          - kind: Identifier
+                            text: h
+              - kind: Newline
+                text: "\r\n"
               - kind: Newline
                 text: "\r\n"
               - kind: DoStatement
@@ -3443,12 +3451,18 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: h
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: Identifier
+                                text: h
+              - kind: Newline
+                text: "\r\n"
               - kind: ExitStatement
                 children:
                   - kind: Whitespace

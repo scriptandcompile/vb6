@@ -7055,36 +7055,46 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: sFile
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: sFile
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: AppendKeyword
-                            text: Append
+                          - kind: KeywordClause
+                            children:
+                              - kind: AppendKeyword
+                                text: Append
                           - kind: Whitespace
                             text: " "
-                          - kind: LockKeyword
-                            text: Lock
-                          - kind: Whitespace
-                            text: " "
-                          - kind: WriteKeyword
-                            text: Write
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: h
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: KeywordClause
+                            children:
+                              - kind: LockKeyword
+                                text: Lock
+                              - kind: Whitespace
+                                text: " "
+                              - kind: WriteKeyword
+                                text: Write
+                              - kind: Whitespace
+                                text: " "
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: Identifier
+                                    text: h
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: PrintStatement
                         children:
                           - kind: Whitespace
@@ -7549,12 +7559,18 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: h
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: h
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "  "
                   - kind: EndKeyword
@@ -7807,28 +7823,36 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: sFile
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: sFile
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: InputKeyword
-                    text: Input
+                  - kind: KeywordClause
+                    children:
+                      - kind: InputKeyword
+                        text: Input
                   - kind: Whitespace
                     text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: h
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Octothorpe
+                            text: "#"
+                          - kind: Identifier
+                            text: h
+              - kind: Newline
+                text: "\r\n"
               - kind: Newline
                 text: "\r\n"
               - kind: DoStatement
@@ -8807,12 +8831,18 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: h
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: Identifier
+                                text: h
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -12131,72 +12161,104 @@ cst:
                                     text: Open
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: psEnginePath
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Ampersand
-                                    text: "&"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: StringLiteral
-                                    text: "\"\\Trace_\""
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Ampersand
-                                    text: "&"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: Format
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: DateKeyword
-                                    text: Date
-                                  - kind: Comma
-                                    text: ","
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: StringLiteral
-                                    text: "\"YYMMDD\""
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Ampersand
-                                    text: "&"
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: StringLiteral
-                                    text: "\".txt\""
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: psEnginePath
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Ampersand
+                                                text: "&"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"\\Trace_\""
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: Ampersand
+                                            text: "&"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: CallExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Format
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: DateKeyword
+                                                            text: Date
+                                                  - kind: Comma
+                                                    text: ","
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: StringLiteralExpression
+                                                        children:
+                                                          - kind: StringLiteral
+                                                            text: "\"YYMMDD\""
+                                              - kind: RightParenthesis
+                                                text: )
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Ampersand
+                                        text: "&"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: StringLiteralExpression
+                                        children:
+                                          - kind: StringLiteral
+                                            text: "\".txt\""
                                   - kind: Whitespace
                                     text: " "
                                   - kind: ForKeyword
                                     text: For
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: AppendKeyword
-                                    text: Append
+                                  - kind: KeywordClause
+                                    children:
+                                      - kind: AppendKeyword
+                                        text: Append
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: LockKeyword
-                                    text: Lock
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: WriteKeyword
-                                    text: Write
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: AsKeyword
-                                    text: As
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: Identifier
-                                    text: h
-                                  - kind: Newline
-                                    text: "\r\n"
+                                  - kind: KeywordClause
+                                    children:
+                                      - kind: LockKeyword
+                                        text: Lock
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: WriteKeyword
+                                        text: Write
+                                      - kind: Whitespace
+                                        text: " "
+                                  - kind: ExpressionClause
+                                    children:
+                                      - kind: AsKeyword
+                                        text: As
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Octothorpe
+                                            text: "#"
+                                          - kind: Identifier
+                                            text: h
+                              - kind: Newline
+                                text: "\r\n"
                               - kind: Whitespace
                                 text: "    "
                           - kind: ElseClause
@@ -12215,112 +12277,174 @@ cst:
                                         text: Open
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: psEnginePath
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Ampersand
-                                        text: "&"
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: StringLiteral
-                                        text: "\"\\Trace_\""
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Ampersand
-                                        text: "&"
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: Format
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: DateKeyword
-                                        text: Date
-                                      - kind: Comma
-                                        text: ","
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: StringLiteral
-                                        text: "\"YYMMDD\""
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Ampersand
-                                        text: "&"
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: StringLiteral
-                                        text: "\"_T\""
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Ampersand
-                                        text: "&"
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: Trim
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: Identifier
-                                        text: CStr
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: Identifier
-                                        text: GetMax
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: IntegerLiteral
-                                        text: "0"
-                                      - kind: Comma
-                                        text: ","
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: ThreadNum
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Ampersand
-                                        text: "&"
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: StringLiteral
-                                        text: "\".txt\""
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: BinaryExpression
+                                                    children:
+                                                      - kind: BinaryExpression
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: psEnginePath
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: Ampersand
+                                                            text: "&"
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: StringLiteralExpression
+                                                            children:
+                                                              - kind: StringLiteral
+                                                                text: "\"\\Trace_\""
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: Ampersand
+                                                        text: "&"
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: CallExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: Format
+                                                          - kind: LeftParenthesis
+                                                            text: (
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: DateKeyword
+                                                                        text: Date
+                                                              - kind: Comma
+                                                                text: ","
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: StringLiteralExpression
+                                                                    children:
+                                                                      - kind: StringLiteral
+                                                                        text: "\"YYMMDD\""
+                                                          - kind: RightParenthesis
+                                                            text: )
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: Ampersand
+                                                    text: "&"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: StringLiteralExpression
+                                                    children:
+                                                      - kind: StringLiteral
+                                                        text: "\"_T\""
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Ampersand
+                                                text: "&"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: Trim
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: CallExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: CStr
+                                                              - kind: LeftParenthesis
+                                                                text: (
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: CallExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: GetMax
+                                                                          - kind: LeftParenthesis
+                                                                            text: (
+                                                                          - kind: ArgumentList
+                                                                            children:
+                                                                              - kind: Argument
+                                                                                children:
+                                                                                  - kind: NumericLiteralExpression
+                                                                                    children:
+                                                                                      - kind: IntegerLiteral
+                                                                                        text: "0"
+                                                                              - kind: Comma
+                                                                                text: ","
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: Argument
+                                                                                children:
+                                                                                  - kind: IdentifierExpression
+                                                                                    children:
+                                                                                      - kind: Identifier
+                                                                                        text: ThreadNum
+                                                                          - kind: RightParenthesis
+                                                                            text: )
+                                                              - kind: RightParenthesis
+                                                                text: )
+                                                  - kind: RightParenthesis
+                                                    text: )
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: Ampersand
+                                            text: "&"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: StringLiteralExpression
+                                            children:
+                                              - kind: StringLiteral
+                                                text: "\".txt\""
                                       - kind: Whitespace
                                         text: " "
                                       - kind: ForKeyword
                                         text: For
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: AppendKeyword
-                                        text: Append
+                                      - kind: KeywordClause
+                                        children:
+                                          - kind: AppendKeyword
+                                            text: Append
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: LockKeyword
-                                        text: Lock
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: WriteKeyword
-                                        text: Write
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: AsKeyword
-                                        text: As
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: Identifier
-                                        text: h
-                                      - kind: Newline
-                                        text: "\r\n"
+                                      - kind: KeywordClause
+                                        children:
+                                          - kind: LockKeyword
+                                            text: Lock
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: WriteKeyword
+                                            text: Write
+                                          - kind: Whitespace
+                                            text: " "
+                                      - kind: ExpressionClause
+                                        children:
+                                          - kind: AsKeyword
+                                            text: As
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Octothorpe
+                                                text: "#"
+                                              - kind: Identifier
+                                                text: h
+                                  - kind: Newline
+                                    text: "\r\n"
                                   - kind: Whitespace
                                     text: "    "
                           - kind: EndKeyword
@@ -12367,12 +12491,18 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: h
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: h
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "  "
                   - kind: EndKeyword
@@ -13427,66 +13557,94 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: psEnginePath
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Ampersand
-                    text: "&"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"\\\""
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Ampersand
-                    text: "&"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: LCase
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: psAppName
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Ampersand
-                    text: "&"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\".log\""
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: psEnginePath
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Ampersand
+                                text: "&"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"\\\""
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Ampersand
+                            text: "&"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: LCase
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: psAppName
+                              - kind: RightParenthesis
+                                text: )
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Ampersand
+                        text: "&"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: StringLiteralExpression
+                        children:
+                          - kind: StringLiteral
+                            text: "\".log\""
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: AppendKeyword
-                    text: Append
+                  - kind: KeywordClause
+                    children:
+                      - kind: AppendKeyword
+                        text: Append
                   - kind: Whitespace
                     text: " "
-                  - kind: LockKeyword
-                    text: Lock
-                  - kind: Whitespace
-                    text: " "
-                  - kind: WriteKeyword
-                    text: Write
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: LogFile
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: KeywordClause
+                    children:
+                      - kind: LockKeyword
+                        text: Lock
+                      - kind: Whitespace
+                        text: " "
+                      - kind: WriteKeyword
+                        text: Write
+                      - kind: Whitespace
+                        text: " "
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Octothorpe
+                            text: "#"
+                          - kind: Identifier
+                            text: LogFile
+              - kind: Newline
+                text: "\r\n"
               - kind: PrintStatement
                 children:
                   - kind: Whitespace
@@ -13529,12 +13687,18 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: LogFile
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: Identifier
+                                text: LogFile
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -15019,28 +15183,36 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: sFile
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: sFile
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: InputKeyword
-                            text: Input
+                          - kind: KeywordClause
+                            children:
+                              - kind: InputKeyword
+                                text: Input
                           - kind: Whitespace
                             text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: f
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: Identifier
+                                    text: f
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Newline
                         text: "\r\n"
                       - kind: DoStatement
@@ -15465,12 +15637,18 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: f
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: f
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "  "
                   - kind: EndKeyword

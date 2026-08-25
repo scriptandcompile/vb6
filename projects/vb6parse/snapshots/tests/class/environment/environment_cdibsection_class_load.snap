@@ -51140,32 +51140,46 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: GetDosPath
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: f
-                          - kind: RightParenthesis
-                            text: )
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: GetDosPath
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: f
+                              - kind: RightParenthesis
+                                text: )
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: BinaryKeyword
-                            text: Binary
+                          - kind: KeywordClause
+                            children:
+                              - kind: BinaryKeyword
+                                text: Binary
                           - kind: Whitespace
                             text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: mf
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: mf
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: PutStatement
                         children:
                           - kind: PutKeyword
@@ -51370,12 +51384,18 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: mf
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: mf
+                      - kind: Newline
+                        text: "\r\n"
                   - kind: EndKeyword
                     text: End
                   - kind: Whitespace
@@ -52574,32 +52594,46 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: GetDosPath
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: f
-                          - kind: RightParenthesis
-                            text: )
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: GetDosPath
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: f
+                              - kind: RightParenthesis
+                                text: )
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: BinaryKeyword
-                            text: Binary
+                          - kind: KeywordClause
+                            children:
+                              - kind: BinaryKeyword
+                                text: Binary
                           - kind: Whitespace
                             text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: FH
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: FH
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: GetStatement
                         children:
                           - kind: GetKeyword
@@ -52632,10 +52666,16 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: FH
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: FH
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Newline
                         text: "\r\n"
                       - kind: CallStatement
@@ -52778,10 +52818,16 @@ cst:
                         text: Close
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: FH
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: FH
+                  - kind: Newline
+                    text: "\r\n"
               - kind: CallStatement
                 children:
                   - kind: Identifier

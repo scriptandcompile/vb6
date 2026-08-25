@@ -61,18 +61,26 @@ root:
                   text: RSet
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: rightAligned
-                - kind: Whitespace
-                  text: " "
-                - kind: EqualityOperator
-                  text: "="
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"R\""
-                - kind: Newline
-                  text: "\n"
+                - kind: BinaryExpression
+                  children:
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: rightAligned
+                    - kind: Whitespace
+                      text: " "
+                    - kind: EqualityOperator
+                      text: "="
+                    - kind: Whitespace
+                      text: " "
+                    - kind: StringLiteralExpression
+                      children:
+                        - kind: StringLiteral
+                          text: "\"R\""
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Newline
+                      text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

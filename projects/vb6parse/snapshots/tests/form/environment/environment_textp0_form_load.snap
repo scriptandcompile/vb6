@@ -33685,10 +33685,16 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: EndOfLineComment
-                            text: "' we closed all files"
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: EndOfLineComment
+                                        text: "' we closed all files"
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: AssignmentStatement
                         children:
                           - kind: IdentifierExpression
@@ -48315,10 +48321,16 @@ cst:
                                     text: Close
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: EndOfLineComment
-                                    text: "' we closed all files"
-                                  - kind: Newline
-                                    text: "\r\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: EndOfLineComment
+                                                text: "' we closed all files"
+                              - kind: Newline
+                                text: "\r\n"
                               - kind: AssignmentStatement
                                 children:
                                   - kind: IdentifierExpression

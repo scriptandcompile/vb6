@@ -45920,40 +45920,56 @@ cst:
                                                     text: Open
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: GetDosPath
-                                                  - kind: LeftParenthesis
-                                                    text: (
-                                                  - kind: Identifier
-                                                    text: FileName
-                                                  - kind: RightParenthesis
-                                                    text: )
+                                                  - kind: CallExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: GetDosPath
+                                                      - kind: LeftParenthesis
+                                                        text: (
+                                                      - kind: ArgumentList
+                                                        children:
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: FileName
+                                                      - kind: RightParenthesis
+                                                        text: )
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: ForKeyword
                                                     text: For
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: BinaryKeyword
-                                                    text: Binary
+                                                  - kind: KeywordClause
+                                                    children:
+                                                      - kind: BinaryKeyword
+                                                        text: Binary
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: AccessKeyword
-                                                    text: Access
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: WriteKeyword
-                                                    text: Write
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: AsKeyword
-                                                    text: As
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: Identifier
-                                                    text: FileNum
-                                                  - kind: Newline
-                                                    text: "\r\n"
+                                                  - kind: KeywordClause
+                                                    children:
+                                                      - kind: AccessKeyword
+                                                        text: Access
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: WriteKeyword
+                                                        text: Write
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                  - kind: ExpressionClause
+                                                    children:
+                                                      - kind: AsKeyword
+                                                        text: As
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: FileNum
+                                              - kind: Newline
+                                                text: "\r\n"
                                               - kind: PutStatement
                                                 children:
                                                   - kind: Whitespace
@@ -45986,10 +46002,16 @@ cst:
                                                     text: Close
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: FileNum
-                                                  - kind: Newline
-                                                    text: "\r\n"
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: FileNum
+                                              - kind: Newline
+                                                text: "\r\n"
                                               - kind: Whitespace
                                                 text: "    "
                                           - kind: EndKeyword

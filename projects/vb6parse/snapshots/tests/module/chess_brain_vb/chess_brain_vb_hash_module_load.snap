@@ -22631,56 +22631,72 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: App
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: Path
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Ampersand
-                            text: "&"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: StringLiteral
-                            text: "\"\\CB_THREAD0.TXT\""
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: App
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: Path
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Ampersand
+                                text: "&"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"\\CB_THREAD0.TXT\""
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: AppendKeyword
-                            text: Append
+                          - kind: KeywordClause
+                            children:
+                              - kind: AppendKeyword
+                                text: Append
                           - kind: Whitespace
                             text: " "
-                          - kind: AccessKeyword
-                            text: Access
-                          - kind: Whitespace
-                            text: " "
-                          - kind: WriteKeyword
-                            text: Write
-                          - kind: Whitespace
-                            text: " "
-                          - kind: LockKeyword
-                            text: Lock
-                          - kind: Whitespace
-                            text: " "
-                          - kind: WriteKeyword
-                            text: Write
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: lLOCK_FILEHANDLE
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: KeywordClause
+                            children:
+                              - kind: AccessKeyword
+                                text: Access
+                              - kind: Whitespace
+                                text: " "
+                              - kind: WriteKeyword
+                                text: Write
+                              - kind: Whitespace
+                                text: " "
+                          - kind: KeywordClause
+                            children:
+                              - kind: LockKeyword
+                                text: Lock
+                              - kind: Whitespace
+                                text: " "
+                              - kind: WriteKeyword
+                                text: Write
+                              - kind: Whitespace
+                                text: " "
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: Identifier
+                                    text: lLOCK_FILEHANDLE
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: PrintStatement
                         children:
                           - kind: Whitespace
@@ -23033,56 +23049,72 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: App
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: Path
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Ampersand
-                            text: "&"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: StringLiteral
-                            text: "\"\\CB_THREAD0.TXT\""
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: App
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: Path
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Ampersand
+                                text: "&"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"\\CB_THREAD0.TXT\""
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: AppendKeyword
-                            text: Append
+                          - kind: KeywordClause
+                            children:
+                              - kind: AppendKeyword
+                                text: Append
                           - kind: Whitespace
                             text: " "
-                          - kind: AccessKeyword
-                            text: Access
-                          - kind: Whitespace
-                            text: " "
-                          - kind: WriteKeyword
-                            text: Write
-                          - kind: Whitespace
-                            text: " "
-                          - kind: LockKeyword
-                            text: Lock
-                          - kind: Whitespace
-                            text: " "
-                          - kind: WriteKeyword
-                            text: Write
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: lLOCK_FILEHANDLE2
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: KeywordClause
+                            children:
+                              - kind: AccessKeyword
+                                text: Access
+                              - kind: Whitespace
+                                text: " "
+                              - kind: WriteKeyword
+                                text: Write
+                              - kind: Whitespace
+                                text: " "
+                          - kind: KeywordClause
+                            children:
+                              - kind: LockKeyword
+                                text: Lock
+                              - kind: Whitespace
+                                text: " "
+                              - kind: WriteKeyword
+                                text: Write
+                              - kind: Whitespace
+                                text: " "
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: Identifier
+                                    text: lLOCK_FILEHANDLE2
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                       - kind: AssignmentStatement
@@ -23115,12 +23147,18 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: lLOCK_FILEHANDLE2
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: lLOCK_FILEHANDLE2
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "  "
                   - kind: CompilerEndIfClause
@@ -23321,36 +23359,48 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: psEnginePath
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Ampersand
-                            text: "&"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: StringLiteral
-                            text: "\"\\DEBUG_LOG.TXT\""
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: psEnginePath
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Ampersand
+                                text: "&"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"\\DEBUG_LOG.TXT\""
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: AppendKeyword
-                            text: Append
+                          - kind: KeywordClause
+                            children:
+                              - kind: AppendKeyword
+                                text: Append
                           - kind: Whitespace
                             text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: lLOCK_FILEHANDLE3
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: Identifier
+                                    text: lLOCK_FILEHANDLE3
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: PrintStatement
                         children:
                           - kind: Whitespace
@@ -23387,12 +23437,18 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: lLOCK_FILEHANDLE3
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: lLOCK_FILEHANDLE3
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "  "
                   - kind: CompilerEndIfClause

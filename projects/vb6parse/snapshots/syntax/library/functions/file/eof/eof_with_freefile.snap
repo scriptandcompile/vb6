@@ -125,9 +125,15 @@ root:
           text: Close
         - kind: Whitespace
           text: " "
-        - kind: Octothorpe
-          text: "#"
-        - kind: Identifier
-          text: fileNum
-        - kind: Newline
-          text: "\n"
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: Identifier
+                      text: fileNum
+    - kind: Newline
+      text: "\n"

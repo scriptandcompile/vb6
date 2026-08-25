@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/functions/file/eof.rs
+source: projects/vb6parse/src/syntax/library/functions/file/eof.rs
 expression: tree
 ---
 root:
@@ -89,12 +89,18 @@ root:
           text: Close
         - kind: Whitespace
           text: " "
-        - kind: Octothorpe
-          text: "#"
-        - kind: Identifier
-          text: fileNum
-        - kind: Newline
-          text: "\n"
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: Identifier
+                      text: fileNum
+    - kind: Newline
+      text: "\n"
     - kind: ExitStatement
       children:
         - kind: ExitKeyword
@@ -147,9 +153,15 @@ root:
               text: Close
             - kind: Whitespace
               text: " "
-            - kind: Octothorpe
-              text: "#"
-            - kind: Identifier
-              text: fileNum
-            - kind: Newline
-              text: "\n"
+            - kind: ArgumentList
+              children:
+                - kind: Argument
+                  children:
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Octothorpe
+                          text: "#"
+                        - kind: Identifier
+                          text: fileNum
+        - kind: Newline
+          text: "\n"

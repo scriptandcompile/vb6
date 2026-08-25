@@ -111,9 +111,15 @@ root:
           text: Close
         - kind: Whitespace
           text: " "
-        - kind: Octothorpe
-          text: "#"
-        - kind: IntegerLiteral
-          text: "1"
-        - kind: Newline
-          text: "\n"
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: IntegerLiteral
+                      text: "1"
+    - kind: Newline
+      text: "\n"

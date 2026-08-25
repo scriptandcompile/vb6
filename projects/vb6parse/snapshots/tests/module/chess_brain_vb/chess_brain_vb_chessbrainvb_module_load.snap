@@ -39503,20 +39503,34 @@ cst:
                                     text: Mid
                                   - kind: LeftParenthesis
                                     text: (
-                                  - kind: Identifier
-                                    text: isText
-                                  - kind: Comma
-                                    text: ","
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: i
-                                  - kind: Comma
-                                    text: ","
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: isText
+                                      - kind: Comma
+                                        text: ","
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: i
+                                      - kind: Comma
+                                        text: ","
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Argument
+                                        children:
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "1"
                                   - kind: RightParenthesis
                                     text: )
                                   - kind: Whitespace
@@ -39525,16 +39539,24 @@ cst:
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Chr
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: Identifier
-                                    text: c
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Newline
-                                    text: "\r\n"
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Chr
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: c
+                                      - kind: RightParenthesis
+                                        text: )
+                              - kind: Newline
+                                text: "\r\n"
                               - kind: Whitespace
                                 text: "        "
                           - kind: EndKeyword

@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/form/binary_metamorphosis.rs
-assertion_line: 100
 expression: form_file
 ---
 form:
@@ -820,36 +819,46 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Trial
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Trial
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: BinaryKeyword
-                    text: Binary
+                  - kind: KeywordClause
+                    children:
+                      - kind: BinaryKeyword
+                        text: Binary
                   - kind: Whitespace
                     text: " "
-                  - kind: AccessKeyword
-                    text: Access
-                  - kind: Whitespace
-                    text: " "
-                  - kind: ReadKeyword
-                    text: Read
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: FF
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: KeywordClause
+                    children:
+                      - kind: AccessKeyword
+                        text: Access
+                      - kind: Whitespace
+                        text: " "
+                      - kind: ReadKeyword
+                        text: Read
+                      - kind: Whitespace
+                        text: " "
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Octothorpe
+                            text: "#"
+                          - kind: Identifier
+                            text: FF
+              - kind: Newline
+                text: "\r\n"
               - kind: Whitespace
                 text: "        "
               - kind: AssignmentStatement
@@ -928,12 +937,18 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: Identifier
-                    text: FF
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: Identifier
+                                text: FF
+              - kind: Newline
+                text: "\r\n"
               - kind: Whitespace
                 text: "    "
               - kind: Newline
@@ -3742,26 +3757,34 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CurEnvFile
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: CurEnvFile
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: AppendKeyword
-                            text: Append
+                          - kind: KeywordClause
+                            children:
+                              - kind: AppendKeyword
+                                text: Append
                           - kind: Whitespace
                             text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: file1
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: file1
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: PrintStatement
                         children:
                           - kind: Whitespace
@@ -3798,12 +3821,18 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: file1
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: file1
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                       - kind: Newline

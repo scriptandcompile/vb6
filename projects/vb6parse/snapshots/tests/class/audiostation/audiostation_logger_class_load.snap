@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/class/audiostation.rs
-assertion_line: 32
 expression: class
 ---
 header:
@@ -143,34 +142,46 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Folder
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Ampersand
-                    text: "&"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"\\audiostation.log\""
+                  - kind: BinaryExpression
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: Folder
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Ampersand
+                        text: "&"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: StringLiteralExpression
+                        children:
+                          - kind: StringLiteral
+                            text: "\"\\audiostation.log\""
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: AppendKeyword
-                    text: Append
+                  - kind: KeywordClause
+                    children:
+                      - kind: AppendKeyword
+                        text: Append
                   - kind: Whitespace
                     text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: FileNum
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: FileNum
+              - kind: Newline
+                text: "\n"
               - kind: PrintStatement
                 children:
                   - kind: PrintKeyword
@@ -679,10 +690,16 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: FileNum
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: FileNum
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

@@ -4127,44 +4127,60 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: NowFolder
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"\\cma\\\""
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"user.cbe\""
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: NowFolder
+                          - kind: Whitespace
+                            text: " "
+                          - kind: AdditionOperator
+                            text: +
+                          - kind: Whitespace
+                            text: " "
+                          - kind: StringLiteralExpression
+                            children:
+                              - kind: StringLiteral
+                                text: "\"\\cma\\\""
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AdditionOperator
+                        text: +
+                      - kind: Whitespace
+                        text: " "
+                      - kind: StringLiteralExpression
+                        children:
+                          - kind: StringLiteral
+                            text: "\"user.cbe\""
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: BinaryKeyword
-                    text: Binary
+                  - kind: KeywordClause
+                    children:
+                      - kind: BinaryKeyword
+                        text: Binary
                   - kind: Whitespace
                     text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Octothorpe
+                            text: "#"
+                          - kind: IntegerLiteral
+                            text: "1"
+              - kind: Newline
+                text: "\n"
               - kind: GetStatement
                 children:
                   - kind: Whitespace
@@ -4297,12 +4313,18 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "        "
               - kind: AssignmentStatement
@@ -4577,44 +4599,60 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: TempPath
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"\\cma\\\""
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"user.cbe\""
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: TempPath
+                          - kind: Whitespace
+                            text: " "
+                          - kind: AdditionOperator
+                            text: +
+                          - kind: Whitespace
+                            text: " "
+                          - kind: StringLiteralExpression
+                            children:
+                              - kind: StringLiteral
+                                text: "\"\\cma\\\""
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AdditionOperator
+                        text: +
+                      - kind: Whitespace
+                        text: " "
+                      - kind: StringLiteralExpression
+                        children:
+                          - kind: StringLiteral
+                            text: "\"user.cbe\""
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: BinaryKeyword
-                    text: Binary
+                  - kind: KeywordClause
+                    children:
+                      - kind: BinaryKeyword
+                        text: Binary
                   - kind: Whitespace
                     text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Octothorpe
+                            text: "#"
+                          - kind: IntegerLiteral
+                            text: "1"
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -4673,12 +4711,18 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: Newline
@@ -13999,28 +14043,36 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: LoadFile
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: LoadFile
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: InputKeyword
-                    text: Input
+                  - kind: KeywordClause
+                    children:
+                      - kind: InputKeyword
+                        text: Input
                   - kind: Whitespace
                     text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Octothorpe
+                            text: "#"
+                          - kind: IntegerLiteral
+                            text: "1"
+              - kind: Newline
+                text: "\n"
               - kind: DoStatement
                 children:
                   - kind: Whitespace
@@ -14225,12 +14277,18 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
+              - kind: Newline
+                text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: IfStatement

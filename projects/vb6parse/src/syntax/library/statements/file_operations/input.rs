@@ -1,5 +1,6 @@
 use crate::parsers::SyntaxKind;
 
+use crate::Token;
 use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
@@ -34,7 +35,22 @@ impl Parser<'_> {
     //
     // [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/input-statement)
     pub(crate) fn parse_input_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::InputStatement);
+        self.builder.start_node(SyntaxKind::InputStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        self.parse_expression();
+        self.consume_whitespace();
+
+        if !self.is_at_end() && self.at_token(Token::Comma) {
+            self.consume_token();
+            self.consume_whitespace();
+            self.parse_separated_expressions(Token::Comma, SyntaxKind::ArgumentList);
+        }
+
+        self.builder.finish_node();
     }
 }
 

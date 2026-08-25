@@ -16547,22 +16547,30 @@ cst:
                                             text: LSet
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: destValue
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: destValue
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: EqualityOperator
+                                                text: "="
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: s
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: EqualityOperator
-                                            text: "="
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: Identifier
-                                            text: s
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: EndOfLineComment
-                                            text: "'LSet cannot copy an odd number of bytes"
-                                          - kind: Newline
-                                            text: "\r\n"
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: EndOfLineComment
+                                                text: "'LSet cannot copy an odd number of bytes"
+                                      - kind: Newline
+                                        text: "\r\n"
                                       - kind: IfStatement
                                         children:
                                           - kind: Whitespace
@@ -16615,20 +16623,34 @@ cst:
                                                     text: MidB
                                                   - kind: LeftParenthesis
                                                     text: (
-                                                  - kind: Identifier
-                                                    text: destValue
-                                                  - kind: Comma
-                                                    text: ","
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: Identifier
-                                                    text: tempSize
-                                                  - kind: Comma
-                                                    text: ","
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: destValue
+                                                      - kind: Comma
+                                                        text: ","
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: tempSize
+                                                      - kind: Comma
+                                                        text: ","
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "1"
                                                   - kind: RightParenthesis
                                                     text: )
                                                   - kind: Whitespace
@@ -16637,28 +16659,44 @@ cst:
                                                     text: "="
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: MidB$
-                                                  - kind: LeftParenthesis
-                                                    text: (
-                                                  - kind: Identifier
-                                                    text: s
-                                                  - kind: Comma
-                                                    text: ","
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: Identifier
-                                                    text: tempSize
-                                                  - kind: Comma
-                                                    text: ","
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
-                                                  - kind: RightParenthesis
-                                                    text: )
-                                                  - kind: Newline
-                                                    text: "\r\n"
+                                                  - kind: CallExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: MidB$
+                                                      - kind: LeftParenthesis
+                                                        text: (
+                                                      - kind: ArgumentList
+                                                        children:
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: s
+                                                          - kind: Comma
+                                                            text: ","
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: tempSize
+                                                          - kind: Comma
+                                                            text: ","
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: NumericLiteralExpression
+                                                                children:
+                                                                  - kind: IntegerLiteral
+                                                                    text: "1"
+                                                      - kind: RightParenthesis
+                                                        text: )
+                                              - kind: Newline
+                                                text: "\r\n"
                                               - kind: Whitespace
                                                 text: "            "
                                           - kind: EndKeyword
@@ -16813,18 +16851,26 @@ cst:
                                                         text: LSet
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Identifier
-                                                        text: destValue
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: EqualityOperator
-                                                        text: "="
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: Identifier
-                                                        text: arrBytes
-                                                      - kind: Newline
-                                                        text: "\r\n"
+                                                      - kind: BinaryExpression
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: destValue
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: EqualityOperator
+                                                            text: "="
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: arrBytes
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Newline
+                                                            text: "\r\n"
                                                   - kind: IfStatement
                                                     children:
                                                       - kind: Whitespace
@@ -16971,20 +17017,34 @@ cst:
                                                                 text: MidB
                                                               - kind: LeftParenthesis
                                                                 text: (
-                                                              - kind: Identifier
-                                                                text: destValue
-                                                              - kind: Comma
-                                                                text: ","
-                                                              - kind: Whitespace
-                                                                text: " "
-                                                              - kind: Identifier
-                                                                text: tempSize
-                                                              - kind: Comma
-                                                                text: ","
-                                                              - kind: Whitespace
-                                                                text: " "
-                                                              - kind: IntegerLiteral
-                                                                text: "1"
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: destValue
+                                                                  - kind: Comma
+                                                                    text: ","
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: tempSize
+                                                                  - kind: Comma
+                                                                    text: ","
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: NumericLiteralExpression
+                                                                        children:
+                                                                          - kind: IntegerLiteral
+                                                                            text: "1"
                                                               - kind: RightParenthesis
                                                                 text: )
                                                               - kind: Whitespace
@@ -16993,10 +17053,12 @@ cst:
                                                                 text: "="
                                                               - kind: Whitespace
                                                                 text: " "
-                                                              - kind: Identifier
-                                                                text: lastByte
-                                                              - kind: Newline
-                                                                text: "\r\n"
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: lastByte
+                                                          - kind: Newline
+                                                            text: "\r\n"
                                                           - kind: Whitespace
                                                             text: "                "
                                                       - kind: EndKeyword
@@ -17025,14 +17087,24 @@ cst:
                                                             text: MidB
                                                           - kind: LeftParenthesis
                                                             text: (
-                                                          - kind: Identifier
-                                                            text: destValue
-                                                          - kind: Comma
-                                                            text: ","
-                                                          - kind: Whitespace
-                                                            text: " "
-                                                          - kind: IntegerLiteral
-                                                            text: "1"
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: destValue
+                                                              - kind: Comma
+                                                                text: ","
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: NumericLiteralExpression
+                                                                    children:
+                                                                      - kind: IntegerLiteral
+                                                                        text: "1"
                                                           - kind: RightParenthesis
                                                             text: )
                                                           - kind: Whitespace
@@ -17041,10 +17113,12 @@ cst:
                                                             text: "="
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: Identifier
-                                                            text: arrBytes
-                                                          - kind: Newline
-                                                            text: "\r\n"
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: arrBytes
+                                                      - kind: Newline
+                                                        text: "\r\n"
                                                       - kind: Whitespace
                                                         text: "            "
                                               - kind: EndKeyword

@@ -7728,28 +7728,36 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: sFile
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: sFile
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: InputKeyword
-                            text: Input
+                          - kind: KeywordClause
+                            children:
+                              - kind: InputKeyword
+                                text: Input
                           - kind: Whitespace
                             text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: fNum
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: Identifier
+                                    text: fNum
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: Newline
@@ -8478,12 +8486,18 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: fNum
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: fNum
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: Newline

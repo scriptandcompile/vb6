@@ -1196,40 +1196,52 @@ cst:
                     text: Open
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: App
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Path
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Ampersand
-                    text: "&"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"\\Demo.map\""
+                  - kind: BinaryExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: App
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: Path
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Ampersand
+                        text: "&"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: StringLiteralExpression
+                        children:
+                          - kind: StringLiteral
+                            text: "\"\\Demo.map\""
                   - kind: Whitespace
                     text: " "
                   - kind: ForKeyword
                     text: For
                   - kind: Whitespace
                     text: " "
-                  - kind: BinaryKeyword
-                    text: Binary
+                  - kind: KeywordClause
+                    children:
+                      - kind: BinaryKeyword
+                        text: Binary
                   - kind: Whitespace
                     text: " "
-                  - kind: AsKeyword
-                    text: As
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: ExpressionClause
+                    children:
+                      - kind: AsKeyword
+                        text: As
+                      - kind: Whitespace
+                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Octothorpe
+                            text: "#"
+                          - kind: IntegerLiteral
+                            text: "1"
+              - kind: Newline
+                text: "\r\n"
               - kind: Whitespace
                 text: "        "
               - kind: EndOfLineComment
@@ -1374,12 +1386,18 @@ cst:
                     text: Close
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
+              - kind: Newline
+                text: "\r\n"
               - kind: Whitespace
                 text: "    "
               - kind: Newline
@@ -2846,28 +2864,36 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: sFile
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: sFile
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: BinaryKeyword
-                            text: Binary
+                          - kind: KeywordClause
+                            children:
+                              - kind: BinaryKeyword
+                                text: Binary
                           - kind: Whitespace
                             text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: IntegerLiteral
+                                    text: "1"
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "            "
                       - kind: EndOfLineComment
@@ -3012,12 +3038,18 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: Newline
@@ -3472,28 +3504,36 @@ cst:
                             text: Open
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: sFile
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: sFile
                           - kind: Whitespace
                             text: " "
                           - kind: ForKeyword
                             text: For
                           - kind: Whitespace
                             text: " "
-                          - kind: BinaryKeyword
-                            text: Binary
+                          - kind: KeywordClause
+                            children:
+                              - kind: BinaryKeyword
+                                text: Binary
                           - kind: Whitespace
                             text: " "
-                          - kind: AsKeyword
-                            text: As
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ExpressionClause
+                            children:
+                              - kind: AsKeyword
+                                text: As
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: IntegerLiteral
+                                    text: "1"
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "            "
                       - kind: EndOfLineComment
@@ -3582,12 +3622,18 @@ cst:
                             text: Close
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: Newline
