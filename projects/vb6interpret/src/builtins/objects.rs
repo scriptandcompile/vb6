@@ -1,17 +1,19 @@
 //! VB6 object function registry.
 //!
-//! One [`Builtin`](super::Builtin) entry per object function, each wrapping
-//! the typed `vb6runtime::library::objects` implementation.
+//! One [`typed_builtin!`](crate::typed_builtin) entry per object function.
+//! `TypeName` is a predicate: it observes the un-coerced variant (returning
+//! `"Empty"`, `"Null"`, `"Nothing"`, class names, or array type names), so
+//! its parameter stays raw by design.
+//!
+//! Not registered: `CreateObject`, `GetObject`, `CallByName` are doc-only
+//! placeholders in the runtime; `Load`/`Unload` are statement forms.
 
 use super::{Builtin, Registry};
-use crate::builtin;
-use vb6core::error::VBResult;
+use crate::typed_builtin;
 use vb6runtime::library::objects as objfn;
-use vb6runtime::VBVariant;
 
 /// Register the object functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {
-    registry.insert(builtin!("typename", 1, 1, |args| {
-        objfn::typename::type_name(&args[0])
-    }));
+    registry.insert(typed_builtin!("typename", 1, 1, (value: variant),
+        objfn::typename::type_name(value)));
 }
