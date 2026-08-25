@@ -11,6 +11,36 @@ use crate::parsers::cst::{RecoveryEvent, RecoveryStrategy};
 use std::num::NonZeroUsize;
 
 impl Parser<'_> {
+    /// Start a `KeywordClause` node, consume the expected keyword token, finish the node.
+    ///
+    /// If the current token does not match `keyword`, reports an error and does not
+    /// consume anything so the caller can handle recovery.
+    ///
+    /// # Arguments
+    /// * `keyword` - The expected keyword `SyntaxKind` (e.g. `SyntaxKind::ForKeyword`)
+    pub(crate) fn parse_keyword_clause(&mut self, keyword: SyntaxKind) {
+        let expected_kind = keyword;
+        let Some((text, token)) = self.tokens.get(self.pos) else {
+            self.builder.start_node(SyntaxKind::KeywordClause.to_raw());
+            self.builder.finish_node();
+            return;
+        };
+
+        let token_kind = SyntaxKind::from(*token);
+        if token_kind != expected_kind {
+            self.report_error(ParserError::UnexpectedTokens {
+                expected: vec![format!("{:?}", expected_kind)],
+                found: vec![*token],
+            });
+            return;
+        }
+
+        self.builder.start_node(SyntaxKind::KeywordClause.to_raw());
+        self.builder.token(token_kind.to_raw(), text);
+        self.pos += 1;
+        self.builder.finish_node();
+    }
+
     /// Check if we've reached the end of the token stream.
     pub(crate) fn is_at_end(&self) -> bool {
         self.pos >= self.tokens.len()
