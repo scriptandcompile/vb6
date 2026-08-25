@@ -160,6 +160,7 @@
 use crate::parsers::SyntaxKind;
 
 use crate::parsers::cst::Parser;
+use crate::Token;
 
 impl Parser<'_> {
     /// Parse a Write # statement.
@@ -177,7 +178,22 @@ impl Parser<'_> {
     /// Write #1, "Hello", 42, True
     /// ```
     pub(crate) fn parse_write_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::WriteStatement);
+        self.builder.start_node(SyntaxKind::WriteStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        self.parse_expression();
+        self.consume_whitespace();
+
+        if self.at_token(Token::Comma) {
+            self.consume_token();
+            self.consume_whitespace();
+            self.parse_separated_expressions(Token::Comma, SyntaxKind::ArgumentList);
+        }
+
+        self.builder.finish_node();
     }
 }
 

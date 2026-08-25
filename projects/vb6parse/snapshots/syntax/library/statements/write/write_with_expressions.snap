@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/write.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/write.rs
 expression: tree
 ---
 root:
@@ -33,40 +33,60 @@ root:
                   text: Write
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: x
-                - kind: Whitespace
-                  text: " "
-                - kind: AdditionOperator
-                  text: +
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: y
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: total
-                - kind: Whitespace
-                  text: " "
-                - kind: MultiplicationOperator
-                  text: "*"
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "2"
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: BinaryExpression
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: x
+                            - kind: Whitespace
+                              text: " "
+                            - kind: AdditionOperator
+                              text: +
+                            - kind: Whitespace
+                              text: " "
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: y
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: BinaryExpression
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: total
+                            - kind: Whitespace
+                              text: " "
+                            - kind: MultiplicationOperator
+                              text: "*"
+                            - kind: Whitespace
+                              text: " "
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "2"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

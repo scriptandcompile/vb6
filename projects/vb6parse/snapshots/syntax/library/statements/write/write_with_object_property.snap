@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/write.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/write.rs
 expression: tree
 ---
 root:
@@ -33,32 +33,44 @@ root:
                   text: Write
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: obj
-                - kind: PeriodOperator
-                  text: "."
-                - kind: NameKeyword
-                  text: Name
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: obj
-                - kind: PeriodOperator
-                  text: "."
-                - kind: Identifier
-                  text: Value
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: Identifier
+                              text: obj
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: NameKeyword
+                              text: Name
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: Identifier
+                              text: obj
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: Value
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

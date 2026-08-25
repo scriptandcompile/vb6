@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/write.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/write.rs
 expression: tree
 ---
 root:
@@ -33,32 +33,50 @@ root:
                   text: Write
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: IntegerLiteral
-                  text: "42"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: SingleLiteral
-                  text: "3.14"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: SubtractionOperator
-                  text: "-"
-                - kind: IntegerLiteral
-                  text: "100"
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "42"
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: SingleLiteral
+                              text: "3.14"
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: UnaryExpression
+                          children:
+                            - kind: SubtractionOperator
+                              text: "-"
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "100"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace
