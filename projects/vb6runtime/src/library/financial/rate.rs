@@ -739,7 +739,7 @@
 //! - `MIRR`: Returns modified internal rate of return
 
 use crate::error::{VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBDouble, VBInteger, VBVariant};
 use vb6core::error::err_number;
 
 /// Implementation of the `Rate` function.
@@ -766,19 +766,17 @@ use vb6core::error::err_number;
 ///   have no valid rate, or the equation has no real solution)
 /// - Returns a `Double`
 pub fn rate(
-    nper: &VBVariant,
-    pmt: &VBVariant,
-    pv: &VBVariant,
-    fv: Option<&VBVariant>,
-    type_: Option<&VBVariant>,
-    guess: Option<&VBVariant>,
+    nper: &VBDouble,
+    pmt: &VBDouble,
+    pv: &VBDouble,
+    fv: Option<&VBDouble>,
+    type_: Option<&VBInteger>,
+    guess: Option<&VBDouble>,
 ) -> VBResult<VBVariant> {
-    let nper_val = nper.as_f64()?;
-    let pmt_val = pmt.as_f64()?;
-    let pv_val = pv.as_f64()?;
-    let fv_val = fv.map(|f| f.as_f64()).transpose()?.unwrap_or(0.0);
-    let type_val = type_.map(|t| t.as_i16()).transpose()?.unwrap_or(0);
-    let guess_val = guess.map(|g| g.as_f64()).transpose()?.unwrap_or(0.1);
+    let (nper_val, pmt_val, pv_val) = (nper.as_f64(), pmt.as_f64(), pv.as_f64());
+    let fv_val = fv.map_or(0.0, |f| f.as_f64());
+    let type_val = type_.map_or(0, |t| t.as_i16());
+    let guess_val = guess.map_or(0.1, |g| g.as_f64());
 
     // Validate inputs per VB6 behavior
     if nper_val <= 0.0 {
@@ -787,7 +785,7 @@ pub fn rate(
 
     // Special case: zero interest rate.
     // At rate = 0 the time-value equation reduces to pv + pmt*nper + fv = 0.
-    let scale = pv_val
+    let scale: f64 = pv_val
         .abs()
         .max((pmt_val * nper_val).abs())
         .max(fv_val.abs());
@@ -893,13 +891,13 @@ fn rate_solves_equation(
 #[cfg(test)]
 mod tests {
     use super::rate;
-    use crate::value::VBVariant;
+    use crate::value::{VBDouble, VBInteger, VBVariant};
 
     fn rate_defaults(nper: f64, pmt: f64, pv: f64) -> VBVariant {
         rate(
-            &VBVariant::from_double(nper),
-            &VBVariant::from_double(pmt),
-            &VBVariant::from_double(pv),
+            &VBDouble::from(nper),
+            &VBDouble::from(pmt),
+            &VBDouble::from(pv),
             None,
             None,
             None,
@@ -909,10 +907,10 @@ mod tests {
 
     fn rate_with_fv(nper: f64, pmt: f64, pv: f64, fv: f64) -> VBVariant {
         rate(
-            &VBVariant::from_double(nper),
-            &VBVariant::from_double(pmt),
-            &VBVariant::from_double(pv),
-            Some(&VBVariant::from_double(fv)),
+            &VBDouble::from(nper),
+            &VBDouble::from(pmt),
+            &VBDouble::from(pv),
+            Some(&VBDouble::from(fv)),
             None,
             None,
         )
@@ -921,11 +919,11 @@ mod tests {
 
     fn rate_with_type(nper: f64, pmt: f64, pv: f64, fv: f64, ptype: i16) -> VBVariant {
         rate(
-            &VBVariant::from_double(nper),
-            &VBVariant::from_double(pmt),
-            &VBVariant::from_double(pv),
-            Some(&VBVariant::from_double(fv)),
-            Some(&VBVariant::from_integer(ptype)),
+            &VBDouble::from(nper),
+            &VBDouble::from(pmt),
+            &VBDouble::from(pv),
+            Some(&VBDouble::from(fv)),
+            Some(&VBInteger::from(ptype)),
             None,
         )
         .unwrap()
@@ -933,12 +931,12 @@ mod tests {
 
     fn rate_with_guess(nper: f64, pmt: f64, pv: f64, fv: f64, ptype: i16, guess: f64) -> VBVariant {
         rate(
-            &VBVariant::from_double(nper),
-            &VBVariant::from_double(pmt),
-            &VBVariant::from_double(pv),
-            Some(&VBVariant::from_double(fv)),
-            Some(&VBVariant::from_integer(ptype)),
-            Some(&VBVariant::from_double(guess)),
+            &VBDouble::from(nper),
+            &VBDouble::from(pmt),
+            &VBDouble::from(pv),
+            Some(&VBDouble::from(fv)),
+            Some(&VBInteger::from(ptype)),
+            Some(&VBDouble::from(guess)),
         )
         .unwrap()
     }
@@ -1043,9 +1041,9 @@ mod tests {
     #[test]
     fn rate_with_integer_args() {
         let result = rate(
-            &VBVariant::from_long(60),
-            &VBVariant::from_long(-200),
-            &VBVariant::from_long(10000),
+            &VBDouble::from(60.0),
+            &VBDouble::from(-200.0),
+            &VBDouble::from(10000.0),
             None,
             None,
             None,
@@ -1057,9 +1055,9 @@ mod tests {
     #[test]
     fn rate_negative_periods_raises_error_5() {
         let err = rate(
-            &VBVariant::from_double(-1.0),
-            &VBVariant::from_double(-200.0),
-            &VBVariant::from_double(10000.0),
+            &VBDouble::from(-1.0),
+            &VBDouble::from(-200.0),
+            &VBDouble::from(10000.0),
             None,
             None,
             None,
@@ -1071,9 +1069,9 @@ mod tests {
     #[test]
     fn rate_zero_periods_raises_error_5() {
         let err = rate(
-            &VBVariant::from_double(0.0),
-            &VBVariant::from_double(-200.0),
-            &VBVariant::from_double(10000.0),
+            &VBDouble::from(0.0),
+            &VBDouble::from(-200.0),
+            &VBDouble::from(10000.0),
             None,
             None,
             None,
@@ -1086,9 +1084,9 @@ mod tests {
     fn rate_same_sign_raises_error_5() {
         // Both pmt and pv positive: no negative cash flow, no valid rate
         let err = rate(
-            &VBVariant::from_double(60.0),
-            &VBVariant::from_double(200.0),
-            &VBVariant::from_double(10000.0),
+            &VBDouble::from(60.0),
+            &VBDouble::from(200.0),
+            &VBDouble::from(10000.0),
             None,
             None,
             None,
@@ -1101,28 +1099,14 @@ mod tests {
     fn rate_same_sign_negative_raises_error_5() {
         // Both pmt and pv negative
         let err = rate(
-            &VBVariant::from_double(60.0),
-            &VBVariant::from_double(-200.0),
-            &VBVariant::from_double(-10000.0),
+            &VBDouble::from(60.0),
+            &VBDouble::from(-200.0),
+            &VBDouble::from(-10000.0),
             None,
             None,
             None,
         )
         .unwrap_err();
         assert_eq!(err.number, 5);
-    }
-
-    #[test]
-    fn rate_null_raises_invalid_use_of_null() {
-        let err = rate(
-            &VBVariant::Null,
-            &VBVariant::from_double(-200.0),
-            &VBVariant::from_double(10000.0),
-            None,
-            None,
-            None,
-        )
-        .unwrap_err();
-        assert_eq!(err.number, 94);
     }
 }

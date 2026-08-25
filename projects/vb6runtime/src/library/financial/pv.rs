@@ -657,7 +657,7 @@
 //! ## Related Functions
 //!
 use crate::error::{VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBDouble, VBInteger, VBVariant};
 use vb6core::error::err_number;
 
 /// Implementation of the `PV` function.
@@ -673,17 +673,15 @@ use vb6core::error::err_number;
 /// - `type` defaults to 0 (end of period) if omitted; use 1 for beginning of period
 /// - Returns a `Double`
 pub fn pv(
-    rate: &VBVariant,
-    nper: &VBVariant,
-    pmt: &VBVariant,
-    fv: Option<&VBVariant>,
-    type_: Option<&VBVariant>,
+    rate: &VBDouble,
+    nper: &VBDouble,
+    pmt: &VBDouble,
+    fv: Option<&VBDouble>,
+    type_: Option<&VBInteger>,
 ) -> VBResult<VBVariant> {
-    let rate_val = rate.as_f64()?;
-    let nper_val = nper.as_f64()?;
-    let pmt_val = pmt.as_f64()?;
-    let fv_val = fv.map(|f| f.as_f64()).transpose()?.unwrap_or(0.0);
-    let type_val = type_.map(|t| t.as_i16()).transpose()?.unwrap_or(0);
+    let (rate_val, nper_val, pmt_val) = (rate.as_f64(), nper.as_f64(), pmt.as_f64());
+    let fv_val = fv.map_or(0.0, |f| f.as_f64());
+    let type_val = type_.map_or(0, |t| t.as_i16());
 
     // Validate inputs per VB6 behavior
     if nper_val <= 0.0 {
@@ -713,13 +711,13 @@ pub fn pv(
 #[cfg(test)]
 mod tests {
     use super::pv;
-    use crate::value::VBVariant;
+    use crate::value::{VBDouble, VBInteger, VBVariant};
 
     fn pv_defaults(rate: f64, nper: f64, pmt: f64) -> VBVariant {
         pv(
-            &VBVariant::from_double(rate),
-            &VBVariant::from_double(nper),
-            &VBVariant::from_double(pmt),
+            &VBDouble::from(rate),
+            &VBDouble::from(nper),
+            &VBDouble::from(pmt),
             None,
             None,
         )
@@ -728,10 +726,10 @@ mod tests {
 
     fn pv_with_fv(rate: f64, nper: f64, pmt: f64, fv: f64) -> VBVariant {
         pv(
-            &VBVariant::from_double(rate),
-            &VBVariant::from_double(nper),
-            &VBVariant::from_double(pmt),
-            Some(&VBVariant::from_double(fv)),
+            &VBDouble::from(rate),
+            &VBDouble::from(nper),
+            &VBDouble::from(pmt),
+            Some(&VBDouble::from(fv)),
             None,
         )
         .unwrap()
@@ -739,11 +737,11 @@ mod tests {
 
     fn pv_with_type(rate: f64, nper: f64, pmt: f64, fv: f64, ptype: i16) -> VBVariant {
         pv(
-            &VBVariant::from_double(rate),
-            &VBVariant::from_double(nper),
-            &VBVariant::from_double(pmt),
-            Some(&VBVariant::from_double(fv)),
-            Some(&VBVariant::from_integer(ptype)),
+            &VBDouble::from(rate),
+            &VBDouble::from(nper),
+            &VBDouble::from(pmt),
+            Some(&VBDouble::from(fv)),
+            Some(&VBInteger::from(ptype)),
         )
         .unwrap()
     }
@@ -783,9 +781,9 @@ mod tests {
     #[test]
     fn pv_negative_periods_raises_error_5() {
         let err = pv(
-            &VBVariant::from_double(0.05),
-            &VBVariant::from_double(-1.0),
-            &VBVariant::from_double(-100.0),
+            &VBDouble::from(0.05),
+            &VBDouble::from(-1.0),
+            &VBDouble::from(-100.0),
             None,
             None,
         )
@@ -796,9 +794,9 @@ mod tests {
     #[test]
     fn pv_zero_periods_raises_error_5() {
         let err = pv(
-            &VBVariant::from_double(0.05),
-            &VBVariant::from_double(0.0),
-            &VBVariant::from_double(-100.0),
+            &VBDouble::from(0.05),
+            &VBDouble::from(0.0),
+            &VBDouble::from(-100.0),
             None,
             None,
         )
@@ -809,27 +807,14 @@ mod tests {
     #[test]
     fn pv_with_integer_args() {
         let result = pv(
-            &VBVariant::from_double(0.005),
-            &VBVariant::from_long(12),
-            &VBVariant::from_long(-100),
+            &VBDouble::from(0.005),
+            &VBDouble::from(12.0),
+            &VBDouble::from(-100.0),
             None,
             None,
         )
         .unwrap();
         assert!((result.as_f64().unwrap() - (-1161.893)).abs() < 0.01);
-    }
-
-    #[test]
-    fn pv_null_raises_invalid_use_of_null() {
-        let err = pv(
-            &VBVariant::Null,
-            &VBVariant::from_double(12.0),
-            &VBVariant::from_double(-100.0),
-            None,
-            None,
-        )
-        .unwrap_err();
-        assert_eq!(err.number, 94);
     }
 
     #[test]

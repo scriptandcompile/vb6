@@ -115,19 +115,19 @@ Classes:
 
 | Function | Arity | Runtime signature | Class | Null |
 |---|---|---|---|---|
-| `ddb` | 4..5 | `fn(cost: &VBVariant, salvage: &VBVariant, life: &VBVariant, period: &VBVariant, factor: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `fv` | 3..5 | `fn(rate: &VBVariant, nper: &VBVariant, pmt: &VBVariant, pv: Option<&VBVariant>, type_: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `ipmt` | 4..6 | `fn(rate: &VBVariant, per: &VBVariant, nper: &VBVariant, pv: &VBVariant, fv: Option<&VBVariant>, type_: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `irr` | 1..2 | `fn(values: &VBVariant, guess: Option<&VBVariant>) -> VBResult<VBVariant>` | structural | propagates Null |
-| `mirr` | 2..2 | `fn(values: &VBVariant, finance_rate: f64, reinvest_rate: f64) -> VBResult<VBVariant>` | structural | propagates Null |
-| `nper` | 3..5 | `fn(rate: &VBVariant, pmt: &VBVariant, pv: &VBVariant, fv: Option<&VBVariant>, type_: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `npv` | 2..2 | `fn(rate: &VBVariant, values: &VBVariant) -> VBResult<VBVariant>` | structural | propagates Null |
-| `pmt` | 3..5 | `fn(rate: VBVariant, nper: VBVariant, pv: VBVariant, fv: Option<&VBVariant>, type_val: Option<&VBVariant>) -> VBResult<VBVariant>` | typed | raises 94 |
-| `ppmt` | 4..6 | `fn(rate: &VBVariant, per: &VBVariant, nper: &VBVariant, pv: &VBVariant, fv: Option<&VBVariant>, type_: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `pv` | 3..5 | `fn(rate: &VBVariant, nper: &VBVariant, pmt: &VBVariant, fv: Option<&VBVariant>, type_: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `rate` | 3..6 | `fn(nper: &VBVariant, pmt: &VBVariant, pv: &VBVariant, fv: Option<&VBVariant>, type_: Option<&VBVariant>, guess: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `sln` | 3..3 | `fn(cost: &VBVariant, salvage: &VBVariant, life: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
-| `syd` | 4..4 | `fn(cost: &VBVariant, salvage: &VBVariant, life: &VBVariant, period: &VBVariant) -> VBResult<VBVariant>` | variant-input | propagates Null |
+| `ddb` | 4..5 | `fn(cost: &VBDouble, salvage: &VBDouble, life: &VBDouble, period: &VBDouble, factor: Option<&VBDouble>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `fv` | 3..5 | `fn(rate: &VBDouble, nper: &VBDouble, pmt: &VBDouble, pv: Option<&VBDouble>, type_: Option<&VBInteger>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `ipmt` | 4..6 | `fn(rate: &VBDouble, per: &VBDouble, nper: &VBDouble, pv: &VBDouble, fv: Option<&VBDouble>, type_: Option<&VBInteger>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `irr` | 1..2 | `fn(values: &VBVariant, guess: Option<&VBDouble>) -> VBResult<VBVariant>` | structural | propagates Null |
+| `mirr` | 2..2 | `fn(values: &VBVariant, finance_rate: &VBDouble, reinvest_rate: &VBDouble) -> VBResult<VBVariant>` | structural | propagates Null |
+| `nper` | 3..5 | `fn(rate: &VBDouble, pmt: &VBDouble, pv: &VBDouble, fv: Option<&VBDouble>, type_: Option<&VBInteger>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `npv` | 2..2 | `fn(rate: &VBDouble, values: &VBVariant) -> VBResult<VBVariant>` | structural | propagates Null |
+| `pmt` | 3..5 | `fn(rate: &VBDouble, nper: &VBDouble, pv: &VBDouble, fv: Option<&VBDouble>, type_val: Option<&VBDouble>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `ppmt` | 4..6 | `fn(rate: &VBDouble, per: &VBDouble, nper: &VBDouble, pv: &VBDouble, fv: Option<&VBDouble>, type_: Option<&VBInteger>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `pv` | 3..5 | `fn(rate: &VBDouble, nper: &VBDouble, pmt: &VBDouble, fv: Option<&VBDouble>, type_: Option<&VBInteger>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `rate` | 3..6 | `fn(nper: &VBDouble, pmt: &VBDouble, pv: &VBDouble, fv: Option<&VBDouble>, type_: Option<&VBInteger>, guess: Option<&VBDouble>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `sln` | 3..3 | `fn(cost: &VBDouble, salvage: &VBDouble, life: &VBDouble) -> VBResult<VBVariant>` | typed | raises 94 |
+| `syd` | 4..4 | `fn(cost: &VBDouble, salvage: &VBDouble, life: &VBDouble, period: &VBDouble) -> VBResult<VBVariant>` | typed | raises 94 |
 
 ## `graphics`
 

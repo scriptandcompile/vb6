@@ -695,7 +695,7 @@
 //!
 
 use crate::error::{VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBDouble, VBVariant};
 use vb6core::error::err_number;
 
 /// Implementation of the `SLN` function.
@@ -708,10 +708,8 @@ use vb6core::error::err_number;
 /// - If `life` is 0 or negative, raises error 5 (Invalid procedure call)
 /// - If `cost` or `salvage` is negative, raises error 5
 /// - Returns a `Double`
-pub fn sln(cost: &VBVariant, salvage: &VBVariant, life: &VBVariant) -> VBResult<VBVariant> {
-    let cost_val = cost.as_f64()?;
-    let salvage_val = salvage.as_f64()?;
-    let life_val = life.as_f64()?;
+pub fn sln(cost: &VBDouble, salvage: &VBDouble, life: &VBDouble) -> VBResult<VBVariant> {
+    let (cost_val, salvage_val, life_val) = (cost.as_f64(), salvage.as_f64(), life.as_f64());
 
     // Validate inputs per VB6 behavior
     if life_val <= 0.0 || cost_val < 0.0 || salvage_val < 0.0 {
@@ -724,13 +722,13 @@ pub fn sln(cost: &VBVariant, salvage: &VBVariant, life: &VBVariant) -> VBResult<
 #[cfg(test)]
 mod tests {
     use super::sln;
-    use crate::value::VBVariant;
+    use crate::value::{VBDouble, VBVariant};
 
     fn sln_default(cost: f64, salvage: f64, life: f64) -> VBVariant {
         sln(
-            &VBVariant::from_double(cost),
-            &VBVariant::from_double(salvage),
-            &VBVariant::from_double(life),
+            &VBDouble::from(cost),
+            &VBDouble::from(salvage),
+            &VBDouble::from(life),
         )
         .unwrap()
     }
@@ -758,9 +756,9 @@ mod tests {
     #[test]
     fn sln_zero_life_raises_error_5() {
         let err = sln(
-            &VBVariant::from_double(10000.0),
-            &VBVariant::from_double(1000.0),
-            &VBVariant::from_double(0.0),
+            &VBDouble::from(10000.0),
+            &VBDouble::from(1000.0),
+            &VBDouble::from(0.0),
         )
         .unwrap_err();
         assert_eq!(err.number, 5);
@@ -769,9 +767,9 @@ mod tests {
     #[test]
     fn sln_negative_life_raises_error_5() {
         let err = sln(
-            &VBVariant::from_double(10000.0),
-            &VBVariant::from_double(1000.0),
-            &VBVariant::from_double(-5.0),
+            &VBDouble::from(10000.0),
+            &VBDouble::from(1000.0),
+            &VBDouble::from(-5.0),
         )
         .unwrap_err();
         assert_eq!(err.number, 5);
@@ -780,28 +778,22 @@ mod tests {
     #[test]
     fn sln_negative_cost_raises_error_5() {
         let err = sln(
-            &VBVariant::from_double(-100.0),
-            &VBVariant::from_double(0.0),
-            &VBVariant::from_double(5.0),
+            &VBDouble::from(-100.0),
+            &VBDouble::from(0.0),
+            &VBDouble::from(5.0),
         )
         .unwrap_err();
         assert_eq!(err.number, 5);
     }
 
     #[test]
-    fn sln_with_integer_args() {
+    fn sln_with_integral_values() {
         let result = sln(
-            &VBVariant::from_long(10000),
-            &VBVariant::from_long(1000),
-            &VBVariant::from_long(5),
+            &VBDouble::from(10000.0),
+            &VBDouble::from(1000.0),
+            &VBDouble::from(5.0),
         )
         .unwrap();
         assert_eq!(result.as_f64().unwrap(), 1800.0);
-    }
-
-    #[test]
-    fn sln_null_raises_invalid_use_of_null() {
-        let err = sln(&VBVariant::Null, &VBVariant::Empty, &VBVariant::Empty).unwrap_err();
-        assert_eq!(err.number, 94);
     }
 }

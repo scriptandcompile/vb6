@@ -660,7 +660,7 @@
 //! - Does not account for bonus depreciation or special tax rules
 
 use crate::error::{VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBDouble, VBVariant};
 use vb6core::error::err_number;
 
 /// Implementation of the `SYD` function.
@@ -676,15 +676,17 @@ use vb6core::error::err_number;
 /// - If any argument is invalid, raises error 5 (Invalid procedure call)
 /// - Returns a `Double`
 pub fn syd(
-    cost: &VBVariant,
-    salvage: &VBVariant,
-    life: &VBVariant,
-    period: &VBVariant,
+    cost: &VBDouble,
+    salvage: &VBDouble,
+    life: &VBDouble,
+    period: &VBDouble,
 ) -> VBResult<VBVariant> {
-    let cost_val = cost.as_f64()?;
-    let salvage_val = salvage.as_f64()?;
-    let life_val = life.as_f64()?;
-    let period_val = period.as_f64()?;
+    let (cost_val, salvage_val, life_val, period_val) = (
+        cost.as_f64(),
+        salvage.as_f64(),
+        life.as_f64(),
+        period.as_f64(),
+    );
 
     // Validate inputs per VB6 behavior
     if life_val <= 0.0
@@ -709,14 +711,14 @@ pub fn syd(
 #[cfg(test)]
 mod tests {
     use super::syd;
-    use crate::value::VBVariant;
+    use crate::value::{VBDouble, VBVariant};
 
     fn syd_default(cost: f64, salvage: f64, life: f64, period: f64) -> VBVariant {
         syd(
-            &VBVariant::from_double(cost),
-            &VBVariant::from_double(salvage),
-            &VBVariant::from_double(life),
-            &VBVariant::from_double(period),
+            &VBDouble::from(cost),
+            &VBDouble::from(salvage),
+            &VBDouble::from(life),
+            &VBDouble::from(period),
         )
         .unwrap()
     }
@@ -767,10 +769,10 @@ mod tests {
     #[test]
     fn syd_with_integer_args() {
         let result = syd(
-            &VBVariant::from_long(10000),
-            &VBVariant::from_long(1000),
-            &VBVariant::from_long(5),
-            &VBVariant::from_long(2),
+            &VBDouble::from(10000.0),
+            &VBDouble::from(1000.0),
+            &VBDouble::from(5.0),
+            &VBDouble::from(2.0),
         )
         .unwrap();
         assert_eq!(result.as_f64().unwrap(), 2400.0);
@@ -779,10 +781,10 @@ mod tests {
     #[test]
     fn syd_zero_life_raises_error_5() {
         let err = syd(
-            &VBVariant::from_double(10000.0),
-            &VBVariant::from_double(1000.0),
-            &VBVariant::from_double(0.0),
-            &VBVariant::from_double(1.0),
+            &VBDouble::from(10000.0),
+            &VBDouble::from(1000.0),
+            &VBDouble::from(0.0),
+            &VBDouble::from(1.0),
         )
         .unwrap_err();
         assert_eq!(err.number, 5);
@@ -791,10 +793,10 @@ mod tests {
     #[test]
     fn syd_period_greater_than_life_raises_error_5() {
         let err = syd(
-            &VBVariant::from_double(10000.0),
-            &VBVariant::from_double(1000.0),
-            &VBVariant::from_double(5.0),
-            &VBVariant::from_double(6.0),
+            &VBDouble::from(10000.0),
+            &VBDouble::from(1000.0),
+            &VBDouble::from(5.0),
+            &VBDouble::from(6.0),
         )
         .unwrap_err();
         assert_eq!(err.number, 5);
@@ -803,10 +805,10 @@ mod tests {
     #[test]
     fn syd_period_less_than_one_raises_error_5() {
         let err = syd(
-            &VBVariant::from_double(10000.0),
-            &VBVariant::from_double(1000.0),
-            &VBVariant::from_double(5.0),
-            &VBVariant::from_double(0.0),
+            &VBDouble::from(10000.0),
+            &VBDouble::from(1000.0),
+            &VBDouble::from(5.0),
+            &VBDouble::from(0.0),
         )
         .unwrap_err();
         assert_eq!(err.number, 5);
@@ -815,10 +817,10 @@ mod tests {
     #[test]
     fn syd_cost_less_than_salvage_raises_error_5() {
         let err = syd(
-            &VBVariant::from_double(1000.0),
-            &VBVariant::from_double(2000.0),
-            &VBVariant::from_double(5.0),
-            &VBVariant::from_double(1.0),
+            &VBDouble::from(1000.0),
+            &VBDouble::from(2000.0),
+            &VBDouble::from(5.0),
+            &VBDouble::from(1.0),
         )
         .unwrap_err();
         assert_eq!(err.number, 5);
@@ -827,24 +829,12 @@ mod tests {
     #[test]
     fn syd_negative_cost_raises_error_5() {
         let err = syd(
-            &VBVariant::from_double(-100.0),
-            &VBVariant::from_double(0.0),
-            &VBVariant::from_double(5.0),
-            &VBVariant::from_double(1.0),
+            &VBDouble::from(-100.0),
+            &VBDouble::from(0.0),
+            &VBDouble::from(5.0),
+            &VBDouble::from(1.0),
         )
         .unwrap_err();
         assert_eq!(err.number, 5);
-    }
-
-    #[test]
-    fn syd_null_raises_invalid_use_of_null() {
-        let err = syd(
-            &VBVariant::Null,
-            &VBVariant::Empty,
-            &VBVariant::Empty,
-            &VBVariant::Empty,
-        )
-        .unwrap_err();
-        assert_eq!(err.number, 94);
     }
 }

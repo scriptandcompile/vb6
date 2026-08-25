@@ -615,7 +615,7 @@
 //! - `Rate`: Interest rate per period
 
 use crate::error::{VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBDouble, VBVariant};
 use vb6core::error::err_number;
 
 /// Implementation of the `IRR` function.
@@ -629,9 +629,9 @@ use vb6core::error::err_number;
 /// - Optional `guess` defaults to 0.1 (10%)
 /// - Iterates up to 20 times until result is within 0.00001 of previous iteration
 /// - Raises error 5 if IRR cannot be found after 20 iterations
-pub fn irr(values: &VBVariant, guess: Option<&VBVariant>) -> VBResult<VBVariant> {
+pub fn irr(values: &VBVariant, guess: Option<&VBDouble>) -> VBResult<VBVariant> {
     let arr = values.as_array()?;
-    let guess_val = guess.map(|g| g.as_f64()).transpose()?.unwrap_or(0.1);
+    let guess_val = guess.map_or(0.1, |g| g.as_f64());
 
     let cash_flows: Vec<f64> = arr
         .as_slice()
@@ -705,7 +705,7 @@ fn calculate_npv_derivative(cash_flows: &[f64], rate: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::irr;
-    use crate::value::VBVariant;
+    use crate::value::{VBDouble, VBVariant};
     use vb6core::error::err_number;
 
     fn make_array(values: &[f64]) -> VBVariant {
@@ -729,7 +729,7 @@ mod tests {
     fn irr_with_guess() {
         // Same cash flows with explicit guess
         let cash_flows = make_array(&[-10000.0, 3000.0, 3500.0, 4000.0, 4500.0]);
-        let result = irr(&cash_flows, Some(&VBVariant::from_double(0.2))).unwrap();
+        let result = irr(&cash_flows, Some(&VBDouble::from(0.2))).unwrap();
         let irr_val = result.as_f64().unwrap();
         assert!((irr_val - 0.1709).abs() < 0.01);
     }

@@ -1,86 +1,64 @@
 //! VB6 financial function registry.
 //!
-//! One [`Builtin`](super::Builtin) entry per financial function, each wrapping
-//! the typed `vb6runtime::library::financial` implementation.
+//! One [`typed_builtin!`](crate::typed_builtin) entry per financial function.
+//! Scalar money/term parameters use `double` kinds (`CBool`/`CDbl` coercion,
+//! present-Null → 94); payment-type flags use `integer`; optional scalars
+//! use `opt_*` kinds so absent and unconvertible stay distinct. The
+//! cash-flow arrays of `Irr`/`NPer`… stay Variant because they are observed
+//! structurally.
 
 use super::{Builtin, Registry};
-use crate::builtin;
-use vb6core::error::VBResult;
+use crate::typed_builtin;
 use vb6runtime::library::financial as finfn;
-use vb6runtime::VBVariant;
 
 /// Register the financial functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {
-    registry.insert(builtin!("ddb", 4, 5, |args| {
-        let factor = if args.len() > 4 { Some(&args[4]) } else { None };
-        finfn::ddb::ddb(&args[0], &args[1], &args[2], &args[3], factor)
-    }));
-
-    registry.insert(builtin!("fv", 3, 5, |args| {
-        let pv = if args.len() > 3 { Some(&args[3]) } else { None };
-        let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
-        finfn::fv::fv(&args[0], &args[1], &args[2], pv, type_)
-    }));
-
-    registry.insert(builtin!("ipmt", 4, 6, |args| {
-        let fv = if args.len() > 4 { Some(&args[4]) } else { None };
-        let type_ = if args.len() > 5 { Some(&args[5]) } else { None };
-        finfn::ipmt::ipmt(&args[0], &args[1], &args[2], &args[3], fv, type_)
-    }));
-
-    registry.insert(builtin!("irr", 1, 2, |args| {
-        let guess = if args.len() > 1 { Some(&args[1]) } else { None };
-        finfn::irr::irr(&args[0], guess)
-    }));
-
-    registry.insert(builtin!("mirr", 2, 2, |args| {
-        finfn::mirr::mirr(
-            &args[0],
-            args[1].as_f64().unwrap(),
-            args[2].as_f64().unwrap(),
-        )
-    }));
-
-    registry.insert(builtin!("nper", 3, 5, |args| {
-        let fv = if args.len() > 3 { Some(&args[3]) } else { None };
-        let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
-        finfn::nper::nper(&args[0], &args[1], &args[2], fv, type_)
-    }));
-
-    registry.insert(builtin!("npv", 2, 2, |args| {
-        finfn::npv::npv(&args[0], &args[1])
-    }));
-
-    registry.insert(builtin!("pmt", 3, 5, |args| {
-        let fv = if args.len() > 3 { Some(&args[3]) } else { None };
-        let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
-        finfn::pmt::pmt(args[0].clone(), args[1].clone(), args[2].clone(), fv, type_)
-    }));
-
-    registry.insert(builtin!("ppmt", 4, 6, |args| {
-        let fv = if args.len() > 4 { Some(&args[4]) } else { None };
-        let type_ = if args.len() > 5 { Some(&args[5]) } else { None };
-        finfn::ppmt::ppmt(&args[0], &args[1], &args[2], &args[3], fv, type_)
-    }));
-
-    registry.insert(builtin!("pv", 3, 5, |args| {
-        let fv = if args.len() > 3 { Some(&args[3]) } else { None };
-        let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
-        finfn::pv::pv(&args[0], &args[1], &args[2], fv, type_)
-    }));
-
-    registry.insert(builtin!("rate", 3, 6, |args| {
-        let fv = if args.len() > 3 { Some(&args[3]) } else { None };
-        let type_ = if args.len() > 4 { Some(&args[4]) } else { None };
-        let guess = if args.len() > 5 { Some(&args[5]) } else { None };
-        finfn::rate::rate(&args[0], &args[1], &args[2], fv, type_, guess)
-    }));
-
-    registry.insert(builtin!("sln", 3, 3, |args| {
-        finfn::sln::sln(&args[0], &args[1], &args[2])
-    }));
-
-    registry.insert(builtin!("syd", 4, 4, |args| {
-        finfn::syd::syd(&args[0], &args[1], &args[2], &args[3])
-    }));
+    registry.insert(typed_builtin!("ddb", 4, 5,
+            (cost: double, salvage: double, life: double,
+             period: double, factor: opt_double),
+        finfn::ddb::ddb(&cost, &salvage, &life, &period, factor.as_ref())));
+    registry.insert(typed_builtin!("fv", 3, 5,
+        (rate: double, nper: double, pmt: double,
+         pv: opt_double, type_: opt_integer),
+        finfn::fv::fv(&rate, &nper, &pmt, pv.as_ref(), type_.as_ref())));
+    registry.insert(typed_builtin!("ipmt", 4, 6,
+            (rate: double, per: double, nper: double, pv: double,
+             fv: opt_double, type_: opt_integer),
+        finfn::ipmt::ipmt(&rate, &per, &nper, &pv, fv.as_ref(), type_.as_ref())));
+    registry.insert(typed_builtin!("irr", 1, 2,
+        (values: variant, guess: opt_double),
+        finfn::irr::irr(values, guess.as_ref())));
+    registry.insert(typed_builtin!("mirr", 2, 2,
+        (values: variant, finance_rate: double, reinvest_rate: double),
+        finfn::mirr::mirr(values, &finance_rate, &reinvest_rate)));
+    registry.insert(typed_builtin!("nper", 3, 5,
+            (rate: double, pmt: double, pv: double,
+             fv: opt_double, type_: opt_integer),
+        finfn::nper::nper(&rate, &pmt, &pv, fv.as_ref(), type_.as_ref())));
+    registry.insert(typed_builtin!("npv", 2, 2,
+        (rate: double, values: variant),
+        finfn::npv::npv(&rate, values)));
+    registry.insert(typed_builtin!("pmt", 3, 5,
+            (rate: double, nper: double, pv: double,
+             fv: opt_double, type_val: opt_double),
+        finfn::pmt::pmt(&rate, &nper, &pv, fv.as_ref(), type_val.as_ref())));
+    registry.insert(typed_builtin!("ppmt", 4, 6,
+            (rate: double, per: double, nper: double, pv: double,
+             fv: opt_double, type_: opt_integer),
+        finfn::ppmt::ppmt(&rate, &per, &nper, &pv, fv.as_ref(), type_.as_ref())));
+    registry.insert(typed_builtin!("pv", 3, 5,
+        (rate: double, nper: double, pmt: double,
+         fv: opt_double, type_: opt_integer),
+        finfn::pv::pv(&rate, &nper, &pmt, fv.as_ref(), type_.as_ref())));
+    registry.insert(typed_builtin!("rate", 3, 6,
+            (nper: double, pmt: double, pv: double, fv: opt_double,
+             type_: opt_integer, guess: opt_double),
+        finfn::rate::rate(&nper, &pmt, &pv, fv.as_ref(), type_.as_ref(),
+            guess.as_ref())));
+    registry.insert(typed_builtin!("sln", 3, 3,
+        (cost: double, salvage: double, life: double),
+        finfn::sln::sln(&cost, &salvage, &life)));
+    registry.insert(typed_builtin!("syd", 4, 4,
+        (cost: double, salvage: double, life: double, period: double),
+        finfn::syd::syd(&cost, &salvage, &life, &period)));
 }

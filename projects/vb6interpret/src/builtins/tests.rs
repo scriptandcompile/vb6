@@ -975,3 +975,37 @@ fn financial_functions_dispatch() {
     .unwrap();
     assert_eq!(result.as_f64().unwrap(), 2400.0);
 }
+
+#[test]
+fn financial_functions_propagate_null_policy_at_the_boundary() {
+    // Required scalars are typed: a present Null is error 94 — including
+    // Pmt, whose pre-migration body collapsed every conversion failure
+    // (Null included) to type mismatch.
+    let err = call_builtin(
+        "Pmt",
+        &[
+            VBVariant::Null,
+            VBVariant::from_double(12.0),
+            VBVariant::from_double(1000.0),
+        ],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+
+    // Optional scalars stay present-Null → 94 too.
+    let err = call_builtin(
+        "FV",
+        &[
+            VBVariant::from_double(0.1),
+            VBVariant::from_double(12.0),
+            VBVariant::from_double(-100.0),
+            VBVariant::Null,
+        ],
+    )
+    .unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+
+    // Cash-flow arrays are structural: a non-array `values` is error 13.
+    let err = call_builtin("NPV", &[VBVariant::from_double(0.1), VBVariant::Null]).unwrap_err();
+    assert_eq!(err.number, vb6core::error::err_number::TYPE_MISMATCH);
+}

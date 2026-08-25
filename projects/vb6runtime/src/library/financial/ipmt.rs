@@ -516,7 +516,7 @@
 //! - `FV`: Future value
 
 use crate::error::{VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBDouble, VBInteger, VBVariant};
 use vb6core::error::err_number;
 
 /// Implementation of the `IPmt` function.
@@ -533,19 +533,17 @@ use vb6core::error::err_number;
 /// - `type` defaults to 0 (end of period) if omitted; use 1 for beginning of period
 /// - Returns a `Double`
 pub fn ipmt(
-    rate: &VBVariant,
-    per: &VBVariant,
-    nper: &VBVariant,
-    pv: &VBVariant,
-    fv: Option<&VBVariant>,
-    type_: Option<&VBVariant>,
+    rate: &VBDouble,
+    per: &VBDouble,
+    nper: &VBDouble,
+    pv: &VBDouble,
+    fv: Option<&VBDouble>,
+    type_: Option<&VBInteger>,
 ) -> VBResult<VBVariant> {
-    let rate_val = rate.as_f64()?;
-    let per_val = per.as_f64()?;
-    let nper_val = nper.as_f64()?;
-    let pv_val = pv.as_f64()?;
-    let fv_val = fv.map(|f| f.as_f64()).transpose()?.unwrap_or(0.0);
-    let type_val = type_.map(|t| t.as_i16()).transpose()?.unwrap_or(0);
+    let (rate_val, per_val, nper_val, pv_val) =
+        (rate.as_f64(), per.as_f64(), nper.as_f64(), pv.as_f64());
+    let fv_val = fv.map_or(0.0, |f| f.as_f64());
+    let type_val = type_.map_or(0, |t| t.as_i16());
 
     // Validate inputs per VB6 behavior
     if nper_val <= 0.0 {
@@ -606,14 +604,14 @@ fn fv_formula(rate: f64, nper: f64, pmt: f64, pv: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::ipmt;
-    use crate::value::VBVariant;
+    use crate::value::{VBDouble, VBInteger, VBVariant};
 
     fn ipmt_defaults(rate: f64, per: f64, nper: f64, pv: f64) -> VBVariant {
         ipmt(
-            &VBVariant::from_double(rate),
-            &VBVariant::from_double(per),
-            &VBVariant::from_double(nper),
-            &VBVariant::from_double(pv),
+            &VBDouble::from(rate),
+            &VBDouble::from(per),
+            &VBDouble::from(nper),
+            &VBDouble::from(pv),
             None,
             None,
         )
@@ -622,11 +620,11 @@ mod tests {
 
     fn ipmt_with_fv(rate: f64, per: f64, nper: f64, pv: f64, fv: f64) -> VBVariant {
         ipmt(
-            &VBVariant::from_double(rate),
-            &VBVariant::from_double(per),
-            &VBVariant::from_double(nper),
-            &VBVariant::from_double(pv),
-            Some(&VBVariant::from_double(fv)),
+            &VBDouble::from(rate),
+            &VBDouble::from(per),
+            &VBDouble::from(nper),
+            &VBDouble::from(pv),
+            Some(&VBDouble::from(fv)),
             None,
         )
         .unwrap()
@@ -634,12 +632,12 @@ mod tests {
 
     fn ipmt_with_type(rate: f64, per: f64, nper: f64, pv: f64, fv: f64, ptype: i16) -> VBVariant {
         ipmt(
-            &VBVariant::from_double(rate),
-            &VBVariant::from_double(per),
-            &VBVariant::from_double(nper),
-            &VBVariant::from_double(pv),
-            Some(&VBVariant::from_double(fv)),
-            Some(&VBVariant::from_integer(ptype)),
+            &VBDouble::from(rate),
+            &VBDouble::from(per),
+            &VBDouble::from(nper),
+            &VBDouble::from(pv),
+            Some(&VBDouble::from(fv)),
+            Some(&VBInteger::from(ptype)),
         )
         .unwrap()
     }
@@ -687,10 +685,10 @@ mod tests {
     #[test]
     fn ipmt_zero_nper_raises_error_5() {
         let err = ipmt(
-            &VBVariant::from_double(0.05),
-            &VBVariant::from_double(1.0),
-            &VBVariant::from_double(0.0),
-            &VBVariant::from_double(-20000.0),
+            &VBDouble::from(0.05),
+            &VBDouble::from(1.0),
+            &VBDouble::from(0.0),
+            &VBDouble::from(-20000.0),
             None,
             None,
         )
@@ -701,10 +699,10 @@ mod tests {
     #[test]
     fn ipmt_per_out_of_range_raises_error_5() {
         let err = ipmt(
-            &VBVariant::from_double(0.05),
-            &VBVariant::from_double(49.0), // per > nper
-            &VBVariant::from_double(48.0),
-            &VBVariant::from_double(-20000.0),
+            &VBDouble::from(0.05),
+            &VBDouble::from(49.0), // per > nper
+            &VBDouble::from(48.0),
+            &VBDouble::from(-20000.0),
             None,
             None,
         )
@@ -715,10 +713,10 @@ mod tests {
     #[test]
     fn ipmt_with_integer_args() {
         let result = ipmt(
-            &VBVariant::from_double(0.08 / 12.0),
-            &VBVariant::from_long(1),
-            &VBVariant::from_long(48),
-            &VBVariant::from_long(-20000),
+            &VBDouble::from(0.08 / 12.0),
+            &VBDouble::from(1.0),
+            &VBDouble::from(48.0),
+            &VBDouble::from(-20000.0),
             None,
             None,
         )
@@ -728,26 +726,12 @@ mod tests {
     }
 
     #[test]
-    fn ipmt_null_raises_invalid_use_of_null() {
-        let err = ipmt(
-            &VBVariant::Null,
-            &VBVariant::from_double(1.0),
-            &VBVariant::from_double(48.0),
-            &VBVariant::from_double(-20000.0),
-            None,
-            None,
-        )
-        .unwrap_err();
-        assert_eq!(err.number, 94);
-    }
-
-    #[test]
     fn ipmt_negative_nper_raises_error_5() {
         let err = ipmt(
-            &VBVariant::from_double(0.05),
-            &VBVariant::from_double(1.0),
-            &VBVariant::from_double(-48.0),
-            &VBVariant::from_double(-20000.0),
+            &VBDouble::from(0.05),
+            &VBDouble::from(1.0),
+            &VBDouble::from(-48.0),
+            &VBDouble::from(-20000.0),
             None,
             None,
         )
@@ -770,11 +754,11 @@ mod tests {
         for per in 1..=48 {
             for ptype in [0, 1] {
                 let pmt_val = crate::library::financial::pmt::pmt(
-                    VBVariant::from_double(rate),
-                    VBVariant::from_double(48.0),
-                    VBVariant::from_double(-20000.0),
+                    &VBDouble::from(rate),
+                    &VBDouble::from(48.0),
+                    &VBDouble::from(-20000.0),
                     None,
-                    Some(&VBVariant::from_integer(ptype)),
+                    Some(&VBDouble::from(f64::from(ptype))),
                 )
                 .unwrap()
                 .as_f64()
@@ -784,12 +768,12 @@ mod tests {
                     .as_f64()
                     .unwrap();
                 let ppmt_val = crate::library::financial::ppmt::ppmt(
-                    &VBVariant::from_double(rate),
-                    &VBVariant::from_double(per as f64),
-                    &VBVariant::from_double(48.0),
-                    &VBVariant::from_double(-20000.0),
+                    &VBDouble::from(rate),
+                    &VBDouble::from(per as f64),
+                    &VBDouble::from(48.0),
+                    &VBDouble::from(-20000.0),
                     None,
-                    Some(&VBVariant::from_integer(ptype)),
+                    Some(&VBInteger::from(ptype)),
                 )
                 .unwrap()
                 .as_f64()
@@ -811,10 +795,10 @@ mod tests {
     #[test]
     fn ipmt_per_zero_raises_error_5() {
         let err = ipmt(
-            &VBVariant::from_double(0.05),
-            &VBVariant::from_double(0.0),
-            &VBVariant::from_double(48.0),
-            &VBVariant::from_double(-20000.0),
+            &VBDouble::from(0.05),
+            &VBDouble::from(0.0),
+            &VBDouble::from(48.0),
+            &VBDouble::from(-20000.0),
             None,
             None,
         )

@@ -830,24 +830,24 @@
 //! - `Rate`: Returns the interest rate per period
 
 use crate::error::{VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBDouble, VBVariant};
 use vb6core::error::err_number;
 
 /// Implementation of the `Pmt` function.
 ///
 /// Returns a Double specifying the payment for an annuity based on periodic, fixed payments and a fixed interest rate.
 pub fn pmt(
-    rate: VBVariant,
-    nper: VBVariant,
-    pv: VBVariant,
-    fv: Option<&VBVariant>,
-    type_val: Option<&VBVariant>,
+    rate: &VBDouble,
+    nper: &VBDouble,
+    pv: &VBDouble,
+    fv: Option<&VBDouble>,
+    type_val: Option<&VBDouble>,
 ) -> VBResult<VBVariant> {
-    let rate_f = rate.as_f64().map_err(|_| VBError::type_mismatch())?;
-    let nper_f = nper.as_f64().map_err(|_| VBError::type_mismatch())?;
-    let pv_f = pv.as_f64().map_err(|_| VBError::type_mismatch())?;
-    let fv_f = fv.map(|v| v.as_f64().unwrap_or(0.0)).unwrap_or(0.0);
-    let type_f = type_val.map(|v| v.as_f64().unwrap_or(0.0)).unwrap_or(0.0);
+    let (rate_f, nper_f, pv_f) = (rate.as_f64(), nper.as_f64(), pv.as_f64());
+    let fv_f = fv.map_or(0.0, |f| f.as_f64());
+    // VB6 treats the type flag as truthy/falsy; any non-zero value behaves
+    // like "payments at beginning of period".
+    let type_f = type_val.map_or(0.0, |t| t.as_f64());
 
     if nper_f == 0.0 || rate_f == -1.0 {
         return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
@@ -876,16 +876,16 @@ pub fn pmt(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::value::VBVariant;
+    use crate::value::VBDouble;
 
     #[test]
     fn pmt_simple_loan() {
         // Example 1: Calculate monthly payment for a $20,000 loan at 6% APR for 5 years
         // Pmt(0.06 / 12, 5 * 12, 20000)
         let result = pmt(
-            VBVariant::from_double(0.06 / 12.0),
-            VBVariant::from_double(5.0 * 12.0),
-            VBVariant::from_double(20000.0),
+            &VBDouble::from(0.06 / 12.0),
+            &VBDouble::from(5.0 * 12.0),
+            &VBDouble::from(20000.0),
             None,
             None,
         )
@@ -899,9 +899,9 @@ mod tests {
         // Example 2: $200,000 home loan, 30 years, 4.5% APR
         // Pmt(0.045 / 12, 30 * 12, 200000)
         let result = pmt(
-            VBVariant::from_double(0.045 / 12.0),
-            VBVariant::from_double(30.0 * 12.0),
-            VBVariant::from_double(200000.0),
+            &VBDouble::from(0.045 / 12.0),
+            &VBDouble::from(30.0 * 12.0),
+            &VBDouble::from(200000.0),
             None,
             None,
         )
@@ -915,10 +915,10 @@ mod tests {
         // Example 3: How much to save monthly to accumulate $50,000 in 10 years at 5% annual return?
         // Pmt(0.05 / 12, 10 * 12, 0, -50000)
         let result = pmt(
-            VBVariant::from_double(0.05 / 12.0),
-            VBVariant::from_double(10.0 * 12.0),
-            VBVariant::from_double(0.0),
-            Some(&VBVariant::from_double(-50000.0)),
+            &VBDouble::from(0.05 / 12.0),
+            &VBDouble::from(10.0 * 12.0),
+            &VBDouble::from(0.0),
+            Some(&VBDouble::from(-50000.0)),
             None,
         )
         .unwrap();
@@ -931,11 +931,11 @@ mod tests {
         // Example 4: Lease payment due at start of month
         // Pmt(0.08 / 12, 36, 25000, 0, 1)
         let result = pmt(
-            VBVariant::from_double(0.08 / 12.0),
-            VBVariant::from_double(36.0),
-            VBVariant::from_double(25000.0),
+            &VBDouble::from(0.08 / 12.0),
+            &VBDouble::from(36.0),
+            &VBDouble::from(25000.0),
             None,
-            Some(&VBVariant::from_double(1.0)),
+            Some(&VBDouble::from(1.0)),
         )
         .unwrap();
         let val = result.as_f64().unwrap();
@@ -946,9 +946,9 @@ mod tests {
     fn pmt_zero_rate() {
         // Pmt(0, 12, 1200) -> -(1200 - 0) / 12 = -100
         let result = pmt(
-            VBVariant::from_double(0.0),
-            VBVariant::from_double(12.0),
-            VBVariant::from_double(1200.0),
+            &VBDouble::from(0.0),
+            &VBDouble::from(12.0),
+            &VBDouble::from(1200.0),
             None,
             None,
         )
@@ -960,9 +960,9 @@ mod tests {
     #[test]
     fn pmt_invalid_nper_raises_error_5() {
         let result = pmt(
-            VBVariant::from_double(0.05),
-            VBVariant::from_double(0.0),
-            VBVariant::from_double(1000.0),
+            &VBDouble::from(0.05),
+            &VBDouble::from(0.0),
+            &VBDouble::from(1000.0),
             None,
             None,
         );

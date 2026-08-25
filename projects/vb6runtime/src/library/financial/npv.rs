@@ -806,7 +806,7 @@
 //! cash flow calculations.
 
 use crate::error::{VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBDouble, VBVariant};
 use vb6core::error::err_number;
 
 /// Implementation of the `NPV` function.
@@ -819,7 +819,7 @@ use vb6core::error::err_number;
 /// - `values` must be an array of cash flows (period 1, period 2, ...)
 /// - Returns the sum of discounted cash flows
 /// - Formula: NPV = sum(values(i) / (1 + rate)^(i+1)) for i = 0..n-1
-pub fn npv(rate: &VBVariant, values: &VBVariant) -> VBResult<VBVariant> {
+pub fn npv(rate: &VBDouble, values: &VBVariant) -> VBResult<VBVariant> {
     let arr = values.as_array()?;
 
     let cash_flows: Vec<f64> = arr
@@ -833,7 +833,7 @@ pub fn npv(rate: &VBVariant, values: &VBVariant) -> VBResult<VBVariant> {
         return Err(VBError::new(err_number::INVALID_PROCEDURE_CALL));
     }
 
-    let rate = 1.0 + rate.as_f64()?;
+    let rate = 1.0 + rate.as_f64();
     let mut npv = 0.0_f64;
     for (i, &cf) in cash_flows.iter().enumerate() {
         npv += cf / rate.powi(i as i32 + 1);
@@ -845,7 +845,7 @@ pub fn npv(rate: &VBVariant, values: &VBVariant) -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::npv;
-    use crate::value::VBVariant;
+    use crate::value::{VBDouble, VBVariant};
 
     fn make_array(values: &[f64]) -> VBVariant {
         VBVariant::Array(crate::array::ArrayValue::from_vec_with_bounds(
@@ -858,7 +858,7 @@ mod tests {
     #[test]
     fn npv_single_cash_flow() {
         let cash_flows = make_array(&[1000.0]);
-        let result = npv(&VBVariant::from_double(0.1), &cash_flows).unwrap();
+        let result = npv(&VBDouble::from(0.1), &cash_flows).unwrap();
         let npv_val = result.as_f64().unwrap();
         assert!((npv_val - 909.09).abs() < 0.01);
     }
@@ -866,7 +866,7 @@ mod tests {
     #[test]
     fn npv_multiple_periods() {
         let cash_flows = make_array(&[1000.0, 2000.0, 3000.0]);
-        let result = npv(&VBVariant::from_double(0.1), &cash_flows).unwrap();
+        let result = npv(&VBDouble::from(0.1), &cash_flows).unwrap();
         let npv_val = result.as_f64().unwrap();
         assert!((npv_val - 4815.93).abs() < 0.1);
     }
@@ -874,7 +874,7 @@ mod tests {
     #[test]
     fn npv_zero_rate() {
         let cash_flows = make_array(&[1000.0, 2000.0, 3000.0]);
-        let result = npv(&VBVariant::from_double(0.0), &cash_flows).unwrap();
+        let result = npv(&VBDouble::from(0.0), &cash_flows).unwrap();
         let npv_val = result.as_f64().unwrap();
         assert!((npv_val - 6000.0).abs() < 0.001);
     }
@@ -882,7 +882,7 @@ mod tests {
     #[test]
     fn npv_negative_cash_flows() {
         let cash_flows = make_array(&[1000.0, -500.0, 2000.0]);
-        let result = npv(&VBVariant::from_double(0.1), &cash_flows).unwrap();
+        let result = npv(&VBDouble::from(0.1), &cash_flows).unwrap();
         let npv_val = result.as_f64().unwrap();
         assert!(npv_val > 0.0);
     }
@@ -890,7 +890,7 @@ mod tests {
     #[test]
     fn npv_empty_array_raises_error() {
         let cash_flows = make_array(&[]);
-        let err = npv(&VBVariant::from_double(0.1), &cash_flows).unwrap_err();
+        let err = npv(&VBDouble::from(0.1), &cash_flows).unwrap_err();
         assert_eq!(err.number, 5);
     }
 }

@@ -739,7 +739,7 @@
 //! - **`PPmt`** - Calculates principal payment for a specific period
 
 use crate::error::{VBError, VBResult};
-use crate::value::VBVariant;
+use crate::value::{VBDouble, VBInteger, VBVariant};
 use vb6core::error::err_number;
 
 /// Implementation of the `NPer` function.
@@ -760,17 +760,15 @@ use vb6core::error::err_number;
 ///   - pmt equals zero and pv equals zero (no payment or investment)
 ///   - nper would be infinite (payment too small to ever reach fv)
 pub fn nper(
-    rate: &VBVariant,
-    pmt: &VBVariant,
-    pv: &VBVariant,
-    fv: Option<&VBVariant>,
-    type_: Option<&VBVariant>,
+    rate: &VBDouble,
+    pmt: &VBDouble,
+    pv: &VBDouble,
+    fv: Option<&VBDouble>,
+    type_: Option<&VBInteger>,
 ) -> VBResult<VBVariant> {
-    let rate = rate.as_f64()?;
-    let pmt = pmt.as_f64()?;
-    let pv = pv.as_f64()?;
-    let fv = fv.map(|f| f.as_f64()).transpose()?.unwrap_or(0.0);
-    let type_ = type_.map(|t| t.as_i16()).transpose()?.unwrap_or(0);
+    let (rate, pmt, pv) = (rate.as_f64(), pmt.as_f64(), pv.as_f64());
+    let fv = fv.map_or(0.0, |f| f.as_f64());
+    let type_ = type_.map_or(0, |t| t.as_i16());
 
     // Validate inputs per VB6 behavior
     if rate < 0.0 {
@@ -870,13 +868,13 @@ pub fn nper(
 #[cfg(test)]
 mod tests {
     use super::nper;
-    use crate::value::VBVariant;
+    use crate::value::{VBDouble, VBInteger, VBVariant};
 
     fn nper_defaults(rate: f64, pmt: f64, pv: f64) -> VBVariant {
         nper(
-            &VBVariant::from_double(rate),
-            &VBVariant::from_double(pmt),
-            &VBVariant::from_double(pv),
+            &VBDouble::from(rate),
+            &VBDouble::from(pmt),
+            &VBDouble::from(pv),
             None,
             None,
         )
@@ -885,10 +883,10 @@ mod tests {
 
     fn nper_with_fv(rate: f64, pmt: f64, pv: f64, fv: f64) -> VBVariant {
         nper(
-            &VBVariant::from_double(rate),
-            &VBVariant::from_double(pmt),
-            &VBVariant::from_double(pv),
-            Some(&VBVariant::from_double(fv)),
+            &VBDouble::from(rate),
+            &VBDouble::from(pmt),
+            &VBDouble::from(pv),
+            Some(&VBDouble::from(fv)),
             None,
         )
         .unwrap()
@@ -896,11 +894,11 @@ mod tests {
 
     fn nper_with_type(rate: f64, pmt: f64, pv: f64, fv: f64, ptype: i16) -> VBVariant {
         nper(
-            &VBVariant::from_double(rate),
-            &VBVariant::from_double(pmt),
-            &VBVariant::from_double(pv),
-            Some(&VBVariant::from_double(fv)),
-            Some(&VBVariant::from_integer(ptype)),
+            &VBDouble::from(rate),
+            &VBDouble::from(pmt),
+            &VBDouble::from(pv),
+            Some(&VBDouble::from(fv)),
+            Some(&VBInteger::from(ptype)),
         )
         .unwrap()
     }
@@ -938,9 +936,9 @@ mod tests {
     #[test]
     fn nper_negative_rate_raises_error_5() {
         let err = nper(
-            &VBVariant::from_double(-0.05),
-            &VBVariant::from_double(-100.0),
-            &VBVariant::from_double(1000.0),
+            &VBDouble::from(-0.05),
+            &VBDouble::from(-100.0),
+            &VBDouble::from(1000.0),
             None,
             None,
         )
@@ -951,9 +949,9 @@ mod tests {
     #[test]
     fn nper_zero_pmt_raises_error_5() {
         let err = nper(
-            &VBVariant::from_double(0.0),
-            &VBVariant::from_double(0.0),
-            &VBVariant::from_double(1000.0),
+            &VBDouble::from(0.0),
+            &VBDouble::from(0.0),
+            &VBDouble::from(1000.0),
             None,
             None,
         )
@@ -979,27 +977,14 @@ mod tests {
     #[test]
     fn nper_with_integer_args() {
         let result = nper(
-            &VBVariant::from_double(0.05),
-            &VBVariant::from_long(-100),
-            &VBVariant::from_long(1000),
+            &VBDouble::from(0.05),
+            &VBDouble::from(-100.0),
+            &VBDouble::from(1000.0),
             None,
             None,
         )
         .unwrap();
         assert!(result.as_f64().unwrap() > 0.0);
-    }
-
-    #[test]
-    fn nper_null_raises_invalid_use_of_null() {
-        let err = nper(
-            &VBVariant::Null,
-            &VBVariant::from_double(-100.0),
-            &VBVariant::from_double(1000.0),
-            None,
-            None,
-        )
-        .unwrap_err();
-        assert_eq!(err.number, 94);
     }
 
     #[test]

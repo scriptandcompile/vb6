@@ -733,6 +733,7 @@
 //! - **XNPV** - NPV for irregular cash flow timing (Excel only)
 
 use crate::error::{VBError, VBResult};
+use crate::value::VBDouble;
 use crate::value::VBVariant;
 use vb6core::error::err_number;
 
@@ -751,7 +752,11 @@ use vb6core::error::err_number;
 /// - `values` must contain at least one positive and one negative value
 /// - `finance_rate` and `reinvest_rate` are required parameters
 /// - Error 5 (Invalid procedure call) if array contains only positive or only negative values
-pub fn mirr(values: &VBVariant, finance_rate: f64, reinvest_rate: f64) -> VBResult<VBVariant> {
+pub fn mirr(
+    values: &VBVariant,
+    finance_rate: &VBDouble,
+    reinvest_rate: &VBDouble,
+) -> VBResult<VBVariant> {
     let arr = values.as_array()?;
 
     let cash_flows: Vec<f64> = arr
@@ -781,7 +786,7 @@ pub fn mirr(values: &VBVariant, finance_rate: f64, reinvest_rate: f64) -> VBResu
         .enumerate()
         .map(|(i, &cf)| {
             if cf < 0.0 {
-                (-cf) / (1.0 + finance_rate).powi(i as i32)
+                (-cf) / (1.0 + finance_rate.as_f64()).powi(i as i32)
             } else {
                 0.0
             }
@@ -794,7 +799,7 @@ pub fn mirr(values: &VBVariant, finance_rate: f64, reinvest_rate: f64) -> VBResu
         .enumerate()
         .map(|(i, &cf)| {
             if cf > 0.0 {
-                cf * (1.0 + reinvest_rate).powi((n - 1 - i) as i32)
+                cf * (1.0 + reinvest_rate.as_f64()).powi((n - 1 - i) as i32)
             } else {
                 0.0
             }
@@ -809,7 +814,7 @@ pub fn mirr(values: &VBVariant, finance_rate: f64, reinvest_rate: f64) -> VBResu
 #[cfg(test)]
 mod tests {
     use super::mirr;
-    use crate::value::VBVariant;
+    use crate::value::{VBDouble, VBVariant};
 
     fn make_array(values: &[f64]) -> VBVariant {
         VBVariant::Array(crate::array::ArrayValue::from_vec_with_bounds(
@@ -823,7 +828,7 @@ mod tests {
     fn mirr_simple_two_period() {
         // -100 invested, 120 returned -> MIRR should be positive
         let cash_flows = make_array(&[-100.0, 120.0]);
-        let result = mirr(&cash_flows, 0.1, 0.05).unwrap();
+        let result = mirr(&cash_flows, &VBDouble::from(0.1), &VBDouble::from(0.05)).unwrap();
         let mirr_val = result.as_f64().unwrap();
         assert!(mirr_val.is_finite());
     }
@@ -831,14 +836,14 @@ mod tests {
     #[test]
     fn mirr_error_on_all_positive() {
         let cash_flows = make_array(&[3000.0, 3500.0, 4000.0]);
-        let err = mirr(&cash_flows, 0.1, 0.05).unwrap_err();
+        let err = mirr(&cash_flows, &VBDouble::from(0.1), &VBDouble::from(0.05)).unwrap_err();
         assert_eq!(err.number, 5);
     }
 
     #[test]
     fn mirr_error_on_all_negative() {
         let cash_flows = make_array(&[-3000.0, -3500.0, -4000.0]);
-        let err = mirr(&cash_flows, 0.1, 0.05).unwrap_err();
+        let err = mirr(&cash_flows, &VBDouble::from(0.1), &VBDouble::from(0.05)).unwrap_err();
         assert_eq!(err.number, 5);
     }
 
@@ -846,7 +851,7 @@ mod tests {
     fn mirr_with_mixed_cash_flows() {
         // Simple investment: -100 (outflow), +120 (inflow)
         let cash_flows = make_array(&[-100.0, 120.0]);
-        let result = mirr(&cash_flows, 0.1, 0.05).unwrap();
+        let result = mirr(&cash_flows, &VBDouble::from(0.1), &VBDouble::from(0.05)).unwrap();
         let mirr_val = result.as_f64().unwrap();
         // Should produce a reasonable MIRR value
         assert!(mirr_val.is_finite());
@@ -855,7 +860,7 @@ mod tests {
     #[test]
     fn mirr_empty_array_error() {
         let cash_flows = make_array(&[]);
-        let err = mirr(&cash_flows, 0.1, 0.05).unwrap_err();
+        let err = mirr(&cash_flows, &VBDouble::from(0.1), &VBDouble::from(0.05)).unwrap_err();
         assert_eq!(err.number, 5);
     }
 
@@ -866,7 +871,7 @@ mod tests {
         // FV_pos = 120 * (1+0.05)^(1-1) = 120
         // MIRR = (120/100)^(1/(2-1)) - 1 = 1.2^1 - 1 = 0.2
         let cash_flows = make_array(&[-100.0, 120.0]);
-        let result = mirr(&cash_flows, 0.1, 0.05).unwrap();
+        let result = mirr(&cash_flows, &VBDouble::from(0.1), &VBDouble::from(0.05)).unwrap();
         let mirr_val = result.as_f64().unwrap();
         assert!((mirr_val - 0.2).abs() < 0.0001);
     }
