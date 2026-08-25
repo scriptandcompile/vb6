@@ -25,7 +25,7 @@ use vb6core::error::{err_number, VBError};
 use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
 
-use crate::error::{RunError, RunResult};
+use crate::error::{BuiltinCallInfo, RunError, RunResult};
 use crate::interpreter::{Flow, Interpreter};
 use crate::program::is_statement_kind;
 
@@ -211,13 +211,18 @@ impl Interpreter {
         self.error_here(VBError::with_description(
             err_number::INVALID_PROCEDURE_CALL,
             format!("{what} is not supported yet"),
-        ))
+        ), None)
     }
 
     /// Build an error tagged with the current source location.
-    pub(crate) fn error_here(&self, error: VBError) -> RunError {
+    pub(crate) fn error_here(
+        &self,
+        error: VBError,
+        call_info: Option<BuiltinCallInfo>,
+    ) -> RunError {
         RunError::new(error)
             .at_line(self.current_stmt_line)
             .in_procedure(&self.current_procedure_name())
+            .with_builtin_call(call_info)
     }
 }

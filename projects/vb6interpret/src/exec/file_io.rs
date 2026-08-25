@@ -25,7 +25,7 @@ impl Interpreter {
 
         let path_tok = children
             .get(idx)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         let path_value = self.eval_flat_token(path_tok)?;
         idx += 1;
 
@@ -93,11 +93,11 @@ impl Interpreter {
         }
         let number_tok = children
             .get(idx)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         let file_number = self
             .eval_flat_token(number_tok)?
             .as_i16()
-            .map_err(|_| self.error_here(VBError::type_mismatch()))?;
+            .map_err(|_| self.error_here(VBError::type_mismatch(), None))?;
         idx += 1;
 
         let mut record_length = 0i32;
@@ -112,7 +112,7 @@ impl Interpreter {
         }
 
         filefn::open::open_file(&path_value, mode, access, lock, file_number, record_length)
-            .map_err(|e| self.error_here(e))?;
+            .map_err(|e| self.error_here(e, None))?;
 
         Ok(Flow::Next)
     }
@@ -129,14 +129,14 @@ impl Interpreter {
                     let number = self
                         .eval_flat_token(child)?
                         .as_i16()
-                        .map_err(|_| self.error_here(VBError::type_mismatch()))?;
+                        .map_err(|_| self.error_here(VBError::type_mismatch(), None))?;
                     file_numbers.push(number);
                 }
                 _ => {}
             }
         }
 
-        filefn::close::close_files(&file_numbers).map_err(|e| self.error_here(e))?;
+        filefn::close::close_files(&file_numbers).map_err(|e| self.error_here(e, None))?;
 
         Ok(Flow::Next)
     }

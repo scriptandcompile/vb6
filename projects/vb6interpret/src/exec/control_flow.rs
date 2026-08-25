@@ -54,12 +54,12 @@ impl Interpreter {
         let then_index = children
             .iter()
             .position(|c| c.kind() == SyntaxKind::ThenKeyword)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         let cond = children[..then_index]
             .iter()
             .rev()
             .find(|c| c.is_significant())
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         let cond_true = self.eval_expr(cond)?.as_bool()?;
 
         let is_block = node
@@ -115,7 +115,7 @@ impl Interpreter {
                                 .rev()
                                 .find(|c| c.is_significant())
                                 .ok_or_else(|| {
-                                    self.error_here(VBError::invalid_procedure_call())
+                                    self.error_here(VBError::invalid_procedure_call(), None)
                                 })?;
                             let elseif_true = self.eval_expr(elseif_cond)?.as_bool()?;
                             if elseif_true {
@@ -178,15 +178,15 @@ impl Interpreter {
             .iter()
             .position(|c| c.kind() == SyntaxKind::ToKeyword);
         let (Some(eq_index), Some(to_index)) = (eq_index, to_index) else {
-            return Err(self.error_here(VBError::invalid_procedure_call()));
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
         };
 
         let start_node = significant
             .get(eq_index + 1)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         let end_node = significant
             .get(to_index + 1)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
 
         let mut step = VBVariant::from_long(1);
         let mut step_cursor = None;
@@ -204,7 +204,7 @@ impl Interpreter {
         let end = self.eval_expr(end_node)?;
         let step_f = step.as_f64()?;
         if step_f == 0.0 {
-            return Err(self.error_here(VBError::invalid_procedure_call()));
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
 
         let body_index = children
@@ -289,7 +289,7 @@ impl Interpreter {
             self.current_stmt_line = next_line;
             self.step_marked(next_cursor)?;
             counter_value = arith(counter_value, step.clone(), ArithmeticOperator::Add)
-                .map_err(|e| self.error_here(e))?;
+                .map_err(|e| self.error_here(e, None))?;
         }
         self.set_variable(&name, counter_value);
         Ok(Flow::Next)
@@ -430,7 +430,7 @@ impl Interpreter {
             .iter()
             .find(|c| !matches!(c.kind(), SyntaxKind::WhileKeyword))
             .copied()
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         let cond_cursor = Some((cond.start_offset(), cond.end_offset()));
         let wend_cursor = significant
             .iter()
@@ -506,7 +506,7 @@ impl Interpreter {
             Some(idx) => {
                 let expr = significant
                     .get(idx + 1)
-                    .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+                    .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
                 self.eval_expr(expr)?
             }
             None => VBVariant::Empty,
@@ -554,10 +554,10 @@ impl Interpreter {
                 SyntaxKind::IsKeyword => {
                     let op = spec
                         .get(index + 1)
-                        .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+                        .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
                     let value_node = spec
                         .get(index + 2)
-                        .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+                        .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
                     let value = self.eval_case_value(value_node)?;
                     let matched = self.apply_compare(selector, op.kind(), &value)?;
                     if matched {
@@ -632,7 +632,7 @@ impl Interpreter {
             SyntaxKind::LessThanOrEqualOperator => a <= b,
             SyntaxKind::GreaterThanOperator => a > b,
             SyntaxKind::GreaterThanOrEqualOperator => a >= b,
-            _ => return Err(self.error_here(VBError::invalid_procedure_call())),
+            _ => return Err(self.error_here(VBError::invalid_procedure_call(), None)),
         })
     }
 

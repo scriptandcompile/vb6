@@ -8,6 +8,24 @@ use std::fmt;
 use ariadne::{Config, Label, Report, ReportKind, Source};
 use vb6core::error::{err_number, VBError};
 
+/// Context about which parameter of a builtin call failed.
+///
+/// Carries the zero-based parameter index, the parameter name from the builtin
+/// declaration, and the byte ranges of all arguments at the call site.
+#[derive(Debug, Clone)]
+pub struct BuiltinCallInfo {
+    /// Zero-based parameter index that failed.
+    pub param_index: usize,
+    /// Human-readable parameter name from the `typed_builtin!` declaration
+    /// (e.g. "number", "input", "start").
+    pub param_name: String,
+    /// Byte ranges `(start, end)` of each evaluated argument in the source.
+    /// Length matches the number of arguments supplied. `None` when byte
+    /// ranges are unavailable (e.g. statement-position paths that lack the
+    /// CST argument list node).
+    pub arg_byte_ranges: Option<Vec<(u32, u32)>>,
+}
+
 /// An error raised during interpretation of VB6 code.
 #[derive(Debug, Clone)]
 pub struct RunError {
@@ -19,6 +37,8 @@ pub struct RunError {
     pub line: Option<usize>,
     /// The name of the procedure that was executing, when known.
     pub procedure: Option<String>,
+    /// Which parameter failed, when the error originates from a builtin call.
+    pub builtin_call: Option<BuiltinCallInfo>,
 }
 
 impl RunError {
@@ -29,6 +49,7 @@ impl RunError {
             is_debug_pause: false,
             line: None,
             procedure: None,
+            builtin_call: None,
         }
     }
 
@@ -39,6 +60,7 @@ impl RunError {
             is_debug_pause: true,
             line: None,
             procedure: None,
+            builtin_call: None,
         }
     }
 
@@ -51,6 +73,12 @@ impl RunError {
     /// Attach the executing procedure name.
     pub fn in_procedure(mut self, name: &str) -> Self {
         self.procedure = Some(name.to_string());
+        self
+    }
+
+    /// Attach builtin call parameter context.
+    pub fn with_builtin_call(mut self, info: Option<BuiltinCallInfo>) -> Self {
+        self.builtin_call = info;
         self
     }
 
@@ -130,7 +158,57 @@ pub fn render_error_report(
         return None;
     }
     let line = error.line? + line_offset;
-    render_report_at_line(source_name, source, line, &error.error.to_string())
+    let (span_start, span_end) = if let Some(ref call) = error.builtin_call {
+        if let Some(ref ranges) = call.arg_byte_ranges {
+            if let Some(&(start, end)) = ranges.get(call.param_index) {
+                (start as usize, end as usize)
+            } else {
+                line_byte_span(source, line)?
+            }
+        } else {
+            line_byte_span(source, line)?
+        }
+    } else {
+        line_byte_span(source, line)?
+    };
+
+    let label_message = if let Some(ref call) = error.builtin_call {
+        format!("'{}' parameter", call.param_name)
+    } else {
+        "error here".to_string()
+    };
+
+    render_report_with_label(
+        source_name,
+        source,
+        line,
+        &error.error.to_string(),
+        span_start,
+        span_end,
+        &label_message,
+    )
+}
+
+fn render_report_with_label(
+    source_name: &str,
+    source: &str,
+    _line: usize,
+    message: &str,
+    span_start: usize,
+    span_end: usize,
+    label: &str,
+) -> Option<String> {
+    let cache = (source_name.to_string(), Source::from(source));
+    let mut buf = Vec::new();
+    let report = Report::build(
+        ReportKind::Error,
+        (source_name.to_string(), span_start..=span_end),
+    )
+    .with_message(message)
+    .with_label(Label::new((source_name.to_string(), span_start..=span_end)).with_message(label))
+    .with_config(Config::new().with_color(false));
+    report.finish().write(cache, &mut buf).ok()?;
+    String::from_utf8(buf).ok()
 }
 
 /// Render an ariadne report pointing at the 1-based source `line` with `message`
@@ -145,7 +223,6 @@ pub fn render_report_at_line(
     message: &str,
 ) -> Option<String> {
     let (span_start, span_end) = line_byte_span(source, line)?;
-
     let cache = (source_name.to_string(), Source::from(source));
     let mut buf = Vec::new();
     let report = Report::build(

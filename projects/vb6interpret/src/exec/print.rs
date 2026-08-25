@@ -23,11 +23,11 @@ impl Interpreter {
             Some(hash_pos) => {
                 let expr = top_level
                     .get(hash_pos + 1)
-                    .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+                    .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
                 let number = self
                     .eval_expr(expr)?
                     .as_i16()
-                    .map_err(|_| self.error_here(VBError::type_mismatch()))?;
+                    .map_err(|_| self.error_here(VBError::type_mismatch(), None))?;
                 Some(number)
             }
             None => None,
@@ -68,7 +68,7 @@ impl Interpreter {
 
         if let Some(number) = file_number {
             filefn::print::print_statement(number, &file_values, !trailing_separator)
-                .map_err(|e| self.error_here(e))?;
+                .map_err(|e| self.error_here(e, None))?;
             return Ok(());
         }
 

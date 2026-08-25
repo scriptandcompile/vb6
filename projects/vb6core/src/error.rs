@@ -131,6 +131,10 @@ pub struct VBError {
     pub help_file: String,
     /// The context ID within the Help file (`Err.HelpContext`).
     pub help_context: i32,
+    /// Zero-based parameter index that caused this error (builtin calls).
+    pub param_index: Option<usize>,
+    /// Parameter name from the builtin declaration.
+    pub param_name: Option<String>,
 }
 
 /// Convenience result type for runtime operations.
@@ -146,6 +150,8 @@ impl VBError {
             source: String::new(),
             help_file: String::new(),
             help_context: 0,
+            param_index: None,
+            param_name: None,
         }
     }
 
@@ -157,6 +163,8 @@ impl VBError {
             source: String::new(),
             help_file: String::new(),
             help_context: 0,
+            param_index: None,
+            param_name: None,
         }
     }
 
@@ -175,6 +183,8 @@ impl VBError {
             source: source.into(),
             help_file: help_file.into(),
             help_context,
+            param_index: None,
+            param_name: None,
         }
     }
 

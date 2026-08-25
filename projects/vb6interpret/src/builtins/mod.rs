@@ -88,50 +88,64 @@ use vb6runtime::value::VBVariant;
 #[macro_export]
 macro_rules! typed_builtin {
     ($name:literal, $min:expr, $max:expr,
-     ($($param:ident : $kind:ident),* $(,)?),
-     $body:expr) => {
-        Builtin {
-            name: $name,
-            min_args: $min,
-            max_args: $max,
-            call: |_args: &[::vb6runtime::VBVariant]| -> ::vb6core::error::VBResult<::vb6runtime::VBVariant> {
-                // Left-to-right conversion order: one statement per
-                // declared parameter, each converting the argument at the
-                // running index, so the leftmost offending argument errors
-                // first.
-                let mut __arg_index = 0usize;
-                $(
-                    let $param =
-                        $crate::__convert_arg!(_args, __arg_index, $kind)?;
-                    __arg_index += 1;
-                )*
-                $body
-            },
-        }
-    };
+      ($($param:ident : $kind:ident),* $(,)?),
+      $body:expr) => {
+         Builtin {
+             name: $name,
+             min_args: $min,
+             max_args: $max,
+             call: |_args: &[::vb6runtime::VBVariant]| -> ::vb6core::error::VBResult<::vb6runtime::VBVariant> {
+                 let mut __arg_index = 0usize;
+                 let __result: ::vb6core::error::VBResult<::vb6runtime::VBVariant> = {
+                     $(
+                         let __param_name = stringify!($param);
+                         let $param =
+                             $crate::__convert_arg!(_args, __arg_index, $kind)
+                                 .map_err(|mut __e| {
+                                     __e.param_index = Some(__arg_index);
+                                     __e.param_name = Some(__param_name.to_string());
+                                     __e
+                                 })?;
+                         __arg_index += 1;
+                     )*
+                     $body
+                 };
+                __result
+             },
+         }
+     };
     // Variadic-tail form: after the fixed parameters, `rest $name: variants`
     // binds every remaining argument as an unconverted slice (for functions
     // like Switch whose evaluation semantics walk the raw argument list).
     ($name:literal, $min:expr, $max:expr,
-     ($($param:ident : $kind:ident),* $(,)?),
-     rest $rest:ident : variants,
-     $body:expr) => {
-        Builtin {
-            name: $name,
-            min_args: $min,
-            max_args: $max,
-            call: |_args: &[::vb6runtime::VBVariant]| -> ::vb6core::error::VBResult<::vb6runtime::VBVariant> {
-                let mut __arg_index = 0usize;
-                $(
-                    let $param =
-                        $crate::__convert_arg!(_args, __arg_index, $kind)?;
-                    __arg_index += 1;
-                )*
-                let $rest = &_args[__arg_index..];
-                $body
-            },
-        }
-    };
+      ($($param:ident : $kind:ident),* $(,)?),
+      rest $rest:ident : variants,
+      $body:expr) => {
+         Builtin {
+             name: $name,
+             min_args: $min,
+             max_args: $max,
+             call: |_args: &[::vb6runtime::VBVariant]| -> ::vb6core::error::VBResult<::vb6runtime::VBVariant> {
+                 let mut __arg_index = 0usize;
+                 let __result: ::vb6core::error::VBResult<::vb6runtime::VBVariant> = {
+                     $(
+                         let __param_name = stringify!($param);
+                         let $param =
+                             $crate::__convert_arg!(_args, __arg_index, $kind)
+                                 .map_err(|mut __e| {
+                                     __e.param_index = Some(__arg_index);
+                                     __e.param_name = Some(__param_name.to_string());
+                                     __e
+                                 })?;
+                         __arg_index += 1;
+                     )*
+                     let $rest = &_args[__arg_index..];
+                     $body
+                 };
+                __result
+             },
+         }
+     };
 }
 
 /// Kind dispatch for [`typed_builtin!`]: converts the argument at `$index`

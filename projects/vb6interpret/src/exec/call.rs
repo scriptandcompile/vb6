@@ -46,23 +46,23 @@ impl Interpreter {
                 // Full `MsgBox` semantics: the interaction backend shows the
                 // dialog (or records it) and the return value is discarded
                 // because this form is a statement, not a function call.
-                crate::builtins::call_builtin("msgbox", &args).map_err(|e| self.error_here(e))?;
+                crate::builtins::call_builtin("msgbox", &args).map_err(|e| self.error_here(e, None))?;
                 Ok(Flow::Next)
             }
             // `Beep` is a registered builtin Sub; a `Call` discards its
             // (always `Empty`) return value.
             "beep" => {
-                crate::builtins::call_builtin("beep", &args).map_err(|e| self.error_here(e))?;
+                crate::builtins::call_builtin("beep", &args).map_err(|e| self.error_here(e, None))?;
                 Ok(Flow::Next)
             }
             // `Shell "prog"` statement form: the backend starts the program
             // (or records the request) and the task ID is discarded because
             // this form is a statement, not a function call.
             "shell" => {
-                crate::builtins::call_builtin("shell", &args).map_err(|e| self.error_here(e))?;
+                crate::builtins::call_builtin("shell", &args).map_err(|e| self.error_here(e, None))?;
                 Ok(Flow::Next)
             }
-            _ => Err(self.error_here(VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED))), // Sub or Function not defined
+            _ => Err(self.error_here(VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED), None)), // Sub or Function not defined
         }
     }
 }

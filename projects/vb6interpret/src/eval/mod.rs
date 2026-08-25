@@ -13,7 +13,7 @@ pub(crate) use literals::literal_value;
 pub(crate) use operators::{arith, ArithmeticOperator};
 
 use crate::builtins;
-use crate::error::{RunError, RunResult};
+use crate::error::{BuiltinCallInfo, RunError, RunResult};
 use crate::interpreter::Interpreter;
 use crate::scope::normalize;
 use vb6core::error::{err_number, VBError, VBResult};
@@ -41,14 +41,14 @@ impl Interpreter {
             SyntaxKind::BinaryExpression => {
                 let parts: Vec<&CstNode> = node.significant_children().collect();
                 if parts.len() != 3 {
-                    return Err(self.error_at(node, VBError::invalid_procedure_call()));
+                    return Err(self.error_at(node, VBError::invalid_procedure_call(), None));
                 }
                 self.eval_binary(parts[0], parts[1], parts[2])
             }
             SyntaxKind::UnaryExpression => {
                 let parts: Vec<&CstNode> = node.significant_children().collect();
                 if parts.len() != 2 {
-                    return Err(self.error_at(node, VBError::invalid_procedure_call()));
+                    return Err(self.error_at(node, VBError::invalid_procedure_call(), None));
                 }
                 self.eval_unary(parts[0], parts[1])
             }
@@ -63,7 +63,7 @@ impl Interpreter {
                 }) {
                     self.eval_expr(expr)
                 } else {
-                    Err(self.error_at(node, VBError::invalid_procedure_call()))
+                    Err(self.error_at(node, VBError::invalid_procedure_call(), None))
                 }
             }
             SyntaxKind::CallExpression => self.eval_call(node),
@@ -73,6 +73,7 @@ impl Interpreter {
                     err_number::INVALID_PROCEDURE_CALL,
                     "Object member access is not supported yet",
                 ),
+                None,
             )),
             SyntaxKind::TypeOfExpression => Err(self.error_at(
                 node,
@@ -80,6 +81,7 @@ impl Interpreter {
                     err_number::INVALID_PROCEDURE_CALL,
                     "TypeOf requires object support, which is not implemented yet",
                 ),
+                None,
             )),
             SyntaxKind::NewExpression => Err(self.error_at(
                 node,
@@ -87,6 +89,7 @@ impl Interpreter {
                     err_number::INVALID_PROCEDURE_CALL,
                     "New object creation is not implemented yet",
                 ),
+                None,
             )),
             SyntaxKind::AddressOfExpression => Err(self.error_at(
                 node,
@@ -94,6 +97,7 @@ impl Interpreter {
                     err_number::INVALID_PROCEDURE_CALL,
                     "AddressOf is not implemented yet",
                 ),
+                None,
             )),
             other => Err(self.error_at(
                 node,
@@ -101,6 +105,7 @@ impl Interpreter {
                     err_number::INVALID_PROCEDURE_CALL,
                     format!("Unsupported expression node: {other:?}"),
                 ),
+                None,
             )),
         }
     }
@@ -110,10 +115,10 @@ impl Interpreter {
     pub(crate) fn eval_literal(&self, node: &CstNode) -> RunResult<VBVariant> {
         if let Some(token) = node.first_child() {
             return literal_value(token.text(), token.kind())
-                .ok_or_else(|| self.error_at(node, VBError::type_mismatch()));
+                .ok_or_else(|| self.error_at(node, VBError::type_mismatch(), None));
         }
         literal_value(node.text(), node.kind())
-            .ok_or_else(|| self.error_at(node, VBError::type_mismatch()))
+            .ok_or_else(|| self.error_at(node, VBError::type_mismatch(), None))
     }
 
     /// Evaluate an identifier reference.
@@ -133,6 +138,7 @@ impl Interpreter {
                         err_number::OBJECT_REQUIRED,
                         "'Me' is not available in a standard module",
                     ),
+                    None,
                 ));
             }
             _ => {}
@@ -157,27 +163,27 @@ impl Interpreter {
 
         match op.kind() {
             SyntaxKind::AdditionOperator => {
-                operators::add(lhs, rhs).map_err(|e| self.error_at(op, e))
+                operators::add(lhs, rhs).map_err(|e| self.error_at(op, e, None))
             }
             SyntaxKind::SubtractionOperator => {
                 operators::arith(lhs, rhs, ArithmeticOperator::Subtract)
-                    .map_err(|e| self.error_at(op, e))
+                    .map_err(|e| self.error_at(op, e, None))
             }
             SyntaxKind::MultiplicationOperator => {
                 operators::arith(lhs, rhs, ArithmeticOperator::Multiply)
-                    .map_err(|e| self.error_at(op, e))
+                    .map_err(|e| self.error_at(op, e, None))
             }
             SyntaxKind::DivisionOperator => operators::arith(lhs, rhs, ArithmeticOperator::Divide)
-                .map_err(|e| self.error_at(op, e)),
+                .map_err(|e| self.error_at(op, e, None)),
             SyntaxKind::BackwardSlashOperator => {
                 operators::arith(lhs, rhs, ArithmeticOperator::IntegerDivide)
-                    .map_err(|e| self.error_at(op, e))
+                    .map_err(|e| self.error_at(op, e, None))
             }
             SyntaxKind::ModKeyword => operators::arith(lhs, rhs, ArithmeticOperator::Modulus)
-                .map_err(|e| self.error_at(op, e)),
+                .map_err(|e| self.error_at(op, e, None)),
             SyntaxKind::ExponentiationOperator => {
                 operators::arith(lhs, rhs, ArithmeticOperator::Exponent)
-                    .map_err(|e| self.error_at(op, e))
+                    .map_err(|e| self.error_at(op, e, None))
             }
             SyntaxKind::Ampersand => {
                 let left = lhs.as_string()?;
@@ -204,15 +210,15 @@ impl Interpreter {
                     .map_err(RunError::new)
             }
             SyntaxKind::AndKeyword => operators::bitwise(lhs, rhs, operators::LogicalOperator::And)
-                .map_err(|e| self.error_at(op, e)),
+                .map_err(|e| self.error_at(op, e, None)),
             SyntaxKind::OrKeyword => operators::bitwise(lhs, rhs, operators::LogicalOperator::Or)
-                .map_err(|e| self.error_at(op, e)),
+                .map_err(|e| self.error_at(op, e, None)),
             SyntaxKind::XorKeyword => operators::bitwise(lhs, rhs, operators::LogicalOperator::Xor)
-                .map_err(|e| self.error_at(op, e)),
+                .map_err(|e| self.error_at(op, e, None)),
             SyntaxKind::EqvKeyword => operators::bitwise(lhs, rhs, operators::LogicalOperator::Eqv)
-                .map_err(|e| self.error_at(op, e)),
+                .map_err(|e| self.error_at(op, e, None)),
             SyntaxKind::ImpKeyword => operators::bitwise(lhs, rhs, operators::LogicalOperator::Imp)
-                .map_err(|e| self.error_at(op, e)),
+                .map_err(|e| self.error_at(op, e, None)),
             SyntaxKind::IsKeyword => {
                 let result = match (&lhs, &rhs) {
                     (VBVariant::Nothing, VBVariant::Nothing) => true,
@@ -233,6 +239,7 @@ impl Interpreter {
                     err_number::INVALID_PROCEDURE_CALL,
                     format!("Unsupported binary operator: {other:?}"),
                 ),
+                None,
             )),
         }
     }
@@ -259,6 +266,7 @@ impl Interpreter {
                     err_number::INVALID_PROCEDURE_CALL,
                     format!("Unsupported unary operator: {other:?}"),
                 ),
+                None,
             )),
         }
     }
@@ -298,7 +306,22 @@ impl Interpreter {
         }
 
         // Builtin function.
-        builtins::call_builtin(&name, &args).map_err(|e| self.error_at(node, e))
+        builtins::call_builtin(&name, &args).map_err(|e| {
+            let param_info = e
+                .param_index
+                .map(|idx| (idx, e.param_name.clone().unwrap_or_default()));
+            let arg_byte_ranges = argument_list.map(|list| {
+                list.children_by_kind(SyntaxKind::Argument)
+                    .map(|arg| arg.byte_range())
+                    .collect()
+            });
+            let call_info = param_info.map(|(param_index, param_name)| BuiltinCallInfo {
+                param_index,
+                param_name,
+                arg_byte_ranges,
+            });
+            self.error_at(node, e, call_info)
+        })
     }
 
     /// Evaluate an `ArgumentList` into positional argument values.
@@ -327,10 +350,16 @@ impl Interpreter {
     }
 
     /// Attach source line information to a VB6 error.
-    fn error_at(&self, _node: &CstNode, error: VBError) -> RunError {
+    fn error_at(
+        &self,
+        _node: &CstNode,
+        error: VBError,
+        call_info: Option<BuiltinCallInfo>,
+    ) -> RunError {
         RunError::new(error)
             .at_line(self.current_stmt_line)
             .in_procedure(&self.current_procedure_name())
+            .with_builtin_call(call_info)
     }
 }
 

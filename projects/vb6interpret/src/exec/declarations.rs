@@ -90,7 +90,7 @@ impl Interpreter {
                 }
             } else if !bounds.is_empty() {
                 let array =
-                    ArrayValue::new_fixed(ty.clone(), &bounds).map_err(|e| self.error_here(e))?;
+                    ArrayValue::new_fixed(ty.clone(), &bounds).map_err(|e| self.error_here(e, None))?;
                 self.declare_in(&name, VBVariant::Array(array));
             } else {
                 let value = VBVariant::default_for_type(&ty);
@@ -163,7 +163,7 @@ impl Interpreter {
             }
         }
 
-        let array = ArrayValue::new_fixed(ty, &bounds).map_err(|e| self.error_here(e))?;
+        let array = ArrayValue::new_fixed(ty, &bounds).map_err(|e| self.error_here(e, None))?;
         self.set_variable(&name, VBVariant::Array(array));
         Ok(())
     }
@@ -171,7 +171,7 @@ impl Interpreter {
     /// Parse one dimension's bounds: `expr` or `expr To expr`.
     fn parse_dimension(&mut self, parts: &[&CstNode]) -> RunResult<vb6runtime::ArrayDimension> {
         if parts.is_empty() {
-            return Err(self.error_here(VBError::invalid_procedure_call()));
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
         if let Some(to_index) = parts
             .iter()
@@ -179,17 +179,17 @@ impl Interpreter {
         {
             let lower = parts[..to_index]
                 .last()
-                .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+                .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
             let upper = parts[to_index + 1..]
                 .first()
-                .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+                .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
             let lo = self.eval_expr(lower)?.as_i32()?;
             let hi = self.eval_expr(upper)?.as_i32()?;
             Ok(vb6runtime::ArrayDimension::new(lo, hi))
         } else {
             let upper = parts
                 .last()
-                .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+                .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
             let hi = self.eval_expr(upper)?.as_i32()?;
             // A single bound uses 0-based indexing (`Dim a(5)` -> 0 To 5).
             Ok(vb6runtime::ArrayDimension::new(0, hi))

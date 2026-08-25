@@ -58,17 +58,17 @@ impl Interpreter {
         let eq_index = significant
             .iter()
             .position(|c| c.kind() == SyntaxKind::EqualityOperator)
-            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call(), None))?;
         let expr = significant
             .get(eq_index + 1)
-            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call(), None))?;
         let value = self.eval_expr(expr)?;
         // Always set the mock clock so `Date` reads correctly.
         vb6runtime::library::datetime::date_statement::date_statement(&value)
-            .map_err(|e| self.error_here(e))?;
+            .map_err(|e| self.error_here(e, None))?;
         // When the real clock is allowed, also write the OS clock and clear the mock offset.
         if self.allow_system_time {
-            let serial = value.as_date_serial().map_err(|e| self.error_here(e))?;
+            let serial = value.as_date_serial().map_err(|e| self.error_here(e, None))?;
             if let Some(ts) = serial_to_timestamp(serial) {
                 if let Err(_e) = vb6runtime::state::clock::system_set(ts) {
                     // Best-effort: the real clock write may fail due to
@@ -94,7 +94,7 @@ impl Interpreter {
             .filter(|c| c.kind() != SyntaxKind::Comma)
             .collect();
         if args.is_empty() || args.len() > 2 {
-            return Err(self.error_here(VBError::invalid_procedure_call()));
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
         let title = self.eval_expr(args[0])?;
         let wait = match args.get(1) {
@@ -114,12 +114,12 @@ impl Interpreter {
             }
             None => false,
         };
-        let title = title.as_string().map_err(|e| self.error_here(e))?;
+        let title = title.as_string().map_err(|e| self.error_here(e, None))?;
         vb6runtime::library::interaction::app_activate::app_activate(
             &vb6runtime::value::VBString::from(title),
             wait,
         )
-        .map_err(|e| self.error_here(e))?;
+        .map_err(|e| self.error_here(e, None))?;
         Ok(())
     }
 
@@ -136,7 +136,7 @@ impl Interpreter {
             .filter(|c| c.kind() != SyntaxKind::Comma)
             .collect();
         if args.is_empty() || args.len() > 2 {
-            return Err(self.error_here(VBError::invalid_procedure_call()));
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
         let keys = self.eval_expr(args[0])?;
         let wait = match args.get(1) {
@@ -156,12 +156,12 @@ impl Interpreter {
             }
             None => false,
         };
-        let keys = keys.as_string().map_err(|e| self.error_here(e))?;
+        let keys = keys.as_string().map_err(|e| self.error_here(e, None))?;
         vb6runtime::library::interaction::sendkeys::send_keys(
             &vb6runtime::value::VBString::from(keys),
             wait,
         )
-        .map_err(|e| self.error_here(e))?;
+        .map_err(|e| self.error_here(e, None))?;
         Ok(())
     }
 
@@ -176,12 +176,12 @@ impl Interpreter {
             .filter(|c| c.kind() != SyntaxKind::Comma)
             .collect();
         if args.len() != 2 {
-            return Err(self.error_here(VBError::invalid_procedure_call()));
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
         let picture = self.eval_simple_operand(args[0])?;
         let filename = self.eval_simple_operand(args[1])?;
         vb6runtime::library::graphics::savepicture::save_picture(&picture, &filename)
-            .map_err(|e| self.error_here(e))?;
+            .map_err(|e| self.error_here(e, None))?;
         Ok(())
     }
 
@@ -191,15 +191,15 @@ impl Interpreter {
         let eq_index = significant
             .iter()
             .position(|c| c.kind() == SyntaxKind::EqualityOperator)
-            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call(), None))?;
         let expr = significant
             .get(eq_index + 1)
-            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(vb6core::error::VBError::invalid_procedure_call(), None))?;
         let value = self.eval_expr(expr)?;
         vb6runtime::library::datetime::time_statement::time_statement(&value)
-            .map_err(|e| self.error_here(e))?;
+            .map_err(|e| self.error_here(e, None))?;
         if self.allow_system_time {
-            let serial = value.as_date_serial().map_err(|e| self.error_here(e))?;
+            let serial = value.as_date_serial().map_err(|e| self.error_here(e, None))?;
             if let Some(ts) = time_serial_to_timestamp(serial) {
                 if let Err(_e) = vb6runtime::state::clock::system_set(ts) {
                     // Best-effort.
@@ -228,27 +228,27 @@ impl Interpreter {
         let eq_index = significant
             .iter()
             .position(|c| c.kind() == SyntaxKind::EqualityOperator)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         // Target variable: the first identifier-like token after the
         // statement keyword (index 0) and before the `=`.
         let target = significant[1..eq_index]
             .iter()
             .find(|c| program::is_identifier_like(c))
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         let name = target.text().trim().to_string();
         if significant.len() != eq_index + 2 {
             return Err(self.error_here(VBError::with_description(
                 err_number::INVALID_PROCEDURE_CALL,
                 "LSet/RSet support only a single source expression",
-            )));
+            ), None));
         }
         let value = self.eval_flat_operand(significant[eq_index + 1])?;
-        let value = VBString::try_from(&value).map_err(|e| self.error_here(e))?;
+        let value = VBString::try_from(&value).map_err(|e| self.error_here(e, None))?;
         let current = match self.lookup(&name) {
-            Some(current) => VBString::try_from(current).map_err(|e| self.error_here(e))?,
+            Some(current) => VBString::try_from(current).map_err(|e| self.error_here(e, None))?,
             None => VBString::from(""),
         };
-        let aligned = align(&current, &value).map_err(|e| self.error_here(e))?;
+        let aligned = align(&current, &value).map_err(|e| self.error_here(e, None))?;
         self.set_variable(&name, VBVariant::from(aligned));
         Ok(())
     }
@@ -272,7 +272,7 @@ impl Interpreter {
         let eq_index = significant
             .iter()
             .position(|c| c.kind() == SyntaxKind::EqualityOperator)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         let lhs = &significant[1..eq_index];
         if lhs.len() < 2
             || lhs[0].kind() != SyntaxKind::LeftParenthesis
@@ -281,7 +281,7 @@ impl Interpreter {
             return Err(self.error_here(VBError::with_description(
                 err_number::INVALID_PROCEDURE_CALL,
                 ARITY_MESSAGE,
-            )));
+            ), None));
         }
         let inner = &lhs[1..lhs.len() - 1];
 
@@ -298,20 +298,20 @@ impl Interpreter {
             return Err(self.error_here(VBError::with_description(
                 err_number::INVALID_PROCEDURE_CALL,
                 ARITY_MESSAGE,
-            )));
+            ), None));
         }
         // First argument names the target variable.
         let target = parts[0][0];
         if !program::is_identifier_like(target) {
-            return Err(self.error_here(VBError::invalid_procedure_call()));
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
         let name = target.text().trim().to_string();
         let start = VBLong::try_from(&self.eval_flat_operand(parts[1][0])?)
-            .map_err(|e| self.error_here(e))?;
+            .map_err(|e| self.error_here(e, None))?;
         let length = match parts.get(2) {
             Some(part) => Some(
                 VBLong::try_from(&self.eval_flat_operand(part[0])?)
-                    .map_err(|e| self.error_here(e))?,
+                    .map_err(|e| self.error_here(e, None))?,
             ),
             None => None,
         };
@@ -320,16 +320,16 @@ impl Interpreter {
             return Err(self.error_here(VBError::with_description(
                 err_number::INVALID_PROCEDURE_CALL,
                 "Mid/MidB support only a single source expression",
-            )));
+            ), None));
         }
         let value = self.eval_flat_operand(significant[eq_index + 1])?;
-        let value = VBString::try_from(&value).map_err(|e| self.error_here(e))?;
+        let value = VBString::try_from(&value).map_err(|e| self.error_here(e, None))?;
         let current = match self.lookup(&name) {
-            Some(current) => VBString::try_from(current).map_err(|e| self.error_here(e))?,
+            Some(current) => VBString::try_from(current).map_err(|e| self.error_here(e, None))?,
             None => VBString::from(""),
         };
         let updated =
-            apply(&current, &start, length.as_ref(), &value).map_err(|e| self.error_here(e))?;
+            apply(&current, &start, length.as_ref(), &value).map_err(|e| self.error_here(e, None))?;
         self.set_variable(&name, VBVariant::from(updated));
         Ok(())
     }

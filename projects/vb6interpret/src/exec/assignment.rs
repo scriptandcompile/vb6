@@ -26,12 +26,12 @@ impl Interpreter {
                 )
             })
             .copied()
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         // RHS is the last significant child (a `Set` LHS object may have `New`).
         let rhs = significant
             .last()
             .copied()
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
         let value = self.eval_expr(rhs)?;
         self.assign(lhs, value)
     }
@@ -66,17 +66,17 @@ impl Interpreter {
                 let existing = self
                     .lookup(&name)
                     .cloned()
-                    .ok_or_else(|| self.error_here(VBError::subscript_out_of_range()))?;
+                    .ok_or_else(|| self.error_here(VBError::subscript_out_of_range(), None))?;
                 if let VBVariant::Array(mut array) = existing {
                     array.set(&indices, value)?;
                     self.set_variable(&name, VBVariant::Array(array));
                     Ok(())
                 } else {
-                    Err(self.error_here(VBError::type_mismatch()))
+                    Err(self.error_here(VBError::type_mismatch(), None))
                 }
             }
             SyntaxKind::MemberAccessExpression => Err(self.unsupported(lhs, "member assignment")),
-            _ => Err(self.error_here(VBError::invalid_procedure_call())),
+            _ => Err(self.error_here(VBError::invalid_procedure_call(), None)),
         }
     }
 
@@ -106,13 +106,13 @@ impl Interpreter {
         let eq_index = significant
             .iter()
             .position(|c| c.kind() == SyntaxKind::EqualityOperator)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call()))?;
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
 
         // Target: the identifier between `Set` and `=`. Member targets
         // (`Set Form1.Picture = ...`) need object support.
         let target = &significant[1..eq_index];
         if target.len() != 1 || !program::is_identifier_like(target[0]) {
-            return Err(self.error_here(VBError::invalid_procedure_call()));
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
         let name = target[0].text().trim().to_string();
 

@@ -65,7 +65,7 @@ impl Interpreter {
     /// `Name(arg, ...)` whose arguments are themselves flat expressions.
     pub(crate) fn eval_flat_expression(&mut self, tokens: &[&CstNode]) -> RunResult<VBVariant> {
         let Some((first, rest)) = tokens.split_first() else {
-            return Err(self.error_here(VBError::invalid_procedure_call()));
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
         };
         if rest.is_empty() {
             return self.eval_flat_atom(first);
@@ -77,7 +77,7 @@ impl Interpreter {
                         .last()
                         .is_none_or(|t| t.kind() != SyntaxKind::RightParenthesis)
                 {
-                    return Err(self.error_here(VBError::invalid_procedure_call()));
+                    return Err(self.error_here(VBError::invalid_procedure_call(), None));
                 }
                 let inner = &rest[1..rest.len() - 1];
                 let args = self.eval_flat_arguments(inner)?;
@@ -87,13 +87,13 @@ impl Interpreter {
                 if self.procedures.contains_key(&crate::scope::normalize(name)) {
                     return self.call_function(name, args);
                 }
-                crate::builtins::call_builtin(name, &args).map_err(|e| self.error_here(e))
+                crate::builtins::call_builtin(name, &args).map_err(|e| self.error_here(e, None))
             }
             SyntaxKind::NewKeyword => Err(self.error_here(VBError::with_description(
                 err_number::INVALID_PROCEDURE_CALL,
                 "New object creation is not implemented yet",
-            ))),
-            _ => Err(self.error_here(VBError::invalid_procedure_call())),
+            ), None)),
+            _ => Err(self.error_here(VBError::invalid_procedure_call(), None)),
         }
     }
 
@@ -156,7 +156,7 @@ impl Interpreter {
             | SyntaxKind::DateLiteral
             | SyntaxKind::TrueKeyword
             | SyntaxKind::FalseKeyword => self.eval_literal(node),
-            _ => Err(self.error_here(VBError::invalid_procedure_call())),
+            _ => Err(self.error_here(VBError::invalid_procedure_call(), None)),
         }
     }
 
