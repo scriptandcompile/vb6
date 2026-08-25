@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/string_manipulation/midb.rs
+source: projects/vb6parse/src/syntax/library/statements/string_manipulation/midb.rs
 expression: tree
 ---
 root:
@@ -33,40 +33,70 @@ root:
                   text: MidB
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: arr
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: i
-                - kind: RightParenthesis
-                  text: )
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: startPos
-                - kind: Whitespace
-                  text: " "
-                - kind: AdditionOperator
-                  text: +
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "1"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: LenB
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: newStr
-                - kind: RightParenthesis
-                  text: )
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: arr
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: i
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: BinaryExpression
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: startPos
+                            - kind: Whitespace
+                              text: " "
+                            - kind: AdditionOperator
+                              text: +
+                            - kind: Whitespace
+                              text: " "
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "1"
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: LenB
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: newStr
+                            - kind: RightParenthesis
+                              text: )
                 - kind: RightParenthesis
                   text: )
                 - kind: Whitespace
@@ -75,10 +105,12 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: newStr
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: newStr
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace
