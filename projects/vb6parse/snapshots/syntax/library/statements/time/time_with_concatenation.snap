@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/time.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/time.rs
 expression: tree
 ---
 root:
@@ -37,34 +37,48 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: hours
-                - kind: Whitespace
-                  text: " "
-                - kind: Ampersand
-                  text: "&"
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\":\""
-                - kind: Whitespace
-                  text: " "
-                - kind: Ampersand
-                  text: "&"
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: minutes
-                - kind: Whitespace
-                  text: " "
-                - kind: Ampersand
-                  text: "&"
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\":00\""
-                - kind: Newline
-                  text: "\n"
+                - kind: BinaryExpression
+                  children:
+                    - kind: BinaryExpression
+                      children:
+                        - kind: BinaryExpression
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: hours
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Ampersand
+                              text: "&"
+                            - kind: Whitespace
+                              text: " "
+                            - kind: StringLiteralExpression
+                              children:
+                                - kind: StringLiteral
+                                  text: "\":\""
+                        - kind: Whitespace
+                          text: " "
+                        - kind: Ampersand
+                          text: "&"
+                        - kind: Whitespace
+                          text: " "
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: minutes
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Ampersand
+                      text: "&"
+                    - kind: Whitespace
+                      text: " "
+                    - kind: StringLiteralExpression
+                      children:
+                        - kind: StringLiteral
+                          text: "\":00\""
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

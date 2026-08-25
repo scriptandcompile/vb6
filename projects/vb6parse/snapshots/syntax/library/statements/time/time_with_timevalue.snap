@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/time.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/time.rs
 expression: tree
 ---
 root:
@@ -37,16 +37,24 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: TimeValue
-                - kind: LeftParenthesis
-                  text: (
-                - kind: StringLiteral
-                  text: "\"3:30 PM\""
-                - kind: RightParenthesis
-                  text: )
-                - kind: Newline
-                  text: "\n"
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: TimeValue
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: StringLiteralExpression
+                              children:
+                                - kind: StringLiteral
+                                  text: "\"3:30 PM\""
+                    - kind: RightParenthesis
+                      text: )
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/time.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/time.rs
 expression: tree
 ---
 root:
@@ -37,18 +37,24 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: baseTime
-                - kind: Whitespace
-                  text: " "
-                - kind: AdditionOperator
-                  text: +
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: offset
-                - kind: Newline
-                  text: "\n"
+                - kind: BinaryExpression
+                  children:
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: baseTime
+                    - kind: Whitespace
+                      text: " "
+                    - kind: AdditionOperator
+                      text: +
+                    - kind: Whitespace
+                      text: " "
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: offset
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

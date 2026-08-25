@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/time.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/time.rs
 expression: tree
 ---
 root:
@@ -69,10 +69,12 @@ root:
                           text: "="
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: userTime
-                        - kind: Newline
-                          text: "\n"
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: userTime
+                    - kind: Newline
+                      text: "\n"
                     - kind: Whitespace
                       text: "    "
                 - kind: EndKeyword

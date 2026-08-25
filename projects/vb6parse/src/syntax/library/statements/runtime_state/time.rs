@@ -248,7 +248,35 @@ use crate::parsers::syntaxkind::SyntaxKind;
 
 impl Parser<'_> {
     pub(crate) fn parse_time_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::TimeStatement);
+        self.parsing_header = false;
+
+        self.builder.start_node(SyntaxKind::TimeStatement.to_raw());
+
+        self.consume_whitespace();
+
+        if let Some((text, token)) = self.tokens.get(self.pos) {
+            let kind = SyntaxKind::from(*token);
+            if kind == SyntaxKind::TimeKeyword {
+                self.builder.token(SyntaxKind::TimeKeyword.to_raw(), text);
+                self.pos += 1;
+            }
+        }
+
+        self.consume_whitespace();
+
+        if let Some((text, token)) = self.tokens.get(self.pos) {
+            let kind = SyntaxKind::from(*token);
+            if kind == SyntaxKind::EqualityOperator {
+                self.builder.token(kind.to_raw(), text);
+                self.pos += 1;
+            }
+        }
+
+        self.consume_whitespace();
+
+        self.parse_expression();
+
+        self.builder.finish_node();
     }
 }
 

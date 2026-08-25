@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/time.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/time.rs
 expression: tree
 ---
 root:
@@ -15,12 +15,16 @@ root:
           text: "="
         - kind: Whitespace
           text: " "
-        - kind: StringLiteral
-          text: "\"08:00:00\""
-        - kind: ColonOperator
-          text: ":"
-        - kind: Whitespace
-          text: " "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"08:00:00\""
+    - kind: ColonOperator
+      text: ":"
+    - kind: Whitespace
+      text: " "
+    - kind: TimeStatement
+      children:
         - kind: TimeKeyword
           text: Time
         - kind: Whitespace
@@ -29,7 +33,9 @@ root:
           text: "="
         - kind: Whitespace
           text: " "
-        - kind: StringLiteral
-          text: "\"12:00:00\""
-        - kind: Newline
-          text: "\n"
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"12:00:00\""
+    - kind: Newline
+      text: "\n"

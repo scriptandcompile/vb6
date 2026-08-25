@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/time.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/time.rs
 expression: tree
 ---
 root:
@@ -37,28 +37,44 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: TimeSerial
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "14"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "30"
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "0"
-                - kind: RightParenthesis
-                  text: )
-                - kind: Newline
-                  text: "\n"
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: TimeSerial
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "14"
+                        - kind: Comma
+                          text: ","
+                        - kind: Whitespace
+                          text: " "
+                        - kind: Argument
+                          children:
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "30"
+                        - kind: Comma
+                          text: ","
+                        - kind: Whitespace
+                          text: " "
+                        - kind: Argument
+                          children:
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "0"
+                    - kind: RightParenthesis
+                      text: )
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace
