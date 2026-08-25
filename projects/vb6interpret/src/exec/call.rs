@@ -6,7 +6,7 @@ use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
 
 use super::super::program;
-use crate::error::RunResult;
+use crate::error::{BuiltinCallInfo, RunResult};
 use crate::interpreter::{Flow, Interpreter};
 
 impl Interpreter {
@@ -41,28 +41,74 @@ impl Interpreter {
             return Ok(flow);
         }
 
+        // Compute byte ranges for parameter-specific error highlighting.
+        let arg_byte_ranges = argument_list.map(|list| {
+            list.children_by_kind(SyntaxKind::Argument)
+                .map(|arg| arg.byte_range())
+                .collect()
+        });
+
         match name.to_lowercase().as_str() {
             "msgbox" => {
                 // Full `MsgBox` semantics: the interaction backend shows the
                 // dialog (or records it) and the return value is discarded
                 // because this form is a statement, not a function call.
-                crate::builtins::call_builtin("msgbox", &args).map_err(|e| self.error_here(e, None))?;
+                crate::builtins::call_builtin("msgbox", &args).map_err(|e| {
+                    let param_info = e
+                        .param_index
+                        .map(|idx| (idx, e.param_name.clone().unwrap_or_default()));
+                    let call_info = param_info.map(|(param_index, param_name)| {
+                        BuiltinCallInfo {
+                            param_index,
+                            param_name,
+                            arg_byte_ranges: arg_byte_ranges.clone(),
+                        }
+                    });
+                    self.error_here(e, call_info)
+                })?;
                 Ok(Flow::Next)
             }
             // `Beep` is a registered builtin Sub; a `Call` discards its
             // (always `Empty`) return value.
             "beep" => {
-                crate::builtins::call_builtin("beep", &args).map_err(|e| self.error_here(e, None))?;
+                crate::builtins::call_builtin("beep", &args).map_err(|e| {
+                    let param_info = e
+                        .param_index
+                        .map(|idx| (idx, e.param_name.clone().unwrap_or_default()));
+                    let call_info = param_info.map(|(param_index, param_name)| {
+                        BuiltinCallInfo {
+                            param_index,
+                            param_name,
+                            arg_byte_ranges: arg_byte_ranges.clone(),
+                        }
+                    });
+                    self.error_here(e, call_info)
+                })?;
                 Ok(Flow::Next)
             }
             // `Shell "prog"` statement form: the backend starts the program
             // (or records the request) and the task ID is discarded because
             // this form is a statement, not a function call.
             "shell" => {
-                crate::builtins::call_builtin("shell", &args).map_err(|e| self.error_here(e, None))?;
+                crate::builtins::call_builtin("shell", &args).map_err(|e| {
+                    let param_info = e
+                        .param_index
+                        .map(|idx| (idx, e.param_name.clone().unwrap_or_default()));
+                    let call_info = param_info.map(|(param_index, param_name)| {
+                        BuiltinCallInfo {
+                            param_index,
+                            param_name,
+                            arg_byte_ranges: arg_byte_ranges.clone(),
+                        }
+                    });
+                    self.error_here(e, call_info)
+                })?;
                 Ok(Flow::Next)
             }
-            _ => Err(self.error_here(VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED), None)), // Sub or Function not defined
+            _ => Err(self.error_here(
+                VBError::new(err_number::SUB_OR_FUNCTION_NOT_DEFINED),
+                None,
+            )), // Sub or Function not defined
         }
     }
 }
