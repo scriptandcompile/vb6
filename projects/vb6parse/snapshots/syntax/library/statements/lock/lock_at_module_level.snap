@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/lock.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/lock.rs
 expression: tree
 ---
 root:
@@ -11,9 +11,11 @@ root:
           text: Lock
         - kind: Whitespace
           text: " "
-        - kind: Octothorpe
-          text: "#"
-        - kind: IntegerLiteral
-          text: "1"
-        - kind: Newline
-          text: "\n"
+        - kind: IdentifierExpression
+          children:
+            - kind: Octothorpe
+              text: "#"
+            - kind: IntegerLiteral
+              text: "1"
+    - kind: Newline
+      text: "\n"

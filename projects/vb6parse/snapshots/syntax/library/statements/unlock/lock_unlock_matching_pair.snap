@@ -33,18 +33,22 @@ root:
                   text: Lock
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: IntegerLiteral
-                  text: "5"
-                - kind: Newline
-                  text: "\n"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "5"
+            - kind: Newline
+              text: "\n"
             - kind: Whitespace
               text: "    "
             - kind: AssignmentStatement

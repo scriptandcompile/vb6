@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/lock.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/lock.rs
 expression: tree
 ---
 root:
@@ -33,16 +33,20 @@ root:
                   text: Lock
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: fileNum
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: fileNum
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: recordNum
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: recordNum
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace
