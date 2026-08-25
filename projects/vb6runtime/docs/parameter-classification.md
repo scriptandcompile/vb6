@@ -89,27 +89,27 @@ Classes:
 
 | Function | Arity | Runtime signature | Class | Null |
 |---|---|---|---|---|
-| `chdir` | 1..1 | `fn(path: VBVariant) -> VBResult<()>` | typed | raises 94 |
-| `chdrive` | 1..1 | `fn(drive: VBVariant) -> VBResult<()>` | typed | raises 94 |
-| `curdir` | 0..1 | `fn(drive: VBVariant) -> VBResult<VBVariant>` | typed | raises 94 |
-| `curdir$` | 0..1 | `fn(drive: VBVariant) -> VBResult<VBVariant>` | $-strict | raises 94 |
-| `dir` | 0..2 | `fn(pathname: VBVariant, attributes: i16) -> VBResult<VBVariant>` | typed | raises 94 |
-| `eof` | 1..1 | `fn(file_number: VBVariant) -> VBResult<VBBoolean>` | typed | raises 94 |
-| `fileattr` | 2..2 | `fn(file_number: VBVariant, return_type: VBVariant) -> VBResult<VBLong>` | typed | raises 94 |
-| `filecopy` | 2..2 | `fn(source: VBVariant, destination: VBVariant) -> VBResult<()>` | typed | raises 94 |
-| `filedatetime` | 1..1 | `fn(pathname: VBVariant) -> VBResult<VBVariant>` | typed | raises 94 |
-| `filelen` | 1..1 | `fn(pathname: VBVariant) -> VBResult<VBLong>` | typed | raises 94 |
-| `freefile` | 0..1 | `fn(range: VBVariant) -> VBResult<VBInteger>` | typed | raises 94 |
-| `getattr` | 1..1 | `fn(pathname: VBVariant) -> VBResult<VBInteger>` | typed | raises 94 |
-| `input` | 2..2 | `fn(number: VBLong, file_number: VBVariant) -> VBResult<VBVariant>` | typed | raises 94 |
-| `kill` | 1..1 | `fn(pathname: VBVariant) -> VBResult<()>` | typed | raises 94 |
-| `loc` | 1..1 | `fn(file_number: VBVariant) -> VBResult<VBLong>` | typed | raises 94 |
-| `lof` | 1..1 | `fn(file_number: VBVariant) -> VBResult<VBLong>` | typed | raises 94 |
-| `mkdir` | 1..1 | `fn(path: VBVariant) -> VBResult<()>` | typed | raises 94 |
-| `name` | 2..2 | `fn(old_pathname: VBVariant, new_pathname: VBVariant) -> VBResult<()>` | typed | raises 94 |
-| `rmdir` | 1..1 | `fn(path: VBVariant) -> VBResult<()>` | typed | raises 94 |
-| `seek` | 1..1 | `fn(file_number: VBVariant) -> VBResult<VBLong>` | typed | raises 94 |
-| `setattr` | 2..2 | `fn(pathname: VBVariant, attributes: VBVariant) -> VBResult<()>` | typed | raises 94 |
+| `chdir` | 1..1 | `fn(path: &VBVariant) -> VBResult<()>` | variant-input | raises 13 |
+| `chdrive` | 1..1 | `fn(drive: &VBVariant) -> VBResult<()>` | variant-input | raises 13 |
+| `curdir` | 0..1 | `fn(drive: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | raises 13 |
+| `curdir$` | 0..1 | `fn(drive: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | raises 13 |
+| `dir` | 0..2 | `fn(pathname: Option<&VBVariant>, attributes: Option<&VBVariant>) -> VBResult<VBVariant>` | variant-input | raises 13 |
+| `eof` | 1..1 | `fn(file_number: &VBVariant) -> VBResult<VBBoolean>` | variant-input | raises 13 |
+| `fileattr` | 2..2 | `fn(file_number: &VBVariant, return_type: &VBVariant) -> VBResult<VBLong>` | variant-input | raises 13 |
+| `filecopy` | 2..2 | `fn(source: &VBVariant, destination: &VBVariant) -> VBResult<()>` | variant-input | raises 13 |
+| `filedatetime` | 1..1 | `fn(pathname: &VBVariant) -> VBResult<VBVariant>` | variant-input | raises 13 |
+| `filelen` | 1..1 | `fn(pathname: &VBVariant) -> VBResult<VBLong>` | variant-input | raises 13 |
+| `freefile` | 0..1 | `fn(range: Option<&VBVariant>) -> VBResult<VBInteger>` | variant-input | Null acts as omitted |
+| `getattr` | 1..1 | `fn(pathname: &VBVariant) -> VBResult<VBInteger>` | variant-input | raises 13 |
+| `input` | 2..2 | `fn(number_chars: &VBVariant, file_number: &VBVariant) -> VBResult<VBVariant>` | variant-input | raises 13 |
+| `kill` | 1..1 | `fn(pathname: &VBVariant) -> VBResult<()>` | variant-input | raises 13 |
+| `loc` | 1..1 | `fn(file_number: &VBVariant) -> VBResult<VBLong>` | variant-input | raises 13 |
+| `lof` | 1..1 | `fn(file_number: &VBVariant) -> VBResult<VBLong>` | variant-input | raises 13 |
+| `mkdir` | 1..1 | `fn(path: &VBVariant) -> VBResult<()>` | variant-input | raises 13 |
+| `name` | 2..2 | `fn(old_pathname: &VBVariant, new_pathname: &VBVariant) -> VBResult<()>` | variant-input | raises 13 |
+| `rmdir` | 1..1 | `fn(path: &VBVariant) -> VBResult<()>` | variant-input | raises 13 |
+| `seek` | 1..1 | `fn(file_number: &VBVariant) -> VBResult<VBLong>` | variant-input | raises 13 |
+| `setattr` | 2..2 | `fn(pathname: &VBVariant, attributes: &VBVariant) -> VBResult<()>` | variant-input | raises 13 |
 
 ## `financial`
 

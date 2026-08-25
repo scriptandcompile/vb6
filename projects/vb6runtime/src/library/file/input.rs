@@ -507,12 +507,18 @@ use vb6core::error::err_number;
 ///
 /// Returns a `String` containing up to `number` characters read from the file.
 /// If fewer than `number` characters remain, returns all remaining characters.
-pub fn input(number: VBLong, file_number: VBVariant) -> VBResult<VBVariant> {
+pub fn input(number_chars: &VBVariant, file_number: &VBVariant) -> VBResult<VBVariant> {
+    // The character count keeps its historical per-call error text: an
+    // unconvertible count is "Type mismatch in Input", not a plain 13.
+    let number = number_chars.as_i32().map(VBLong::from).map_err(|_| {
+        VBError::with_description(err_number::TYPE_MISMATCH, "Type mismatch in Input")
+    })?;
+
     // Convert file number to integer
     let file_num = match file_number {
-        VBVariant::Long(v) => v as i16,
-        VBVariant::Integer(v) => v,
-        VBVariant::Byte(v) => v as i16,
+        VBVariant::Long(v) => *v as i16,
+        VBVariant::Integer(v) => *v,
+        VBVariant::Byte(v) => *v as i16,
         _ => {
             return Err(VBError::with_description(
                 err_number::TYPE_MISMATCH,
@@ -593,11 +599,11 @@ mod tests {
         .unwrap();
 
         // Read 5 characters
-        let result = input(VBLong::from(5), VBVariant::Long(1)).unwrap();
+        let result = input(&VBVariant::from_long(5), &VBVariant::Long(1)).unwrap();
         assert_eq!(result, VBVariant::from_string("Hello"));
 
         // Read remaining characters
-        let result = input(VBLong::from(8), VBVariant::Long(1)).unwrap();
+        let result = input(&VBVariant::from_long(8), &VBVariant::Long(1)).unwrap();
         assert_eq!(result, VBVariant::from_string(", World!"));
 
         let _ = file::close_all_files();
@@ -629,7 +635,7 @@ mod tests {
         .unwrap();
 
         // Read 0 characters
-        let result = input(VBLong::from(0), VBVariant::Long(1)).unwrap();
+        let result = input(&VBVariant::from_long(0), &VBVariant::Long(1)).unwrap();
         assert_eq!(result, VBVariant::from_string(""));
 
         let _ = file::close_all_files();
@@ -661,7 +667,7 @@ mod tests {
         .unwrap();
 
         // Try to read more characters than available
-        let result = input(VBLong::from(100), VBVariant::Long(1)).unwrap();
+        let result = input(&VBVariant::from_long(100), &VBVariant::Long(1)).unwrap();
         assert_eq!(result, VBVariant::from_string("Hi"));
 
         let _ = file::close_all_files();
@@ -693,7 +699,7 @@ mod tests {
         .unwrap();
 
         // Read 3 bytes
-        let result = input(VBLong::from(3), VBVariant::Long(1)).unwrap();
+        let result = input(&VBVariant::from_long(3), &VBVariant::Long(1)).unwrap();
         assert_eq!(result, VBVariant::from_string("ABC"));
 
         let _ = file::close_all_files();
@@ -703,14 +709,14 @@ mod tests {
     fn input_rejects_invalid_file_number() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = input(VBLong::from(1), VBVariant::Long(0));
+        let result = input(&VBVariant::from_long(1), &VBVariant::Long(0));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,
             err_number::BAD_FILE_NAME_OR_NUMBER
         );
 
-        let result = input(VBLong::from(1), VBVariant::Long(512));
+        let result = input(&VBVariant::from_long(1), &VBVariant::Long(512));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,
@@ -725,7 +731,7 @@ mod tests {
         let _guard = crate::state::test_support::lock_test();
         let _ = file::close_all_files();
 
-        let result = input(VBLong::from(1), VBVariant::Long(1));
+        let result = input(&VBVariant::from_long(1), &VBVariant::Long(1));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,
@@ -756,7 +762,7 @@ mod tests {
         .unwrap();
 
         // Try to read from output mode file
-        let result = input(VBLong::from(1), VBVariant::Long(1));
+        let result = input(&VBVariant::from_long(1), &VBVariant::Long(1));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_MODE);
 
@@ -784,7 +790,7 @@ mod tests {
         .unwrap();
 
         // Try to read from append mode file
-        let result = input(VBLong::from(1), VBVariant::Long(1));
+        let result = input(&VBVariant::from_long(1), &VBVariant::Long(1));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_MODE);
 
@@ -812,7 +818,7 @@ mod tests {
         .unwrap();
 
         // Try to read from random mode file
-        let result = input(VBLong::from(1), VBVariant::Long(1));
+        let result = input(&VBVariant::from_long(1), &VBVariant::Long(1));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::BAD_FILE_MODE);
 

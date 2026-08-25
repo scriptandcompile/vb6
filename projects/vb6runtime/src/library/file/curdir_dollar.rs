@@ -47,7 +47,7 @@ use super::curdir::resolve_curdir;
 ///
 /// Returns `Ok(VBVariant::String(...))` with the current directory path,
 /// or `Err(VBError)` on failure.
-pub fn curdir_dollar(drive: VBVariant) -> VBResult<VBVariant> {
+pub fn curdir_dollar(drive: Option<&VBVariant>) -> VBResult<VBVariant> {
     let dir = resolve_curdir(drive)?;
     Ok(VBVariant::from_string(&dir))
 }
@@ -65,7 +65,7 @@ mod tests {
         file::set_root(dir.path());
         file::set_current_dir(dir.path()).unwrap();
 
-        let result = curdir_dollar(VBVariant::Empty).unwrap();
+        let result = curdir_dollar(None).unwrap();
         match result {
             VBVariant::String(s) => {
                 let s_str = s.as_str();

@@ -273,7 +273,7 @@ mod tests {
         seek_statement(VBVariant::Long(1), VBVariant::Long(7)).unwrap();
 
         // Check position
-        let pos = crate::library::file::seek::seek(VBVariant::Long(1)).unwrap();
+        let pos = crate::library::file::seek::seek(&VBVariant::Long(1)).unwrap();
         assert_eq!(pos.as_i32(), 7);
 
         let _ = file::close_all_files();

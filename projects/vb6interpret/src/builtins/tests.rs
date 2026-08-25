@@ -1031,6 +1031,26 @@ fn objects_functions_dispatch() {
 }
 
 #[test]
+fn file_functions_keep_strict_raw_variant_semantics() {
+    // The file functions deliberately do not use boundary coercion: a Long
+    // path is not CStr-coerced, it is a type mismatch naming the function.
+    let err = call_builtin("ChDir", &[VBVariant::from_long(42)]).unwrap_err();
+    assert_eq!(err.number, 13);
+    assert!(err.description.contains("Type mismatch in ChDir"));
+
+    // Likewise a numeric string is not CLng-coerced into a file number.
+    let err = call_builtin("EOF", &[VBVariant::from_string("1")]).unwrap_err();
+    assert_eq!(err.number, 13);
+    assert!(err.description.contains("Type mismatch in EOF"));
+
+    // FreeFile's Null acts as the omitted argument (default range 0), and
+    // neither form touches the filesystem, so no backend fixture is needed.
+    let omitted = call_builtin("FreeFile", &[]).unwrap();
+    let explicit_null = call_builtin("FreeFile", &[VBVariant::Null]).unwrap();
+    assert_eq!(omitted, explicit_null);
+}
+
+#[test]
 fn financial_functions_dispatch() {
     // DDB with default factor (2.0)
     let result = call_builtin(

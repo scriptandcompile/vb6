@@ -59,7 +59,7 @@ use vb6core::error::err_number;
 /// # Returns
 ///
 /// Returns `Ok(())` on success, or `Err(VBError)` on failure.
-pub fn mkdir(path: VBVariant) -> VBResult<()> {
+pub fn mkdir(path: &VBVariant) -> VBResult<()> {
     // Get the path
     let path_str = match path {
         VBVariant::String(s) => s.as_str().to_string(),
@@ -101,7 +101,7 @@ mod tests {
         file::set_root(dir.path());
 
         // Create directory
-        mkdir(VBVariant::from_string("newdir")).unwrap();
+        mkdir(&VBVariant::from_string("newdir")).unwrap();
 
         // Verify
         assert!(dir.path().join("newdir").is_dir());
@@ -117,7 +117,7 @@ mod tests {
         // Create directory
         std::fs::create_dir(dir.path().join("existing")).unwrap();
 
-        let result = mkdir(VBVariant::from_string("existing"));
+        let result = mkdir(&VBVariant::from_string("existing"));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,
@@ -129,7 +129,7 @@ mod tests {
     fn mkdir_rejects_non_string() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = mkdir(VBVariant::Long(42));
+        let result = mkdir(&VBVariant::Long(42));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }

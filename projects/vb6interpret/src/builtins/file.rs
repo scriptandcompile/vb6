@@ -1,103 +1,110 @@
 //! VB6 file function registry.
 //!
-//! One [`Builtin`](super::Builtin) entry per file function, each wrapping
-//! the typed `vb6runtime::library::file` implementation.
+//! One [`typed_builtin!`](crate::typed_builtin) entry per file function.
+//!
+//! Every parameter stays a raw Variant by design: the `LoadRes`-style
+//! strictness here is deliberate — path parameters accept only actual
+//! strings and file-number parameters only actual Byte/Integer/Longs, each
+//! rejection reporting "Type mismatch in <Function>" (13) rather than the
+//! boundary's coercion semantics. An omitted argument acts as `Empty`
+//! where the body says so (`Dir`, `FreeFile`, `CurDir`).
+//!
+//! Not registered: the file *statements* (`Open`, `Close`, `Print#`,
+//! `Write#`, `Input#`, `Line Input#`, `Get#`, `Put#`, `Lock`, `Unlock`,
+//! `Seek`, `Width`, `Reset`) are executed directly by `exec::file_io` and
+//! `exec::print`.
 
 use super::{Builtin, Registry};
-use crate::builtin;
-use vb6core::error::VBResult;
-use vb6runtime::library::file as filefn;
+use crate::typed_builtin;
+use vb6runtime::library::file::ch_dir::chdir;
+use vb6runtime::library::file::ch_drive::chdrive;
+use vb6runtime::library::file::curdir::curdir;
+use vb6runtime::library::file::curdir_dollar::curdir_dollar;
+use vb6runtime::library::file::dir::dir;
+use vb6runtime::library::file::eof::eof;
+use vb6runtime::library::file::fileattr::fileattr;
+use vb6runtime::library::file::filecopy::file_copy;
+use vb6runtime::library::file::filedatetime::file_datetime;
+use vb6runtime::library::file::filelen::file_len;
+use vb6runtime::library::file::freefile::free_file;
+use vb6runtime::library::file::getattr::getattr;
+use vb6runtime::library::file::input::input;
+use vb6runtime::library::file::kill::kill;
+use vb6runtime::library::file::loc::loc;
+use vb6runtime::library::file::lof::lof;
+use vb6runtime::library::file::mkdir::mkdir;
+use vb6runtime::library::file::name::name_statement;
+use vb6runtime::library::file::rmdir::rmdir;
+use vb6runtime::library::file::seek::seek;
+use vb6runtime::library::file::setattr::setattr;
 use vb6runtime::VBVariant;
 
 /// Register the file functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {
-    registry.insert(builtin!("dir", 0, 2, |args| {
-        let pathname = args.first().cloned().unwrap_or(VBVariant::Empty);
-        let attributes: i16 = args
-            .get(1)
-            .and_then(|v| v.as_i32().ok())
-            .map(|n| n as i16)
-            .unwrap_or(0);
-        filefn::dir::dir(pathname, attributes)
-    }));
-    registry.insert(builtin!("freefile", 0, 1, |args| {
-        let range = args.first().cloned().unwrap_or(VBVariant::Empty);
-        filefn::freefile::free_file(range).map(VBVariant::from)
-    }));
-    registry.insert(builtin!("eof", 1, 1, |args| {
-        filefn::eof::eof(args[0].clone()).map(VBVariant::from)
-    }));
-    registry.insert(builtin!("lof", 1, 1, |args| {
-        filefn::lof::lof(args[0].clone()).map(VBVariant::from)
-    }));
-    registry.insert(builtin!("loc", 1, 1, |args| {
-        filefn::loc::loc(args[0].clone()).map(VBVariant::from)
-    }));
-    registry.insert(builtin!("filelen", 1, 1, |args| {
-        filefn::filelen::file_len(args[0].clone()).map(VBVariant::from)
-    }));
-    registry.insert(builtin!("fileattr", 2, 2, |args| {
-        filefn::fileattr::fileattr(args[0].clone(), args[1].clone()).map(VBVariant::from)
-    }));
-    registry.insert(builtin!("filedatetime", 1, 1, |args| {
-        filefn::filedatetime::file_datetime(args[0].clone())
-    }));
-    registry.insert(builtin!("seek", 1, 1, |args| {
-        filefn::seek::seek(args[0].clone()).map(VBVariant::from)
-    }));
-    registry.insert(builtin!("curdir", 0, 1, |args| {
-        let drive = args.first().cloned().unwrap_or(VBVariant::Empty);
-        filefn::curdir::curdir(drive)
-    }));
-    registry.insert(builtin!("curdir$", 0, 1, |args| {
-        let drive = args.first().cloned().unwrap_or(VBVariant::Empty);
-        filefn::curdir_dollar::curdir_dollar(drive)
-    }));
-    registry.insert(builtin!("getattr", 1, 1, |args| {
-        filefn::getattr::getattr(args[0].clone()).map(VBVariant::from)
-    }));
-    registry.insert(builtin!("setattr", 2, 2, |args| {
-        filefn::setattr::setattr(args[0].clone(), args[1].clone())?;
+    registry.insert(typed_builtin!("dir", 0, 2,
+        (pathname: opt_variant, attributes: opt_variant),
+        dir(pathname, attributes)));
+    registry.insert(
+        typed_builtin!("freefile", 0, 1, (range_number: opt_variant),
+        free_file(range_number).map(VBVariant::from)),
+    );
+    registry.insert(typed_builtin!("eof", 1, 1, (file_number: variant),
+        eof(file_number).map(VBVariant::from)));
+    registry.insert(typed_builtin!("lof", 1, 1, (file_number: variant),
+        lof(file_number).map(VBVariant::from)));
+    registry.insert(typed_builtin!("loc", 1, 1, (file_number: variant),
+        loc(file_number).map(VBVariant::from)));
+    registry.insert(typed_builtin!("seek", 1, 1, (file_number: variant),
+        seek(file_number).map(VBVariant::from)));
+    registry.insert(typed_builtin!("filelen", 1, 1, (pathname: variant),
+        file_len(pathname).map(VBVariant::from)));
+    registry.insert(typed_builtin!("fileattr", 2, 2,
+        (file_number: variant, return_type: variant),
+        fileattr(file_number, return_type).map(VBVariant::from)));
+    registry.insert(typed_builtin!("filedatetime", 1, 1, (pathname: variant),
+        file_datetime(pathname)));
+    registry.insert(typed_builtin!("curdir", 0, 1, (drive: opt_variant),
+        curdir(drive)));
+    registry.insert(typed_builtin!("curdir$", 0, 1, (drive: opt_variant),
+        curdir_dollar(drive)));
+    registry.insert(typed_builtin!("getattr", 1, 1, (pathname: variant),
+        getattr(pathname).map(VBVariant::from)));
+    registry.insert(typed_builtin!("setattr", 2, 2,
+        (pathname: variant, attributes: variant), {
+        setattr(pathname, attributes)?;
         Ok(VBVariant::Empty)
     }));
-    registry.insert(builtin!("kill", 1, 1, |args| {
-        filefn::kill::kill(args[0].clone())?;
+    registry.insert(typed_builtin!("kill", 1, 1, (pathname: variant), {
+        kill(pathname)?;
         Ok(VBVariant::Empty)
     }));
-    registry.insert(builtin!("filecopy", 2, 2, |args| {
-        filefn::filecopy::file_copy(args[0].clone(), args[1].clone())?;
+    registry.insert(typed_builtin!("filecopy", 2, 2,
+        (source: variant, destination: variant), {
+        file_copy(source, destination)?;
         Ok(VBVariant::Empty)
     }));
-    registry.insert(builtin!("name", 2, 2, |args| {
-        filefn::name::name_statement(args[0].clone(), args[1].clone())?;
+    registry.insert(typed_builtin!("name", 2, 2,
+        (old_pathname: variant, new_pathname: variant), {
+        name_statement(old_pathname, new_pathname)?;
         Ok(VBVariant::Empty)
     }));
-    registry.insert(builtin!("mkdir", 1, 1, |args| {
-        filefn::mkdir::mkdir(args[0].clone())?;
+    registry.insert(typed_builtin!("mkdir", 1, 1, (path: variant), {
+        mkdir(path)?;
         Ok(VBVariant::Empty)
     }));
-    registry.insert(builtin!("rmdir", 1, 1, |args| {
-        filefn::rmdir::rmdir(args[0].clone())?;
+    registry.insert(typed_builtin!("rmdir", 1, 1, (path: variant), {
+        rmdir(path)?;
         Ok(VBVariant::Empty)
     }));
-    registry.insert(builtin!("chdir", 1, 1, |args| {
-        filefn::ch_dir::chdir(args[0].clone())?;
+    registry.insert(typed_builtin!("chdir", 1, 1, (path: variant), {
+        chdir(path)?;
         Ok(VBVariant::Empty)
     }));
-    registry.insert(builtin!("chdrive", 1, 1, |args| {
-        filefn::ch_drive::chdrive(args[0].clone())?;
+    registry.insert(typed_builtin!("chdrive", 1, 1, (drive: variant), {
+        chdrive(drive)?;
         Ok(VBVariant::Empty)
     }));
-    registry.insert(builtin!("input", 2, 2, |args| {
-        let number = args[0]
-            .as_i32()
-            .map(vb6runtime::value::VBLong::from)
-            .map_err(|_| {
-                vb6core::error::VBError::with_description(
-                    vb6core::error::err_number::TYPE_MISMATCH,
-                    "Type mismatch in Input",
-                )
-            })?;
-        filefn::input::input(number, args[1].clone())
-    }));
+    registry.insert(typed_builtin!("input", 2, 2,
+        (number_chars: variant, file_number: variant),
+        input(number_chars, file_number)));
 }

@@ -643,16 +643,17 @@ use crate::value::{VBInteger, VBVariant};
 /// # Returns
 ///
 /// Returns the next available file number, or 0 if no files are available.
-pub fn free_file(range: VBVariant) -> VBResult<VBInteger> {
-    // Convert range to integer, default to 0
+pub fn free_file(range: Option<&VBVariant>) -> VBResult<VBInteger> {
+    // Convert range to integer; an omitted argument acts as `Empty`, and
+    // both mean the default range 0.
     let range_num = match range {
-        VBVariant::Empty | VBVariant::Null => 0,
-        VBVariant::Long(v) => v,
-        VBVariant::Integer(v) => v as i32,
-        VBVariant::Byte(v) => v as i32,
-        VBVariant::Double(v) => v as i32,
-        VBVariant::Single(v) => v as i32,
-        _ => {
+        None | Some(VBVariant::Empty) | Some(VBVariant::Null) => 0,
+        Some(VBVariant::Long(v)) => *v,
+        Some(VBVariant::Integer(v)) => *v as i32,
+        Some(VBVariant::Byte(v)) => *v as i32,
+        Some(VBVariant::Double(v)) => *v as i32,
+        Some(VBVariant::Single(v)) => *v as i32,
+        Some(_) => {
             return Err(VBError::with_description(
                 13, // Type mismatch
                 "Type mismatch in FreeFile",
@@ -683,7 +684,7 @@ mod tests {
         let _guard = crate::state::test_support::lock_test();
         let _ = file::close_all_files();
 
-        assert_eq!(free_file(VBVariant::Empty).unwrap().as_i16(), 1);
+        assert_eq!(free_file(None).unwrap().as_i16(), 1);
 
         let dir = tempfile::tempdir().unwrap();
         file::set_root(dir.path());
@@ -699,7 +700,7 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(free_file(VBVariant::Empty).unwrap().as_i16(), 2);
+        assert_eq!(free_file(None).unwrap().as_i16(), 2);
 
         let _ = file::close_all_files();
     }
@@ -709,7 +710,7 @@ mod tests {
         let _guard = crate::state::test_support::lock_test();
         let _ = file::close_all_files();
 
-        assert_eq!(free_file(VBVariant::Long(1)).unwrap().as_i16(), 256);
+        assert_eq!(free_file(Some(&VBVariant::Long(1))).unwrap().as_i16(), 256);
 
         let dir = tempfile::tempdir().unwrap();
         file::set_root(dir.path());
@@ -725,7 +726,7 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(free_file(VBVariant::Long(1)).unwrap().as_i16(), 257);
+        assert_eq!(free_file(Some(&VBVariant::Long(1))).unwrap().as_i16(), 257);
 
         let _ = file::close_all_files();
     }
@@ -734,7 +735,7 @@ mod tests {
     fn free_file_rejects_invalid_range() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = free_file(VBVariant::Long(2));
+        let result = free_file(Some(&VBVariant::Long(2)));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,

@@ -639,12 +639,12 @@ use crate::value::{VBLong, VBVariant};
 /// # Returns
 ///
 /// Returns the current position (1-based), or 0 if the file is not open.
-pub fn loc(file_number: VBVariant) -> VBResult<VBLong> {
+pub fn loc(file_number: &VBVariant) -> VBResult<VBLong> {
     // Convert file number to integer
     let file_num = match file_number {
-        VBVariant::Long(v) => v as i16,
-        VBVariant::Integer(v) => v,
-        VBVariant::Byte(v) => v as i16,
+        VBVariant::Long(v) => *v as i16,
+        VBVariant::Integer(v) => *v,
+        VBVariant::Byte(v) => *v as i16,
         _ => {
             return Err(VBError::with_description(
                 13, // Type mismatch
@@ -708,7 +708,7 @@ mod tests {
         file::write_file(1, b"Hello").unwrap();
 
         // Check LOC
-        let pos = loc(VBVariant::Long(1)).unwrap();
+        let pos = loc(&VBVariant::Long(1)).unwrap();
         assert_eq!(pos.as_i32(), 6); // After writing 5 bytes, position is 6
 
         let _ = file::close_all_files();
@@ -733,7 +733,7 @@ mod tests {
         )
         .unwrap();
 
-        let pos = loc(VBVariant::Long(1)).unwrap();
+        let pos = loc(&VBVariant::Long(1)).unwrap();
         assert_eq!(pos.as_i32(), 1); // Position 1 is the start
 
         let _ = file::close_all_files();
@@ -743,14 +743,14 @@ mod tests {
     fn loc_rejects_invalid_file_number() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = loc(VBVariant::Long(0));
+        let result = loc(&VBVariant::Long(0));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,
             err_number::BAD_FILE_NAME_OR_NUMBER
         );
 
-        let result = loc(VBVariant::Long(512));
+        let result = loc(&VBVariant::Long(512));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,
@@ -765,7 +765,7 @@ mod tests {
         let _guard = crate::state::test_support::lock_test();
         let _ = file::close_all_files();
 
-        let result = loc(VBVariant::Long(1));
+        let result = loc(&VBVariant::Long(1));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,

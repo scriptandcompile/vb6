@@ -844,7 +844,7 @@ use crate::value::{VBLong, VBVariant};
 /// # Returns
 ///
 /// Returns the file length in bytes, or 0 if the file doesn't exist.
-pub fn file_len(pathname: VBVariant) -> VBResult<VBLong> {
+pub fn file_len(pathname: &VBVariant) -> VBResult<VBLong> {
     // Get the file path
     let path_str = match pathname {
         VBVariant::String(s) => s.as_str().to_string(),
@@ -878,7 +878,7 @@ mod tests {
         // Create a file with known content
         std::fs::write(dir.path().join("test.txt"), "Hello, World!").unwrap();
 
-        let len = file_len(VBVariant::from_string("test.txt")).unwrap();
+        let len = file_len(&VBVariant::from_string("test.txt")).unwrap();
         assert_eq!(len.as_i32(), 13);
     }
 
@@ -889,7 +889,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         file::set_root(dir.path());
 
-        let len = file_len(VBVariant::from_string("nonexistent.txt")).unwrap();
+        let len = file_len(&VBVariant::from_string("nonexistent.txt")).unwrap();
         assert_eq!(len.as_i32(), 0);
     }
 
@@ -897,7 +897,7 @@ mod tests {
     fn file_len_rejects_non_string() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = file_len(VBVariant::Long(42));
+        let result = file_len(&VBVariant::Long(42));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }

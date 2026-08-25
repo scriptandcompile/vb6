@@ -63,7 +63,7 @@ use vb6core::error::err_number;
 /// # Returns
 ///
 /// Returns `Ok(())` on success, or `Err(VBError)` on failure.
-pub fn name_statement(old_pathname: VBVariant, new_pathname: VBVariant) -> VBResult<()> {
+pub fn name_statement(old_pathname: &VBVariant, new_pathname: &VBVariant) -> VBResult<()> {
     // Get old path
     let old_str = match old_pathname {
         VBVariant::String(s) => s.as_str().to_string(),
@@ -139,8 +139,8 @@ mod tests {
 
         // Rename it
         name_statement(
-            VBVariant::from_string("old.txt"),
-            VBVariant::from_string("new.txt"),
+            &VBVariant::from_string("old.txt"),
+            &VBVariant::from_string("new.txt"),
         )
         .unwrap();
 
@@ -159,8 +159,8 @@ mod tests {
         file::set_root(dir.path());
 
         let result = name_statement(
-            VBVariant::from_string("nonexistent.txt"),
-            VBVariant::from_string("new.txt"),
+            &VBVariant::from_string("nonexistent.txt"),
+            &VBVariant::from_string("new.txt"),
         );
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
@@ -177,8 +177,8 @@ mod tests {
         std::fs::write(dir.path().join("new.txt"), "World").unwrap();
 
         let result = name_statement(
-            VBVariant::from_string("old.txt"),
-            VBVariant::from_string("new.txt"),
+            &VBVariant::from_string("old.txt"),
+            &VBVariant::from_string("new.txt"),
         );
         assert!(result.is_err());
         assert_eq!(
@@ -191,11 +191,11 @@ mod tests {
     fn name_rejects_non_string() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = name_statement(VBVariant::Long(42), VBVariant::from_string("new.txt"));
+        let result = name_statement(&VBVariant::Long(42), &VBVariant::from_string("new.txt"));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
 
-        let result = name_statement(VBVariant::from_string("old.txt"), VBVariant::Long(42));
+        let result = name_statement(&VBVariant::from_string("old.txt"), &VBVariant::Long(42));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }

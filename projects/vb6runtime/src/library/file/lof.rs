@@ -700,12 +700,12 @@ use crate::value::{VBLong, VBVariant};
 /// # Returns
 ///
 /// Returns the file length in bytes, or 0 if the file is not open.
-pub fn lof(file_number: VBVariant) -> VBResult<VBLong> {
+pub fn lof(file_number: &VBVariant) -> VBResult<VBLong> {
     // Convert file number to integer
     let file_num = match file_number {
-        VBVariant::Long(v) => v as i16,
-        VBVariant::Integer(v) => v,
-        VBVariant::Byte(v) => v as i16,
+        VBVariant::Long(v) => *v as i16,
+        VBVariant::Integer(v) => *v,
+        VBVariant::Byte(v) => *v as i16,
         _ => {
             return Err(VBError::with_description(
                 13, // Type mismatch
@@ -769,7 +769,7 @@ mod tests {
         file::write_file(1, b"Hello, World!").unwrap();
 
         // Check LOF
-        let len = lof(VBVariant::Long(1)).unwrap();
+        let len = lof(&VBVariant::Long(1)).unwrap();
         assert_eq!(len.as_i32(), 13);
 
         let _ = file::close_all_files();
@@ -794,7 +794,7 @@ mod tests {
         )
         .unwrap();
 
-        let len = lof(VBVariant::Long(1)).unwrap();
+        let len = lof(&VBVariant::Long(1)).unwrap();
         assert_eq!(len.as_i32(), 0);
 
         let _ = file::close_all_files();
@@ -804,14 +804,14 @@ mod tests {
     fn lof_rejects_invalid_file_number() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = lof(VBVariant::Long(0));
+        let result = lof(&VBVariant::Long(0));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,
             err_number::BAD_FILE_NAME_OR_NUMBER
         );
 
-        let result = lof(VBVariant::Long(512));
+        let result = lof(&VBVariant::Long(512));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,
@@ -826,7 +826,7 @@ mod tests {
         let _guard = crate::state::test_support::lock_test();
         let _ = file::close_all_files();
 
-        let result = lof(VBVariant::Long(1));
+        let result = lof(&VBVariant::Long(1));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,

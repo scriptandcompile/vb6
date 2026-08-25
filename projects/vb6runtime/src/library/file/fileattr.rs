@@ -788,12 +788,12 @@ use vb6core::error::err_number;
 /// # Returns
 ///
 /// Returns the file mode or OS handle.
-pub fn fileattr(file_number: VBVariant, return_type: VBVariant) -> VBResult<VBLong> {
+pub fn fileattr(file_number: &VBVariant, return_type: &VBVariant) -> VBResult<VBLong> {
     // Convert file number to integer
     let file_num = match file_number {
-        VBVariant::Long(v) => v as i16,
-        VBVariant::Integer(v) => v,
-        VBVariant::Byte(v) => v as i16,
+        VBVariant::Long(v) => *v as i16,
+        VBVariant::Integer(v) => *v,
+        VBVariant::Byte(v) => *v as i16,
         _ => {
             return Err(VBError::with_description(
                 13, // Type mismatch
@@ -804,9 +804,9 @@ pub fn fileattr(file_number: VBVariant, return_type: VBVariant) -> VBResult<VBLo
 
     // Convert return type to integer
     let ret_type = match return_type {
-        VBVariant::Long(v) => v,
-        VBVariant::Integer(v) => v as i32,
-        VBVariant::Byte(v) => v as i32,
+        VBVariant::Long(v) => *v,
+        VBVariant::Integer(v) => *v as i32,
+        VBVariant::Byte(v) => *v as i32,
         _ => {
             return Err(VBError::with_description(
                 13, // Type mismatch
@@ -885,7 +885,7 @@ mod tests {
         )
         .unwrap();
 
-        let mode = fileattr(VBVariant::Long(1), VBVariant::Long(1)).unwrap();
+        let mode = fileattr(&VBVariant::Long(1), &VBVariant::Long(1)).unwrap();
         assert_eq!(mode.as_i32(), 2); // Output mode
 
         let _ = file::close_all_files();
@@ -895,7 +895,7 @@ mod tests {
     fn fileattr_rejects_invalid_file_number() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = fileattr(VBVariant::Long(0), VBVariant::Long(1));
+        let result = fileattr(&VBVariant::Long(0), &VBVariant::Long(1));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,
@@ -910,7 +910,7 @@ mod tests {
         let _guard = crate::state::test_support::lock_test();
         let _ = file::close_all_files();
 
-        let result = fileattr(VBVariant::Long(1), VBVariant::Long(1));
+        let result = fileattr(&VBVariant::Long(1), &VBVariant::Long(1));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,
@@ -939,7 +939,7 @@ mod tests {
         )
         .unwrap();
 
-        let result = fileattr(VBVariant::Long(1), VBVariant::Long(3));
+        let result = fileattr(&VBVariant::Long(1), &VBVariant::Long(3));
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().number,

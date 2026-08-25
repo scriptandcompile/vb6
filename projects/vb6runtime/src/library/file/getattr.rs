@@ -818,7 +818,7 @@ pub const VB_ARCHIVE: i16 = 32;
 /// # Returns
 ///
 /// Returns the file attributes as an integer.
-pub fn getattr(pathname: VBVariant) -> VBResult<VBInteger> {
+pub fn getattr(pathname: &VBVariant) -> VBResult<VBInteger> {
     // Get the file path
     let path_str = match pathname {
         VBVariant::String(s) => s.as_str().to_string(),
@@ -860,7 +860,7 @@ mod tests {
         // Create a file
         std::fs::write(dir.path().join("test.txt"), "Hello").unwrap();
 
-        let attrs = getattr(VBVariant::from_string("test.txt")).unwrap();
+        let attrs = getattr(&VBVariant::from_string("test.txt")).unwrap();
         assert_eq!(attrs.as_i16() & VB_DIRECTORY, 0);
     }
 
@@ -874,7 +874,7 @@ mod tests {
         // Create directory
         std::fs::create_dir(dir.path().join("testdir")).unwrap();
 
-        let attrs = getattr(VBVariant::from_string("testdir")).unwrap();
+        let attrs = getattr(&VBVariant::from_string("testdir")).unwrap();
         assert_ne!(attrs.as_i16() & VB_DIRECTORY, 0);
     }
 
@@ -885,7 +885,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         file::set_root(dir.path());
 
-        let result = getattr(VBVariant::from_string("nonexistent.txt"));
+        let result = getattr(&VBVariant::from_string("nonexistent.txt"));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
     }
@@ -894,7 +894,7 @@ mod tests {
     fn getattr_rejects_non_string() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = getattr(VBVariant::Long(42));
+        let result = getattr(&VBVariant::Long(42));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }

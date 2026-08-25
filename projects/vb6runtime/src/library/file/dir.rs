@@ -724,8 +724,16 @@ use std::path::Path;
 ///
 /// The `Dir` function is used to retrieve file and directory names that match a pattern.
 /// It's commonly used to iterate through files in a directory or to check if a file exists.
-pub fn dir(pathname: VBVariant, attributes: i16) -> VBResult<VBVariant> {
-    let pathname_str = match pathname {
+pub fn dir(pathname: Option<&VBVariant>, attributes: Option<&VBVariant>) -> VBResult<VBVariant> {
+    // An omitted path acts as `Empty`, and an omitted or unconvertible
+    // attribute mask falls back to 0 (no filtering) — the historical
+    // adapter behavior, now owned by the body.
+    let attributes = attributes
+        .and_then(|value| value.as_i32().ok())
+        .map(|number| number as i16)
+        .unwrap_or(0);
+    let empty = VBVariant::Empty;
+    let pathname_str = match pathname.unwrap_or(&empty) {
         VBVariant::String(s) => s.as_str().to_string(),
         _ => {
             return Err(VBError::with_description(

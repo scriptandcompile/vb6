@@ -46,6 +46,32 @@ OVERRIDES = {
     ("resources", "loadresdata"): ("variant-input", "raises 326"),
     ("resources", "loadrespicture"): ("variant-input", "raises 326"),
     ("resources", "loadresstring"): ("variant-input", "raises 326"),
+    # The file functions keep strict raw-Variant semantics: path parameters
+    # accept only actual strings, file-number parameters only Byte/Integer/
+    # Long; anything else (Null included) reports 13 naming the function.
+    # FreeFile's Null acts as the omitted argument instead, and Dir's
+    # attribute mask silently falls back to 0 when unconvertible.
+    ("file", "dir"): ("variant-input", "raises 13"),
+    ("file", "freefile"): ("variant-input", "Null acts as omitted"),
+    ("file", "eof"): ("variant-input", "raises 13"),
+    ("file", "lof"): ("variant-input", "raises 13"),
+    ("file", "loc"): ("variant-input", "raises 13"),
+    ("file", "seek"): ("variant-input", "raises 13"),
+    ("file", "filelen"): ("variant-input", "raises 13"),
+    ("file", "fileattr"): ("variant-input", "raises 13"),
+    ("file", "filedatetime"): ("variant-input", "raises 13"),
+    ("file", "curdir"): ("variant-input", "raises 13"),
+    ("file", "curdir$"): ("variant-input", "raises 13"),
+    ("file", "getattr"): ("variant-input", "raises 13"),
+    ("file", "setattr"): ("variant-input", "raises 13"),
+    ("file", "kill"): ("variant-input", "raises 13"),
+    ("file", "filecopy"): ("variant-input", "raises 13"),
+    ("file", "name"): ("variant-input", "raises 13"),
+    ("file", "mkdir"): ("variant-input", "raises 13"),
+    ("file", "rmdir"): ("variant-input", "raises 13"),
+    ("file", "chdir"): ("variant-input", "raises 13"),
+    ("file", "chdrive"): ("variant-input", "raises 13"),
+    ("file", "input"): ("variant-input", "raises 13"),
 }
 
 # Entries whose dispatch adapter propagates Null without a `propstring`

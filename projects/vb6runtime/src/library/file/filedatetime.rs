@@ -857,7 +857,7 @@ use crate::value::VBVariant;
 /// # Returns
 ///
 /// Returns a date serial value.
-pub fn file_datetime(pathname: VBVariant) -> VBResult<VBVariant> {
+pub fn file_datetime(pathname: &VBVariant) -> VBResult<VBVariant> {
     // Get the file path
     let path_str = match pathname {
         VBVariant::String(s) => s.as_str().to_string(),
@@ -918,7 +918,7 @@ mod tests {
         // Create a file
         std::fs::write(dir.path().join("test.txt"), "Hello").unwrap();
 
-        let result = file_datetime(VBVariant::from_string("test.txt"));
+        let result = file_datetime(&VBVariant::from_string("test.txt"));
         assert!(result.is_ok());
 
         // The result should be a date serial (a positive number)
@@ -936,7 +936,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         file::set_root(dir.path());
 
-        let result = file_datetime(VBVariant::from_string("nonexistent.txt"));
+        let result = file_datetime(&VBVariant::from_string("nonexistent.txt"));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
     }
@@ -945,7 +945,7 @@ mod tests {
     fn file_datetime_rejects_non_string() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = file_datetime(VBVariant::Long(42));
+        let result = file_datetime(&VBVariant::Long(42));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }

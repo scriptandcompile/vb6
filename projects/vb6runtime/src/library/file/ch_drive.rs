@@ -35,7 +35,7 @@ use vb6core::error::err_number;
 /// # Returns
 ///
 /// Returns `Ok(())` on success, or `Err(VBError)` on failure.
-pub fn chdrive(drive: VBVariant) -> VBResult<()> {
+pub fn chdrive(drive: &VBVariant) -> VBResult<()> {
     let drive_char = match drive {
         VBVariant::String(s) => {
             let s = s.as_str();
@@ -86,7 +86,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         file::set_root(dir.path());
 
-        chdrive(VBVariant::from_string("D")).unwrap();
+        chdrive(&VBVariant::from_string("D")).unwrap();
 
         let result = file::current_dir_for_drive('D');
         assert!(result.is_ok());
@@ -96,7 +96,7 @@ mod tests {
     fn chdrive_rejects_non_string() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = chdrive(VBVariant::Long(42));
+        let result = chdrive(&VBVariant::Long(42));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }
@@ -108,6 +108,6 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         file::set_root(dir.path());
 
-        chdrive(VBVariant::from_string("")).unwrap();
+        chdrive(&VBVariant::from_string("")).unwrap();
     }
 }

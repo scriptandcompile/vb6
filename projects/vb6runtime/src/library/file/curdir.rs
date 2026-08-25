@@ -50,15 +50,17 @@ use vb6core::error::err_number;
 ///
 /// Returns `Ok(VBVariant::String(...))` with the current directory path,
 /// or `Err(VBError)` on failure.
-pub fn curdir(drive: VBVariant) -> VBResult<VBVariant> {
+pub fn curdir(drive: Option<&VBVariant>) -> VBResult<VBVariant> {
     let dir = resolve_curdir(drive)?;
     Ok(VBVariant::from_string(&dir))
 }
 
 /// Shared implementation for `CurDir` and `CurDir$`.
-pub(super) fn resolve_curdir(drive: VBVariant) -> VBResult<String> {
+pub(super) fn resolve_curdir(drive: Option<&VBVariant>) -> VBResult<String> {
     let drive_char: Option<char> = match drive {
-        VBVariant::String(s) => {
+        // An omitted argument acts as `Empty`: the current drive.
+        None | Some(VBVariant::Empty) => None,
+        Some(VBVariant::String(s)) => {
             let s = s.as_str().trim().to_string();
             if s.is_empty() {
                 None
@@ -74,8 +76,7 @@ pub(super) fn resolve_curdir(drive: VBVariant) -> VBResult<String> {
                 Some(first.to_ascii_uppercase())
             }
         }
-        VBVariant::Empty => None,
-        _ => {
+        Some(_) => {
             return Err(VBError::with_description(
                 err_number::TYPE_MISMATCH,
                 "Type mismatch in CurDir",
@@ -116,7 +117,7 @@ mod tests {
         file::set_root(dir.path());
         file::set_current_dir(dir.path()).unwrap();
 
-        let result = curdir(VBVariant::Empty).unwrap();
+        let result = curdir(None).unwrap();
         match result {
             VBVariant::String(s) => {
                 let s_str = s.as_str();
@@ -130,7 +131,7 @@ mod tests {
     fn curdir_rejects_non_string() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = curdir(VBVariant::Long(42));
+        let result = curdir(Some(&VBVariant::Long(42)));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }

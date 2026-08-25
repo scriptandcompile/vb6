@@ -40,7 +40,7 @@ use vb6core::error::err_number;
 /// # Returns
 ///
 /// Returns `Ok(())` on success, or `Err(VBError)` on failure.
-pub fn kill(pathname: VBVariant) -> VBResult<()> {
+pub fn kill(pathname: &VBVariant) -> VBResult<()> {
     // Get the file path
     let path_str = match pathname {
         VBVariant::String(s) => s.as_str().to_string(),
@@ -85,7 +85,7 @@ mod tests {
         assert!(dir.path().join("test.txt").exists());
 
         // Kill it
-        kill(VBVariant::from_string("test.txt")).unwrap();
+        kill(&VBVariant::from_string("test.txt")).unwrap();
         assert!(!dir.path().join("test.txt").exists());
     }
 
@@ -96,7 +96,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         file::set_root(dir.path());
 
-        let result = kill(VBVariant::from_string("nonexistent.txt"));
+        let result = kill(&VBVariant::from_string("nonexistent.txt"));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
     }
@@ -105,7 +105,7 @@ mod tests {
     fn kill_rejects_non_string() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = kill(VBVariant::Long(42));
+        let result = kill(&VBVariant::Long(42));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }

@@ -36,7 +36,7 @@ use vb6core::error::err_number;
 /// # Returns
 ///
 /// Returns `Ok(())` on success, or `Err(VBError)` on failure.
-pub fn chdir(path: VBVariant) -> VBResult<()> {
+pub fn chdir(path: &VBVariant) -> VBResult<()> {
     let path_str = match path {
         VBVariant::String(s) => s.as_str().to_string(),
         _ => {
@@ -93,7 +93,7 @@ mod tests {
         std::fs::create_dir(&subdir).unwrap();
         file::set_root(dir.path());
 
-        chdir(VBVariant::from_string("subdir")).unwrap();
+        chdir(&VBVariant::from_string("subdir")).unwrap();
 
         let cwd = file::current_dir().unwrap();
         assert_eq!(cwd, subdir);
@@ -106,7 +106,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         file::set_root(dir.path());
 
-        let result = chdir(VBVariant::from_string("nonexistent"));
+        let result = chdir(&VBVariant::from_string("nonexistent"));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::PATH_NOT_FOUND);
     }
@@ -115,7 +115,7 @@ mod tests {
     fn chdir_rejects_non_string() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = chdir(VBVariant::Long(42));
+        let result = chdir(&VBVariant::Long(42));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }

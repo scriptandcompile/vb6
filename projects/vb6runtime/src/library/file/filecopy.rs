@@ -42,7 +42,7 @@ use vb6core::error::err_number;
 /// # Returns
 ///
 /// Returns `Ok(())` on success, or `Err(VBError)` on failure.
-pub fn file_copy(source: VBVariant, destination: VBVariant) -> VBResult<()> {
+pub fn file_copy(source: &VBVariant, destination: &VBVariant) -> VBResult<()> {
     // Get source path
     let source_str = match source {
         VBVariant::String(s) => s.as_str().to_string(),
@@ -102,8 +102,8 @@ mod tests {
 
         // Copy it
         file_copy(
-            VBVariant::from_string("source.txt"),
-            VBVariant::from_string("dest.txt"),
+            &VBVariant::from_string("source.txt"),
+            &VBVariant::from_string("dest.txt"),
         )
         .unwrap();
 
@@ -126,8 +126,8 @@ mod tests {
 
         // Copy
         file_copy(
-            VBVariant::from_string("source.txt"),
-            VBVariant::from_string("dest.txt"),
+            &VBVariant::from_string("source.txt"),
+            &VBVariant::from_string("dest.txt"),
         )
         .unwrap();
 
@@ -144,8 +144,8 @@ mod tests {
         file::set_root(dir.path());
 
         let result = file_copy(
-            VBVariant::from_string("nonexistent.txt"),
-            VBVariant::from_string("dest.txt"),
+            &VBVariant::from_string("nonexistent.txt"),
+            &VBVariant::from_string("dest.txt"),
         );
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
@@ -155,11 +155,11 @@ mod tests {
     fn file_copy_rejects_non_string() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = file_copy(VBVariant::Long(42), VBVariant::from_string("dest.txt"));
+        let result = file_copy(&VBVariant::Long(42), &VBVariant::from_string("dest.txt"));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
 
-        let result = file_copy(VBVariant::from_string("source.txt"), VBVariant::Long(42));
+        let result = file_copy(&VBVariant::from_string("source.txt"), &VBVariant::Long(42));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }

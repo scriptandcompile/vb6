@@ -227,7 +227,7 @@ use vb6core::error::err_number;
 /// # Returns
 ///
 /// Returns `Ok(())` on success, or `Err(VBError)` on failure.
-pub fn setattr(pathname: VBVariant, attributes: VBVariant) -> VBResult<()> {
+pub fn setattr(pathname: &VBVariant, attributes: &VBVariant) -> VBResult<()> {
     // Get the file path
     let path_str = match pathname {
         VBVariant::String(s) => s.as_str().to_string(),
@@ -241,9 +241,9 @@ pub fn setattr(pathname: VBVariant, attributes: VBVariant) -> VBResult<()> {
 
     // Get attributes
     let attrs = match attributes {
-        VBVariant::Long(v) => v as i16,
-        VBVariant::Integer(v) => v,
-        VBVariant::Byte(v) => v as i16,
+        VBVariant::Long(v) => *v as i16,
+        VBVariant::Integer(v) => *v,
+        VBVariant::Byte(v) => *v as i16,
         _ => {
             return Err(VBError::with_description(
                 13, // Type mismatch
@@ -284,7 +284,7 @@ mod tests {
         std::fs::write(dir.path().join("test.txt"), "Hello").unwrap();
 
         // Set readonly (VB_READ_ONLY = 1)
-        setattr(VBVariant::from_string("test.txt"), VBVariant::Long(1)).unwrap();
+        setattr(&VBVariant::from_string("test.txt"), &VBVariant::Long(1)).unwrap();
 
         // Verify
         let metadata = std::fs::metadata(dir.path().join("test.txt")).unwrap();
@@ -299,8 +299,8 @@ mod tests {
         file::set_root(dir.path());
 
         let result = setattr(
-            VBVariant::from_string("nonexistent.txt"),
-            VBVariant::Long(0),
+            &VBVariant::from_string("nonexistent.txt"),
+            &VBVariant::Long(0),
         );
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::FILE_NOT_FOUND);
@@ -310,7 +310,7 @@ mod tests {
     fn setattr_rejects_non_string_path() {
         let _guard = crate::state::test_support::lock_test();
 
-        let result = setattr(VBVariant::Long(42), VBVariant::Long(0));
+        let result = setattr(&VBVariant::Long(42), &VBVariant::Long(0));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
     }
@@ -325,8 +325,8 @@ mod tests {
         std::fs::write(dir.path().join("test.txt"), "Hello").unwrap();
 
         let result = setattr(
-            VBVariant::from_string("test.txt"),
-            VBVariant::from_string("invalid"),
+            &VBVariant::from_string("test.txt"),
+            &VBVariant::from_string("invalid"),
         );
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().number, err_number::TYPE_MISMATCH);
