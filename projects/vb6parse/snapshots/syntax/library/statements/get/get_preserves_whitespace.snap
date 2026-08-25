@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/get.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/get.rs
 expression: tree
 ---
 root:
@@ -13,10 +13,12 @@ root:
           text: Get
         - kind: Whitespace
           text: "    "
-        - kind: Octothorpe
-          text: "#"
-        - kind: IntegerLiteral
-          text: "1"
+        - kind: IdentifierExpression
+          children:
+            - kind: Octothorpe
+              text: "#"
+            - kind: IntegerLiteral
+              text: "1"
         - kind: Whitespace
           text: "  "
         - kind: Comma
@@ -27,9 +29,15 @@ root:
           text: ","
         - kind: Whitespace
           text: "  "
-        - kind: Identifier
-          text: myVar
-        - kind: Whitespace
-          text: "    "
-        - kind: Newline
-          text: "\n"
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: myVar
+            - kind: Whitespace
+              text: "    "
+    - kind: Newline
+      text: "\n"

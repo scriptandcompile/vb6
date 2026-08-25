@@ -2129,24 +2129,34 @@ cst:
                             text: Get
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: RData
-                          - kind: Newline
-                            text: "\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: RData
+                      - kind: Newline
+                        text: "\n"
                       - kind: CloseStatement
                         children:
                           - kind: Whitespace
@@ -3871,24 +3881,34 @@ cst:
                     text: Get
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: RData
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: RData
+              - kind: Newline
+                text: "\n"
               - kind: CloseStatement
                 children:
                   - kind: Whitespace
@@ -4985,24 +5005,34 @@ cst:
                     text: Get
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "3"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "3"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: HeaderA
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: HeaderA
+              - kind: Newline
+                text: "\n"
               - kind: ReDimStatement
                 children:
                   - kind: Whitespace
@@ -5047,36 +5077,50 @@ cst:
                     text: Get
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "3"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "3"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: HeaderA
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: FooterPos
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: HeaderA
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: FooterPos
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AdditionOperator
+                        text: +
+                      - kind: Whitespace
+                        text: " "
+                      - kind: NumericLiteralExpression
+                        children:
+                          - kind: IntegerLiteral
+                            text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: FooterB
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: FooterB
+              - kind: Newline
+                text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: AssignmentStatement
@@ -5869,42 +5913,64 @@ cst:
                             text: Get
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "3"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "3"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: FooterB
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: i
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: DataAddr
-                          - kind: Whitespace
-                            text: " "
-                          - kind: AdditionOperator
-                            text: +
-                          - kind: Whitespace
-                            text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: FooterB
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: i
+                                      - kind: RightParenthesis
+                                        text: )
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: DataAddr
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AdditionOperator
+                                text: +
+                              - kind: Whitespace
+                                text: " "
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: RData
-                          - kind: Newline
-                            text: "\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: RData
+                      - kind: Newline
+                        text: "\n"
                       - kind: Newline
                         text: "\n"
                       - kind: Whitespace
@@ -6875,10 +6941,12 @@ cst:
                                                 text: Get
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Octothorpe
-                                                text: "#"
-                                              - kind: IntegerLiteral
-                                                text: "4"
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Octothorpe
+                                                    text: "#"
+                                                  - kind: IntegerLiteral
+                                                    text: "4"
                                               - kind: Comma
                                                 text: ","
                                               - kind: Whitespace
@@ -6887,10 +6955,16 @@ cst:
                                                 text: ","
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: RData
-                                              - kind: Newline
-                                                text: "\n"
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: RData
+                                          - kind: Newline
+                                            text: "\n"
                                           - kind: CloseStatement
                                             children:
                                               - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/file/eof.rs
+source: projects/vb6parse/src/syntax/library/functions/file/eof.rs
 expression: tree
 ---
 root:
@@ -51,10 +51,12 @@ root:
                   text: Get
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: Identifier
-                  text: fileNum
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: Identifier
+                      text: fileNum
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
@@ -63,10 +65,16 @@ root:
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: record
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: record
+            - kind: Newline
+              text: "\n"
         - kind: LoopKeyword
           text: Loop
         - kind: Newline

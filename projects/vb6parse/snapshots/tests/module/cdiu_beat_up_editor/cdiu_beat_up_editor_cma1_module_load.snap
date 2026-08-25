@@ -5131,24 +5131,34 @@ cst:
                             text: Get
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: SongFile
-                          - kind: Newline
-                            text: "\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: SongFile
+                      - kind: Newline
+                        text: "\n"
                       - kind: CloseStatement
                         children:
                           - kind: Whitespace
@@ -6117,24 +6127,34 @@ cst:
                             text: Get
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: SigT
-                          - kind: Newline
-                            text: "\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: SigT
+                      - kind: Newline
+                        text: "\n"
                       - kind: IfStatement
                         children:
                           - kind: Whitespace
@@ -6175,10 +6195,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -6187,10 +6209,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: LenTPData
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: LenTPData
+                              - kind: Newline
+                                text: "\n"
                               - kind: ReDimStatement
                                 children:
                                   - kind: Whitespace
@@ -6257,10 +6285,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -6269,10 +6299,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: GData
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: GData
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "            "
                           - kind: EndKeyword
@@ -6469,24 +6505,34 @@ cst:
                             text: Get
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: SigT
-                          - kind: Newline
-                            text: "\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: SigT
+                      - kind: Newline
+                        text: "\n"
                       - kind: IfStatement
                         children:
                           - kind: Whitespace
@@ -6527,10 +6573,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -6539,10 +6587,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: LenTPData
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: LenTPData
+                              - kind: Newline
+                                text: "\n"
                               - kind: ReDimStatement
                                 children:
                                   - kind: Whitespace
@@ -6571,10 +6625,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -6583,10 +6639,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: SData
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: SData
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "            "
                           - kind: EndKeyword
@@ -6783,24 +6845,34 @@ cst:
                             text: Get
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: SigT2
-                          - kind: Newline
-                            text: "\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: SigT2
+                      - kind: Newline
+                        text: "\n"
                       - kind: IfStatement
                         children:
                           - kind: Whitespace
@@ -6841,10 +6913,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -6853,10 +6927,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: CurTime
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: CurTime
+                              - kind: Newline
+                                text: "\n"
                               - kind: GetStatement
                                 children:
                                   - kind: Whitespace
@@ -6865,10 +6945,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -6877,10 +6959,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: ShitTime
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: ShitTime
+                              - kind: Newline
+                                text: "\n"
                               - kind: GetStatement
                                 children:
                                   - kind: Whitespace
@@ -6889,10 +6977,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -6901,10 +6991,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: CurrPos
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: CurrPos
+                              - kind: Newline
+                                text: "\n"
                               - kind: GetStatement
                                 children:
                                   - kind: Whitespace
@@ -6913,10 +7009,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -6925,10 +7023,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: SetRx
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: SetRx
+                              - kind: Newline
+                                text: "\n"
                               - kind: GetStatement
                                 children:
                                   - kind: Whitespace
@@ -6937,10 +7041,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -6949,10 +7055,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Tmp
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Tmp
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "                "
                               - kind: AssignmentStatement
@@ -6995,10 +7107,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -7007,10 +7121,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "                "
                               - kind: AssignmentStatement
@@ -7079,10 +7199,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -7091,10 +7213,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "                "
                               - kind: AssignmentStatement
@@ -7163,10 +7291,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -7175,10 +7305,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "                "
                               - kind: AssignmentStatement
@@ -7247,10 +7383,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -7259,10 +7397,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "                "
                               - kind: AssignmentStatement
@@ -7331,10 +7475,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -7343,10 +7489,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "                "
                               - kind: AssignmentStatement
@@ -7415,10 +7567,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -7427,10 +7581,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "                "
                               - kind: EndOfLineComment
@@ -7449,10 +7609,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -7461,10 +7623,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -7681,10 +7849,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -7693,10 +7863,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -7869,10 +8045,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -7881,10 +8059,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: CBT2
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: CBT2
+                              - kind: Newline
+                                text: "\n"
                               - kind: GetStatement
                                 children:
                                   - kind: Whitespace
@@ -7893,10 +8077,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -7905,10 +8091,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Offset2
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: Offset2
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -8041,10 +8233,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -8053,10 +8247,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "                "
                               - kind: AssignmentStatement
@@ -8101,10 +8301,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -8113,10 +8315,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: ChooseBackGroundA
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: ChooseBackGroundA
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "                "
                               - kind: Newline
@@ -8129,10 +8337,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -8141,10 +8351,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -8361,10 +8577,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -8373,10 +8591,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -8593,10 +8817,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -8605,10 +8831,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -8825,10 +9057,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -8837,10 +9071,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -9057,10 +9297,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -9069,10 +9311,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -9289,10 +9537,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -9301,10 +9551,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -9521,10 +9777,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -9533,10 +9791,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -9753,10 +10017,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -9765,10 +10031,16 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RealName
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RealName
+                              - kind: Newline
+                                text: "\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -10633,24 +10905,34 @@ cst:
                     text: Get
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: SongFile
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: SongFile
+              - kind: Newline
+                text: "\n"
               - kind: CloseStatement
                 children:
                   - kind: Whitespace

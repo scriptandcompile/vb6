@@ -30509,10 +30509,12 @@ cst:
                                     text: Get
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: Identifier
-                                    text: i
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: i
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -30521,14 +30523,22 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: bIn
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Newline
-                                    text: "\r\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: CallExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: bIn
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: ArgumentList
+                                                children: []
+                                              - kind: RightParenthesis
+                                                text: )
+                              - kind: Newline
+                                text: "\r\n"
                               - kind: CloseStatement
                                 children:
                                   - kind: Whitespace

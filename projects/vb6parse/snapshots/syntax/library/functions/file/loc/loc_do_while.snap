@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/file/loc.rs
+source: projects/vb6parse/src/syntax/library/functions/file/loc.rs
 expression: tree
 ---
 root:
@@ -71,10 +71,12 @@ root:
                   text: Get
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
@@ -83,10 +85,16 @@ root:
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: data
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: data
+            - kind: Newline
+              text: "\n"
             - kind: Whitespace
               text: "            "
         - kind: LoopKeyword

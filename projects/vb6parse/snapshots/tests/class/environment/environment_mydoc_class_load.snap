@@ -76162,8 +76162,10 @@ cst:
                     text: Get
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: FNr
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: FNr
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -76172,10 +76174,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bom
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: bom
+              - kind: Newline
+                text: "\r\n"
               - kind: SelectCaseStatement
                 children:
                   - kind: Whitespace
@@ -76796,8 +76804,10 @@ cst:
                                 text: Get
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: FNr
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: FNr
                               - kind: Comma
                                 text: ","
                               - kind: Whitespace
@@ -76806,10 +76816,16 @@ cst:
                                 text: ","
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: BTmp
-                              - kind: Newline
-                                text: "\r\n"
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: BTmp
+                          - kind: Newline
+                            text: "\r\n"
                           - kind: IfStatement
                             children:
                               - kind: Whitespace
@@ -78170,26 +78186,38 @@ cst:
                                 text: Get
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: FNr
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: FNr
                               - kind: Comma
                                 text: ","
                               - kind: Whitespace
                                 text: " "
-                              - kind: IntegerLiteral
-                                text: "1"
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
                               - kind: Comma
                                 text: ","
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: buf
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: RightParenthesis
-                                text: )
-                              - kind: Newline
-                                text: "\r\n"
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: buf
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children: []
+                                          - kind: RightParenthesis
+                                            text: )
+                          - kind: Newline
+                            text: "\r\n"
                           - kind: Whitespace
                             text: "        "
                           - kind: CallStatement
@@ -93632,8 +93660,10 @@ cst:
                             text: Get
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: f
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: f
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
@@ -93642,10 +93672,16 @@ cst:
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: Buffer
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Buffer
+                      - kind: Newline
+                        text: "\r\n"
                   - kind: ElseIfClause
                     children:
                       - kind: ElseIfKeyword
@@ -93722,8 +93758,10 @@ cst:
                                 text: Get
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: f
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: f
                               - kind: Comma
                                 text: ","
                               - kind: Whitespace
@@ -93732,10 +93770,16 @@ cst:
                                 text: ","
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: Buffer
-                              - kind: Newline
-                                text: "\r\n"
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Buffer
+                          - kind: Newline
+                            text: "\r\n"
                   - kind: EndKeyword
                     text: End
                   - kind: Whitespace
