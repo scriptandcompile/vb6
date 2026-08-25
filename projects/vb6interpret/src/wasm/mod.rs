@@ -36,6 +36,12 @@ pub struct WasmRunError {
     pub line: Option<usize>,
     /// Executing procedure name, when known.
     pub procedure: Option<String>,
+    /// Zero-based parameter index that failed in a builtin call, when the
+    /// error originates from one.
+    pub param_index: Option<usize>,
+    /// Parameter name from the builtin declaration, when the error
+    /// originates from a builtin call.
+    pub param_name: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -114,6 +120,8 @@ fn parse_module(code: &str) -> Result<ModuleFile, WasmRunError> {
                 is_debug_pause: false,
                 line,
                 procedure: None,
+                param_index: None,
+                param_name: None,
             })
         }
     }
@@ -121,6 +129,8 @@ fn parse_module(code: &str) -> Result<ModuleFile, WasmRunError> {
 
 fn convert_run_error(error: RunError, code: &str, line_offset: usize) -> WasmRunError {
     let pretty_report = render_error_report("playground.bas", code, &error, line_offset);
+    let param_index = error.builtin_call.as_ref().map(|c| c.param_index);
+    let param_name = error.builtin_call.as_ref().map(|c| c.param_name.clone());
     WasmRunError {
         message: error.to_string(),
         pretty_report,
@@ -128,6 +138,8 @@ fn convert_run_error(error: RunError, code: &str, line_offset: usize) -> WasmRun
         is_debug_pause: error.is_debug_pause(),
         line: error.line,
         procedure: error.procedure,
+        param_index,
+        param_name,
     }
 }
 
