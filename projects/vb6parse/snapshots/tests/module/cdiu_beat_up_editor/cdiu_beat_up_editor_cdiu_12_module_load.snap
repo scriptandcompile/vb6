@@ -1673,24 +1673,34 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "3"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "3"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: HeaderA
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: HeaderA
+              - kind: Newline
+                text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: ForStatement
@@ -2633,10 +2643,12 @@ cst:
                             text: Put
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "3"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "3"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
@@ -2645,10 +2657,16 @@ cst:
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: RData
-                          - kind: Newline
-                            text: "\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: RData
+                      - kind: Newline
+                        text: "\n"
                       - kind: Whitespace
                         text: "    "
                       - kind: AssignmentStatement
@@ -2751,10 +2769,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "3"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "3"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -2763,34 +2783,50 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: FooterB
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: FooterB
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: PutKeyword
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "3"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "3"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: HeaderA
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: HeaderA
+              - kind: Newline
+                text: "\n"
               - kind: CloseStatement
                 children:
                   - kind: CloseKeyword
@@ -3545,24 +3581,34 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "3"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "3"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: HeaderA
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: HeaderA
+              - kind: Newline
+                text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: Whitespace
@@ -4357,10 +4403,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "3"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "3"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -4369,10 +4417,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: RData
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: RData
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -4471,10 +4525,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "3"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "3"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -4483,34 +4539,50 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: FooterB
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: FooterB
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: PutKeyword
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "3"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "3"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: HeaderA
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: HeaderA
+              - kind: Newline
+                text: "\n"
               - kind: CloseStatement
                 children:
                   - kind: CloseKeyword
@@ -6613,24 +6685,34 @@ cst:
                                     text: Put
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: IntegerLiteral
-                                    text: "2"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: IntegerLiteral
+                                        text: "2"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: IntegerLiteral
-                                    text: "1"
+                                  - kind: NumericLiteralExpression
+                                    children:
+                                      - kind: IntegerLiteral
+                                        text: "1"
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RData
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: RData
+                              - kind: Newline
+                                text: "\n"
                               - kind: CloseStatement
                                 children:
                                   - kind: Whitespace

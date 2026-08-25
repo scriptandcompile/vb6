@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/put.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/put.rs
 expression: tree
 ---
 root:
@@ -33,8 +33,10 @@ root:
                   text: Put
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: fileNum
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: fileNum
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
@@ -43,10 +45,16 @@ root:
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: buffer
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: buffer
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

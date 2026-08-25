@@ -14070,10 +14070,12 @@ cst:
                             text: Put
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: mf
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: Identifier
+                                text: mf
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
@@ -14082,14 +14084,22 @@ cst:
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: a
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: a
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children: []
+                                      - kind: RightParenthesis
+                                        text: )
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: CloseStatement
                         children:
                           - kind: Whitespace

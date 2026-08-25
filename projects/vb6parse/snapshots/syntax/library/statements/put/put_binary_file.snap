@@ -71,10 +71,12 @@ root:
                   text: Put
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
@@ -83,14 +85,22 @@ root:
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: byteArray
-                - kind: LeftParenthesis
-                  text: (
-                - kind: RightParenthesis
-                  text: )
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: byteArray
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children: []
+                            - kind: RightParenthesis
+                              text: )
+            - kind: Newline
+              text: "\n"
             - kind: CloseStatement
               children:
                 - kind: Whitespace

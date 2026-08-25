@@ -13305,24 +13305,34 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Data1
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Data1
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -13331,10 +13341,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -13343,114 +13355,184 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: StringLiteral
-                    text: "\"B;Y\""
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: CStr
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: YNumber
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\";X\""
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: CStr
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: XNumber
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\";D0 0 \""
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: CStr
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: YNumber
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\" \""
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: CStr
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: XNumber
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: vbCrLf
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: BinaryExpression
+                                children:
+                                  - kind: BinaryExpression
+                                    children:
+                                      - kind: BinaryExpression
+                                        children:
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: BinaryExpression
+                                                    children:
+                                                      - kind: BinaryExpression
+                                                        children:
+                                                          - kind: StringLiteralExpression
+                                                            children:
+                                                              - kind: StringLiteral
+                                                                text: "\"B;Y\""
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: AdditionOperator
+                                                            text: +
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: CallExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: CStr
+                                                              - kind: LeftParenthesis
+                                                                text: (
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: YNumber
+                                                              - kind: RightParenthesis
+                                                                text: )
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: AdditionOperator
+                                                        text: +
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: StringLiteralExpression
+                                                        children:
+                                                          - kind: StringLiteral
+                                                            text: "\";X\""
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: AdditionOperator
+                                                    text: +
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: CallExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: CStr
+                                                      - kind: LeftParenthesis
+                                                        text: (
+                                                      - kind: ArgumentList
+                                                        children:
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: XNumber
+                                                      - kind: RightParenthesis
+                                                        text: )
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: AdditionOperator
+                                                text: +
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\";D0 0 \""
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: AdditionOperator
+                                            text: +
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: CallExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: CStr
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: BinaryExpression
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: YNumber
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: SubtractionOperator
+                                                            text: "-"
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: IntegerLiteral
+                                                                text: "1"
+                                              - kind: RightParenthesis
+                                                text: )
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AdditionOperator
+                                        text: +
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: StringLiteralExpression
+                                        children:
+                                          - kind: StringLiteral
+                                            text: "\" \""
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: AdditionOperator
+                                    text: +
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: CStr
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: XNumber
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: SubtractionOperator
+                                                    text: "-"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "1"
+                                      - kind: RightParenthesis
+                                        text: )
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AdditionOperator
+                                text: +
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: vbCrLf
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -13459,10 +13541,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -13471,10 +13555,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Data2
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Data2
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: Newline
@@ -13855,10 +13945,12 @@ cst:
                                         text: Put
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: IntegerLiteral
-                                        text: "1"
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Octothorpe
+                                            text: "#"
+                                          - kind: IntegerLiteral
+                                            text: "1"
                                       - kind: Comma
                                         text: ","
                                       - kind: Whitespace
@@ -13867,106 +13959,170 @@ cst:
                                         text: ","
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: StringLiteral
-                                        text: "\"C;Y\""
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: AdditionOperator
-                                        text: +
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: CStr
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: Identifier
-                                        text: i
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: AdditionOperator
-                                        text: +
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: StartNumber
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: AdditionOperator
-                                        text: +
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: StringLiteral
-                                        text: "\";X\""
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: AdditionOperator
-                                        text: +
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: CStr
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: Identifier
-                                        text: u
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: AdditionOperator
-                                        text: +
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: StringLiteral
-                                        text: "\";K\""
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: AdditionOperator
-                                        text: +
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: NumberOrString
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: AdditionOperator
-                                        text: +
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: GData
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: Identifier
-                                        text: u
-                                      - kind: Comma
-                                        text: ","
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: i
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: AdditionOperator
-                                        text: +
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: NumberOrString
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: AdditionOperator
-                                        text: +
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: vbCrLf
-                                      - kind: Newline
-                                        text: "\n"
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: BinaryExpression
+                                                    children:
+                                                      - kind: BinaryExpression
+                                                        children:
+                                                          - kind: BinaryExpression
+                                                            children:
+                                                              - kind: BinaryExpression
+                                                                children:
+                                                                  - kind: BinaryExpression
+                                                                    children:
+                                                                      - kind: BinaryExpression
+                                                                        children:
+                                                                          - kind: BinaryExpression
+                                                                            children:
+                                                                              - kind: StringLiteralExpression
+                                                                                children:
+                                                                                  - kind: StringLiteral
+                                                                                    text: "\"C;Y\""
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: AdditionOperator
+                                                                                text: +
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: CallExpression
+                                                                                children:
+                                                                                  - kind: Identifier
+                                                                                    text: CStr
+                                                                                  - kind: LeftParenthesis
+                                                                                    text: (
+                                                                                  - kind: ArgumentList
+                                                                                    children:
+                                                                                      - kind: Argument
+                                                                                        children:
+                                                                                          - kind: BinaryExpression
+                                                                                            children:
+                                                                                              - kind: IdentifierExpression
+                                                                                                children:
+                                                                                                  - kind: Identifier
+                                                                                                    text: i
+                                                                                              - kind: Whitespace
+                                                                                                text: " "
+                                                                                              - kind: AdditionOperator
+                                                                                                text: +
+                                                                                              - kind: Whitespace
+                                                                                                text: " "
+                                                                                              - kind: IdentifierExpression
+                                                                                                children:
+                                                                                                  - kind: Identifier
+                                                                                                    text: StartNumber
+                                                                                  - kind: RightParenthesis
+                                                                                    text: )
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: AdditionOperator
+                                                                            text: +
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: StringLiteralExpression
+                                                                            children:
+                                                                              - kind: StringLiteral
+                                                                                text: "\";X\""
+                                                                      - kind: Whitespace
+                                                                        text: " "
+                                                                      - kind: AdditionOperator
+                                                                        text: +
+                                                                      - kind: Whitespace
+                                                                        text: " "
+                                                                      - kind: CallExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: CStr
+                                                                          - kind: LeftParenthesis
+                                                                            text: (
+                                                                          - kind: ArgumentList
+                                                                            children:
+                                                                              - kind: Argument
+                                                                                children:
+                                                                                  - kind: IdentifierExpression
+                                                                                    children:
+                                                                                      - kind: Identifier
+                                                                                        text: u
+                                                                          - kind: RightParenthesis
+                                                                            text: )
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: AdditionOperator
+                                                                    text: +
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: StringLiteralExpression
+                                                                    children:
+                                                                      - kind: StringLiteral
+                                                                        text: "\";K\""
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: AdditionOperator
+                                                                text: +
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: NumberOrString
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: AdditionOperator
+                                                            text: +
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: CallExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: GData
+                                                              - kind: LeftParenthesis
+                                                                text: (
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: u
+                                                                  - kind: Comma
+                                                                    text: ","
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: i
+                                                              - kind: RightParenthesis
+                                                                text: )
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: AdditionOperator
+                                                        text: +
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: NumberOrString
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: AdditionOperator
+                                                    text: +
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: vbCrLf
+                                  - kind: Newline
+                                    text: "\n"
                               - kind: Whitespace
                                 text: "                        "
                           - kind: NextKeyword
@@ -13999,10 +14155,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -14011,18 +14169,28 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: StringLiteral
-                    text: "\"E\""
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: vbCrLf
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: BinaryExpression
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"E\""
+                              - kind: Whitespace
+                                text: " "
+                              - kind: AdditionOperator
+                                text: +
+                              - kind: Whitespace
+                                text: " "
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: vbCrLf
+              - kind: Newline
+                text: "\n"
               - kind: CloseStatement
                 children:
                   - kind: Whitespace
@@ -18089,24 +18257,34 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: StringLiteral
-                    text: "\"KarMooBeatEditorFile\""
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: StringLiteralExpression
+                            children:
+                              - kind: StringLiteral
+                                text: "\"KarMooBeatEditorFile\""
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -18115,10 +18293,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -18127,22 +18307,40 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CLng
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: UBound
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: KData
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: CLng
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: UBound
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: KData
+                                          - kind: RightParenthesis
+                                            text: )
+                              - kind: RightParenthesis
+                                text: )
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -18151,10 +18349,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -18163,10 +18363,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: KData
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: KData
+              - kind: Newline
+                text: "\n"
               - kind: CloseStatement
                 children:
                   - kind: Whitespace
@@ -21609,10 +21815,12 @@ cst:
                             text: Put
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
@@ -21621,16 +21829,28 @@ cst:
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: TData
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: i
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Newline
-                            text: "\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: TData
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: i
+                                      - kind: RightParenthesis
+                                        text: )
+                      - kind: Newline
+                        text: "\n"
                       - kind: IfStatement
                         children:
                           - kind: Whitespace
@@ -21679,10 +21899,12 @@ cst:
                                 text: Put
                               - kind: Whitespace
                                 text: " "
-                              - kind: Octothorpe
-                                text: "#"
-                              - kind: IntegerLiteral
-                                text: "1"
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: IntegerLiteral
+                                    text: "1"
                               - kind: Comma
                                 text: ","
                               - kind: Whitespace
@@ -21691,10 +21913,16 @@ cst:
                                 text: ","
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: vbCrLf
-                              - kind: Newline
-                                text: "\n"
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: vbCrLf
+                          - kind: Newline
+                            text: "\n"
                       - kind: Whitespace
                         text: "            "
                   - kind: NextKeyword
@@ -23193,24 +23421,34 @@ cst:
                             text: Put
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: SongFile
-                          - kind: Newline
-                            text: "\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: SongFile
+                      - kind: Newline
+                        text: "\n"
                       - kind: CloseStatement
                         children:
                           - kind: Whitespace
@@ -23367,24 +23605,34 @@ cst:
                             text: Put
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "1"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "1"
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: RandomCode
-                          - kind: Newline
-                            text: "\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: RandomCode
+                      - kind: Newline
+                        text: "\n"
                       - kind: CloseStatement
                         children:
                           - kind: Whitespace
@@ -23493,24 +23741,34 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: StringLiteral
-                    text: "\"CdiuBeatEditorFileData\""
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: StringLiteralExpression
+                            children:
+                              - kind: StringLiteral
+                                text: "\"CdiuBeatEditorFileData\""
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -23519,10 +23777,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -23531,22 +23791,40 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CLng
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: UBound
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: GData
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: CLng
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: UBound
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: GData
+                                          - kind: RightParenthesis
+                                            text: )
+                              - kind: RightParenthesis
+                                text: )
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -23555,10 +23833,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -23567,10 +23847,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: GData
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: GData
+              - kind: Newline
+                text: "\n"
               - kind: CloseStatement
                 children:
                   - kind: Whitespace
@@ -23665,24 +23951,34 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: StringLiteral
-                    text: "\"CdiuBeatEditorFileSata\""
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: StringLiteralExpression
+                            children:
+                              - kind: StringLiteral
+                                text: "\"CdiuBeatEditorFileSata\""
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -23691,10 +23987,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -23703,22 +24001,40 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CLng
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: UBound
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: SData
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: CLng
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: UBound
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: SData
+                                          - kind: RightParenthesis
+                                            text: )
+                              - kind: RightParenthesis
+                                text: )
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -23727,10 +24043,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -23739,10 +24057,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: SData
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: SData
+              - kind: Newline
+                text: "\n"
               - kind: CloseStatement
                 children:
                   - kind: Whitespace
@@ -23837,24 +24161,34 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: StringLiteral
-                    text: "\"CdiuBeatEditorFileMata\""
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: StringLiteralExpression
+                            children:
+                              - kind: StringLiteral
+                                text: "\"CdiuBeatEditorFileMata\""
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -23863,10 +24197,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -23875,22 +24211,40 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CLng
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: UBound
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: MData
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: CLng
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: UBound
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: MData
+                                          - kind: RightParenthesis
+                                            text: )
+                              - kind: RightParenthesis
+                                text: )
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -23899,10 +24253,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -23911,10 +24267,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: MData
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: MData
+              - kind: Newline
+                text: "\n"
               - kind: CloseStatement
                 children:
                   - kind: Whitespace
@@ -24009,24 +24371,34 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: NumericLiteralExpression
+                    children:
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: StringLiteral
-                    text: "\"CdiuBeatEditorFileInfo\""
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: StringLiteralExpression
+                            children:
+                              - kind: StringLiteral
+                                text: "\"CdiuBeatEditorFileInfo\""
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -24035,10 +24407,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24047,10 +24421,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CurTime
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: CurTime
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -24059,10 +24439,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24071,10 +24453,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ShitTime
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ShitTime
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -24083,10 +24471,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24095,10 +24485,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CurrPos
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: CurrPos
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -24107,10 +24503,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24119,10 +24517,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: SetRx
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: SetRx
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -24131,10 +24535,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24143,24 +24549,38 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CLng
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: cmt
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Times
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: value
-                  - kind: RightParenthesis
-                    text: )
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: CLng
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: MemberAccessExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: cmt
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: Times
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: value
+                              - kind: RightParenthesis
+                                text: )
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24189,10 +24609,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24201,10 +24623,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24233,10 +24661,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24245,10 +24675,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24277,10 +24713,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24289,10 +24727,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24321,10 +24765,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24333,10 +24779,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24365,10 +24817,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24377,10 +24831,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24409,10 +24869,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24421,10 +24883,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24465,10 +24933,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24477,10 +24947,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24509,10 +24985,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24521,10 +24999,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -24533,10 +25017,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24545,10 +25031,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CBT
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: CBT
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -24557,10 +25049,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24569,10 +25063,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: OffSet
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: OffSet
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24601,10 +25101,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24613,10 +25115,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: PutStatement
                 children:
                   - kind: Whitespace
@@ -24625,10 +25133,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24637,10 +25147,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ChooseBackGround
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ChooseBackGround
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24681,10 +25197,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24693,10 +25211,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24737,10 +25261,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24749,10 +25275,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24793,10 +25325,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24805,10 +25339,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24849,10 +25389,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24861,10 +25403,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24905,10 +25453,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24917,10 +25467,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -24961,10 +25517,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -24973,10 +25531,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -25017,10 +25581,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -25029,10 +25595,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: Whitespace
                 text: "    "
               - kind: AssignmentStatement
@@ -25073,10 +25645,12 @@ cst:
                     text: Put
                   - kind: Whitespace
                     text: " "
-                  - kind: Octothorpe
-                    text: "#"
-                  - kind: IntegerLiteral
-                    text: "1"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Octothorpe
+                        text: "#"
+                      - kind: IntegerLiteral
+                        text: "1"
                   - kind: Comma
                     text: ","
                   - kind: Whitespace
@@ -25085,10 +25659,16 @@ cst:
                     text: ","
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Tmp
-                  - kind: Newline
-                    text: "\n"
+                  - kind: ArgumentList
+                    children:
+                      - kind: Argument
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Tmp
+              - kind: Newline
+                text: "\n"
               - kind: CloseStatement
                 children:
                   - kind: Whitespace

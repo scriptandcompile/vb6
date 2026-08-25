@@ -51186,10 +51186,12 @@ cst:
                             text: Put
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: mf
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: Identifier
+                                text: mf
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
@@ -51198,20 +51200,28 @@ cst:
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: ff
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: ff
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: PutStatement
                         children:
                           - kind: PutKeyword
                             text: Put
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: mf
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: Identifier
+                                text: mf
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
@@ -51220,14 +51230,20 @@ cst:
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: m_tBI
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: bmiHeader
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: m_tBI
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: bmiHeader
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: IfStatement
                         children:
                           - kind: IfKeyword
@@ -51310,10 +51326,12 @@ cst:
                                             text: Put
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Octothorpe
-                                            text: "#"
-                                          - kind: Identifier
-                                            text: mf
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Octothorpe
+                                                text: "#"
+                                              - kind: Identifier
+                                                text: mf
                                           - kind: Comma
                                             text: ","
                                           - kind: Whitespace
@@ -51322,20 +51340,34 @@ cst:
                                             text: ","
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: m_tBI
-                                          - kind: PeriodOperator
-                                            text: "."
-                                          - kind: Identifier
-                                            text: bmiColors
-                                          - kind: LeftParenthesis
-                                            text: (
-                                          - kind: Identifier
-                                            text: i
-                                          - kind: RightParenthesis
-                                            text: )
-                                          - kind: Newline
-                                            text: "\r\n"
+                                          - kind: ArgumentList
+                                            children:
+                                              - kind: Argument
+                                                children:
+                                                  - kind: CallExpression
+                                                    children:
+                                                      - kind: MemberAccessExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: m_tBI
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: bmiColors
+                                                      - kind: LeftParenthesis
+                                                        text: (
+                                                      - kind: ArgumentList
+                                                        children:
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: i
+                                                      - kind: RightParenthesis
+                                                        text: )
+                                      - kind: Newline
+                                        text: "\r\n"
                                   - kind: NextKeyword
                                     text: Next
                                   - kind: Whitespace
@@ -51358,10 +51390,12 @@ cst:
                             text: Put
                           - kind: Whitespace
                             text: " "
-                          - kind: Octothorpe
-                            text: "#"
-                          - kind: Identifier
-                            text: mf
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Octothorpe
+                                text: "#"
+                              - kind: Identifier
+                                text: mf
                           - kind: Comma
                             text: ","
                           - kind: Whitespace
@@ -51370,14 +51404,22 @@ cst:
                             text: ","
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: bDib
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ArgumentList
+                            children:
+                              - kind: Argument
+                                children:
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: bDib
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children: []
+                                      - kind: RightParenthesis
+                                        text: )
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: CloseStatement
                         children:
                           - kind: CloseKeyword

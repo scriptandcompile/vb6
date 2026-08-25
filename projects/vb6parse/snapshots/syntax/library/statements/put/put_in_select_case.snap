@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/put.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/put.rs
 expression: tree
 ---
 root:
@@ -65,10 +65,12 @@ root:
                               text: Put
                             - kind: Whitespace
                               text: " "
-                            - kind: Octothorpe
-                              text: "#"
-                            - kind: IntegerLiteral
-                              text: "1"
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Octothorpe
+                                  text: "#"
+                                - kind: IntegerLiteral
+                                  text: "1"
                             - kind: Comma
                               text: ","
                             - kind: Whitespace
@@ -77,10 +79,16 @@ root:
                               text: ","
                             - kind: Whitespace
                               text: " "
-                            - kind: Identifier
-                              text: type1Record
-                            - kind: Newline
-                              text: "\n"
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: type1Record
+                        - kind: Newline
+                          text: "\n"
                         - kind: Whitespace
                           text: "        "
                 - kind: CaseClause
@@ -103,10 +111,12 @@ root:
                               text: Put
                             - kind: Whitespace
                               text: " "
-                            - kind: Octothorpe
-                              text: "#"
-                            - kind: IntegerLiteral
-                              text: "1"
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Octothorpe
+                                  text: "#"
+                                - kind: IntegerLiteral
+                                  text: "1"
                             - kind: Comma
                               text: ","
                             - kind: Whitespace
@@ -115,10 +125,16 @@ root:
                               text: ","
                             - kind: Whitespace
                               text: " "
-                            - kind: Identifier
-                              text: type2Record
-                            - kind: Newline
-                              text: "\n"
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: type2Record
+                        - kind: Newline
+                          text: "\n"
                         - kind: Whitespace
                           text: "    "
                 - kind: EndKeyword

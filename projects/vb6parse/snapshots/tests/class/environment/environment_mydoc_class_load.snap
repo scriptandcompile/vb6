@@ -69748,10 +69748,12 @@ cst:
                                 text: Put
                               - kind: Whitespace
                                 text: " "
-                              - kind: Octothorpe
-                                text: "#"
-                              - kind: Identifier
-                                text: W
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Octothorpe
+                                    text: "#"
+                                  - kind: Identifier
+                                    text: W
                               - kind: Comma
                                 text: ","
                               - kind: Whitespace
@@ -69760,16 +69762,24 @@ cst:
                                 text: ","
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: a
-                              - kind: LeftParenthesis
-                                text: (
-                              - kind: RightParenthesis
-                                text: )
-                              - kind: Newline
-                                text: "\r\n"
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: a
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children: []
+                                          - kind: RightParenthesis
+                                            text: )
                           - kind: Newline
                             text: "\r\n"
+                      - kind: Newline
+                        text: "\r\n"
                   - kind: ElseIfClause
                     children:
                       - kind: ElseIfKeyword
@@ -69904,10 +69914,12 @@ cst:
                                     text: Put
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: Identifier
-                                    text: W
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: W
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -69916,14 +69928,22 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: a
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Newline
-                                    text: "\r\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: CallExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: a
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: ArgumentList
+                                                children: []
+                                              - kind: RightParenthesis
+                                                text: )
+                              - kind: Newline
+                                text: "\r\n"
                           - kind: AssignmentStatement
                             children:
                               - kind: IdentifierExpression
@@ -70044,10 +70064,12 @@ cst:
                                         text: Put
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: Identifier
-                                        text: W
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Octothorpe
+                                            text: "#"
+                                          - kind: Identifier
+                                            text: W
                                       - kind: Comma
                                         text: ","
                                       - kind: Whitespace
@@ -70056,16 +70078,28 @@ cst:
                                         text: ","
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: CByte
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: LongLiteral
-                                        text: "&HEF"
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Newline
-                                        text: "\r\n"
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: CByte
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: LongLiteral
+                                                                text: "&HEF"
+                                                  - kind: RightParenthesis
+                                                    text: )
+                                  - kind: Newline
+                                    text: "\r\n"
                                   - kind: PutStatement
                                     children:
                                       - kind: Whitespace
@@ -70074,10 +70108,12 @@ cst:
                                         text: Put
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: Identifier
-                                        text: W
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Octothorpe
+                                            text: "#"
+                                          - kind: Identifier
+                                            text: W
                                       - kind: Comma
                                         text: ","
                                       - kind: Whitespace
@@ -70086,16 +70122,28 @@ cst:
                                         text: ","
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: CByte
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: LongLiteral
-                                        text: "&HBB"
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Newline
-                                        text: "\r\n"
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: CByte
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: LongLiteral
+                                                                text: "&HBB"
+                                                  - kind: RightParenthesis
+                                                    text: )
+                                  - kind: Newline
+                                    text: "\r\n"
                                   - kind: PutStatement
                                     children:
                                       - kind: Whitespace
@@ -70104,10 +70152,12 @@ cst:
                                         text: Put
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: Identifier
-                                        text: W
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Octothorpe
+                                            text: "#"
+                                          - kind: Identifier
+                                            text: W
                                       - kind: Comma
                                         text: ","
                                       - kind: Whitespace
@@ -70116,16 +70166,28 @@ cst:
                                         text: ","
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: CByte
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: LongLiteral
-                                        text: "&HBF"
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Newline
-                                        text: "\r\n"
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: CByte
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: NumericLiteralExpression
+                                                            children:
+                                                              - kind: LongLiteral
+                                                                text: "&HBF"
+                                                  - kind: RightParenthesis
+                                                    text: )
+                                  - kind: Newline
+                                    text: "\r\n"
                                   - kind: Whitespace
                                     text: "        "
                               - kind: EndKeyword
@@ -70924,10 +70986,12 @@ cst:
                                                             text: Put
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: Octothorpe
-                                                            text: "#"
-                                                          - kind: Identifier
-                                                            text: W
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Octothorpe
+                                                                text: "#"
+                                                              - kind: Identifier
+                                                                text: W
                                                           - kind: Comma
                                                             text: ","
                                                           - kind: Whitespace
@@ -70936,14 +71000,22 @@ cst:
                                                             text: ","
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: Identifier
-                                                            text: bbBuf
-                                                          - kind: LeftParenthesis
-                                                            text: (
-                                                          - kind: RightParenthesis
-                                                            text: )
-                                                          - kind: Newline
-                                                            text: "\r\n"
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: CallExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: bbBuf
+                                                                      - kind: LeftParenthesis
+                                                                        text: (
+                                                                      - kind: ArgumentList
+                                                                        children: []
+                                                                      - kind: RightParenthesis
+                                                                        text: )
+                                                      - kind: Newline
+                                                        text: "\r\n"
                                                       - kind: Whitespace
                                                         text: "            "
                                                   - kind: EndKeyword
@@ -71212,10 +71284,12 @@ cst:
                                         text: Put
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: Identifier
-                                        text: W
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Octothorpe
+                                            text: "#"
+                                          - kind: Identifier
+                                            text: W
                                       - kind: Comma
                                         text: ","
                                       - kind: Whitespace
@@ -71224,42 +71298,72 @@ cst:
                                         text: ","
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Convert2Ansi
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: Identifier
-                                        text: textString
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: Identifier
-                                        text: LF
-                                      - kind: DollarSign
-                                        text: $
-                                      - kind: Comma
-                                        text: ","
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: iPos
-                                      - kind: Comma
-                                        text: ","
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: maxmw
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Comma
-                                        text: ","
-                                      - kind: Whitespace
-                                        text: " "
-                                      - kind: Identifier
-                                        text: mLCid
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Newline
-                                        text: "\r\n"
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: Convert2Ansi
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children:
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: CallExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: textString
+                                                              - kind: LeftParenthesis
+                                                                text: (
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: LF
+                                                                          - kind: DollarSign
+                                                                            text: $
+                                                                  - kind: Comma
+                                                                    text: ","
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: iPos
+                                                                  - kind: Comma
+                                                                    text: ","
+                                                                  - kind: Whitespace
+                                                                    text: " "
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: maxmw
+                                                              - kind: RightParenthesis
+                                                                text: )
+                                                      - kind: Comma
+                                                        text: ","
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: Argument
+                                                        children:
+                                                          - kind: IdentifierExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: mLCid
+                                                  - kind: RightParenthesis
+                                                    text: )
+                                  - kind: Newline
+                                    text: "\r\n"
                                   - kind: Whitespace
                                     text: "            "
                               - kind: WendKeyword
@@ -71696,10 +71800,12 @@ cst:
                                     text: Put
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Octothorpe
-                                    text: "#"
-                                  - kind: Identifier
-                                    text: W
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Octothorpe
+                                        text: "#"
+                                      - kind: Identifier
+                                        text: W
                                   - kind: Comma
                                     text: ","
                                   - kind: Whitespace
@@ -71708,14 +71814,22 @@ cst:
                                     text: ","
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: a
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Newline
-                                    text: "\r\n"
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: CallExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: a
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: ArgumentList
+                                                children: []
+                                              - kind: RightParenthesis
+                                                text: )
+                              - kind: Newline
+                                text: "\r\n"
                           - kind: WendKeyword
                             text: Wend
                           - kind: Newline
@@ -71822,10 +71936,12 @@ cst:
                                         text: Put
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Octothorpe
-                                        text: "#"
-                                      - kind: Identifier
-                                        text: W
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Octothorpe
+                                            text: "#"
+                                          - kind: Identifier
+                                            text: W
                                       - kind: Comma
                                         text: ","
                                       - kind: Whitespace
@@ -71834,14 +71950,22 @@ cst:
                                         text: ","
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: a
-                                      - kind: LeftParenthesis
-                                        text: (
-                                      - kind: RightParenthesis
-                                        text: )
-                                      - kind: Newline
-                                        text: "\r\n"
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: CallExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: a
+                                                  - kind: LeftParenthesis
+                                                    text: (
+                                                  - kind: ArgumentList
+                                                    children: []
+                                                  - kind: RightParenthesis
+                                                    text: )
+                                  - kind: Newline
+                                    text: "\r\n"
                               - kind: WendKeyword
                                 text: Wend
                               - kind: Newline

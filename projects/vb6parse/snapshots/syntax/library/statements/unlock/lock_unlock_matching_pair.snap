@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/unlock.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/unlock.rs
 expression: tree
 ---
 root:
@@ -77,24 +77,34 @@ root:
                   text: Put
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: IntegerLiteral
-                  text: "5"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "5"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: myData
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: myData
+            - kind: Newline
+              text: "\n"
             - kind: UnlockStatement
               children:
                 - kind: Whitespace
