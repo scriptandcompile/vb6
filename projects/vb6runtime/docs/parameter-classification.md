@@ -139,12 +139,12 @@ Classes:
 
 | Function | Arity | Runtime signature | Class | Null |
 |---|---|---|---|---|
-| `beep` | 0..0 | *(adapter-built, no runtime target)* | typed | raises 94 |
-| `command` | 0..0 | *(adapter-built, no runtime target)* | typed | raises 94 |
-| `command$` | 0..0 | *(adapter-built, no runtime target)* | $-strict | raises 94 |
+| `beep` | 0..0 | `fn() -> ()` | typed | raises 94 |
+| `command` | 0..0 | `fn() -> VBResult<VBString>` | typed | raises 94 |
+| `command$` | 0..0 | `fn() -> VBResult<VBString>` | $-strict | raises 94 |
 | `doevents` | 0..0 | `fn() -> VBResult<VBVariant>` | typed | raises 94 |
-| `msgbox` | 1..5 | *(adapter-built, no runtime target)* | typed | raises 94 |
-| `shell` | 1..2 | *(adapter-built, no runtime target)* | typed | raises 94 |
+| `msgbox` | 1..5 | `fn(prompt: &VBString, buttons: Option<&VBLong>, title: Option<&VBString>, helpfile: Option<&VBString>, context: Option<&VBLong>) -> VBResult<VBVariant>` | typed | raises 94 |
+| `shell` | 1..2 | `fn(pathname: &VBString, window_style: Option<&VBLong>) -> VBResult<VBVariant>` | typed | raises 94 |
 
 ## `logic`
 
@@ -273,15 +273,4 @@ Classes:
 Statement-form operands arrive as flat token runs; their conversions
 live in `vb6interpret/src/exec/*` until the parser emits expression
 nodes, and are out of scope for the registry sweep (plan A11).
-
-## Entries without a direct runtime target
-
-Adapter builds the result inline (state reads, constants);
-nothing to migrate at the runtime boundary:
-
-- `interaction`:`beep`
-- `interaction`:`command`
-- `interaction`:`command$`
-- `interaction`:`msgbox`
-- `interaction`:`shell`
 

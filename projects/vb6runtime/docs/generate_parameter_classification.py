@@ -100,11 +100,12 @@ def parse_signatures():
     for path in sorted(LIBRARY.rglob("*.rs")):
         text = path.read_text().split("#[cfg(test)]")[0]
         for m in re.finditer(
-            r"pub fn (\w+)\s*\(((?:[^()]|\([^)]*\))*?)\)\s*->\s*([^{]+?)\s*\{",
+            r"pub fn (\w+)\s*\(((?:[^()]|\([^)]*\))*?)\)\s*(?:->\s*([^{]+?)\s*)?\{",
             text, re.S,
         ):
             params = re.sub(r"\s+", " ", m.group(2)).strip().rstrip(",")
-            ret = re.sub(r"\s+", " ", m.group(3)).strip()
+            # A function may omit its return type; that means unit (`Sub`s).
+            ret = re.sub(r"\s+", " ", m.group(3)).strip() if m.group(3) else "()"
             sigs.setdefault(m.group(1), (params, ret))
     return sigs
 

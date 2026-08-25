@@ -1,54 +1,55 @@
 //! VB6 interaction function registry.
 //!
-//! One [`Builtin`](super::Builtin) entry per interaction function, each
-//! wrapping the typed `vb6runtime::library::interaction`
+//! One [`typed_builtin!`](crate::typed_builtin) entry per interaction
+//! function, each wrapping the typed `vb6runtime::library::interaction`
 //! implementation.
+//!
+//! - `Beep` is a Sub: no arguments, no value, so the entry returns `Empty`.
+//! - `Command`/`Command$` return runtime strings that are lifted into
+//!   Variants here.
+//! - `MsgBox`'s optional tail and `Shell`'s window style are declared
+//!   `As Long` / `As String` in VB6: present `Null` rejects with 94 at the
+//!   boundary; value validation of the style itself stays in-body.
 
-use super::{arg_string, Builtin, Registry};
-use crate::builtin;
-use vb6core::error::VBResult;
+use super::{Builtin, Registry};
+use crate::typed_builtin;
 use vb6runtime::library::interaction::beep::beep;
 use vb6runtime::library::interaction::command::command;
 use vb6runtime::library::interaction::command_dollar::command_dollar;
 use vb6runtime::library::interaction::doevents::do_events;
 use vb6runtime::library::interaction::msgbox::msg_box;
 use vb6runtime::library::interaction::shell::shell;
-use vb6runtime::value::{VBLong, VBString};
 use vb6runtime::VBVariant;
 
 /// Register the interaction functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {
-    // `Beep` is a Sub, not a Function: it takes no arguments and yields no
-    // value, so the registry entry returns `Empty`.
-    registry.insert(builtin!("beep", 0, 0, |_args| {
+    registry.insert(typed_builtin!("beep", 0, 0, (), {
         beep();
         Ok(VBVariant::Empty)
     }));
-    registry.insert(builtin!("command", 0, 0, |_args| {
-        Ok(VBVariant::from(command()?))
-    }));
-    registry.insert(builtin!("command$", 0, 0, |_args| {
-        Ok(VBVariant::from(command_dollar()?))
-    }));
-    registry.insert(builtin!("doevents", 0, 0, |_args| { do_events() }));
-    registry.insert(builtin!("msgbox", 1, 5, |args| {
-        let prompt = arg_string(args, 0)?;
-        let buttons = args.get(1).map(VBLong::try_from).transpose()?;
-        let title = args.get(2).map(VBString::try_from).transpose()?;
-        let helpfile = args.get(3).map(VBString::try_from).transpose()?;
-        let context = args.get(4).map(VBLong::try_from).transpose()?;
-        msg_box(
-            &prompt,
-            buttons.as_ref(),
-            title.as_ref(),
-            helpfile.as_ref(),
-            context.as_ref(),
-        )
-    }));
-    registry.insert(builtin!("shell", 1, 2, |args| {
-        let pathname = arg_string(args, 0)?;
-        shell(&pathname, args.get(1))
-    }));
+    registry.insert(typed_builtin!(
+        "command",
+        0,
+        0,
+        (),
+        command().map(VBVariant::from)
+    ));
+    registry.insert(typed_builtin!(
+        "command$",
+        0,
+        0,
+        (),
+        command_dollar().map(VBVariant::from)
+    ));
+    registry.insert(typed_builtin!("doevents", 0, 0, (), do_events()));
+    registry.insert(typed_builtin!("msgbox", 1, 5,
+        (prompt: string, buttons: opt_long, title: opt_string,
+         helpfile: opt_string, context: opt_long),
+        msg_box(&prompt, buttons.as_ref(), title.as_ref(),
+                helpfile.as_ref(), context.as_ref())));
+    registry.insert(typed_builtin!("shell", 1, 2,
+        (pathname: string, window_style: opt_long),
+        shell(&pathname, window_style.as_ref())));
 }
 
 #[cfg(test)]
@@ -213,5 +214,25 @@ mod tests {
         .unwrap_err();
         assert_eq!(err.number, 5);
         interaction::reset_backend();
+    }
+
+    #[test]
+    fn optional_arguments_reject_null_at_the_boundary() {
+        // Both rejections happen during argument conversion, before any
+        // backend access, so no fixture is needed.
+        let err = call_builtin(
+            "MsgBox",
+            &[
+                VBVariant::from_string("x"),
+                VBVariant::from_long(0),
+                VBVariant::Null,
+            ],
+        )
+        .unwrap_err();
+        assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+
+        let err =
+            call_builtin("Shell", &[VBVariant::from_string("x"), VBVariant::Null]).unwrap_err();
+        assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
     }
 }

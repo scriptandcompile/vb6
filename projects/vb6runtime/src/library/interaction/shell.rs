@@ -770,12 +770,12 @@ use crate::value::{VBLong, VBString, VBVariant};
 /// means here: the native backends launch a real detached process (the task
 /// ID is its process id), while the memory backend answers from a scripted
 /// response list without touching the OS.
-pub fn shell(pathname: &VBString, window_style: Option<&VBVariant>) -> VBResult<VBVariant> {
+pub fn shell(pathname: &VBString, window_style: Option<&VBLong>) -> VBResult<VBVariant> {
     let raw_style = match window_style {
         // VB6's documented default for an omitted argument:
         // "the program is started minimized with focus".
         None => state::interaction::WindowStyle::default().id(),
-        Some(style) => i64::from(VBLong::try_from(style)?.as_i32()),
+        Some(style) => i64::from(style.as_i32()),
     };
     let request = state::interaction::ShellRequest::parse(pathname.as_str(), raw_style)?;
     let task_id = state::interaction::shell(&request)?;
@@ -821,12 +821,12 @@ mod tests {
         set_backend(MemoryBackend::new());
         shell(
             &VBString::from("calc.exe"),
-            Some(&VBVariant::from_long(3)), // vbMaximizedFocus
+            Some(&VBLong::from(3)), // vbMaximizedFocus
         )
         .unwrap();
         shell(
             &VBString::from("backup.bat"),
-            Some(&VBVariant::from_integer(0)), // vbHide
+            Some(&VBLong::from(0)), // vbHide
         )
         .unwrap();
 
@@ -841,35 +841,13 @@ mod tests {
         let _guard = lock_test();
         set_backend(MemoryBackend::new());
         // 5 sits between vbNormalNoFocus (4) and vbMinimizedNoFocus (6).
-        let err = shell(&VBString::from("x"), Some(&VBVariant::from_long(5))).unwrap_err();
+        let err = shell(&VBString::from("x"), Some(&VBLong::from(5))).unwrap_err();
         assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
         assert!(
             err.description.contains("vbMinimizedNoFocus"),
             "{}",
             err.description
         );
-        state::interaction::reset_backend();
-    }
-
-    #[test]
-    fn null_window_style_is_invalid_use_of_null() {
-        let _guard = lock_test();
-        set_backend(MemoryBackend::new());
-        let err = shell(&VBString::from("x"), Some(&VBVariant::Null)).unwrap_err();
-        assert_eq!(err.number, err_number::INVALID_USE_OF_NULL);
-        state::interaction::reset_backend();
-    }
-
-    #[test]
-    fn non_numeric_window_style_is_type_mismatch() {
-        let _guard = lock_test();
-        set_backend(MemoryBackend::new());
-        let err = shell(
-            &VBString::from("x"),
-            Some(&VBVariant::from_string("normal")),
-        )
-        .unwrap_err();
-        assert_eq!(err.number, err_number::TYPE_MISMATCH);
         state::interaction::reset_backend();
     }
 
