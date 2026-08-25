@@ -1,6 +1,7 @@
 use crate::parsers::SyntaxKind;
 
 use crate::parsers::cst::Parser;
+use crate::Token;
 
 impl Parser<'_> {
     // VB6 Close statement syntax:
@@ -15,7 +16,17 @@ impl Parser<'_> {
     //
     // [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/close-statement)
     pub(crate) fn parse_close_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::CloseStatement);
+        self.builder.start_node(SyntaxKind::CloseStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        if !self.at_token(Token::Newline) && !self.is_at_end() {
+            self.parse_separated_expressions(Token::Comma, SyntaxKind::ArgumentList);
+        }
+
+        self.builder.finish_node();
     }
 }
 
