@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/date.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/date.rs
 expression: tree
 ---
 root:
@@ -37,22 +37,30 @@ root:
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: Now
-                - kind: LeftParenthesis
-                  text: (
-                - kind: RightParenthesis
-                  text: )
-                - kind: Whitespace
-                  text: " "
-                - kind: AdditionOperator
-                  text: +
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "7"
-                - kind: Newline
-                  text: "\n"
+                - kind: BinaryExpression
+                  children:
+                    - kind: CallExpression
+                      children:
+                        - kind: Identifier
+                          text: Now
+                        - kind: LeftParenthesis
+                          text: (
+                        - kind: ArgumentList
+                          children: []
+                        - kind: RightParenthesis
+                          text: )
+                    - kind: Whitespace
+                      text: " "
+                    - kind: AdditionOperator
+                      text: +
+                    - kind: Whitespace
+                      text: " "
+                    - kind: NumericLiteralExpression
+                      children:
+                        - kind: IntegerLiteral
+                          text: "7"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace
