@@ -260,6 +260,8 @@ pub enum SyntaxKind {
     StatementList,
     /// Expression clause (wraps an expression in a named clause context)
     ExpressionClause,
+    /// Keyword clause (wraps a known keyword token in a named node)
+    KeywordClause,
 
     // Token kinds - map from Token
     // We start these at a higher offset to avoid conflicts
