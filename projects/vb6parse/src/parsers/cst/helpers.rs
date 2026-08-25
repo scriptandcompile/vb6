@@ -80,6 +80,59 @@ impl Parser<'_> {
         self.builder.finish_node();
     }
 
+    /// Parse a comma-separated (or whitespace-separated) list of expressions.
+    ///
+    /// Starts a parent node of the given `child_kind` (typically `ArgumentList`),
+    /// wraps each parsed expression in an `Argument` node, and stops when the
+    /// separator token is no longer present.
+    ///
+    /// # Arguments
+    /// * `separator` - The separator token between items (e.g. `Token::Comma`)
+    /// * `child_kind` - The `SyntaxKind` for the wrapper node (e.g. `SyntaxKind::ArgumentList`)
+    pub(crate) fn parse_separated_expressions(
+        &mut self,
+        separator: Token,
+        child_kind: SyntaxKind,
+    ) {
+        self.builder.start_node(child_kind.to_raw());
+
+        // Parse the first expression wrapped in Argument
+        self.builder.start_node(SyntaxKind::Argument.to_raw());
+        self.parse_expression();
+        self.builder.finish_node();
+
+        // Parse subsequent expressions separated by the separator token
+        loop {
+            // Skip whitespace before checking for separator
+            while !self.is_at_end() && self.at_token(Token::Whitespace) {
+                self.consume_token();
+            }
+
+            if self.is_at_end() || !self.at_token(separator) {
+                break;
+            }
+
+            // Consume the separator
+            self.consume_token();
+
+            // Skip whitespace after separator
+            while !self.is_at_end() && self.at_token(Token::Whitespace) {
+                self.consume_token();
+            }
+
+            if self.is_at_end() {
+                break;
+            }
+
+            // Parse the next expression wrapped in Argument
+            self.builder.start_node(SyntaxKind::Argument.to_raw());
+            self.parse_expression();
+            self.builder.finish_node();
+        }
+
+        self.builder.finish_node();
+    }
+
     /// Start a `KeywordClause` node, consume the expected keyword token, finish the node.
     ///
     /// If the current token does not match `keyword`, reports an error and does not
