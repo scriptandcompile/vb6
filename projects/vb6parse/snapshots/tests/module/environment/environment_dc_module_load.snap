@@ -9227,8 +9227,10 @@ cst:
                     children:
                       - kind: BeepKeyword
                         text: Beep
-                      - kind: ColonOperator
-                        text: ":"
+                  - kind: ColonOperator
+                    text: ":"
+                  - kind: ExitStatement
+                    children:
                       - kind: Whitespace
                         text: " "
                       - kind: ExitKeyword
@@ -9237,8 +9239,8 @@ cst:
                         text: " "
                       - kind: SubKeyword
                         text: Sub
-                      - kind: Newline
-                        text: "\r\n"
+                  - kind: Newline
+                    text: "\r\n"
               - kind: IfStatement
                 children:
                   - kind: IfKeyword

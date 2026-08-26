@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/colon_separator.rs
+source: projects/vb6parse/tests/colon_separator.rs
 expression: tree
 ---
 root:
@@ -33,22 +33,26 @@ root:
                   text: Beep
                 - kind: Whitespace
                   text: " "
-                - kind: ColonOperator
-                  text: ":"
+            - kind: ColonOperator
+              text: ":"
+            - kind: BeepStatement
+              children:
                 - kind: Whitespace
                   text: " "
                 - kind: BeepKeyword
                   text: Beep
                 - kind: Whitespace
                   text: " "
-                - kind: ColonOperator
-                  text: ":"
+            - kind: ColonOperator
+              text: ":"
+            - kind: BeepStatement
+              children:
                 - kind: Whitespace
                   text: " "
                 - kind: BeepKeyword
                   text: Beep
-                - kind: Newline
-                  text: "\n"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

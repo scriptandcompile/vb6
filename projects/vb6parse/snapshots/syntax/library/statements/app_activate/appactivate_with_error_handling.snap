@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/statements/system_interaction/app_activate.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/app_activate.rs
 expression: tree
 ---
 root:
@@ -53,14 +53,20 @@ root:
                   text: AppActivate
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: lstTopWin
-                - kind: PeriodOperator
-                  text: "."
-                - kind: TextKeyword
-                  text: Text
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: Identifier
+                              text: lstTopWin
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: TextKeyword
+                              text: Text
+            - kind: Newline
+              text: "\n"
             - kind: IfStatement
               children:
                 - kind: Whitespace

@@ -2272,8 +2272,10 @@ cst:
                     children:
                       - kind: BeepKeyword
                         text: Beep
-                      - kind: ColonOperator
-                        text: ":"
+                  - kind: ColonOperator
+                    text: ":"
+                  - kind: ExitStatement
+                    children:
                       - kind: Whitespace
                         text: " "
                       - kind: ExitKeyword
@@ -2282,8 +2284,8 @@ cst:
                         text: " "
                       - kind: SubKeyword
                         text: Sub
-                      - kind: Newline
-                        text: "\r\n"
+                  - kind: Newline
+                    text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -4804,22 +4806,30 @@ cst:
                                                 children:
                                                   - kind: BeepKeyword
                                                     text: Beep
-                                                  - kind: ColonOperator
-                                                    text: ":"
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: Identifier
-                                                    text: Cancel
+                                              - kind: ColonOperator
+                                                text: ":"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: AssignmentStatement
+                                                children:
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: Cancel
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
                                                     text: "="
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: TrueKeyword
-                                                    text: "True"
-                                                  - kind: ColonOperator
-                                                    text: ":"
+                                                  - kind: BooleanLiteralExpression
+                                                    children:
+                                                      - kind: TrueKeyword
+                                                        text: "True"
+                                              - kind: ColonOperator
+                                                text: ":"
+                                              - kind: ExitStatement
+                                                children:
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: ExitKeyword
@@ -4828,8 +4838,8 @@ cst:
                                                     text: " "
                                                   - kind: SubKeyword
                                                     text: Sub
-                                                  - kind: Newline
-                                                    text: "\r\n"
+                                              - kind: Newline
+                                                text: "\r\n"
                                           - kind: Whitespace
                                             text: "        "
                                       - kind: ElseClause
@@ -4928,22 +4938,30 @@ cst:
                                                     children:
                                                       - kind: BeepKeyword
                                                         text: Beep
-                                                      - kind: ColonOperator
-                                                        text: ":"
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: Identifier
-                                                        text: Cancel
+                                                  - kind: ColonOperator
+                                                    text: ":"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: AssignmentStatement
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: Cancel
                                                       - kind: Whitespace
                                                         text: " "
                                                       - kind: EqualityOperator
                                                         text: "="
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: TrueKeyword
-                                                        text: "True"
-                                                      - kind: ColonOperator
-                                                        text: ":"
+                                                      - kind: BooleanLiteralExpression
+                                                        children:
+                                                          - kind: TrueKeyword
+                                                            text: "True"
+                                                  - kind: ColonOperator
+                                                    text: ":"
+                                                  - kind: ExitStatement
+                                                    children:
                                                       - kind: Whitespace
                                                         text: " "
                                                       - kind: ExitKeyword
@@ -4952,8 +4970,8 @@ cst:
                                                         text: " "
                                                       - kind: SubKeyword
                                                         text: Sub
-                                                      - kind: Newline
-                                                        text: "\r\n"
+                                                  - kind: Newline
+                                                    text: "\r\n"
                                               - kind: Whitespace
                                                 text: "        "
                                       - kind: EndKeyword
@@ -5368,22 +5386,30 @@ cst:
                                         children:
                                           - kind: BeepKeyword
                                             text: Beep
-                                          - kind: ColonOperator
-                                            text: ":"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: Identifier
-                                            text: once2
+                                      - kind: ColonOperator
+                                        text: ":"
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: AssignmentStatement
+                                        children:
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: once2
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: FalseKeyword
-                                            text: "False"
-                                          - kind: ColonOperator
-                                            text: ":"
+                                          - kind: BooleanLiteralExpression
+                                            children:
+                                              - kind: FalseKeyword
+                                                text: "False"
+                                      - kind: ColonOperator
+                                        text: ":"
+                                      - kind: ExitStatement
+                                        children:
                                           - kind: Whitespace
                                             text: " "
                                           - kind: ExitKeyword
@@ -5392,8 +5418,8 @@ cst:
                                             text: " "
                                           - kind: SubKeyword
                                             text: Sub
-                                          - kind: Newline
-                                            text: "\r\n"
+                                      - kind: Newline
+                                        text: "\r\n"
                               - kind: IfStatement
                                 children:
                                   - kind: Whitespace
@@ -5656,8 +5682,8 @@ cst:
                                                 text: "            "
                                               - kind: BeepKeyword
                                                 text: Beep
-                                              - kind: Newline
-                                                text: "\r\n"
+                                          - kind: Newline
+                                            text: "\r\n"
                                           - kind: Whitespace
                                             text: "            "
                                           - kind: AssignmentStatement
@@ -5810,22 +5836,30 @@ cst:
                                             children:
                                               - kind: BeepKeyword
                                                 text: Beep
-                                              - kind: ColonOperator
-                                                text: ":"
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: Identifier
-                                                text: once2
+                                          - kind: ColonOperator
+                                            text: ":"
+                                          - kind: Whitespace
+                                            text: " "
+                                          - kind: AssignmentStatement
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: once2
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
                                                 text: "="
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: FalseKeyword
-                                                text: "False"
-                                              - kind: ColonOperator
-                                                text: ":"
+                                              - kind: BooleanLiteralExpression
+                                                children:
+                                                  - kind: FalseKeyword
+                                                    text: "False"
+                                          - kind: ColonOperator
+                                            text: ":"
+                                          - kind: ExitStatement
+                                            children:
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: ExitKeyword
@@ -5834,8 +5868,8 @@ cst:
                                                 text: " "
                                               - kind: SubKeyword
                                                 text: Sub
-                                              - kind: Newline
-                                                text: "\r\n"
+                                          - kind: Newline
+                                            text: "\r\n"
                                   - kind: IfStatement
                                     children:
                                       - kind: Whitespace
@@ -6098,8 +6132,8 @@ cst:
                                                     text: "            "
                                                   - kind: BeepKeyword
                                                     text: Beep
-                                                  - kind: Newline
-                                                    text: "\r\n"
+                                              - kind: Newline
+                                                text: "\r\n"
                                               - kind: Whitespace
                                                 text: "            "
                                               - kind: AssignmentStatement

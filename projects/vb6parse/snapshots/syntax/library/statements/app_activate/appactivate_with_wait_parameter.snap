@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/app_activate.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/app_activate.rs
 expression: tree
 ---
 root:
@@ -33,16 +33,26 @@ root:
                   text: AppActivate
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"Calculator\""
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: TrueKeyword
-                  text: "True"
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Calculator\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: BooleanLiteralExpression
+                          children:
+                            - kind: TrueKeyword
+                              text: "True"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace
