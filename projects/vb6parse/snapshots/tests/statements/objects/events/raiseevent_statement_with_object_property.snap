@@ -1,5 +1,6 @@
 ---
-source: projects/vb6parse/src/syntax/statements/objects/events.rs
+source: projects/vb6parse/tests/statements/objects/events.rs
+assertion_line: 346
 expression: tree
 ---
 root:
@@ -34,11 +35,15 @@ root:
                 - kind: Whitespace
                   text: " "
                 - kind: Identifier
-                  text: SourceChanged
+                  text: PropertyUpdated
                 - kind: LeftParenthesis
                   text: (
-                - kind: MeKeyword
-                  text: Me
+                - kind: Identifier
+                  text: myObject
+                - kind: PeriodOperator
+                  text: "."
+                - kind: PropertyKeyword
+                  text: Property
                 - kind: RightParenthesis
                   text: )
                 - kind: Newline

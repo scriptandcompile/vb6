@@ -1,5 +1,6 @@
 ---
-source: projects/vb6parse/src/syntax/statements/objects/events.rs
+source: projects/vb6parse/tests/statements/objects/events.rs
+assertion_line: 128
 expression: tree
 ---
 root:
@@ -32,27 +33,21 @@ root:
                 - kind: RaiseEventKeyword
                   text: RaiseEvent
                 - kind: Whitespace
-                  text: "   "
+                  text: " "
                 - kind: Identifier
-                  text: EventName
-                - kind: Whitespace
-                  text: "   "
+                  text: ValueChanged
                 - kind: LeftParenthesis
                   text: (
-                - kind: Whitespace
-                  text: "   "
                 - kind: Identifier
-                  text: arg1
+                  text: x
                 - kind: Whitespace
-                  text: "   "
-                - kind: Comma
-                  text: ","
+                  text: " "
+                - kind: AdditionOperator
+                  text: +
                 - kind: Whitespace
-                  text: "   "
+                  text: " "
                 - kind: Identifier
-                  text: arg2
-                - kind: Whitespace
-                  text: "   "
+                  text: y
                 - kind: RightParenthesis
                   text: )
                 - kind: Newline

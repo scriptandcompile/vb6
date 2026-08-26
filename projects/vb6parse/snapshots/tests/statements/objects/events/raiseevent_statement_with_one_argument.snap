@@ -1,5 +1,6 @@
 ---
-source: projects/vb6parse/src/syntax/statements/objects/events.rs
+source: projects/vb6parse/tests/statements/objects/events.rs
+assertion_line: 46
 expression: tree
 ---
 root:
@@ -34,17 +35,11 @@ root:
                 - kind: Whitespace
                   text: " "
                 - kind: Identifier
-                  text: ItemSelected
+                  text: DataReceived
                 - kind: LeftParenthesis
                   text: (
-                - kind: Identifier
-                  text: items
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: index
-                - kind: RightParenthesis
-                  text: )
+                - kind: StringLiteral
+                  text: "\"Test data\""
                 - kind: RightParenthesis
                   text: )
                 - kind: Newline

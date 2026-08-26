@@ -77,3 +77,6 @@ mod setattr;
 
 #[path = "statements/objects/call.rs"]
 mod call;
+
+#[path = "statements/objects/events.rs"]
+mod events;
