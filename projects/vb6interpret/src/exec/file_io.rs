@@ -140,19 +140,19 @@ impl Interpreter {
     /// `Close [[#]filenumber] [, [#]filenumber] ...`; closes all open files
     /// if the list is empty.
     pub(crate) fn exec_close(&mut self, node: &CstNode) -> RunResult<Flow> {
-        let children: Vec<&CstNode> = node.significant_children().collect();
         let mut file_numbers: Vec<i16> = Vec::new();
 
-        for child in &children {
-            match child.kind() {
-                SyntaxKind::IntegerLiteral | SyntaxKind::Identifier => {
-                    let number = self
-                        .eval_flat_token(child)?
-                        .as_i16()
+        for arg in node.children_by_kind(SyntaxKind::Argument) {
+            for child in arg.significant_children() {
+                if matches!(child.kind(),
+                    SyntaxKind::StringLiteralExpression | SyntaxKind::NumericLiteralExpression
+                    | SyntaxKind::IdentifierExpression | SyntaxKind::Octothorpe
+                ) {
+                    let value = self.eval_expr(child)
                         .map_err(|_| self.error_here(VBError::type_mismatch(), None))?;
-                    file_numbers.push(number);
+                    file_numbers.push(value.as_i16()?);
+                    break;
                 }
-                _ => {}
             }
         }
 
