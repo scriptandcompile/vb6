@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/ch_drive.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/ch_drive.rs
 expression: tree
 ---
 root:
@@ -13,7 +13,9 @@ root:
           text: ChDrive
         - kind: Whitespace
           text: " "
-        - kind: StringLiteral
-          text: "\"D:\""
-        - kind: Newline
-          text: "\n"
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"D:\""
+    - kind: Newline
+      text: "\n"

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/ch_drive.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/ch_drive.rs
 expression: tree
 ---
 root:
@@ -33,14 +33,16 @@ root:
                   text: ChDrive
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: App
-                - kind: PeriodOperator
-                  text: "."
-                - kind: Identifier
-                  text: Path
-                - kind: Newline
-                  text: "\n"
+                - kind: MemberAccessExpression
+                  children:
+                    - kind: Identifier
+                      text: App
+                    - kind: PeriodOperator
+                      text: "."
+                    - kind: Identifier
+                      text: Path
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

@@ -33,10 +33,12 @@ root:
                   text: ChDrive
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\""
+            - kind: Newline
+              text: "\n"
             - kind: ChDirStatement
               children:
                 - kind: Whitespace

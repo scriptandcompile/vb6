@@ -1589,14 +1589,16 @@ cst:
                     text: ChDrive
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: App
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: path
-                  - kind: Newline
-                    text: "\n"
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: App
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: path
+              - kind: Newline
+                text: "\n"
               - kind: ChDirStatement
                 children:
                   - kind: ChDirKeyword

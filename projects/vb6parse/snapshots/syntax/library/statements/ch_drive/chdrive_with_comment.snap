@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/ch_drive.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/ch_drive.rs
 expression: tree
 ---
 root:
@@ -33,14 +33,16 @@ root:
                   text: ChDrive
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: driveLetter
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: driveLetter
                 - kind: Whitespace
                   text: " "
-                - kind: EndOfLineComment
-                  text: "' Change to specified drive"
-                - kind: Newline
-                  text: "\n"
+            - kind: EndOfLineComment
+              text: "' Change to specified drive"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace
