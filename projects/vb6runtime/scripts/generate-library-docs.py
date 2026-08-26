@@ -110,8 +110,12 @@ def parse_library_structure(src_dir: Path) -> Tuple[List[Category], List[Categor
     """
     Parse the library directory structure and extract all documentation.
     
+    Supports two structures:
+    - Legacy vb6parse: src/functions/ and src/statements/ with category subdirs
+    - vb6runtime flat: category subdirs directly under src/
+    
     Args:
-        src_dir: Path to src/syntax/library/
+        src_dir: Path to library source directory
         
     Returns:
         Tuple of (function_categories, statement_categories)
@@ -119,10 +123,104 @@ def parse_library_structure(src_dir: Path) -> Tuple[List[Category], List[Categor
     functions_dir = src_dir / "functions"
     statements_dir = src_dir / "statements"
     
-    function_categories = parse_category_dir(functions_dir, "function")
-    statement_categories = parse_category_dir(statements_dir, "statement")
+    if functions_dir.exists() and statements_dir.exists():
+        # Legacy vb6parse structure
+        function_categories = parse_category_dir(functions_dir, "function")
+        statement_categories = parse_category_dir(statements_dir, "statement")
+        return function_categories, statement_categories
+    
+    # Flat vb6runtime structure: each subdir is a category
+    all_categories: Dict[str, Category] = {}
+    
+    for subdir in sorted(src_dir.iterdir()):
+        if not subdir.is_dir() or subdir.name == "constants.rs":
+            continue
+        
+        category_name = subdir.name
+        display_name = category_name.replace('_', ' ').title()
+        description = _get_category_description(subdir)
+        
+        category = Category(
+            name=category_name,
+            display_name=display_name,
+            description=description
+        )
+        
+        for rs_file in sorted(subdir.glob("*.rs")):
+            if rs_file.name == "mod.rs":
+                continue
+            
+            item_name = rs_file.stem
+            doc_content = extract_module_docs(rs_file)
+            
+            if doc_content:
+                is_statement = item_name.endswith("_statement")
+                item_type = "statement" if is_statement else "function"
+                
+                item = LibraryItem(
+                    name=item_name,
+                    category=category_name,
+                    subcategory=None,
+                    file_path=rs_file,
+                    doc_content=doc_content,
+                    item_type=item_type
+                )
+                category.items.append(item)
+        
+        if category.items:
+            all_categories[category_name] = category
+    
+    # Split categories into functions-only and statements-only lists
+    function_categories = [
+        Category(c.name, c.display_name, c.description,
+                 [i for i in c.items if i.item_type == "function"])
+        for c in all_categories.values()
+        if any(i.item_type == "function" for i in c.items)
+    ]
+    statement_categories = [
+        Category(c.name, c.display_name, c.description,
+                 [i for i in c.items if i.item_type == "statement"])
+        for c in all_categories.values()
+        if any(i.item_type == "statement" for i in c.items)
+    ]
     
     return function_categories, statement_categories
+
+
+def _get_category_description(category_dir: Path) -> str:
+    """
+    Extract a description for a category in the flat structure.
+    
+    Reads the first line of the module doc comment from mod.rs,
+    stripping the VB6 prefix to get a clean description.
+    """
+    mod_file = category_dir / "mod.rs"
+    if not mod_file.exists():
+        return ""
+    
+    try:
+        with open(mod_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Look for the first //! comment line
+        for line in content.splitlines():
+            stripped = line.strip()
+            if stripped.startswith('//!'):
+                desc = stripped[3:].strip()
+                # Strip common prefixes
+                for prefix in ['VB6 ', 'VB6. ']:
+                    if desc.startswith(prefix):
+                        desc = desc[len(prefix):]
+                # Take only the first sentence/clause
+                for terminator in ['.', '—', '\u2014']:
+                    if terminator in desc:
+                        desc = desc[:desc.index(terminator)].strip()
+                        break
+                return desc
+    except Exception:
+        pass
+    
+    return ""
 
 
 def parse_category_dir(category_dir: Path, item_type: str) -> List[Category]:
@@ -303,8 +401,8 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="VB6Parse Library Reference - {title}">
-    <title>{title} - VB6Parse Library Reference</title>
+    <meta name="description" content="VB6Runtime Library Reference - {title}">
+    <title>{title} - VB6Runtime Library Reference</title>
     <link rel="stylesheet" href="{base_path}assets/css/style.css">
     <link rel="stylesheet" href="{base_path}assets/css/docs-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
@@ -326,8 +424,8 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
             <a href="{base_path}index.html">Home</a>
             <a href="{base_path}library/index.html">Library Reference</a>
             <a href="{base_path}documentation.html">Documentation</a>
-            <a href="https://docs.rs/vb6parse" target="_blank">API Docs</a>
-            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse" target="_blank">GitHub</a>
+            <a href="https://docs.rs/vb6runtime" target="_blank">API Docs</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">GitHub</a>
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                 <span class="theme-icon">🌙</span>
             </button>
@@ -340,7 +438,7 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
 
     <footer>
         <div class="container">
-            <p>&copy; 2024-2026 VB6Parse Contributors. Licensed under the MIT License.</p>
+            <p>&copy; 2024-2026 VB6Runtime Contributors. Licensed under the MIT License.</p>
         </div>
     </footer>
 </body>
@@ -376,7 +474,7 @@ def generate_library_index(functions: List[Category], statements: List[Category]
             
             <div class="info-box" style="margin: 2rem 0;">
                 <strong>📖 About This Reference:</strong> This documentation is automatically generated from 
-                the VB6Parse source code. Each entry includes syntax, parameters, return values, remarks, 
+                the VB6Runtime source code. Each entry includes syntax, parameters, return values, remarks, 
                 and comprehensive examples to help you understand VB6's built-in library.
             </div>
         </section>
@@ -423,7 +521,7 @@ def generate_library_index(functions: List[Category], statements: List[Category]
 """
     
     breadcrumbs = [
-        ("VB6Parse", "index.html"),
+        ("VB6Runtime", "index.html"),
         ("Library Reference", "")
     ]
     
@@ -470,7 +568,7 @@ def generate_category_index(category: Category, item_type: str, output_dir: Path
 """
     
     breadcrumbs = [
-        ("VB6Parse", "index.html"),
+        ("VB6Runtime", "index.html"),
         ("Library", "library/index.html"),
         (f"{item_type.title()}s", None),
         (category.display_name, "")
@@ -505,7 +603,7 @@ def generate_item_page(item: LibraryItem, category: Category, output_dir: Path) 
 """
     
     breadcrumbs = [
-        ("VB6Parse", "index.html"),
+        ("VB6Runtime", "index.html"),
         ("Library", "library/index.html"),
         (category.display_name, f"library/{item.item_type}s/{category.slug}/index.html"),
         (item.name, "")
@@ -566,13 +664,13 @@ def generate_search_index(functions: List[Category], statements: List[Category],
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Generate VB6 Library Reference documentation from Rust source files"
+        description="Generate VB6 Runtime Library Reference documentation from Rust source files"
     )
     parser.add_argument(
         "--src",
         type=Path,
-        default=Path("src/syntax/library"),
-        help="Path to library source directory (default: src/syntax/library)"
+        default=Path("src/library"),
+        help="Path to library source directory (default: src/library)"
     )
     parser.add_argument(
         "--output",
@@ -603,7 +701,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     
     print("=" * 60)
-    print("VB6Parse Library Documentation Generator")
+    print("VB6Runtime Library Documentation Generator")
     print("=" * 60)
     print(f"Source: {args.src}")
     print(f"Output: {args.output}")
