@@ -1,5 +1,6 @@
 ---
-source: vb6parse/tests/invalid_syntax/invalid_control_flow.rs
+source: projects/vb6parse/tests/invalid_syntax/invalid_control_flow.rs
+assertion_line: 518
 expression: failure_messages
 ---
-[]
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub Test()\\n    Stop 123\\nEnd Sub\\n\", error_offset: 24, line_start: 3, line_end: 4, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [IntegerLiteral] }), severity: Error, labels: [], notes: [] }"
