@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/ch_dir.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/ch_dir.rs
 expression: tree
 ---
 root:
@@ -53,10 +53,12 @@ root:
                           text: ChDir
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: newPath
-                        - kind: Newline
-                          text: "\n"
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: newPath
+                    - kind: Newline
+                      text: "\n"
                     - kind: Whitespace
                       text: "    "
                 - kind: EndKeyword

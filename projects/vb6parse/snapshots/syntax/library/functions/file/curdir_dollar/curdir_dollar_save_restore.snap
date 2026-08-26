@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/file/curdir_dollar.rs
+source: projects/vb6parse/src/syntax/library/functions/file/curdir_dollar.rs
 expression: tree
 ---
 root:
@@ -79,10 +79,12 @@ root:
                   text: ChDir
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\Temp\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\\Temp\""
+            - kind: Newline
+              text: "\n"
             - kind: ChDirStatement
               children:
                 - kind: Whitespace
@@ -91,10 +93,12 @@ root:
                   text: ChDir
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: savedDir
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: savedDir
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

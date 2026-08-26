@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/file/curdir_dollar.rs
+source: projects/vb6parse/src/syntax/library/functions/file/curdir_dollar.rs
 expression: tree
 ---
 root:
@@ -81,10 +81,12 @@ root:
                           text: ChDir
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: expectedDir
-                        - kind: Newline
-                          text: "\n"
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: expectedDir
+                    - kind: Newline
+                      text: "\n"
                     - kind: Whitespace
                       text: "    "
                 - kind: EndKeyword

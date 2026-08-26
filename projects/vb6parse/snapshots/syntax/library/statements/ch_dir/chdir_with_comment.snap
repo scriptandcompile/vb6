@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/ch_dir.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/ch_dir.rs
 expression: tree
 ---
 root:
@@ -33,14 +33,16 @@ root:
                   text: ChDir
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: basePath
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: basePath
                 - kind: Whitespace
                   text: " "
-                - kind: EndOfLineComment
-                  text: "' Change to base directory"
-                - kind: Newline
-                  text: "\n"
+            - kind: EndOfLineComment
+              text: "' Change to base directory"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

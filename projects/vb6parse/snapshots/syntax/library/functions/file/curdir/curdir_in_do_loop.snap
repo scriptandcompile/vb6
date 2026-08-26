@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/file/curdir.rs
+source: projects/vb6parse/src/syntax/library/functions/file/curdir.rs
 expression: tree
 ---
 root:
@@ -51,10 +51,12 @@ root:
                   text: ChDir
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"..\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"..\""
+            - kind: Newline
+              text: "\n"
         - kind: LoopKeyword
           text: Loop
         - kind: Newline
