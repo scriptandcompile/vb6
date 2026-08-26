@@ -26,3 +26,6 @@ mod filecopy;
 
 #[path = "statements/file_operations/get.rs"]
 mod get;
+
+#[path = "statements/file_operations/input.rs"]
+mod input;
