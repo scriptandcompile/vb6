@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/statements/filesystem/rmdir.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/rmdir.rs
 expression: tree
 ---
 root:
@@ -39,10 +39,12 @@ root:
                   text: RmDir
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\Project\\Temp\\Cache\\Old\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\\Project\\Temp\\Cache\\Old\""
+            - kind: Newline
+              text: "\n"
             - kind: RmDirStatement
               children:
                 - kind: Whitespace
@@ -51,10 +53,12 @@ root:
                   text: RmDir
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\Project\\Temp\\Cache\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\\Project\\Temp\\Cache\""
+            - kind: Newline
+              text: "\n"
             - kind: RmDirStatement
               children:
                 - kind: Whitespace
@@ -63,10 +67,12 @@ root:
                   text: RmDir
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\Project\\Temp\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\\Project\\Temp\""
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

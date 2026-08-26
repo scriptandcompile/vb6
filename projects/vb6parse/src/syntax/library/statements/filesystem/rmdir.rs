@@ -62,13 +62,32 @@
 //!
 //! [RmDir Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/rmdir-statement)
 
+use crate::parsers::SyntaxKind;
+
+use crate::Token;
 use crate::parsers::cst::Parser;
-use crate::parsers::syntaxkind::SyntaxKind;
 
 impl Parser<'_> {
     /// Parses an `RmDir` statement.
+    ///
+    /// `RmDir` statement syntax:
+    /// ```vb
+    /// RmDir path
+    /// ```
+    ///
+    /// - **path**: Required. String expression that identifies the directory or folder to be removed. May include drive.
     pub(crate) fn parse_rmdir_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::RmDirStatement);
+        self.builder.start_node(SyntaxKind::RmDirStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        if !self.is_at_end() && !self.at_token(Token::Newline) {
+            self.parse_expression();
+        }
+
+        self.builder.finish_node();
     }
 }
 

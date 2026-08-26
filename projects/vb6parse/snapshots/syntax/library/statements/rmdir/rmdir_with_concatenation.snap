@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/rmdir.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/rmdir.rs
 expression: tree
 ---
 root:
@@ -73,18 +73,24 @@ root:
                   text: RmDir
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: basePath
-                - kind: Whitespace
-                  text: " "
-                - kind: Ampersand
-                  text: "&"
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"OldData\""
-                - kind: Newline
-                  text: "\n"
+                - kind: BinaryExpression
+                  children:
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: basePath
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Ampersand
+                      text: "&"
+                    - kind: Whitespace
+                      text: " "
+                    - kind: StringLiteralExpression
+                      children:
+                        - kind: StringLiteral
+                          text: "\"OldData\""
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

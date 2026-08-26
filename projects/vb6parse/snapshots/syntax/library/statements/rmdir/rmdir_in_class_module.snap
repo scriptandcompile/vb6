@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/rmdir.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/rmdir.rs
 expression: tree
 ---
 root:
@@ -57,10 +57,12 @@ root:
                   text: RmDir
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: m_tempDirectory
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: m_tempDirectory
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

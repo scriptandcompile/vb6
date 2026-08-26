@@ -19567,10 +19567,12 @@ cst:
                             text: RmDir
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: TempDirName
-                          - kind: Newline
-                            text: "\n"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: TempDirName
+                      - kind: Newline
+                        text: "\n"
                       - kind: Whitespace
                         text: "        "
                   - kind: LoopKeyword

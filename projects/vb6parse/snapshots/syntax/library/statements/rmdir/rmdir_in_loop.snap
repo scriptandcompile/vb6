@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/statements/filesystem/rmdir.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/rmdir.rs
 expression: tree
 ---
 root:
@@ -89,18 +89,24 @@ root:
                           text: RmDir
                         - kind: Whitespace
                           text: " "
-                        - kind: StringLiteral
-                          text: "\"C:\\Temp\\Session\""
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Ampersand
-                          text: "&"
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: i
-                        - kind: Newline
-                          text: "\n"
+                        - kind: BinaryExpression
+                          children:
+                            - kind: StringLiteralExpression
+                              children:
+                                - kind: StringLiteral
+                                  text: "\"C:\\Temp\\Session\""
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Ampersand
+                              text: "&"
+                            - kind: Whitespace
+                              text: " "
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: i
+                    - kind: Newline
+                      text: "\n"
                     - kind: Whitespace
                       text: "    "
                 - kind: NextKeyword
