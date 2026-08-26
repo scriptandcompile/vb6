@@ -3625,20 +3625,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: cDialog
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: cDialog
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: pdOpenSaveDialog
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: pdOpenSaveDialog
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -6207,26 +6211,36 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: creatures
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: i
-                          - kind: RightParenthesis
-                            text: )
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: creatures
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: i
+                              - kind: RightParenthesis
+                                text: )
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NewKeyword
-                            text: New
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Organism
+                          - kind: NewExpression
+                            children:
+                              - kind: NewKeyword
+                                text: New
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: Organism
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -8449,26 +8463,36 @@ cst:
                                                             text: Set
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: Identifier
-                                                            text: creatures
-                                                          - kind: LeftParenthesis
-                                                            text: (
-                                                          - kind: Identifier
-                                                            text: totalCreatures
-                                                          - kind: RightParenthesis
-                                                            text: )
+                                                          - kind: CallExpression
+                                                            children:
+                                                              - kind: Identifier
+                                                                text: creatures
+                                                              - kind: LeftParenthesis
+                                                                text: (
+                                                              - kind: ArgumentList
+                                                                children:
+                                                                  - kind: Argument
+                                                                    children:
+                                                                      - kind: IdentifierExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: totalCreatures
+                                                              - kind: RightParenthesis
+                                                                text: )
                                                           - kind: Whitespace
                                                             text: " "
                                                           - kind: EqualityOperator
                                                             text: "="
                                                           - kind: Whitespace
                                                             text: " "
-                                                          - kind: NewKeyword
-                                                            text: New
-                                                          - kind: Whitespace
-                                                            text: " "
-                                                          - kind: Identifier
-                                                            text: Organism
+                                                          - kind: NewExpression
+                                                            children:
+                                                              - kind: NewKeyword
+                                                                text: New
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: Identifier
+                                                                text: Organism
                                                           - kind: Newline
                                                             text: "\r\n"
                                                       - kind: Whitespace

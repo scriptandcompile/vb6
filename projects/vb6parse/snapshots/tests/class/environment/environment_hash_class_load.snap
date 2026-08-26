@@ -2048,24 +2048,34 @@ cst:
                                                     text: Set
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: aa
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: aa
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
                                                     text: "="
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: v
-                                                  - kind: LeftParenthesis
-                                                    text: (
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: nDx
-                                                  - kind: RightParenthesis
-                                                    text: )
+                                                  - kind: CallExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: v
+                                                      - kind: LeftParenthesis
+                                                        text: (
+                                                      - kind: ArgumentList
+                                                        children:
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: nDx
+                                                      - kind: RightParenthesis
+                                                        text: )
                                                   - kind: Newline
                                                     text: "\r\n"
                                               - kind: SetStatement
@@ -2076,24 +2086,34 @@ cst:
                                                     text: Set
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: v
-                                                  - kind: LeftParenthesis
-                                                    text: (
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: nDx
-                                                  - kind: RightParenthesis
-                                                    text: )
+                                                  - kind: CallExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: v
+                                                      - kind: LeftParenthesis
+                                                        text: (
+                                                      - kind: ArgumentList
+                                                        children:
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: nDx
+                                                      - kind: RightParenthesis
+                                                        text: )
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
                                                     text: "="
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: NothingKeyword
-                                                    text: Nothing
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: NothingKeyword
+                                                        text: Nothing
                                                   - kind: Newline
                                                     text: "\r\n"
                                               - kind: SetStatement
@@ -2104,24 +2124,34 @@ cst:
                                                     text: Set
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: aa
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: aa
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
                                                     text: "="
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: v
-                                                  - kind: LeftParenthesis
-                                                    text: (
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: nDx
-                                                  - kind: RightParenthesis
-                                                    text: )
+                                                  - kind: CallExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: v
+                                                      - kind: LeftParenthesis
+                                                        text: (
+                                                      - kind: ArgumentList
+                                                        children:
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: PeriodOperator
+                                                                    text: "."
+                                                                  - kind: Identifier
+                                                                    text: nDx
+                                                      - kind: RightParenthesis
+                                                        text: )
                                                   - kind: Newline
                                                     text: "\r\n"
                                               - kind: Whitespace
@@ -6344,24 +6374,34 @@ cst:
                                                                 text: Set
                                                               - kind: Whitespace
                                                                 text: " "
-                                                              - kind: Identifier
-                                                                text: v
-                                                              - kind: LeftParenthesis
-                                                                text: (
-                                                              - kind: PeriodOperator
-                                                                text: "."
-                                                              - kind: Identifier
-                                                                text: nDx
-                                                              - kind: RightParenthesis
-                                                                text: )
+                                                              - kind: CallExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: v
+                                                                  - kind: LeftParenthesis
+                                                                    text: (
+                                                                  - kind: ArgumentList
+                                                                    children:
+                                                                      - kind: Argument
+                                                                        children:
+                                                                          - kind: IdentifierExpression
+                                                                            children:
+                                                                              - kind: PeriodOperator
+                                                                                text: "."
+                                                                              - kind: Identifier
+                                                                                text: nDx
+                                                                  - kind: RightParenthesis
+                                                                    text: )
                                                               - kind: Whitespace
                                                                 text: " "
                                                               - kind: EqualityOperator
                                                                 text: "="
                                                               - kind: Whitespace
                                                                 text: " "
-                                                              - kind: NothingKeyword
-                                                                text: Nothing
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: NothingKeyword
+                                                                    text: Nothing
                                                               - kind: Newline
                                                                 text: "\r\n"
                                                       - kind: IfStatement

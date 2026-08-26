@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/datetime/timeserial.rs
+source: projects/vb6parse/src/syntax/library/functions/datetime/timeserial.rs
 expression: tree
 ---
 root:
@@ -33,20 +33,24 @@ root:
                   text: Set
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: calculator
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: calculator
                 - kind: Whitespace
                   text: " "
                 - kind: EqualityOperator
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: NewKeyword
-                  text: New
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: TimeCalculator
+                - kind: NewExpression
+                  children:
+                    - kind: NewKeyword
+                      text: New
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Identifier
+                      text: TimeCalculator
                 - kind: Newline
                   text: "\n"
             - kind: Whitespace

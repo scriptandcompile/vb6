@@ -1,5 +1,5 @@
 ---
-source: src/parsers/cst/property_statements.rs
+source: projects/vb6parse/src/parsers/cst/property_statements.rs
 expression: tree
 ---
 root:
@@ -51,16 +51,20 @@ root:
                   text: Set
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: mCallback
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: mCallback
                 - kind: Whitespace
                   text: " "
                 - kind: EqualityOperator
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: newObj
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: newObj
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

@@ -9778,16 +9778,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: oTarget
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: oTarget
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: Newline
@@ -10012,16 +10016,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: oTarget
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: oTarget
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: obj
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: obj
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -11228,28 +11236,42 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: oSink
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: oSink
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CreateEventSink
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: iid_event
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: MeKeyword
-                    text: Me
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: CreateEventSink
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: iid_event
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: MeKeyword
+                                    text: Me
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: Newline

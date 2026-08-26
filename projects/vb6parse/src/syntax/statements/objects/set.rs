@@ -45,7 +45,6 @@ impl Parser<'_> {
     ///
     /// [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/set-statement)
     pub(crate) fn parse_set_statement(&mut self) {
-        // if we are now parsing a set statement, we are no longer in the header.
         self.parsing_header = false;
 
         self.builder.start_node(SyntaxKind::SetStatement.to_raw());
@@ -53,12 +52,36 @@ impl Parser<'_> {
 
         // Consume "Set" keyword
         self.consume_token();
+        self.consume_whitespace();
 
-        // Consume everything until newline
-        // This includes: variable, "=", [New], object expression
-        self.consume_until_after(Token::Newline);
+        // Parse left-hand side (identifier or member access like Form1.Picture)
+        self.parse_lvalue();
 
-        self.builder.finish_node(); // SetStatement
+        // Skip whitespace
+        self.consume_whitespace();
+
+        // Consume "="
+        if self.at_token(Token::EqualityOperator) {
+            self.consume_token();
+        }
+        self.consume_whitespace();
+
+        // Parse right-hand side as a proper expression tree
+        // parse_expression handles:
+        // - "Set obj = Nothing" → IdentifierExpression for Nothing
+        // - "Set obj = New MyClass" → NewExpression via parse_prefix_expression_frame
+        // - "Set obj = GetObject(...)" → CallExpression
+        // - "Set obj = collection.Item(1)" → MemberAccessExpression + CallExpression
+        // - "Set obj = someVar" → IdentifierExpression
+        // - "Set obj = a + b" → BinaryExpression
+        self.parse_expression();
+
+        // Consume newline
+        if self.at_token(Token::Newline) {
+            self.consume_token();
+        }
+
+        self.builder.finish_node();
     }
 }
 

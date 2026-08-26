@@ -13600,24 +13600,34 @@ cst:
                                                     text: Set
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: SourceFile
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: SourceFile
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
                                                     text: "="
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: C_Obj
-                                                  - kind: LeftParenthesis
-                                                    text: (
-                                                  - kind: Identifier
-                                                    text: File
-                                                  - kind: RightParenthesis
-                                                    text: )
+                                                  - kind: CallExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: C_Obj
+                                                      - kind: LeftParenthesis
+                                                        text: (
+                                                      - kind: ArgumentList
+                                                        children:
+                                                          - kind: Argument
+                                                            children:
+                                                              - kind: IdentifierExpression
+                                                                children:
+                                                                  - kind: Identifier
+                                                                    text: File
+                                                      - kind: RightParenthesis
+                                                        text: )
                                                   - kind: Newline
                                                     text: "\r\n"
                                               - kind: Whitespace
@@ -25342,20 +25352,24 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: cFolders
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: cFolders
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: NewKeyword
-                                    text: New
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: Collection
+                                  - kind: NewExpression
+                                    children:
+                                      - kind: NewKeyword
+                                        text: New
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Identifier
+                                        text: Collection
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
@@ -26806,20 +26820,24 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: pvEnumFiles
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: pvEnumFiles
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: NewKeyword
-                                    text: New
-                                  - kind: Whitespace
-                                    text: " "
-                                  - kind: Identifier
-                                    text: Collection
+                                  - kind: NewExpression
+                                    children:
+                                      - kind: NewKeyword
+                                        text: New
+                                      - kind: Whitespace
+                                        text: " "
+                                      - kind: Identifier
+                                        text: Collection
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
@@ -59404,20 +59422,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: pvVfsOpen
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: Stream
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: pvVfsOpen
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Stream
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: File
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: File
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement
@@ -61210,20 +61232,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: pvVfsCreate
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: Stream
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: pvVfsCreate
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Stream
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: File
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: File
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
@@ -62208,20 +62234,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: uFile
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: Stream
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: uFile
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: Stream
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NothingKeyword
-                            text: Nothing
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: NothingKeyword
+                                text: Nothing
                           - kind: Newline
                             text: "\r\n"
                   - kind: EndKeyword
@@ -72682,16 +72712,20 @@ cst:
                                             text: Set
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: vDest
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: vDest
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: vSrc
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: vSrc
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: Whitespace
@@ -75626,16 +75660,20 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: C_Obj
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: C_Obj
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Value
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Value
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: OnErrorStatement
@@ -76040,26 +76078,38 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: oCache
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: oCache
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: VBA
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: CreateObject
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: StringLiteral
-                                    text: "\"VBScript.RegExp\""
-                                  - kind: RightParenthesis
-                                    text: )
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: VBA
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: CreateObject
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"VBScript.RegExp\""
+                                      - kind: RightParenthesis
+                                        text: )
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
@@ -76126,16 +76176,20 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: InitRegExp
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: InitRegExp
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: oCache
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: oCache
                                   - kind: Newline
                                     text: "\r\n"
                           - kind: EndKeyword

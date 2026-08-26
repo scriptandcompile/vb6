@@ -6993,16 +6993,20 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: typeInf
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: typeInf
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: NothingKeyword
-                                    text: Nothing
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: NothingKeyword
+                                        text: Nothing
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
@@ -7597,20 +7601,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: mList
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: mList
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: FastCollection
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: FastCollection
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -7881,16 +7889,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: IDsp
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: IDsp
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: obj
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: obj
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -8329,22 +8341,32 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: typeInf
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: typeInf
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ResolveObjPtrNoRef
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: ppTInfo
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: ResolveObjPtrNoRef
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: ppTInfo
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -8415,18 +8437,24 @@ cst:
                         text: Set
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: typeInf
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: typeInf
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: NothingKeyword
-                        text: Nothing
-                      - kind: ColonOperator
-                        text: ":"
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: NothingKeyword
+                            text: Nothing
+                  - kind: ColonOperator
+                    text: ":"
+                  - kind: ExitStatement
+                    children:
                       - kind: Whitespace
                         text: " "
                       - kind: ExitKeyword
@@ -8435,8 +8463,8 @@ cst:
                         text: " "
                       - kind: FunctionKeyword
                         text: Function
-                      - kind: Newline
-                        text: "\r\n"
+                  - kind: Newline
+                    text: "\r\n"
               - kind: Whitespace
                 text: "    "
               - kind: CallStatement
@@ -8581,16 +8609,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: typeInf
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: typeInf
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NothingKeyword
-                            text: Nothing
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: NothingKeyword
+                                text: Nothing
                           - kind: Newline
                             text: "\r\n"
                       - kind: ExitStatement
@@ -8827,22 +8859,32 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: typeInf
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: typeInf
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: ResolveObjPtrNoRef
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: Identifier
-                                    text: ppTInfo
-                                  - kind: RightParenthesis
-                                    text: )
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: ResolveObjPtrNoRef
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: ppTInfo
+                                      - kind: RightParenthesis
+                                        text: )
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
@@ -11933,16 +11975,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: typeInf
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: typeInf
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: SetStatement
@@ -11953,16 +11999,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: IDsp
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: IDsp
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -12691,16 +12741,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CreateIDispatch
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: CreateIDispatch
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: obj
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: obj
                           - kind: Newline
                             text: "\r\n"
                       - kind: ExitStatement
@@ -12949,16 +13003,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CreateIDispatch
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CreateIDispatch
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: retObj
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: retObj
                   - kind: Newline
                     text: "\r\n"
               - kind: Newline
@@ -13801,28 +13859,42 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CreateObjectEx2
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CreateObjectEx2
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CreateObjectEx
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: pathToDll
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: Clsid
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: CreateObjectEx
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: pathToDll
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Clsid
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -15027,16 +15099,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: out
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: out
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -26063,22 +26139,32 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: pCustTypeInfo
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: pCustTypeInfo
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: ResolveObjPtrNoRef
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: Identifier
-                                    text: ppTInfo
-                                  - kind: RightParenthesis
-                                    text: )
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: ResolveObjPtrNoRef
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: ppTInfo
+                                      - kind: RightParenthesis
+                                        text: )
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: SetStatement
@@ -26089,16 +26175,20 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: pCustTypeInfo
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: pCustTypeInfo
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: NothingKeyword
-                                    text: Nothing
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: NothingKeyword
+                                        text: Nothing
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
@@ -26189,22 +26279,32 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: pCustTypeInfo
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: pCustTypeInfo
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ResolveObjPtrNoRef
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: ppTInfo
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: ResolveObjPtrNoRef
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: ppTInfo
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: AssignmentStatement
@@ -26297,16 +26397,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: pCustTypeInfo
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: pCustTypeInfo
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -28065,34 +28169,52 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: NewObjectFromActivexDll
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: NewObjectFromActivexDll
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CreateObjectEx2
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: pathToDll
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: pathToDll
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: className
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: CreateObjectEx2
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: pathToDll
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: pathToDll
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: className
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword

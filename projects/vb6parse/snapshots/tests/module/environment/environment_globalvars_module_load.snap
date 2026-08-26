@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/module/environment.rs
+source: projects/vb6parse/tests/module/environment.rs
 expression: module
 ---
 name: globalvars
@@ -1937,20 +1937,24 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: thisform
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: thisform
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Screen
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: ActiveForm
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Screen
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: ActiveForm
                                   - kind: Newline
                                     text: "\r\n"
                           - kind: ElseIfClause
@@ -1995,20 +1999,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thisform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thisform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: MyPopUp
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: LASTActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MyPopUp
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: LASTActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
@@ -2039,20 +2047,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thisform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thisform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Screen
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: ActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Screen
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: ActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                           - kind: EndKeyword
@@ -2217,20 +2229,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Scr
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Scr
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bstack
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Owner
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: bstack
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: Owner
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -2349,24 +2365,30 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: Scr
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: bstack
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Owner
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Parent
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: bstack
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: Owner
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: Parent
                               - kind: Newline
                                 text: "\r\n"
                           - kind: IfStatement
@@ -2453,20 +2475,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: Parent
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Parent
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement
@@ -3331,20 +3357,24 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: thisform
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: thisform
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Screen
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: ActiveForm
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Screen
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: ActiveForm
                                   - kind: Newline
                                     text: "\r\n"
                           - kind: ElseIfClause
@@ -3389,20 +3419,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thisform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thisform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: MyPopUp
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: LASTActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MyPopUp
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: LASTActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
@@ -3433,20 +3467,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thisform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thisform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Screen
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: ActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Screen
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: ActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                           - kind: EndKeyword
@@ -3509,20 +3547,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Scr
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Scr
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bstack
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Owner
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: bstack
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: Owner
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -3641,24 +3683,30 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: Scr
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: bstack
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Owner
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Parent
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: bstack
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: Owner
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: Parent
                               - kind: Newline
                                 text: "\r\n"
                           - kind: IfStatement
@@ -3745,20 +3793,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: Parent
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Parent
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement
@@ -4771,20 +4823,24 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: thisform
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: thisform
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Screen
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: ActiveForm
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Screen
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: ActiveForm
                                   - kind: Newline
                                     text: "\r\n"
                           - kind: ElseIfClause
@@ -4829,20 +4885,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thisform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thisform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: MyPopUp
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: LASTActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MyPopUp
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: LASTActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
@@ -4873,20 +4933,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thisform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thisform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Screen
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: ActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Screen
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: ActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                           - kind: EndKeyword
@@ -5593,20 +5657,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Scr
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Scr
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bstack
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Owner
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: bstack
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: Owner
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -5725,24 +5793,30 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: Scr
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: bstack
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Owner
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Parent
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: bstack
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: Owner
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: Parent
                               - kind: Newline
                                 text: "\r\n"
                           - kind: IfStatement
@@ -5829,20 +5903,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: Parent
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Parent
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement
@@ -6927,20 +7005,24 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: thisform
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: thisform
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Screen
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: ActiveForm
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Screen
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: ActiveForm
                                   - kind: Newline
                                     text: "\r\n"
                           - kind: ElseIfClause
@@ -6985,20 +7067,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thisform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thisform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: MyPopUp
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: LASTActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MyPopUp
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: LASTActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
@@ -7029,20 +7115,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thisform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thisform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Screen
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: ActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Screen
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: ActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                           - kind: EndKeyword
@@ -7825,20 +7915,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Scr
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Scr
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bstack
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Owner
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: bstack
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: Owner
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -7957,24 +8051,30 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: Scr
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: bstack
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Owner
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Parent
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: bstack
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: Owner
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: Parent
                               - kind: Newline
                                 text: "\r\n"
                           - kind: IfStatement
@@ -8061,20 +8161,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: Parent
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Parent
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement
@@ -9215,20 +9319,24 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: thisform
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: thisform
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Screen
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: ActiveForm
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Screen
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: ActiveForm
                                   - kind: Newline
                                     text: "\r\n"
                           - kind: ElseIfClause
@@ -9273,20 +9381,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thisform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thisform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: MyPopUp
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: LASTActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MyPopUp
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: LASTActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
@@ -9317,20 +9429,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thisform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thisform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Screen
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: ActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Screen
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: ActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                           - kind: EndKeyword
@@ -10057,20 +10173,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Scr
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Scr
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bstack
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Owner
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: bstack
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: Owner
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -10189,24 +10309,30 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: Scr
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: bstack
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Owner
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Parent
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: bstack
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: Owner
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: Parent
                               - kind: Newline
                                 text: "\r\n"
                           - kind: IfStatement
@@ -10293,20 +10419,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: Parent
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Parent
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement
@@ -11551,20 +11681,24 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: thatform
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: thatform
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Screen
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: ActiveForm
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Screen
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: ActiveForm
                                   - kind: Newline
                                     text: "\r\n"
                           - kind: ElseIfClause
@@ -11609,20 +11743,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thatform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thatform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: MyPopUp
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: LASTActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: MyPopUp
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: LASTActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
@@ -11653,20 +11791,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: thatform
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: thatform
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Screen
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: ActiveForm
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Screen
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: ActiveForm
                                       - kind: Newline
                                         text: "\r\n"
                           - kind: EndKeyword
@@ -12233,20 +12375,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Scr
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Scr
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: bstack
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Owner
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: bstack
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: Owner
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -12365,24 +12511,30 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: Scr
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Scr
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: bstack
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Owner
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Parent
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: MemberAccessExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: bstack
+                                      - kind: PeriodOperator
+                                        text: "."
+                                      - kind: Identifier
+                                        text: Owner
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: Parent
                               - kind: Newline
                                 text: "\r\n"
                           - kind: IfStatement
@@ -12469,20 +12621,24 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: Scr
-                                      - kind: PeriodOperator
-                                        text: "."
-                                      - kind: Identifier
-                                        text: Parent
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: Scr
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: Parent
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement

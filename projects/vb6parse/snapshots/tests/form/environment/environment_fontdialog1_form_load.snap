@@ -3215,20 +3215,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: TEXT1
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: TEXT1
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: myTextBox
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: myTextBox
                   - kind: Newline
                     text: "\r\n"
               - kind: SetStatement
@@ -3237,20 +3241,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: TEXT1
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Container
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: TEXT1
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: Container
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: gList3
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: gList3
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -7261,16 +7269,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: LastGlist
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: LastGlist
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: CallStatement
@@ -17777,16 +17789,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: LastGlist
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: LastGlist
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: this
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: this
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -17917,36 +17933,46 @@ cst:
                         text: Set
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: LastGlist
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: LastGlist
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: this
-                      - kind: Whitespace
-                        text: " "
-                      - kind: ElseKeyword
-                        text: Else
-                      - kind: Whitespace
-                        text: " "
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: this
+                  - kind: Whitespace
+                    text: " "
+                  - kind: ElseKeyword
+                    text: Else
+                  - kind: Whitespace
+                    text: " "
+                  - kind: SetStatement
+                    children:
                       - kind: SetKeyword
                         text: Set
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: LastGlist
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: LastGlist
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: NothingKeyword
-                        text: Nothing
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: NothingKeyword
+                            text: Nothing
                       - kind: Newline
                         text: "\r\n"
           - kind: EndKeyword
@@ -18205,16 +18231,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: LastGlist
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: LastGlist
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement

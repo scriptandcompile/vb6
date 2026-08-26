@@ -552,20 +552,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Copy
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Copy
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: mStiva2
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: mStiva2
                   - kind: Newline
                     text: "\r\n"
               - kind: ForStatement
@@ -3136,26 +3140,38 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: PopObj
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: PopObj
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: mstack
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: item
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: IntegerLiteral
-                    text: "1"
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: mstack
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: item
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "1"
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: CallStatement
@@ -3236,16 +3252,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: aa
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: aa
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: RHS
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: RHS
                   - kind: Newline
                     text: "\r\n"
               - kind: CallStatement
@@ -4624,22 +4644,28 @@ cst:
                         text: Set
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: mstack
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: mstack
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: NewKeyword
-                        text: New
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Identifier
-                        text: Collection
-                      - kind: ColonOperator
-                        text: ":"
+                      - kind: NewExpression
+                        children:
+                          - kind: NewKeyword
+                            text: New
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: Collection
+                  - kind: ColonOperator
+                    text: ":"
+                  - kind: ExitStatement
+                    children:
                       - kind: Whitespace
                         text: " "
                       - kind: ExitKeyword
@@ -4648,8 +4674,8 @@ cst:
                         text: " "
                       - kind: SubKeyword
                         text: Sub
-                      - kind: Newline
-                        text: "\r\n"
+                  - kind: Newline
+                    text: "\r\n"
               - kind: ForStatement
                 children:
                   - kind: ForKeyword

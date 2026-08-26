@@ -3560,16 +3560,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Socket
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Socket
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: m_oSocket
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: m_oSocket
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -3696,16 +3700,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: LastError
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: LastError
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Err
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Err
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -4160,20 +4168,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: m_oSocket
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: m_oSocket
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: cAsyncSocket
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: cAsyncSocket
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -4602,16 +4614,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: m_oSocket
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: m_oSocket
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NothingKeyword
-                            text: Nothing
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: NothingKeyword
+                                text: Nothing
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace

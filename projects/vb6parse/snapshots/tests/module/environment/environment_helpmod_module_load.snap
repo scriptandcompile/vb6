@@ -4365,22 +4365,32 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: oshell
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: oshell
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CreateObject
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: StringLiteral
-                    text: "\"Shell.Application\""
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: CreateObject
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"Shell.Application\""
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -4425,26 +4435,38 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: oFolder
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: oFolder
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: oshell
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: NameSpace
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: NET_HOOD
-                          - kind: RightParenthesis
-                            text: )
+                          - kind: CallExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: oshell
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: NameSpace
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: NET_HOOD
+                              - kind: RightParenthesis
+                                text: )
                           - kind: Newline
                             text: "\r\n"
                       - kind: ForEachStatement
@@ -4883,16 +4905,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: ofile
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ofile
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NothingKeyword
-                            text: Nothing
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: NothingKeyword
+                                text: Nothing
                           - kind: Newline
                             text: "\r\n"
                       - kind: SetStatement
@@ -4901,16 +4927,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: oFolder
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: oFolder
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NothingKeyword
-                            text: Nothing
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: NothingKeyword
+                                text: Nothing
                           - kind: Newline
                             text: "\r\n"
                       - kind: IfStatement
@@ -5357,22 +5387,32 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: oshell
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: oshell
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CreateObject
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: StringLiteral
-                    text: "\"Shell.Application\""
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: CreateObject
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"Shell.Application\""
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -5417,26 +5457,38 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: oFolder
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: oFolder
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: oshell
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: NameSpace
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: NET_HOOD
-                          - kind: RightParenthesis
-                            text: )
+                          - kind: CallExpression
+                            children:
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: oshell
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: NameSpace
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: NET_HOOD
+                              - kind: RightParenthesis
+                                text: )
                           - kind: Newline
                             text: "\r\n"
                       - kind: Newline
@@ -5563,16 +5615,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: ofile
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ofile
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NothingKeyword
-                            text: Nothing
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: NothingKeyword
+                                text: Nothing
                           - kind: Newline
                             text: "\r\n"
                       - kind: SetStatement
@@ -5581,16 +5637,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: oFolder
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: oFolder
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NothingKeyword
-                            text: Nothing
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: NothingKeyword
+                                text: Nothing
                           - kind: Newline
                             text: "\r\n"
                   - kind: EndKeyword
@@ -7163,20 +7223,24 @@ cst:
                                             text: Set
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: M
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: M
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: NewKeyword
-                                            text: New
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: Identifier
-                                            text: clsHttpsRequest
+                                          - kind: NewExpression
+                                            children:
+                                              - kind: NewKeyword
+                                                text: New
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Identifier
+                                                text: clsHttpsRequest
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: IfStatement

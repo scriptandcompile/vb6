@@ -11182,16 +11182,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: LastError
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: LastError
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Err
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Err
                   - kind: Newline
                     text: "\r\n"
               - kind: WithStatement
@@ -13096,34 +13100,52 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: m_pCleanup
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: m_pCleanup
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: InitCleanupThunk
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: m_hSocket
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"ws2_32\""
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"closesocket\""
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: InitCleanupThunk
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: m_hSocket
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"ws2_32\""
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"closesocket\""
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -13916,34 +13938,52 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: m_pCleanup
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: m_pCleanup
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: InitCleanupThunk
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: m_hSocket
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"ws2_32\""
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: StringLiteral
-                    text: "\"closesocket\""
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: InitCleanupThunk
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: m_hSocket
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"ws2_32\""
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"closesocket\""
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -14328,16 +14368,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: m_pCleanup
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: m_pCleanup
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: ExitStatement
@@ -16422,20 +16466,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: ConnectedSocket
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ConnectedSocket
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NewKeyword
-                            text: New
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: cAsyncSocket
+                          - kind: NewExpression
+                            children:
+                              - kind: NewKeyword
+                                text: New
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: cAsyncSocket
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -30908,16 +30956,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: m_pCleanup
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: m_pCleanup
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NothingKeyword
-                            text: Nothing
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: NothingKeyword
+                                text: Nothing
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -41674,24 +41726,30 @@ cst:
                                                                     text: Set
                                                                   - kind: Whitespace
                                                                     text: " "
-                                                                  - kind: Identifier
-                                                                    text: m_cMsgQueue
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: m_cMsgQueue
                                                                   - kind: Whitespace
                                                                     text: " "
                                                                   - kind: EqualityOperator
                                                                     text: "="
                                                                   - kind: Whitespace
                                                                     text: " "
-                                                                  - kind: NewKeyword
-                                                                    text: New
-                                                                  - kind: Whitespace
-                                                                    text: " "
-                                                                  - kind: Identifier
-                                                                    text: VBA
-                                                                  - kind: PeriodOperator
-                                                                    text: "."
-                                                                  - kind: Identifier
-                                                                    text: Collection
+                                                                  - kind: MemberAccessExpression
+                                                                    children:
+                                                                      - kind: NewExpression
+                                                                        children:
+                                                                          - kind: NewKeyword
+                                                                            text: New
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: Identifier
+                                                                            text: VBA
+                                                                      - kind: PeriodOperator
+                                                                        text: "."
+                                                                      - kind: Identifier
+                                                                        text: Collection
                                                                   - kind: Newline
                                                                     text: "\r\n"
                                                               - kind: Whitespace
@@ -46562,28 +46620,42 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: pvAddressOfNotifyProc
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: pvAddressOfNotifyProc
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: InitAddressOfMethod
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: MeKeyword
-                    text: Me
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "4"
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: InitAddressOfMethod
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: MeKeyword
+                                    text: Me
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "4"
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -54312,22 +54384,32 @@ cst:
                                             text: Set
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: m_oHelperWindow
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: m_oHelperWindow
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: pvToSocket
-                                          - kind: LeftParenthesis
-                                            text: (
-                                          - kind: Identifier
-                                            text: lPtr
-                                          - kind: RightParenthesis
-                                            text: )
+                                          - kind: CallExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: pvToSocket
+                                              - kind: LeftParenthesis
+                                                text: (
+                                              - kind: ArgumentList
+                                                children:
+                                                  - kind: Argument
+                                                    children:
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: lPtr
+                                              - kind: RightParenthesis
+                                                text: )
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: Whitespace
@@ -54348,20 +54430,24 @@ cst:
                                                 text: Set
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: m_oHelperWindow
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: m_oHelperWindow
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
                                                 text: "="
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: NewKeyword
-                                                text: New
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: Identifier
-                                                text: cAsyncSocket
+                                              - kind: NewExpression
+                                                children:
+                                                  - kind: NewKeyword
+                                                    text: New
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: Identifier
+                                                    text: cAsyncSocket
                                               - kind: Newline
                                                 text: "\r\n"
                                           - kind: Whitespace
@@ -54690,64 +54776,102 @@ cst:
                                                         text: Set
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: Notify
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: Notify
                                                       - kind: Whitespace
                                                         text: " "
                                                       - kind: EqualityOperator
                                                         text: "="
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Identifier
-                                                        text: InitAsyncSelectNotifyThunk
-                                                      - kind: LeftParenthesis
-                                                        text: (
-                                                      - kind: Identifier
-                                                        text: hWndHelper
-                                                      - kind: Comma
-                                                        text: ","
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: MeKeyword
-                                                        text: Me
-                                                      - kind: Comma
-                                                        text: ","
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: Identifier
-                                                        text: pvAddressOfNotifyProc
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: NotifyProc
-                                                      - kind: LeftParenthesis
-                                                        text: (
-                                                      - kind: IntegerLiteral
-                                                        text: "0"
-                                                      - kind: Comma
-                                                        text: ","
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: IntegerLiteral
-                                                        text: "0"
-                                                      - kind: Comma
-                                                        text: ","
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: IntegerLiteral
-                                                        text: "0"
-                                                      - kind: Comma
-                                                        text: ","
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: IntegerLiteral
-                                                        text: "0"
-                                                      - kind: RightParenthesis
-                                                        text: )
-                                                      - kind: RightParenthesis
-                                                        text: )
+                                                      - kind: CallExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: InitAsyncSelectNotifyThunk
+                                                          - kind: LeftParenthesis
+                                                            text: (
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: hWndHelper
+                                                              - kind: Comma
+                                                                text: ","
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: MeKeyword
+                                                                        text: Me
+                                                              - kind: Comma
+                                                                text: ","
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: CallExpression
+                                                                    children:
+                                                                      - kind: MemberAccessExpression
+                                                                        children:
+                                                                          - kind: Identifier
+                                                                            text: pvAddressOfNotifyProc
+                                                                          - kind: PeriodOperator
+                                                                            text: "."
+                                                                          - kind: Identifier
+                                                                            text: NotifyProc
+                                                                      - kind: LeftParenthesis
+                                                                        text: (
+                                                                      - kind: ArgumentList
+                                                                        children:
+                                                                          - kind: Argument
+                                                                            children:
+                                                                              - kind: NumericLiteralExpression
+                                                                                children:
+                                                                                  - kind: IntegerLiteral
+                                                                                    text: "0"
+                                                                          - kind: Comma
+                                                                            text: ","
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: Argument
+                                                                            children:
+                                                                              - kind: NumericLiteralExpression
+                                                                                children:
+                                                                                  - kind: IntegerLiteral
+                                                                                    text: "0"
+                                                                          - kind: Comma
+                                                                            text: ","
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: Argument
+                                                                            children:
+                                                                              - kind: NumericLiteralExpression
+                                                                                children:
+                                                                                  - kind: IntegerLiteral
+                                                                                    text: "0"
+                                                                          - kind: Comma
+                                                                            text: ","
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: Argument
+                                                                            children:
+                                                                              - kind: NumericLiteralExpression
+                                                                                children:
+                                                                                  - kind: IntegerLiteral
+                                                                                    text: "0"
+                                                                      - kind: RightParenthesis
+                                                                        text: )
+                                                          - kind: RightParenthesis
+                                                            text: )
                                                       - kind: Newline
                                                         text: "\r\n"
                                                   - kind: SetStatement
@@ -54758,36 +54882,54 @@ cst:
                                                         text: Set
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: PeriodOperator
-                                                        text: "."
-                                                      - kind: Identifier
-                                                        text: Cleanup
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: Cleanup
                                                       - kind: Whitespace
                                                         text: " "
                                                       - kind: EqualityOperator
                                                         text: "="
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Identifier
-                                                        text: InitCleanupThunk
-                                                      - kind: LeftParenthesis
-                                                        text: (
-                                                      - kind: Identifier
-                                                        text: hWndHelper
-                                                      - kind: Comma
-                                                        text: ","
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: StringLiteral
-                                                        text: "\"user32\""
-                                                      - kind: Comma
-                                                        text: ","
-                                                      - kind: Whitespace
-                                                        text: " "
-                                                      - kind: StringLiteral
-                                                        text: "\"DestroyWindow\""
-                                                      - kind: RightParenthesis
-                                                        text: )
+                                                      - kind: CallExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: InitCleanupThunk
+                                                          - kind: LeftParenthesis
+                                                            text: (
+                                                          - kind: ArgumentList
+                                                            children:
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: IdentifierExpression
+                                                                    children:
+                                                                      - kind: Identifier
+                                                                        text: hWndHelper
+                                                              - kind: Comma
+                                                                text: ","
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: StringLiteralExpression
+                                                                    children:
+                                                                      - kind: StringLiteral
+                                                                        text: "\"user32\""
+                                                              - kind: Comma
+                                                                text: ","
+                                                              - kind: Whitespace
+                                                                text: " "
+                                                              - kind: Argument
+                                                                children:
+                                                                  - kind: StringLiteralExpression
+                                                                    children:
+                                                                      - kind: StringLiteral
+                                                                        text: "\"DestroyWindow\""
+                                                          - kind: RightParenthesis
+                                                            text: )
                                                       - kind: Newline
                                                         text: "\r\n"
                                                   - kind: Whitespace
@@ -54936,16 +55078,20 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: m_oHelperWindow
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: m_oHelperWindow
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: NothingKeyword
-                                    text: Nothing
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: NothingKeyword
+                                        text: Nothing
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
@@ -55112,18 +55258,22 @@ cst:
                                                 text: Set
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: Notify
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: Notify
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
                                                 text: "="
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: NothingKeyword
-                                                text: Nothing
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: NothingKeyword
+                                                    text: Nothing
                                               - kind: Newline
                                                 text: "\r\n"
                                           - kind: Whitespace
@@ -55186,18 +55336,22 @@ cst:
                                                 text: Set
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: Cleanup
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: Cleanup
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
                                                 text: "="
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: NothingKeyword
-                                                text: Nothing
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: NothingKeyword
+                                                    text: Nothing
                                               - kind: Newline
                                                 text: "\r\n"
                                           - kind: Whitespace

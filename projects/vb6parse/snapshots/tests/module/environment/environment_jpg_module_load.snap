@@ -987,16 +987,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: DecodeHEXtoMemBloc
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: DecodeHEXtoMemBloc
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: mem
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: mem
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -1533,16 +1537,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: Decode64toMemBloc
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Decode64toMemBloc
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: mem
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: mem
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -2327,16 +2335,20 @@ cst:
                                             text: Set
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: File2newMemblock
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: File2newMemblock
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: mem
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: mem
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: IfStatement
@@ -4125,20 +4137,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: SaveJPGtoBuffer
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: SaveJPGtoBuffer
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: j
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: GetBuffer
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: j
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: GetBuffer
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -12535,20 +12551,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: what
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: what
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: thislayer
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: Parent
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: thislayer
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: Parent
                           - kind: Newline
                             text: "\r\n"
                       - kind: IfStatement
@@ -12689,16 +12709,20 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: parent1
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: parent1
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: what
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: what
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: WithStatement
@@ -13091,16 +13115,20 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: parent2
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: parent2
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: what
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: what
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: WithStatement

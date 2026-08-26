@@ -641,20 +641,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: cDialog
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: cDialog
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: pdOpenSaveDialog
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: pdOpenSaveDialog
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -1125,20 +1129,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: fDraw
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: fDraw
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: FastDrawing
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: FastDrawing
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -2761,20 +2769,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: fDraw
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: fDraw
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: FastDrawing
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: FastDrawing
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace

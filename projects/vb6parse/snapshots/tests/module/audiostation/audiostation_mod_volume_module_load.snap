@@ -1075,20 +1075,24 @@ cst:
                                             text: Set
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: VolumeChannelModel
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: VolumeChannelModel
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: NewKeyword
-                                            text: New
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: Identifier
-                                            text: mdlVolumeChannel
+                                          - kind: NewExpression
+                                            children:
+                                              - kind: NewKeyword
+                                                text: New
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Identifier
+                                                text: mdlVolumeChannel
                                           - kind: Newline
                                             text: "\n"
                                       - kind: Whitespace
@@ -1253,16 +1257,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ListOfVolChannels
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ListOfVolChannels
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: returnCollection
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: returnCollection
                   - kind: Newline
                     text: "\n"
           - kind: EndKeyword
@@ -1441,16 +1449,20 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: ChannelExists
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: ChannelExists
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: Channel
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: Channel
                                   - kind: Newline
                                     text: "\n"
                               - kind: ExitStatement
@@ -1487,16 +1499,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ChannelExists
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ChannelExists
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\n"
           - kind: EndKeyword

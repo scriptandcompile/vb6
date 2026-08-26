@@ -3263,20 +3263,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: HTMLdoc
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: HTMLdoc
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: MyWebBrowser
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: document
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: MyWebBrowser
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: document
                   - kind: Newline
                     text: "\n"
               - kind: Newline
@@ -3365,16 +3369,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: HTMLdoc
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: HTMLdoc
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\n"
               - kind: SetStatement
@@ -3383,16 +3391,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: MyWebBrowser
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: MyWebBrowser
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\n"
               - kind: Newline

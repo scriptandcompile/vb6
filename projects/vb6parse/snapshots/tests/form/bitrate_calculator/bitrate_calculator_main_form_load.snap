@@ -5525,16 +5525,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: comboRatio
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: comboRatio
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -5661,16 +5665,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: comboFPS
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: comboFPS
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -5733,16 +5741,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: chkRatio
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: chkRatio
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -6021,16 +6033,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtAspectRatio
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: txtAspectRatio
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -6251,22 +6267,32 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtAudioBitrate
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: Index
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: txtAudioBitrate
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Index
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -6757,22 +6783,32 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtAudioSize
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: Index
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: txtAudioSize
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: Index
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -6835,16 +6871,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: comboSizePreset
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: comboSizePreset
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -7157,16 +7197,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtBitrate
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: txtBitrate
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -7641,16 +7685,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtBitsPerPixel
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: txtBitsPerPixel
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -8071,16 +8119,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtFinalFileSize
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: txtFinalFileSize
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -8501,16 +8553,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtHeight
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: txtHeight
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -9439,16 +9495,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtHours
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: txtHours
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -10059,16 +10119,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtMin
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: txtMin
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -10631,16 +10695,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtSeconds
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: txtSeconds
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -11061,16 +11129,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtTotalFrames
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: txtTotalFrames
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -11291,16 +11363,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CtrlFocused
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: CtrlFocused
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: txtWidth
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: txtWidth
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace

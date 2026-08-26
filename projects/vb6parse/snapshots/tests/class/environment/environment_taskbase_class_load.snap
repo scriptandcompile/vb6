@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -324,16 +324,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: TaskInterface_Process
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: TaskInterface_Process
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myProcess
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myProcess
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -388,16 +392,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myProcess
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myProcess
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Value
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Value
                   - kind: Newline
                     text: "\r\n"
               - kind: Newline
@@ -1004,16 +1012,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: TaskInterface_Owner
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: TaskInterface_Owner
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myOwner
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myOwner
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -1072,16 +1084,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myOwner
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myOwner
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: RHS
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: RHS
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -1288,16 +1304,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myOwner
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myOwner
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: EndOfLineComment

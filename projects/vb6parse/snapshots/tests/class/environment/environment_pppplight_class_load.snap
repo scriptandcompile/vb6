@@ -272,22 +272,32 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: iBoxArray_item
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: Identifier
-                    text: curitem
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: iBoxArray_item
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: curitem
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: item
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: item
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -462,16 +472,20 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: usehandler
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: usehandler
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: GroupRef
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: GroupRef
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement
@@ -942,16 +956,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: GroupRef
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: GroupRef
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: a
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: a
                   - kind: Newline
                     text: "\r\n"
               - kind: AssignmentStatement
@@ -1224,16 +1242,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: usehandler
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: usehandler
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: GroupRef
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: GroupRef
                           - kind: Newline
                             text: "\r\n"
                       - kind: IfStatement
@@ -2728,20 +2750,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: iBoxArray_EmptyArraySameType
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: iBoxArray_EmptyArraySameType
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: tuple
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: tuple
                   - kind: Newline
                     text: "\r\n"
               - kind: CallStatement
@@ -3156,16 +3182,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: GroupRef
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: GroupRef
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: RHS
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: RHS
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -3220,16 +3250,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: iBoxArray_GroupRef
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: iBoxArray_GroupRef
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: GroupRef
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: GroupRef
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -3762,16 +3796,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: usehandler
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: usehandler
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: GroupRef
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: GroupRef
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -4008,16 +4046,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: peekvalue
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: peekvalue
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: GroupRef
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: GroupRef
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -4142,16 +4184,20 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: usehandler
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: usehandler
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: GroupRef
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: GroupRef
                               - kind: Newline
                                 text: "\r\n"
                           - kind: IfStatement
@@ -4310,24 +4356,30 @@ cst:
                                                 text: Set
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: peekvalue
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: peekvalue
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
                                                 text: "="
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: usehandler
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: objref
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: ValueObj
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: MemberAccessExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: usehandler
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: objref
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: ValueObj
                                               - kind: Newline
                                                 text: "\r\n"
                                           - kind: Whitespace
@@ -4418,16 +4470,20 @@ cst:
                                             text: Set
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: peekvalue
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: peekvalue
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: usehandler
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: usehandler
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: Whitespace
@@ -4482,16 +4538,20 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: peekvalue
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: peekvalue
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: GroupRef
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: GroupRef
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
@@ -4512,16 +4572,20 @@ cst:
                                             text: Set
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: peekvalue
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: peekvalue
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: actualData
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: actualData
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: Whitespace
@@ -4858,16 +4922,20 @@ cst:
                                             text: Set
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: usehandler
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: usehandler
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: GroupRef
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: GroupRef
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: IfStatement
@@ -4998,24 +5066,30 @@ cst:
                                                     text: Set
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: usehandler
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: objref
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: Identifier
-                                                    text: ValueObj
+                                                  - kind: MemberAccessExpression
+                                                    children:
+                                                      - kind: MemberAccessExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: usehandler
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: Identifier
+                                                            text: objref
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: ValueObj
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
                                                     text: "="
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: item
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: item
                                                   - kind: Newline
                                                     text: "\r\n"
                                               - kind: ExitStatement
@@ -5148,16 +5222,20 @@ cst:
                                                         text: Set
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Identifier
-                                                        text: GroupRef
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: GroupRef
                                                       - kind: Whitespace
                                                         text: " "
                                                       - kind: EqualityOperator
                                                         text: "="
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Identifier
-                                                        text: item
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: item
                                                       - kind: Newline
                                                         text: "\r\n"
                                                   - kind: Whitespace
@@ -5244,16 +5322,20 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: actualData
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: actualData
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: item
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: item
                               - kind: Newline
                                 text: "\r\n"
                   - kind: EndKeyword
@@ -5414,16 +5496,20 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: usehandler
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: usehandler
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: GroupRef
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: GroupRef
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: IfStatement
@@ -5692,16 +5778,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: iBoxArray_item
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: iBoxArray_item
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: GroupRef
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: GroupRef
                           - kind: Newline
                             text: "\r\n"
                   - kind: ElseIfClause
@@ -5806,16 +5896,20 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: usehandler
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: usehandler
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: GroupRef
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: GroupRef
                               - kind: Newline
                                 text: "\r\n"
                           - kind: IfStatement
@@ -5974,24 +6068,30 @@ cst:
                                                 text: Set
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: iBoxArray_item
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: iBoxArray_item
                                               - kind: Whitespace
                                                 text: " "
                                               - kind: EqualityOperator
                                                 text: "="
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: Identifier
-                                                text: usehandler
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: objref
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: Identifier
-                                                text: ValueObj
+                                              - kind: MemberAccessExpression
+                                                children:
+                                                  - kind: MemberAccessExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: usehandler
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: Identifier
+                                                        text: objref
+                                                  - kind: PeriodOperator
+                                                    text: "."
+                                                  - kind: Identifier
+                                                    text: ValueObj
                                               - kind: Newline
                                                 text: "\r\n"
                                           - kind: Whitespace
@@ -6062,16 +6162,20 @@ cst:
                                             text: Set
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: iBoxArray_item
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: iBoxArray_item
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: usehandler
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: usehandler
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: Whitespace
@@ -6126,16 +6230,20 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: iBoxArray_item
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: iBoxArray_item
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: GroupRef
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: GroupRef
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: Whitespace
@@ -6188,16 +6296,20 @@ cst:
                                                     text: Set
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: iBoxArray_item
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: iBoxArray_item
                                                   - kind: Whitespace
                                                     text: " "
                                                   - kind: EqualityOperator
                                                     text: "="
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: Identifier
-                                                    text: actualData
+                                                  - kind: IdentifierExpression
+                                                    children:
+                                                      - kind: Identifier
+                                                        text: actualData
                                                   - kind: Newline
                                                     text: "\r\n"
                                               - kind: Whitespace
@@ -6514,16 +6626,20 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: iBoxArray_itemObject
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: iBoxArray_itemObject
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: actualData
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: actualData
                                   - kind: Newline
                                     text: "\r\n"
                               - kind: Whitespace
@@ -6556,16 +6672,20 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: iBoxArray_itemObject
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: iBoxArray_itemObject
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: GroupRef
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: GroupRef
                               - kind: Newline
                                 text: "\r\n"
                   - kind: EndKeyword
@@ -7130,16 +7250,20 @@ cst:
                                             text: Set
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: usehandler
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: usehandler
                                           - kind: Whitespace
                                             text: " "
                                           - kind: EqualityOperator
                                             text: "="
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: GroupRef
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: GroupRef
                                           - kind: Newline
                                             text: "\r\n"
                                       - kind: IfStatement
@@ -7692,16 +7816,20 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: usehandler
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: usehandler
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: GroupRef
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: GroupRef
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement
@@ -8306,16 +8434,20 @@ cst:
                                         text: Set
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: usehandler
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: usehandler
                                       - kind: Whitespace
                                         text: " "
                                       - kind: EqualityOperator
                                         text: "="
                                       - kind: Whitespace
                                         text: " "
-                                      - kind: Identifier
-                                        text: GroupRef
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: GroupRef
                                       - kind: Newline
                                         text: "\r\n"
                                   - kind: IfStatement
@@ -9012,16 +9144,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: refgroup
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: refgroup
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: RHS
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: RHS
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -9074,16 +9210,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: iBoxArray_refgroup
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: iBoxArray_refgroup
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: refgroup
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: refgroup
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -9882,16 +10022,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: obj
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: obj
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: MeKeyword
-                    text: Me
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: MeKeyword
+                        text: Me
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace

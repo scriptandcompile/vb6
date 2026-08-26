@@ -1671,28 +1671,42 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: pvAddressOfTimerProc
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: pvAddressOfTimerProc
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: InitAddressOfMethod
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: MeKeyword
-                    text: Me
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: IntegerLiteral
-                    text: "0"
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: InitAddressOfMethod
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: MeKeyword
+                                    text: Me
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: NumericLiteralExpression
+                                children:
+                                  - kind: IntegerLiteral
+                                    text: "0"
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -1839,16 +1853,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: m_oSocket
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: m_oSocket
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: oSocket
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: oSocket
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -1879,20 +1897,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: m_cEvents
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: m_cEvents
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: Collection
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: Collection
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -7663,48 +7685,70 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: m_pTimer
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: m_pTimer
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: InitFireOnceTimerThunk
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: MeKeyword
-                            text: Me
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: pvAddressOfTimerProc
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: TimerProc
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Comma
-                            text: ","
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: Delay
-                          - kind: ColonOperator
-                            text: ":"
-                          - kind: EqualityOperator
-                            text: "="
-                          - kind: Identifier
-                            text: lDelay
-                          - kind: RightParenthesis
-                            text: )
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: InitFireOnceTimerThunk
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: MeKeyword
+                                            text: Me
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: CallExpression
+                                        children:
+                                          - kind: MemberAccessExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: pvAddressOfTimerProc
+                                              - kind: PeriodOperator
+                                                text: "."
+                                              - kind: Identifier
+                                                text: TimerProc
+                                          - kind: LeftParenthesis
+                                            text: (
+                                          - kind: ArgumentList
+                                            children: []
+                                          - kind: RightParenthesis
+                                            text: )
+                                  - kind: Comma
+                                    text: ","
+                                  - kind: Whitespace
+                                    text: " "
+                                  - kind: Argument
+                                    children:
+                                      - kind: Identifier
+                                        text: Delay
+                                      - kind: ColonOperator
+                                        text: ":"
+                                      - kind: EqualityOperator
+                                        text: "="
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: lDelay
+                              - kind: RightParenthesis
+                                text: )
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -7809,16 +7853,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: m_oSocket
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: m_oSocket
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword

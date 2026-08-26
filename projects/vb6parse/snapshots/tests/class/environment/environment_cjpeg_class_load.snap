@@ -44118,20 +44118,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: GetBuffer
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: GetBuffer
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: mHandler
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: mHandler
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -44176,16 +44180,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: usehandler
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: usehandler
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: GetBuffer
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: GetBuffer
                   - kind: Newline
                     text: "\r\n"
               - kind: SetStatement
@@ -44196,20 +44204,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Buffer
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Buffer
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: MemBlock
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: MemBlock
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -44298,20 +44310,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: usehandler
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: objref
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: usehandler
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: objref
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Buffer
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Buffer
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace

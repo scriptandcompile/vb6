@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/resources/loadrespicture.rs
+source: projects/vb6parse/src/syntax/library/functions/resources/loadrespicture.rs
 expression: tree
 ---
 root:
@@ -55,28 +55,42 @@ root:
                   text: Set
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: pic
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: pic
                 - kind: Whitespace
                   text: " "
                 - kind: EqualityOperator
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: LoadResPicture
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: resID
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: vbResBitmap
-                - kind: RightParenthesis
-                  text: )
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: LoadResPicture
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: resID
+                        - kind: Comma
+                          text: ","
+                        - kind: Whitespace
+                          text: " "
+                        - kind: Argument
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: vbResBitmap
+                    - kind: RightParenthesis
+                      text: )
                 - kind: Newline
                   text: "\n"
             - kind: Whitespace

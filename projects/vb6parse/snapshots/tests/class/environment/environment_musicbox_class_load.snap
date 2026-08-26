@@ -1116,16 +1116,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: TaskInterface_Process
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: TaskInterface_Process
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myProcess
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myProcess
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -1178,16 +1182,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myProcess
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myProcess
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: aProcess
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: aProcess
                   - kind: Newline
                     text: "\r\n"
               - kind: SetStatement
@@ -1196,20 +1204,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myProcess
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Process
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: myProcess
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: Process
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myBase
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myBase
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -1604,20 +1616,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myBase
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Owner
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: myBase
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: Owner
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: RHS
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: RHS
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -7812,20 +7828,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: TaskInterface_Owner
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: TaskInterface_Owner
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myBase
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Owner
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: myBase
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: Owner
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -8276,16 +8296,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myBase
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myBase
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -8338,20 +8362,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myBase
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myBase
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: TaskBase
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: TaskBase
                   - kind: Newline
                     text: "\r\n"
               - kind: AssignmentStatement

@@ -2410,22 +2410,32 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: oShell
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: oShell
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CreateObject
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: StringLiteral
-                    text: "\"WSCript.shell\""
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: CreateObject
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"WSCript.shell\""
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\n"
               - kind: Newline
@@ -2746,22 +2756,32 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: myFSO
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: myFSO
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CreateObject
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: StringLiteral
-                    text: "\"Scripting.FileSystemObject\""
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: CreateObject
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"Scripting.FileSystemObject\""
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\n"
               - kind: Newline
@@ -3400,22 +3420,32 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Registry
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Registry
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: CreateObject
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: StringLiteral
-                    text: "\"WScript.Shell\""
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: Identifier
+                        text: CreateObject
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"WScript.Shell\""
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\n"
               - kind: AssignmentStatement

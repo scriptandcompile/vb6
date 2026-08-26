@@ -613,16 +613,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: mySocket
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: mySocket
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NothingKeyword
-                            text: Nothing
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: NothingKeyword
+                                text: Nothing
                           - kind: Newline
                             text: "\r\n"
                   - kind: EndKeyword
@@ -2939,16 +2943,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: OwnAsyncSocket
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: OwnAsyncSocket
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: mySocket
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: mySocket
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -3563,38 +3571,48 @@ cst:
                         text: Set
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: mySocket
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: mySocket
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: NewKeyword
-                        text: New
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Identifier
-                        text: cAsyncSocket
-                      - kind: ColonOperator
-                        text: ":"
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Identifier
-                        text: m_hSocket
+                      - kind: NewExpression
+                        children:
+                          - kind: NewKeyword
+                            text: New
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: cAsyncSocket
+                  - kind: ColonOperator
+                    text: ":"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AssignmentStatement
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: m_hSocket
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: mySocket
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: Identifier
-                        text: SocketHandle
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: mySocket
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: SocketHandle
                       - kind: Newline
                         text: "\r\n"
               - kind: Whitespace
@@ -4713,16 +4731,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: iConnectedSocket
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: iConnectedSocket
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ConnectedSocket
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ConnectedSocket
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement
@@ -4769,20 +4791,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: cSocket
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: cSocket
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NewKeyword
-                            text: New
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: cAsyncSocket
+                          - kind: NewExpression
+                            children:
+                              - kind: NewKeyword
+                                text: New
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: cAsyncSocket
                           - kind: Newline
                             text: "\r\n"
                       - kind: SetStatement
@@ -4793,20 +4819,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: iConnectedSocket
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: OwnAsyncSocket
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: iConnectedSocket
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: OwnAsyncSocket
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: cSocket
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: cSocket
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -5443,38 +5473,48 @@ cst:
                         text: Set
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: mySocket
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: mySocket
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: NewKeyword
-                        text: New
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Identifier
-                        text: cAsyncSocket
-                      - kind: ColonOperator
-                        text: ":"
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Identifier
-                        text: m_hSocket
+                      - kind: NewExpression
+                        children:
+                          - kind: NewKeyword
+                            text: New
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: cAsyncSocket
+                  - kind: ColonOperator
+                    text: ":"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AssignmentStatement
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: m_hSocket
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: mySocket
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: Identifier
-                        text: SocketHandle
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: mySocket
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: SocketHandle
                       - kind: Newline
                         text: "\r\n"
               - kind: Whitespace
@@ -5795,38 +5835,48 @@ cst:
                         text: Set
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: mySocket
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: mySocket
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: NewKeyword
-                        text: New
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Identifier
-                        text: cAsyncSocket
-                      - kind: ColonOperator
-                        text: ":"
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Identifier
-                        text: m_hSocket
+                      - kind: NewExpression
+                        children:
+                          - kind: NewKeyword
+                            text: New
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: cAsyncSocket
+                  - kind: ColonOperator
+                    text: ":"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AssignmentStatement
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: m_hSocket
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: mySocket
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: Identifier
-                        text: SocketHandle
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: mySocket
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: SocketHandle
                       - kind: Newline
                         text: "\r\n"
               - kind: Whitespace
@@ -7045,16 +7095,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: b
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: b
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: buf
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: buf
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -8627,16 +8681,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: b
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: b
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: buf
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: buf
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -10149,38 +10207,48 @@ cst:
                         text: Set
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: mySocket
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: mySocket
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: NewKeyword
-                        text: New
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Identifier
-                        text: cAsyncSocket
-                      - kind: ColonOperator
-                        text: ":"
-                      - kind: Whitespace
-                        text: " "
-                      - kind: Identifier
-                        text: m_hSocket
+                      - kind: NewExpression
+                        children:
+                          - kind: NewKeyword
+                            text: New
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Identifier
+                            text: cAsyncSocket
+                  - kind: ColonOperator
+                    text: ":"
+                  - kind: Whitespace
+                    text: " "
+                  - kind: AssignmentStatement
+                    children:
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: m_hSocket
                       - kind: Whitespace
                         text: " "
                       - kind: EqualityOperator
                         text: "="
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: mySocket
-                      - kind: PeriodOperator
-                        text: "."
-                      - kind: Identifier
-                        text: SocketHandle
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: mySocket
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: SocketHandle
                       - kind: Newline
                         text: "\r\n"
               - kind: Whitespace
@@ -10393,20 +10461,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: TM
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: TM
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NewKeyword
-                            text: New
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: clsProfiler
+                          - kind: NewExpression
+                            children:
+                              - kind: NewKeyword
+                                text: New
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: clsProfiler
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -12695,20 +12767,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: TM
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: TM
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: NewKeyword
-                            text: New
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Identifier
-                            text: clsProfiler
+                          - kind: NewExpression
+                            children:
+                              - kind: NewKeyword
+                                text: New
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Identifier
+                                text: clsProfiler
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace

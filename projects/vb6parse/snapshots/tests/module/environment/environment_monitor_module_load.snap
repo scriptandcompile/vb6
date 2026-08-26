@@ -4745,16 +4745,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: f
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: f
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: z
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: z
                           - kind: Newline
                             text: "\r\n"
                   - kind: ElseClause
@@ -4771,20 +4775,24 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: f
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: f
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: z
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Parent
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: z
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: Parent
                               - kind: Newline
                                 text: "\r\n"
                   - kind: EndKeyword
@@ -4937,16 +4945,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: f
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: f
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: z
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: z
                           - kind: Newline
                             text: "\r\n"
                   - kind: ElseClause
@@ -4963,20 +4975,24 @@ cst:
                                 text: Set
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: f
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: f
                               - kind: Whitespace
                                 text: " "
                               - kind: EqualityOperator
                                 text: "="
                               - kind: Whitespace
                                 text: " "
-                              - kind: Identifier
-                                text: z
-                              - kind: PeriodOperator
-                                text: "."
-                              - kind: Identifier
-                                text: Parent
+                              - kind: MemberAccessExpression
+                                children:
+                                  - kind: Identifier
+                                    text: z
+                                  - kind: PeriodOperator
+                                    text: "."
+                                  - kind: Identifier
+                                    text: Parent
                               - kind: Newline
                                 text: "\r\n"
                   - kind: EndKeyword

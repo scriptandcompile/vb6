@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/class/environment.rs
+source: projects/vb6parse/tests/class/environment.rs
 expression: class
 ---
 header:
@@ -175,16 +175,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: glistN
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: glistN
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: glistNN
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: glistNN
                   - kind: Newline
                     text: "\r\n"
               - kind: CallStatement
@@ -791,16 +795,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: glistN
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: glistN
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword

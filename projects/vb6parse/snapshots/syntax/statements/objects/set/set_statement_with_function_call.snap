@@ -1,5 +1,5 @@
 ---
-source: src/syntax/statements/objects/set.rs
+source: projects/vb6parse/src/syntax/statements/objects/set.rs
 expression: tree
 ---
 root:
@@ -33,22 +33,32 @@ root:
                   text: Set
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: result
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: result
                 - kind: Whitespace
                   text: " "
                 - kind: EqualityOperator
                   text: "="
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: GetObject
-                - kind: LeftParenthesis
-                  text: (
-                - kind: StringLiteral
-                  text: "\"WinMgmts:\""
-                - kind: RightParenthesis
-                  text: )
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: GetObject
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: StringLiteralExpression
+                              children:
+                                - kind: StringLiteral
+                                  text: "\"WinMgmts:\""
+                    - kind: RightParenthesis
+                      text: )
                 - kind: Newline
                   text: "\n"
         - kind: EndKeyword

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/objects/getobject.rs
+source: projects/vb6parse/src/syntax/library/functions/objects/getobject.rs
 expression: tree
 ---
 root:
@@ -11,27 +11,41 @@ root:
           text: Set
         - kind: Whitespace
           text: " "
-        - kind: Identifier
-          text: app
+        - kind: IdentifierExpression
+          children:
+            - kind: Identifier
+              text: app
         - kind: Whitespace
           text: " "
         - kind: EqualityOperator
           text: "="
         - kind: Whitespace
           text: " "
-        - kind: LeftParenthesis
-          text: (
-        - kind: Identifier
-          text: GetObject
-        - kind: LeftParenthesis
-          text: (
-        - kind: Comma
-          text: ","
-        - kind: Whitespace
-          text: " "
-        - kind: StringLiteral
-          text: "\"Excel.Application\""
-        - kind: RightParenthesis
-          text: )
-        - kind: RightParenthesis
-          text: )
+        - kind: ParenthesizedExpression
+          children:
+            - kind: LeftParenthesis
+              text: (
+            - kind: CallExpression
+              children:
+                - kind: Identifier
+                  text: GetObject
+                - kind: LeftParenthesis
+                  text: (
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children: []
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Excel.Application\""
+                - kind: RightParenthesis
+                  text: )
+            - kind: RightParenthesis
+              text: )

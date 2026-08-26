@@ -86406,16 +86406,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: THISOBJECT
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: THISOBJECT
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: ThisObject1
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: ThisObject1
                   - kind: Newline
                     text: "\r\n"
               - kind: IfStatement

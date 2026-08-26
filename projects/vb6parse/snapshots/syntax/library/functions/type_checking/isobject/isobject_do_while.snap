@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/type_checking/isobject.rs
+source: projects/vb6parse/src/syntax/library/functions/type_checking/isobject.rs
 expression: tree
 ---
 root:
@@ -65,20 +65,26 @@ root:
                           text: Set
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: currentItem
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: currentItem
                         - kind: Whitespace
                           text: " "
                         - kind: EqualityOperator
                           text: "="
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: GetNext
-                        - kind: LeftParenthesis
-                          text: (
-                        - kind: RightParenthesis
-                          text: )
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: GetNext
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children: []
+                            - kind: RightParenthesis
+                              text: )
                         - kind: Newline
                           text: "\n"
                     - kind: Whitespace

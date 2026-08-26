@@ -371,16 +371,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: GetCallBack
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: GetCallBack
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Callback
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Callback
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -849,16 +853,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Callback
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Callback
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: there
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: there
                   - kind: Newline
                     text: "\r\n"
               - kind: OnErrorStatement
@@ -911,36 +919,54 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: glistN
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: glistN
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: there
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Controls
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Add
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: StringLiteral
-                    text: "\"m2000.glist\""
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: ctrlName
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: there
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: Controls
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: Add
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"m2000.glist\""
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: ctrlName
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -1115,16 +1141,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Callback
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Callback
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: there
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: there
                   - kind: Newline
                     text: "\r\n"
               - kind: OnErrorStatement
@@ -1195,36 +1225,54 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: glistN
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: glistN
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: there
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Controls
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Add
-                  - kind: LeftParenthesis
-                    text: (
-                  - kind: StringLiteral
-                    text: "\"m2000.glist\""
-                  - kind: Comma
-                    text: ","
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: ctrlName
-                  - kind: RightParenthesis
-                    text: )
+                  - kind: CallExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: there
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: Controls
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: Add
+                      - kind: LeftParenthesis
+                        text: (
+                      - kind: ArgumentList
+                        children:
+                          - kind: Argument
+                            children:
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"m2000.glist\""
+                          - kind: Comma
+                            text: ","
+                          - kind: Whitespace
+                            text: " "
+                          - kind: Argument
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: ctrlName
+                      - kind: RightParenthesis
+                        text: )
                   - kind: Newline
                     text: "\r\n"
               - kind: Whitespace
@@ -1965,16 +2013,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Callback
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Callback
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: SetStatement
@@ -1985,16 +2037,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: glistN
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: glistN
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -2665,18 +2721,22 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: Font
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: Font
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: ff
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ff
                           - kind: Newline
                             text: "\r\n"
                       - kind: AssignmentStatement
@@ -3245,16 +3305,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: glistN
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: glistN
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -4655,20 +4719,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: glistN
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: Font
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: glistN
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: Font
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: aa
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: aa
                           - kind: Newline
                             text: "\r\n"
                   - kind: EndKeyword
@@ -8535,16 +8603,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: glistN
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: glistN
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
               - kind: CallStatement
@@ -8595,16 +8667,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Callback
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Callback
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword

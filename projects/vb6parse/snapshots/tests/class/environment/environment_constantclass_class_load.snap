@@ -172,16 +172,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: Value
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Value
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: mValue
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: mValue
                           - kind: Newline
                             text: "\r\n"
                   - kind: ElseClause
@@ -836,16 +840,20 @@ cst:
                                     text: Set
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: mValue
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: mValue
                                   - kind: Whitespace
                                     text: " "
                                   - kind: EqualityOperator
                                     text: "="
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: RHS
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: RHS
                                   - kind: Newline
                                     text: "\r\n"
                           - kind: ElseClause

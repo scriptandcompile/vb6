@@ -531,20 +531,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Zip
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Zip
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NewKeyword
-                    text: New
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: cZipArchive
+                  - kind: NewExpression
+                    children:
+                      - kind: NewKeyword
+                        text: New
+                      - kind: Whitespace
+                        text: " "
+                      - kind: Identifier
+                        text: cZipArchive
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -1559,20 +1563,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: Handler
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: objref
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: Handler
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: objref
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: mem
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: mem
                           - kind: Newline
                             text: "\r\n"
                       - kind: SetStatement
@@ -1583,16 +1591,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CreateZipBuffer
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: CreateZipBuffer
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: Handler
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Handler
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -2619,20 +2631,24 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Handler
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: objref
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: Identifier
+                        text: Handler
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: objref
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: touple
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: touple
                   - kind: Newline
                     text: "\r\n"
               - kind: AssignmentStatement
@@ -2663,16 +2679,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: FileInfo
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: FileInfo
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Handler
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Handler
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
@@ -3691,20 +3711,24 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: Handler
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: objref
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: Handler
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: objref
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: mem
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: mem
                           - kind: Newline
                             text: "\r\n"
                       - kind: SetStatement
@@ -3715,16 +3739,20 @@ cst:
                             text: Set
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: ExtractOneToBuffer
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ExtractOneToBuffer
                           - kind: Whitespace
                             text: " "
                           - kind: EqualityOperator
                             text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: Handler
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: Handler
                           - kind: Newline
                             text: "\r\n"
                       - kind: Whitespace
@@ -3989,16 +4017,20 @@ cst:
                     text: Set
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: Zip
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: Zip
                   - kind: Whitespace
                     text: " "
                   - kind: EqualityOperator
                     text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: NothingKeyword
-                    text: Nothing
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: NothingKeyword
+                        text: Nothing
                   - kind: Newline
                     text: "\r\n"
           - kind: EndKeyword
