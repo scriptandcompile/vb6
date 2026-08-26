@@ -1,0 +1,41 @@
+---
+source: projects/vb6parse/tests/library/file/freefile.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: OpenStatement
+      children:
+        - kind: OpenKeyword
+          text: Open
+        - kind: Whitespace
+          text: " "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"data.txt\""
+        - kind: Whitespace
+          text: " "
+        - kind: ForKeyword
+          text: For
+        - kind: Whitespace
+          text: " "
+        - kind: KeywordClause
+          children:
+            - kind: OutputKeyword
+              text: Output
+        - kind: Whitespace
+          text: " "
+        - kind: ExpressionClause
+          children:
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IdentifierExpression
+              children:
+                - kind: Octothorpe
+                  text: "#"
+                - kind: Identifier
+                  text: FreeFile

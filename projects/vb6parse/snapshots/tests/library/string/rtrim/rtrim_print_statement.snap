@@ -1,0 +1,51 @@
+---
+source: projects/vb6parse/tests/library/string/rtrim.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: Whitespace
+      text: "            "
+    - kind: PrintStatement
+      children:
+        - kind: PrintKeyword
+          text: Print
+        - kind: Whitespace
+          text: " "
+        - kind: Octothorpe
+          text: "#"
+        - kind: NumericLiteralExpression
+          children:
+            - kind: IntegerLiteral
+              text: "1"
+        - kind: Comma
+          text: ","
+        - kind: Whitespace
+          text: " "
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: RTrim
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: LineKeyword
+                                  text: line
+                    - kind: RightParenthesis
+                      text: )
+        - kind: Newline
+          text: "\n"
+    - kind: Whitespace
+      text: "        "

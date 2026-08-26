@@ -1,0 +1,21 @@
+---
+source: projects/vb6parse/src/syntax/statements/filesystem/rmdir.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Whitespace
+      text: "    "
+    - kind: RmDirStatement
+      children:
+        - kind: RmDirKeyword
+          text: RmDir
+        - kind: Whitespace
+          text: "    "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"C:\\Temp\""
+    - kind: Whitespace
+      text: "    "

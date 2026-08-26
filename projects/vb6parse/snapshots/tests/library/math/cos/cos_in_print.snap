@@ -1,0 +1,47 @@
+---
+source: projects/vb6parse/tests/library/math/cos.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: PrintStatement
+      children:
+        - kind: PrintKeyword
+          text: Print
+        - kind: Whitespace
+          text: " "
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"Cosine: \""
+            - kind: Semicolon
+              text: ;
+            - kind: Whitespace
+              text: " "
+            - kind: Argument
+              children:
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: Cos
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: angle
+                    - kind: RightParenthesis
+                      text: )
+        - kind: Newline
+          text: "\n"

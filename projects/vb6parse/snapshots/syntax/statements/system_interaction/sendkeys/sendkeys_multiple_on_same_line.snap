@@ -1,0 +1,41 @@
+---
+source: projects/vb6parse/src/syntax/statements/system_interaction/sendkeys.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: SendKeysStatement
+      children:
+        - kind: SendKeysKeyword
+          text: SendKeys
+        - kind: Whitespace
+          text: " "
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"A\""
+    - kind: ColonOperator
+      text: ":"
+    - kind: Whitespace
+      text: " "
+    - kind: SendKeysStatement
+      children:
+        - kind: SendKeysKeyword
+          text: SendKeys
+        - kind: Whitespace
+          text: " "
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"B\""
+    - kind: Newline
+      text: "\n"

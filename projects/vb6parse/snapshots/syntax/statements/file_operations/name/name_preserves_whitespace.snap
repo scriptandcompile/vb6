@@ -1,0 +1,33 @@
+---
+source: projects/vb6parse/src/syntax/statements/file_operations/name.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Whitespace
+      text: "    "
+    - kind: NameStatement
+      children:
+        - kind: NameKeyword
+          text: Name
+        - kind: Whitespace
+          text: "    "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"old.txt\""
+        - kind: Whitespace
+          text: "    "
+        - kind: AsKeyword
+          text: As
+        - kind: Whitespace
+          text: "    "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"new.txt\""
+        - kind: Whitespace
+          text: "    "
+    - kind: Newline
+      text: "\n"

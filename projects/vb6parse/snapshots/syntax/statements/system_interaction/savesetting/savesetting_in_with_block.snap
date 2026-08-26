@@ -1,0 +1,81 @@
+---
+source: projects/vb6parse/src/syntax/statements/system_interaction/savesetting.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: WithStatement
+      children:
+        - kind: WithKeyword
+          text: With
+        - kind: Whitespace
+          text: " "
+        - kind: IdentifierExpression
+          children:
+            - kind: Identifier
+              text: Form1
+        - kind: Newline
+          text: "\n"
+        - kind: StatementList
+          children:
+            - kind: SaveSettingStatement
+              children:
+                - kind: Whitespace
+                  text: "    "
+                - kind: SaveSettingKeyword
+                  text: SaveSetting
+                - kind: Whitespace
+                  text: " "
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"MyApp\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Form\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Width\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: Width
+            - kind: Newline
+              text: "\n"
+        - kind: EndKeyword
+          text: End
+        - kind: Whitespace
+          text: " "
+        - kind: WithKeyword
+          text: With
+        - kind: Newline
+          text: "\n"

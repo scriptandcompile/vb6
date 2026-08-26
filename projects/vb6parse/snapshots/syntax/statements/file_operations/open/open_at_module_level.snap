@@ -1,0 +1,41 @@
+---
+source: projects/vb6parse/src/syntax/statements/file_operations/open.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: OpenStatement
+      children:
+        - kind: OpenKeyword
+          text: Open
+        - kind: Whitespace
+          text: " "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"TESTFILE\""
+        - kind: Whitespace
+          text: " "
+        - kind: ForKeyword
+          text: For
+        - kind: Whitespace
+          text: " "
+        - kind: KeywordClause
+          children:
+            - kind: InputKeyword
+              text: Input
+        - kind: Whitespace
+          text: " "
+        - kind: ExpressionClause
+          children:
+            - kind: AsKeyword
+              text: As
+            - kind: Whitespace
+              text: " "
+            - kind: IdentifierExpression
+              children:
+                - kind: Octothorpe
+                  text: "#"
+                - kind: IntegerLiteral
+                  text: "1"

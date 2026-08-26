@@ -1,0 +1,23 @@
+---
+source: projects/vb6parse/src/syntax/statements/filesystem/mkdir.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Whitespace
+      text: "    "
+    - kind: MkDirStatement
+      children:
+        - kind: MkDirKeyword
+          text: MkDir
+        - kind: Whitespace
+          text: "    "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"MyFolder\""
+    - kind: Whitespace
+      text: "    "
+    - kind: Newline
+      text: "\n"

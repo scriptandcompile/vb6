@@ -1,0 +1,37 @@
+---
+source: projects/vb6parse/src/syntax/statements/system_interaction/savepicture.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: SavePictureStatement
+      children:
+        - kind: SavePictureKeyword
+          text: SavePicture
+        - kind: Whitespace
+          text: " "
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: MemberAccessExpression
+                  children:
+                    - kind: Identifier
+                      text: Picture1
+                    - kind: PeriodOperator
+                      text: "."
+                    - kind: Identifier
+                      text: Picture
+            - kind: Comma
+              text: ","
+            - kind: Whitespace
+              text: " "
+            - kind: Argument
+              children:
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"image.bmp\""
+    - kind: Newline
+      text: "\n"
