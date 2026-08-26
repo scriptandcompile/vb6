@@ -4,17 +4,16 @@ use crate::Token;
 use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
-    /// Parses a `ChDrive` statement.
+    /// Parses a `ChDir` statement.
     ///
-    /// `ChDrive` statement syntax:
+    /// `ChDir` statement syntax:
     /// ```vb
-    /// ChDrive drive
+    /// ChDir path
     /// ```
     ///
-    /// - **drive**: Required. String expression that specifies the drive.
-    pub(crate) fn parse_ch_drive_statement(&mut self) {
-        self.builder
-            .start_node(SyntaxKind::ChDriveStatement.to_raw());
+    /// - **path**: Required. String expression that specifies the directory path.
+    pub(crate) fn parse_ch_dir_statement(&mut self) {
+        self.builder.start_node(SyntaxKind::ChDirStatement.to_raw());
 
         self.consume_whitespace();
         self.consume_token();

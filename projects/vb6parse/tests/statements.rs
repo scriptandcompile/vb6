@@ -59,3 +59,6 @@ mod width;
 
 #[path = "statements/file_operations/write.rs"]
 mod write;
+
+#[path = "statements/filesystem/chdir.rs"]
+mod chdir;
