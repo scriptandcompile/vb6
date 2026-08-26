@@ -38391,10 +38391,12 @@ cst:
                         text: Load
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: Form3
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: Form3
+                  - kind: Newline
+                    text: "\r\n"
               - kind: AssignmentStatement
                 children:
                   - kind: IdentifierExpression

@@ -4096,14 +4096,18 @@ cst:
                             text: Load
                           - kind: Whitespace
                             text: " "
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: m_file
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: ParenthesizedExpression
+                            children:
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: m_file
+                              - kind: RightParenthesis
+                                text: )
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: ElseIfClause

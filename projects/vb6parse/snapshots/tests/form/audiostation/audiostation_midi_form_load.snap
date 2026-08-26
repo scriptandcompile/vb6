@@ -14115,16 +14115,24 @@ cst:
                             text: Load
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: LabelTrackName
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: i
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Newline
-                            text: "\n"
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: LabelTrackName
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: i
+                              - kind: RightParenthesis
+                                text: )
+                      - kind: Newline
+                        text: "\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: AssignmentStatement
@@ -14347,16 +14355,24 @@ cst:
                             text: Load
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: VIndicator1
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: i
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Newline
-                            text: "\n"
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: VIndicator1
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: i
+                              - kind: RightParenthesis
+                                text: )
+                      - kind: Newline
+                        text: "\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: AssignmentStatement
@@ -14485,16 +14501,24 @@ cst:
                             text: Load
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: VIndicatorPeak
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: i
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Newline
-                            text: "\n"
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: VIndicatorPeak
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: i
+                              - kind: RightParenthesis
+                                text: )
+                      - kind: Newline
+                        text: "\n"
                       - kind: LoadStatement
                         children:
                           - kind: Whitespace
@@ -14503,16 +14527,24 @@ cst:
                             text: Load
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: CommandIndicatorPeak
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: i
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Newline
-                            text: "\n"
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: CommandIndicatorPeak
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: i
+                              - kind: RightParenthesis
+                                text: )
+                      - kind: Newline
+                        text: "\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: Newline
@@ -14525,16 +14557,24 @@ cst:
                             text: Load
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: TextIndicator1
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: Identifier
-                            text: i
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: Newline
-                            text: "\n"
+                          - kind: CallExpression
+                            children:
+                              - kind: Identifier
+                                text: TextIndicator1
+                              - kind: LeftParenthesis
+                                text: (
+                              - kind: ArgumentList
+                                children:
+                                  - kind: Argument
+                                    children:
+                                      - kind: IdentifierExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: i
+                              - kind: RightParenthesis
+                                text: )
+                      - kind: Newline
+                        text: "\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: AssignmentStatement

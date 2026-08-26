@@ -2891,20 +2891,30 @@ cst:
                                     text: Load
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: f
-                                  - kind: PeriodOperator
-                                    text: "."
-                                  - kind: Identifier
-                                    text: lblMonitors
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: Identifier
-                                    text: n
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Newline
-                                    text: "\r\n"
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: MemberAccessExpression
+                                        children:
+                                          - kind: Identifier
+                                            text: f
+                                          - kind: PeriodOperator
+                                            text: "."
+                                          - kind: Identifier
+                                            text: lblMonitors
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: n
+                                      - kind: RightParenthesis
+                                        text: )
+                              - kind: Newline
+                                text: "\r\n"
                               - kind: Whitespace
                                 text: "            "
                               - kind: AssignmentStatement

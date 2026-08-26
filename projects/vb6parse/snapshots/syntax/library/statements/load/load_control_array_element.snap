@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/load.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/load.rs
 expression: tree
 ---
 root:
@@ -33,16 +33,24 @@ root:
                   text: Load
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: txtControl
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "5"
-                - kind: RightParenthesis
-                  text: )
-                - kind: Newline
-                  text: "\n"
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: txtControl
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "5"
+                    - kind: RightParenthesis
+                      text: )
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

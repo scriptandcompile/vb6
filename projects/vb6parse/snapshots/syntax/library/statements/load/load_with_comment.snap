@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/load.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/load.rs
 expression: tree
 ---
 root:
@@ -33,14 +33,16 @@ root:
                   text: Load
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: frmAbout
-                - kind: Whitespace
-                  text: " "
-                - kind: EndOfLineComment
-                  text: "' Show about dialog"
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: frmAbout
+            - kind: Whitespace
+              text: " "
+            - kind: EndOfLineComment
+              text: "' Show about dialog"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/load.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/load.rs
 expression: tree
 ---
 root:
@@ -89,16 +89,24 @@ root:
                           text: Load
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: lblLabel
-                        - kind: LeftParenthesis
-                          text: (
-                        - kind: Identifier
-                          text: i
-                        - kind: RightParenthesis
-                          text: )
-                        - kind: Newline
-                          text: "\n"
+                        - kind: CallExpression
+                          children:
+                            - kind: Identifier
+                              text: lblLabel
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children:
+                                - kind: Argument
+                                  children:
+                                    - kind: IdentifierExpression
+                                      children:
+                                        - kind: Identifier
+                                          text: i
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Newline
+                      text: "\n"
                     - kind: Whitespace
                       text: "    "
                 - kind: NextKeyword
