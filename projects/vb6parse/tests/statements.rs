@@ -62,3 +62,6 @@ mod write;
 
 #[path = "statements/filesystem/chdir.rs"]
 mod chdir;
+
+#[path = "statements/filesystem/chdrive.rs"]
+mod chdrive;

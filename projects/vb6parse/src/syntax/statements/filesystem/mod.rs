@@ -5,7 +5,7 @@
 //! - Directory management (`MkDir`, `RmDir`)
 //! - File attributes (`SetAttr`)
 
-pub(crate) mod ch_drive;
+pub(crate) mod chdrive;
 pub(crate) mod chdir;
 pub(crate) mod mkdir;
 pub(crate) mod rmdir;
