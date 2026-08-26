@@ -221,39 +221,42 @@ impl Interpreter {
     /// `LSet stringvar = string` / `RSet stringvar = string`: align `string`
     /// within `stringvar` (left or right per `align`) and store the result
     /// back.
-    ///
-    /// Like `Open`/`Close`, these statements keep their operands as flat
-    /// tokens rather than nested expression nodes, so the source may be a
-    /// single identifier-like token, a literal, or a wrapped expression;
-    /// compound flat-token expressions are not evaluated. The alignment
-    /// width is the target's current length.
     pub(crate) fn exec_alignment_set(
         &mut self,
         node: &CstNode,
         align: fn(&VBString, &VBString) -> VBResult<VBString>,
     ) -> RunResult<()> {
-        let significant: Vec<&CstNode> = node.significant_children().collect();
-        let eq_index = significant
+        // Locate the BinaryExpression child (the `target = value` portion).
+        let binary = node
+            .children()
+            .iter()
+            .find(|c| c.kind() == SyntaxKind::BinaryExpression)
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+        let binary_children: Vec<&CstNode> = binary.significant_children().collect();
+        let eq_index = binary_children
             .iter()
             .position(|c| c.kind() == SyntaxKind::EqualityOperator)
             .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
-        // Target variable: the first identifier-like token after the
-        // statement keyword (index 0) and before the `=`.
-        let target = significant[1..eq_index]
+        // Target variable: the expression before the `=`.
+        let target_expr: Vec<&CstNode> = binary_children[..eq_index]
             .iter()
-            .find(|c| program::is_identifier_like(c))
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
-        let name = target.text().trim().to_string();
-        if significant.len() != eq_index + 2 {
-            return Err(self.error_here(
-                VBError::with_description(
-                    err_number::INVALID_PROCEDURE_CALL,
-                    "LSet/RSet support only a single source expression",
-                ),
-                None,
-            ));
-        }
-        let value = self.eval_flat_operand(significant[eq_index + 1])?;
+            .copied()
+            .filter(|c| c.kind() == SyntaxKind::IdentifierExpression)
+            .collect();
+        let (Some(target_node), None) = (target_expr.first(), target_expr.get(1)) else {
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
+        };
+        let name = program::identifier_name(target_node);
+        // Value expression: the expression after the `=`.
+        let value_expr: Vec<&CstNode> = binary_children[eq_index + 1..]
+            .iter()
+            .copied()
+            .filter(|c| !matches!(c.kind(), SyntaxKind::Whitespace | SyntaxKind::Newline))
+            .collect();
+        let Some(value) = value_expr.first() else {
+            return Err(self.error_here(VBError::invalid_procedure_call(), None));
+        };
+        let value = self.eval_expr(value)?;
         let value = VBString::try_from(&value).map_err(|e| self.error_here(e, None))?;
         let current = match self.lookup(&name) {
             Some(current) => VBString::try_from(current).map_err(|e| self.error_here(e, None))?,
