@@ -270,77 +270,74 @@ impl Interpreter {
     /// `Mid(target, start[, length]) = string` and the byte-oriented `MidB`
     /// form: overwrite the target variable in place via `apply` and store
     /// the result back.
-    ///
-    /// Like other simple builtin statements, operands arrive as flat tokens,
-    /// shaped exactly like the `Mid` function call followed by an
-    /// assignment: a parenthesized argument list naming the target variable,
-    /// its start position, and optional length, then the replacement
-    /// expression.
     pub(crate) fn exec_mid_set(
         &mut self,
         node: &CstNode,
         apply: fn(&VBString, &VBLong, Option<&VBLong>, &VBString) -> VBResult<VBString>,
     ) -> RunResult<()> {
         const ARITY_MESSAGE: &str = "Mid expects Mid(target, start[, length]) = string";
-        let significant: Vec<&CstNode> = node.significant_children().collect();
-        let eq_index = significant
-            .iter()
-            .position(|c| c.kind() == SyntaxKind::EqualityOperator)
-            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
-        let lhs = &significant[1..eq_index];
-        if lhs.len() < 2
-            || lhs[0].kind() != SyntaxKind::LeftParenthesis
-            || lhs[lhs.len() - 1].kind() != SyntaxKind::RightParenthesis
-        {
-            return Err(self.error_here(
-                VBError::with_description(err_number::INVALID_PROCEDURE_CALL, ARITY_MESSAGE),
-                None,
-            ));
-        }
-        let inner = &lhs[1..lhs.len() - 1];
 
-        // Split the argument list on commas into `target, start[, length]`.
-        let mut parts: Vec<Vec<&CstNode>> = vec![Vec::new()];
-        for child in inner {
-            if child.kind() == SyntaxKind::Comma {
-                parts.push(Vec::new());
-            } else {
-                parts.last_mut().expect("parts is never empty").push(child);
-            }
-        }
-        if !(2..=3).contains(&parts.len()) || parts.iter().any(|part| part.len() != 1) {
+        let arg_list = node
+            .children_by_kind(SyntaxKind::ArgumentList)
+            .next()
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+
+        let args: Vec<&CstNode> = arg_list.children_by_kind(SyntaxKind::Argument).collect();
+        if !(2..=3).contains(&args.len()) {
             return Err(self.error_here(
                 VBError::with_description(err_number::INVALID_PROCEDURE_CALL, ARITY_MESSAGE),
                 None,
             ));
         }
+
         // First argument names the target variable.
-        let target = parts[0][0];
-        if !program::is_identifier_like(target) {
+        if !program::is_identifier_like(args[0]) {
             return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
-        let name = target.text().trim().to_string();
-        let start = VBLong::try_from(&self.eval_flat_operand(parts[1][0])?)
+        let name = args[0].text().trim().to_string();
+
+        // Second argument: start position.
+        let start_expr = args[1]
+            .significant_children()
+            .next()
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+        let start = VBLong::try_from(&self.eval_expr(start_expr)?)
             .map_err(|e| self.error_here(e, None))?;
-        let length = match parts.get(2) {
-            Some(part) => Some(
-                VBLong::try_from(&self.eval_flat_operand(part[0])?)
+
+        // Third argument (optional): length.
+        let length = if let Some(len_arg) = args.get(2) {
+            let len_expr = len_arg
+                .significant_children()
+                .next()
+                .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+            Some(
+                VBLong::try_from(&self.eval_expr(len_expr)?)
                     .map_err(|e| self.error_here(e, None))?,
-            ),
-            None => None,
+            )
+        } else {
+            None
         };
 
-        if significant.len() != eq_index + 2 {
-            return Err(self.error_here(
-                VBError::with_description(
-                    err_number::INVALID_PROCEDURE_CALL,
-                    "Mid/MidB support only a single source expression",
-                ),
-                None,
-            ));
-        }
-        let value = self.eval_flat_operand(significant[eq_index + 1])?;
+        // Replacement expression: the expression after the `=` operator.
+        let sig: Vec<&CstNode> = node.significant_children().collect();
+        let eq_pos = sig
+            .iter()
+            .position(|c| c.kind() == SyntaxKind::EqualityOperator);
+        let value_node = match eq_pos.and_then(|i| sig.get(i + 1)) {
+            Some(node) => node,
+            None => {
+                return Err(self.error_here(
+                    VBError::with_description(
+                        err_number::INVALID_PROCEDURE_CALL,
+                        "Mid/MidB requires a replacement expression after '='",
+                    ),
+                    None,
+                ))
+            }
+        };
+        let value = self.eval_expr(value_node)?;
         let value = VBString::try_from(&value).map_err(|e| self.error_here(e, None))?;
+
         let current = match self.lookup(&name) {
             Some(current) => VBString::try_from(current).map_err(|e| self.error_here(e, None))?,
             None => VBString::from(""),
