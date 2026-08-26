@@ -48,5 +48,5 @@ mod lock;
 #[path = "statements/file_operations/print.rs"]
 mod print;
 
-#[path = "statements/file_operations/reset.rs"]
-mod reset;
+#[path = "statements/file_operations/seek.rs"]
+mod seek;
