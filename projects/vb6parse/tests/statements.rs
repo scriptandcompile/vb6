@@ -71,3 +71,6 @@ mod mkdir;
 
 #[path = "statements/filesystem/rmdir.rs"]
 mod rmdir;
+
+#[path = "statements/filesystem/setattr.rs"]
+mod setattr;
