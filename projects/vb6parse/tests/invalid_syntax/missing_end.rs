@@ -1,29 +1,5 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
 
-fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str, actual: usize) {
-    let primary_path =
-        format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
-    let prefixed_path = format!(
-        "snapshots/tests/invalid_syntax/{snapshot_dir}/invalid_syntax__{snapshot_dir}__{snapshot_name}.snap"
-    );
-    let path = if std::path::Path::new(&primary_path).exists() {
-        primary_path
-    } else {
-        prefixed_path
-    };
-    let content = std::fs::read_to_string(&path)
-        .unwrap_or_else(|err| panic!("Failed to read snapshot file {path}: {err}"));
-    let expected = content
-        .lines()
-        .filter(|line| line.trim_start().starts_with("- "))
-        .count();
-
-    assert_eq!(
-        actual, expected,
-        "Unexpected failure count for snapshot {snapshot_name}"
-    );
-}
-
 /// Test missing End Sub statement
 #[test]
 fn missing_end_sub() {
@@ -36,13 +12,6 @@ Sub TestSub()
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
     // Report current behavior: parser may or may not report failures
-    eprintln!("=== Failures for missing_end_sub ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     // CST should still be parseable (resilient parsing)
     let cst = cst_opt.expect("CST should be present even with syntax errors");
 
@@ -59,13 +28,7 @@ Sub TestSub()
     insta::assert_yaml_snapshot!("missing_end_sub_cst", tree);
 
     // Snapshot the failures to document current error reporting behavior
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_sub_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("missing_end_sub_failures", failure_messages);
+    insta::assert_yaml_snapshot!("missing_end_sub_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test missing End Sub when another Sub declaration starts.
@@ -82,13 +45,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_sub_before_next_sub ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -99,13 +55,7 @@ End Sub
 
     insta::assert_yaml_snapshot!("missing_end_sub_before_next_sub_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_sub_before_next_sub_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("missing_end_sub_before_next_sub_failures", failure_messages);
+    insta::assert_yaml_snapshot!("missing_end_sub_before_next_sub_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test missing End Function statement
@@ -118,13 +68,6 @@ Function Calculate(x As Integer) As Integer
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_function ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -135,13 +78,7 @@ Function Calculate(x As Integer) As Integer
 
     insta::assert_yaml_snapshot!("missing_end_function_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_function_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("missing_end_function_failures", failure_messages);
+    insta::assert_yaml_snapshot!("missing_end_function_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test missing End Function when another Function declaration starts.
@@ -157,13 +94,6 @@ End Function
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_function_before_next_function ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -174,15 +104,9 @@ End Function
 
     insta::assert_yaml_snapshot!("missing_end_function_before_next_function_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_function_before_next_function_failures",
-        failures.len(),
-    );
     insta::assert_yaml_snapshot!(
         "missing_end_function_before_next_function_failures",
-        failure_messages
+        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
     );
 }
 
@@ -196,13 +120,6 @@ Property Get Name() As String
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_property ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -213,13 +130,7 @@ Property Get Name() As String
 
     insta::assert_yaml_snapshot!("missing_end_property_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_property_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("missing_end_property_failures", failure_messages);
+    insta::assert_yaml_snapshot!("missing_end_property_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test missing End Property when another Property declaration starts.
@@ -235,13 +146,6 @@ End Property
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_property_before_next_property ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -252,15 +156,9 @@ End Property
 
     insta::assert_yaml_snapshot!("missing_end_property_before_next_property_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_property_before_next_property_failures",
-        failures.len(),
-    );
     insta::assert_yaml_snapshot!(
         "missing_end_property_before_next_property_failures",
-        failure_messages
+        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
     );
 }
 
@@ -276,13 +174,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_if ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -293,9 +184,10 @@ End Sub
 
     insta::assert_yaml_snapshot!("missing_end_if_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot("missing_end", "missing_end_if_failures", failures.len());
-    insta::assert_yaml_snapshot!("missing_end_if_failures", failure_messages);
+    insta::assert_yaml_snapshot!(
+        "missing_end_if_failures",
+        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+    );
 }
 
 /// Test missing End Type statement
@@ -309,13 +201,6 @@ Type Point
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_type ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -326,13 +211,7 @@ Type Point
 
     insta::assert_yaml_snapshot!("missing_end_type_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_type_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("missing_end_type_failures", failure_messages);
+    insta::assert_yaml_snapshot!("missing_end_type_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test missing End Type when another Type declaration starts.
@@ -350,13 +229,6 @@ End Type
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_type_before_next_type ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -367,15 +239,9 @@ End Type
 
     insta::assert_yaml_snapshot!("missing_end_type_before_next_type_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_type_before_next_type_failures",
-        failures.len(),
-    );
     insta::assert_yaml_snapshot!(
         "missing_end_type_before_next_type_failures",
-        failure_messages
+        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
     );
 }
 
@@ -393,13 +259,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_type_before_next_sub ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -410,15 +269,9 @@ End Sub
 
     insta::assert_yaml_snapshot!("missing_end_type_before_next_sub_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_type_before_next_sub_failures",
-        failures.len(),
-    );
     insta::assert_yaml_snapshot!(
         "missing_end_type_before_next_sub_failures",
-        failure_messages
+        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
     );
 }
 
@@ -436,13 +289,6 @@ End Function
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_type_before_next_function ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -453,15 +299,9 @@ End Function
 
     insta::assert_yaml_snapshot!("missing_end_type_before_next_function_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_type_before_next_function_failures",
-        failures.len(),
-    );
     insta::assert_yaml_snapshot!(
         "missing_end_type_before_next_function_failures",
-        failure_messages
+        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
     );
 }
 
@@ -480,13 +320,6 @@ End Type
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_sub_before_next_type ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -497,15 +330,9 @@ End Type
 
     insta::assert_yaml_snapshot!("missing_end_sub_before_next_type_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_sub_before_next_type_failures",
-        failures.len(),
-    );
     insta::assert_yaml_snapshot!(
         "missing_end_sub_before_next_type_failures",
-        failure_messages
+        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
     );
 }
 
@@ -523,13 +350,6 @@ End Type
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_function_before_next_type ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -540,15 +360,9 @@ End Type
 
     insta::assert_yaml_snapshot!("missing_end_function_before_next_type_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_function_before_next_type_failures",
-        failures.len(),
-    );
     insta::assert_yaml_snapshot!(
         "missing_end_function_before_next_type_failures",
-        failure_messages
+        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
     );
 }
 
@@ -567,13 +381,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for missing_end_select ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -584,13 +391,7 @@ End Sub
 
     insta::assert_yaml_snapshot!("missing_end_select_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "missing_end_select_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("missing_end_select_failures", failure_messages);
+    insta::assert_yaml_snapshot!("missing_end_select_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test nested missing End statements
@@ -606,13 +407,6 @@ Sub Test()
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for nested_missing_ends ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -623,11 +417,5 @@ Sub Test()
 
     insta::assert_yaml_snapshot!("nested_missing_ends_cst", tree);
 
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "missing_end",
-        "nested_missing_ends_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("nested_missing_ends_failures", failure_messages);
+    insta::assert_yaml_snapshot!("nested_missing_ends_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }

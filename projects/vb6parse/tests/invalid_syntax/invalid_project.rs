@@ -5,30 +5,6 @@
 
 use vb6parse::{ProjectFile, SourceFile};
 
-fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str, actual: usize) {
-    let primary_path =
-        format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
-    let prefixed_path = format!(
-        "snapshots/tests/invalid_syntax/{snapshot_dir}/invalid_syntax__{snapshot_dir}__{snapshot_name}.snap"
-    );
-    let path = if std::path::Path::new(&primary_path).exists() {
-        primary_path
-    } else {
-        prefixed_path
-    };
-    let content = std::fs::read_to_string(&path)
-        .unwrap_or_else(|err| panic!("Failed to read snapshot file {path}: {err}"));
-    let expected = content
-        .lines()
-        .filter(|line| line.trim_start().starts_with("- "))
-        .count();
-
-    assert_eq!(
-        actual, expected,
-        "Unexpected failure count for snapshot {snapshot_name}"
-    );
-}
-
 #[test]
 fn unterminated_section_header() {
     let source = r"Type=Exe
@@ -44,13 +20,10 @@ AutoRefresh=1
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "unterminated_section_header_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("unterminated_section_header_failures", failure_messages);
     });
 }
 
@@ -68,13 +41,10 @@ fn missing_property_name() {
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "missing_property_name_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("missing_property_name_failures", failure_messages);
     });
 }
 
@@ -91,13 +61,10 @@ fn invalid_project_type() {
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "invalid_project_type_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("invalid_project_type_failures", failure_messages);
     });
 }
 
@@ -115,15 +82,9 @@ Reference=*\G{00020430-0000-0000-C000-000000000046#2.0#0#C:\Windows\System32\std
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
-            "reference_compiled_missing_closing_brace_failures",
-            failures.len(),
-        );
         insta::assert_yaml_snapshot!(
             "reference_compiled_missing_closing_brace_failures",
-            failure_messages
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
     });
 }
@@ -142,13 +103,10 @@ Reference=*\G{not-a-valid-uuid}#2.0#0#C:\Windows\System32\stdole2.tlb#OLE Automa
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "reference_compiled_invalid_uuid_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("reference_compiled_invalid_uuid_failures", failure_messages);
     });
 }
 
@@ -166,15 +124,9 @@ Reference=*\G{00020430-0000-0000-C000-000000000046}#
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
-            "reference_compiled_missing_unknown1_failures",
-            failures.len(),
-        );
         insta::assert_yaml_snapshot!(
             "reference_compiled_missing_unknown1_failures",
-            failure_messages
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
     });
 }
@@ -193,13 +145,10 @@ Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "reference_compiled_missing_path_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("reference_compiled_missing_path_failures", failure_messages);
     });
 }
 
@@ -217,13 +166,10 @@ Reference=
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "reference_project_missing_path_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("reference_project_missing_path_failures", failure_messages);
     });
 }
 
@@ -241,13 +187,10 @@ Reference="C:\InvalidPath\Project.vbp"
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "reference_project_invalid_path_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("reference_project_invalid_path_failures", failure_messages);
     });
 }
 
@@ -265,15 +208,9 @@ Object=00020430-0000-0000-C000-000000000046}#2.0#0; stdole2.tlb
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
-            "object_compiled_missing_opening_brace_failures",
-            failures.len(),
-        );
         insta::assert_yaml_snapshot!(
             "object_compiled_missing_opening_brace_failures",
-            failure_messages
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
     });
 }
@@ -292,15 +229,9 @@ Object={00020430-0000-0000-C000-000000000046#2.0#0; stdole2.tlb
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
-            "object_compiled_missing_closing_brace_failures",
-            failures.len(),
-        );
         insta::assert_yaml_snapshot!(
             "object_compiled_missing_closing_brace_failures",
-            failure_messages
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
     });
 }
@@ -319,13 +250,10 @@ Object={invalid-uuid}#2.0#0; stdole2.tlb
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "object_compiled_invalid_uuid_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("object_compiled_invalid_uuid_failures", failure_messages);
     });
 }
 
@@ -343,13 +271,10 @@ Object={00020430-0000-0000-C000-000000000046}
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "object_compiled_missing_version_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("object_compiled_missing_version_failures", failure_messages);
     });
 }
 
@@ -367,13 +292,10 @@ Object={00020430-0000-0000-C000-000000000046}#invalid#0; stdole2.tlb
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "object_compiled_invalid_version_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("object_compiled_invalid_version_failures", failure_messages);
     });
 }
 
@@ -391,15 +313,9 @@ Object={00020430-0000-0000-C000-000000000046}#2.0#0;
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
-            "object_compiled_missing_filename_failures",
-            failures.len(),
-        );
         insta::assert_yaml_snapshot!(
             "object_compiled_missing_filename_failures",
-            failure_messages
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
     });
 }
@@ -418,13 +334,10 @@ Module=Module1;
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "module_missing_filename_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("module_missing_filename_failures", failure_messages);
     });
 }
 
@@ -442,13 +355,10 @@ Class=Class1;
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "class_missing_filename_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("class_missing_filename_failures", failure_messages);
     });
 }
 
@@ -466,13 +376,10 @@ Designer=
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "designer_missing_path_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("designer_missing_path_failures", failure_messages);
     });
 }
 
@@ -490,13 +397,10 @@ Form=
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "form_missing_path_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("form_missing_path_failures", failure_messages);
     });
 }
 
@@ -514,13 +418,10 @@ UserControl=
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "usercontrol_missing_path_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("usercontrol_missing_path_failures", failure_messages);
     });
 }
 
@@ -538,13 +439,10 @@ Title=MyProject"`
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "parameter_missing_opening_quote_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("parameter_missing_opening_quote_failures", failure_messages);
     });
 }
 
@@ -562,13 +460,10 @@ Title="MyProject
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "parameter_missing_closing_quote_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("parameter_missing_closing_quote_failures", failure_messages);
     });
 }
 
@@ -586,13 +481,10 @@ Title=MyProject
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "parameter_missing_both_quotes_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("parameter_missing_both_quotes_failures", failure_messages);
     });
 }
 
@@ -610,13 +502,10 @@ Retained="5"
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "parameter_invalid_enum_value_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("parameter_invalid_enum_value_failures", failure_messages);
     });
 }
 
@@ -634,13 +523,10 @@ DllBaseAddress=
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "dllbaseaddress_missing_value_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("dllbaseaddress_missing_value_failures", failure_messages);
     });
 }
 
@@ -658,15 +544,9 @@ DllBaseAddress=11000000
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
-            "dllbaseaddress_missing_hex_prefix_failures",
-            failures.len(),
-        );
         insta::assert_yaml_snapshot!(
             "dllbaseaddress_missing_hex_prefix_failures",
-            failure_messages
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
     });
 }
@@ -685,13 +565,10 @@ DllBaseAddress=&hGGGGGGGG
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "dllbaseaddress_invalid_hex_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("dllbaseaddress_invalid_hex_failures", failure_messages);
     });
 }
 
@@ -709,13 +586,10 @@ DllBaseAddress=&h
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "dllbaseaddress_empty_hex_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("dllbaseaddress_empty_hex_failures", failure_messages);
     });
 }
 
@@ -744,12 +618,9 @@ DllBaseAddress=11000000
     let mut settings = insta::Settings::clone_current();
     settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_project");
     settings.bind(|| {
-        let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-        assert_failure_count_matches_snapshot(
-            "invalid_project",
+        insta::assert_yaml_snapshot!(
             "multiple_errors_in_one_file_failures",
-            failures.len(),
+            failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
         );
-        insta::assert_yaml_snapshot!("multiple_errors_in_one_file_failures", failure_messages);
     });
 }

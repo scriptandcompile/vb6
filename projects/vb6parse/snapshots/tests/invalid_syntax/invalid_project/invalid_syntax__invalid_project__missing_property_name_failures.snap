@@ -1,0 +1,5 @@
+---
+source: projects/vb6parse/tests/invalid_syntax/invalid_project.rs
+expression: "failures.iter().map(|f| format!(\"{f:?}\")).collect::<Vec<_>>()"
+---
+- "ErrorDetails { source_name: \"test.vbp\", source_content: \"Type=Exe\\n=SomeValue\\n\", error_offset: 9, line_start: 9, line_end: 19, kind: Project(ParameterLineUnknown { line: \"\" }), severity: Error, labels: [], notes: [] }"

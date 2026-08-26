@@ -1,29 +1,5 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
 
-fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str, actual: usize) {
-    let primary_path =
-        format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
-    let prefixed_path = format!(
-        "snapshots/tests/invalid_syntax/{snapshot_dir}/invalid_syntax__{snapshot_dir}__{snapshot_name}.snap"
-    );
-    let path = if std::path::Path::new(&primary_path).exists() {
-        primary_path
-    } else {
-        prefixed_path
-    };
-    let content = std::fs::read_to_string(&path)
-        .unwrap_or_else(|err| panic!("Failed to read snapshot file {path}: {err}"));
-    let expected = content
-        .lines()
-        .filter(|line| line.trim_start().starts_with("- "))
-        .count();
-
-    assert_eq!(
-        actual, expected,
-        "Unexpected failure count for snapshot {snapshot_name}"
-    );
-}
-
 /// Test unclosed string literal
 #[test]
 fn unclosed_string() {
@@ -36,13 +12,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for unclosed_string ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -52,14 +21,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("unclosed_string_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_literals",
-        "unclosed_string_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("unclosed_string_failures", failure_messages);
+    insta::assert_yaml_snapshot!("unclosed_string_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test string with incomplete quote escape
@@ -74,13 +36,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for incomplete_quote_escape ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -90,14 +45,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("incomplete_quote_escape_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_literals",
-        "incomplete_quote_escape_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("incomplete_quote_escape_failures", failure_messages);
+    insta::assert_yaml_snapshot!("incomplete_quote_escape_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test invalid numeric literal with multiple decimal points
@@ -112,13 +60,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for multiple_decimal_points ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -128,14 +69,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("multiple_decimal_points_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_literals",
-        "multiple_decimal_points_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("multiple_decimal_points_failures", failure_messages);
+    insta::assert_yaml_snapshot!("multiple_decimal_points_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test invalid hexadecimal literal
@@ -150,13 +84,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for invalid_hex_literal ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -166,14 +93,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("invalid_hex_literal_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_literals",
-        "invalid_hex_literal_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("invalid_hex_literal_failures", failure_messages);
+    insta::assert_yaml_snapshot!("invalid_hex_literal_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test invalid octal literal
@@ -188,13 +108,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for invalid_octal_literal ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -204,14 +117,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("invalid_octal_literal_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_literals",
-        "invalid_octal_literal_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("invalid_octal_literal_failures", failure_messages);
+    insta::assert_yaml_snapshot!("invalid_octal_literal_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test invalid date literal - bad month
@@ -226,13 +132,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for invalid_date_month ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -242,14 +141,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("invalid_date_month_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_literals",
-        "invalid_date_month_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("invalid_date_month_failures", failure_messages);
+    insta::assert_yaml_snapshot!("invalid_date_month_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test unclosed date literal
@@ -264,13 +156,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for unclosed_date_literal ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -280,14 +165,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("unclosed_date_literal_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_literals",
-        "unclosed_date_literal_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("unclosed_date_literal_failures", failure_messages);
+    insta::assert_yaml_snapshot!("unclosed_date_literal_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test invalid exponent in scientific notation
@@ -302,13 +180,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for invalid_scientific_notation ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -318,14 +189,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("invalid_scientific_notation_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_literals",
-        "invalid_scientific_notation_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("invalid_scientific_notation_failures", failure_messages);
+    insta::assert_yaml_snapshot!("invalid_scientific_notation_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test number with invalid type suffix
@@ -340,13 +204,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for invalid_number_suffix ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -356,14 +213,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("invalid_number_suffix_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_literals",
-        "invalid_number_suffix_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("invalid_number_suffix_failures", failure_messages);
+    insta::assert_yaml_snapshot!("invalid_number_suffix_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test number with leading zeros (potentially ambiguous)
@@ -378,13 +228,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for number_with_leading_zeros ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -394,12 +237,5 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("number_with_leading_zeros_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_literals",
-        "number_with_leading_zeros_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("number_with_leading_zeros_failures", failure_messages);
+    insta::assert_yaml_snapshot!("number_with_leading_zeros_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }

@@ -1,0 +1,5 @@
+---
+source: projects/vb6parse/tests/invalid_syntax/mismatched_keywords.rs
+expression: "failures.iter().map(|f| format!(\"{f:?}\")).collect::<Vec<_>>()"
+---
+- "ErrorDetails { source_name: \"test.bas\", source_content: \"\\nSub Test()\\n    If x > 0 Then\\n        Debug.Print \\\"Positive\\\"\\n    End Select\\nEnd Sub\\n\", error_offset: 75, line_start: 5, line_end: 6, kind: Parser(UnexpectedTokens { expected: [\"statement\"], found: [EndKeyword, Whitespace, SelectKeyword] }), severity: Error, labels: [], notes: [] }"

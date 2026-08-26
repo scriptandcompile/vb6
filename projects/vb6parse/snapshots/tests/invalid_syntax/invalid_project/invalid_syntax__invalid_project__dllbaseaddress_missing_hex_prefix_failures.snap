@@ -1,0 +1,5 @@
+---
+source: projects/vb6parse/tests/invalid_syntax/invalid_project.rs
+expression: "failures.iter().map(|f| format!(\"{f:?}\")).collect::<Vec<_>>()"
+---
+- "ErrorDetails { source_name: \"test.vbp\", source_content: \"Type=OleDll\\nDllBaseAddress=11000000\\n\", error_offset: 27, line_start: 12, line_end: 35, kind: Project(DllBaseAddressMissingHexPrefix), severity: Error, labels: [], notes: [] }"

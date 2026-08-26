@@ -1,29 +1,5 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
 
-fn assert_failure_count_matches_snapshot(snapshot_dir: &str, snapshot_name: &str, actual: usize) {
-    let primary_path =
-        format!("snapshots/tests/invalid_syntax/{snapshot_dir}/{snapshot_name}.snap");
-    let prefixed_path = format!(
-        "snapshots/tests/invalid_syntax/{snapshot_dir}/invalid_syntax__{snapshot_dir}__{snapshot_name}.snap"
-    );
-    let path = if std::path::Path::new(&primary_path).exists() {
-        primary_path
-    } else {
-        prefixed_path
-    };
-    let content = std::fs::read_to_string(&path)
-        .unwrap_or_else(|err| panic!("Failed to read snapshot file {path}: {err}"));
-    let expected = content
-        .lines()
-        .filter(|line| line.trim_start().starts_with("- "))
-        .count();
-
-    assert_eq!(
-        actual, expected,
-        "Unexpected failure count for snapshot {snapshot_name}"
-    );
-}
-
 /// Test Exit Sub outside of a subroutine
 #[test]
 fn exit_sub_outside_sub() {
@@ -32,13 +8,6 @@ Exit Sub
 ";
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
-
-    eprintln!("=== Failures for exit_sub_outside_sub ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
 
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
@@ -49,14 +18,7 @@ Exit Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("exit_sub_outside_sub_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "exit_sub_outside_sub_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("exit_sub_outside_sub_failures", failure_messages);
+    insta::assert_yaml_snapshot!("exit_sub_outside_sub_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test Exit Function outside of a function
@@ -70,13 +32,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for exit_function_outside_function ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -86,14 +41,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("exit_function_outside_function_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "exit_function_outside_function_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("exit_function_outside_function_failures", failure_messages);
+    insta::assert_yaml_snapshot!("exit_function_outside_function_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test Exit Property outside of a property
@@ -108,13 +56,6 @@ End Function
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for exit_property_outside_property ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -124,14 +65,7 @@ End Function
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("exit_property_outside_property_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "exit_property_outside_property_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("exit_property_outside_property_failures", failure_messages);
+    insta::assert_yaml_snapshot!("exit_property_outside_property_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test Exit For outside of a For loop
@@ -147,13 +81,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for exit_for_outside_loop ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -163,14 +90,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("exit_for_outside_loop_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "exit_for_outside_loop_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("exit_for_outside_loop_failures", failure_messages);
+    insta::assert_yaml_snapshot!("exit_for_outside_loop_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test Exit Do outside of a Do loop
@@ -186,13 +106,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for exit_do_outside_loop ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -202,14 +115,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("exit_do_outside_loop_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "exit_do_outside_loop_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("exit_do_outside_loop_failures", failure_messages);
+    insta::assert_yaml_snapshot!("exit_do_outside_loop_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test `GoTo` with missing label
@@ -224,13 +130,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for goto_missing_label ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -240,14 +139,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("goto_missing_label_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "goto_missing_label_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("goto_missing_label_failures", failure_messages);
+    insta::assert_yaml_snapshot!("goto_missing_label_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test `GoSub` with missing label
@@ -264,13 +156,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for gosub_missing_label ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -280,14 +165,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("gosub_missing_label_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "gosub_missing_label_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("gosub_missing_label_failures", failure_messages);
+    insta::assert_yaml_snapshot!("gosub_missing_label_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test `On Error` with missing destination
@@ -302,13 +180,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for on_error_missing_destination ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -318,14 +189,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("on_error_missing_destination_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "on_error_missing_destination_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("on_error_missing_destination_failures", failure_messages);
+    insta::assert_yaml_snapshot!("on_error_missing_destination_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test Resume without On Error context
@@ -339,13 +203,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for resume_without_on_error ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -355,14 +212,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("resume_without_on_error_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "resume_without_on_error_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("resume_without_on_error_failures", failure_messages);
+    insta::assert_yaml_snapshot!("resume_without_on_error_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test nested Exit statements in wrong context
@@ -380,13 +230,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for nested_exit_wrong_context ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -396,14 +239,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("nested_exit_wrong_context_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "nested_exit_wrong_context_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("nested_exit_wrong_context_failures", failure_messages);
+    insta::assert_yaml_snapshot!("nested_exit_wrong_context_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test Return statement in module (only valid in classes)
@@ -417,13 +253,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for return_in_module ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -433,14 +262,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("return_in_module_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "return_in_module_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("return_in_module_failures", failure_messages);
+    insta::assert_yaml_snapshot!("return_in_module_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test `On Error GoTo` with missing line number/label
@@ -455,13 +277,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for on_error_goto_missing_target ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -471,14 +286,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("on_error_goto_missing_target_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "on_error_goto_missing_target_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("on_error_goto_missing_target_failures", failure_messages);
+    insta::assert_yaml_snapshot!("on_error_goto_missing_target_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test Stop statement with arguments (should have none)
@@ -492,13 +300,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for stop_with_arguments ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -508,14 +309,7 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("stop_with_arguments_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "stop_with_arguments_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("stop_with_arguments_failures", failure_messages);
+    insta::assert_yaml_snapshot!("stop_with_arguments_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
 
 /// Test Resume with invalid keyword combination
@@ -529,13 +323,6 @@ End Sub
 
     let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
 
-    eprintln!("=== Failures for resume_invalid_combination ===");
-    eprintln!("Number of failures: {}", failures.len());
-    for failure in &failures {
-        failure.eprint();
-    }
-    eprintln!("=== End Failures ===");
-
     let cst = cst_opt.expect("CST should be present even with syntax errors");
     let tree = cst.to_serializable();
 
@@ -545,12 +332,5 @@ End Sub
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("resume_invalid_combination_cst", tree);
-
-    let failure_messages: Vec<String> = failures.iter().map(|f| format!("{f:?}")).collect();
-    assert_failure_count_matches_snapshot(
-        "invalid_control_flow",
-        "resume_invalid_combination_failures",
-        failures.len(),
-    );
-    insta::assert_yaml_snapshot!("resume_invalid_combination_failures", failure_messages);
+    insta::assert_yaml_snapshot!("resume_invalid_combination_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
 }
