@@ -179,15 +179,4 @@ impl Interpreter {
             _ => Err(self.error_here(VBError::invalid_procedure_call(), None)),
         }
     }
-
-    /// Evaluate a bare literal or `Identifier` token, as found in the flat
-    /// token stream of `Open`/`Close` (which aren't parsed into nested
-    /// expression nodes like other statements).
-    pub(crate) fn eval_flat_token(&mut self, node: &CstNode) -> RunResult<VBVariant> {
-        if node.kind() == SyntaxKind::Identifier {
-            let name = node.text().trim().to_string();
-            return Ok(self.lookup(&name).cloned().unwrap_or(VBVariant::Empty));
-        }
-        self.eval_literal(node)
-    }
 }
