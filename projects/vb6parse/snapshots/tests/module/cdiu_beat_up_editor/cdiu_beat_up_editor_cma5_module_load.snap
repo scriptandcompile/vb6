@@ -19277,18 +19277,24 @@ cst:
                             text: Kill
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: TempDirName
-                          - kind: Whitespace
-                            text: " "
-                          - kind: Ampersand
-                            text: "&"
-                          - kind: Whitespace
-                            text: " "
-                          - kind: StringLiteral
-                            text: "\"*.*\""
-                          - kind: Newline
-                            text: "\n"
+                          - kind: BinaryExpression
+                            children:
+                              - kind: IdentifierExpression
+                                children:
+                                  - kind: Identifier
+                                    text: TempDirName
+                              - kind: Whitespace
+                                text: " "
+                              - kind: Ampersand
+                                text: "&"
+                              - kind: Whitespace
+                                text: " "
+                              - kind: StringLiteralExpression
+                                children:
+                                  - kind: StringLiteral
+                                    text: "\"*.*\""
+                      - kind: Newline
+                        text: "\n"
                       - kind: Whitespace
                         text: "            "
                       - kind: Newline
@@ -19497,18 +19503,24 @@ cst:
                                             text: Kill
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: TempDirName
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: Ampersand
-                                            text: "&"
-                                          - kind: Whitespace
-                                            text: " "
-                                          - kind: StringLiteral
-                                            text: "\"*.*\""
-                                          - kind: Newline
-                                            text: "\n"
+                                          - kind: BinaryExpression
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: TempDirName
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: Ampersand
+                                                text: "&"
+                                              - kind: Whitespace
+                                                text: " "
+                                              - kind: StringLiteralExpression
+                                                children:
+                                                  - kind: StringLiteral
+                                                    text: "\"*.*\""
+                                      - kind: Newline
+                                        text: "\n"
                                       - kind: Whitespace
                                         text: "                            "
                                   - kind: EndKeyword

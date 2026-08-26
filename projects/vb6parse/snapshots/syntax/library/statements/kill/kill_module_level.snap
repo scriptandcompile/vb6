@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/kill.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/kill.rs
 expression: tree
 ---
 root:
@@ -11,7 +11,9 @@ root:
           text: Kill
         - kind: Whitespace
           text: " "
-        - kind: StringLiteral
-          text: "\"temp.dat\""
-        - kind: Newline
-          text: "\n"
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"temp.dat\""
+    - kind: Newline
+      text: "\n"

@@ -1851,10 +1851,12 @@ cst:
                             text: Kill
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: ScannerCaptureFile
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ScannerCaptureFile
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "        "
                       - kind: Newline

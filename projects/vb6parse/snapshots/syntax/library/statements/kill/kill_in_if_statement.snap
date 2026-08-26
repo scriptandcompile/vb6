@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/kill.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/kill.rs
 expression: tree
 ---
 root:
@@ -53,10 +53,12 @@ root:
                           text: Kill
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: fileName
-                        - kind: Newline
-                          text: "\n"
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: fileName
+                    - kind: Newline
+                      text: "\n"
                     - kind: Whitespace
                       text: "    "
                 - kind: EndKeyword

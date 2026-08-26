@@ -14445,10 +14445,12 @@ cst:
                     text: Kill
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: FileName
-                  - kind: Newline
-                    text: "\n"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: FileName
+              - kind: Newline
+                text: "\n"
               - kind: Newline
                 text: "\n"
               - kind: LabelStatement

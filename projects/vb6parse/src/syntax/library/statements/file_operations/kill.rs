@@ -1,6 +1,7 @@
 use crate::parsers::SyntaxKind;
 
 use crate::parsers::cst::Parser;
+use crate::Token;
 
 impl Parser<'_> {
     // VB6 Kill statement syntax:
@@ -30,7 +31,18 @@ impl Parser<'_> {
     //
     // [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/kill-statement)
     pub(crate) fn parse_kill_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::KillStatement);
+        self.builder.start_node(SyntaxKind::KillStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        if !self.is_at_end() && !self.at_token(Token::Newline) {
+            self.parse_expression();
+            self.consume_whitespace();
+        }
+
+        self.builder.finish_node();
     }
 }
 
