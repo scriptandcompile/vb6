@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/delete_setting.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/delete_setting.rs
 expression: tree
 ---
 root:
@@ -33,20 +33,30 @@ root:
                   text: DeleteSetting
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: App
-                - kind: PeriodOperator
-                  text: "."
-                - kind: Identifier
-                  text: ProductName
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"FileFilter\""
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: Identifier
+                              text: App
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: ProductName
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"FileFilter\""
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

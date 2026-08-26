@@ -1,29 +1,60 @@
-use crate::parsers::SyntaxKind;
+//! # `DeleteSetting` Statement
+//!
+//! Deletes a section or key setting from an application's entry in the Windows registry.
+//!
+//! ## Syntax
+//!
+//! ```vb
+//! DeleteSetting appname [, section [, key]]
+//! ```
+//!
+//! ## Parts
+//!
+//! - **appname**: Required. String expression containing the name of the application or project.
+//! - **section**: Optional. String expression containing the name of the section to delete.
+//! - **key**: Optional. String expression containing the name of the key to delete.
+//!
+//! ## Examples
+//!
+//! ```vb
+//! DeleteSetting "MyApp", "Startup"            ' Deletes entire Startup section
+//! DeleteSetting "MyApp", "Startup", "Left"    ' Deletes Left key from Startup section
+//! ```
+//!
+//! ## References
+//!
+//! - [DeleteSetting Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/deletesetting-statement)
 
 use crate::parsers::cst::Parser;
+use crate::parsers::syntaxkind::SyntaxKind;
+use crate::Token;
 
 impl Parser<'_> {
-    // VB6 DeleteSetting statement syntax:
-    // - DeleteSetting appname, section[, key]
-    //
-    // Deletes a section or key setting from an application's entry in the Windows registry.
-    //
-    // The DeleteSetting statement syntax has these named arguments:
-    //
-    // | Part     | Description |
-    // |----------|-------------|
-    // | appname  | Required. String expression containing the name of the application or project to which the section or key setting applies. |
-    // | section  | Required. String expression containing the name of the section from which the key setting is being deleted. If only appname and section are provided, the specified section is deleted along with all related key settings. |
-    // | key      | Optional. String expression containing the name of the key setting being deleted. |
-    //
-    // Examples:
-    // - DeleteSetting "MyApp", "Startup" (deletes entire Startup section)
-    // - DeleteSetting "MyApp", "Startup", "Left" (deletes Left key from Startup section)
-    // - DeleteSetting App.ProductName, "FileFilter" (deletes FileFilter section)
-    //
-    // [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/deletesetting-statement)
+    /// Parses a `DeleteSetting` statement.
+    ///
+    /// Deletes a section or key setting from an application's registry entry.
+    ///
+    /// ## Syntax
+    ///
+    /// ```vb
+    /// DeleteSetting appname [, section [, key]]
+    /// ```
+    ///
+    /// ## Reference
+    ///
+    /// [DeleteSetting Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/deletesetting-statement)
     pub(crate) fn parse_delete_setting_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::DeleteSettingStatement);
+        self.builder.start_node(SyntaxKind::DeleteSettingStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        if !self.at_token(Token::Newline) && !self.is_at_end() {
+            self.parse_separated_expressions(Token::Comma, SyntaxKind::ArgumentList);
+        }
+
+        self.builder.finish_node();
     }
 }
 
