@@ -3,6 +3,9 @@
 #[path = "statements/declarations/arrays.rs"]
 mod arrays;
 
+#[path = "statements/declarations/erase.rs"]
+mod erase;
+
 #[path = "statements/control_flow/exit.rs"]
 mod exit;
 
