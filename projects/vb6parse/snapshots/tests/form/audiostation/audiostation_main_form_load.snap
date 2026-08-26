@@ -22376,16 +22376,24 @@ cst:
                                     text: Unload
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: PictureBox_Disabled
-                                  - kind: LeftParenthesis
-                                    text: (
-                                  - kind: Identifier
-                                    text: E
-                                  - kind: RightParenthesis
-                                    text: )
-                                  - kind: Newline
-                                    text: "\n"
+                                  - kind: CallExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: PictureBox_Disabled
+                                      - kind: LeftParenthesis
+                                        text: (
+                                      - kind: ArgumentList
+                                        children:
+                                          - kind: Argument
+                                            children:
+                                              - kind: IdentifierExpression
+                                                children:
+                                                  - kind: Identifier
+                                                    text: E
+                                      - kind: RightParenthesis
+                                        text: )
+                              - kind: Newline
+                                text: "\n"
                               - kind: Whitespace
                                 text: "    "
                           - kind: NextKeyword

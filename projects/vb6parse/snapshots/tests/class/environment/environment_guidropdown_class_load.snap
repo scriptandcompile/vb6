@@ -2931,10 +2931,12 @@ cst:
                         text: Unload
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: Pad
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: Pad
+                  - kind: Newline
+                    text: "\r\n"
               - kind: IfStatement
                 children:
                   - kind: IfKeyword
@@ -5767,10 +5769,12 @@ cst:
                         text: Unload
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: Pad
-                      - kind: Newline
-                        text: "\r\n"
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: Pad
+                  - kind: Newline
+                    text: "\r\n"
               - kind: SetStatement
                 children:
                   - kind: SetKeyword

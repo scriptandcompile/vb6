@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/endless_runner_game_vb6_0.rs
+source: projects/vb6parse/tests/form/endless_runner_game_vb6_0.rs
 expression: form_file
 ---
 form:
@@ -2284,10 +2284,12 @@ cst:
                     text: Unload
                   - kind: Whitespace
                     text: " "
-                  - kind: MeKeyword
-                    text: Me
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: MeKeyword
+                        text: Me
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -2364,10 +2366,12 @@ cst:
                     text: Unload
                   - kind: Whitespace
                     text: " "
-                  - kind: MeKeyword
-                    text: Me
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: MeKeyword
+                        text: Me
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace
@@ -7318,10 +7322,12 @@ cst:
                             text: Unload
                           - kind: Whitespace
                             text: " "
-                          - kind: MeKeyword
-                            text: Me
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: MeKeyword
+                                text: Me
+                      - kind: Newline
+                        text: "\r\n"
                   - kind: EndKeyword
                     text: End
                   - kind: Whitespace

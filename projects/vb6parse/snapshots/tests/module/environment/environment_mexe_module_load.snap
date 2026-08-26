@@ -3607,10 +3607,12 @@ cst:
                                     text: Unload
                                   - kind: Whitespace
                                     text: " "
-                                  - kind: Identifier
-                                    text: z
-                                  - kind: Newline
-                                    text: "\r\n"
+                                  - kind: IdentifierExpression
+                                    children:
+                                      - kind: Identifier
+                                        text: z
+                              - kind: Newline
+                                text: "\r\n"
                           - kind: NextKeyword
                             text: Next
                           - kind: Whitespace

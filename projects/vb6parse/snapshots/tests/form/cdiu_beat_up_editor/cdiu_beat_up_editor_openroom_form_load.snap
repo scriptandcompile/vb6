@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/cdiu_beat_up_editor.rs
+source: projects/vb6parse/tests/form/cdiu_beat_up_editor.rs
 expression: form_file
 ---
 form:
@@ -932,10 +932,12 @@ cst:
                     text: Unload
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: OpenRoom
-                  - kind: Newline
-                    text: "\n"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: OpenRoom
+              - kind: Newline
+                text: "\n"
               - kind: AssignmentStatement
                 children:
                   - kind: MemberAccessExpression

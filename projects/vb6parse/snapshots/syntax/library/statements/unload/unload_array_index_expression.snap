@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/unload.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/unload.rs
 expression: tree
 ---
 root:
@@ -73,24 +73,36 @@ root:
                   text: Unload
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: picImage
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: idx
-                - kind: Whitespace
-                  text: " "
-                - kind: MultiplicationOperator
-                  text: "*"
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "2"
-                - kind: RightParenthesis
-                  text: )
-                - kind: Newline
-                  text: "\n"
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: picImage
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: BinaryExpression
+                              children:
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: idx
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: MultiplicationOperator
+                                  text: "*"
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: NumericLiteralExpression
+                                  children:
+                                    - kind: IntegerLiteral
+                                      text: "2"
+                    - kind: RightParenthesis
+                      text: )
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

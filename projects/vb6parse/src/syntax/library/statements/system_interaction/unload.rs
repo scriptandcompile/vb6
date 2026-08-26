@@ -147,26 +147,29 @@
 use crate::parsers::SyntaxKind;
 
 use crate::parsers::cst::Parser;
+use crate::Token;
 
 impl Parser<'_> {
-    /// Parse a Visual Basic 6 Unload statement.
+    /// Parses an Unload statement.
     ///
     /// Unload statement syntax:
-    /// - Unload object
-    ///
-    /// Removes a form or control from memory.
-    ///
-    /// Examples:
     /// ```vb
-    /// Unload Form1
-    /// Unload Me
-    /// Unload frmDialog
-    /// Unload txtControl(5)
+    /// Unload object
     /// ```
     ///
-    /// [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/unload-statement)
+    /// - **object**: Required. An object expression that evaluates to a Form or control.
     pub(crate) fn parse_unload_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::UnloadStatement);
+        self.builder.start_node(SyntaxKind::UnloadStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        if !self.is_at_end() && !self.at_token(Token::Newline) {
+            self.parse_expression();
+        }
+
+        self.builder.finish_node();
     }
 }
 

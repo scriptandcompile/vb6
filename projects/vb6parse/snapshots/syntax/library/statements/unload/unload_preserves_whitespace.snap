@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/unload.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/unload.rs
 expression: tree
 ---
 root:
@@ -13,9 +13,11 @@ root:
           text: Unload
         - kind: Whitespace
           text: "    "
-        - kind: Identifier
-          text: Form1
-        - kind: Whitespace
-          text: "    "
-        - kind: Newline
-          text: "\n"
+        - kind: IdentifierExpression
+          children:
+            - kind: Identifier
+              text: Form1
+    - kind: Whitespace
+      text: "    "
+    - kind: Newline
+      text: "\n"

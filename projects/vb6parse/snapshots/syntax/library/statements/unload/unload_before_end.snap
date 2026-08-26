@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/statements/system_interaction/unload.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/unload.rs
 expression: tree
 ---
 root:
@@ -37,10 +37,12 @@ root:
                   text: Unload
                 - kind: Whitespace
                   text: " "
-                - kind: MeKeyword
-                  text: Me
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: MeKeyword
+                      text: Me
+            - kind: Newline
+              text: "\n"
             - kind: Whitespace
               text: "    "
             - kind: EndStatement

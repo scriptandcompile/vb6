@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/unload.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/unload.rs
 expression: tree
 ---
 root:
@@ -33,14 +33,18 @@ root:
                   text: Unload
                 - kind: Whitespace
                   text: " "
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: frmDialog
-                - kind: RightParenthesis
-                  text: )
-                - kind: Newline
-                  text: "\n"
+                - kind: ParenthesizedExpression
+                  children:
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: frmDialog
+                    - kind: RightParenthesis
+                      text: )
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

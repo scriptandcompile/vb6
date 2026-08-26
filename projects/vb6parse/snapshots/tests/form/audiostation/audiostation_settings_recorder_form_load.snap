@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/audiostation.rs
+source: projects/vb6parse/tests/form/audiostation.rs
 expression: form_file
 ---
 form:
@@ -526,10 +526,12 @@ cst:
                     text: Unload
                   - kind: Whitespace
                     text: " "
-                  - kind: MeKeyword
-                    text: Me
-                  - kind: Newline
-                    text: "\n"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: MeKeyword
+                        text: Me
+              - kind: Newline
+                text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

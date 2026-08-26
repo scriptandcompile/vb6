@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/unload.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/unload.rs
 expression: tree
 ---
 root:
@@ -33,16 +33,24 @@ root:
                   text: Unload
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: Form1
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "0"
-                - kind: RightParenthesis
-                  text: )
-                - kind: Newline
-                  text: "\n"
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: Form1
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "0"
+                    - kind: RightParenthesis
+                      text: )
+            - kind: Newline
+              text: "\n"
             - kind: UnloadStatement
               children:
                 - kind: Whitespace
@@ -51,16 +59,24 @@ root:
                   text: Unload
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: Form1
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "1"
-                - kind: RightParenthesis
-                  text: )
-                - kind: Newline
-                  text: "\n"
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: Form1
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "1"
+                    - kind: RightParenthesis
+                      text: )
+            - kind: Newline
+              text: "\n"
             - kind: UnloadStatement
               children:
                 - kind: Whitespace
@@ -69,16 +85,24 @@ root:
                   text: Unload
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: Form1
-                - kind: LeftParenthesis
-                  text: (
-                - kind: IntegerLiteral
-                  text: "2"
-                - kind: RightParenthesis
-                  text: )
-                - kind: Newline
-                  text: "\n"
+                - kind: CallExpression
+                  children:
+                    - kind: Identifier
+                      text: Form1
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: NumericLiteralExpression
+                              children:
+                                - kind: IntegerLiteral
+                                  text: "2"
+                    - kind: RightParenthesis
+                      text: )
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace
