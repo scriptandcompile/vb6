@@ -32,3 +32,6 @@ mod kill;
 
 #[path = "statements/file_operations/input.rs"]
 mod input;
+
+#[path = "statements/file_operations/line_input.rs"]
+mod line_input;
