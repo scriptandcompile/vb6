@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Generate VB6 Library Reference documentation from Rust source files.
+Generate VB6 Runtime Library Reference documentation from Rust source files.
 
 This script extracts module documentation (//! comments) from Rust files in
-src/syntax/library/ and generates HTML pages for the GitHub Pages documentation site.
+vb6runtime/src/library/ and generates HTML pages for the GitHub Pages documentation site.
 """
 
 import argparse
@@ -191,9 +191,6 @@ def get_category_descriptions(mod_file: Path) -> Dict[str, str]:
     
     Args:
         mod_file: Path to mod.rs file
-        
-    Returns:
-        Dictionary mapping category names to descriptions
     """
     descriptions = {}
     
@@ -225,9 +222,6 @@ def markdown_to_html(md_content: str) -> str:
     
     Args:
         md_content: Markdown content
-        
-    Returns:
-        HTML string
     """
     import html as html_module
 
