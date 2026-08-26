@@ -42,7 +42,6 @@
 //! - **Random Numbers**: `Randomize`
 
 use crate::language::Token;
-use crate::parsers::SyntaxKind;
 use crate::parsers::cst::Parser;
 
 pub(crate) mod file_operations;
@@ -258,33 +257,5 @@ impl Parser<'_> {
             }
             _ => {}
         }
-    }
-
-    /// Generic parser for built-in statements that follow the pattern:
-    /// - Keyword [arguments]
-    ///
-    /// All built-in statements in this module share the same structure:
-    /// 1. Set `parsing_header` to false
-    /// 2. Start a syntax node of the given kind
-    /// 3. Consume the keyword token
-    /// 4. Consume everything until newline (arguments/parameters)
-    /// 5. Consume the newline
-    /// 6. Finish the syntax node
-    pub(super) fn parse_simple_builtin_statement(&mut self, kind: SyntaxKind) {
-        // if we are now parsing a built-in statement, we are no longer in the header.
-        self.parsing_header = false;
-
-        self.builder.start_node(kind.to_raw());
-
-        // Consume any leading whitespace
-        self.consume_whitespace();
-
-        // Consume the keyword
-        self.consume_token();
-
-        // Consume everything until newline (arguments/parameters)
-        self.consume_until_after(Token::Newline);
-
-        self.builder.finish_node();
     }
 }
