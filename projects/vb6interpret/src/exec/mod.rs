@@ -5,16 +5,14 @@
 //! its raw children, so nested bodies receive accurate start lines without
 //! accumulating loop iterations.
 //!
-//! Submodules hold the statement families and the flat token evaluator;
-//! this file keeps the statement dispatch loop and the shared error
-//! helpers.
+//! Submodules hold the statement families; this file keeps the statement
+//! dispatch loop and the shared error helpers.
 
 mod assignment;
 mod call;
 mod control_flow;
 mod declarations;
 mod file_io;
-mod flat;
 mod print;
 mod statements;
 mod util;
