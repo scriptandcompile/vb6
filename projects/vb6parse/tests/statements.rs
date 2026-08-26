@@ -20,3 +20,6 @@ mod resume;
 
 #[path = "statements/file_operations/close.rs"]
 mod close;
+
+#[path = "statements/file_operations/filecopy.rs"]
+mod filecopy;
