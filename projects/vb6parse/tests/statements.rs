@@ -56,3 +56,6 @@ mod seek;
 
 #[path = "statements/file_operations/width.rs"]
 mod width;
+
+#[path = "statements/file_operations/write.rs"]
+mod write;
