@@ -123,11 +123,26 @@
 
 use crate::parsers::cst::Parser;
 use crate::parsers::syntaxkind::SyntaxKind;
+use crate::Token;
 
 impl Parser<'_> {
     /// Parses a `SaveSetting` statement.
+    ///
+    /// ```vb
+    /// SaveSetting appname, section, key, setting
+    /// ```
     pub(crate) fn parse_savesetting_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::SaveSettingStatement);
+        self.builder.start_node(SyntaxKind::SaveSettingStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        if !self.at_token(Token::Newline) && !self.is_at_end() {
+            self.parse_separated_expressions(Token::Comma, SyntaxKind::ArgumentList);
+        }
+
+        self.builder.finish_node();
     }
 }
 

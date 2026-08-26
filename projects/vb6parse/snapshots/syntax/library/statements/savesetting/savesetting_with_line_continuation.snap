@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/savesetting.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/savesetting.rs
 expression: tree
 ---
 root:
@@ -33,34 +33,52 @@ root:
                   text: SaveSetting
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"MyApp\""
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: Underscore
-                  text: _
-                - kind: Newline
-                  text: "\n"
-                - kind: Whitespace
-                  text: "        "
-                - kind: StringLiteral
-                  text: "\"Section\""
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"Key\""
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"Value\""
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"MyApp\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: Underscore
+                          text: _
+                        - kind: Newline
+                          text: "\n"
+                        - kind: Whitespace
+                          text: "        "
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Section\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Key\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Value\""
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

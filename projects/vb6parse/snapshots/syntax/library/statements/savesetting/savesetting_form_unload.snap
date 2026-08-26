@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/savesetting.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/savesetting.rs
 expression: tree
 ---
 root:
@@ -47,36 +47,54 @@ root:
                   text: SaveSetting
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: App
-                - kind: PeriodOperator
-                  text: "."
-                - kind: Identifier
-                  text: Title
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"Position\""
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"Left\""
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: MeKeyword
-                  text: Me
-                - kind: PeriodOperator
-                  text: "."
-                - kind: Identifier
-                  text: Left
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: Identifier
+                              text: App
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: Title
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Position\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Left\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: MeKeyword
+                              text: Me
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: Left
+            - kind: Newline
+              text: "\n"
             - kind: SaveSettingStatement
               children:
                 - kind: Whitespace
@@ -85,36 +103,54 @@ root:
                   text: SaveSetting
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: App
-                - kind: PeriodOperator
-                  text: "."
-                - kind: Identifier
-                  text: Title
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"Position\""
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\"Top\""
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: MeKeyword
-                  text: Me
-                - kind: PeriodOperator
-                  text: "."
-                - kind: Identifier
-                  text: Top
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: Identifier
+                              text: App
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: Title
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Position\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"Top\""
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: MeKeyword
+                              text: Me
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: Top
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace
