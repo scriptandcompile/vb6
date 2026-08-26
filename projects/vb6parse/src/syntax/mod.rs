@@ -10,7 +10,6 @@
 //!
 //! For the CST data structure itself, see the `parsers::cst` module.
 
-pub mod expressions;
 pub mod statements;
 
 // Re-export commonly used types from the CST module for convenience
