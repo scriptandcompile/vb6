@@ -97,10 +97,10 @@ impl Interpreter {
 
     /// `Set obj = expr`: object-reference assignment.
     ///
-    /// The parser keeps `Set` statements as flat token runs (unlike `Let`,
-    /// which builds real expression nodes), so both sides are interpreted
-    /// from raw tokens here: the target is an identifier and the source is
-    /// evaluated by [`Interpreter::eval_flat_expression`].
+    /// The LHS is parsed as an `IdentifierExpression` (or
+    /// `MemberAccessExpression` for property assignments like
+    /// `Set Form1.Picture = ...`). The RHS is a proper expression tree node
+    /// evaluated by [`Interpreter::eval_expr`].
     pub(crate) fn exec_set_statement(&mut self, node: &CstNode) -> RunResult<()> {
         let significant: Vec<&CstNode> = node.significant_children().collect();
         let eq_index = significant
@@ -108,15 +108,22 @@ impl Interpreter {
             .position(|c| c.kind() == SyntaxKind::EqualityOperator)
             .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
 
-        // Target: the identifier between `Set` and `=`. Member targets
-        // (`Set Form1.Picture = ...`) need object support.
-        let target = &significant[1..eq_index];
-        if target.len() != 1 || !program::is_identifier_like(target[0]) {
-            return Err(self.error_here(VBError::invalid_procedure_call(), None));
-        }
-        let name = target[0].text().trim().to_string();
+        // Target: the identifier between `Set` and `=`.
+        let target = significant
+            .iter()
+            .find(|c| c.kind() == SyntaxKind::IdentifierExpression)
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
 
-        let value = self.eval_flat_expression(&significant[eq_index + 1..])?;
+        let name = program::identifier_name(target);
+
+        // RHS: a proper expression tree node (like AssignmentStatement).
+        let rhs = significant
+            .iter()
+            .skip(eq_index + 1)
+            .find(|c| !matches!(c.kind(), SyntaxKind::Whitespace | SyntaxKind::Newline))
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+
+        let value = self.eval_expr(rhs)?;
         self.assign_to_name(&name, value);
         Ok(())
     }
