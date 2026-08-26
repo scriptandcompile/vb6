@@ -162,13 +162,44 @@
 //!
 //! - [Seek Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/seek-statement)
 
+use crate::parsers::SyntaxKind;
+
 use crate::parsers::cst::Parser;
-use crate::parsers::syntaxkind::SyntaxKind;
+use crate::Token;
 
 impl Parser<'_> {
     /// Parses a Seek statement.
+    ///
+    /// Seek statement syntax:
+    /// ```vb
+    /// Seek [#]filenumber, position
+    /// ```
+    ///
+    /// - **filenumber**: Required. Any valid file number. The number sign (#) is optional.
+    /// - **position**: Required. Number indicating where the next read or write should occur.
     pub(crate) fn parse_seek_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::SeekStatement);
+        self.builder.start_node(SyntaxKind::SeekStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        // Parse filenumber expression
+        self.parse_expression();
+        self.consume_whitespace();
+
+        // Parse comma
+        if self.at_token(Token::Comma) {
+            self.consume_token();
+            self.consume_whitespace();
+        }
+
+        // Parse position expression
+        if !self.is_at_end() && !self.at_token(Token::Newline) {
+            self.parse_expression();
+        }
+
+        self.builder.finish_node();
     }
 }
 

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/seek.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/seek.rs
 expression: tree
 ---
 root:
@@ -11,17 +11,21 @@ root:
           text: Seek
         - kind: Whitespace
           text: "   "
-        - kind: Octothorpe
-          text: "#"
-        - kind: IntegerLiteral
-          text: "1"
+        - kind: IdentifierExpression
+          children:
+            - kind: Octothorpe
+              text: "#"
+            - kind: IntegerLiteral
+              text: "1"
         - kind: Whitespace
           text: "  "
         - kind: Comma
           text: ","
         - kind: Whitespace
           text: "   "
-        - kind: IntegerLiteral
-          text: "100"
-        - kind: Newline
-          text: "\n"
+        - kind: NumericLiteralExpression
+          children:
+            - kind: IntegerLiteral
+              text: "100"
+    - kind: Newline
+      text: "\n"

@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/statements/file_operations/seek.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/seek.rs
 expression: tree
 ---
 root:
@@ -31,18 +31,22 @@ root:
           text: Seek
         - kind: Whitespace
           text: " "
-        - kind: Octothorpe
-          text: "#"
-        - kind: IntegerLiteral
-          text: "1"
+        - kind: IdentifierExpression
+          children:
+            - kind: Octothorpe
+              text: "#"
+            - kind: IntegerLiteral
+              text: "1"
         - kind: Comma
           text: ","
         - kind: Whitespace
           text: " "
-        - kind: Identifier
-          text: targetPos
-        - kind: Newline
-          text: "\n"
+        - kind: IdentifierExpression
+          children:
+            - kind: Identifier
+              text: targetPos
+    - kind: Newline
+      text: "\n"
     - kind: IfStatement
       children:
         - kind: IfKeyword

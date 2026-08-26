@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/seek.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/seek.rs
 expression: tree
 ---
 root:
@@ -65,16 +65,20 @@ root:
                   text: Seek
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: fileNum
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: fileNum
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: pos
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: pos
+            - kind: Newline
+              text: "\n"
             - kind: Whitespace
               text: "    "
             - kind: AssignmentStatement
