@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/sendkeys.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/sendkeys.rs
 expression: tree
 ---
 root:
@@ -49,10 +49,16 @@ root:
                   text: SendKeys
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"{DOWN}\""
-                - kind: Newline
-                  text: "\n"
+                - kind: ArgumentList
+                  children:
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"{DOWN}\""
+            - kind: Newline
+              text: "\n"
         - kind: NextKeyword
           text: Next
         - kind: Whitespace

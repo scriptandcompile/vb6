@@ -191,11 +191,39 @@
 
 use crate::parsers::cst::Parser;
 use crate::parsers::syntaxkind::SyntaxKind;
+use crate::Token;
 
 impl Parser<'_> {
     /// Parses a `SendKeys` statement.
+    ///
+    /// Sends one or more keystrokes to the active window as if typed at the keyboard.
+    ///
+    /// ## Syntax
+    ///
+    /// ```vb
+    /// SendKeys string [, wait]
+    /// ```
+    ///
+    /// ## Parts
+    ///
+    /// - **string**: Required. String expression specifying the keystrokes to send.
+    /// - **wait**: Optional. Boolean value specifying the wait mode.
+    ///
+    /// ## Reference
+    ///
+    /// [SendKeys Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/sendkeys-statement)
     pub(crate) fn parse_sendkeys_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::SendKeysStatement);
+        self.builder.start_node(SyntaxKind::SendKeysStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        if !self.at_token(Token::Newline) && !self.is_at_end() {
+            self.parse_separated_expressions(Token::Comma, SyntaxKind::ArgumentList);
+        }
+
+        self.builder.finish_node();
     }
 }
 
