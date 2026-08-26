@@ -32,9 +32,18 @@ use crate::parsers::SyntaxKind;
 
 use crate::parsers::cst::Parser;
 
+use crate::Token;
+
 impl Parser<'_> {
     pub(crate) fn parse_error_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::ErrorStatement);
+        self.builder.start_node(SyntaxKind::ErrorStatement.to_raw());
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+        if !self.is_at_end() && !self.at_token(Token::Newline) {
+            self.parse_expression();
+        }
+        self.builder.finish_node();
     }
 }
 
@@ -292,6 +301,49 @@ Sub Test()
     Error 1
     DoSomething
     Error 2
+End Sub
+";
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
+        let cst = cst_opt.expect("CST should be parsed");
+
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../../../snapshots/syntax/library/statements/error");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn error_assignment_not_statement() {
+        // `Error = errorObject` is an assignment, not the Error statement.
+        // The parser must NOT create an ErrorStatement node for this.
+        let source = r"
+Sub Test()
+    Error = errorObject
+End Sub
+";
+        let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();
+        assert_eq!(failures.len(), 0, "Expected no parse failures.");
+        let cst = cst_opt.expect("CST should be parsed");
+
+        let tree = cst.to_serializable();
+
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("../../../../../snapshots/syntax/library/statements/error");
+        settings.set_prepend_module_to_snapshot(false);
+        let _guard = settings.bind_to_scope();
+        insta::assert_yaml_snapshot!(tree);
+    }
+
+    #[test]
+    fn error_assignment_with_space() {
+        // `Error  =  errorObject` should also be parsed as an assignment.
+        let source = r"
+Sub Test()
+    Error  =  errorObject
 End Sub
 ";
         let (cst_opt, failures) = ConcreteSyntaxTree::from_text("test.bas", source).unpack();

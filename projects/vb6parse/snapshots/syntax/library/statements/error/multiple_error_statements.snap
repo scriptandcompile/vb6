@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/error.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/error.rs
 expression: tree
 ---
 root:
@@ -33,10 +33,12 @@ root:
                   text: Error
                 - kind: Whitespace
                   text: " "
-                - kind: IntegerLiteral
-                  text: "1"
-                - kind: Newline
-                  text: "\n"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "1"
+            - kind: Newline
+              text: "\n"
             - kind: Whitespace
               text: "    "
             - kind: CallStatement
@@ -53,10 +55,12 @@ root:
                   text: Error
                 - kind: Whitespace
                   text: " "
-                - kind: IntegerLiteral
-                  text: "2"
-                - kind: Newline
-                  text: "\n"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "2"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

@@ -56,7 +56,8 @@ impl Parser<'_> {
     ///
     /// Special handling:
     /// - `ErrorKeyword` followed by `DollarSign` is NOT a statement (it's the `Error$` function)
-    /// - `MidKeyword` followed by `DollarSign` is NOT a statement (it's the `Mid$` function) so we exclude those patterns.
+    /// - `ErrorKeyword` followed by `=` is NOT a statement (it's an assignment)
+    /// - `MidKeyword` followed by `DollarSign` is NOT a statement (it's the `Mid$` function)
     ///
     /// Checks both current position and next non-whitespace token.
     pub(crate) fn is_library_statement_keyword(&self) -> bool {
@@ -70,6 +71,21 @@ impl Parser<'_> {
         } else {
             self.current_token().copied()
         };
+
+        // Special case: `Error = ...` is an assignment, not the Error statement.
+        // Look ahead past whitespace to check if Error is followed by `=`.
+        if matches!(token, Some(Token::ErrorKeyword)) {
+            let tokens_after: Vec<Token> = self
+                .tokens
+                .iter()
+                .skip(self.pos)
+                .filter(|(_text, t)| !matches!(t, Token::Whitespace))
+                .map(|(_, t)| *t)
+                .collect();
+            if let Some(&Token::EqualityOperator) = tokens_after.get(1) {
+                return false;
+            }
+        }
 
         matches!(
             token,
