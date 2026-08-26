@@ -39,5 +39,8 @@ mod line_input;
 #[path = "statements/file_operations/name.rs"]
 mod name;
 
+#[path = "statements/file_operations/open.rs"]
+mod open;
+
 #[path = "statements/file_operations/lock.rs"]
 mod lock;
