@@ -74,3 +74,6 @@ mod rmdir;
 
 #[path = "statements/filesystem/setattr.rs"]
 mod setattr;
+
+#[path = "statements/objects/call.rs"]
+mod call;
