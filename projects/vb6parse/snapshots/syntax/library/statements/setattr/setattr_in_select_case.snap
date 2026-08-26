@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/setattr.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/setattr.rs
 expression: tree
 ---
 root:
@@ -45,16 +45,20 @@ root:
                       text: SetAttr
                     - kind: Whitespace
                       text: " "
-                    - kind: Identifier
-                      text: filePath
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: filePath
                     - kind: Comma
                       text: ","
                     - kind: Whitespace
                       text: " "
-                    - kind: Identifier
-                      text: vbReadOnly
-                    - kind: Newline
-                      text: "\n"
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: vbReadOnly
+                - kind: Newline
+                  text: "\n"
                 - kind: Whitespace
                   text: "    "
         - kind: CaseClause
@@ -77,16 +81,20 @@ root:
                       text: SetAttr
                     - kind: Whitespace
                       text: " "
-                    - kind: Identifier
-                      text: filePath
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: filePath
                     - kind: Comma
                       text: ","
                     - kind: Whitespace
                       text: " "
-                    - kind: Identifier
-                      text: vbHidden
-                    - kind: Newline
-                      text: "\n"
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: vbHidden
+                - kind: Newline
+                  text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/setattr.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/setattr.rs
 expression: tree
 ---
 root:
@@ -49,32 +49,44 @@ root:
                   text: SetAttr
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\Files\\File\""
-                - kind: Whitespace
-                  text: " "
-                - kind: Ampersand
-                  text: "&"
-                - kind: Whitespace
-                  text: " "
-                - kind: Identifier
-                  text: i
-                - kind: Whitespace
-                  text: " "
-                - kind: Ampersand
-                  text: "&"
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteral
-                  text: "\".txt\""
+                - kind: BinaryExpression
+                  children:
+                    - kind: BinaryExpression
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"C:\\Files\\File\""
+                        - kind: Whitespace
+                          text: " "
+                        - kind: Ampersand
+                          text: "&"
+                        - kind: Whitespace
+                          text: " "
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: i
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Ampersand
+                      text: "&"
+                    - kind: Whitespace
+                      text: " "
+                    - kind: StringLiteralExpression
+                      children:
+                        - kind: StringLiteral
+                          text: "\".txt\""
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: vbReadOnly
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: vbReadOnly
+            - kind: Newline
+              text: "\n"
         - kind: NextKeyword
           text: Next
         - kind: Whitespace

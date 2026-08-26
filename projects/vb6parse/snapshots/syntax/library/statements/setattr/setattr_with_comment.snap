@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/setattr.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/setattr.rs
 expression: tree
 ---
 root:
@@ -33,20 +33,24 @@ root:
                   text: SetAttr
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\MyFile.txt\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\\MyFile.txt\""
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: vbReadOnly
-                - kind: Whitespace
-                  text: " "
-                - kind: EndOfLineComment
-                  text: "' Make read-only"
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: vbReadOnly
+            - kind: Whitespace
+              text: " "
+            - kind: EndOfLineComment
+              text: "' Make read-only"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

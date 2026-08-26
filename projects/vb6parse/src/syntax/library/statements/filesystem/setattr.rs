@@ -214,11 +214,41 @@
 
 use crate::parsers::cst::Parser;
 use crate::parsers::syntaxkind::SyntaxKind;
+use crate::Token;
 
 impl Parser<'_> {
     /// Parses a `SetAttr` statement.
+    ///
+    /// SetAttr statement syntax:
+    /// ```vb
+    /// SetAttr pathname, attributes
+    /// ```
+    ///
+    /// - **pathname**: Required. String expression that specifies a file name.
+    /// - **attributes**: Required. Numeric expression specifying the file attributes.
     pub(crate) fn parse_setattr_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::SetAttrStatement);
+        self.builder.start_node(SyntaxKind::SetAttrStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        // Parse pathname expression
+        self.parse_expression();
+        self.consume_whitespace();
+
+        // Parse comma
+        if self.at_token(Token::Comma) {
+            self.consume_token();
+            self.consume_whitespace();
+        }
+
+        // Parse attributes expression
+        if !self.is_at_end() && !self.at_token(Token::Newline) {
+            self.parse_expression();
+        }
+
+        self.builder.finish_node();
     }
 }
 

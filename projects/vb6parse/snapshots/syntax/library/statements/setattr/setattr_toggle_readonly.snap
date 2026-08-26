@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/setattr.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/setattr.rs
 expression: tree
 ---
 root:
@@ -65,28 +65,38 @@ root:
                           text: SetAttr
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: filePath
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: filePath
                         - kind: Comma
                           text: ","
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: currentAttrs
-                        - kind: Whitespace
-                          text: " "
-                        - kind: AndKeyword
-                          text: And
-                        - kind: Whitespace
-                          text: " "
-                        - kind: NotKeyword
-                          text: Not
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: vbReadOnly
-                        - kind: Newline
-                          text: "\n"
+                        - kind: BinaryExpression
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: currentAttrs
+                            - kind: Whitespace
+                              text: " "
+                            - kind: AndKeyword
+                              text: And
+                            - kind: Whitespace
+                              text: " "
+                            - kind: UnaryExpression
+                              children:
+                                - kind: NotKeyword
+                                  text: Not
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: vbReadOnly
+                    - kind: Newline
+                      text: "\n"
                     - kind: Whitespace
                       text: "    "
                 - kind: ElseClause
@@ -105,24 +115,32 @@ root:
                               text: SetAttr
                             - kind: Whitespace
                               text: " "
-                            - kind: Identifier
-                              text: filePath
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: filePath
                             - kind: Comma
                               text: ","
                             - kind: Whitespace
                               text: " "
-                            - kind: Identifier
-                              text: currentAttrs
-                            - kind: Whitespace
-                              text: " "
-                            - kind: OrKeyword
-                              text: Or
-                            - kind: Whitespace
-                              text: " "
-                            - kind: Identifier
-                              text: vbReadOnly
-                            - kind: Newline
-                              text: "\n"
+                            - kind: BinaryExpression
+                              children:
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: currentAttrs
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: OrKeyword
+                                  text: Or
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: vbReadOnly
+                        - kind: Newline
+                          text: "\n"
                         - kind: Whitespace
                           text: "    "
                 - kind: EndKeyword
