@@ -23,3 +23,6 @@ mod close;
 
 #[path = "statements/file_operations/filecopy.rs"]
 mod filecopy;
+
+#[path = "statements/file_operations/get.rs"]
+mod get;
