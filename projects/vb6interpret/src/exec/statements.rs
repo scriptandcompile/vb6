@@ -90,29 +90,33 @@ impl Interpreter {
     /// Shell task ID becomes its decimal digits, which platform backends
     /// may resolve to a window); `wait` defaults to `False`.
     pub(crate) fn exec_app_activate(&mut self, node: &CstNode) -> RunResult<()> {
-        let significant: Vec<&CstNode> = node.significant_children().collect();
-        let args: Vec<&CstNode> = significant
-            .iter()
-            .skip(1) // the AppActivate keyword
-            .copied()
-            .filter(|c| c.kind() != SyntaxKind::Comma)
-            .collect();
+        let arg_list = node
+            .children_by_kind(SyntaxKind::ArgumentList)
+            .next()
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+
+        let args: Vec<&CstNode> = arg_list.children_by_kind(SyntaxKind::Argument).collect();
         if args.is_empty() || args.len() > 2 {
             return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
-        let title = self.eval_expr(args[0])?;
+        let title_node = args[0]
+            .significant_children()
+            .next()
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+        let title = self.eval_expr(title_node)?;
         let wait = match args.get(1) {
-            Some(expr) => {
-                // Simple builtin statements keep their arguments unwrapped,
-                // so a literal `True`/`False` arrives as a bare keyword
-                // token rather than an expression node.
+            Some(arg) => {
+                let expr_node = arg
+                    .significant_children()
+                    .next()
+                    .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
                 let value = if matches!(
-                    expr.kind(),
+                    expr_node.kind(),
                     SyntaxKind::TrueKeyword | SyntaxKind::FalseKeyword
                 ) {
-                    self.eval_literal(expr)?
+                    self.eval_literal(expr_node)?
                 } else {
-                    self.eval_expr(expr)?
+                    self.eval_expr(expr_node)?
                 };
                 value.as_bool()?
             }
@@ -132,29 +136,33 @@ impl Interpreter {
     /// The keystroke expression is converted to its string form; `wait`
     /// defaults to `False`. Malformed key strings raise VB6 error 5.
     pub(crate) fn exec_send_keys(&mut self, node: &CstNode) -> RunResult<()> {
-        let significant: Vec<&CstNode> = node.significant_children().collect();
-        let args: Vec<&CstNode> = significant
-            .iter()
-            .skip(1) // the SendKeys keyword
-            .copied()
-            .filter(|c| c.kind() != SyntaxKind::Comma)
-            .collect();
+        let arg_list = node
+            .children_by_kind(SyntaxKind::ArgumentList)
+            .next()
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+
+        let args: Vec<&CstNode> = arg_list.children_by_kind(SyntaxKind::Argument).collect();
         if args.is_empty() || args.len() > 2 {
             return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
-        let keys = self.eval_expr(args[0])?;
+        let keys_node = args[0]
+            .significant_children()
+            .next()
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+        let keys = self.eval_expr(keys_node)?;
         let wait = match args.get(1) {
-            Some(expr) => {
-                // Simple builtin statements keep their arguments unwrapped,
-                // so a literal `True`/`False` arrives as a bare keyword
-                // token rather than an expression node.
+            Some(arg) => {
+                let expr_node = arg
+                    .significant_children()
+                    .next()
+                    .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
                 let value = if matches!(
-                    expr.kind(),
+                    expr_node.kind(),
                     SyntaxKind::TrueKeyword | SyntaxKind::FalseKeyword
                 ) {
-                    self.eval_literal(expr)?
+                    self.eval_literal(expr_node)?
                 } else {
-                    self.eval_expr(expr)?
+                    self.eval_expr(expr_node)?
                 };
                 value.as_bool()?
             }
