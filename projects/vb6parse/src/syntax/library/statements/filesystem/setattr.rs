@@ -212,14 +212,14 @@
 //!
 //! - [SetAttr Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/setattr-statement)
 
+use crate::Token;
 use crate::parsers::cst::Parser;
 use crate::parsers::syntaxkind::SyntaxKind;
-use crate::Token;
 
 impl Parser<'_> {
     /// Parses a `SetAttr` statement.
     ///
-    /// SetAttr statement syntax:
+    /// `SetAttr` statement syntax:
     /// ```vb
     /// SetAttr pathname, attributes
     /// ```
@@ -227,7 +227,8 @@ impl Parser<'_> {
     /// - **pathname**: Required. String expression that specifies a file name.
     /// - **attributes**: Required. Numeric expression specifying the file attributes.
     pub(crate) fn parse_setattr_statement(&mut self) {
-        self.builder.start_node(SyntaxKind::SetAttrStatement.to_raw());
+        self.builder
+            .start_node(SyntaxKind::SetAttrStatement.to_raw());
 
         self.consume_whitespace();
         self.consume_token();
