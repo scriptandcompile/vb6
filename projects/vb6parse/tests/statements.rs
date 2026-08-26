@@ -68,3 +68,6 @@ mod chdrive;
 
 #[path = "statements/filesystem/mkdir.rs"]
 mod mkdir;
+
+#[path = "statements/filesystem/rmdir.rs"]
+mod rmdir;
