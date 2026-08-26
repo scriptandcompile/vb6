@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/randomize.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/randomize.rs
 expression: tree
 ---
 root:
@@ -33,26 +33,36 @@ root:
                   text: Randomize
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: x
-                - kind: Whitespace
-                  text: " "
-                - kind: MultiplicationOperator
-                  text: "*"
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "100"
-                - kind: Whitespace
-                  text: " "
-                - kind: AdditionOperator
-                  text: +
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "42"
-                - kind: Newline
-                  text: "\n"
+                - kind: BinaryExpression
+                  children:
+                    - kind: BinaryExpression
+                      children:
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: x
+                        - kind: Whitespace
+                          text: " "
+                        - kind: MultiplicationOperator
+                          text: "*"
+                        - kind: Whitespace
+                          text: " "
+                        - kind: NumericLiteralExpression
+                          children:
+                            - kind: IntegerLiteral
+                              text: "100"
+                    - kind: Whitespace
+                      text: " "
+                    - kind: AdditionOperator
+                      text: +
+                    - kind: Whitespace
+                      text: " "
+                    - kind: NumericLiteralExpression
+                      children:
+                        - kind: IntegerLiteral
+                          text: "42"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

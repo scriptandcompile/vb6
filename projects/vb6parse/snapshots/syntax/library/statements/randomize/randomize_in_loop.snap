@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/randomize.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/randomize.rs
 expression: tree
 ---
 root:
@@ -69,10 +69,12 @@ root:
                           text: Randomize
                         - kind: Whitespace
                           text: " "
-                        - kind: Identifier
-                          text: i
-                        - kind: Newline
-                          text: "\n"
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Identifier
+                              text: i
+                    - kind: Newline
+                      text: "\n"
                     - kind: Whitespace
                       text: "        "
                     - kind: AssignmentStatement

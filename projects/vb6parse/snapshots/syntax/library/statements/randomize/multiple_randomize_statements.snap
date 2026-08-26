@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/runtime_state/randomize.rs
+source: projects/vb6parse/src/syntax/library/statements/runtime_state/randomize.rs
 expression: tree
 ---
 root:
@@ -31,8 +31,8 @@ root:
                   text: "    "
                 - kind: RandomizeKeyword
                   text: Randomize
-                - kind: Newline
-                  text: "\n"
+            - kind: Newline
+              text: "\n"
             - kind: Whitespace
               text: "    "
             - kind: AssignmentStatement
@@ -61,10 +61,12 @@ root:
                   text: Randomize
                 - kind: Whitespace
                   text: " "
-                - kind: IntegerLiteral
-                  text: "42"
-                - kind: Newline
-                  text: "\n"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "42"
+            - kind: Newline
+              text: "\n"
             - kind: Whitespace
               text: "    "
             - kind: AssignmentStatement
