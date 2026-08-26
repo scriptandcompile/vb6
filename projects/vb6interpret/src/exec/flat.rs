@@ -36,30 +36,8 @@ use vb6runtime::VBVariant;
 
 use crate::error::{BuiltinCallInfo, RunResult};
 use crate::interpreter::Interpreter;
-use crate::program::is_identifier_like;
 
 impl Interpreter {
-    /// Evaluate one operand of a flat-token statement: an identifier-like
-    /// token names a variable (`Empty` when undeclared, literal keywords
-    /// such as `True` included), anything else evaluates as an expression
-    /// node.
-    pub(crate) fn eval_flat_operand(&mut self, node: &CstNode) -> RunResult<VBVariant> {
-        if is_identifier_like(node) {
-            let name = node.text().trim();
-            if let Some(value) = self.lookup(name) {
-                return Ok(value.clone());
-            }
-            return match node.kind() {
-                SyntaxKind::TrueKeyword => Ok(VBVariant::Boolean(true)),
-                SyntaxKind::FalseKeyword => Ok(VBVariant::Boolean(false)),
-                SyntaxKind::NullKeyword => Ok(VBVariant::Null),
-                SyntaxKind::NothingKeyword => Ok(VBVariant::Nothing),
-                _ => Ok(VBVariant::Empty),
-            };
-        }
-        self.eval_expr(node)
-    }
-
     /// Evaluate a flat token run (a statement parsed without expression
     /// nodes). Handles single atoms, `New` (unsupported), and direct calls
     /// `Name(arg, ...)` whose arguments are themselves flat expressions.
@@ -140,17 +118,6 @@ impl Interpreter {
             .into_iter()
             .map(|part| self.eval_flat_expression(&part))
             .collect()
-    }
-
-    /// Evaluate one operand of a simple builtin statement. These statements
-    /// keep raw tokens, so a bare identifier must be resolved directly
-    /// instead of through `eval_expr`.
-    pub(crate) fn eval_simple_operand(&mut self, node: &CstNode) -> RunResult<VBVariant> {
-        if node.kind() == SyntaxKind::Identifier {
-            self.eval_flat_atom(node)
-        } else {
-            self.eval_expr(node)
-        }
     }
 
     /// Evaluate a single-token flat expression: literals, the special
