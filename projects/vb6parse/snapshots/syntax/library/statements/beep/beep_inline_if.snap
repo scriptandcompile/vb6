@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/statements/system_interaction/beep.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/beep.rs
 expression: tree
 ---
 root:
@@ -47,8 +47,8 @@ root:
                   children:
                     - kind: BeepKeyword
                       text: Beep
-                    - kind: Newline
-                      text: "\n"
+                - kind: Newline
+                  text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

@@ -10,7 +10,13 @@ impl Parser<'_> {
     //
     // [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/beep-statement)
     pub(crate) fn parse_beep_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::BeepStatement);
+        self.builder.start_node(SyntaxKind::BeepStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        self.builder.finish_node();
     }
 }
 
