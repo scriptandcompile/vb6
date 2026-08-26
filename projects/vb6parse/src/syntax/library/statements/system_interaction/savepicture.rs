@@ -102,11 +102,43 @@
 
 use crate::parsers::cst::Parser;
 use crate::parsers::syntaxkind::SyntaxKind;
+use crate::Token;
 
 impl Parser<'_> {
     /// Parses a `SavePicture` statement.
+    ///
+    /// `SavePicture` statement syntax:
+    /// ```vb
+    /// SavePicture picture, filename
+    /// ```
+    ///
+    /// - **picture**: Required. A property or graphic object from which to save the image.
+    /// - **filename**: Required. String expression specifying the name of the file to which the graphic is saved.
     pub(crate) fn parse_savepicture_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::SavePictureStatement);
+        self.builder
+            .start_node(SyntaxKind::SavePictureStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        // Parse picture expression
+        self.parse_expression();
+        self.consume_whitespace();
+
+        // Parse comma
+        if self.at_token(Token::Comma) {
+            self.consume_token();
+            self.consume_whitespace();
+        }
+
+        // Parse filename expression
+        if !self.is_at_end() && !self.at_token(Token::Newline) {
+            self.parse_expression();
+            self.consume_whitespace();
+        }
+
+        self.builder.finish_node();
     }
 }
 
