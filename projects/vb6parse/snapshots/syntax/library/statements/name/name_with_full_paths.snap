@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/name.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/name.rs
 expression: tree
 ---
 root:
@@ -33,18 +33,22 @@ root:
                   text: Name
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\Data\\Report.doc\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\\Data\\Report.doc\""
                 - kind: Whitespace
                   text: " "
                 - kind: AsKeyword
                   text: As
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\Archive\\OldReport.doc\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\\Archive\\OldReport.doc\""
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

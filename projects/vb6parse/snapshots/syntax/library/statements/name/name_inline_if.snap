@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/statements/file_operations/name.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/name.rs
 expression: tree
 ---
 root:
@@ -49,18 +49,22 @@ root:
                       text: Name
                     - kind: Whitespace
                       text: " "
-                    - kind: Identifier
-                      text: oldFile
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: oldFile
                     - kind: Whitespace
                       text: " "
                     - kind: AsKeyword
                       text: As
                     - kind: Whitespace
                       text: " "
-                    - kind: Identifier
-                      text: newFile
-                    - kind: Newline
-                      text: "\n"
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: newFile
+                - kind: Newline
+                  text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

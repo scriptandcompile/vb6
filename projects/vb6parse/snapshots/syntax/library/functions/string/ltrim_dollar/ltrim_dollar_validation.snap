@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/string/ltrim_dollar.rs
+source: projects/vb6parse/src/syntax/library/functions/string/ltrim_dollar.rs
 expression: tree
 ---
 root:
@@ -33,18 +33,22 @@ root:
                   text: name
                 - kind: Whitespace
                   text: " "
-                - kind: EqualityOperator
-                  text: "="
+                - kind: IdentifierExpression
+                  children:
+                    - kind: EqualityOperator
+                      text: "="
                 - kind: Whitespace
                   text: " "
                 - kind: Identifier
                   text: txtName
-                - kind: PeriodOperator
-                  text: "."
-                - kind: TextKeyword
-                  text: Text
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: PeriodOperator
+                      text: "."
+                    - kind: Identifier
+                      text: Text
+            - kind: Newline
+              text: "\n"
             - kind: IfStatement
               children:
                 - kind: Whitespace

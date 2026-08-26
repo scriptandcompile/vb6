@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/name.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/name.rs
 expression: tree
 ---
 root:
@@ -33,18 +33,22 @@ root:
                   text: Name
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"File1.txt\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"File1.txt\""
                 - kind: Whitespace
                   text: " "
                 - kind: AsKeyword
                   text: As
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"Backup1.txt\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"Backup1.txt\""
+            - kind: Newline
+              text: "\n"
             - kind: NameStatement
               children:
                 - kind: Whitespace
@@ -53,18 +57,22 @@ root:
                   text: Name
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"File2.txt\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"File2.txt\""
                 - kind: Whitespace
                   text: " "
                 - kind: AsKeyword
                   text: As
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"Backup2.txt\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"Backup2.txt\""
+            - kind: Newline
+              text: "\n"
             - kind: NameStatement
               children:
                 - kind: Whitespace
@@ -73,18 +81,22 @@ root:
                   text: Name
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"File3.txt\""
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"File3.txt\""
                 - kind: Whitespace
                   text: " "
                 - kind: AsKeyword
                   text: As
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"Backup3.txt\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"Backup3.txt\""
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

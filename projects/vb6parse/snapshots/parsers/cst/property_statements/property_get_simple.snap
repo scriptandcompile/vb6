@@ -1,5 +1,5 @@
 ---
-source: src/parsers/cst/property_statements.rs
+source: projects/vb6parse/src/parsers/cst/property_statements.rs
 expression: tree
 ---
 root:
@@ -45,14 +45,16 @@ root:
                   text: Name
                 - kind: Whitespace
                   text: " "
-                - kind: EqualityOperator
-                  text: "="
+                - kind: IdentifierExpression
+                  children:
+                    - kind: EqualityOperator
+                      text: "="
                 - kind: Whitespace
                   text: " "
                 - kind: Identifier
                   text: m_name
-                - kind: Newline
-                  text: "\n"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

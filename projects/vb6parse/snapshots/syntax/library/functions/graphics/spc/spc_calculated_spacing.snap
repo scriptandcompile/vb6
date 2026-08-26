@@ -53,14 +53,16 @@ root:
                   text: name
                 - kind: Whitespace
                   text: " "
-                - kind: EqualityOperator
-                  text: "="
+                - kind: IdentifierExpression
+                  children:
+                    - kind: EqualityOperator
+                      text: "="
                 - kind: Whitespace
                   text: " "
                 - kind: StringLiteral
                   text: "\"John\""
-                - kind: Newline
-                  text: "\n"
+            - kind: Newline
+              text: "\n"
             - kind: PrintStatement
               children:
                 - kind: Whitespace
