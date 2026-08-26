@@ -100,9 +100,9 @@
 //!
 //! - [SavePicture Statement - Microsoft Docs](https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa268097(v=vs.60))
 
+use crate::Token;
 use crate::parsers::cst::Parser;
 use crate::parsers::syntaxkind::SyntaxKind;
-use crate::Token;
 
 impl Parser<'_> {
     /// Parses a `SavePicture` statement.
@@ -122,8 +122,10 @@ impl Parser<'_> {
         self.consume_token();
         self.consume_whitespace();
 
-        // Parse picture expression
-        self.parse_expression();
+        // Parse picture expression wrapped in ArgumentList/Argument
+        self.builder.start_node(SyntaxKind::ArgumentList.to_raw());
+        self.parse_savepicture_argument();
+
         self.consume_whitespace();
 
         // Parse comma
@@ -132,12 +134,21 @@ impl Parser<'_> {
             self.consume_whitespace();
         }
 
-        // Parse filename expression
+        // Parse filename expression wrapped in Argument
         if !self.is_at_end() && !self.at_token(Token::Newline) {
-            self.parse_expression();
+            self.parse_savepicture_argument();
             self.consume_whitespace();
         }
 
+        self.builder.finish_node(); // ArgumentList
+
+        self.builder.finish_node();
+    }
+
+    /// Parse a single `SavePicture` argument, wrapped in an Argument node.
+    fn parse_savepicture_argument(&mut self) {
+        self.builder.start_node(SyntaxKind::Argument.to_raw());
+        self.parse_expression();
         self.builder.finish_node();
     }
 }

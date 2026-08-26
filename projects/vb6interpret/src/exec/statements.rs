@@ -172,18 +172,28 @@ impl Interpreter {
     /// `SavePicture picture, filename`: save a picture object to a bitmap
     /// file, overwriting any existing file.
     pub(crate) fn exec_save_picture(&mut self, node: &CstNode) -> RunResult<()> {
-        let significant: Vec<&CstNode> = node.significant_children().collect();
-        let args: Vec<&CstNode> = significant
-            .iter()
-            .skip(1) // the SavePicture keyword
-            .copied()
-            .filter(|c| c.kind() != SyntaxKind::Comma)
-            .collect();
+        let arg_list = node
+            .children_by_kind(SyntaxKind::ArgumentList)
+            .next()
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+
+        let args: Vec<&CstNode> = arg_list.children_by_kind(SyntaxKind::Argument).collect();
         if args.len() != 2 {
             return Err(self.error_here(VBError::invalid_procedure_call(), None));
         }
-        let picture = self.eval_simple_operand(args[0])?;
-        let filename = self.eval_simple_operand(args[1])?;
+
+        // Extract the expression from each Argument node.
+        let picture_node = args[0]
+            .significant_children()
+            .next()
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+        let filename_node = args[1]
+            .significant_children()
+            .next()
+            .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
+
+        let picture = self.eval_expr(picture_node)?;
+        let filename = self.eval_expr(filename_node)?;
         vb6runtime::library::graphics::savepicture::save_picture(&picture, &filename)
             .map_err(|e| self.error_here(e, None))?;
         Ok(())
@@ -301,8 +311,8 @@ impl Interpreter {
             .significant_children()
             .next()
             .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?;
-        let start = VBLong::try_from(&self.eval_expr(start_expr)?)
-            .map_err(|e| self.error_here(e, None))?;
+        let start =
+            VBLong::try_from(&self.eval_expr(start_expr)?).map_err(|e| self.error_here(e, None))?;
 
         // Third argument (optional): length.
         let length = if let Some(len_arg) = args.get(2) {

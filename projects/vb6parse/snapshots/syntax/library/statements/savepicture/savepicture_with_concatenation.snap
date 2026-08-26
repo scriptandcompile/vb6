@@ -33,34 +33,40 @@ root:
                   text: SavePicture
                 - kind: Whitespace
                   text: " "
-                - kind: MemberAccessExpression
+                - kind: ArgumentList
                   children:
-                    - kind: Identifier
-                      text: Picture1
-                    - kind: PeriodOperator
-                      text: "."
-                    - kind: Identifier
-                      text: Image
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: BinaryExpression
-                  children:
-                    - kind: IdentifierExpression
+                    - kind: Argument
                       children:
-                        - kind: Identifier
-                          text: basePath
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: Identifier
+                              text: Picture1
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: Image
+                    - kind: Comma
+                      text: ","
                     - kind: Whitespace
                       text: " "
-                    - kind: Ampersand
-                      text: "&"
-                    - kind: Whitespace
-                      text: " "
-                    - kind: StringLiteralExpression
+                    - kind: Argument
                       children:
-                        - kind: StringLiteral
-                          text: "\"\\image.bmp\""
+                        - kind: BinaryExpression
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: basePath
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Ampersand
+                              text: "&"
+                            - kind: Whitespace
+                              text: " "
+                            - kind: StringLiteralExpression
+                              children:
+                                - kind: StringLiteral
+                                  text: "\"\\image.bmp\""
             - kind: Newline
               text: "\n"
         - kind: EndKeyword

@@ -33,22 +33,28 @@ root:
                   text: SavePicture
                 - kind: Whitespace
                   text: " "
-                - kind: MemberAccessExpression
+                - kind: ArgumentList
                   children:
-                    - kind: Identifier
-                      text: Picture1
-                    - kind: PeriodOperator
-                      text: "."
-                    - kind: Identifier
-                      text: Picture
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteralExpression
-                  children:
-                    - kind: StringLiteral
-                      text: "\"..\\Images\\output.bmp\""
+                    - kind: Argument
+                      children:
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: Identifier
+                              text: Picture1
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: Picture
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"..\\Images\\output.bmp\""
             - kind: Newline
               text: "\n"
         - kind: EndKeyword

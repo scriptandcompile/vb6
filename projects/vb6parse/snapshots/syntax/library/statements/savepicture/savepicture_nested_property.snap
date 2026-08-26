@@ -33,28 +33,34 @@ root:
                   text: SavePicture
                 - kind: Whitespace
                   text: " "
-                - kind: MemberAccessExpression
+                - kind: ArgumentList
                   children:
-                    - kind: MemberAccessExpression
+                    - kind: Argument
                       children:
-                        - kind: Identifier
-                          text: frmMain
-                        - kind: PeriodOperator
-                          text: "."
-                        - kind: Identifier
-                          text: picDisplay
-                    - kind: PeriodOperator
-                      text: "."
-                    - kind: Identifier
-                      text: Picture
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteralExpression
-                  children:
-                    - kind: StringLiteral
-                      text: "\"display.bmp\""
+                        - kind: MemberAccessExpression
+                          children:
+                            - kind: MemberAccessExpression
+                              children:
+                                - kind: Identifier
+                                  text: frmMain
+                                - kind: PeriodOperator
+                                  text: "."
+                                - kind: Identifier
+                                  text: picDisplay
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: Picture
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"display.bmp\""
             - kind: Newline
               text: "\n"
         - kind: EndKeyword

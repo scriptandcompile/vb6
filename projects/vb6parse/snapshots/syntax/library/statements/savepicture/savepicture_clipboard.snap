@@ -33,30 +33,36 @@ root:
                   text: SavePicture
                 - kind: Whitespace
                   text: " "
-                - kind: CallExpression
+                - kind: ArgumentList
                   children:
-                    - kind: MemberAccessExpression
+                    - kind: Argument
                       children:
-                        - kind: Identifier
-                          text: Clipboard
-                        - kind: PeriodOperator
-                          text: "."
-                        - kind: Identifier
-                          text: GetData
-                    - kind: LeftParenthesis
-                      text: (
-                    - kind: ArgumentList
-                      children: []
-                    - kind: RightParenthesis
-                      text: )
-                - kind: Comma
-                  text: ","
-                - kind: Whitespace
-                  text: " "
-                - kind: StringLiteralExpression
-                  children:
-                    - kind: StringLiteral
-                      text: "\"clipboard.bmp\""
+                        - kind: CallExpression
+                          children:
+                            - kind: MemberAccessExpression
+                              children:
+                                - kind: Identifier
+                                  text: Clipboard
+                                - kind: PeriodOperator
+                                  text: "."
+                                - kind: Identifier
+                                  text: GetData
+                            - kind: LeftParenthesis
+                              text: (
+                            - kind: ArgumentList
+                              children: []
+                            - kind: RightParenthesis
+                              text: )
+                    - kind: Comma
+                      text: ","
+                    - kind: Whitespace
+                      text: " "
+                    - kind: Argument
+                      children:
+                        - kind: StringLiteralExpression
+                          children:
+                            - kind: StringLiteral
+                              text: "\"clipboard.bmp\""
             - kind: Newline
               text: "\n"
         - kind: EndKeyword
