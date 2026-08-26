@@ -17,3 +17,6 @@ mod jump;
 
 #[path = "statements/control_flow/resume.rs"]
 mod resume;
+
+#[path = "statements/file_operations/close.rs"]
+mod close;
