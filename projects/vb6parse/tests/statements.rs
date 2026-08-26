@@ -45,6 +45,9 @@ mod open;
 #[path = "statements/file_operations/lock.rs"]
 mod lock;
 
+#[path = "statements/file_operations/unlock.rs"]
+mod unlock;
+
 #[path = "statements/file_operations/print.rs"]
 mod print;
 
