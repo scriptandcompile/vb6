@@ -1,6 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use crate::*;
     use vb6parse::ConcreteSyntaxTree;
 
     // GoTo statement tests
