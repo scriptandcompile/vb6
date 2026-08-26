@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/system_interaction/stop.rs
+source: projects/vb6parse/src/syntax/library/statements/system_interaction/stop.rs
 expression: tree
 ---
 root:
@@ -33,10 +33,10 @@ root:
                   text: Stop
                 - kind: Whitespace
                   text: " "
-                - kind: EndOfLineComment
-                  text: "' Debug breakpoint"
-                - kind: Newline
-                  text: "\n"
+            - kind: EndOfLineComment
+              text: "' Debug breakpoint"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

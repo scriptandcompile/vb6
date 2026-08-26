@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/invalid_syntax/invalid_control_flow.rs
+source: projects/vb6parse/tests/invalid_syntax/invalid_control_flow.rs
 expression: tree
 ---
 root:
@@ -33,10 +33,14 @@ root:
                   text: Stop
                 - kind: Whitespace
                   text: " "
+            - kind: ErrorRecovery
+              children:
+                - kind: ErrorExpectedTokens
+                  text: statement
                 - kind: IntegerLiteral
                   text: "123"
-                - kind: Newline
-                  text: "\n"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

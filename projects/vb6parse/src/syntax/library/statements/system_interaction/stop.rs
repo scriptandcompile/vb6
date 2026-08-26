@@ -238,7 +238,11 @@ use crate::parsers::syntaxkind::SyntaxKind;
 impl Parser<'_> {
     /// Parses a Stop statement.
     pub(crate) fn parse_stop_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::StopStatement);
+        self.builder.start_node(SyntaxKind::StopStatement.to_raw());
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+        self.builder.finish_node();
     }
 }
 
