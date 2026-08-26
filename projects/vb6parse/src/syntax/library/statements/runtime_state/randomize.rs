@@ -41,12 +41,13 @@
 
 use crate::parsers::SyntaxKind;
 
-use crate::parsers::cst::Parser;
 use crate::Token;
+use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
     pub(crate) fn parse_randomize_statement(&mut self) {
-        self.builder.start_node(SyntaxKind::RandomizeStatement.to_raw());
+        self.builder
+            .start_node(SyntaxKind::RandomizeStatement.to_raw());
         self.consume_whitespace();
         self.consume_token();
         self.consume_whitespace();

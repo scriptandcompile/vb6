@@ -121,9 +121,9 @@
 //!
 //! - [SaveSetting Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/savesetting-statement)
 
+use crate::Token;
 use crate::parsers::cst::Parser;
 use crate::parsers::syntaxkind::SyntaxKind;
-use crate::Token;
 
 impl Parser<'_> {
     /// Parses a `SaveSetting` statement.
@@ -132,7 +132,8 @@ impl Parser<'_> {
     /// SaveSetting appname, section, key, setting
     /// ```
     pub(crate) fn parse_savesetting_statement(&mut self) {
-        self.builder.start_node(SyntaxKind::SaveSettingStatement.to_raw());
+        self.builder
+            .start_node(SyntaxKind::SaveSettingStatement.to_raw());
 
         self.consume_whitespace();
         self.consume_token();

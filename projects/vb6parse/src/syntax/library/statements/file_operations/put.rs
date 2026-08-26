@@ -1,7 +1,7 @@
 use crate::parsers::SyntaxKind;
 
-use crate::parsers::cst::Parser;
 use crate::Token;
+use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
     /// Parse a Put statement.

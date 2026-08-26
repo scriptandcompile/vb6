@@ -1,7 +1,7 @@
 use crate::parsers::SyntaxKind;
 
-use crate::parsers::cst::Parser;
 use crate::Token;
+use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
     // VB6 Unlock statement syntax:
@@ -39,7 +39,8 @@ impl Parser<'_> {
     //
     // [Reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/unlock-statement)
     pub(crate) fn parse_unlock_statement(&mut self) {
-        self.builder.start_node(SyntaxKind::UnlockStatement.to_raw());
+        self.builder
+            .start_node(SyntaxKind::UnlockStatement.to_raw());
 
         self.consume_whitespace();
         self.consume_token();

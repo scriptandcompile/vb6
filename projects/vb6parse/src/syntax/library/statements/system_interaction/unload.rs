@@ -146,8 +146,8 @@
 
 use crate::parsers::SyntaxKind;
 
-use crate::parsers::cst::Parser;
 use crate::Token;
+use crate::parsers::cst::Parser;
 
 impl Parser<'_> {
     /// Parses an Unload statement.
@@ -159,7 +159,8 @@ impl Parser<'_> {
     ///
     /// - **object**: Required. An object expression that evaluates to a Form or control.
     pub(crate) fn parse_unload_statement(&mut self) {
-        self.builder.start_node(SyntaxKind::UnloadStatement.to_raw());
+        self.builder
+            .start_node(SyntaxKind::UnloadStatement.to_raw());
 
         self.consume_whitespace();
         self.consume_token();

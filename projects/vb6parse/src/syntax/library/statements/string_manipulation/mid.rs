@@ -54,8 +54,7 @@ impl Parser<'_> {
         self.consume_whitespace();
 
         if let Some((text, _)) = self.tokens.get(self.pos) {
-            self.builder
-                .token(SyntaxKind::MidKeyword.to_raw(), text);
+            self.builder.token(SyntaxKind::MidKeyword.to_raw(), text);
             self.pos += 1;
         }
 

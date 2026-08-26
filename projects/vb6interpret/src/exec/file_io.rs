@@ -15,14 +15,22 @@ impl Interpreter {
         let sig_children: Vec<&CstNode> = node.significant_children().collect();
 
         // Pathname: first expression node after OpenKeyword
-        let pathname_node = sig_children.iter()
-            .skip(1)
-            .find(|c| matches!(c.kind(), SyntaxKind::StringLiteralExpression | SyntaxKind::IdentifierExpression));
-        let path_value = self.eval_expr(pathname_node.ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?)
+        let pathname_node = sig_children.iter().skip(1).find(|c| {
+            matches!(
+                c.kind(),
+                SyntaxKind::StringLiteralExpression | SyntaxKind::IdentifierExpression
+            )
+        });
+        let path_value = self
+            .eval_expr(
+                pathname_node
+                    .ok_or_else(|| self.error_here(VBError::invalid_procedure_call(), None))?,
+            )
             .map_err(|_| self.error_here(VBError::invalid_procedure_call(), None))?;
 
         // Mode: first KeywordClause after ForKeyword
-        let mode_keyword = sig_children.iter()
+        let mode_keyword = sig_children
+            .iter()
             .skip_while(|c| c.kind() != SyntaxKind::ForKeyword)
             .skip(1)
             .find(|c| c.kind() == SyntaxKind::KeywordClause)
@@ -40,7 +48,8 @@ impl Interpreter {
         };
 
         // Access clause: second KeywordClause after ForKeyword (contains AccessKeyword)
-        let access_kw_clauses: Vec<&CstNode> = sig_children.iter()
+        let access_kw_clauses: Vec<&CstNode> = sig_children
+            .iter()
             .skip_while(|c| c.kind() != SyntaxKind::ForKeyword)
             .skip(1)
             .filter(|c| c.kind() == SyntaxKind::KeywordClause)
@@ -62,7 +71,7 @@ impl Interpreter {
                     (false, true) => file_state::AccessMode::Write,
                     _ => file_state::AccessMode::ReadWrite,
                 }
-            },
+            }
             None => file_state::AccessMode::ReadWrite,
         };
 
@@ -84,29 +93,33 @@ impl Interpreter {
                     (false, true) => file_state::LockMode::LockWrite,
                     _ => file_state::LockMode::Shared,
                 }
-            },
+            }
             None => file_state::LockMode::Shared,
         };
 
         // Filenumber: first ExpressionClause
         let filenumber_clause = node.first_child_by_kind(SyntaxKind::ExpressionClause);
-        let filenumber_expr = filenumber_clause
-            .and_then(|c| c.first_child_by_kind(SyntaxKind::IdentifierExpression));
-        let file_number = self.eval_filenumber(filenumber_expr)
+        let filenumber_expr =
+            filenumber_clause.and_then(|c| c.first_child_by_kind(SyntaxKind::IdentifierExpression));
+        let file_number = self
+            .eval_filenumber(filenumber_expr)
             .map_err(|_| self.error_here(VBError::type_mismatch(), None))?;
 
         // Len clause: last ExpressionClause (if two, the second is Len)
-        let len_clauses: Vec<&CstNode> = node.children_by_kind(SyntaxKind::ExpressionClause).collect();
+        let len_clauses: Vec<&CstNode> = node
+            .children_by_kind(SyntaxKind::ExpressionClause)
+            .collect();
         let record_length = match len_clauses.len() {
             2 => {
                 let clause = len_clauses[1];
-                let expr = clause.first_child_by_kind(SyntaxKind::NumericLiteralExpression)
+                let expr = clause
+                    .first_child_by_kind(SyntaxKind::NumericLiteralExpression)
                     .or_else(|| clause.first_child_by_kind(SyntaxKind::LiteralExpression));
                 match expr {
                     Some(e) => self.eval_literal(e)?.as_i32().unwrap_or(0),
                     None => 0,
                 }
-            },
+            }
             _ => 0,
         };
 
@@ -144,11 +157,15 @@ impl Interpreter {
 
         for arg in node.children_by_kind(SyntaxKind::Argument) {
             for child in arg.significant_children() {
-                if matches!(child.kind(),
-                    SyntaxKind::StringLiteralExpression | SyntaxKind::NumericLiteralExpression
-                    | SyntaxKind::IdentifierExpression | SyntaxKind::Octothorpe
+                if matches!(
+                    child.kind(),
+                    SyntaxKind::StringLiteralExpression
+                        | SyntaxKind::NumericLiteralExpression
+                        | SyntaxKind::IdentifierExpression
+                        | SyntaxKind::Octothorpe
                 ) {
-                    let value = self.eval_expr(child)
+                    let value = self
+                        .eval_expr(child)
                         .map_err(|_| self.error_here(VBError::type_mismatch(), None))?;
                     file_numbers.push(value.as_i16()?);
                     break;

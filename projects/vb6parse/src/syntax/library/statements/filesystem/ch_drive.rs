@@ -13,7 +13,8 @@ impl Parser<'_> {
     ///
     /// - **drive**: Required. String expression that specifies the drive.
     pub(crate) fn parse_ch_drive_statement(&mut self) {
-        self.builder.start_node(SyntaxKind::ChDriveStatement.to_raw());
+        self.builder
+            .start_node(SyntaxKind::ChDriveStatement.to_raw());
 
         self.consume_whitespace();
         self.consume_token();

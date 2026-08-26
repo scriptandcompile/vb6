@@ -48,9 +48,9 @@
 //!
 //! [Name Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/name-statement)
 
+use crate::Token;
 use crate::parsers::cst::Parser;
 use crate::parsers::syntaxkind::SyntaxKind;
-use crate::Token;
 
 impl Parser<'_> {
     // VB6 Name statement syntax:

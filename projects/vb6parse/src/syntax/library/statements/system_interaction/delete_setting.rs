@@ -25,9 +25,9 @@
 //!
 //! - [DeleteSetting Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/deletesetting-statement)
 
+use crate::Token;
 use crate::parsers::cst::Parser;
 use crate::parsers::syntaxkind::SyntaxKind;
-use crate::Token;
 
 impl Parser<'_> {
     /// Parses a `DeleteSetting` statement.
@@ -44,7 +44,8 @@ impl Parser<'_> {
     ///
     /// [DeleteSetting Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/deletesetting-statement)
     pub(crate) fn parse_delete_setting_statement(&mut self) {
-        self.builder.start_node(SyntaxKind::DeleteSettingStatement.to_raw());
+        self.builder
+            .start_node(SyntaxKind::DeleteSettingStatement.to_raw());
 
         self.consume_whitespace();
         self.consume_token();
