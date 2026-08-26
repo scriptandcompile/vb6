@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/file_copy.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/file_copy.rs
 expression: tree
 ---
 root:
@@ -69,48 +69,68 @@ root:
                           text: FileCopy
                         - kind: Whitespace
                           text: " "
-                        - kind: StringLiteral
-                          text: "\"file\""
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Ampersand
-                          text: "&"
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: i
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Ampersand
-                          text: "&"
-                        - kind: Whitespace
-                          text: " "
-                        - kind: StringLiteral
-                          text: "\".txt\""
+                        - kind: BinaryExpression
+                          children:
+                            - kind: BinaryExpression
+                              children:
+                                - kind: StringLiteralExpression
+                                  children:
+                                    - kind: StringLiteral
+                                      text: "\"file\""
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Ampersand
+                                  text: "&"
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: i
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Ampersand
+                              text: "&"
+                            - kind: Whitespace
+                              text: " "
+                            - kind: StringLiteralExpression
+                              children:
+                                - kind: StringLiteral
+                                  text: "\".txt\""
                         - kind: Comma
                           text: ","
                         - kind: Whitespace
                           text: " "
-                        - kind: StringLiteral
-                          text: "\"backup\""
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Ampersand
-                          text: "&"
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Identifier
-                          text: i
-                        - kind: Whitespace
-                          text: " "
-                        - kind: Ampersand
-                          text: "&"
-                        - kind: Whitespace
-                          text: " "
-                        - kind: StringLiteral
-                          text: "\".txt\""
-                        - kind: Newline
-                          text: "\n"
+                        - kind: BinaryExpression
+                          children:
+                            - kind: BinaryExpression
+                              children:
+                                - kind: StringLiteralExpression
+                                  children:
+                                    - kind: StringLiteral
+                                      text: "\"backup\""
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: Ampersand
+                                  text: "&"
+                                - kind: Whitespace
+                                  text: " "
+                                - kind: IdentifierExpression
+                                  children:
+                                    - kind: Identifier
+                                      text: i
+                            - kind: Whitespace
+                              text: " "
+                            - kind: Ampersand
+                              text: "&"
+                            - kind: Whitespace
+                              text: " "
+                            - kind: StringLiteralExpression
+                              children:
+                                - kind: StringLiteral
+                                  text: "\".txt\""
+                    - kind: Newline
+                      text: "\n"
                     - kind: Whitespace
                       text: "    "
                 - kind: NextKeyword
