@@ -19960,22 +19960,28 @@ cst:
                     text: Width
                   - kind: Whitespace
                     text: " "
-                  - kind: EqualityOperator
-                    text: "="
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: EqualityOperator
+                        text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: m_tBI
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: bmiHeader
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: biWidth
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: MemberAccessExpression
+                    children:
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: m_tBI
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: bmiHeader
+                      - kind: PeriodOperator
+                        text: "."
+                      - kind: Identifier
+                        text: biWidth
+              - kind: Newline
+                text: "\r\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

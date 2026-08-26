@@ -14553,24 +14553,30 @@ cst:
                                                     text: Width
                                                   - kind: Whitespace
                                                     text: " "
-                                                  - kind: EqualityOperator
-                                                    text: "="
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: PeriodOperator
-                                                    text: "."
-                                                  - kind: WidthKeyword
-                                                    text: Width
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: SubtractionOperator
-                                                    text: "-"
-                                                  - kind: Whitespace
-                                                    text: " "
-                                                  - kind: IntegerLiteral
-                                                    text: "1"
-                                                  - kind: Newline
-                                                    text: "\r\n"
+                                                  - kind: BinaryExpression
+                                                    children:
+                                                      - kind: MemberAccessExpression
+                                                        children:
+                                                          - kind: EqualityOperator
+                                                            text: "="
+                                                          - kind: Whitespace
+                                                            text: " "
+                                                          - kind: PeriodOperator
+                                                            text: "."
+                                                          - kind: WidthKeyword
+                                                            text: Width
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: SubtractionOperator
+                                                        text: "-"
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: NumericLiteralExpression
+                                                        children:
+                                                          - kind: IntegerLiteral
+                                                            text: "1"
+                                              - kind: Newline
+                                                text: "\r\n"
                                               - kind: Whitespace
                                                 text: "                    "
                                               - kind: AssignmentStatement
@@ -15093,14 +15099,18 @@ cst:
                                                         text: Width
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: EqualityOperator
-                                                        text: "="
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: EqualityOperator
+                                                            text: "="
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Identifier
-                                                        text: MeWidth
-                                                      - kind: Newline
-                                                        text: "\r\n"
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: MeWidth
+                                                  - kind: Newline
+                                                    text: "\r\n"
                                                   - kind: Whitespace
                                                     text: "                "
                                                   - kind: AssignmentStatement
@@ -29517,14 +29527,18 @@ cst:
                                                                                 text: Width
                                                                               - kind: Whitespace
                                                                                 text: " "
-                                                                              - kind: EqualityOperator
-                                                                                text: "="
+                                                                              - kind: IdentifierExpression
+                                                                                children:
+                                                                                  - kind: EqualityOperator
+                                                                                    text: "="
                                                                               - kind: Whitespace
                                                                                 text: " "
-                                                                              - kind: Identifier
-                                                                                text: MeWidth
-                                                                              - kind: Newline
-                                                                                text: "\r\n"
+                                                                              - kind: IdentifierExpression
+                                                                                children:
+                                                                                  - kind: Identifier
+                                                                                    text: MeWidth
+                                                                          - kind: Newline
+                                                                            text: "\r\n"
                                                                           - kind: Whitespace
                                                                             text: "                    "
                                                                           - kind: AssignmentStatement
@@ -29911,24 +29925,30 @@ cst:
                                                                         text: Width
                                                                       - kind: Whitespace
                                                                         text: " "
-                                                                      - kind: EqualityOperator
-                                                                        text: "="
-                                                                      - kind: Whitespace
-                                                                        text: " "
-                                                                      - kind: PeriodOperator
-                                                                        text: "."
-                                                                      - kind: WidthKeyword
-                                                                        text: Width
-                                                                      - kind: Whitespace
-                                                                        text: " "
-                                                                      - kind: SubtractionOperator
-                                                                        text: "-"
-                                                                      - kind: Whitespace
-                                                                        text: " "
-                                                                      - kind: IntegerLiteral
-                                                                        text: "1"
-                                                                      - kind: Newline
-                                                                        text: "\r\n"
+                                                                      - kind: BinaryExpression
+                                                                        children:
+                                                                          - kind: MemberAccessExpression
+                                                                            children:
+                                                                              - kind: EqualityOperator
+                                                                                text: "="
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: PeriodOperator
+                                                                                text: "."
+                                                                              - kind: WidthKeyword
+                                                                                text: Width
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: SubtractionOperator
+                                                                            text: "-"
+                                                                          - kind: Whitespace
+                                                                            text: " "
+                                                                          - kind: NumericLiteralExpression
+                                                                            children:
+                                                                              - kind: IntegerLiteral
+                                                                                text: "1"
+                                                                  - kind: Newline
+                                                                    text: "\r\n"
                                                                   - kind: Whitespace
                                                                     text: "                    "
                                                                   - kind: AssignmentStatement
@@ -32951,14 +32971,18 @@ cst:
                                                                                     text: Width
                                                                                   - kind: Whitespace
                                                                                     text: " "
-                                                                                  - kind: EqualityOperator
-                                                                                    text: "="
+                                                                                  - kind: IdentifierExpression
+                                                                                    children:
+                                                                                      - kind: EqualityOperator
+                                                                                        text: "="
                                                                                   - kind: Whitespace
                                                                                     text: " "
-                                                                                  - kind: Identifier
-                                                                                    text: MeWidth
-                                                                                  - kind: Newline
-                                                                                    text: "\r\n"
+                                                                                  - kind: IdentifierExpression
+                                                                                    children:
+                                                                                      - kind: Identifier
+                                                                                        text: MeWidth
+                                                                              - kind: Newline
+                                                                                text: "\r\n"
                                                                               - kind: Whitespace
                                                                                 text: "                    "
                                                                               - kind: AssignmentStatement
@@ -33345,24 +33369,30 @@ cst:
                                                                             text: Width
                                                                           - kind: Whitespace
                                                                             text: " "
-                                                                          - kind: EqualityOperator
-                                                                            text: "="
-                                                                          - kind: Whitespace
-                                                                            text: " "
-                                                                          - kind: PeriodOperator
-                                                                            text: "."
-                                                                          - kind: WidthKeyword
-                                                                            text: Width
-                                                                          - kind: Whitespace
-                                                                            text: " "
-                                                                          - kind: SubtractionOperator
-                                                                            text: "-"
-                                                                          - kind: Whitespace
-                                                                            text: " "
-                                                                          - kind: IntegerLiteral
-                                                                            text: "1"
-                                                                          - kind: Newline
-                                                                            text: "\r\n"
+                                                                          - kind: BinaryExpression
+                                                                            children:
+                                                                              - kind: MemberAccessExpression
+                                                                                children:
+                                                                                  - kind: EqualityOperator
+                                                                                    text: "="
+                                                                                  - kind: Whitespace
+                                                                                    text: " "
+                                                                                  - kind: PeriodOperator
+                                                                                    text: "."
+                                                                                  - kind: WidthKeyword
+                                                                                    text: Width
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: SubtractionOperator
+                                                                                text: "-"
+                                                                              - kind: Whitespace
+                                                                                text: " "
+                                                                              - kind: NumericLiteralExpression
+                                                                                children:
+                                                                                  - kind: IntegerLiteral
+                                                                                    text: "1"
+                                                                      - kind: Newline
+                                                                        text: "\r\n"
                                                                       - kind: Whitespace
                                                                         text: "                    "
                                                                       - kind: AssignmentStatement
@@ -72619,14 +72649,18 @@ cst:
                                                         text: Width
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: EqualityOperator
-                                                        text: "="
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: EqualityOperator
+                                                            text: "="
                                                       - kind: Whitespace
                                                         text: " "
-                                                      - kind: Identifier
-                                                        text: MeWidth
-                                                      - kind: Newline
-                                                        text: "\r\n"
+                                                      - kind: IdentifierExpression
+                                                        children:
+                                                          - kind: Identifier
+                                                            text: MeWidth
+                                                  - kind: Newline
+                                                    text: "\r\n"
                                                   - kind: Whitespace
                                                     text: "                    "
                                                   - kind: AssignmentStatement
@@ -73057,24 +73091,30 @@ cst:
                                                 text: Width
                                               - kind: Whitespace
                                                 text: " "
-                                              - kind: EqualityOperator
-                                                text: "="
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: PeriodOperator
-                                                text: "."
-                                              - kind: WidthKeyword
-                                                text: Width
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: SubtractionOperator
-                                                text: "-"
-                                              - kind: Whitespace
-                                                text: " "
-                                              - kind: IntegerLiteral
-                                                text: "1"
-                                              - kind: Newline
-                                                text: "\r\n"
+                                              - kind: BinaryExpression
+                                                children:
+                                                  - kind: MemberAccessExpression
+                                                    children:
+                                                      - kind: EqualityOperator
+                                                        text: "="
+                                                      - kind: Whitespace
+                                                        text: " "
+                                                      - kind: PeriodOperator
+                                                        text: "."
+                                                      - kind: WidthKeyword
+                                                        text: Width
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: SubtractionOperator
+                                                    text: "-"
+                                                  - kind: Whitespace
+                                                    text: " "
+                                                  - kind: NumericLiteralExpression
+                                                    children:
+                                                      - kind: IntegerLiteral
+                                                        text: "1"
+                                          - kind: Newline
+                                            text: "\r\n"
                                           - kind: Whitespace
                                             text: "                    "
                                           - kind: AssignmentStatement

@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/width.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/width.rs
 expression: tree
 ---
 root:
@@ -33,26 +33,34 @@ root:
                   text: Width
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: IntegerLiteral
-                  text: "1"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: IntegerLiteral
+                      text: "1"
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: maxWidth
-                - kind: Whitespace
-                  text: " "
-                - kind: MultiplicationOperator
-                  text: "*"
-                - kind: Whitespace
-                  text: " "
-                - kind: IntegerLiteral
-                  text: "2"
-                - kind: Newline
-                  text: "\n"
+                - kind: BinaryExpression
+                  children:
+                    - kind: IdentifierExpression
+                      children:
+                        - kind: Identifier
+                          text: maxWidth
+                    - kind: Whitespace
+                      text: " "
+                    - kind: MultiplicationOperator
+                      text: "*"
+                    - kind: Whitespace
+                      text: " "
+                    - kind: NumericLiteralExpression
+                      children:
+                        - kind: IntegerLiteral
+                          text: "2"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

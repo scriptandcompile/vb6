@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/file_operations/width.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/width.rs
 expression: tree
 ---
 root:
@@ -33,22 +33,32 @@ root:
                   text: Width
                 - kind: Whitespace
                   text: " "
-                - kind: Octothorpe
-                  text: "#"
-                - kind: LeftParenthesis
-                  text: (
-                - kind: Identifier
-                  text: fileNum
-                - kind: RightParenthesis
-                  text: )
+                - kind: CallExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: LeftParenthesis
+                      text: (
+                    - kind: ArgumentList
+                      children:
+                        - kind: Argument
+                          children:
+                            - kind: IdentifierExpression
+                              children:
+                                - kind: Identifier
+                                  text: fileNum
+                    - kind: RightParenthesis
+                      text: )
                 - kind: Comma
                   text: ","
                 - kind: Whitespace
                   text: " "
-                - kind: IntegerLiteral
-                  text: "80"
-                - kind: Newline
-                  text: "\n"
+                - kind: NumericLiteralExpression
+                  children:
+                    - kind: IntegerLiteral
+                      text: "80"
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

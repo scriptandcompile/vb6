@@ -1,5 +1,5 @@
 ---
-source: vb6parse/src/syntax/library/statements/file_operations/width.rs
+source: projects/vb6parse/src/syntax/library/statements/file_operations/width.rs
 expression: tree
 ---
 root:
@@ -49,20 +49,24 @@ root:
                           text: Width
                         - kind: Whitespace
                           text: " "
-                        - kind: Octothorpe
-                          text: "#"
-                        - kind: IntegerLiteral
-                          text: "1"
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: Octothorpe
+                              text: "#"
+                            - kind: IntegerLiteral
+                              text: "1"
                         - kind: Comma
                           text: ","
                         - kind: Whitespace
                           text: " "
-                        - kind: PeriodOperator
-                          text: "."
-                        - kind: Identifier
-                          text: LineWidth
-                        - kind: Newline
-                          text: "\n"
+                        - kind: IdentifierExpression
+                          children:
+                            - kind: PeriodOperator
+                              text: "."
+                            - kind: Identifier
+                              text: LineWidth
+                    - kind: Newline
+                      text: "\n"
                     - kind: Whitespace
                       text: "    "
                 - kind: EndKeyword

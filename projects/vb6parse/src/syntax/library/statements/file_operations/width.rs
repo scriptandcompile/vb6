@@ -119,6 +119,7 @@
 use crate::parsers::SyntaxKind;
 
 use crate::parsers::cst::Parser;
+use crate::Token;
 
 impl Parser<'_> {
     /// Parse a Width # statement.
@@ -135,7 +136,28 @@ impl Parser<'_> {
     /// Width #1, 80
     /// ```
     pub(crate) fn parse_width_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::WidthStatement);
+        self.builder.start_node(SyntaxKind::WidthStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        // Parse filenumber expression
+        self.parse_expression();
+        self.consume_whitespace();
+
+        // Parse comma
+        if self.at_token(Token::Comma) {
+            self.consume_token();
+            self.consume_whitespace();
+        }
+
+        // Parse width expression
+        if !self.is_at_end() && !self.at_token(Token::Newline) {
+            self.parse_expression();
+        }
+
+        self.builder.finish_node();
     }
 }
 

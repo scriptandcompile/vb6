@@ -5080,38 +5080,50 @@ cst:
                     text: Width
                   - kind: Whitespace
                     text: " "
-                  - kind: EqualityOperator
-                    text: "="
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: EqualityOperator
+                        text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: m_uPadding
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Left
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: ClientWidth
-                  - kind: Whitespace
-                    text: " "
-                  - kind: AdditionOperator
-                    text: +
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: m_uPadding
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Right
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: m_uPadding
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: Left
+                          - kind: Whitespace
+                            text: " "
+                          - kind: AdditionOperator
+                            text: +
+                          - kind: Whitespace
+                            text: " "
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: ClientWidth
+                      - kind: Whitespace
+                        text: " "
+                      - kind: AdditionOperator
+                        text: +
+                      - kind: Whitespace
+                        text: " "
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: m_uPadding
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: Right
+              - kind: Newline
+                text: "\r\n"
               - kind: IfStatement
                 children:
                   - kind: Whitespace
@@ -5170,24 +5182,36 @@ cst:
                             text: Width
                           - kind: Whitespace
                             text: " "
-                          - kind: EqualityOperator
-                            text: "="
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: EqualityOperator
+                                text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: Identifier
-                            text: m_uHorParts
-                          - kind: LeftParenthesis
-                            text: (
-                          - kind: IntegerLiteral
-                            text: "0"
-                          - kind: RightParenthesis
-                            text: )
-                          - kind: PeriodOperator
-                            text: "."
-                          - kind: Identifier
-                            text: Size
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: CallExpression
+                                children:
+                                  - kind: Identifier
+                                    text: m_uHorParts
+                                  - kind: LeftParenthesis
+                                    text: (
+                                  - kind: ArgumentList
+                                    children:
+                                      - kind: Argument
+                                        children:
+                                          - kind: NumericLiteralExpression
+                                            children:
+                                              - kind: IntegerLiteral
+                                                text: "0"
+                                  - kind: RightParenthesis
+                                    text: )
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: Size
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword
@@ -5660,38 +5684,50 @@ cst:
                     text: Width
                   - kind: Whitespace
                     text: " "
-                  - kind: EqualityOperator
-                    text: "="
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: EqualityOperator
+                        text: "="
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: BoxWidth
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: m_uPadding
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Left
-                  - kind: Whitespace
-                    text: " "
-                  - kind: SubtractionOperator
-                    text: "-"
-                  - kind: Whitespace
-                    text: " "
-                  - kind: Identifier
-                    text: m_uPadding
-                  - kind: PeriodOperator
-                    text: "."
-                  - kind: Identifier
-                    text: Right
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: BinaryExpression
+                    children:
+                      - kind: BinaryExpression
+                        children:
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: Identifier
+                                text: BoxWidth
+                          - kind: Whitespace
+                            text: " "
+                          - kind: SubtractionOperator
+                            text: "-"
+                          - kind: Whitespace
+                            text: " "
+                          - kind: MemberAccessExpression
+                            children:
+                              - kind: Identifier
+                                text: m_uPadding
+                              - kind: PeriodOperator
+                                text: "."
+                              - kind: Identifier
+                                text: Left
+                      - kind: Whitespace
+                        text: " "
+                      - kind: SubtractionOperator
+                        text: "-"
+                      - kind: Whitespace
+                        text: " "
+                      - kind: MemberAccessExpression
+                        children:
+                          - kind: Identifier
+                            text: m_uPadding
+                          - kind: PeriodOperator
+                            text: "."
+                          - kind: Identifier
+                            text: Right
+              - kind: Newline
+                text: "\r\n"
               - kind: IfStatement
                 children:
                   - kind: Whitespace
@@ -5732,14 +5768,18 @@ cst:
                             text: Width
                           - kind: Whitespace
                             text: " "
-                          - kind: EqualityOperator
-                            text: "="
+                          - kind: IdentifierExpression
+                            children:
+                              - kind: EqualityOperator
+                                text: "="
                           - kind: Whitespace
                             text: " "
-                          - kind: IntegerLiteral
-                            text: "0"
-                          - kind: Newline
-                            text: "\r\n"
+                          - kind: NumericLiteralExpression
+                            children:
+                              - kind: IntegerLiteral
+                                text: "0"
+                      - kind: Newline
+                        text: "\r\n"
                       - kind: Whitespace
                         text: "    "
                   - kind: EndKeyword
