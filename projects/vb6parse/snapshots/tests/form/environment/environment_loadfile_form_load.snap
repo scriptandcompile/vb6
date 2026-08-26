@@ -1,5 +1,5 @@
 ---
-source: vb6parse/tests/form/environment.rs
+source: projects/vb6parse/tests/form/environment.rs
 expression: form_file
 ---
 form:
@@ -7875,12 +7875,14 @@ cst:
                     text: MkDir
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: a
-                  - kind: DollarSign
-                    text: $
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: a
+                      - kind: DollarSign
+                        text: $
+              - kind: Newline
+                text: "\r\n"
               - kind: CallStatement
                 children:
                   - kind: Identifier

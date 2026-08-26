@@ -18701,10 +18701,12 @@ cst:
                                             text: MkDir
                                           - kind: Whitespace
                                             text: " "
-                                          - kind: Identifier
-                                            text: TempFileHolder
-                                          - kind: Newline
-                                            text: "\n"
+                                          - kind: IdentifierExpression
+                                            children:
+                                              - kind: Identifier
+                                                text: TempFileHolder
+                                      - kind: Newline
+                                        text: "\n"
                                       - kind: Whitespace
                                         text: "                        "
                                   - kind: EndKeyword

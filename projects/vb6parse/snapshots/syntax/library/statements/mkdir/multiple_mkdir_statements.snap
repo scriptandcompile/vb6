@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/statements/filesystem/mkdir.rs
+source: projects/vb6parse/src/syntax/library/statements/filesystem/mkdir.rs
 expression: tree
 ---
 root:
@@ -33,10 +33,12 @@ root:
                   text: MkDir
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\Temp\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\\Temp\""
+            - kind: Newline
+              text: "\n"
             - kind: MkDirStatement
               children:
                 - kind: Whitespace
@@ -45,10 +47,12 @@ root:
                   text: MkDir
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\Temp\\Logs\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\\Temp\\Logs\""
+            - kind: Newline
+              text: "\n"
             - kind: MkDirStatement
               children:
                 - kind: Whitespace
@@ -57,10 +61,12 @@ root:
                   text: MkDir
                 - kind: Whitespace
                   text: " "
-                - kind: StringLiteral
-                  text: "\"C:\\Temp\\Data\""
-                - kind: Newline
-                  text: "\n"
+                - kind: StringLiteralExpression
+                  children:
+                    - kind: StringLiteral
+                      text: "\"C:\\Temp\\Data\""
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

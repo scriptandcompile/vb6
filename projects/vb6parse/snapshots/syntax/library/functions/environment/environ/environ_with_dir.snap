@@ -1,5 +1,5 @@
 ---
-source: src/syntax/library/functions/environment/environ.rs
+source: projects/vb6parse/src/syntax/library/functions/environment/environ.rs
 expression: tree
 ---
 root:
@@ -109,10 +109,12 @@ root:
                   text: MkDir
                 - kind: Whitespace
                   text: " "
-                - kind: Identifier
-                  text: configDir
-                - kind: Newline
-                  text: "\n"
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: configDir
+            - kind: Newline
+              text: "\n"
         - kind: EndKeyword
           text: End
         - kind: Whitespace

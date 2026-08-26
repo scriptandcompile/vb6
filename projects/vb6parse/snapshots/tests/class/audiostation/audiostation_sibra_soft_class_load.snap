@@ -1752,10 +1752,12 @@ cst:
                         text: MkDir
                       - kind: Whitespace
                         text: " "
-                      - kind: Identifier
-                        text: FolderPath
-                      - kind: Newline
-                        text: "\n"
+                      - kind: IdentifierExpression
+                        children:
+                          - kind: Identifier
+                            text: FolderPath
+                  - kind: Newline
+                    text: "\n"
           - kind: EndKeyword
             text: End
           - kind: Whitespace

@@ -10000,12 +10000,14 @@ cst:
                     text: MkDir
                   - kind: Whitespace
                     text: " "
-                  - kind: Identifier
-                    text: a
-                  - kind: DollarSign
-                    text: $
-                  - kind: Newline
-                    text: "\r\n"
+                  - kind: IdentifierExpression
+                    children:
+                      - kind: Identifier
+                        text: a
+                      - kind: DollarSign
+                        text: $
+              - kind: Newline
+                text: "\r\n"
               - kind: CallStatement
                 children:
                   - kind: Identifier

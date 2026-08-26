@@ -45,13 +45,32 @@
 //!
 //! [MkDir Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/mkdir-statement)
 
+use crate::parsers::SyntaxKind;
+
+use crate::Token;
 use crate::parsers::cst::Parser;
-use crate::parsers::syntaxkind::SyntaxKind;
 
 impl Parser<'_> {
     /// Parses a `MkDir` statement.
+    ///
+    /// `MkDir` statement syntax:
+    /// ```vb
+    /// MkDir path
+    /// ```
+    ///
+    /// - **path**: Required. String expression that identifies the directory or folder to be created. May include drive.
     pub(crate) fn parse_mkdir_statement(&mut self) {
-        self.parse_simple_builtin_statement(SyntaxKind::MkDirStatement);
+        self.builder.start_node(SyntaxKind::MkDirStatement.to_raw());
+
+        self.consume_whitespace();
+        self.consume_token();
+        self.consume_whitespace();
+
+        if !self.is_at_end() && !self.at_token(Token::Newline) {
+            self.parse_expression();
+        }
+
+        self.builder.finish_node();
     }
 }
 
