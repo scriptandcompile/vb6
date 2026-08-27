@@ -8,7 +8,6 @@ A complete, high-performance parser library for Visual Basic 6 code and project 
 
 **[Project Documentation & Resources](https://scriptandcompile.github.io/vb6parse/)**  
 **[Interactive Playground](https://scriptandcompile.github.io/vb6parse/playground.html)**  
-**[VB6 Library Reference](https://scriptandcompile.github.io/vb6parse/library/)**  
 **[Code Coverage Report](https://scriptandcompile.github.io/vb6parse/coverage.html)**  
 **[Performance Benchmarks](https://scriptandcompile.github.io/vb6parse/benchmarks.html)**
 
@@ -20,7 +19,6 @@ VB6Parse is designed as a foundational library for tools that analyze, convert, 
 - Fast, efficient parsing with minimal allocations
 - Full support for VB6 project files, modules, classes, forms, and resources
 - Concrete Syntax Tree (CST) with complete source fidelity
-- 160+ built-in VB6 library functions and 42 statements
 - Comprehensive error handling with detailed failure information
 - Zero-copy tokenization and streaming parsing
 
@@ -84,7 +82,7 @@ Bytes/String/File → SourceFile → SourceStream → TokenStream → CST → Ob
 
 1. **I/O Layer** (`io`): Character decoding and stream access
 2. **Lexer Layer** (`lexer`): Tokenization with keyword lookup
-3. **Syntax Layer** (`syntax`): VB6 language constructs and library functions
+3. **Syntax Layer** (`syntax`): VB6 language constructs and parsing rules
 4. **Parsers Layer** (`parsers`): CST construction from tokens
 5. **Files Layer** (`files`): High-level file format parsers
 6. **Language Layer** (`language`): VB6 types, colors, controls
@@ -104,26 +102,6 @@ src/
 │   └── token_stream.rs          # TokenStream implementation
 │
 ├── syntax/                      # Syntax Layer - VB6 Language constructs
-│   ├── library/                 # VB6 built-in library unit tests and documentation
-│   │   ├── functions/           # 160+ VB6 functions (14 categories)
-│   │   │   ├── array/           # Array, Filter, Join, Split, etc.
-│   │   │   ├── conversion/      # CBool, CInt, CLng, Str, Val, etc.
-│   │   │   ├── datetime/        # Date, Now, Time, Year, Month, etc.
-│   │   │   ├── file_system/     # Dir, EOF, FileLen, LOF, etc.
-│   │   │   ├── financial/       # FV, IPmt, IRR, NPV, PV, Rate, etc.
-│   │   │   ├── interaction/     # MsgBox, InputBox, Shell, etc.
-│   │   │   ├── math/            # Abs, Cos, Sin, Tan, Log, Sqr, etc.
-│   │   │   ├── miscellaneous/   # Environ, RGB, QBColor, etc.
-│   │   │   ├── string/          # Left, Right, Mid, Len, Trim, etc.
-│   │   │   └── ...
-│   │   └── statements/          # VB6 statement unit tests and documentation (7 categories)
-│   │       ├── file_operations/ # Open, Close, Get, Put, etc.
-│   │       ├── filesystem/      # FileCopy, Kill, MkDir, RmDir, etc.
-│   │       ├── runtime_control/ # DoEvents, Stop, End, etc.
-│   │       ├── runtime_state/   # Date, Time assignment, etc.
-│   │       ├── string_manipulation/ # Mid statement, etc.
-│   │       ├── system_interaction/  # Beep, etc.
-│   │       └── ...
 │   ├── statements/              # Statement parsing logic
 │   │   ├── control_flow/        # If, Select Case, For, While parsers
 │   │   ├── declarations/        # Dim, ReDim, Const, Enum parsers
@@ -311,39 +289,6 @@ let source = SourceFile::from_string("test.bas", "Dim x As Integer");
 - [src/io/decode.rs](src/io/decode.rs) - Decoding implementation
 - [examples/parse_class.rs](examples/parse_class.rs) - Byte-level parsing
 
-### VB6 Library Functions
-
-VB6Parse includes full definitions for 160+ VB6 library functions organized into 14 categories:
-
-```rust
-// Access function metadata
-use vb6parse::syntax::library::functions::string::left;
-use vb6parse::syntax::library::functions::math::sin;
-use vb6parse::syntax::library::functions::conversion::cint;
-
-// Each module includes:
-// - Full VB6 documentation
-// - Function signatures
-// - Parameter descriptions
-// - Usage examples
-// - Related functions
-```
-
-**Categories:**
-- Array manipulation (Array, Filter, Join, Split, UBound, LBound)
-- Conversion (CBool, CDate, CInt, CLng, CStr, Val, Str)
-- Date/Time (Date, Time, Now, Year, Month, Day, Hour, DateAdd, DateDiff)
-- File System (Dir, EOF, FileLen, FreeFile, LOF, Seek)
-- Financial (FV, IPmt, IRR, NPV, PV, Rate)
-- Formatting (Format, FormatCurrency, FormatDateTime, FormatNumber, FormatPercent)
-- Interaction (MsgBox, InputBox, Shell, CreateObject, GetObject)
-- Inspection (IsArray, IsDate, IsEmpty, IsNull, IsNumeric, TypeName, VarType)
-- Math (Abs, Atn, Cos, Exp, Log, Rnd, Sgn, Sin, Sqr, Tan)
-- String (Left, Right, Mid, Len, InStr, Replace, Trim, UCase, LCase)
-- And more...
-
-**See also:** [src/syntax/library/functions/](src/syntax/library/functions/)
-
 ### Form Resources (FRX Files)
 
 Form resource files contain binary data for controls (images, icons, property blobs):
@@ -484,7 +429,7 @@ Coverage reports are saved to:
 - **LCOV files:** `lcov.info` (when using `--lcov` flag)
 
 **Current Coverage:**
-- **Library tests:** 5,467 tests covering VB6 library functions
+- **Library tests:** 5,467 unit tests
 - **Integration tests:** 31 tests with real-world VB6 projects
 - **Documentation tests:** 83 tests ensuring examples work
 - **Coverage focus:** Parsers, tokenization, error handling, and file format support
@@ -525,12 +470,6 @@ cargo fmt
 5. **Documentation:** Include doc tests for public APIs
 
 ### Adding New Features
-
-**VB6 Library Functions:**
-- Add to appropriate category in `src/syntax/library/functions/`
-- Include full VB6 documentation
-- Add comprehensive tests
-- Update category mod.rs
 
 **Control Types:**
 - Add to `src/language/controls/`

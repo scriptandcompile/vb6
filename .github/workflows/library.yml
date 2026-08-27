@@ -1,11 +1,11 @@
-name: Update VB6Parse Library Documentation
+name: Update VB6Runtime Library Documentation
 
 on:
   push:
     branches: [master]
     paths:
-      - 'projects/vb6parse/src/syntax/library/**'
-      - 'projects/vb6parse/scripts/generate-library-docs.py'
+      - 'projects/vb6runtime/src/library/**'
+      - 'projects/vb6runtime/scripts/generate-library-docs.py'
   workflow_dispatch:
 
 permissions:
@@ -28,9 +28,9 @@ jobs:
 
       - name: Generate library documentation
         run: |
-          python3 projects/vb6parse/scripts/generate-library-docs.py \
-            --src projects/vb6parse/src/syntax/library \
-            --output docs/vb6parse/library \
+          python3 projects/vb6runtime/scripts/generate-library-docs.py \
+            --src projects/vb6runtime/src/library \
+            --output docs/vb6runtime/library \
             --clean
 
       - name: Commit and push if changed
@@ -38,7 +38,7 @@ jobs:
           git pull --rebase --autostash
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add docs/vb6parse/library/
+          git add docs/vb6runtime/library/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

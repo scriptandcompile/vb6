@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Runtime - A Rust implementation of the Visual Basic 6.0 runtime library">
+    <meta name="keywords" content="vb6, runtime, visual basic 6, rust, legacy code, vb6 functions">
+    <title>VB6Runtime - Visual Basic 6 Runtime Library in Rust</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>VB6Runtime</h1>
+            <p class="tagline">A Rust implementation of the Visual Basic 6.0 runtime library</p>
+            <div class="badges">
+                <a href="https://crates.io/crates/vb6runtime" target="_blank">
+                    <img src="https://img.shields.io/crates/v/vb6runtime.svg" alt="Crates.io">
+                </a>
+                <a href="https://docs.rs/vb6runtime" target="_blank">
+                    <img src="https://docs.rs/vb6runtime/badge.svg" alt="Documentation">
+                </a>
+                <a href="https://opensource.org/licenses/MIT" target="_blank">
+                    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <a href="#overview">Overview</a>
+            <a href="#features">Features</a>
+            <a href="#library">Library Reference</a>
+            <a href="documentation.html">Documentation</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>
+                VB6Runtime is a comprehensive Rust implementation of the Visual Basic 6.0 runtime library.
+                It provides implementations for all 194 built-in VB6 functions and 9 statements across 14 function
+                categories and 4 statement categories. The library enables developers to build tools that simulate,
+                analyze, or migrate VB6 applications by providing runtime-equivalent behavior in a modern Rust codebase.
+            </p>
+        </section>
+
+        <section id="features">
+            <h2>Key Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>📚 Complete API Coverage</h3>
+                    <p>194 functions and 9 statements covering all major VB6 runtime categories including string, file, datetime, financial, and more</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🚀 Rust Performance</h3>
+                    <p>Native Rust implementation with zero dependencies, leveraging Rust's type system for safe and efficient code</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔧 Tooling Ready</h3>
+                    <p>Designed as a foundation for VB6 analysis, conversion, and migration tools that need runtime behavior</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📖 Well Documented</h3>
+                    <p>Each function includes syntax, parameters, return values, remarks, and examples for easy reference</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="library">
+            <h2>Library Reference</h2>
+            <p>
+                Explore the complete VB6 runtime library reference with 194 functions organized in 14 categories
+                and 9 statements in 4 categories. Each entry includes comprehensive documentation with examples.
+            </p>
+            <div class="doc-links" id="api-doc-links">
+                <a href="library/index.html" class="doc-link">
+                    <h3>📖 Library Reference</h3>
+                    <p>Complete reference for all 194 VB6 built-in functions and 9 statements.</p>
+                    <ul style="margin-top: 10px; color: #666;">
+                        <li>14 function categories</li>
+                        <li>4 statement categories</li>
+                        <li>Syntax and parameter details</li>
+                        <li>Usage examples</li>
+                    </ul>
+                </a>
+
+                <a href="https://docs.rs/vb6runtime" class="doc-link" target="_blank">
+                    <h3>📦 API Reference (docs.rs)</h3>
+                    <p>Complete Rust API documentation generated from inline documentation comments.</p>
+                    <ul style="margin-top: 10px; color: #666;">
+                        <li>All public APIs documented</li>
+                        <li>Type signatures and traits</li>
+                        <li>Module organization</li>
+                        <li>Usage examples</li>
+                    </ul>
+                </a>
+                
+                <a href="https://crates.io/crates/vb6runtime" class="doc-link" target="_blank">
+                    <h3>📦 Crates.io Package</h3>
+                    <p>Official package page with version history, dependencies, and installation instructions.</p>
+                    <ul style="margin-top: 10px; color: #666;">
+                        <li>Version history and downloads</li>
+                        <li>Dependency information</li>
+                        <li>README and quick start</li>
+                        <li>License and metadata</li>
+                    </ul>
+                </a>
+
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" class="doc-link" target="_blank">
+                    <h3>💻 Source Code</h3>
+                    <p>View the source code, report issues, or contribute to the project on GitHub.</p>
+                    <ul style="margin-top: 10px; color: #666;">
+                        <li>Full source code</li>
+                        <li>Test suite</li>
+                        <li>Issue tracker</li>
+                        <li>Contributing guidelines</li>
+                    </ul>
+                </a>
+            </div>
+        </section>
+
+        <section id="function-categories">
+            <h2>Function Categories</h2>
+            <p>
+                VB6Runtime implements functions across 14 categories that mirror the VB6 built-in library organization.
+            </p>
+            <div class="feature-grid">
+                <a href="library/functions/arrays/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Arrays</h3>
+                    <p>Array manipulation functions</p>
+                    <small>6 functions</small>
+                </a>
+                <a href="library/functions/conversion/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Conversion</h3>
+                    <p>Type conversion functions</p>
+                    <small>6 functions</small>
+                </a>
+                <a href="library/functions/datetime/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Datetime</h3>
+                    <p>Date and time functions</p>
+                    <small>22 functions</small>
+                </a>
+                <a href="library/functions/environment/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Environment</h3>
+                    <p>Environment functions</p>
+                    <small>10 functions</small>
+                </a>
+                <a href="library/functions/file/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>File</h3>
+                    <p>File I/O functions</p>
+                    <small>32 functions</small>
+                </a>
+                <a href="library/functions/financial/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Financial</h3>
+                    <p>Financial calculations</p>
+                    <small>13 functions</small>
+                </a>
+                <a href="library/functions/graphics/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Graphics</h3>
+                    <p>Graphics functions</p>
+                    <small>6 functions</small>
+                </a>
+                <a href="library/functions/interaction/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Interaction</h3>
+                    <p>User interaction functions</p>
+                    <small>10 functions</small>
+                </a>
+                <a href="library/functions/logic/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Logic</h3>
+                    <p>Logical functions</p>
+                    <small>3 functions</small>
+                </a>
+                <a href="library/functions/math/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Math</h3>
+                    <p>Mathematical functions</p>
+                    <small>15 functions</small>
+                </a>
+                <a href="library/functions/objects/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Objects</h3>
+                    <p>Object manipulation functions</p>
+                    <small>6 functions</small>
+                </a>
+                <a href="library/functions/resources/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Resources</h3>
+                    <p>Resource management functions</p>
+                    <small>4 functions</small>
+                </a>
+                <a href="library/functions/string/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>String</h3>
+                    <p>String manipulation functions</p>
+                    <small>53 functions</small>
+                </a>
+                <a href="library/functions/type_checking/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>Type Checking</h3>
+                    <p>Type checking functions</p>
+                    <small>8 functions</small>
+                </a>
+            </div>
+        </section>
+
+        <section id="community">
+            <h2>Community & Contributing</h2>
+            <p>
+                VB6Runtime is open source and welcomes contributions! Whether you're reporting bugs,
+                suggesting features, or submitting pull requests, your help is appreciated.
+            </p>
+            <div class="community-links">
+                <a href="https://github.com/scriptandcompile/vb6/issues" class="community-btn" target="_blank">
+                    Report an Issue
+                </a>
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime/CONTRIBUTING.md" class="community-btn" target="_blank">
+                    Contributing Guide
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Runtime is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>

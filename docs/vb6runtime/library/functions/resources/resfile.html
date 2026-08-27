@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Runtime Library Reference - resfile - Resources">
+    <title>resfile - Resources - VB6Runtime Library Reference</title>
+    <link rel="stylesheet" href="../../../assets/css/style.css">
+    <link rel="stylesheet" href="../../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../../../index.html">VB6Runtime</a> / <a href="../../../library/index.html">Library</a> / <a href="../../../library/functions/resources/index.html">Resources</a> / resfile</h1>
+            <p class="tagline">VB6 Library Reference</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../../../index.html">Home</a>
+            <a href="../../../library/index.html">Library Reference</a>
+            <a href="../../../documentation.html">Documentation</a>
+            <a href="https://docs.rs/vb6runtime" target="_blank">API Docs</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container">
+        
+        <article class="library-item">
+            <p>Win32 .res (compiled resource script) file parser.
+Backs the VB6 <code>LoadResData</code>, <code>LoadResPicture</code>, and <code>LoadResString</code> functions,
+which read from the single <code>.res</code> file a VB6 project links at compile time.</p>
+<h1 id="file-format">File format</h1>
+<p>A <code>.res</code> file is a flat, ordered sequence of <em>resource records</em> with no
+global file header and no directory. Each record is self-describing and
+carries its own header, so the file is parsed by walking record to record
+until the buffer is exhausted. Every record has this layout:</p>
+<pre><code class="language-text">offset  size  field
+------  ----  ---------------------------------------------------------
+     0     4  DataSize      byte length of the resource data
+     4     4  HeaderSize    byte length of this header, data starts here
+     8     *  Type          ordinal-or-name (see below)
+     *     *  Name          ordinal-or-name (see below)
+     *   0-2  padding       to align the following DWORD to 4 bytes
+     *     4  DataVersion
+     *     2  MemoryFlags
+     *     2  LanguageId    Win32 LANGID, e.g. 0x0409 = en-US
+     *     4  Version
+     *     4  Characteristics
+     *     *  data          DataSize bytes, then padded to a 4-byte bound</code></pre>
+<p><code>Type</code> and <code>Name</code> are each an <code>ordinal-or-name</code>: if the first <code>u16</code> is
+[<code>ORDINAL_MARKER</code>] (<code>0xFFFF</code>) the field is a 4-byte ordinal whose value is
+the second <code>u16</code>; otherwise it is a NUL-terminated UTF-16LE string. This is
+why the header is variable-length and why <code>HeaderSize</code> — not a fixed
+constant — must be used to find the data.
+Note that <code>HeaderSize</code> is authoritative: it is used to locate the data, and
+the fixed trailer is read at the position derived from the type/name fields.
+Both are cross-checked, and a record whose <code>HeaderSize</code> disagrees with its
+parsed contents is rejected as a malformed file.
+Every well-formed <code>.res</code> file begins with a <em>null record</em>: <code>Type</code> ordinal 0,
+<code>Name</code> ordinal 0, and <code>DataSize</code> 0. It carries no resource and is skipped.</p>
+<h1 id="references">References</h1>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/windows/win32/menurc/resourceheader">RESOURCEHEADER structure</a></li>
+<li><a href="https://learn.microsoft.com/en-us/windows/win32/menurc/resource-types">Resource types</a></li>
+</ul>
+        </article>
+        
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+            <p>
+                <a href="index.html">← Back to Resources</a> |
+                <a href="../index.html">View all functions</a>
+            </p>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024-2026 VB6Runtime Contributors. Licensed under the MIT License.</p>
+        </div>
+    </footer>
+</body>
+</html>

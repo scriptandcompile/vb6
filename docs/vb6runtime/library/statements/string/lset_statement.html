@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Runtime Library Reference - lset_statement - String">
+    <title>lset_statement - String - VB6Runtime Library Reference</title>
+    <link rel="stylesheet" href="../../../assets/css/style.css">
+    <link rel="stylesheet" href="../../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../../../index.html">VB6Runtime</a> / <a href="../../../library/index.html">Library</a> / <a href="../../../library/statements/string/index.html">String</a> / lset_statement</h1>
+            <p class="tagline">VB6 Library Reference</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../../../index.html">Home</a>
+            <a href="../../../library/index.html">Library Reference</a>
+            <a href="../../../documentation.html">Documentation</a>
+            <a href="https://docs.rs/vb6runtime" target="_blank">API Docs</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container">
+        
+        <article class="library-item">
+            <p>VB6 LSet statement syntax:
+- LSet stringvar = string
+- LSet varname1 = varname2 (for user-defined types)
+Left-aligns a string within a string variable, or copies a variable of one user-defined type
+to another variable of a different user-defined type.
+The LSet statement syntax has these parts:</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>stringvar</td>
+<td>Required. Name of string variable.</td>
+</tr>
+<tr>
+<td>string</td>
+<td>Required. String expression to be left-aligned within stringvar.</td>
+</tr>
+<tr>
+<td>varname1</td>
+<td>Required. Variable name of the user-defined type being copied to.</td>
+</tr>
+<tr>
+<td>varname2</td>
+<td>Required. Variable name of the user-defined type being copied from.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="remarks">Remarks</h2>
+<ul>
+<li>LSet left-aligns strings within string variables.</li>
+<li>If string is shorter than stringvar, LSet left-aligns the string in stringvar and pads
+  remaining characters with spaces.</li>
+<li>If string is longer than stringvar, LSet places only the leftmost characters that fit into
+  stringvar.</li>
+<li>Warning: Using LSet to copy variables of different user-defined types is not recommended.
+  Copying variables of one user-defined type into variables of a different user-defined type
+  can produce unpredictable results.</li>
+<li>When copying between variables of user-defined types, the memory assigned to one variable is
+  copied byte-for-byte to the memory assigned to the other variable.</li>
+<li>LSet is commonly used with fixed-length strings.</li>
+<li>LSet can be used with variant variables that contain strings.</li>
+</ul>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-vbnet">LSet MyString = &quot;Left&quot;
+LSet FixedString = userName
+LSet myRecord = sourceRecord</code></pre>
+<h2 id="reference">Reference</h2>
+<p><a href="https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/lset-statement">LSet Statement - Microsoft Docs</a></p>
+        </article>
+        
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+            <p>
+                <a href="index.html">← Back to String</a> |
+                <a href="../index.html">View all statements</a>
+            </p>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024-2026 VB6Runtime Contributors. Licensed under the MIT License.</p>
+        </div>
+    </footer>
+</body>
+</html>
