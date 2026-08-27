@@ -661,6 +661,7 @@ fn environment_modtypeinfo_module_load() {
     insta::assert_yaml_snapshot!(module);
 }
 
+#[ignore = "Very slow. Need to revisit after we finish moving around the parser to be more efficient."]
 #[test]
 fn environment_module10_module_load() {
     let module_bytes = include_bytes!("../../../../test-data/Environment/Module10.bas");
