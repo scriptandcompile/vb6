@@ -83,3 +83,6 @@ mod events;
 
 #[path = "statements/objects/set.rs"]
 mod set;
+
+#[path = "statements/objects/with_block.rs"]
+mod with_block;
