@@ -13,6 +13,7 @@ pub struct ConverterRegistry {
 }
 
 impl ConverterRegistry {
+    /// Create a new empty [`ConverterRegistry`].
     pub fn new() -> Self {
         Self {
             converters: HashMap::new(),

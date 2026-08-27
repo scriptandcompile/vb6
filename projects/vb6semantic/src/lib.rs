@@ -49,16 +49,24 @@ pub mod types;
 pub mod wasm;
 
 // Re-export core types
+/// Semantic analysis engine for VB6 projects.
 pub use analyzer::SemanticAnalyzer;
+/// Semantic analysis errors and results.
 pub use error::{Result, SemanticError, SourceLocation};
+/// Resolved references registry and resolvers.
 pub use references::{
     ManifestReferenceResolver, ReferenceContext, ReferenceInfo, ReferenceRegistry,
     ReferenceResolver, StaticReferenceResolver,
 };
+/// Name resolution across scopes.
 pub use resolution::NameResolver;
+/// Scope management for symbol lookup.
 pub use scope::{Scope, ScopeKind, ScopeManager};
+/// A symbol in the symbol table.
 pub use symbols::{Symbol, SymbolKind, SymbolTable, Visibility};
+/// Type checking and inference.
 pub use types::{TypeChecker, TypeInfo};
+/// VB6 type definition (re-exported from vb6core).
 pub use vb6core::types::VBType;
 
 /// Version of the semantic analysis library

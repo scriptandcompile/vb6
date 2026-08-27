@@ -164,7 +164,7 @@
 //! Attribute VB_Name = \"frmExampleForm\"\r
 //! ";
 //!
-//! let source = vb6parse::SourceFile::decode("frmExampleForm.frm", input).expect("Failed to decode source file");
+//! let source = vb6parse::SourceFile::decode_with_replacement("frmExampleForm.frm", input).expect("Failed to decode source file");
 //! let result = FormFile::parse(&source);
 //!
 //! let (Some(project), failures) = result.unpack() else {
@@ -200,16 +200,22 @@ pub mod wasm;
 // =============================================================================
 
 // I/O Layer - Decoding and character stream access
+/// Source file with decoded text content.
 pub use crate::io::{SourceFile, SourceStream};
 
 // Lexer Layer - Tokenization
+/// A single lexical token from VB6 source.
 pub use crate::lexer::{Token, TokenStream, tokenize};
 
 // File Parsers - Main entry points for parsing VB6 files
 pub use crate::files::{ClassFile, FormFile, FormResourceFile, ModuleFile, ProjectFile};
 
 // Syntax Parsers - CST parsing and tree types
+/// Represents the kind/category of a CST node.
 pub use crate::parsers::{ConcreteSyntaxTree, ParseResult, SerializableTree, SyntaxKind, parse};
 
 // Error Types - New unified error handling (Phase 4)
+/// Additional context specific to a parse error.
+/// The kind or category of a parse/lex error.
+/// The severity level of a diagnostic message.
 pub use crate::errors::{ErrorDetails, ErrorKind, Severity};

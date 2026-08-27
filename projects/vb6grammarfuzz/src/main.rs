@@ -1,8 +1,8 @@
-//! Grammar-based fuzzer for vb6parse.
+//! vb6grammarfuzz - ANTLR4 grammar fuzzing and delta-debugging tool for VB6 parsing
 //!
-//! Uses an ANTLR4 `.g4` grammar file to generate random VB6 source,
-//! parses it with vb6parse, checks the CST for Error nodes, and
-//! minimizes any failing inputs via delta debugging.
+//! This crate provides a CLI binary for generating random VB6 source from an ANTLR4
+//! grammar, checking it for parse errors, and delta-debugging failing inputs.
+//! For library usage, see `vb6parse` instead.
 
 mod checker;
 mod g4_parser;

@@ -1,8 +1,8 @@
-//! vb6harness: differential test harness for the VB6 interpreter and compiler.
+//! vb6harness - Test harness for running and comparing VB6 tool outputs against golden files
 //!
-//! Runs a corpus of VB6 test modules through each engine (`vb6interpret`,
-//! `vb6compile`, and the legacy `VB6.exe`) and compares their `Print` output
-//! against committed golden files.
+//! This crate provides a CLI binary for running a corpus of VB6 test modules
+//! through multiple engines and comparing their output against committed golden files.
+//! For library usage, see `vb6interpret` and `vb6compile` instead.
 
 mod compare;
 mod engines;

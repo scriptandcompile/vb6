@@ -12,6 +12,9 @@ pub struct ConversionValidator {
 }
 
 impl ConversionValidator {
+    /// Create a new [`ConversionValidator`].
+    ///
+    /// * `strict_mode` - when `true`, validation errors are treated as hard failures.
     pub fn new(strict_mode: bool) -> Self {
         Self { strict_mode }
     }
@@ -29,16 +32,22 @@ impl Default for ConversionValidator {
     }
 }
 
-/// Report from validation
+/// Report from validation.
 #[derive(Debug, Clone)]
 pub struct ValidationReport {
+    /// Whether all checks passed.
     pub passed: bool,
+    /// Errors found during validation.
     pub errors: Vec<ValidationError>,
+    /// Non-fatal warnings.
     pub warnings: Vec<String>,
 }
 
+/// A single validation error.
 #[derive(Debug, Clone)]
 pub struct ValidationError {
+    /// Human-readable error description.
     pub message: String,
+    /// Location in the source where the error occurred.
     pub location: Option<SourceLocation>,
 }

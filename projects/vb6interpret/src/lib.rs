@@ -1,4 +1,5 @@
-//! vb6-interpret: VB6 interpreter library
+#![warn(missing_docs)]
+//! vb6interpret: VB6 interpreter and REPL
 //!
 //! A tree-walking interpreter that executes VB6 `.bas` modules directly from
 //! the `vb6parse` concrete syntax tree, using `vb6runtime` values.

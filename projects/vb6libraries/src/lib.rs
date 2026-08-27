@@ -1,4 +1,4 @@
-//! VB6 third-party library and Windows API integration hooks
+//! vb6libraries: VB6 library detection and mapping (win32, office, third-party)
 //!
 //! This crate provides modular support for common VB6 third-party libraries,
 //! Windows API calls, Office automation, and database integrations.
@@ -46,6 +46,9 @@
 //! - Generate appropriate code for each library
 //! - Handle cross-cutting concerns (libraries affecting backend and frontend)
 
+#![warn(missing_docs)]
+
+
 /// Library detection and analysis
 pub mod detection {
     use std::collections::HashSet;
@@ -65,23 +68,34 @@ pub mod detection {
         pub third_party: HashSet<String>,
     }
 
+    /// Which Office applications are used by a VB6 project.
     #[derive(Debug, Clone, Default)]
     pub struct OfficeUsage {
+        /// Microsoft Excel COM automation.
         pub excel: bool,
+        /// Microsoft Word COM automation.
         pub word: bool,
+        /// Microsoft Outlook COM automation.
         pub outlook: bool,
+        /// Microsoft Access database automation.
         pub access: bool,
     }
 
+    /// Which database technologies are used by a VB6 project.
     #[derive(Debug, Clone, Default)]
     pub struct DatabaseUsage {
+        /// DAO (Data Access Objects) is used.
         pub dao: bool,
+        /// ADO (ActiveX Data Objects) is used.
         pub ado: bool,
+        /// RDO (Remote Data Objects) is used.
         pub rdo: bool,
+        /// ODBC connections are used.
         pub odbc: bool,
     }
 
     impl LibraryUsage {
+        /// Create a new empty [`LibraryUsage`].
         pub fn new() -> Self {
             Self::default()
         }
@@ -152,28 +166,41 @@ pub mod traits {
         fn generate_frontend(&self, context: &FrontendContext) -> String;
     }
 
-    /// Context for backend code generation
+    /// Context for backend code generation.
     pub struct BackendContext {
+        /// The backend target to generate code for.
         pub target: BackendTarget,
     }
 
+    /// Target backend language for code generation.
     pub enum BackendTarget {
+        /// Rust backend (e.g., via `vb6codegen`).
         Rust,
+        /// LLVM-based backend.
         Llvm,
     }
 
-    /// Context for frontend code generation
+    /// Context for frontend code generation.
     pub struct FrontendContext {
+        /// The frontend UI framework to target.
         pub framework: FrontendFramework,
     }
 
+    /// Front-end UI frameworks for converted VB6 forms.
     pub enum FrontendFramework {
+        /// React (JavaScript/TypeScript).
         React,
+        /// Vue (JavaScript/TypeScript).
         Vue,
+        /// Svelte (JavaScript).
         Svelte,
+        /// Leptos (Rust/WASM).
         Leptos,
+        /// Yew (Rust/WASM).
         Yew,
+        /// Flutter (Dart).
         Flutter,
+        /// egui (Rust/-native).
         Egui,
     }
 }

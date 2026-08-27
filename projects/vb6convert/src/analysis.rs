@@ -16,6 +16,7 @@ pub struct ProjectAnalyzer {
 }
 
 impl ProjectAnalyzer {
+    /// Create a new [`ProjectAnalyzer`].
     pub fn new() -> Self {
         Self {
             detected_features: HashSet::new(),
@@ -69,12 +70,20 @@ pub struct AnalysisReport {
 /// Statistics about a VB6 project
 #[derive(Debug, Clone)]
 pub struct ProjectStats {
+    /// Total number of files in the project.
     pub total_files: usize,
+    /// Number of standard modules (.bas).
     pub modules: usize,
+    /// Number of class modules (.cls).
     pub classes: usize,
+    /// Number of form modules (.frm).
     pub forms: usize,
+    /// Total number of lines of source code.
     pub total_lines: usize,
+    /// Number of Win32 API calls detected.
     pub api_calls: usize,
+    /// Number of database connection usages.
     pub database_connections: usize,
+    /// Third-party control name to count mapping.
     pub third_party_controls: HashMap<String, usize>,
 }

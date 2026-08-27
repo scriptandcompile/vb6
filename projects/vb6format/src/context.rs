@@ -27,10 +27,14 @@ pub(crate) struct Context {
     pub compiler_directive_depth: usize,
 }
 
+/// Which phase the formatter is in relative to a compiler directive block.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectivePhase {
+    /// Inside a compiler directive preamble (before any body code).
     BeforeDirective,
+    /// Inside the main body of a module after directives.
     BeforeBody,
+    /// After a compiler directive block has ended.
     AfterDirective,
 }
 

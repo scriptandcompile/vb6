@@ -68,12 +68,19 @@ pub struct GeneratedFile {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+/// Category of a file generated or processed during conversion.
 pub enum FileType {
+    /// Generated source code file.
     SourceCode,
+    /// Configuration file (Cargo.toml, package.json, etc.).
     Configuration,
+    /// Static asset (image, icon, etc.).
     Asset,
+    /// Documentation file.
     Documentation,
+    /// Test file.
     Test,
+    /// Other / unclassified file.
     Other,
 }
 
@@ -91,17 +98,24 @@ pub struct ConversionWarning {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+/// Severity level for conversion warnings.
 pub enum WarningSeverity {
+    /// Informational message.
     Info,
+    /// Warning that may indicate a potential issue.
     Warning,
+    /// Error-level issue.
     Error,
 }
 
-/// Location in a source file
+/// Location in a source file.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SourceLocation {
+    /// Path to the source file.
     pub file: PathBuf,
+    /// Line number (1-based).
     pub line: usize,
+    /// Column number (1-based).
     pub column: usize,
 }
 
