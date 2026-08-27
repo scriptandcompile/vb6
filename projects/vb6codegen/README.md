@@ -2,9 +2,18 @@
 
 Shared code generation library for VB6 conversion and compilation projects.
 
+## Implementation Status: PLANNING
+
+> This crate is in the planning phase. The documentation below describes
+> the intended design. `src/lib.rs` is currently empty and all described types
+> (`CodegenBackend`, `RustBackend`, `JavaScriptBackend`, `CodegenConfig`, `CaseStyle`)
+> are not yet implemented.
+
 ## Overview
 
 `vb6codegen` provides a unified code generation framework used by both `vb6convert` (source-to-source converter) and `vb6compile` (ahead-of-time compiler). It includes backend implementations for multiple target languages and platforms.
+
+**Note:** All described functionality is planned but not yet implemented.
 
 ## Architecture
 
@@ -50,34 +59,24 @@ Both `vb6convert` and `vb6compile` need to generate code in the same target lang
 
 ## Features
 
-### Backends
+### Backends *(planned)*
 
-- **Rust** - Generate idiomatic Rust code
-- **JavaScript** - Generate modern JavaScript (ES6+)
-- **TypeScript** - Generate TypeScript with full type annotations
-- **LLVM** - Generate LLVM IR for native compilation (optional)
+- **Rust** - Generate idiomatic Rust code *(not implemented)*
+- **JavaScript** - Generate modern JavaScript (ES6+) *(not implemented)*
+- **TypeScript** - Generate TypeScript with full type annotations *(not implemented)*
+- **LLVM** - Generate LLVM IR for native compilation *(not implemented)*
 
 ### Integration with VB6 Libraries
 
-**vb6runtime** - Core dependency for VB6 type system and semantics:
-- Uses `vb6runtime::VBType` for type definitions
-- Generated code links to `vb6runtime` for complex types (Variant, Currency, Date, Arrays)
-- Maps VB6 standard library to `vb6runtime` implementations
-
-**vb6core** - Optional dependency for IR-based generation:
-- Can accept `vb6core::ir::Module` as input (used by vb6compile)
-- Understands IR instruction set
-- Not used by vb6convert (which works from AST)
+*(planned)*
 
 ### Utilities
 
-- Type mapping and conversion
-- Code formatting and indentation
-- Naming convention transformations (snake_case, camelCase, PascalCase, etc.)
-- Runtime library function mappings
-- Standard library equivalents
+*(planned)*
 
 ## Usage
+
+**Note:** The API described below is planned but not yet implemented.
 
 Add this to your `Cargo.toml`:
 
@@ -120,14 +119,18 @@ for (path, content) in generated.files {
 
 ## Feature Flags
 
-- `rust-backend` - Enable Rust code generation (default)
-- `javascript-backend` - Enable JavaScript code generation
-- `typescript-backend` - Enable TypeScript code generation
-- `llvm-backend` - Enable LLVM IR generation (requires LLVM)
-- `all-backends` - Enable all backends
-- `serde-support` - Enable serde serialization support
+All feature flags below are planned but not yet defined in `Cargo.toml`:
+
+- `rust-backend` - Enable Rust code generation *(planned)*
+- `javascript-backend` - Enable JavaScript code generation *(planned)*
+- `typescript-backend` - Enable TypeScript code generation *(planned)*
+- `llvm-backend` - Enable LLVM IR generation *(planned)*
+- `all-backends` - Enable all backends *(planned)*
+- `serde-support` - Enable serde serialization support *(planned)*
 
 ## Type Mappings
+
+*(planned — not yet implemented)*
 
 ### Rust
 
@@ -140,7 +143,7 @@ for (path, content) in generated.files {
 | Double | `f64` |
 | String | `String` |
 | Boolean | `bool` |
-| Variant | `vb6runtime::Variant` |
+| Variant | `vb6runtime::VBVariant` |
 
 ### JavaScript/TypeScript
 
@@ -153,11 +156,13 @@ for (path, content) in generated.files {
 
 ## Architecture
 
+**Note:** The architecture described below is planned but not yet implemented.
+
 See [docs/DESIGN.md](docs/DESIGN.md) for detailed architecture information.
 
 ## Integration
 
-### With vb6convert
+**Note:** Integration with `vb6convert` and `vb6compile` is planned but not yet implemented.
 
 `vb6convert` uses `vb6codegen` to generate target code after parsing and analyzing VB6 source:
 
@@ -175,18 +180,14 @@ VB6 Source → Parse → AST → IR → Optimize → vb6codegen → Target Code
 
 ## Development
 
+**Note:** The commands below are for a future implementation.
+
 ```bash
-# Build with default features
-cargo build
+# Build (not yet possible - crate is empty)
+# cargo build
 
-# Build with all backends
-cargo build --features all-backends
-
-# Run tests
-cargo test
-
-# Run examples
-cargo run --example rust_codegen --features rust-backend
+# Run tests (not yet possible)
+# cargo test
 ```
 
 ## License

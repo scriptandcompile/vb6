@@ -2,20 +2,28 @@
 
 A Visual Basic 6 compiler that transforms VB6 code into native executables or other target languages.
 
+## Implementation Status: PLANNING
+
+> This crate is in the planning phase. The documentation below describes
+> the intended design. The current source code is a stub and most features
+> are not yet implemented.
+
 ## Overview
 
 `vb6compile` (short command: `vb6c`) is an ahead-of-time compiler for VB6 that generates efficient, native code or transpiles to modern languages. It supports multiple backends including Rust, LLVM, and JavaScript.
 
+**Note:** The CLI, backends, and optimization pipeline are not yet implemented.
+
 ## Features
 
-- **Multiple Backends**: Compile to Rust, LLVM IR, JavaScript, or native code
-- **Optimization**: Multiple optimization levels (-O0 to -O3)
-- **Cross-Compilation**: Generate code for different platforms
-- **Incremental Compilation**: Fast rebuilds with caching
-- **Debug Info**: Generate debug symbols for debuggers
-- **Static Analysis**: Detect issues at compile time
-- **Link-Time Optimization**: Whole-program optimization
-- **Profile-Guided Optimization**: Use runtime profiles to optimize
+- **Multiple Backends**: Compile to Rust, LLVM IR, JavaScript, or native code *(planned)*
+- **Optimization**: Multiple optimization levels (-O0 to -O3) *(planned)*
+- **Cross-Compilation**: Generate code for different platforms *(planned)*
+- **Incremental Compilation**: Fast rebuilds with caching *(planned)*
+- **Debug Info**: Generate debug symbols for debuggers *(planned)*
+- **Static Analysis**: Detect issues at compile time *(planned)*
+- **Link-Time Optimization**: Whole-program optimization *(planned)*
+- **Profile-Guided Optimization**: Use runtime profiles to optimize *(planned)*
 
 ## Architecture
 
@@ -48,16 +56,15 @@ A Visual Basic 6 compiler that transforms VB6 code into native executables or ot
 ## Installation
 
 ```bash
-# Install from source
-cargo install --path . --features all-backends
-
-# Or build specific backend
-cargo build --release --features rust-backend
+# Build from source
+cargo build --release
 ```
 
 ## Usage
 
 ### Basic Compilation
+
+**Note:** The CLI commands below describe the intended design and are not yet implemented.
 
 ```bash
 # Compile to native executable (via Rust)
@@ -75,7 +82,10 @@ vb6c compile --emit javascript --backend js MyProject.vbp
 
 ### Optimization Levels
 
+**Note:** Optimization levels are not yet implemented.
+
 ```bash
+```
 # No optimization (fast compile, slow runtime)
 vb6c compile -O0 MyProject.vbp
 
@@ -94,7 +104,10 @@ vb6c compile -Os MyProject.vbp
 
 ### Cross-Compilation
 
+**Note:** Cross-compilation targets are not yet implemented.
+
 ```bash
+```
 # Compile for Windows x64
 vb6c compile --target x86_64-pc-windows-msvc MyProject.vbp
 
@@ -110,7 +123,10 @@ vb6c compile --target wasm32-unknown-unknown MyProject.vbp
 
 ### Link-Time Optimization
 
+**Note:** LTO is not yet implemented.
+
 ```bash
+```
 # Enable LTO for smaller, faster executables
 vb6c compile --lto MyProject.vbp
 
@@ -120,7 +136,10 @@ vb6c compile --lto=thin MyProject.vbp
 
 ### Debug Information
 
+**Note:** Debug info generation is not yet implemented.
+
 ```bash
+```
 # Include debug symbols
 vb6c compile --debug MyProject.vbp
 
@@ -130,7 +149,10 @@ vb6c compile -O2 --debug MyProject.vbp
 
 ### Incremental Compilation
 
+**Note:** Incremental compilation is not yet implemented.
+
 ```bash
+```
 # Enable incremental compilation
 vb6c compile --incremental MyProject.vbp
 
@@ -140,6 +162,9 @@ vb6c clean MyProject.vbp
 
 ## Command-Line Interface
 
+**Note:** The CLI is a planned feature. The current source code is a stub.
+
+```
 ```
 vb6c [OPTIONS] <COMMAND>
 
@@ -171,6 +196,8 @@ Options:
 
 ## Backends
 
+**Note:** Backends are not yet implemented. The descriptions below outline the intended design.
+
 ### vb6-Rust Backend (Default)
 
 Generates idiomatic Rust code:
@@ -194,40 +221,15 @@ pub fn calculate(x: i32, y: i32) -> i32 {
 
 ### LLVM Backend (Optional)
 
-Generates LLVM IR for maximum performance:
-
-**Advantages**:
-- Direct native code generation
-- Advanced optimizations
-- Cross-platform support
-- Industry-standard LLVM toolchain
-
-**Use Cases**:
-- Maximum performance requirements
-- Embedded systems
-- Custom platforms
+**Note:** LLVM backend is a planned feature.
 
 ### JavaScript Backend (Optional)
 
-Generates JavaScript for web deployment:
-
-**Advantages**:
-- Run in browsers
-- Node.js deployment
-- WebAssembly integration
-- Modern JS features (ES6+)
-
-**Generated Code Example**:
-```javascript
-function calculate(x, y) {
-    let result = 0;
-    result = x + y;
-    result *= 2;
-    return result;
-}
-```
+**Note:** JavaScript backend is a planned feature.
 
 ## Optimization Passes
+
+**Note:** The optimizer is not yet implemented.
 
 ### -O0 (No Optimization)
 - Fast compilation
@@ -269,22 +271,22 @@ VB6 types are mapped to native types in each backend:
 | Double | f64 | double | number |
 | String | String | *i8 | string |
 | Boolean | bool | i1 | boolean |
-| Variant | VbVariant | %variant | any |
+| Variant | VBVariant | %variant | any |
 | Object | Rc<dyn VbObject> | *obj | object |
 
 ## Runtime Library
 
-The compiler links against `vb6core` for:
+The compiler links against `vb6runtime` for:
 - Standard library functions
-- Variant support
+- Variant support (`VBVariant`)
 - Object model
 - Error handling
 
 **Rust Example**:
 ```rust
-use vb6core::stdlib;
+use vb6runtime::VBVariant;
 
-let result = stdlib::string::left("Hello World", 5)?;
+let value = VBVariant::from_integer(42);
 ```
 
 **LLVM Example**:
@@ -295,6 +297,8 @@ declare i8* @vb6_string_left(i8*, i32)
 ```
 
 ## Build System Integration
+
+**Note:** Build system integration is a planned feature.
 
 ### Cargo Integration
 
@@ -336,6 +340,8 @@ target_link_libraries(myproject vb6core)
 
 ## Performance
 
+**Note:** Performance benchmarks are not yet available (no implementation exists).
+
 Typical performance characteristics:
 
 | Benchmark | VB6 (native) | vb6c -O0 | vb6c -O2 | vb6c -O3 |
@@ -362,11 +368,8 @@ Current limitations:
 ### Building
 
 ```bash
-# Build all backends
-cargo build --release --features all-backends
-
-# Build specific backend
-cargo build --release --features rust-backend
+# Build from source
+cargo build --release
 ```
 
 ### Testing
@@ -384,12 +387,10 @@ cargo test --test codegen
 
 ### Adding a New Backend
 
-1. Create `src/backend/my_backend.rs`
-2. Implement `CodeGenerator` trait
-3. Add feature flag to `Cargo.toml`
-4. Register backend in `src/backend/mod.rs`
+**Note:** This is a planned feature. The trait interface below outlines the intended design.
 
 ```rust
+```
 pub trait CodeGenerator {
     fn generate_module(&mut self, module: &IRModule) -> Result<String>;
     fn generate_function(&mut self, function: &IRFunction) -> Result<String>;
@@ -398,6 +399,8 @@ pub trait CodeGenerator {
 ```
 
 ## Future Enhancements
+
+The following are planned features for a future implementation.
 
 - [ ] C backend
 - [ ] Go backend

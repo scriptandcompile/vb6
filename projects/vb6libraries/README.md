@@ -2,9 +2,18 @@
 
 VB6 third-party library and Windows API integration hooks for code generation and compilation.
 
+## Implementation Status: PLANNING
+
+> This crate is in the planning phase. The documentation below describes
+> the intended design. The actual crate only has `src/lib.rs` and all described
+> types (`Win32ApiMapper`, `ExcelMapper`, `LibraryAnalyzer`, `LibraryLinker`)
+> are not yet implemented.
+
 ## Overview
 
 `vb6libraries` provides modular support for common VB6 third-party libraries, Windows API calls, Office automation, and database integrations. This crate is used by `vb6codegen`, `vb6convert`, and `vb6compile` to handle library-specific code generation.
+
+**Note:** All described functionality is planned but not yet implemented.
 
 ### Purpose
 
@@ -23,6 +32,9 @@ This crate provides:
 
 ## Architecture
 
+**Note:** The architecture and directory structure below describe the planned design.
+
+```
 ```
 ┌─────────────────────────────────────────────┐
 │          vb6libraries                       │
@@ -49,6 +61,8 @@ This crate provides:
 ```
 
 ## Library Categories
+
+*(All categories below are planned but not yet implemented.)*
 
 ### 1. Windows APIs (`win32-*`)
 
@@ -185,7 +199,10 @@ vb6libraries = { path = "../vb6libraries", features = ["crystalreports", "devexp
 
 ### In vb6codegen
 
+**Note:** The API below is planned. Types `Win32ApiMapper`, `ExcelMapper`, `AdoMapper` are not yet implemented.
+
 ```rust
+```
 use vb6libraries::win32::Win32ApiMapper;
 use vb6libraries::office::ExcelMapper;
 use vb6libraries::database::AdoMapper;
@@ -209,7 +226,10 @@ if libraries.uses_ado() {
 
 ### In vb6convert
 
+**Note:** `LibraryAnalyzer` is not yet implemented.
+
 ```rust
+```
 use vb6libraries::analysis::LibraryAnalyzer;
 
 // Analyze project for library usage
@@ -227,7 +247,10 @@ println!("Suggested Cargo features: {:?}", features);
 
 ### In vb6compile
 
+**Note:** `LibraryLinker` is not yet implemented.
+
 ```rust
+```
 use vb6libraries::linking::LibraryLinker;
 
 // Link against required libraries
@@ -284,17 +307,6 @@ useEffect(() => {
 Use feature flags to include only what you need:
 
 ```toml
-# Minimal: Just Win32 core
-vb6libraries = { features = ["win32-core"] }
-
-# Office automation
-vb6libraries = { features = ["excel-automation", "word-automation"] }
-
-# Full database stack
-vb6libraries = { features = ["full-database"] }
-
-# Everything
-vb6libraries = { features = ["full"] }
 ```
 
 ## Implementation Status
@@ -310,6 +322,9 @@ vb6libraries = { features = ["full"] }
 
 ## Directory Structure
 
+**Note:** The directory structure below describes the planned layout. Currently only `src/lib.rs` exists.
+
+```
 ```
 vb6libraries/
 ├── src/
