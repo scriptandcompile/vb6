@@ -110,3 +110,6 @@ mod midb;
 
 #[path = "statements/string_manipulation/rset.rs"]
 mod rset;
+
+#[path = "statements/system_interaction/app_activate.rs"]
+mod app_activate;
