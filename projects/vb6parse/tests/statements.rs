@@ -92,3 +92,6 @@ mod date;
 
 #[path = "statements/runtime_state/error.rs"]
 mod error;
+
+#[path = "statements/runtime_state/randomize.rs"]
+mod randomize;
