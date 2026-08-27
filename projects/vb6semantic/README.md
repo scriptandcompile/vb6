@@ -110,9 +110,16 @@ Supported VB6 types:
 
 ## Integration with vb6parse
 
-vb6parse is responsible for loading sourcefiles, parsing these sourcefiles into the 
+vb6parse is responsible for loading source files, parsing these source files into the
 corresponding file types (ProjectFile, ModuleFile, ClassFile, FormFile, etc) and then
 vb6semantic is responsible for doing semantic analysis on these files.
+
+## Module Overview
+
+In addition to the core components listed above, vb6semantic includes:
+
+- **`query`** — Query infrastructure for analyzing projects
+- **`references`** — Reference registry and resolvers for manifest/static references
 
 ## Use Cases
 
@@ -148,22 +155,20 @@ vb6semantic is responsible for doing semantic analysis on these files.
 - Scope management framework
 - Basic error types
 - Type compatibility checking
+- Reference registry and resolvers
+- Query infrastructure
 
 ### 🚧 In Progress
 - Full VB6 project analysis
-- Complete name resolution
-- All type checking rules
+- Complete name resolution across all scope types
 
 ### 📋 Planned
-- Control flow analysis
-- Dead code detection
 - Advanced type inference
 - Cross-reference tracking
-- Performance optimizations
 
 ## Examples
 
-See [docs/EXAMPLES.md](docs/EXAMPLES.md) for detailed examples.
+Examples are demonstrated through the [vb6semantic lib.rs doctests](../src/lib.rs).
 
 ## Testing
 
@@ -180,7 +185,6 @@ cargo test -p vb6semantic --lib symbols
 
 ## Documentation
 
-- [DESIGN.md](docs/DESIGN.md) - Detailed design documentation
 - [SYMBOL_TABLES.md](docs/SYMBOL_TABLES.md) - Symbol table design
 
 ## Contributing

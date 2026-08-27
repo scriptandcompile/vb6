@@ -1,3 +1,8 @@
+//! aspen - VB6 workspace analyzer and formatter (like `cargo check` + `cargo fmt` for VB6)
+//!
+//! This crate provides a CLI binary for checking and formatting VB6 source files
+//! across a workspace. For library usage, see `vb6format` and `vb6parse` instead.
+
 mod check;
 mod fmt;
 
