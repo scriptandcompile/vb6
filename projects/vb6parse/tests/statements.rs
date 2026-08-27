@@ -105,5 +105,8 @@ mod lset;
 #[path = "statements/string_manipulation/mid.rs"]
 mod mid;
 
+#[path = "statements/string_manipulation/midb.rs"]
+mod midb;
+
 #[path = "statements/string_manipulation/rset.rs"]
 mod rset;
