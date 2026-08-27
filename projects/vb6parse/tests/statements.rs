@@ -102,5 +102,8 @@ mod time;
 #[path = "statements/string_manipulation/lset.rs"]
 mod lset;
 
+#[path = "statements/string_manipulation/mid.rs"]
+mod mid;
+
 #[path = "statements/string_manipulation/rset.rs"]
 mod rset;
