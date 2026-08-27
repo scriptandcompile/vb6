@@ -1,0 +1,19 @@
+---
+source: projects/vb6parse/tests/file_operations/kill.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: KillStatement
+      children:
+        - kind: KillKeyword
+          text: Kill
+        - kind: Whitespace
+          text: " "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"temp.dat\""
+    - kind: Newline
+      text: "\n"

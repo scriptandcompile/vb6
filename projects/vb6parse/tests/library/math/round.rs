@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    const SNAPSHOT_PATH: &str = "../../../snapshots/parsers/cst/library/math/round";
+
     use vb6parse::ConcreteSyntaxTree;
 
     #[test]
@@ -16,7 +17,7 @@ result = Round(3.7)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -35,7 +36,7 @@ rounded = Round(12.3456, 2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -55,7 +56,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -75,7 +76,7 @@ End Function
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -94,7 +95,7 @@ value = Round(inputValue, decimalPlaces)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -112,7 +113,7 @@ MsgBox "Rounded: " & Round(pi, 3)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -130,7 +131,7 @@ Debug.Print Round(value, 4)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -153,7 +154,7 @@ End Select
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -175,7 +176,7 @@ End Sub
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -195,7 +196,7 @@ End With
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -217,7 +218,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -237,7 +238,7 @@ Next i
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -257,7 +258,7 @@ Loop
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -277,7 +278,7 @@ Loop
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -297,7 +298,7 @@ Wend
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -316,7 +317,7 @@ val = (Round(input, 3))
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -335,7 +336,7 @@ display = IIf(Round(value) > 10, "High", "Low")
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -354,7 +355,7 @@ result = Round(Round(value, 3) * 100, 1)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -373,7 +374,7 @@ prices(i) = Round(rawPrices(i), 2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -392,7 +393,7 @@ obj.RoundedValue = Round(obj.RawValue, 4)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -410,7 +411,7 @@ Call ProcessValue(Round(measurement, 2))
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -429,7 +430,7 @@ msg = "Price: $" & Round(price, 2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -449,7 +450,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -468,7 +469,7 @@ roundedToTens = Round(2748, -1)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -488,7 +489,7 @@ r2 = Round(3.5)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -511,7 +512,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -536,7 +537,7 @@ End Sub
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/round");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);

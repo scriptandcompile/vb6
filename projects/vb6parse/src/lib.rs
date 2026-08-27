@@ -190,7 +190,6 @@ pub mod io;
 pub mod language;
 pub mod lexer;
 pub mod parsers;
-pub mod syntax;
 
 // wasm module for playground use.
 #[cfg(target_arch = "wasm32")]

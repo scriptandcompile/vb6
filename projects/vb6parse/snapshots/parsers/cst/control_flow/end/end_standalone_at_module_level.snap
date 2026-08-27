@@ -1,0 +1,13 @@
+---
+source: projects/vb6parse/tests/control_flow/end.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: EndStatement
+      children:
+        - kind: EndKeyword
+          text: End
+    - kind: Newline
+      text: "\n"

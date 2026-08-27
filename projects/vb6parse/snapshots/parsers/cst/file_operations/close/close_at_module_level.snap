@@ -1,0 +1,27 @@
+---
+source: projects/vb6parse/tests/file_operations/close.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: CloseStatement
+      children:
+        - kind: CloseKeyword
+          text: Close
+        - kind: Whitespace
+          text: " "
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Octothorpe
+                      text: "#"
+                    - kind: IntegerLiteral
+                      text: "1"
+    - kind: Newline
+      text: "\n"

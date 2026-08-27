@@ -1,0 +1,9 @@
+mod invalid_control_flow;
+mod invalid_declarations;
+mod invalid_literals;
+mod invalid_parameter_list;
+mod invalid_project;
+mod mismatched_keywords;
+mod missing_end;
+mod missing_keywords;
+mod recovery_alignment;

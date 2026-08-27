@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    const SNAPSHOT_PATH: &str = "../../../snapshots/parsers/cst/library/string/formatnumber";
+
     use vb6parse::ConcreteSyntaxTree;
 
     #[test]
@@ -15,7 +16,7 @@ result = FormatNumber(value)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -33,7 +34,7 @@ formatted = FormatNumber(value, 2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -51,7 +52,7 @@ formatted = FormatNumber(value, 0)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -69,7 +70,7 @@ result = FormatNumber(negative, 2, , vbTrue)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -87,7 +88,7 @@ formatted = FormatNumber(value, 2, vbTrue, vbTrue, vbTrue)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -105,7 +106,7 @@ Debug.Print FormatNumber(total, 2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -123,7 +124,7 @@ msg = "Total: " & FormatNumber(total, 2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -143,7 +144,7 @@ End Function
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -162,7 +163,7 @@ grid.TextMatrix(i + 1, 1) = FormatNumber(values(i), 2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -180,7 +181,7 @@ result = FormatNumber(value * 100, 2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -198,7 +199,7 @@ formatted = FormatNumber(value / Billion, 2) & "B"
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -216,7 +217,7 @@ lst.AddItem FormatNumber(values(i), decimals)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -236,7 +237,7 @@ summary = "Actual: " & FormatNumber(actual, 2) & vbCrLf & _
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -258,7 +259,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -278,7 +279,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -298,7 +299,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -320,7 +321,7 @@ ErrorHandler:
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -340,7 +341,7 @@ Next i
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -363,7 +364,7 @@ End Select
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -381,7 +382,7 @@ comparison = FormatNumber(value1, 2) & " vs " & FormatNumber(value2, 2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -399,7 +400,7 @@ result = FormatNumber(fraction, 2, vbFalse)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -417,7 +418,7 @@ formatted = FormatNumber(largeNumber, 2, , , vbTrue)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -435,7 +436,7 @@ formatted = FormatNumber(rs.Fields(fieldName).Value, decimals)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -454,7 +455,7 @@ result = FormatNumber(value, decimals, vbTrue, parens, vbTrue)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -472,7 +473,7 @@ result = FormatNumber(value, decimals) & " " & unit
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -490,7 +491,7 @@ difference = FormatNumber(actual - expected, 2, , vbTrue)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatnumber");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);

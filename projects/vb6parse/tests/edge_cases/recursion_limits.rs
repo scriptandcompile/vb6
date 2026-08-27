@@ -1,6 +1,7 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
 
 use std::fmt::Write;
+const SNAPSHOT_PATH: &str = "../../snapshots/parsers/cst/edge_cases/recursion_limits";
 
 /// Test deeply nested If statements
 /// This tests indirect recursion through `parse_statement_list()` and `parse_if_statement()`.
@@ -42,7 +43,7 @@ fn deeply_nested_if_statements() {
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/edge_cases/recursion_limits");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -91,7 +92,7 @@ fn deeply_nested_for_loops() {
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/edge_cases/recursion_limits");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -140,7 +141,7 @@ fn deeply_nested_parentheses() {
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/edge_cases/recursion_limits");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -184,7 +185,7 @@ fn long_binary_operation_chain() {
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/edge_cases/recursion_limits");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -249,7 +250,7 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/edge_cases/recursion_limits");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -289,7 +290,7 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/edge_cases/recursion_limits");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -342,7 +343,7 @@ fn deeply_nested_select_case() {
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/edge_cases/recursion_limits");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -391,7 +392,7 @@ fn deeply_nested_with_blocks() {
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/edge_cases/recursion_limits");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -438,7 +439,7 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/edge_cases/recursion_limits");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 

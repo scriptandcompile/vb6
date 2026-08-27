@@ -1,0 +1,17 @@
+---
+source: projects/vb6parse/tests/filesystem/mkdir.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: MkDirStatement
+      children:
+        - kind: MkDirKeyword
+          text: MkDir
+        - kind: Whitespace
+          text: " "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"C:\\Temp\""

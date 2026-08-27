@@ -1,0 +1,34 @@
+use vb6parse::*;
+const SNAPSHOT_PATH: &str = "../../../snapshots/parsers/files/chess_brain_vb/class";
+
+#[test]
+fn chess_brain_vb_hashmap_class_load() {
+    let class_bytes = include_bytes!(
+        "../../../../../test-data/ChessBrainVB/ChessbrainVB_V4_10/Modules/HashMap.cls"
+    );
+
+    let result = SourceFile::decode_with_replacement("HashMap.cls", class_bytes);
+
+    let source_file = match result {
+        Ok(source_file) => source_file,
+        Err(e) => panic!("Failed to decode source file 'HashMap.cls': {e:?}"),
+    };
+
+    let (class_file_opt, failures) = ClassFile::parse(&source_file).unpack();
+
+    if !failures.is_empty() {
+        for failure in failures {
+            failure.print();
+        }
+
+        panic!("Class parse had failures");
+    }
+
+    let class = class_file_opt.expect("Class should be present.");
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path(SNAPSHOT_PATH);
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+    insta::assert_yaml_snapshot!(class);
+}

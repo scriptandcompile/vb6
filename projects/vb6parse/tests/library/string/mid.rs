@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    const SNAPSHOT_PATH: &str = "../../../snapshots/parsers/cst/library/string/mid";
+
     use vb6parse::ConcreteSyntaxTree;
 
     #[test]
@@ -15,7 +16,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -33,7 +34,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -51,7 +52,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -71,7 +72,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -91,7 +92,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -110,7 +111,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -128,7 +129,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -148,7 +149,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -169,7 +170,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -191,7 +192,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -209,7 +210,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -227,7 +228,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -247,7 +248,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -265,7 +266,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -283,7 +284,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -301,7 +302,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -321,7 +322,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -342,7 +343,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -363,7 +364,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -384,7 +385,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -402,7 +403,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -420,7 +421,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -440,7 +441,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -458,7 +459,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -477,7 +478,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -495,7 +496,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -513,7 +514,7 @@ mod tests {
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/mid");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);

@@ -1,4 +1,5 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
+const SNAPSHOT_PATH: &str = "../../snapshots/parsers/cst/invalid_syntax/invalid_declarations";
 
 /// Test Dim statement with missing identifier
 #[test]
@@ -15,13 +16,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("dim_missing_identifier_cst", tree);
 
-    insta::assert_yaml_snapshot!("dim_missing_identifier_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "dim_missing_identifier_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Dim statement with missing type annotation
@@ -39,13 +46,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("dim_missing_type_cst", tree);
 
-    insta::assert_yaml_snapshot!("dim_missing_type_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "dim_missing_type_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Function with missing return type
@@ -63,13 +76,19 @@ End Function
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("function_missing_return_type_cst", tree);
 
-    insta::assert_yaml_snapshot!("function_missing_return_type_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "function_missing_return_type_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Sub with missing identifier (empty parentheses)
@@ -87,13 +106,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("sub_missing_name_cst", tree);
 
-    insta::assert_yaml_snapshot!("sub_missing_name_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "sub_missing_name_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test duplicate Public modifiers
@@ -111,13 +136,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("duplicate_public_modifier_cst", tree);
 
-    insta::assert_yaml_snapshot!("duplicate_public_modifier_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "duplicate_public_modifier_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test conflicting visibility modifiers
@@ -135,7 +166,7 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -143,7 +174,10 @@ End Sub
 
     insta::assert_yaml_snapshot!(
         "conflicting_visibility_modifiers_failures",
-        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -162,13 +196,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("array_missing_bounds_cst", tree);
 
-    insta::assert_yaml_snapshot!("array_missing_bounds_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "array_missing_bounds_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Const without value assignment
@@ -186,13 +226,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("const_missing_value_cst", tree);
 
-    insta::assert_yaml_snapshot!("const_missing_value_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "const_missing_value_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Type with missing member name
@@ -211,13 +257,19 @@ End Type
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("type_missing_member_name_cst", tree);
 
-    insta::assert_yaml_snapshot!("type_missing_member_name_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "type_missing_member_name_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test parameter with missing name
@@ -235,13 +287,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("parameter_missing_name_cst", tree);
 
-    insta::assert_yaml_snapshot!("parameter_missing_name_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "parameter_missing_name_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Optional parameter without default value
@@ -259,7 +317,7 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -267,7 +325,10 @@ End Sub
 
     insta::assert_yaml_snapshot!(
         "optional_parameter_missing_default_failures",
-        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -287,13 +348,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("duplicate_static_modifier_cst", tree);
 
-    insta::assert_yaml_snapshot!("duplicate_static_modifier_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "duplicate_static_modifier_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Enum with missing member value after equals
@@ -313,11 +380,17 @@ End Enum
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_declarations");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("enum_missing_member_value_cst", tree);
 
-    insta::assert_yaml_snapshot!("enum_missing_member_value_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "enum_missing_member_value_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }

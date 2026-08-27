@@ -1,4 +1,5 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
+const SNAPSHOT_PATH: &str = "../../snapshots/parsers/cst/invalid_syntax/invalid_literals";
 
 /// Test unclosed string literal
 #[test]
@@ -16,12 +17,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_literals");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("unclosed_string_cst", tree);
-    insta::assert_yaml_snapshot!("unclosed_string_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "unclosed_string_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test string with incomplete quote escape
@@ -40,12 +47,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_literals");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("incomplete_quote_escape_cst", tree);
-    insta::assert_yaml_snapshot!("incomplete_quote_escape_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "incomplete_quote_escape_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test invalid numeric literal with multiple decimal points
@@ -64,12 +77,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_literals");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("multiple_decimal_points_cst", tree);
-    insta::assert_yaml_snapshot!("multiple_decimal_points_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "multiple_decimal_points_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test invalid hexadecimal literal
@@ -88,12 +107,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_literals");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("invalid_hex_literal_cst", tree);
-    insta::assert_yaml_snapshot!("invalid_hex_literal_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "invalid_hex_literal_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test invalid octal literal
@@ -112,12 +137,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_literals");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("invalid_octal_literal_cst", tree);
-    insta::assert_yaml_snapshot!("invalid_octal_literal_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "invalid_octal_literal_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test invalid date literal - bad month
@@ -136,12 +167,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_literals");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("invalid_date_month_cst", tree);
-    insta::assert_yaml_snapshot!("invalid_date_month_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "invalid_date_month_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test unclosed date literal
@@ -160,12 +197,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_literals");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("unclosed_date_literal_cst", tree);
-    insta::assert_yaml_snapshot!("unclosed_date_literal_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "unclosed_date_literal_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test invalid exponent in scientific notation
@@ -184,12 +227,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_literals");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("invalid_scientific_notation_cst", tree);
-    insta::assert_yaml_snapshot!("invalid_scientific_notation_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "invalid_scientific_notation_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test number with invalid type suffix
@@ -208,12 +257,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_literals");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("invalid_number_suffix_cst", tree);
-    insta::assert_yaml_snapshot!("invalid_number_suffix_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "invalid_number_suffix_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test number with leading zeros (potentially ambiguous)
@@ -232,10 +287,16 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/invalid_literals");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("number_with_leading_zeros_cst", tree);
-    insta::assert_yaml_snapshot!("number_with_leading_zeros_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "number_with_leading_zeros_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }

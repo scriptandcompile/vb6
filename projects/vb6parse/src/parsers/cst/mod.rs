@@ -198,31 +198,26 @@ use rowan::{GreenNode, GreenNodeBuilder, Language};
 use serde::Serialize;
 
 // Submodules for organized CST parsing
-mod assignment;
-mod attribute_statements;
-mod declarations;
-mod deftype_statements;
-mod enum_statements;
+mod control_flow;
 mod expressions;
-mod for_statements;
-mod function_statements;
 mod helpers;
-mod if_statements;
-mod label_statements;
-mod loop_statements;
 mod navigation;
-mod option_statements;
-mod parameters;
-mod properties;
-mod property_statements;
-mod select_statements;
-mod sub_statements;
-mod type_statements;
+mod recovery;
+mod statements;
 pub mod visitor;
 
 // Re-export navigation types
 pub use navigation::CstNode;
 pub use visitor::{Visitor, VisitorMut, walk_node, walk_node_mut};
+
+// Re-export recovery types
+pub use recovery::{NodeRange, RecoveryEvent, RecoveryStrategy};
+
+// Re-export control flow types
+pub use control_flow::{
+    ControlFlowFrame, ControlFlowFrameType, DoPhase, ForPhase, IfPhase, MAX_STATEMENT_DEPTH,
+    SelectPhase, StatementListContext, WhilePhase, WithPhase,
+};
 
 /// Maximum depth for nested property groups to prevent stack overflow.
 const MAX_PROPERTY_GROUP_DEPTH: usize = 100;
@@ -401,24 +396,6 @@ impl ConcreteSyntaxTree {
     #[must_use]
     pub fn to_root_node(&self) -> CstNode {
         CstNode::new(SyntaxKind::Root, self.text(), false, self.children())
-    }
-
-    /// Returns byte ranges for each `ErrorRecovery` node in the CST.
-    #[must_use]
-    pub fn error_recovery_ranges(&self) -> Vec<NodeRange> {
-        let syntax_node = rowan::SyntaxNode::<VB6Language>::new_root(self.root.clone());
-
-        syntax_node
-            .descendants()
-            .filter(|node| node.kind() == SyntaxKind::ErrorRecovery)
-            .map(|node| {
-                let range = node.text_range();
-                NodeRange {
-                    start: range.start().into(),
-                    end: range.end().into(),
-                }
-            })
-            .collect()
     }
 
     /// Create a new CST with specified node kinds removed from the root level.
@@ -626,216 +603,6 @@ impl PropertyGroupFrame {
             name: self.name,
             guid: self.guid,
             properties: self.properties,
-        }
-    }
-}
-
-// ==================== Control Flow State Machine Types ====================
-
-/// Maximum depth for nested control flow statements
-const MAX_STATEMENT_DEPTH: usize = 500;
-
-/// Simple enum to identify the type of control flow frame.
-/// This avoids using magic numbers (i32) for frame type identification.
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-enum ControlFlowFrameType {
-    StatementList,
-    IfStatement,
-    ForStatement,
-    SelectCase,
-    WhileStatement,
-    DoStatement,
-    WithStatement,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-/// Strategy used by parser recovery when creating `ErrorRecovery` nodes.
-pub enum RecoveryStrategy {
-    /// Recover by consuming exactly one unexpected token.
-    SingleToken,
-    /// Recover by consuming tokens until the end of the current line.
-    ToNewline,
-    /// Recover from a mismatched `End <block>` terminator.
-    ProcedureTerminator,
-}
-
-#[derive(Debug, Clone)]
-/// A single parser recovery event captured during CST construction.
-pub struct RecoveryEvent {
-    /// Monotonic event id in parse order.
-    pub id: usize,
-    /// Human-readable expectations for this parser location.
-    pub expected: Vec<String>,
-    /// Tokens consumed during recovery.
-    pub found: Vec<Token>,
-    /// Recovery strategy that was used.
-    pub strategy: RecoveryStrategy,
-    /// Span at which recovery started.
-    pub span: Span,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-/// Byte range for a CST node in source content.
-pub struct NodeRange {
-    /// Inclusive start byte offset.
-    pub start: u32,
-    /// Exclusive end byte offset.
-    pub end: u32,
-}
-
-/// Parsing state for control flow statements
-///
-/// This enum represents the state machine frames for parsing control flow
-/// statements without mutual recursion. Each frame type corresponds to a
-/// control flow construct and tracks its parsing progress through phases.
-enum ControlFlowFrame {
-    /// Parsing a statement list
-    StatementList {
-        depth: usize,
-        /// Context for determining when to stop parsing
-        context: StatementListContext,
-        /// Whether `start_node` has been called for this frame
-        started: bool,
-    },
-
-    /// Parsing an If statement
-    IfStatement { phase: IfPhase, depth: usize },
-
-    /// Parsing a For loop
-    ForStatement {
-        phase: ForPhase,
-        is_for_each: bool,
-        depth: usize,
-    },
-
-    /// Parsing a Select Case
-    SelectCase { phase: SelectPhase, depth: usize },
-
-    /// Parsing a While loop
-    WhileStatement { phase: WhilePhase, depth: usize },
-
-    /// Parsing a Do loop
-    DoStatement { phase: DoPhase, depth: usize },
-
-    /// Parsing a With block
-    WithStatement { phase: WithPhase, depth: usize },
-}
-
-/// Context for statement list parsing to determine stop conditions
-#[derive(Copy, Clone)]
-enum StatementListContext {
-    /// Top-level statement list (stops at end of input)
-    TopLevel,
-    /// `If/Then` body (stops at `ElseIf`, `Else`, or `End If`)
-    IfThenBody,
-    /// `ElseIf` body (stops at `ElseIf`, `Else`, or `End If`)  
-    ElseIfBody,
-    /// `Else` body (stops at `End If`)
-    ElseBody,
-    /// `For` loop body (stops at `Next`)
-    ForBody,
-    /// `Select Case` body (stops at `Case`, `Case Else`, or `End Select`)
-    SelectCaseBody,
-    /// `While` loop body (stops at `Wend`)
-    WhileBody,
-    /// `Do` loop body (stops at `Loop`)
-    DoBody,
-    /// `With` block body (stops at `End With`)
-    WithBody,
-}
-
-/// Phases for parsing an If statement
-#[derive(Copy, Clone)]
-enum IfPhase {
-    /// Start parsing the If statement (parse condition and Then keyword)
-    Start,
-    /// Parse the Then body (statement list pushed separately)
-    ThenBody,
-    /// Check for and parse `ElseIf` condition
-    CheckElseIf,
-    /// Parse `ElseIf` body (statement list pushed separately)
-    ElseIfBody,
-    /// Check for and parse `Else`
-    CheckElse,
-    /// Parse `Else` body (statement list pushed separately)
-    ElseBody,
-    /// Finish the `If` statement (parse `End If`)
-    Finish,
-}
-
-/// Phases for parsing a `For` loop
-#[derive(Copy, Clone)]
-enum ForPhase {
-    /// Start parsing (parse `For` variable = start `To` end [`Step` step])
-    Start,
-    /// Parse loop body (statement list pushed separately)
-    Body,
-    /// Finish the loop (parse `Next`)
-    Finish,
-}
-
-/// Phases for parsing a `Select Case` statement
-#[derive(Copy, Clone)]
-enum SelectPhase {
-    /// Start parsing (parse `Select Case` expression)
-    Start,
-    /// Parse `Case` clause
-    CaseClause,
-    /// Parse `Case` body (statement list pushed separately)
-    CaseBody,
-    /// Check for more `Case` clauses or `Case Else`
-    CheckNextCase,
-    /// Parse `Case Else` body (statement list pushed separately)
-    CaseElseBody,
-    /// Finish (parse `End Select`)
-    Finish,
-}
-
-/// Phases for parsing a `While` loop
-#[derive(Copy, Clone)]
-enum WhilePhase {
-    /// Start parsing (parse `While` condition)
-    Start,
-    /// Parse loop body (statement list pushed separately)
-    Body,
-    /// Finish the loop (parse `Wend`)
-    Finish,
-}
-
-/// Phases for parsing a `Do` loop
-#[derive(Copy, Clone)]
-enum DoPhase {
-    /// Start parsing (parse `Do` [While/Until condition])
-    Start,
-    /// Parse loop body (statement list pushed separately)
-    Body,
-    /// Finish the loop (parse `Loop` [While/Until condition])
-    Finish,
-}
-
-/// Phases for parsing a `With` block
-#[derive(Copy, Clone)]
-enum WithPhase {
-    /// Start parsing (parse `With` expression)
-    Start,
-    /// Parse `With` body (statement list pushed separately)
-    Body,
-    /// Finish the block (parse `End With`)
-    Finish,
-}
-
-impl ControlFlowFrame {
-    /// Get the type identifier for this frame.
-    /// This allows matching on frame types without borrowing the entire frame.
-    fn frame_type(&self) -> ControlFlowFrameType {
-        match self {
-            ControlFlowFrame::StatementList { .. } => ControlFlowFrameType::StatementList,
-            ControlFlowFrame::IfStatement { .. } => ControlFlowFrameType::IfStatement,
-            ControlFlowFrame::ForStatement { .. } => ControlFlowFrameType::ForStatement,
-            ControlFlowFrame::SelectCase { .. } => ControlFlowFrameType::SelectCase,
-            ControlFlowFrame::WhileStatement { .. } => ControlFlowFrameType::WhileStatement,
-            ControlFlowFrame::DoStatement { .. } => ControlFlowFrameType::DoStatement,
-            ControlFlowFrame::WithStatement { .. } => ControlFlowFrameType::WithStatement,
         }
     }
 }

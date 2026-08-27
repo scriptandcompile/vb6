@@ -1,4 +1,5 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
+const SNAPSHOT_PATH: &str = "../../snapshots/parsers/cst/invalid_syntax/mismatched_keywords";
 
 /// Test Sub with End Function mismatch
 #[test]
@@ -16,13 +17,19 @@ End Function
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/mismatched_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("sub_with_end_function_cst", tree);
 
-    insta::assert_yaml_snapshot!("sub_with_end_function_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "sub_with_end_function_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Function with End Sub mismatch
@@ -40,13 +47,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/mismatched_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("function_with_end_sub_cst", tree);
 
-    insta::assert_yaml_snapshot!("function_with_end_sub_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "function_with_end_sub_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Property Get with End Sub mismatch
@@ -64,13 +77,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/mismatched_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("property_get_with_end_sub_cst", tree);
 
-    insta::assert_yaml_snapshot!("property_get_with_end_sub_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "property_get_with_end_sub_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Property Let with End Function mismatch
@@ -88,13 +107,19 @@ End Function
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/mismatched_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("property_let_with_end_function_cst", tree);
 
-    insta::assert_yaml_snapshot!("property_let_with_end_function_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "property_let_with_end_function_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test If with End Select mismatch
@@ -114,13 +139,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/mismatched_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("if_with_end_select_cst", tree);
 
-    insta::assert_yaml_snapshot!("if_with_end_select_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "if_with_end_select_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Select Case with End If mismatch
@@ -143,13 +174,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/mismatched_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("select_case_with_end_if_cst", tree);
 
-    insta::assert_yaml_snapshot!("select_case_with_end_if_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "select_case_with_end_if_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test For with Wend mismatch
@@ -169,13 +206,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/mismatched_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("for_with_wend_cst", tree);
 
-    insta::assert_yaml_snapshot!("for_with_wend_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "for_with_wend_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Do While with Next mismatch
@@ -195,13 +238,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/mismatched_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("do_while_with_next_cst", tree);
 
-    insta::assert_yaml_snapshot!("do_while_with_next_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "do_while_with_next_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test While with Loop mismatch
@@ -221,13 +270,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/mismatched_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("while_with_loop_cst", tree);
 
-    insta::assert_yaml_snapshot!("while_with_loop_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "while_with_loop_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test Type with End Enum mismatch
@@ -246,11 +301,17 @@ End Enum
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/mismatched_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("type_with_end_enum_cst", tree);
 
-    insta::assert_yaml_snapshot!("type_with_end_enum_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "type_with_end_enum_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }

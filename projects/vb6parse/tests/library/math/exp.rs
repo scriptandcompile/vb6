@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    const SNAPSHOT_PATH: &str = "../../../snapshots/parsers/cst/library/math/exp";
+
     use vb6parse::ConcreteSyntaxTree;
 
     #[test]
@@ -15,7 +16,7 @@ result = Exp(2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -33,7 +34,7 @@ result = Exp(0)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -51,7 +52,7 @@ result = Exp(-1)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -69,7 +70,7 @@ y = Exp(x)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -89,7 +90,7 @@ End Function
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -107,7 +108,7 @@ result = principal * Exp(rate * time)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -125,7 +126,7 @@ amount = Exp(-rate * t)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -143,7 +144,7 @@ result = 1 / (1 + Exp(-x))
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -161,7 +162,7 @@ sinh = (Exp(x) - Exp(-x)) / 2
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -179,7 +180,7 @@ cosh = (Exp(x) + Exp(-x)) / 2
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -197,7 +198,7 @@ result = (1 / (stdDev * Sqr(2 * pi))) * Exp(exponent)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -215,7 +216,7 @@ power = Exp(exponent * Log(base))
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -234,7 +235,7 @@ interest = amount - principal
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -252,7 +253,7 @@ Debug.Print Exp(1)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -272,7 +273,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -293,7 +294,7 @@ Next i
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -311,7 +312,7 @@ probability = (lambda ^ k * Exp(-lambda)) / factorial
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -329,7 +330,7 @@ temp = ambientTemp + (initialTemp - ambientTemp) * Exp(-coolingConstant * time)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -347,7 +348,7 @@ population = capacity / (1 + ratio * Exp(-growthRate * time))
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -369,7 +370,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -389,7 +390,7 @@ builtin = Exp(x)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -407,7 +408,7 @@ callPrice = stockPrice * d1Value - strikePrice * Exp(-rate * time) * d2Value
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -426,7 +427,7 @@ result.Real = magnitude * Cos(z.Imaginary)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -446,7 +447,7 @@ analytical = Exp(b) - Exp(a)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -464,7 +465,7 @@ result = Exp(Log(Exp(x)))
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/math/exp");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);

@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    const SNAPSHOT_PATH: &str = "../../../snapshots/parsers/cst/library/string/formatcurrency";
+
     use vb6parse::ConcreteSyntaxTree;
 
     #[test]
@@ -15,7 +16,7 @@ result = FormatCurrency(amount)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -33,7 +34,7 @@ formatted = FormatCurrency(value, 2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -51,7 +52,7 @@ formatted = FormatCurrency(amount, 0)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -69,7 +70,7 @@ result = FormatCurrency(balance, 2, , vbTrue)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -87,7 +88,7 @@ formatted = FormatCurrency(amount, 2, vbTrue, vbTrue, vbTrue)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -105,7 +106,7 @@ Debug.Print FormatCurrency(price)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -123,7 +124,7 @@ msg = "Total: " & FormatCurrency(total)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -143,7 +144,7 @@ End Function
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -165,7 +166,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -183,7 +184,7 @@ lstPrices.AddItem FormatCurrency(prices(i))
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -203,7 +204,7 @@ summary = "Subtotal: " & FormatCurrency(subtotal) & vbCrLf & _
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -221,7 +222,7 @@ result = FormatCurrency(price * quantity)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -241,7 +242,7 @@ End If
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -259,7 +260,7 @@ comparison = FormatCurrency(price1) & " vs " & FormatCurrency(price2)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -281,7 +282,7 @@ ErrorHandler:
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -301,7 +302,7 @@ Next i
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -324,7 +325,7 @@ End Select
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -342,7 +343,7 @@ MsgBox "Total: " & FormatCurrency(total)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -360,7 +361,7 @@ lblPrice.Caption = FormatCurrency(price)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -378,7 +379,7 @@ formatted = FormatCurrency(rs.Fields("Amount").Value)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -396,7 +397,7 @@ result = FormatCurrency(fraction, 2, vbFalse)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -414,7 +415,7 @@ formatted = FormatCurrency(balance, 2, , vbFalse)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -432,7 +433,7 @@ difference = FormatCurrency(price1 - price2, 2, , vbTrue)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -450,7 +451,7 @@ total = FormatCurrency(subtotal + tax + shipping)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -468,7 +469,7 @@ result = FormatCurrency(CDbl(value), decimals)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);
@@ -487,7 +488,7 @@ result = FormatCurrency(amount, 2, vbTrue, parens, vbTrue)
         let tree = cst.to_serializable();
 
         let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("../../../snapshots/tests/library/string/formatcurrency");
+        settings.set_snapshot_path(SNAPSHOT_PATH);
         settings.set_prepend_module_to_snapshot(false);
         let _guard = settings.bind_to_scope();
         insta::assert_yaml_snapshot!(tree);

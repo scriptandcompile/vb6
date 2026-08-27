@@ -1,4 +1,5 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
+const SNAPSHOT_PATH: &str = "../../snapshots/parsers/cst/invalid_syntax/missing_end";
 
 /// Test missing End Sub statement
 #[test]
@@ -20,7 +21,7 @@ Sub TestSub()
 
     // Set up insta snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -28,7 +29,13 @@ Sub TestSub()
     insta::assert_yaml_snapshot!("missing_end_sub_cst", tree);
 
     // Snapshot the failures to document current error reporting behavior
-    insta::assert_yaml_snapshot!("missing_end_sub_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_end_sub_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing End Sub when another Sub declaration starts.
@@ -49,13 +56,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_end_sub_before_next_sub_cst", tree);
 
-    insta::assert_yaml_snapshot!("missing_end_sub_before_next_sub_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_end_sub_before_next_sub_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing End Function statement
@@ -72,13 +85,19 @@ Function Calculate(x As Integer) As Integer
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_end_function_cst", tree);
 
-    insta::assert_yaml_snapshot!("missing_end_function_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_end_function_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing End Function when another Function declaration starts.
@@ -98,7 +117,7 @@ End Function
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -106,7 +125,10 @@ End Function
 
     insta::assert_yaml_snapshot!(
         "missing_end_function_before_next_function_failures",
-        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -124,13 +146,19 @@ Property Get Name() As String
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_end_property_cst", tree);
 
-    insta::assert_yaml_snapshot!("missing_end_property_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_end_property_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing End Property when another Property declaration starts.
@@ -150,7 +178,7 @@ End Property
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -158,7 +186,10 @@ End Property
 
     insta::assert_yaml_snapshot!(
         "missing_end_property_before_next_property_failures",
-        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -178,7 +209,7 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -186,7 +217,10 @@ End Sub
 
     insta::assert_yaml_snapshot!(
         "missing_end_if_failures",
-        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -205,13 +239,19 @@ Type Point
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_end_type_cst", tree);
 
-    insta::assert_yaml_snapshot!("missing_end_type_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_end_type_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing End Type when another Type declaration starts.
@@ -233,7 +273,7 @@ End Type
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -241,7 +281,10 @@ End Type
 
     insta::assert_yaml_snapshot!(
         "missing_end_type_before_next_type_failures",
-        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -263,7 +306,7 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -271,7 +314,10 @@ End Sub
 
     insta::assert_yaml_snapshot!(
         "missing_end_type_before_next_sub_failures",
-        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -293,7 +339,7 @@ End Function
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -301,7 +347,10 @@ End Function
 
     insta::assert_yaml_snapshot!(
         "missing_end_type_before_next_function_failures",
-        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -324,7 +373,7 @@ End Type
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -332,7 +381,10 @@ End Type
 
     insta::assert_yaml_snapshot!(
         "missing_end_sub_before_next_type_failures",
-        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -354,7 +406,7 @@ End Type
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
@@ -362,7 +414,10 @@ End Type
 
     insta::assert_yaml_snapshot!(
         "missing_end_function_before_next_type_failures",
-        failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>()
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -385,13 +440,19 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_end_select_cst", tree);
 
-    insta::assert_yaml_snapshot!("missing_end_select_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_end_select_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test nested missing End statements
@@ -411,11 +472,17 @@ Sub Test()
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_end");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("nested_missing_ends_cst", tree);
 
-    insta::assert_yaml_snapshot!("nested_missing_ends_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "nested_missing_ends_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }

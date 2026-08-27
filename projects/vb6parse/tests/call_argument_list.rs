@@ -4,6 +4,7 @@
 //! with structured `Argument` children, rather than flat token streams.
 
 use vb6parse::*;
+const SNAPSHOT_PATH: &str = "../snapshots/parsers/cst/call_argument_list";
 
 #[test]
 fn call_with_parenthesized_arguments() {
@@ -20,7 +21,7 @@ fn call_with_parenthesized_arguments() {
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);
@@ -41,7 +42,7 @@ fn call_with_unparenthesized_arguments() {
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);
@@ -62,7 +63,7 @@ fn call_no_arguments() {
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);
@@ -83,7 +84,7 @@ fn call_with_member_access() {
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);
@@ -110,7 +111,7 @@ End Sub
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);
@@ -135,7 +136,7 @@ End Sub
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);
@@ -156,7 +157,7 @@ fn call_nested_in_expression() {
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);
@@ -177,7 +178,7 @@ fn call_with_empty_arguments() {
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);
@@ -198,7 +199,7 @@ fn call_with_bracketed_enum_arguments() {
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);
@@ -219,7 +220,7 @@ fn call_with_bracketed_identifier_containing_whitespace() {
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);
@@ -250,7 +251,7 @@ End Sub
 
     // Create snapshot
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../snapshots/tests/call_argument_list");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
     insta::assert_yaml_snapshot!(tree);

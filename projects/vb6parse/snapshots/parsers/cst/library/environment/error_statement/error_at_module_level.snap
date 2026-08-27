@@ -1,0 +1,19 @@
+---
+source: projects/vb6parse/tests/library/environment/error_statement.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: ErrorStatement
+      children:
+        - kind: ErrorKeyword
+          text: Error
+        - kind: Whitespace
+          text: " "
+        - kind: NumericLiteralExpression
+          children:
+            - kind: IntegerLiteral
+              text: "53"
+    - kind: Newline
+      text: "\n"

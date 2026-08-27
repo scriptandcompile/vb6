@@ -1,0 +1,65 @@
+use vb6parse::*;
+const SNAPSHOT_PATH: &str = "../../../snapshots/parsers/files/chess_brain_vb/project";
+
+#[test]
+fn chess_brain_vb_chessbrainvb_project_load() {
+    let project_file_bytes =
+        include_bytes!("../../../../../test-data/ChessBrainVB/ChessbrainVB_V4_10/ChessBrainVB.vbp");
+
+    let result = SourceFile::decode_with_replacement("ChessBrainVB.vbp", project_file_bytes);
+
+    let source_file = match result {
+        Ok(source_file) => source_file,
+        Err(e) => panic!("Failed to decode source file 'ChessBrainVB.vbp': {e:?}"),
+    };
+
+    let (project_file_opt, failures) = ProjectFile::parse(&source_file).unpack();
+
+    if !failures.is_empty() {
+        for failure in &failures {
+            failure.print();
+        }
+
+        panic!("Project parse had failures");
+    }
+
+    let project = project_file_opt.expect("Project should be present.");
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path(SNAPSHOT_PATH);
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+    insta::assert_yaml_snapshot!(project);
+}
+
+#[test]
+fn chess_brain_vb_chessbrainvb_debug_project_load() {
+    let project_file_bytes = include_bytes!(
+        "../../../../../test-data/ChessBrainVB/ChessbrainVB_V4_10/ChessBrainVB_debug.vbp"
+    );
+
+    let result = SourceFile::decode_with_replacement("ChessBrainVB_debug.vbp", project_file_bytes);
+
+    let source_file = match result {
+        Ok(source_file) => source_file,
+        Err(e) => panic!("Failed to decode source file 'ChessBrainVB_debug.vbp': {e:?}"),
+    };
+
+    let (project_file_opt, failures) = ProjectFile::parse(&source_file).unpack();
+
+    if !failures.is_empty() {
+        for failure in &failures {
+            failure.print();
+        }
+
+        panic!("Project parse had failures");
+    }
+
+    let project = project_file_opt.expect("Project should be present.");
+
+    let mut settings = insta::Settings::clone_current();
+    settings.set_snapshot_path(SNAPSHOT_PATH);
+    settings.set_prepend_module_to_snapshot(false);
+    let _guard = settings.bind_to_scope();
+    insta::assert_yaml_snapshot!(project);
+}

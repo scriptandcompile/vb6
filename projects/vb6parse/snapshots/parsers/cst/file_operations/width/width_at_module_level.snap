@@ -1,0 +1,31 @@
+---
+source: projects/vb6parse/tests/file_operations/width.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: WidthStatement
+      children:
+        - kind: WidthKeyword
+          text: Width
+        - kind: Whitespace
+          text: " "
+        - kind: IdentifierExpression
+          children:
+            - kind: Octothorpe
+              text: "#"
+            - kind: IntegerLiteral
+              text: "1"
+        - kind: Comma
+          text: ","
+        - kind: Whitespace
+          text: " "
+        - kind: NumericLiteralExpression
+          children:
+            - kind: IntegerLiteral
+              text: "80"
+    - kind: Newline
+      text: "\n"

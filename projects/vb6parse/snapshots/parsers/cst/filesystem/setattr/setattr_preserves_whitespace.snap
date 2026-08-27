@@ -1,0 +1,29 @@
+---
+source: projects/vb6parse/tests/filesystem/setattr.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: SetAttrStatement
+      children:
+        - kind: SetAttrKeyword
+          text: SetAttr
+        - kind: Whitespace
+          text: "   "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"File.txt\""
+        - kind: Whitespace
+          text: "  "
+        - kind: Comma
+          text: ","
+        - kind: Whitespace
+          text: "   "
+        - kind: IdentifierExpression
+          children:
+            - kind: Identifier
+              text: vbNormal
+    - kind: Newline
+      text: "\n"

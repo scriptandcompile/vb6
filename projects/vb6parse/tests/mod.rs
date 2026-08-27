@@ -1,0 +1,22 @@
+mod assignments;
+mod attributes;
+mod call_argument_list;
+mod colon_separator;
+mod control_flow;
+mod declarations;
+mod edge_cases;
+mod expression_whitespace;
+mod expressions;
+mod file_operations;
+mod filesystem;
+mod function_declaration;
+mod invalid_syntax;
+
+mod files;
+mod library;
+mod line_statements;
+mod module_options;
+mod objects;
+mod properties;
+mod type_definitions;
+mod type_hinting;

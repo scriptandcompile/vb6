@@ -1,0 +1,43 @@
+---
+source: projects/vb6parse/tests/file_operations/put.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Whitespace
+      text: "    "
+    - kind: PutStatement
+      children:
+        - kind: PutKeyword
+          text: Put
+        - kind: Whitespace
+          text: "    "
+        - kind: IdentifierExpression
+          children:
+            - kind: Octothorpe
+              text: "#"
+            - kind: IntegerLiteral
+              text: "1"
+        - kind: Whitespace
+          text: "  "
+        - kind: Comma
+          text: ","
+        - kind: Whitespace
+          text: "  "
+        - kind: Comma
+          text: ","
+        - kind: Whitespace
+          text: "  "
+        - kind: ArgumentList
+          children:
+            - kind: Argument
+              children:
+                - kind: IdentifierExpression
+                  children:
+                    - kind: Identifier
+                      text: myVar
+            - kind: Whitespace
+              text: "    "
+    - kind: Newline
+      text: "\n"

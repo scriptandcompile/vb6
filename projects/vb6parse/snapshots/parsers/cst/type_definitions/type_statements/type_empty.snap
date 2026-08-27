@@ -1,0 +1,29 @@
+---
+source: projects/vb6parse/tests/type_definitions/type_statements.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: TypeStatement
+      children:
+        - kind: TypeKeyword
+          text: Type
+        - kind: Whitespace
+          text: " "
+        - kind: Identifier
+          text: EmptyType
+        - kind: Newline
+          text: "\n"
+        - kind: StatementList
+          children: []
+        - kind: EndKeyword
+          text: End
+        - kind: Whitespace
+          text: " "
+        - kind: TypeKeyword
+          text: Type
+        - kind: Newline
+          text: "\n"

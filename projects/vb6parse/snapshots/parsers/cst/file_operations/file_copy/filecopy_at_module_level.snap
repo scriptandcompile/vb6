@@ -1,0 +1,27 @@
+---
+source: projects/vb6parse/tests/file_operations/filecopy.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: FileCopyStatement
+      children:
+        - kind: FileCopyKeyword
+          text: FileCopy
+        - kind: Whitespace
+          text: " "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"old.dat\""
+        - kind: Comma
+          text: ","
+        - kind: Whitespace
+          text: " "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"new.dat\""
+    - kind: Newline
+      text: "\n"

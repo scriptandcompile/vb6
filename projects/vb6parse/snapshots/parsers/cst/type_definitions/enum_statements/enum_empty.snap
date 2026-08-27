@@ -1,0 +1,29 @@
+---
+source: projects/vb6parse/tests/type_definitions/enum_statements.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: EnumStatement
+      children:
+        - kind: EnumKeyword
+          text: Enum
+        - kind: Whitespace
+          text: " "
+        - kind: Identifier
+          text: EmptyEnum
+        - kind: Newline
+          text: "\n"
+        - kind: StatementList
+          children: []
+        - kind: EndKeyword
+          text: End
+        - kind: Whitespace
+          text: " "
+        - kind: EnumKeyword
+          text: Enum
+        - kind: Newline
+          text: "\n"

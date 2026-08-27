@@ -1,4 +1,5 @@
 use vb6parse::parsers::cst::ConcreteSyntaxTree;
+const SNAPSHOT_PATH: &str = "../../snapshots/parsers/cst/invalid_syntax/missing_keywords";
 
 /// Test missing Then keyword in If statement
 #[test]
@@ -17,12 +18,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_then_in_if_cst", tree);
-    insta::assert_yaml_snapshot!("missing_then_in_if_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_then_in_if_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing To keyword in For loop
@@ -42,12 +49,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_to_in_for_cst", tree);
-    insta::assert_yaml_snapshot!("missing_to_in_for_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_to_in_for_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing As keyword in Dim statement
@@ -65,12 +78,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_as_in_dim_cst", tree);
-    insta::assert_yaml_snapshot!("missing_as_in_dim_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_as_in_dim_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing = in Const declaration
@@ -88,12 +107,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_equals_in_const_cst", tree);
-    insta::assert_yaml_snapshot!("missing_equals_in_const_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_equals_in_const_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing Case keyword in Select statement
@@ -116,12 +141,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_case_in_select_cst", tree);
-    insta::assert_yaml_snapshot!("missing_case_in_select_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_case_in_select_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing Loop keyword in Do statement
@@ -140,12 +171,18 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_loop_in_do_cst", tree);
-    insta::assert_yaml_snapshot!("missing_loop_in_do_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_loop_in_do_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }
 
 /// Test missing Next keyword in For loop
@@ -164,10 +201,16 @@ End Sub
     let tree = cst.to_serializable();
 
     let mut settings = insta::Settings::clone_current();
-    settings.set_snapshot_path("../../snapshots/tests/invalid_syntax/missing_keywords");
+    settings.set_snapshot_path(SNAPSHOT_PATH);
     settings.set_prepend_module_to_snapshot(false);
     let _guard = settings.bind_to_scope();
 
     insta::assert_yaml_snapshot!("missing_next_in_for_cst", tree);
-    insta::assert_yaml_snapshot!("missing_next_in_for_failures", failures.iter().map(|f| format!("{f:?}")).collect::<Vec<_>>());
+    insta::assert_yaml_snapshot!(
+        "missing_next_in_for_failures",
+        failures
+            .iter()
+            .map(|f| format!("{f:?}"))
+            .collect::<Vec<_>>()
+    );
 }

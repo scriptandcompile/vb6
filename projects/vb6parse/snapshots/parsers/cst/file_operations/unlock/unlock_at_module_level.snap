@@ -1,0 +1,21 @@
+---
+source: projects/vb6parse/tests/file_operations/unlock.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: UnlockStatement
+      children:
+        - kind: UnlockKeyword
+          text: Unlock
+        - kind: Whitespace
+          text: " "
+        - kind: IdentifierExpression
+          children:
+            - kind: Octothorpe
+              text: "#"
+            - kind: IntegerLiteral
+              text: "1"
+    - kind: Newline
+      text: "\n"

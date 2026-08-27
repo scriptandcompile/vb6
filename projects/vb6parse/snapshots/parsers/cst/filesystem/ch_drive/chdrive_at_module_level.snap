@@ -1,0 +1,21 @@
+---
+source: projects/vb6parse/tests/filesystem/chdrive.rs
+expression: tree
+---
+root:
+  kind: Root
+  children:
+    - kind: Newline
+      text: "\n"
+    - kind: ChDriveStatement
+      children:
+        - kind: ChDriveKeyword
+          text: ChDrive
+        - kind: Whitespace
+          text: " "
+        - kind: StringLiteralExpression
+          children:
+            - kind: StringLiteral
+              text: "\"D:\""
+    - kind: Newline
+      text: "\n"

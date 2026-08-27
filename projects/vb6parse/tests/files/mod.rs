@@ -1,0 +1,9 @@
+mod audiostation;
+mod binary_metamorphosis;
+mod bitrate_calculator;
+mod cdiu_beat_up_editor;
+mod chess_brain_vb;
+mod discrete_probability_detector;
+mod endless_runner_game_vb6_0;
+mod environment;
+mod vb6_code;
