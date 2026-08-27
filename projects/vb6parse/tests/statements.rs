@@ -86,3 +86,6 @@ mod set;
 
 #[path = "statements/objects/with_block.rs"]
 mod with_block;
+
+#[path = "statements/runtime_state/date.rs"]
+mod date;
