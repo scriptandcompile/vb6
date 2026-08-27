@@ -98,3 +98,6 @@ mod randomize;
 
 #[path = "statements/runtime_state/time.rs"]
 mod time;
+
+#[path = "statements/string_manipulation/lset.rs"]
+mod lset;
