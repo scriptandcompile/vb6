@@ -16,46 +16,30 @@
 
 ### Component Structure
 
+**Note:** The actual source code uses flat directories rather than the nested structure below.
+
 ```
 vb6interpret/
 ├── src/
 │   ├── main.rs              # CLI entry point
 │   ├── lib.rs               # Library interface
-│   ├── engine/
-│   │   ├── mod.rs           # Interpreter engine
-│   │   ├── executor.rs      # IR execution
-│   │   ├── stack.rs         # Operand stack
-│   │   └── optimizer.rs     # Runtime optimizations
-│   ├── repl/
-│   │   ├── mod.rs           # REPL implementation
-│   │   ├── commands.rs      # REPL commands
-│   │   ├── completion.rs    # Tab completion
-│   │   └── history.rs       # Command history
-│   ├── debugger/
-│   │   ├── mod.rs           # Debugger interface
-│   │   ├── breakpoint.rs    # Breakpoint management
-│   │   ├── step.rs          # Step execution
-│   │   └── inspect.rs       # Variable inspection
-│   ├── pipeline/
-│   │   ├── mod.rs
-│   │   ├── parse.rs         # Parsing stage
-│   │   ├── analyze.rs       # Semantic analysis
-│   │   ├── lower.rs         # AST to IR lowering
-│   │   └── optimize.rs      # IR optimization
-│   └── cli.rs               # CLI argument parsing
+│   ├── interpreter.rs       # Main interpreter engine
+│   ├── program.rs           # Program representation
+│   ├── scope.rs             # Scope management
+│   ├── eval/                # Expression evaluation
+│   ├── exec/                # Statement execution
+│   ├── builtins/            # Built-in VB6 functions
+│   ├── error.rs             # Error types
+│   └── wasm.rs              # WASM support (wasm32 only)
 ├── tests/
-│   ├── interpreter_tests.rs
-│   ├── repl_tests.rs
-│   └── integration/
 └── benches/
-    └── interpreter.rs
 ```
 
 ## Core Components
 
-### 1. Interpreter Engine (`engine/`)
+### 1. Interpreter Engine (`interpreter.rs`)
 
-The heart of the interpreter - executes IR instructions.
+The main interpreter that walks the CST and executes VB6 code using `vb6runtime` values.
 
 ```rust
 pub struct InterpreterEngine {
@@ -112,9 +96,17 @@ pub enum StepResult {
 }
 ```
 
-### 2. Instruction Execution (`engine/executor.rs`)
+### 2. Expression Evaluation (`eval/`)
 
-Core instruction execution logic:
+Expression evaluation logic.
+
+### 3. Statement Execution (`exec/`)
+
+Statement execution logic.
+
+### 4. Built-in Functions (`builtins/`)
+
+VB6 built-in standard library function implementations.
 
 ```rust
 impl InterpreterEngine {
@@ -176,9 +168,13 @@ impl InterpreterEngine {
 }
 ```
 
-### 3. REPL Implementation (`repl/`)
+### 5. Scope Management (`scope.rs`)
 
-Interactive VB6 shell:
+Scope management for variables across different levels (global, module, procedure, block).
+
+### 6. Program Representation (`program.rs`)
+
+Represents a VB6 program consisting of modules, classes, and forms.
 
 ```rust
 pub struct Repl {
@@ -267,9 +263,9 @@ pub enum ReplAction {
 }
 ```
 
-### 4. Debugger (`debugger/`)
+### 7. Error Handling (`error.rs`)
 
-Step-through debugging support:
+Error types for interpreter failures.
 
 ```rust
 pub struct Debugger {
@@ -316,9 +312,9 @@ impl Debugger {
 }
 ```
 
-### 5. Execution Pipeline (`pipeline/`)
+### 8. WASM Support (`wasm.rs`)
 
-Transform VB6 source to executable IR:
+WebAssembly support for running the interpreter in browsers (wasm32 target only).
 
 ```rust
 pub struct ExecutionPipeline {

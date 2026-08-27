@@ -11,22 +11,34 @@ use crate::scope::Scope;
 /// A formatted debug snapshot of a variable at a statement boundary.
 #[derive(Debug, Clone)]
 pub struct DebugVariable {
+    /// Variable name.
     pub name: String,
+    /// Qualified type name as a string.
     pub type_name: String,
+    /// Formatted value of the variable.
     pub value: String,
 }
 
 /// A debugger-oriented snapshot captured at a statement boundary.
 #[derive(Debug, Clone)]
 pub struct DebugSnapshot {
+    /// Number of statements executed so far.
     pub steps: u64,
+    /// Current line being executed (1-based).
     pub current_line: usize,
+    /// Name of the currently executing procedure, if any.
     pub current_procedure: Option<String>,
+    /// Current call stack depth.
     pub stack_depth: usize,
+    /// Global variables visible at this point.
     pub globals: Vec<DebugVariable>,
+    /// Local variables in the current scope.
     pub locals: Vec<DebugVariable>,
+    /// Lines written to `Debug.Print` / Immediate window so far.
     pub output_lines: Vec<String>,
+    /// All output concatenated into a single string.
     pub output_text: String,
+    /// Whether the program has terminated.
     pub terminated: bool,
     /// Byte range `[start, end)` of the specific source element being
     /// executed, when the snapshot targets a sub-line element such as a
