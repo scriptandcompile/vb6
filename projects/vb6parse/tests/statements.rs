@@ -89,3 +89,6 @@ mod with_block;
 
 #[path = "statements/runtime_state/date.rs"]
 mod date;
+
+#[path = "statements/runtime_state/error.rs"]
+mod error;
