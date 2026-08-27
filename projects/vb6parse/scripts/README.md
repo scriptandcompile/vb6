@@ -6,9 +6,6 @@ This directory contains scripts for generating documentation, test coverage, and
 
 ## Scripts
 
-### `generate-library-docs.py`
-Pure Python3 script that generates VB6 Library Reference documentation from Rust source files. Works on both Windows and Linux.
-
 ### `generate-coverage.py`
 Pure Python3 script that generates test coverage data and test statistics. Works on both Windows and Linux.
 
@@ -19,83 +16,6 @@ Pure Python3 script that generates performance benchmark data from Criterion res
 Pure Python3 script that backfills `docs/assets/data/benchmarks-history.json` from real non-CI commits using clustered time windows (last 30 days, around 90 days, around 6 months, and all-time older history).
 
 ---
-
-## Library Documentation Generation (`generate-library-docs.py`)
-
-### Usage
-
-```bash
-# Generate documentation (default paths)
-./scripts/generate-library-docs.py
-
-# With custom paths
-python3 scripts/generate-library-docs.py \
-    --src src/syntax/library \
-    --output docs/library
-
-# Clean output directory before generating
-python3 scripts/generate-library-docs.py --clean
-
-# Show help
-python3 scripts/generate-library-docs.py --help
-```
-
-### What it does
-
-1. **Parses Rust source files** in `src/syntax/library/functions/` and `src/syntax/library/statements/`
-2. **Extracts module documentation** (`//!` comments) from each `.rs` file
-3. **Converts markdown to HTML** with syntax highlighting for VB6 code
-4. **Generates organized HTML pages**:
-   - Main library index page
-   - Category index pages (arrays, math, string, etc.)
-   - Individual function/statement pages
-5. **Creates navigation** with breadcrumbs and cross-links
-6. **Builds search index** (`search-index.json`) for client-side search
-7. **Applies consistent styling** matching the existing docs site
-
-### Output Structure
-
-```
-docs/library/
-  index.html                      # Main library reference page
-  search-index.json               # Search data
-  functions/
-    arrays/
-      index.html                  # Array functions category
-      array.html                  # Individual function pages
-      filter.html
-      join.html
-      ...
-    math/
-      index.html
-      abs.html
-      sin.html
-      ...
-  statements/
-    file_operations/
-      index.html
-      open.html
-      close.html
-      ...
-```
-
-### Generated Content
-
-- **196 total pages**: Main index + category indices + individual item pages
-- **161 function pages**: Organized in 14 categories
-- **15 statement pages**: Organized in 5 categories
-- **Search index**: JSON file with all 176 items for client-side search
-
-### Requirements
-
-- Python 3.6+
-- `markdown` library: `pip install markdown`
-
-### Integration
-
-The generated documentation is automatically linked from:
-- `docs/index.html` - VB6 Library feature card
-- `docs/documentation.html` - Library Reference section
 
 ---
 

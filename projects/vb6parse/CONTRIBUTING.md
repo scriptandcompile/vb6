@@ -15,7 +15,7 @@ Here are some other ideas for contributions, categorized by difficulty:
     *   Add documentation examples to `examples/docs/` for the Getting Started guide (loaded dynamically from GitHub).
     *   Expand the documentation for the `language` and `syntax` modules. Many of the enums and structs could benefit from more detailed explanations and examples.
     *   Document the error types in the `errors` module more thoroughly.
-    *   Add or improve documentation in `src/syntax/library/functions` and `src/syntax/library/statements` (documentation is automatically published to the website).
+    *   VB6 library function documentation lives in `vb6runtime/src/library/`. See that crate's docs for contributing.
 
 *   **Increase Test Coverage:**
     *   Add more unit tests for individual parsers. The existing tests in `tests/` can be used as a template.
@@ -52,20 +52,6 @@ cargo check --examples
 The hook is located at `.git/hooks/pre-commit` and helps prevent example bit-rot.
 
 ## Documentation Generation
-
-### Library Reference Documentation
-
-When adding or updating VB6 library function/statement documentation in `src/syntax/library/`, regenerate the web documentation:
-
-```bash
-# Requires Python 3.6+ and markdown library
-pip install markdown
-
-# Generate library documentation
-python3 scripts/generate-library-docs.py --clean
-```
-
-The generated HTML pages will be created in `docs/library/` and are automatically deployed to GitHub Pages.
 
 ### Coverage and Benchmarks
 

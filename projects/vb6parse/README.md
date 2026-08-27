@@ -8,7 +8,7 @@ A complete, high-performance parser library for Visual Basic 6 code and project 
 
 **[Project Documentation & Resources](https://scriptandcompile.github.io/vb6/vb6parse/)**  
 **[Interactive Playground](https://scriptandcompile.github.io/vb6/vb6parse/playground.html)**  
-**[VB6 Library Reference](https://scriptandcompile.github.io/vb6/vb6parse/library/)**  
+**[VB6 Library Reference](https://scriptandcompile.github.io/vb6/vb6runtime/library/)**  
 **[Code Coverage Report](https://scriptandcompile.github.io/vb6/vb6parse/coverage.html)**  
 **[Performance Benchmarks](https://scriptandcompile.github.io/vb6/vb6parse/benchmarks.html)**
 
@@ -37,7 +37,7 @@ vb6parse = "1.0.1"
 
 ### Quick Links
 
-- **[Parse a VB6 Module](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#hello-world)** - First example: parse a simple VB6 module
+- **[Parse a VB6 Module](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#hello-world)** - Parse a simple VB6 module
 - **[Parse VB6 Projects](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#project-parsing)** - Work with .vbp project files
 - **[Handle Parse Errors](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#error-handling)** - Graceful error handling
 - **[Tokenize VB6 Code](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#tokenization)** - Lower-level tokenization
@@ -84,11 +84,10 @@ Bytes/String/File → SourceFile → SourceStream → TokenStream → CST → Ob
 
 1. **I/O Layer** (`io`): Character decoding and stream access
 2. **Lexer Layer** (`lexer`): Tokenization with keyword lookup
-3. **Syntax Layer** (`syntax`): VB6 language constructs and library functions
-4. **Parsers Layer** (`parsers`): CST construction from tokens
-5. **Files Layer** (`files`): High-level file format parsers
-6. **Language Layer** (`language`): VB6 types, colors, controls
-7. **Errors Layer** (`errors`): Comprehensive error types
+3. **Parsers Layer** (`parsers`): CST construction from tokens
+4. **Files Layer** (`files`): High-level file format parsers
+5. **Language Layer** (`language`): VB6 types, colors, controls
+6. **Errors Layer** (`errors`): Comprehensive error types
 
 ## Source Code Organization
 
@@ -102,33 +101,6 @@ src/
 ├── lexer/                       # Lexer Layer - Tokenization
 │   ├── mod.rs                   # tokenize() function, keyword lookup
 │   └── token_stream.rs          # TokenStream implementation
-│
-├── syntax/                      # Syntax Layer - VB6 Language constructs
-│   ├── library/                 # VB6 built-in library unit tests and documentation
-│   │   ├── functions/           # 160+ VB6 functions (14 categories)
-│   │   │   ├── array/           # Array, Filter, Join, Split, etc.
-│   │   │   ├── conversion/      # CBool, CInt, CLng, Str, Val, etc.
-│   │   │   ├── datetime/        # Date, Now, Time, Year, Month, etc.
-│   │   │   ├── file_system/     # Dir, EOF, FileLen, LOF, etc.
-│   │   │   ├── financial/       # FV, IPmt, IRR, NPV, PV, Rate, etc.
-│   │   │   ├── interaction/     # MsgBox, InputBox, Shell, etc.
-│   │   │   ├── math/            # Abs, Cos, Sin, Tan, Log, Sqr, etc.
-│   │   │   ├── miscellaneous/   # Environ, RGB, QBColor, etc.
-│   │   │   ├── string/          # Left, Right, Mid, Len, Trim, etc.
-│   │   │   └── ...
-│   │   └── statements/          # VB6 statement unit tests and documentation (7 categories)
-│   │       ├── file_operations/ # Open, Close, Get, Put, etc.
-│   │       ├── filesystem/      # FileCopy, Kill, MkDir, RmDir, etc.
-│   │       ├── runtime_control/ # DoEvents, Stop, End, etc.
-│   │       ├── runtime_state/   # Date, Time assignment, etc.
-│   │       ├── string_manipulation/ # Mid statement, etc.
-│   │       ├── system_interaction/  # Beep, etc.
-│   │       └── ...
-│   ├── statements/              # Statement parsing logic
-│   │   ├── control_flow/        # If, Select Case, For, While parsers
-│   │   ├── declarations/        # Dim, ReDim, Const, Enum parsers
-│   │   └── objects/             # Set, With, RaiseEvent parsers
-│   └── expressions/             # Expression parsing utilities
 │
 ├── parsers/                     # Parsers Layer - CST construction
 │   ├── cst/                     # Concrete Syntax Tree implementation
@@ -316,21 +288,9 @@ let source = SourceFile::from_string("test.bas", "Dim x As Integer");
 
 ### VB6 Library Functions
 
-VB6Parse includes full definitions for 160+ VB6 library functions organized into 14 categories:
+VB6 library functions are defined in the `vb6runtime` crate. VB6Parse provides parsing and CST infrastructure for code that calls library functions.
 
-```rust
-// Access function metadata
-use vb6parse::syntax::library::functions::string::left;
-use vb6parse::syntax::library::functions::math::sin;
-use vb6parse::syntax::library::functions::conversion::cint;
-
-// Each module includes:
-// - Full VB6 documentation
-// - Function signatures
-// - Parameter descriptions
-// - Usage examples
-// - Related functions
-```
+For full library function documentation and definitions, see the [vb6runtime docs](https://scriptandcompile.github.io/vb6/vb6runtime/library/).
 
 **Categories:**
 - Array manipulation (Array, Filter, Join, Split, UBound, LBound)
@@ -344,8 +304,6 @@ use vb6parse::syntax::library::functions::conversion::cint;
 - Math (Abs, Atn, Cos, Exp, Log, Rnd, Sgn, Sin, Sqr, Tan)
 - String (Left, Right, Mid, Len, InStr, Replace, Trim, UCase, LCase)
 - And more...
-
-**See also:** [src/syntax/library/functions/](src/syntax/library/functions/)
 
 ### Form Resources (FRX Files)
 
@@ -418,7 +376,7 @@ cargo insta accept
 
 **See also:**
 - [tests/](../../test-data/) - Test files
-- [tests/snapshots/](tests/snapshots/) - Snapshot files
+- [snapshots/](snapshots/) - Snapshot files
 - [📊 View Test Coverage Report](https://scriptandcompile.github.io/vb6/vb6parse/coverage.html)
 
 ## Benchmarking
@@ -506,7 +464,7 @@ git clone https://github.com/scriptandcompile/vb6
 git submodule update --init --recursive
 
 # Move to vb6project
-cd projects/vb6parse
+cd vb6/projects/vb6parse
 
 # Run tests
 cargo test
@@ -530,12 +488,6 @@ cargo fmt
 5. **Documentation:** Include doc tests for public APIs
 
 ### Adding New Features
-
-**VB6 Library Functions:**
-- Add to appropriate category in `src/syntax/library/functions/`
-- Include full VB6 documentation
-- Add comprehensive tests
-- Update category mod.rs
 
 **Control Types:**
 - Add to `src/language/controls/`
