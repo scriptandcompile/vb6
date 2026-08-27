@@ -8,6 +8,7 @@ A complete, high-performance parser library for Visual Basic 6 code and project 
 
 **[Project Documentation & Resources](https://scriptandcompile.github.io/vb6/vb6parse/)**  
 **[Interactive Playground](https://scriptandcompile.github.io/vb6/vb6parse/playground.html)**  
+**[VB6 Library Reference](https://scriptandcompile.github.io/vb6/vb6runtime/library/)**  
 **[Code Coverage Report](https://scriptandcompile.github.io/vb6/vb6parse/coverage.html)**  
 **[Performance Benchmarks](https://scriptandcompile.github.io/vb6/vb6parse/benchmarks.html)**
 
@@ -19,6 +20,7 @@ VB6Parse is designed as a foundational library for tools that analyze, convert, 
 - Fast, efficient parsing with minimal allocations
 - Full support for VB6 project files, modules, classes, forms, and resources
 - Concrete Syntax Tree (CST) with complete source fidelity
+- 160+ built-in VB6 library functions and 42 statements
 - Comprehensive error handling with detailed failure information
 - Zero-copy tokenization and streaming parsing
 
@@ -35,7 +37,7 @@ vb6parse = "1.0.1"
 
 ### Quick Links
 
-- **[Parse a VB6 Module](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#hello-world)** - First example: parse a simple VB6 module
+- **[Parse a VB6 Module](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#hello-world)** - Parse a simple VB6 module
 - **[Parse VB6 Projects](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#project-parsing)** - Work with .vbp project files
 - **[Handle Parse Errors](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#error-handling)** - Graceful error handling
 - **[Tokenize VB6 Code](https://scriptandcompile.github.io/vb6/vb6parse/getting-started.html#tokenization)** - Lower-level tokenization
@@ -82,11 +84,10 @@ Bytes/String/File → SourceFile → SourceStream → TokenStream → CST → Ob
 
 1. **I/O Layer** (`io`): Character decoding and stream access
 2. **Lexer Layer** (`lexer`): Tokenization with keyword lookup
-3. **Syntax Layer** (`syntax`): VB6 language constructs and parsing rules
-4. **Parsers Layer** (`parsers`): CST construction from tokens
-5. **Files Layer** (`files`): High-level file format parsers
-6. **Language Layer** (`language`): VB6 types, colors, controls
-7. **Errors Layer** (`errors`): Comprehensive error types
+3. **Parsers Layer** (`parsers`): CST construction from tokens
+4. **Files Layer** (`files`): High-level file format parsers
+5. **Language Layer** (`language`): VB6 types, colors, controls
+6. **Errors Layer** (`errors`): Comprehensive error types
 
 ## Source Code Organization
 
@@ -100,13 +101,6 @@ src/
 ├── lexer/                       # Lexer Layer - Tokenization
 │   ├── mod.rs                   # tokenize() function, keyword lookup
 │   └── token_stream.rs          # TokenStream implementation
-│
-├── syntax/                      # Syntax Layer - VB6 Language constructs
-│   ├── statements/              # Statement parsing logic
-│   │   ├── control_flow/        # If, Select Case, For, While parsers
-│   │   ├── declarations/        # Dim, ReDim, Const, Enum parsers
-│   │   └── objects/             # Set, With, RaiseEvent parsers
-│   └── expressions/             # Expression parsing utilities
 │
 ├── parsers/                     # Parsers Layer - CST construction
 │   ├── cst/                     # Concrete Syntax Tree implementation
@@ -292,6 +286,25 @@ let source = SourceFile::from_string("test.bas", "Dim x As Integer");
 - [src/io/decode.rs](src/io/decode.rs) - Decoding implementation
 - [examples/parse_class.rs](examples/parse_class.rs) - Byte-level parsing
 
+### VB6 Library Functions
+
+VB6 library functions are defined in the `vb6runtime` crate. VB6Parse provides parsing and CST infrastructure for code that calls library functions.
+
+For full library function documentation and definitions, see the [vb6runtime docs](https://scriptandcompile.github.io/vb6/vb6runtime/library/).
+
+**Categories:**
+- Array manipulation (Array, Filter, Join, Split, UBound, LBound)
+- Conversion (CBool, CDate, CInt, CLng, CStr, Val, Str)
+- Date/Time (Date, Time, Now, Year, Month, Day, Hour, DateAdd, DateDiff)
+- File System (Dir, EOF, FileLen, FreeFile, LOF, Seek)
+- Financial (FV, IPmt, IRR, NPV, PV, Rate)
+- Formatting (Format, FormatCurrency, FormatDateTime, FormatNumber, FormatPercent)
+- Interaction (MsgBox, InputBox, Shell, CreateObject, GetObject)
+- Inspection (IsArray, IsDate, IsEmpty, IsNull, IsNumeric, TypeName, VarType)
+- Math (Abs, Atn, Cos, Exp, Log, Rnd, Sgn, Sin, Sqr, Tan)
+- String (Left, Right, Mid, Len, InStr, Replace, Trim, UCase, LCase)
+- And more...
+
 ### Form Resources (FRX Files)
 
 Form resource files contain binary data for controls (images, icons, property blobs):
@@ -363,7 +376,7 @@ cargo insta accept
 
 **See also:**
 - [tests/](../../test-data/) - Test files
-- [tests/snapshots/](tests/snapshots/) - Snapshot files
+- [snapshots/](snapshots/) - Snapshot files
 - [📊 View Test Coverage Report](https://scriptandcompile.github.io/vb6/vb6parse/coverage.html)
 
 ## Benchmarking
@@ -432,7 +445,7 @@ Coverage reports are saved to:
 - **LCOV files:** `lcov.info` (when using `--lcov` flag)
 
 **Current Coverage:**
-- **Library tests:** 5,467 unit tests
+- **Library tests:** 5,467 tests covering VB6 library functions
 - **Integration tests:** 31 tests with real-world VB6 projects
 - **Documentation tests:** 83 tests ensuring examples work
 - **Coverage focus:** Parsers, tokenization, error handling, and file format support
@@ -451,7 +464,7 @@ git clone https://github.com/scriptandcompile/vb6
 git submodule update --init --recursive
 
 # Move to vb6project
-cd projects/vb6parse
+cd vb6/projects/vb6parse
 
 # Run tests
 cargo test

@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project (tries!) to adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - Unreleased
+
+### Added
+- `ExpressionClause` and `KeywordClause` variants to `SyntaxKind` for named and keyword expression parsing
+- `PropString` type for null-propagating values in built-in functions
+
+### Changed
+- **Massive: Removed flat expression handling** — All statement parsers in vb6parse now use full expression trees instead of flat token consumption. This affects every statement parser in the codebase.
+- **Massive: Converted all VB6 built-in functions to `typed_builtin!` system** — All built-in functions (math, conversions, datetime, type checking, logic, arrays, financial, environment, graphics, resources, interaction, objects, file items, strconv) migrated from the old flat-expression-based system to the new typed builtin system with proper parameter mapping.
+- Moved test snapshots into functional categories (`file_operations`, `declarations`, `control_flow`, `objects`, `string_manipulation`, `runtime_state`) to match the structure used in vb6semantic and vb6interpret.
+- Reorganized syntax module: `syntax/expressions/mod.rs` -> `parsers/cst/expressions.rs`
+- Added `warn(missing_docs)` across the entire workspace
+
+### Fixed
+- WASM build compatibility with the new error handling system
+
+### Removed
+- `eval_flat_operand`, `eval_simple_operand`, and `eval_flat_token` — no longer needed with full expression tree support
+- `parse_named_clause` and `parse_simple_builtin_statement` — superseded by expression tree parsing
+- Graft experiment
+
 ## [1.2.2]
 -- Surprised! It turns out that we also had the same ErrorRecovery issue around the top-level TYpe declarations.
 
@@ -254,7 +275,9 @@ nested subs/functions so it should have failed out.
 - Criterion benchmarking support
 - Comprehensive error types for different VB6 file types
 
-[Unreleased]: https://github.com/scriptandcompile/vb6parse/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/scriptandcompile/vb6parse/compare/v1.2.3...HEAD
+[1.2.3]: https://github.com/scriptandcompile/vb6parse/releases/tag/v1.2.3
+[1.2.2]: https://github.com/scriptandcompile/vb6parse/releases/tag/v1.2.2
 [1.0.0]: https://github.com/scriptandcompile/vb6parse/releases/tag/v1.0.0
 [0.5.1]: https://github.com/scriptandcompile/vb6parse/releases/tag/v0.5.1
 [0.5.0]: https://github.com/scriptandcompile/vb6parse/releases/tag/v0.5.0
