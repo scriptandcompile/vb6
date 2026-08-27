@@ -95,3 +95,6 @@ mod error;
 
 #[path = "statements/runtime_state/randomize.rs"]
 mod randomize;
+
+#[path = "statements/runtime_state/time.rs"]
+mod time;
