@@ -28,7 +28,7 @@ VB6 runtime library providing value system, type conversions, and standard libra
               └──────────────┘
 ```
 
-**Note**: `vb6core` contains the IR and compilation infrastructure, while `vb6runtime` contains the runtime execution infrastructure.
+**Note**: `vb6core` contains the foundational VB6 type definitions (`VBType`, `VBError`), while `vb6runtime` provides the execution infrastructure on top of them.
 
 ## Core Components
 
@@ -37,9 +37,10 @@ VB6 runtime library providing value system, type conversions, and standard libra
 Runtime representation of all VB6 values:
 
 ```rust
-pub enum Value {
+pub enum VBVariant {
     Empty,
     Null,
+    Nothing,
     Byte(u8),
     Integer(i16),
     Long(i32),
@@ -49,17 +50,15 @@ pub enum Value {
     Date(f64),          // OLE Date
     String(String),
     Boolean(bool),      // True = -1, False = 0
-    Variant(Box<Value>),
-    Object(ObjectRef),
-    Array(Array),
-    UserDefined(HashMap<String, Value>),
-    Error(i32),
+    Object(Box<dyn VBObject>),
+    Array(ArrayValue),
+    Error(VBError),
 }
 ```
 
 ### 2. Shared Type System
 
-The runtime crate uses the shared type model from `vb6core` instead of maintaining a second copy of the VB6 type definitions. Runtime code consumes `VBType`, `TypeInfo`, `ArrayBound`, `VBError`, and `VBResult` from `vb6core`, while `vb6runtime` adds the dynamic value layer (`Value`, `ArrayValue`, and conversion behavior):
+The runtime crate uses the shared type model from `vb6core` instead of maintaining a second copy of the VB6 type definitions. Runtime code consumes `VBType`, `TypeInfo`, `ArrayBound`, `VBError`, and `VBResult` from `vb6core`, while `vb6runtime` adds the dynamic value layer (`VBVariant`, `ArrayValue`, and conversion behavior):
 
 ```rust
 use vb6core::error::{VBError, VBResult};
@@ -98,116 +97,24 @@ pub struct CallFrame {
 }
 ```
 
-This model keeps `Value` focused on data representation while letting the runtime distinguish:
+This model keeps `VBVariant` focused on data representation while letting the runtime distinguish:
 
 - omitted optional arguments
 - `ByRef` versus `ByVal` semantics
 - variable-length argument lists for `ParamArray`
 - VB6-specific cases such as `Empty`, `Null`, and `Missing`
 
-In practice, a call flow should evaluate each argument expression into a `Value`, wrap it in `RuntimeArgument`, bind it to the formal parameter list, and then dispatch to the appropriate procedure implementation.
+In practice, a call flow evaluates each argument expression into a `VBVariant`, wraps it in a call context, binds it to the formal parameter list, and then dispatches to the appropriate procedure implementation.
 
 ### 5. Standard Library
 
-Full implementations of VB6 built-in functions:
+Full implementations of VB6 built-in functions are in `vb6runtime::library::`.
 
-#### String Functions
-- `Left$`, `Right$`, `Mid$` - String extraction
-- `Len`, `InStr`, `Replace` - String operations
-- `Trim`, `LTrim`, `RTrim` - Whitespace handling
-- `UCase`, `LCase` - Case conversion
-- `String$`, `Space$` - String generation
+See [vb6runtime library docs](https://scriptandcompile.github.io/vb6/vb6runtime/library/) for the complete function reference.
 
-#### Math Functions
-- `Abs`, `Sgn` - Basic math
-- `Sin`, `Cos`, `Tan`, `Atn` - Trigonometry
-- `Log`, `Exp` - Logarithms
-- `Sqr` - Square root
-- `Rnd`, `Randomize` - Random numbers
-- `Int`, `Fix`, `Round` - Rounding
+### 6. Runtime State
 
-#### Conversion Functions
-- `CInt`, `CLng`, `CDbl`, `CSng` - Numeric conversions
-- `CStr`, `CBool`, `CDate` - Type conversions
-- `Val`, `Str$` - String/number conversion
-- `Hex$`, `Oct$` - Base conversions
-- `Asc`, `Chr$`, `AscW`, `ChrW$` - Character codes
-
-#### Date/Time Functions
-- `Now`, `Date`, `Time` - Current date/time
-- `Year`, `Month`, `Day`, `Hour`, `Minute`, `Second` - Date parts
-- `DateAdd`, `DateDiff` - Date arithmetic
-- `DateSerial`, `TimeSerial` - Date construction
-- `DateValue`, `TimeValue` - Date parsing
-
-#### Array Functions
-- `LBound`, `UBound` - Array bounds
-- `Array` - Create array from values
-- `Join`, `Split` - Array/string conversion
-- `Filter` - Array filtering
-
-#### Format Functions
-- `Format$` - General formatting
-- `FormatNumber`, `FormatCurrency` - Numeric formatting
-- `FormatPercent`, `FormatDateTime` - Specialized formatting
-
-#### File I/O Functions
-- `Dir`, `EOF`, `LOF` - File properties
-- `FileLen`, `FileDateTime` - File information
-- `FreeFile` - Get free file handle
-- `Input$`, `Line Input` - File reading
-- `Open`, `Close`, `Reset` - File operations
-- `Get`, `Put` - Binary I/O
-- `Print #`, `Write #` - Text output
-
-#### Interaction Functions
-- `MsgBox` - Message boxes
-- `InputBox` - Input dialogs
-- `Shell` - Execute programs
-- `Environ` - Environment variables
-- `Command$` - Command line arguments
-
-### 5. Runtime Context
-
-Execution state management:
-
-```rust
-pub struct RuntimeContext {
-    /// Global variables
-    pub globals: HashMap<String, Value>,
-    
-    /// Call stack
-    pub call_stack: Vec<StackFrame>,
-    
-    /// File handles
-    pub file_handles: HashMap<i32, FileHandle>,
-    
-    /// Error state (On Error Resume Next/GoTo)
-    pub error_state: Option<RuntimeError>,
-    
-    /// Random number generator state
-    pub rng: RandomState,
-}
-```
-
-### 6. Error Handling
-
-VB6-compatible error system:
-
-```rust
-pub enum ErrorMode {
-    Propagate,          // Default: propagate to caller
-    ResumeNext,         // On Error Resume Next
-    GoTo(String),       // On Error GoTo label
-}
-
-pub struct RuntimeError {
-    pub number: i32,
-    pub description: String,
-    pub source: String,
-    pub line: usize,
-}
-```
+Process-global state (environment snapshot, RNG seed, settings store) lives in `vb6runtime::state::`.
 
 ## Features
 
@@ -234,41 +141,38 @@ pub struct RuntimeError {
 ### Creating Values
 
 ```rust
-use vb6runtime::value::Value;
+use vb6runtime::VBVariant;
 
-let num = Value::Integer(42);
-let text = Value::String("Hello".to_string());
-let var = Value::Variant(Box::new(Value::Long(100)));
+let num = VBVariant::from_integer(42);
+let text = VBVariant::from_string("Hello");
 ```
 
 ### Type Conversion
 
-```rust
-use vb6runtime::conversion::convert;
-
-let value = Value::String("42".to_string());
-let number = convert(&value, &VBType::Integer)?;  // Value::Integer(42)
-```
-
-### Calling Built-in Functions
+VB6 runtime provides `TryFrom<&VBVariant>` implementations on typed wrappers for VB6-exact conversion:
 
 ```rust
-use vb6runtime::stdlib;
+use vb6runtime::VBVariant;
 
-let result = stdlib::string::left("Hello World", 5)?;  // "Hello"
-let length = stdlib::string::len("Test")?;              // 4
-let now = stdlib::datetime::now()?;                     // Current date/time
+let value = VBVariant::from_string("42");
+let long_val: vb6runtime::VBLong = value.try_into().unwrap();
+assert_eq!(long_val.as_i32(), 42);
 ```
 
-### Runtime Context
+### Library Functions
+
+VB6 library functions are in `vb6runtime::library::`:
 
 ```rust
-use vb6runtime::runtime::RuntimeContext;
+use vb6runtime::library::string;
 
-let mut ctx = RuntimeContext::new();
-ctx.set_global("MyVar", Value::Integer(10));
-let value = ctx.get_global("MyVar")?;
+let result = string::left("Hello World", 5);  // "Hello"
 ```
+
+## Known Limitations
+
+- FRX resource file handling is limited: binary blobs are loaded but not all are mapped to control properties.
+- The runtime does not yet support VB6 class modules or COM object integration.
 
 ## Dependencies
 
@@ -293,9 +197,11 @@ cargo bench -p vb6runtime
 
 ## Status
 
-🚧 **In Design Phase** - Core architecture defined, implementation pending
+✅ **Active Development** — Core value system, type conversions, and 50+ library functions are implemented. See [DESIGN.md](docs/DESIGN.md) for detailed design documentation.
 
-See [DESIGN.md](docs/DESIGN.md) for detailed design documentation.
+## See Also
+
+- [Parameter Classification](docs/parameter-classification.md) — How library function parameters are classified for conversion
 
 ## License
 
