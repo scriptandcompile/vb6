@@ -6,6 +6,8 @@ A modular tool for converting VB6 projects to modern languages and frameworks.
 
 `vb6convert` provides a flexible framework for converting Visual Basic 6 projects into modern programming languages and frameworks such as Rust, JavaScript/TypeScript, Tauri, and more. It leverages the [vb6parse](../vb6parse) library for parsing VB6 code and provides a trait-based architecture for implementing conversion backends.
 
+**Note:** Several key modules are currently stubs. `cargo build --release` may not produce a fully working binary.
+
 ## Features
 
 - **Multiple Target Languages**: Convert to Rust, JavaScript, TypeScript, Dart, and more
@@ -88,6 +90,8 @@ vb6convert validate original.vbp converted/ --harness rust
 
 ## Configuration
 
+**Note:** The `conversion.toml` configuration described below is not yet wired to the actual code.
+
 You can provide additional configuration via a TOML file:
 
 ```toml
@@ -165,9 +169,6 @@ See [TESTING.md](docs/TESTING.md) for comprehensive testing documentation.
 - [Architecture](docs/ARCHITECTURE.md) - System architecture and design
 - [Implementation Guide](docs/IMPLEMENTATION_GUIDE.md) - How to add new converters
 - [Testing](docs/TESTING.md) - Testing framework and strategy
-- [Rust Target](docs/targets/rust.md) - Rust conversion backend
-- [JavaScript Target](docs/targets/javascript.md) - JavaScript/TypeScript conversion
-- [Tauri Target](docs/targets/tauri.md) - Tauri application generation
 
 ## Examples
 
@@ -198,21 +199,6 @@ export function add(x, y) {
 ```
 
 ## Roadmap
-
-- [x] Core framework and traits
-- [x] Project analysis
-- [ ] Rust converter implementation
-- [ ] JavaScript converter implementation
-- [ ] TypeScript converter implementation
-- [ ] Tauri converter implementation
-- [ ] Form layout conversion
-- [ ] Control mapping
-- [ ] Database access layer
-- [ ] Test harness implementation
-- [ ] Svelte/React/Vue converters
-- [ ] Flutter/Dart converters
-- [ ] IDE integration
-- [ ] GUI tool for conversion
 
 ## Contributing
 
