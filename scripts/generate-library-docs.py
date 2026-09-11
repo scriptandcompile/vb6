@@ -530,7 +530,7 @@ def generate_library_index(functions: List[Category], statements: List[Category]
         content,
         breadcrumbs,
         output_dir / "index.html",
-        base_path="../"
+        base_path="../../"
     )
 
 
@@ -579,7 +579,7 @@ def generate_category_index(category: Category, item_type: str, output_dir: Path
         content,
         breadcrumbs,
         output_dir / "index.html",
-        base_path="../../../"
+        base_path="../../"
     )
 
 
@@ -614,7 +614,7 @@ def generate_item_page(item: LibraryItem, category: Category, output_dir: Path) 
         content,
         breadcrumbs,
         output_dir / item.html_filename,
-        base_path="../../../"
+        base_path="../../"
     )
 
 
@@ -669,14 +669,14 @@ def main():
     parser.add_argument(
         "--src",
         type=Path,
-        default=Path("src/library"),
-        help="Path to library source directory (default: src/library)"
+        default=Path("projects/vb6runtime/src/library"),
+        help="Path to library source directory (default: projects/vb6runtime/src/library)"
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("docs/library"),
-        help="Output directory for generated HTML (default: docs/library)"
+        default=Path("docs/vb6runtime/library"),
+        help="Output directory for generated HTML (default: docs/vb6runtime/library)"
     )
     parser.add_argument(
         "--clean",

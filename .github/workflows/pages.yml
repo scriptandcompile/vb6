@@ -5,10 +5,6 @@ on:
     branches:
       - master
       - main
-    paths:
-      - 'docs/**'
-      - '.github/workflows/pages.yml'
-      - 'README.md'
   workflow_dispatch:
 
 permissions:
@@ -33,6 +29,17 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        run: pip install markdown
+
+      - name: Generate library documentation
+        run: python3 scripts/generate-library-docs.py --clean
 
       - name: Upload docs artifact
         uses: actions/upload-pages-artifact@v3
