@@ -23,11 +23,11 @@ anyhow.workspace = true
 clap.workspace = true
 
 # For code generation
-heck.workspace = true  # Case conversions
-indoc.workspace = true  # Indented string literals
+#heck.workspace = true  # Case conversions
+#indoc.workspace = true  # Indented string literals
 
 # For formatting generated code
-rustfmt-wrapper.workspace = true
+#rustfmt-wrapper.workspace = true
 
 # Optional LLVM backend
 inkwell = { workspace = true, optional = true }
@@ -43,3 +43,6 @@ rust-backend = []
 llvm-backend = ["inkwell", "vb6core/llvm"]
 javascript-backend = []
 all-backends = ["rust-backend", "llvm-backend", "javascript-backend"]
+
+[lints]
+workspace = true
