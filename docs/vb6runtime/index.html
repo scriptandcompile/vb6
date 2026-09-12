@@ -6,9 +6,9 @@
     <meta name="description" content="VB6Runtime - A Rust implementation of the Visual Basic 6.0 runtime library">
     <meta name="keywords" content="vb6, runtime, visual basic 6, rust, legacy code, vb6 functions">
     <title>VB6Runtime - Visual Basic 6 Runtime Library in Rust</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="assets/js/theme-switcher.js"></script>
+    <script src="../../assets/js/theme-switcher.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
@@ -35,9 +35,11 @@
     </header>
 
     <nav>
-        <div class="container">
+        <div class="container nav-inner">
             <a href="#overview">Overview</a>
             <a href="#features">Features</a>
+            <a href="#architecture">Architecture</a>
+            <a href="getting-started.html">Getting Started</a>
             <a href="library/index.html">Library Reference</a>
             <a href="documentation.html">Documentation</a>
             <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">GitHub</a>
@@ -47,7 +49,7 @@
         </div>
     </nav>
 
-    <main class="container">
+    <main class="container page-body">
         <section id="overview">
             <h2>Overview</h2>
             <p>
@@ -88,82 +90,89 @@
             </div>
         </section>
 
-        <section id="function-categories">
-            <h2>Function Categories</h2>
+        <section id="architecture">
+            <h2>Architecture</h2>
             <p>
-                VB6Runtime implements functions across 14 categories that mirror the VB6 built-in library organization.
+                VB6Runtime is organized into four architectural layers: a dynamic value system, process-global
+                state management with pluggable backends, a library of standard function implementations, and
+                a boundary module for typed argument conversion. It serves as a shared dependency of
+                vb6interpret and vb6compile.
             </p>
-            <div class="feature-grid">
-                <a href="library/functions/arrays/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Arrays</h3>
-                    <p>Array manipulation functions</p>
-                    <small>6 functions</small>
-                </a>
-                <a href="library/functions/conversion/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Conversion</h3>
-                    <p>Type conversion functions</p>
-                    <small>6 functions</small>
-                </a>
-                <a href="library/functions/datetime/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Datetime</h3>
-                    <p>Date and time functions</p>
-                    <small>22 functions</small>
-                </a>
-                <a href="library/functions/environment/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Environment</h3>
-                    <p>Environment functions</p>
-                    <small>10 functions</small>
-                </a>
-                <a href="library/functions/file/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>File</h3>
-                    <p>File I/O functions</p>
-                    <small>32 functions</small>
-                </a>
-                <a href="library/functions/financial/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Financial</h3>
-                    <p>Financial calculations</p>
-                    <small>13 functions</small>
-                </a>
-                <a href="library/functions/graphics/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Graphics</h3>
-                    <p>Graphics functions</p>
-                    <small>6 functions</small>
-                </a>
-                <a href="library/functions/interaction/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Interaction</h3>
-                    <p>User interaction functions</p>
-                    <small>10 functions</small>
-                </a>
-                <a href="library/functions/logic/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Logic</h3>
-                    <p>Logical functions</p>
-                    <small>3 functions</small>
-                </a>
-                <a href="library/functions/math/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Math</h3>
-                    <p>Mathematical functions</p>
-                    <small>15 functions</small>
-                </a>
-                <a href="library/functions/objects/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Objects</h3>
-                    <p>Object manipulation functions</p>
-                    <small>6 functions</small>
-                </a>
-                <a href="library/functions/resources/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Resources</h3>
-                    <p>Resource management functions</p>
-                    <small>4 functions</small>
-                </a>
-                <a href="library/functions/string/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>String</h3>
-                    <p>String manipulation functions</p>
-                    <small>53 functions</small>
-                </a>
-                <a href="library/functions/type_checking/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h3>Type Checking</h3>
-                    <p>Type checking functions</p>
-                    <small>8 functions</small>
-                </a>
+            <div class="architecture-diagram">
+                <div class="pipeline-layer">
+                    <div class="layer-title">Library Layer</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">String (40+)</div>
+                        <div class="pipeline-box">File (33)</div>
+                        <div class="pipeline-box">Datetime (22)</div>
+                        <div class="pipeline-box">Financial (11)</div>
+                        <div class="pipeline-box">+8 More</div>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div class="pipeline-layer">
+                    <div class="layer-title">State Layer</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">Clock</div>
+                        <div class="pipeline-box">Environment</div>
+                        <div class="pipeline-box">Random</div>
+                        <div class="pipeline-box">Settings</div>
+                        <div class="pipeline-box">File I/O</div>
+                        <div class="pipeline-box">Interaction</div>
+                        <div class="pipeline-box">Resources</div>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div class="pipeline-layer">
+                    <div class="layer-title">Value System</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">VBVariant<br><small>(dynamic types)</small></div>
+                        <div class="pipeline-box">Typed Wrappers<br><small>(VBLong, VBString…)</small></div>
+                        <div class="pipeline-box">ArrayValue<br><small>(arbitrary bounds)</small></div>
+                        <div class="pipeline-box">Boundary<br><small>(arg conversion)</small></div>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div class="pipeline-layer">
+                    <div class="layer-title">Foundation (vb6core)</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">VBType<br><small>(static types)</small></div>
+                        <div class="pipeline-box">VBError<br><small>(Err.Raise, numbers)</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="architecture-details" style="margin-top: 2rem;">
+                <h3>Layer Details</h3>
+                <div class="layer-grid">
+                    <div class="layer-card">
+                        <h4>Library Layer</h4>
+                        <p><strong>Responsibility:</strong> 194 functions and 9 statements across 13 category modules.</p>
+                        <p><strong>Structure:</strong> Each function is a standalone module, re-exported through category <code>mod.rs</code>.</p>
+                        <p><strong>Examples:</strong> <code>library::string::len()</code>, <code>library::file::open()</code></p>
+                    </div>
+
+                    <div class="layer-card">
+                        <h4>State Layer</h4>
+                        <p><strong>Responsibility:</strong> Process-global mutable state, all using a pluggable backend pattern.</p>
+                        <p><strong>Backends:</strong> Native (OS), Memory (tests/WASM), Mock (clock), Playback (random), File/Registry (settings).</p>
+                        <p><strong>Examples:</strong> File I/O manages file numbers 1–511; Random supports classic VB6 LCG, modern Rust <code>rand</code>, and playback modes.</p>
+                    </div>
+
+                    <div class="layer-card">
+                        <h4>Value System</h4>
+                        <p><strong>Responsibility:</strong> Runtime value representation and typed argument conversion.</p>
+                        <p><strong>VBVariant:</strong> Dynamic enum covering all VB6 types (Empty, Null, Byte…Currency, String, Boolean, Date, Object, Array).</p>
+                        <p><strong>Boundary:</strong> <code>arg&lt;T&gt;()</code>, <code>opt_arg&lt;T&gt;()</code>, <code>Nullable&lt;T&gt;</code> for Null-propagating params.</p>
+                    </div>
+
+                    <div class="layer-card">
+                        <h4>Foundation</h4>
+                        <p><strong>Responsibility:</strong> Static type definitions and error types shared across the workspace.</p>
+                        <p><strong>Key Types:</strong> <code>VbType</code> (enum of all VB6 static types), <code>VBError</code> (full Err object with number, description, source, help context).</p>
+                        <p><strong>Consumed By:</strong> vb6interpret (execution), vb6compile (code generation).</p>
+                    </div>
+                </div>
             </div>
         </section>
 

@@ -6,9 +6,9 @@
     <meta name="description" content="VB6Interpret - Execute Visual Basic 6 code directly with REPL, script mode, and project mode">
     <meta name="keywords" content="vb6, interpreter, visual basic 6, repl, runtime, rust">
     <title>VB6Interpret - Visual Basic 6 Interpreter</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="assets/js/theme-switcher.js"></script>
+    <script src="../../assets/js/theme-switcher.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
@@ -36,14 +36,12 @@
     </header>
 
     <nav>
-        <div class="container">
+        <div class="container nav-inner">
             <a href="#overview">Overview</a>
             <a href="#features">Features</a>
             <a href="#architecture">Architecture</a>
+            <a href="getting-started.html">Getting Started</a>
             <a href="playground.html">Playground</a>
-            <a href="#quick-start">Quick Start</a>
-            <a href="#modes">Modes</a>
-            <a href="#limitations">Limitations</a>
             <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret" target="_blank" rel="noreferrer">GitHub</a>
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                 <span class="theme-icon">🌙</span>
@@ -51,7 +49,7 @@
         </div>
     </nav>
 
-    <main class="container">
+    <main class="container page-body">
         <section id="overview">
             <h2>Overview</h2>
             <p>
@@ -66,14 +64,6 @@
                 and <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6core" target="_blank" rel="noreferrer">vb6core</a>
                 to provide source execution with VB6-compatible semantics.
             </p>
-            <div class="tip-box">
-                <strong>💡 Best Fit:</strong> Use VB6Interpret when you want quick feedback on behavior,
-                explore legacy code interactively, or test runtime assumptions before conversion or compilation.
-            </div>
-            <div class="tip-box" style="margin-top: 1rem;">
-                <strong>🧪 Browser Playground:</strong> Try the module runner directly in your browser with the
-                <a href="playground.html">VB6Interpret Playground</a>.
-            </div>
         </section>
 
         <section id="features">
@@ -103,10 +93,6 @@
                     <h3>📊 Trace and Profile</h3>
                     <p>Inspect execution flow with trace output and profile options for performance analysis.</p>
                 </div>
-                <a href="playground.html" class="feature-card" style="text-decoration: none; color: inherit; display: block;">
-                    <h3>🧪 Browser Playground</h3>
-                    <p>Run a single VB6 module in the browser, inspect output, and share reproducible examples.</p>
-                </a>
             </div>
         </section>
 
@@ -168,78 +154,8 @@
             </div>
         </section>
 
-        <section id="quick-start">
-            <h2>Quick Start</h2>
-
-            <h3>Build</h3>
-            <pre data-lang="bash"><code class="language-bash">cargo build -p vb6interpret</code></pre>
-
-            <h3>Start REPL</h3>
-            <pre data-lang="bash"><code class="language-bash">cargo run -p vb6interpret</code></pre>
-
-            <h3>Run a script</h3>
-            <pre data-lang="bash"><code class="language-bash">cargo run -p vb6interpret -- run script.bas</code></pre>
-
-            <h3>Run a project</h3>
-            <pre data-lang="bash"><code class="language-bash">cargo run -p vb6interpret -- run MyProject.vbp</code></pre>
-
-            <h3>REPL sample</h3>
-            <pre data-lang="vb"><code class="language-vbnet">Dim x As Integer
-x = 42
-Print x
-Print Left$("Hello World", 5)</code></pre>
-        </section>
-
-        <section id="modes">
-            <h2>Execution Modes</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Mode</th>
-                        <th>Command</th>
-                        <th>Purpose</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>repl</code></td>
-                        <td><code>vb6interpret</code></td>
-                        <td>Interactive experimentation and quick checks</td>
-                    </tr>
-                    <tr>
-                        <td><code>run</code></td>
-                        <td><code>vb6interpret run target.bas</code></td>
-                        <td>Execute source files or projects normally</td>
-                    </tr>
-                    <tr>
-                        <td><code>debug</code></td>
-                        <td><code>vb6interpret debug target.vbp</code></td>
-                        <td>Step-through execution with inspection tools</td>
-                    </tr>
-                    <tr>
-                        <td><code>check</code></td>
-                        <td><code>vb6interpret check target.bas</code></td>
-                        <td>Validate syntax and analysis readiness without running</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <section id="limitations">
-            <h2>Current Limitations</h2>
-            <ul>
-                <li>Forms and controls execution is planned but not complete.</li>
-                <li>COM object support is not complete.</li>
-                <li>Behavioral parity for all VB6 edge cases is still in progress.</li>
-            </ul>
-            <div class="warning-box">
-                <strong>⚠️ Project status:</strong> VB6Interpret is under active development. Expect capability growth
-                and occasional behavior changes while runtime semantics are refined.
-            </div>
-        </section>
-
         <section id="community">
-            <h2>Contributing</h2>
+            <h2>Community & Contributing</h2>
             <p>
                 Contributions are welcome for execution correctness, debugger behavior, compatibility tests,
                 and integration with vb6runtime semantics.
