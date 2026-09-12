@@ -227,6 +227,16 @@ impl SourceFile {
     ///
     /// A good example of invalid characters would be any chinese characters, as they are not
     /// representable within the Windows-1252 encoding.
+    ///
+    /// # Round-trip
+    ///
+    /// The decoded content can be written back to disk using
+    /// [`encode_windows_1252`] — the encode/decode cycle is lossless for all
+    /// 256 byte values in the Windows-1252 range.
+    ///
+    /// # See Also
+    /// - [`encode_windows_1252`] — write decoded content back as Windows-1252
+    /// - [`decode`] — refuse invalid characters instead of replacing them
     pub fn decode_with_replacement(
         file_name: impl Into<String>,
         source_code: &[u8],
@@ -372,8 +382,9 @@ Currently, only latin-1 source code is supported."
 
 /// Encodes text back into the Windows-1252 bytes that VB6 expects on disk.
 ///
-/// This is the counterpart of [`SourceFile::decode`]: anything that reads a
-/// source file, changes it and writes it back needs it, or the file silently
+/// This is the counterpart of [`SourceFile::decode`] and
+/// [`SourceFile::decode_with_replacement`]: anything that reads a source
+/// file, changes it and writes it back needs it, or the file silently
 /// becomes UTF-8 and VB6 stops reading its accented characters correctly.
 ///
 /// Encoding is refused rather than made lossy. `encoding_rs` maps any
