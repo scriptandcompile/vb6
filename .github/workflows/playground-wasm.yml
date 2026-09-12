@@ -115,6 +115,25 @@ jobs:
             popd > /dev/null
           fi
 
+      - name: Upload WASM to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VB6PARSE_VERSION || 'v1.2.4' }}
+          files: |
+            docs/vb6parse/assets/wasm/vb6parse_bg.wasm
+            docs/vb6semantic/assets/wasm/vb6semantic_bg.wasm
+            docs/vb6interpret/assets/wasm/vb6interpret_bg.wasm
+          fail_on_unmatched_files: true
+          prerelease: true
+          body: |
+            Playground WASM binaries for vb6parse, vb6semantic, and vb6interpret.
+            
+            These files are served from GitHub Releases because GitHub Pages
+            does not support LFS (the WASM files are tracked via LFS in
+            the repository).
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install Git LFS
         run: git lfs install
 

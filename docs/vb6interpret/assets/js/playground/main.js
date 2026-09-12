@@ -3,6 +3,8 @@ import { getDefaultExample, getExample } from "./examples.js";
 import * as Editor from "./editor.js";
 import { createZip } from "./zip.js";
 
+const WASM_RELEASE_URL = "https://github.com/scriptandcompile/vb6/releases/download/v1.2.4/vb6interpret_bg.wasm";
+
 const state = {
     wasmReady: false,
     activeTab: "output",
@@ -187,9 +189,7 @@ async function initPlayground() {
 }
 
 function buildWasmUrl() {
-    const wasmUrl = new URL("../../wasm/vb6interpret_bg.wasm", import.meta.url);
-    wasmUrl.searchParams.set("t", String(Date.now()));
-    return wasmUrl.href;
+    return WASM_RELEASE_URL;
 }
 
 function bindEvents() {

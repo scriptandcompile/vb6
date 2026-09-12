@@ -7,22 +7,28 @@
 
 import init, { analyze_vb6_code, init_panic_hook } from "../../wasm/vb6semantic.js";
 
+const WASM_RELEASE_URL = 'https://github.com/scriptandcompile/vb6/releases/download/v1.2.4/vb6semantic_bg.wasm';
+
 let wasmInitialized = false;
 
 /**
- * Initialize the WASM module
- * This should be called on page load
- *
- * @returns {Promise<boolean>} True if initialization succeeded
+ * Initialize the WASM module by fetching from GitHub Release.
  */
 export async function initWasm() {
     try {
-        await init();
+        console.log('Fetching vb6semantic WASM from release...');
+        const response = await fetch(WASM_RELEASE_URL);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const wasmBuffer = await response.arrayBuffer();
+        await init(wasmBuffer);
         init_panic_hook();
         wasmInitialized = true;
+        console.log('✅ vb6semantic WASM initialized');
         return true;
     } catch (error) {
-        console.error('Failed to initialize WASM:', error);
+        console.error('Failed to initialize vb6semantic WASM:', error);
         return false;
     }
 }
