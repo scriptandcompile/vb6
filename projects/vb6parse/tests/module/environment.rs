@@ -662,6 +662,7 @@ fn environment_modtypeinfo_module_load() {
 }
 
 #[test]
+#[ignore = "snapshot is 627k lines, too large for GitHub"]
 fn environment_module10_module_load() {
     let module_bytes = include_bytes!("../../../../test-data/Environment/Module10.bas");
 
