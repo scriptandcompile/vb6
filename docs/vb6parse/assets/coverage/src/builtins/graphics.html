@@ -1,0 +1,49 @@
+<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'><meta charset='UTF-8'><link rel='stylesheet' type='text/css' href='../../../css/llvm-cov.css'><script src='../../control.js'></script><script>
+// Sync theme with main site and setup theme toggle
+(function() {
+    const THEME_KEY = 'vb6parse-theme';
+    function getSystemPreference() {
+        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+    function getTheme() {
+        return localStorage.getItem(THEME_KEY) || getSystemPreference();
+    }
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        const themeIcon = document.querySelector('.theme-icon');
+        if (themeIcon) {
+            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+    }
+    function toggleTheme() {
+        const currentTheme = getTheme();
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem(THEME_KEY, newTheme);
+        applyTheme(newTheme);
+    }
+    // Apply theme immediately
+    const theme = getTheme();
+    applyTheme(theme);
+    // Setup toggle button when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggle = document.querySelector('.theme-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', toggleTheme);
+        }
+    });
+})();
+</script></head><body><header>
+    <div class="container">
+        <h1>VB6Parse Coverage Report</h1>
+        <p class="tagline">Generated from llvm-cov</p>
+    </div>
+</header>
+<nav>
+    <div class="container">
+        <a href='../../../../coverage.html'>Coverage Report</a>
+        <a href='../../../../index.html'>Overview</a>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+            <span class="theme-icon">🌙</span>
+        </button>
+    </div>
+</nav><span class='control'><a href='javascript:next_line()'>next uncovered line (L)</a>, <a href='javascript:next_region()'>next uncovered region (R)</a>, <a href='javascript:next_branch()'>next uncovered branch (B)</a></span><div class='centered'><table><div class='source-name-title'><pre>/home/runner/work/vb6/vb6/projects/vb6interpret/src/builtins/graphics.rs</pre></div><tr><td><pre>Line</pre></td><td><pre>Count</pre></td><td><pre>Source</pre></td></tr><tr><td class='line-number'><a name='L1' href='#L1'><pre>1</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! VB6 graphics function registry.</pre></td></tr><tr><td class='line-number'><a name='L2' href='#L2'><pre>2</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//!</pre></td></tr><tr><td class='line-number'><a name='L3' href='#L3'><pre>3</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! One [`typed_builtin!`](crate::typed_builtin) entry per graphics function.</pre></td></tr><tr><td class='line-number'><a name='L4' href='#L4'><pre>4</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! `LoadPicture`&apos;s single argument is declared As String in VB6 with an</pre></td></tr><tr><td class='line-number'><a name='L5' href='#L5'><pre>5</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! omitted form meaning &quot;an empty picture&quot;, so it uses the `opt_string` kind</pre></td></tr><tr><td class='line-number'><a name='L6' href='#L6'><pre>6</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! (absent → `None`, present `Null` → 94 at the boundary).</pre></td></tr><tr><td class='line-number'><a name='L7' href='#L7'><pre>7</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//!</pre></td></tr><tr><td class='line-number'><a name='L8' href='#L8'><pre>8</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! Not registered here: `SavePicture` is a statement form executed directly</pre></td></tr><tr><td class='line-number'><a name='L9' href='#L9'><pre>9</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! by the interpreter, and `RGB`/`QBColor`/`Spc`/`Tab` have no registry</pre></td></tr><tr><td class='line-number'><a name='L10' href='#L10'><pre>10</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! entries yet (`RGB` keeps a genuinely-Variant parameter — its per-type</pre></td></tr><tr><td class='line-number'><a name='L11' href='#L11'><pre>11</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! error selection observes the raw variant).</pre></td></tr><tr><td class='line-number'><a name='L12' href='#L12'><pre>12</pre></a></td><td class='skipped-line'></td><td class='code'><pre></pre></td></tr><tr><td class='line-number'><a name='L13' href='#L13'><pre>13</pre></a></td><td class='skipped-line'></td><td class='code'><pre>use super::{Builtin, Registry};</pre></td></tr><tr><td class='line-number'><a name='L14' href='#L14'><pre>14</pre></a></td><td class='skipped-line'></td><td class='code'><pre>use crate::typed_builtin;</pre></td></tr><tr><td class='line-number'><a name='L15' href='#L15'><pre>15</pre></a></td><td class='skipped-line'></td><td class='code'><pre>use vb6runtime::library::graphics::loadpicture::loadpicture;</pre></td></tr><tr><td class='line-number'><a name='L16' href='#L16'><pre>16</pre></a></td><td class='skipped-line'></td><td class='code'><pre></pre></td></tr><tr><td class='line-number'><a name='L17' href='#L17'><pre>17</pre></a></td><td class='skipped-line'></td><td class='code'><pre>/// Register the graphics functions in `registry`.</pre></td></tr><tr><td class='line-number'><a name='L18' href='#L18'><pre>18</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>pub(super) fn register(registry: &amp;mut Registry) {</pre></td></tr><tr><td class='line-number'><a name='L19' href='#L19'><pre>19</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>    registry.insert(typed_builtin!(&quot;loadpicture&quot;, 0, 1, (filename: opt_string),</pre></td></tr><tr><td class='line-number'><a name='L20' href='#L20'><pre>20</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        loadpicture(filename.as_ref())));</pre></td></tr><tr><td class='line-number'><a name='L21' href='#L21'><pre>21</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>}</pre></td></tr></table></div></body></html>

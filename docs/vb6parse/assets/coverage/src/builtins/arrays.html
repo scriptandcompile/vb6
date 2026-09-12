@@ -1,0 +1,49 @@
+<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'><meta charset='UTF-8'><link rel='stylesheet' type='text/css' href='../../../css/llvm-cov.css'><script src='../../control.js'></script><script>
+// Sync theme with main site and setup theme toggle
+(function() {
+    const THEME_KEY = 'vb6parse-theme';
+    function getSystemPreference() {
+        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+    function getTheme() {
+        return localStorage.getItem(THEME_KEY) || getSystemPreference();
+    }
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        const themeIcon = document.querySelector('.theme-icon');
+        if (themeIcon) {
+            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+    }
+    function toggleTheme() {
+        const currentTheme = getTheme();
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem(THEME_KEY, newTheme);
+        applyTheme(newTheme);
+    }
+    // Apply theme immediately
+    const theme = getTheme();
+    applyTheme(theme);
+    // Setup toggle button when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggle = document.querySelector('.theme-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', toggleTheme);
+        }
+    });
+})();
+</script></head><body><header>
+    <div class="container">
+        <h1>VB6Parse Coverage Report</h1>
+        <p class="tagline">Generated from llvm-cov</p>
+    </div>
+</header>
+<nav>
+    <div class="container">
+        <a href='../../../../coverage.html'>Coverage Report</a>
+        <a href='../../../../index.html'>Overview</a>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+            <span class="theme-icon">🌙</span>
+        </button>
+    </div>
+</nav><span class='control'><a href='javascript:next_line()'>next uncovered line (L)</a>, <a href='javascript:next_region()'>next uncovered region (R)</a>, <a href='javascript:next_branch()'>next uncovered branch (B)</a></span><div class='centered'><table><div class='source-name-title'><pre>/home/runner/work/vb6/vb6/projects/vb6interpret/src/builtins/arrays.rs</pre></div><tr><td><pre>Line</pre></td><td><pre>Count</pre></td><td><pre>Source</pre></td></tr><tr><td class='line-number'><a name='L1' href='#L1'><pre>1</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! VB6 array function registry.</pre></td></tr><tr><td class='line-number'><a name='L2' href='#L2'><pre>2</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//!</pre></td></tr><tr><td class='line-number'><a name='L3' href='#L3'><pre>3</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! One [`typed_builtin!`](crate::typed_builtin) entry per array function.</pre></td></tr><tr><td class='line-number'><a name='L4' href='#L4'><pre>4</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! `sourcearray` parameters stay Variant kinds because they are structural</pre></td></tr><tr><td class='line-number'><a name='L5' href='#L5'><pre>5</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! (the runtime must observe Array-ness); scalar options use typed `opt_*`</pre></td></tr><tr><td class='line-number'><a name='L6' href='#L6'><pre>6</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! kinds. `Array()` binds its element list as a raw rest slice — elements</pre></td></tr><tr><td class='line-number'><a name='L7' href='#L7'><pre>7</pre></a></td><td class='skipped-line'></td><td class='code'><pre>//! are stored unconverted.</pre></td></tr><tr><td class='line-number'><a name='L8' href='#L8'><pre>8</pre></a></td><td class='skipped-line'></td><td class='code'><pre></pre></td></tr><tr><td class='line-number'><a name='L9' href='#L9'><pre>9</pre></a></td><td class='skipped-line'></td><td class='code'><pre>use super::{Builtin, Registry};</pre></td></tr><tr><td class='line-number'><a name='L10' href='#L10'><pre>10</pre></a></td><td class='skipped-line'></td><td class='code'><pre>use crate::typed_builtin;</pre></td></tr><tr><td class='line-number'><a name='L11' href='#L11'><pre>11</pre></a></td><td class='skipped-line'></td><td class='code'><pre>use vb6runtime::library::arrays as arrayfn;</pre></td></tr><tr><td class='line-number'><a name='L12' href='#L12'><pre>12</pre></a></td><td class='skipped-line'></td><td class='code'><pre></pre></td></tr><tr><td class='line-number'><a name='L13' href='#L13'><pre>13</pre></a></td><td class='skipped-line'></td><td class='code'><pre>/// Register the array functions in `registry`.</pre></td></tr><tr><td class='line-number'><a name='L14' href='#L14'><pre>14</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>pub(super) fn register(registry: &amp;mut Registry) {</pre></td></tr><tr><td class='line-number'><a name='L15' href='#L15'><pre>15</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>    registry.insert(typed_builtin!(&quot;array&quot;, 0, usize::MAX, (),</pre></td></tr><tr><td class='line-number'><a name='L16' href='#L16'><pre>16</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        rest elements: variants,</pre></td></tr><tr><td class='line-number'><a name='L17' href='#L17'><pre>17</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        Ok(arrayfn::array::array(elements))));</pre></td></tr><tr><td class='line-number'><a name='L18' href='#L18'><pre>18</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>    registry.insert(typed_builtin!(&quot;filter&quot;, 2, 4,</pre></td></tr><tr><td class='line-number'><a name='L19' href='#L19'><pre>19</pre></a></td><td class='skipped-line'></td><td class='code'><pre>            (sourcearray: variant, matchstring: string,</pre></td></tr><tr><td class='line-number'><a name='L20' href='#L20'><pre>20</pre></a></td><td class='skipped-line'></td><td class='code'><pre>             include: opt_boolean, compare: opt_long),</pre></td></tr><tr><td class='line-number'><a name='L21' href='#L21'><pre>21</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        arrayfn::filter::filter(sourcearray, &amp;matchstring,</pre></td></tr><tr><td class='line-number'><a name='L22' href='#L22'><pre>22</pre></a></td><td class='skipped-line'></td><td class='code'><pre>            include.as_ref(), compare.as_ref())));</pre></td></tr><tr><td class='line-number'><a name='L23' href='#L23'><pre>23</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>    registry.insert(typed_builtin!(&quot;join&quot;, 1, 2,</pre></td></tr><tr><td class='line-number'><a name='L24' href='#L24'><pre>24</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        (sourcearray: variant, delimiter: opt_string),</pre></td></tr><tr><td class='line-number'><a name='L25' href='#L25'><pre>25</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        arrayfn::join::join(sourcearray,</pre></td></tr><tr><td class='line-number'><a name='L26' href='#L26'><pre>26</pre></a></td><td class='skipped-line'></td><td class='code'><pre>            delimiter.as_ref()).map(vb6runtime::VBVariant::from_string)));</pre></td></tr><tr><td class='line-number'><a name='L27' href='#L27'><pre>27</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>    registry.insert(typed_builtin!(&quot;lbound&quot;, 1, 2,</pre></td></tr><tr><td class='line-number'><a name='L28' href='#L28'><pre>28</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        (array: variant, dimension: opt_long),</pre></td></tr><tr><td class='line-number'><a name='L29' href='#L29'><pre>29</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        arrayfn::lbound::lbound(array, dimension.as_ref())));</pre></td></tr><tr><td class='line-number'><a name='L30' href='#L30'><pre>30</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>    registry.insert(typed_builtin!(&quot;split&quot;, 1, 4,</pre></td></tr><tr><td class='line-number'><a name='L31' href='#L31'><pre>31</pre></a></td><td class='skipped-line'></td><td class='code'><pre>            (expression: string, delimiter: opt_string,</pre></td></tr><tr><td class='line-number'><a name='L32' href='#L32'><pre>32</pre></a></td><td class='skipped-line'></td><td class='code'><pre>             limit: opt_long, compare: opt_long),</pre></td></tr><tr><td class='line-number'><a name='L33' href='#L33'><pre>33</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        arrayfn::split::split(&amp;expression, delimiter.as_ref(),</pre></td></tr><tr><td class='line-number'><a name='L34' href='#L34'><pre>34</pre></a></td><td class='skipped-line'></td><td class='code'><pre>            limit.as_ref(), compare.as_ref())));</pre></td></tr><tr><td class='line-number'><a name='L35' href='#L35'><pre>35</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>    registry.insert(typed_builtin!(&quot;ubound&quot;, 1, 2,</pre></td></tr><tr><td class='line-number'><a name='L36' href='#L36'><pre>36</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        (array: variant, dimension: opt_long),</pre></td></tr><tr><td class='line-number'><a name='L37' href='#L37'><pre>37</pre></a></td><td class='skipped-line'></td><td class='code'><pre>        arrayfn::ubound::ubound(array, dimension.as_ref())));</pre></td></tr><tr><td class='line-number'><a name='L38' href='#L38'><pre>38</pre></a></td><td class='covered-line'><pre>4</pre></td><td class='code'><pre>}</pre></td></tr></table></div></body></html>
