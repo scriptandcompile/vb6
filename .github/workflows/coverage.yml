@@ -50,6 +50,9 @@ jobs:
       - name: Generate coverage
         run: python3 projects/vb6parse/scripts/generate-coverage.py
 
+      - name: Install Git LFS
+        run: git lfs install
+
       - name: Commit and push if changed
         run: |
           git pull --rebase --autostash

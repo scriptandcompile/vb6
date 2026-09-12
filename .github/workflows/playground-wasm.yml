@@ -119,6 +119,9 @@ jobs:
             popd > /dev/null
           fi
 
+      - name: Install Git LFS
+        run: git lfs install
+
       - name: Commit and push if changed
         env:
           BUILD_PARSE: ${{ needs.detect.outputs.parse }}
