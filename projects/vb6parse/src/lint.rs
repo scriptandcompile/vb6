@@ -221,17 +221,23 @@ fn trailing_whitespace(source: &str) -> Vec<Diagnostic> {
 /// so they are worth knowing about before a migration. Renaming one changes a
 /// public name, so this rule never offers a fix.
 ///
-/// It cannot be written as "an `Identifier` token holding a non-ASCII
-/// character". The lexer takes identifiers with
-/// `take_ascii_underscore_alphanumerics` and stops at the first byte outside
-/// ASCII, so `Añadir` never becomes one token; the stray character reaches the
-/// tokenizer's fallback, which records an `UnknownToken` failure and pushes no
-/// token at all. The character is therefore absent from the CST, and the
-/// failure list is the only place it appears.
+/// # Design
+///
+/// The rule cannot match "an `Identifier` token holding a non-ASCII character".
+/// The lexer takes identifiers with `take_ascii_underscore_alphanumerics` and
+/// stops at the first byte outside ASCII, so `A\u{f1}adir` never becomes one
+/// token; the stray character reaches the tokenizer's fallback, which records
+/// an `UnknownToken` failure and pushes no token at all. The character is
+/// therefore absent from the CST, and the failure list is the only place it
+/// appears.
 ///
 /// That is also what makes the rule precise: comments and string literals are
 /// consumed whole by their own branches, so an accent inside product text
 /// never reaches the fallback and never shows up here.
+///
+/// One accented name produces one failure per character; the rule collapses
+/// adjacent failures on the same line into a single diagnostic to report the
+/// name once rather than once per accent.
 fn non_ascii_in_code(source: &str) -> Vec<Diagnostic> {
     let (_cst_opt, failures) = ConcreteSyntaxTree::from_text("lint_input", source).unpack();
 
