@@ -391,11 +391,12 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
         output_path: Path where HTML file will be saved
     """
     rel = output_path.relative_to(Path("docs/vb6runtime"))
-    depth = len(rel.parts) - 2
-    base = "../" * (depth + 1)
+    nav_parent_parts = Path(rel).parent.parts if Path(rel).parent != Path(".") else ()
+    nav_base = "../" * len(nav_parent_parts)
+    assets_base = "../" * (len(nav_parent_parts) + 1)
     
     breadcrumb_html = ' / '.join([
-        f'<a href="{base}{url}">{text}</a>' if url else text
+        f'<a href="{nav_base}{url}">{text}</a>' if url else text
         for text, url in breadcrumbs
     ])
     
@@ -406,10 +407,10 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="VB6Runtime Library Reference - {title}">
     <title>{title} - VB6Runtime Library Reference</title>
-    <link rel="stylesheet" href="{base}assets/css/style.css">
-    <link rel="stylesheet" href="{base}assets/css/docs-style.css">
+    <link rel="stylesheet" href="{assets_base}assets/css/style.css">
+    <link rel="stylesheet" href="{assets_base}assets/css/docs-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="{base}assets/js/theme-switcher.js"></script>
+    <script src="{assets_base}assets/js/theme-switcher.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
     <script>hljs.highlightAll();</script>
@@ -424,9 +425,9 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
 
     <nav class="docs-nav">
         <div class="container">
-            <a href="{base}index.html">Home</a>
-            <a href="{base}library/index.html">Library Reference</a>
-            <a href="{base}documentation.html">Documentation</a>
+            <a href="{nav_base}index.html">Home</a>
+            <a href="{nav_base}library/index.html">Library Reference</a>
+            <a href="{nav_base}documentation.html">Documentation</a>
             <a href="https://docs.rs/vb6runtime" target="_blank">API Docs</a>
             <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">GitHub</a>
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
@@ -435,12 +436,12 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
         </div>
     </nav>
 
-    <main class="container">
+    <main class="container page-body">
         {content}
     </main>
 
-    <footer>
-        <div class="container">
+    <footer class="site-footer">
+        <div class="container footer-inner">
             <p>&copy; 2024-2026 VB6Runtime Contributors. Licensed under the MIT License.</p>
         </div>
     </footer>
@@ -468,31 +469,30 @@ def generate_library_index(functions: List[Category], statements: List[Category]
     
     content = f"""
         <section id="library-overview">
-            <h2>VB6 Library Reference</h2>
+            <div class="section-heading">
+                <p class="eyebrow">Getting oriented</p>
+                <h2>VB6 Library Reference</h2>
+            </div>
             <p>
                 Complete reference documentation for Visual Basic 6 built-in functions and statements.
                 This reference covers {total_functions} functions organized in {len(functions)} categories 
                 and {total_statements} statements in {len(statements)} categories.
             </p>
-            
-            <div class="info-box" style="margin: 2rem 0;">
-                <strong>📖 About This Reference:</strong> This documentation is automatically generated from 
-                the VB6Runtime source code. Each entry includes syntax, parameters, return values, remarks, 
-                and comprehensive examples to help you understand VB6's built-in library.
-            </div>
         </section>
 
-        <section id="functions" style="margin-top: 3rem;">
-            <h2>Functions ({total_functions} items)</h2>
+        <section id="functions">
+            <div class="section-heading">
+                <h2>Functions ({total_functions} items)</h2>
+            </div>
             <p>VB6 functions return values and can be used in expressions.</p>
             
-            <div class="feature-grid">
+            <div class="doc-links">
 """
     
     for category in functions:
         content += f"""
-                <a href="functions/{category.slug}/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
-                    <h2>{category.display_name}</h2>
+                <a href="functions/{category.slug}/index.html" class="doc-link">
+                    <h3>{category.display_name}</h3>
                     <p>{category.description}</p>
                     <small>{len(category.items)} functions</small>
                 </a>
@@ -502,16 +502,18 @@ def generate_library_index(functions: List[Category], statements: List[Category]
             </div>
         </section>
 
-        <section id="statements" style="margin-top: 3rem;">
-            <h2>Statements (""" + str(total_statements) + """ items)</h2>
+        <section id="statements">
+            <div class="section-heading">
+                <h2>Statements (""" + str(total_statements) + """ items)</h2>
+            </div>
             <p>VB6 statements perform actions and control program flow.</p>
             
-            <div class="feature-grid">
+            <div class="doc-links">
 """
     
     for category in statements:
         content += f"""
-                <a href="statements/{category.slug}/index.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                <a href="statements/{category.slug}/index.html" class="doc-link">
                     <h3>{category.display_name}</h3>
                     <p>{category.description}</p>
                     <small>{len(category.items)} statements</small>
@@ -540,14 +542,16 @@ def generate_category_index(category: Category, item_type: str, output_dir: Path
     """Generate category index page listing all items in the category."""
     
     content = f"""
-        <section id="category-overview" style="margin-bottom: 2rem;">
-            <h2>{category.display_name}</h2>
+        <section id="category-overview">
+            <div class="section-heading">
+                <h2>{category.display_name}</h2>
+            </div>
             <p style="font-size: 1.1rem; margin: 1rem 0;">{category.description}</p>
             <p style="color: var(--primary-color); font-weight: 600;">{len(category.items)} {item_type}s in this category</p>
         </section>
 
-        <section id="items-list" style="margin-top: 2rem;">
-            <div class="feature-grid">
+        <section id="items-list">
+            <div class="doc-links">
 """
     
     for item in sorted(category.items, key=lambda x: x.name.lower()):
@@ -558,7 +562,7 @@ def generate_category_index(category: Category, item_type: str, output_dir: Path
             first_line = first_line[:97] + "..."
         
         content += f"""
-                <a href="{item.html_filename}" class="feature-card" style="text-decoration: none; color: inherit;">
+                <a href="{item.html_filename}" class="doc-link">
                     <h3>{item.name}</h3>
                     <p style="margin-bottom: 0; font-size: 0.95rem;">{first_line}</p>
                 </a>

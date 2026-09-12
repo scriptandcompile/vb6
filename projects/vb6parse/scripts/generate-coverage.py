@@ -287,43 +287,6 @@ def restructure_coverage_html(output_dir):
         relative_path = match.group(1)  # e.g., "src/lexer/mod.rs"
         return f"<div class='source-name-title'><a href='{github_url}{relative_path}'>{relative_path}</a></div>"
     
-    # Theme synchronization script with toggle functionality to inject into HTML files
-    theme_script = """<script>
-// Sync theme with main site and setup theme toggle
-(function() {
-    const THEME_KEY = 'vb6parse-theme';
-    function getSystemPreference() {
-        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-    }
-    function getTheme() {
-        return localStorage.getItem(THEME_KEY) || getSystemPreference();
-    }
-    function applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        const themeIcon = document.querySelector('.theme-icon');
-        if (themeIcon) {
-            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
-        }
-    }
-    function toggleTheme() {
-        const currentTheme = getTheme();
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        localStorage.setItem(THEME_KEY, newTheme);
-        applyTheme(newTheme);
-    }
-    // Apply theme immediately
-    const theme = getTheme();
-    applyTheme(theme);
-    // Setup toggle button when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggle = document.querySelector('.theme-toggle');
-        if (toggle) {
-            toggle.addEventListener('click', toggleTheme);
-        }
-    });
-})();
-</script>"""
-    
     # Fix paths in all HTML files in src/ directory
     src_dir = output_dir / 'src'
     if src_dir.exists():
@@ -352,8 +315,13 @@ def restructure_coverage_html(output_dir):
                 # Replace JS references (handles excessive ../ paths from llvm-cov)
                 content = re.sub(r"src='(?:\.\./)+control\.js'", f"src='{js_prefix}control.js'", content)
                 
-                # Inject theme script before closing </head> tag
-                content = re.sub(r'</head>', f'{theme_script}</head>', content, count=1)
+                # Inject consolidated style.css for base styles (before body)
+                style_link = f"<link rel='stylesheet' type='text/css' href='{css_base}../../assets/css/style.css'>"
+                content = re.sub(r'<body>', '<body>' + style_link, content, count=1)
+                
+                # Replace inline theme script with reference to consolidated theme-switcher.js
+                theme_script_src = f'<script src="{css_base}../../assets/js/theme-switcher.js"></script>'
+                content = re.sub(r'<script>\n// Sync theme with main site.*?</script>', theme_script_src, content, flags=re.DOTALL)
                 
                 # Inject coverage header after <body> tag (for source files)
                 # Calculate path back to main overview from this depth
