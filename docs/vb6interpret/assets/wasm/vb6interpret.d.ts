@@ -139,22 +139,22 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly build_debug_trace: (a: number, b: number, c: number) => void;
+    readonly clear_files: () => void;
     readonly debug_vb6_code: (a: number, b: number, c: number, d: number) => void;
     readonly dump_clock: (a: number) => void;
     readonly dump_env: (a: number) => void;
     readonly dump_files: (a: number) => void;
     readonly dump_settings: (a: number) => void;
+    readonly init_panic_hook: () => void;
     readonly install_file: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly install_setting: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => void;
     readonly interpret_vb6_code: (a: number, b: number, c: number) => void;
+    readonly parse_vb6_code: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly remove_env: (a: number, b: number) => void;
     readonly remove_setting: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
     readonly set_clock: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly set_env: (a: number, b: number, c: number, d: number) => void;
-    readonly clear_files: () => void;
-    readonly parse_vb6_code: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly tokenize_vb6_code: (a: number, b: number, c: number) => void;
-    readonly init_panic_hook: () => void;
     readonly __wbindgen_export: (a: number, b: number) => number;
     readonly __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_export3: (a: number, b: number, c: number) => void;

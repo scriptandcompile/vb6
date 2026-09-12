@@ -97,21 +97,21 @@ jobs:
           if [[ "$BUILD_PARSE" == "true" ]]; then
             echo "Building vb6parse WASM"
             pushd projects/vb6parse > /dev/null
-            python3 scripts/build-wasm.py --optimize --no-typescript
+            python3 scripts/build-wasm.py --optimize
             popd > /dev/null
           fi
 
           if [[ "$BUILD_SEMANTIC" == "true" ]]; then
             echo "Building vb6semantic WASM"
             pushd projects/vb6semantic > /dev/null
-            python3 scripts/build-wasm.py --optimize --no-typescript
+            python3 scripts/build-wasm.py --optimize
             popd > /dev/null
           fi
 
           if [[ "$BUILD_INTERPRET" == "true" ]]; then
             echo "Building vb6interpret WASM"
             pushd projects/vb6interpret > /dev/null
-            python3 scripts/build-wasm.py --optimize --no-typescript
+            python3 scripts/build-wasm.py --optimize
             popd > /dev/null
           fi
 

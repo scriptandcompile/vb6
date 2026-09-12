@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export const analyze_vb6_code: (a: number, b: number, c: number, d: number, e: number) => void;
 export const init_panic_hook: () => void;
 export const parse_vb6_code: (a: number, b: number, c: number, d: number, e: number) => void;
 export const tokenize_vb6_code: (a: number, b: number, c: number) => void;

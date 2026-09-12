@@ -2,6 +2,20 @@
 /* eslint-disable */
 
 /**
+ * Performs semantic analysis on VB6 code and returns an `AnalysisOutput` object
+ * containing scopes, symbols, errors, and warnings.
+ *
+ * The `file_type` argument selects which parser to use and must be one of
+ * `module`/`bas`, `class`/`cls`, or `form`/`frm`.
+ *
+ * # Errors
+ *
+ * Returns an error if the input code cannot be parsed into the requested file
+ * type or if the analyzer fails during analysis.
+ */
+export function analyze_vb6_code(code: string, file_type: string): any;
+
+/**
  * Initializes the panic hook for better error messages in the browser console.
  */
 export function init_panic_hook(): void;
@@ -42,6 +56,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
+    readonly analyze_vb6_code: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly init_panic_hook: () => void;
     readonly parse_vb6_code: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly tokenize_vb6_code: (a: number, b: number, c: number) => void;

@@ -1,3 +1,5 @@
+/* @ts-self-types="./vb6semantic.d.ts" */
+
 /**
  * Performs semantic analysis on VB6 code and returns an `AnalysisOutput` object
  * containing scopes, symbols, errors, and warnings.
