@@ -55,3 +55,5 @@ End Function
 
     let cst = cst_opt.expect("CST should be present.");
     assert_eq!(cst.error_recovery_ranges(), [] as [vb6parse::parsers::cst::NodeRange; 0]);
+    assert!(recovery_events.is_empty());
+}

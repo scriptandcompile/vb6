@@ -295,4 +295,86 @@
 //! - Not all fonts support all Unicode characters; display depends on available fonts
 //! - Some Unicode features like combining characters may not render correctly in all VB6 controls
 
-use crate::{error::VBResult, value::VBVariant};
+use crate::{error::VBResult, value::VBLong, value::VBVariant};
+
+use super::chrw_dollar::chrw_dollar;
+
+/// Returns the Unicode character associated with the specified code.
+///
+/// `charcode` is in the range -32768 to 65535; negative values are treated as
+/// `65536 + charcode`, matching VB6's 16-bit integer behavior. Code 0 returns
+/// the null character (U+0000).
+///
+/// `ChrW` is the Variant-returning counterpart of `ChrW$`; a `Null` charcode
+/// propagates as `Null`.
+///
+/// # Errors
+///
+/// Returns error 5 (`Invalid procedure call or argument`) when `charcode` is
+/// outside the range -32768 to 65535, or names a UTF-16 surrogate (which cannot
+/// be represented as a single Rust `char`).
+pub fn chrw(charcode: &VBLong) -> VBResult<VBVariant> {
+    chrw_dollar(charcode).map(VBVariant::from)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::err_number;
+
+    #[test]
+    fn returns_ascii_characters() {
+        assert_eq!(
+            chrw(&VBLong::from(65)).unwrap(),
+            VBVariant::from_string("A")
+        );
+        assert_eq!(
+            chrw(&VBLong::from(97)).unwrap(),
+            VBVariant::from_string("a")
+        );
+    }
+
+    #[test]
+    fn returns_unicode_characters() {
+        assert_eq!(
+            chrw(&VBLong::from(8364)).unwrap(),
+            VBVariant::from_string("€")
+        );
+        assert_eq!(
+            chrw(&VBLong::from(20013)).unwrap(),
+            VBVariant::from_string("中")
+        );
+    }
+
+    #[test]
+    fn negative_values_are_wrapped() {
+        assert_eq!(
+            chrw(&VBLong::from(-1)).unwrap(),
+            VBVariant::from_string("\u{FFFF}")
+        );
+        assert_eq!(
+            chrw(&VBLong::from(-8192)).unwrap(),
+            VBVariant::from_string("\u{E000}")
+        );
+    }
+
+    #[test]
+    fn code_zero_returns_null_character() {
+        assert_eq!(
+            chrw(&VBLong::from(0)).unwrap(),
+            VBVariant::from_string("\u{0}")
+        );
+    }
+
+    #[test]
+    fn rejects_out_of_range() {
+        assert_eq!(
+            chrw(&VBLong::from(-32769)).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+        assert_eq!(
+            chrw(&VBLong::from(65536)).unwrap_err().number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
+    }
+}

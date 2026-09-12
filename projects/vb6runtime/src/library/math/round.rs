@@ -742,5 +742,162 @@ mod tests {
     use super::round;
     use crate::{
         error::err_number,
-        value::{VBLong, VBVariant},
+        value::{VBDouble, VBLong, VBVariant},
     };
+    use std::convert::TryFrom;
+
+    fn assert_approx_eq(actual: f64, expected: f64) {
+        if (actual == f64::INFINITY && expected == f64::INFINITY)
+            || (actual == f64::NEG_INFINITY && expected == f64::NEG_INFINITY)
+        {
+            return;
+        }
+
+        let diff = (actual - expected).abs();
+        assert!(
+            diff < 1e-12,
+            "expected {expected}, got {actual}, diff {diff}"
+        );
+    }
+
+    #[test]
+    fn rounds_whole_numbers_identity() {
+        let result = round(&VBDouble::from(-12.5), None).unwrap();
+        assert_eq!(result, VBVariant::from_double(-12.0));
+
+        let result = round(&VBDouble::from(5.0), None).unwrap();
+        assert_eq!(result, VBVariant::from_double(5.0));
+    }
+
+    #[test]
+    fn returns_expected_values() {
+        let VBVariant::Double(v) = round(&VBDouble::from(0.0), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 0.0);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(1.0), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 1.0);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(-1.0), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, -1.0);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(1.25), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 1.0);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(1.75), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 2.0);
+    }
+
+    #[test]
+    fn uses_bankers_rounding() {
+        let VBVariant::Double(v) = round(&VBDouble::from(0.5), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 0.0);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(1.5), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 2.0);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(2.5), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 2.0);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(3.5), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 4.0);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(-2.5), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, -2.0);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(-3.5), None).unwrap() else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, -4.0);
+    }
+
+    #[test]
+    fn rounds_to_decimal_places() {
+        let VBVariant::Double(v) = round(&VBDouble::from(1.25), Some(&VBLong::from(1))).unwrap()
+        else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 1.2);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(1.75), Some(&VBLong::from(1))).unwrap()
+        else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 1.8);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(2.25), Some(&VBLong::from(1))).unwrap()
+        else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 2.2);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(3.75), Some(&VBLong::from(1))).unwrap()
+        else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 3.8);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(2.75), Some(&VBLong::from(2))).unwrap()
+        else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, 2.75);
+
+        let VBVariant::Double(v) = round(&VBDouble::from(-1.25), Some(&VBLong::from(1))).unwrap()
+        else {
+            panic!("expected Double")
+        };
+        assert_approx_eq(v, -1.2);
+    }
+
+    #[test]
+    fn explicit_zero_decimals_matches_omitted() {
+        assert_eq!(
+            round(&VBDouble::from(2.5), Some(&VBLong::from(0))).unwrap(),
+            round(&VBDouble::from(2.5), None).unwrap(),
+        );
+    }
+
+    #[test]
+    fn rejects_negative_numdecimalplaces() {
+        let err = round(&VBDouble::from(2.5), Some(&VBLong::from(-1))).unwrap_err();
+        assert_eq!(err.number, err_number::INVALID_PROCEDURE_CALL);
+    }
+
+    #[test]
+    fn conversion_rejects_non_numeric_values() {
+        let err = VBDouble::try_from(&VBVariant::from_string("not-a-number")).unwrap_err();
+        assert_eq!(err.number, err_number::TYPE_MISMATCH);
+    }
+
+    #[test]
+    fn conversion_accepts_numeric_strings() {
+        let parsed = VBDouble::try_from(&VBVariant::from_string("2.5")).unwrap();
+        assert_eq!(round(&parsed, None).unwrap(), VBVariant::from_double(2.0));
+
+        let parsed = VBDouble::try_from(&VBVariant::from_string("1.25")).unwrap();
+        assert_eq!(
+            round(&parsed, Some(&VBLong::from(1))).unwrap(),
+            VBVariant::from_double(1.2)
+        );
+    }
+}

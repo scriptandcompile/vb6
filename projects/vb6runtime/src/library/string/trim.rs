@@ -721,4 +721,90 @@
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
 
-use crate::{error::VBResult, value::VBVariant};
+use crate::{error::VBResult, value::VBString, value::VBVariant};
+
+use super::trim_dollar::trim_dollar;
+
+/// Returns the string with leading and trailing spaces (ASCII 32) removed.
+///
+/// Only the space character is trimmed, matching VB6; tabs and other
+/// whitespace are preserved.
+///
+/// `Trim` is the Variant-returning counterpart of `Trim$`; a `Null` input
+/// propagates as `Null`.
+pub fn trim(input: &VBString) -> VBResult<VBVariant> {
+    trim_dollar(input).map(VBVariant::from)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn trims_both_ends() {
+        assert_eq!(
+            trim(&VBString::from("  Hello World  ")).unwrap(),
+            VBVariant::from_string("Hello World")
+        );
+        assert_eq!(
+            trim(&VBString::from("Hello")).unwrap(),
+            VBVariant::from_string("Hello")
+        );
+    }
+
+    #[test]
+    fn trims_leading_spaces() {
+        assert_eq!(
+            trim(&VBString::from("  Hello World")).unwrap(),
+            VBVariant::from_string("Hello World")
+        );
+        assert_eq!(
+            trim(&VBString::from(" Hello")).unwrap(),
+            VBVariant::from_string("Hello")
+        );
+    }
+
+    #[test]
+    fn trims_trailing_spaces() {
+        assert_eq!(
+            trim(&VBString::from("Hello World  ")).unwrap(),
+            VBVariant::from_string("Hello World")
+        );
+        assert_eq!(
+            trim(&VBString::from("Hello ")).unwrap(),
+            VBVariant::from_string("Hello")
+        );
+    }
+
+    #[test]
+    fn handles_empty_and_all_spaces() {
+        assert_eq!(
+            trim(&VBString::from("")).unwrap(),
+            VBVariant::from_string("")
+        );
+        assert_eq!(
+            trim(&VBString::from("   ")).unwrap(),
+            VBVariant::from_string("")
+        );
+    }
+
+    #[test]
+    fn preserves_inner_and_other_whitespace() {
+        assert_eq!(
+            trim(&VBString::from("  a b  ")).unwrap(),
+            VBVariant::from_string("a b")
+        );
+        assert_eq!(
+            trim(&VBString::from("\tHello\t")).unwrap(),
+            VBVariant::from_string("\tHello\t")
+        );
+    }
+
+    #[test]
+    fn empty_string_preserved() {
+        assert_eq!(
+            trim(&VBString::from("")).unwrap(),
+            VBVariant::from_string("")
+        );
+    }
+}

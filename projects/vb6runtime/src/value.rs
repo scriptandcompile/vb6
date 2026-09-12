@@ -1374,7 +1374,10 @@ mod tests {
         assert_eq!(VBVariant::Integer(5).var_type(), 2);
         assert_eq!(VBVariant::from_string("x").var_type(), 8);
         assert_eq!(VBVariant::Boolean(true).var_type(), 11);
-        assert_eq!(VBVariant::from_error(VBError::new(13)).var_type(), 10);
+        assert_eq!(
+            VBVariant::from_error(VBError::new(err_number::TYPE_MISMATCH)).var_type(),
+            10
+        );
         assert_eq!(
             VBVariant::array_dynamic(VBType::Double).var_type(),
             8192 + 5

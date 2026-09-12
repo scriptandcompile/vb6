@@ -287,6 +287,37 @@ impl<'a> SourceStream<'a> {
         }
     }
 
+    /// Takes the next single UTF-8 character from the stream and advances the
+    /// offset.
+    ///
+    /// This is the counterpart to [`Self::take_count`] for cases where you
+    /// don't know the character length in advance. It always consumes at
+    /// least one character, advancing past any multi-byte sequence, so the
+    /// tokenizer can never loop forever on non-ASCII input.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use vb6parse::SourceStream;
+    ///
+    /// // 'ñ' is two bytes in UTF-8.
+    /// let mut stream = SourceStream::new("test.bas", "ñx");
+    ///
+    /// assert_eq!(stream.take_count(1), None);
+    /// assert_eq!(stream.take_character(), Some("ñ"));
+    /// assert_eq!(stream.take_character(), Some("x"));
+    /// assert_eq!(stream.take_character(), None);
+    /// ```
+    #[must_use]
+    pub fn take_character(&mut self) -> Option<&'a str> {
+        let remaining = &self.contents[self.offset..];
+        let character = remaining.chars().next()?;
+        let end_offset = self.offset + character.len_utf8();
+        let result = &self.contents[self.offset..end_offset];
+        self.offset = end_offset;
+        Some(result)
+    }
+
     /// Takes characters from the stream until a character that matches the
     /// compare `str` is encountered or the end of the stream is reached.
     ///
