@@ -394,10 +394,10 @@ function __wbg_get_imports() {
         __wbg___wbindgen_throw_bb96b2010945f0bc: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
-        __wbg_alert_b130179dd111598f: function(arg0, arg1) {
+        __wbg_alert_8c452b1f9c41473b: function(arg0, arg1) {
             window.alert(getStringFromWasm0(arg0, arg1));
         },
-        __wbg_confirm_db2384b7feba37d4: function(arg0, arg1) {
+        __wbg_confirm_a41ee5e3ca8534e4: function(arg0, arg1) {
             const ret = window.confirm(getStringFromWasm0(arg0, arg1));
             return ret;
         },
@@ -444,7 +444,7 @@ function __wbg_get_imports() {
             const ret = new Object();
             return addHeapObject(ret);
         },
-        __wbg_prompt_fcd930ff20c43412: function(arg0, arg1, arg2, arg3, arg4) {
+        __wbg_prompt_20552ae58c489bab: function(arg0, arg1, arg2, arg3, arg4) {
             const ret = window.prompt(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
             var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_export, wasm.__wbindgen_export2);
             var len1 = WASM_VECTOR_LEN;
