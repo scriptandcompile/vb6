@@ -130,7 +130,7 @@ fn main() -> Result<()> {
             return Ok(());
         }
 
-        let configured = check::load_lint_settings(&project_path);
+        let configured = check::load_lint_settings(&project_path)?;
         let from_cli = |name: &str| -> Option<Vec<String>> {
             matches
                 .get_many::<String>(name)

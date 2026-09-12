@@ -1,13 +1,30 @@
 use anyhow::Error;
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use rayon::prelude::*;
 use vb6parse::files::project::ProjectReference;
-use vb6parse::lint::LintSettings;
+use vb6parse::lint::{Diagnostic, LintSettings};
 use vb6parse::{ProjectFile, SourceFile};
 
 use walkdir::WalkDir;
+
+/// A lint finding paired with the file path where it was discovered.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LintFinding {
+    pub file_path: PathBuf,
+    pub diagnostic: Diagnostic,
+}
+
+impl std::hash::Hash for LintFinding {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.file_path.hash(state);
+        self.diagnostic.line.hash(state);
+        self.diagnostic.column.hash(state);
+        self.diagnostic.code.hash(state);
+    }
+}
 
 /// Settings for the `check` subcommand, including the project path and lint rules.
 pub struct CheckSettings<'a> {
@@ -20,9 +37,9 @@ pub struct CheckSettings<'a> {
 /// The same file can be shared by several projects -- in the code base this
 /// was written against one module is referenced by eight of them -- so a
 /// finding is reported once per project that includes it. Deduplication is
-/// left to the summary, where the whole run is visible.
-fn run_lint_rules(paths: &[PathBuf], settings: &LintSettings) -> Vec<String> {
-    let mut findings: Vec<String> = paths
+/// performed at summary time by (file_path, line, column, code).
+fn run_lint_rules(paths: &[PathBuf], settings: &LintSettings) -> Vec<(PathBuf, Diagnostic)> {
+    paths
         .par_iter()
         .flat_map(|path| {
             let Ok(source) = SourceFile::from_file(path) else {
@@ -33,22 +50,10 @@ fn run_lint_rules(paths: &[PathBuf], settings: &LintSettings) -> Vec<String> {
 
             vb6parse::lint::lint_source(source.as_ref(), settings)
                 .into_iter()
-                .map(|finding| {
-                    format!(
-                        "{}:{}:{}: {} {}",
-                        path.display(),
-                        finding.line,
-                        finding.column,
-                        finding.code,
-                        finding.message
-                    )
-                })
+                .map(|finding| (path.clone(), finding))
                 .collect::<Vec<_>>()
         })
-        .collect();
-
-    findings.sort();
-    findings
+        .collect()
 }
 
 /// Results from running the `check` subcommand on a project, including parsing errors,
@@ -64,8 +69,8 @@ pub struct CheckResults {
     pub missing_files: Vec<String>,
     /// Warnings generated during the check.
     pub warnings: Vec<String>,
-    /// Findings from the lint rules, already formatted for display.
-    pub lint_findings: Vec<String>,
+    /// Findings from the lint rules, stored structurally for deduplication.
+    pub lint_findings: Vec<LintFinding>,
 }
 
 /// Runs the `check` subcommand on a project, returning the results.
@@ -191,7 +196,14 @@ fn report_check(check_results: &CheckResults) {
     if !check_results.lint_findings.is_empty() {
         println!("Lint:");
         for finding in &check_results.lint_findings {
-            println!("  {}", finding);
+            println!(
+                "  {}:{}:{}: {} {}",
+                finding.file_path.display(),
+                finding.diagnostic.line,
+                finding.diagnostic.column,
+                finding.diagnostic.code,
+                finding.diagnostic.message
+            );
         }
     }
 }
@@ -245,7 +257,12 @@ fn report_check_summary(summary: Vec<CheckResults>) {
 
     let total_warning_count = summary.iter().fold(0, |acc, x| acc + x.warnings.len());
 
-    let total_lint_count = summary.iter().fold(0, |acc, x| acc + x.lint_findings.len());
+    let unique_lint: HashSet<&LintFinding> = summary
+        .iter()
+        .flat_map(|r| r.lint_findings.iter())
+        .collect();
+
+    let total_lint_count = unique_lint.len();
 
     let mut parts = Vec::new();
 
@@ -401,7 +418,13 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
         }
     }
 
-    check_results.lint_findings = run_lint_rules(&source_paths, check_settings.lint);
+    check_results.lint_findings = run_lint_rules(&source_paths, check_settings.lint)
+        .into_iter()
+        .map(|(file_path, diagnostic)| LintFinding {
+            file_path,
+            diagnostic,
+        })
+        .collect();
 
     // Analyze the project with vb6semantic. This resolves names, builds symbol
     // tables, and reports semantic errors and warnings across all of the
@@ -456,8 +479,12 @@ struct AspenConfig {
 
 /// Reads the `[lint]` section next to the given path, then from the working
 /// directory, the same way the formatter finds its own settings.
+///
+/// Returns an error when a config file is found but cannot be parsed — a
+/// silently-ignored config looks identical to a config that selected nothing,
+/// which makes debugging rules selection nearly impossible.
 #[must_use]
-pub fn load_lint_settings(project_path: &Path) -> LintConfig {
+pub fn load_lint_settings(project_path: &Path) -> Result<LintConfig> {
     let config_root = if project_path.is_dir() {
         project_path.to_path_buf()
     } else {
@@ -483,16 +510,17 @@ pub fn load_lint_settings(project_path: &Path) -> LintConfig {
         };
 
         match toml::from_str::<AspenConfig>(&contents) {
-            Ok(config) => return config.lint.unwrap_or_default(),
+            Ok(config) => return Ok(config.lint.unwrap_or_default()),
             Err(e) => {
-                // A malformed config that is silently ignored looks exactly
-                // like a config that selected nothing.
-                eprintln!("Ignoring {}: {}", path.display(), e);
+                anyhow::bail!(
+                    "failed to parse config file '{}': {e}",
+                    path.display()
+                );
             }
         }
     }
 
-    LintConfig::default()
+    Ok(LintConfig::default())
 }
 
 /// Prints every rule with its default and fixability.
