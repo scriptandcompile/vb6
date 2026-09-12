@@ -4,8 +4,8 @@ use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
 
-use vb6parse::parsers::cst::{ConcreteSyntaxTree, CstNode};
 use vb6parse::SyntaxKind;
+use vb6parse::parsers::cst::{ConcreteSyntaxTree, CstNode};
 
 /// Details about an Error node found in the CST.
 #[derive(Debug, Clone)]

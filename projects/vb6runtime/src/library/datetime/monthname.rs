@@ -647,7 +647,7 @@ pub fn month_name(month: &VBLong, abbreviate: Option<&VBBoolean>) -> VBResult<VB
 
 #[cfg(test)]
 mod tests {
-    use super::{month_name, ABBREVIATED_NAMES, FULL_NAMES};
+    use super::{ABBREVIATED_NAMES, FULL_NAMES, month_name};
     use crate::error::err_number;
     use crate::value::{VBBoolean, VBLong, VBVariant};
     use std::convert::TryFrom;

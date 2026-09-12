@@ -537,7 +537,7 @@
 //! - Custom Forms: For complex input scenarios
 //! - `Shell`: Execute external programs for advanced input
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::state;
 use crate::value::{VBLong, VBString, VBVariant};
 
@@ -592,7 +592,7 @@ pub fn input_box(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::state::interaction::{memory::MemoryBackend, InputBoxRecord};
+    use crate::state::interaction::{InputBoxRecord, memory::MemoryBackend};
     use crate::state::test_support::lock_test;
 
     fn set_backend(backend: MemoryBackend) {

@@ -6,7 +6,7 @@
 use std::fmt;
 
 use ariadne::{Config, Label, Report, ReportKind, Source};
-use vb6core::error::{err_number, VBError};
+use vb6core::error::{VBError, err_number};
 
 /// Context about which parameter of a builtin call failed.
 ///

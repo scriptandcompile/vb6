@@ -623,7 +623,7 @@
 //! - `Format`: Format strings with values
 //! - `Replace`: Replace placeholders in strings
 
-use super::resfile::{rt, ResFile, STRINGS_PER_BUNDLE};
+use super::resfile::{ResFile, STRINGS_PER_BUNDLE, rt};
 use super::resource_not_found;
 use crate::error::VBResult;
 use crate::state::resources;

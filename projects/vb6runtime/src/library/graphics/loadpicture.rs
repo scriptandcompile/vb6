@@ -654,10 +654,10 @@
 //! - `Dir`: Check file existence before loading
 //! - `App.Path`: Get application directory for relative paths
 
+use crate::StdPicture;
 use crate::error::{VBError, VBResult};
 use crate::state::file::{self, AccessMode, LockMode, OpenMode};
 use crate::value::{VBString, VBVariant};
-use crate::StdPicture;
 use std::path::Path;
 use vb6core::error::err_number;
 

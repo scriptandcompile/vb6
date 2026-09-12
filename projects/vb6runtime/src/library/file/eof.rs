@@ -769,7 +769,7 @@
 
 use crate::error::{VBError, VBResult};
 use crate::state::file;
-use crate::state::file::{OpenMode, MAX_FILE_NUMBER, MIN_FILE_NUMBER};
+use crate::state::file::{MAX_FILE_NUMBER, MIN_FILE_NUMBER, OpenMode};
 use crate::value::{VBBoolean, VBVariant};
 
 /// Check if the current position is at the end of file.

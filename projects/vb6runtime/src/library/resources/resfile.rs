@@ -45,7 +45,7 @@
 //! - [RESOURCEHEADER structure](https://learn.microsoft.com/en-us/windows/win32/menurc/resourceheader)
 //! - [Resource types](https://learn.microsoft.com/en-us/windows/win32/menurc/resource-types)
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::state::file::{self, AccessMode, LockMode, OpenMode};
 
 /// Sentinel `u16` marking an `ordinal-or-name` field as a numeric ordinal
@@ -608,9 +608,10 @@ mod tests {
             .find_any_type(&ResId::Name("fmod".to_string()))
             .unwrap();
         assert_eq!(file.data(entry), b"binary");
-        assert!(file
-            .find_any_type(&ResId::Name("zlib".to_string()))
-            .is_none());
+        assert!(
+            file.find_any_type(&ResId::Name("zlib".to_string()))
+                .is_none()
+        );
     }
 
     #[test]

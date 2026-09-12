@@ -11,7 +11,7 @@
 
 use std::fmt;
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 
 /// One key of a `SendKeys` sequence after decoding: either a character to
 /// type or a named non-printing key.
@@ -267,7 +267,7 @@ fn parse_items(
                             _ => {
                                 return Err(invalid_keys(
                                     "modifier group opened with \"(\" was never closed",
-                                ))
+                                ));
                             }
                         }
                     }

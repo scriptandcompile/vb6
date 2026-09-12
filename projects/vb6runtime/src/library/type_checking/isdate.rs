@@ -569,7 +569,7 @@ pub fn is_date(value: &VBVariant) -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::is_date;
-    use crate::{value::VBVariant, ArrayDimension, VBObject, VBType};
+    use crate::{ArrayDimension, VBObject, VBType, value::VBVariant};
 
     #[derive(Debug)]
     struct TestObject(&'static str);

@@ -9,8 +9,8 @@
 
 use super::{Builtin, Registry};
 use crate::typed_builtin;
-use vb6runtime::library::string as strfn;
 use vb6runtime::VBVariant;
+use vb6runtime::library::string as strfn;
 
 /// Register the string functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {

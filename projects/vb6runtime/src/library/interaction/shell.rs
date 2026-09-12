@@ -786,7 +786,7 @@ pub fn shell(pathname: &VBString, window_style: Option<&VBLong>) -> VBResult<VBV
 mod tests {
     use super::*;
     use crate::error::err_number;
-    use crate::state::interaction::{memory::MemoryBackend, WindowStyle};
+    use crate::state::interaction::{WindowStyle, memory::MemoryBackend};
     use crate::state::test_support::lock_test;
 
     fn set_backend(backend: MemoryBackend) {

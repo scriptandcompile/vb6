@@ -17,13 +17,13 @@ pub use snapshots::{DebugSnapshot, DebugVariable};
 
 use std::collections::HashMap;
 
-use vb6core::error::err_number;
 use vb6core::error::VBError;
+use vb6core::error::err_number;
 use vb6parse::files::ModuleFile;
+use vb6runtime::VBVariant;
 use vb6runtime::state::environment as env_state;
 use vb6runtime::state::resources as resources_state;
 use vb6runtime::state::settings as settings_state;
-use vb6runtime::VBVariant;
 
 use crate::error::{RunError, RunResult};
 use crate::program::Procedure;

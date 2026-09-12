@@ -15,8 +15,8 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
-use rand::rngs::SmallRng;
 use rand::SeedableRng;
+use rand::rngs::SmallRng;
 
 use crate::checker::check_source;
 use crate::g4_parser::parse_g4;
@@ -207,7 +207,9 @@ fn main() -> Result<()> {
             let mut timeouts = 0u64;
             let mut seen_reduced: HashSet<String> = HashSet::new();
 
-            println!("Starting grammar fuzz: {iterations} iterations, seed={base_seed}, start_rule={start_rule}");
+            println!(
+                "Starting grammar fuzz: {iterations} iterations, seed={base_seed}, start_rule={start_rule}"
+            );
 
             for i in 0..iterations {
                 let iter_seed = base_seed.wrapping_add(i as u64);

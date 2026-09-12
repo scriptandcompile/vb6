@@ -606,7 +606,7 @@ pub fn is_array(value: &VBVariant) -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::is_array;
-    use crate::{value::VBVariant, ArrayDimension, VBType};
+    use crate::{ArrayDimension, VBType, value::VBVariant};
 
     #[test]
     fn returns_true_for_fixed_array() {

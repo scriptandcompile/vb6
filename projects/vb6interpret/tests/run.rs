@@ -1,7 +1,7 @@
 //! Integration tests for the `vb6interpret` tree-walking interpreter.
 
-use vb6interpret::run_source;
 use vb6interpret::Interpreter;
+use vb6interpret::run_source;
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
 use vb6runtime::state::settings as settings_state;
@@ -406,7 +406,9 @@ End Sub\n";
 
 #[test]
 fn print_separators() {
-    let out = run("    Debug.Print \"a\"; \"b\"\n    Debug.Print \"c\"\n    Debug.Print \"x\";\n    Debug.Print \"y\"\n");
+    let out = run(
+        "    Debug.Print \"a\"; \"b\"\n    Debug.Print \"c\"\n    Debug.Print \"x\";\n    Debug.Print \"y\"\n",
+    );
     assert_eq!(out, vec!["ab", "c", "xy"]);
 }
 
@@ -422,7 +424,9 @@ fn like_operator() {
          Debug.Print \"hello\" Like \"h[eo]l?o\"\n");
     assert_eq!(
         out,
-        vec!["True", "True", "True", "True", "True", "True", "True", "True"]
+        vec![
+            "True", "True", "True", "True", "True", "True", "True", "True"
+        ]
     );
 }
 
@@ -942,7 +946,7 @@ fn stop_enters_break_mode_with_a_debugger_attached() {
 // ---- MsgBox ----
 
 use vb6runtime::state::interaction::{
-    self, memory::MemoryBackend as InteractionMemory, MsgBoxButton,
+    self, MsgBoxButton, memory::MemoryBackend as InteractionMemory,
 };
 
 /// Run a module with a scripted interaction backend installed; returns the

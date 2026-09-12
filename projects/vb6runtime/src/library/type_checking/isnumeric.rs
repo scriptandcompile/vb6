@@ -659,7 +659,7 @@ pub fn is_numeric(value: &VBVariant) -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::is_numeric;
-    use crate::{value::VBVariant, ArrayDimension, VBObject, VBType};
+    use crate::{ArrayDimension, VBObject, VBType, value::VBVariant};
     use vb6core::error::err_number;
 
     #[derive(Debug)]

@@ -477,7 +477,7 @@
 //! - Fractional values are rounded before conversion
 //! - No direct support for byte-order conversion (endianness)
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::value::{VBString, VBVariant};
 
 /// Implementation of the `Hex$` function.

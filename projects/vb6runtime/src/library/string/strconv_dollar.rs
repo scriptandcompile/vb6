@@ -610,7 +610,7 @@
 //! - LCID parameter has limited practical use
 
 use crate::{
-    error::{err_number, VBError, VBResult},
+    error::{VBError, VBResult, err_number},
     value::{VBLong, VBString},
 };
 
@@ -662,7 +662,7 @@ pub fn strconv_dollar(
             return Err(VBError::with_description(
                 err_number::INVALID_PROCEDURE_CALL,
                 format!("Unsupported conversion {other}"),
-            ))
+            ));
         }
     };
     Ok(VBString::from(result))

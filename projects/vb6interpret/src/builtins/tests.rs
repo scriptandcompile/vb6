@@ -5,8 +5,8 @@
 //! visible through `use super::*` exactly as when the suite was inline.
 
 use super::*;
-use vb6runtime::value::VBString;
 use vb6runtime::ArrayValue;
+use vb6runtime::value::VBString;
 
 /// Serializes dispatch tests that read or write the shared environment
 /// snapshot so parallel test execution cannot interfere with a test's

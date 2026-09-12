@@ -9,7 +9,7 @@ pub mod loadrespicture;
 pub mod loadresstring;
 pub mod resfile;
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::value::VBVariant;
 use resfile::ResId;
 

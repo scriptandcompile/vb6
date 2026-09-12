@@ -8,7 +8,7 @@
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 
 use super::appactivate::{AppActivateRecord, AppActivateRequest};
 use super::backend::InteractionBackend;
@@ -667,9 +667,11 @@ mod tests {
     #[test]
     fn empty_activate_queue_succeeds() {
         let backend = MemoryBackend::new();
-        assert!(backend
-            .app_activate(&AppActivateRequest::new("Calculator"))
-            .is_ok());
+        assert!(
+            backend
+                .app_activate(&AppActivateRequest::new("Calculator"))
+                .is_ok()
+        );
     }
 
     #[test]
@@ -782,9 +784,11 @@ mod tests {
     #[test]
     fn empty_sendkeys_queue_succeeds_without_touching_the_os() {
         let backend = MemoryBackend::new();
-        assert!(backend
-            .send_keys(&SendKeysRequest::parse("Hello{ENTER}", false).unwrap())
-            .is_ok());
+        assert!(
+            backend
+                .send_keys(&SendKeysRequest::parse("Hello{ENTER}", false).unwrap())
+                .is_ok()
+        );
     }
 
     #[test]

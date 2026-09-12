@@ -177,7 +177,7 @@ pub fn entries() -> Vec<(String, String)> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::state::test_support::{position_of, TEST_LOCK};
+    use crate::state::test_support::{TEST_LOCK, position_of};
 
     #[test]
     fn set_env_overwrites_in_place() {

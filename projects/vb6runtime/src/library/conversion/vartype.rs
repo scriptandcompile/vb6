@@ -460,10 +460,12 @@ mod tests {
         assert!(var_type(&VBVariant::Empty).is_ok());
         assert!(var_type(&VBVariant::Null).is_ok());
         assert!(var_type(&VBVariant::Nothing).is_ok());
-        assert!(var_type(&VBVariant::from_error(crate::error::VBError::new(
-            err_number::TYPE_MISMATCH
-        )))
-        .is_ok());
+        assert!(
+            var_type(&VBVariant::from_error(crate::error::VBError::new(
+                err_number::TYPE_MISMATCH
+            )))
+            .is_ok()
+        );
         assert!(var_type(&VBVariant::from_string("test")).is_ok());
     }
 }

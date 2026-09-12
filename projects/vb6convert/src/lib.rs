@@ -5,18 +5,18 @@
 //! conversion modules behind feature flags.
 
 #![warn(missing_docs)]
-    /// Project analysis for conversion compatibility assessment.
-    pub mod analysis;
-    /// Converter registry and factory for language-specific converters.
-    pub mod converters;
-    /// Error types for the conversion pipeline.
-    pub mod error;
-    /// Core conversion traits shared by all target backends.
-    pub mod traits;
-    /// Shared type definitions for conversion results, config, and warnings.
-    pub mod types;
-    /// Validation utilities for checking converted code.
-    pub mod validation;
+/// Project analysis for conversion compatibility assessment.
+pub mod analysis;
+/// Converter registry and factory for language-specific converters.
+pub mod converters;
+/// Error types for the conversion pipeline.
+pub mod error;
+/// Core conversion traits shared by all target backends.
+pub mod traits;
+/// Shared type definitions for conversion results, config, and warnings.
+pub mod types;
+/// Validation utilities for checking converted code.
+pub mod validation;
 
 // Re-export core types and traits
 pub use error::{ConversionError, Result};

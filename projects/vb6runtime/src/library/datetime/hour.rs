@@ -429,7 +429,7 @@
 //! - `Format`: Formats a date/time with custom formatting including AM/PM
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBDate, VBVariant};
+use crate::value::{VBDate, VBVariant, date_serial_to_datetime};
 
 /// Implementation of the `Hour` function.
 ///

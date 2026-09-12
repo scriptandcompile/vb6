@@ -622,13 +622,13 @@
 //! - `StrConv`: Convert byte array to string
 //! - `FreeFile`: Get file number for saving resource data
 
-use super::resfile::{rt, ResId};
+use super::resfile::{ResId, rt};
 use super::{index_to_res_id, resource_not_found};
+use crate::VBType;
 use crate::array::ArrayValue;
 use crate::error::VBResult;
 use crate::state::resources;
 use crate::value::VBVariant;
-use crate::VBType;
 
 /// Highest custom resource format `LoadResData` accepts.
 ///

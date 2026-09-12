@@ -308,7 +308,7 @@ pub fn array(elements: &[VBVariant]) -> VBVariant {
 #[cfg(test)]
 mod tests {
     use super::array;
-    use crate::error::{err_number, VBError};
+    use crate::error::{VBError, err_number};
     use crate::types::VBType;
     use crate::value::VBVariant;
 

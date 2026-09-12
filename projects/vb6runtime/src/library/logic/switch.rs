@@ -483,7 +483,7 @@
 //! - No fall-through behavior like some languages' switch statements
 //! - Cannot use ranges directly (must use comparison expressions)
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::value::VBVariant;
 
 /// Implementation of the `Switch` function.

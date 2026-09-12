@@ -49,7 +49,7 @@ fn system_set_native(ts: Timestamp) -> Result<(), SystemClockError> {
 
     #[cfg(windows)]
     {
-        use windows_sys::Win32::System::Time::{SetSystemTime, SYSTEMTIME};
+        use windows_sys::Win32::System::Time::{SYSTEMTIME, SetSystemTime};
 
         // Convert Unix epoch to Windows FILETIME (100-ns intervals since 1601-01-01).
         // Difference between 1601-01-01 and 1970-01-01 in 100-ns intervals:

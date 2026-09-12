@@ -9,8 +9,8 @@
 
 use super::{Builtin, Registry};
 use crate::typed_builtin;
-use vb6runtime::library::conversion as convfn;
 use vb6runtime::VBVariant;
+use vb6runtime::library::conversion as convfn;
 
 /// Register the conversion functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {

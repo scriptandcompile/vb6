@@ -510,7 +510,7 @@
 //! Debug.Print original = rebuilt       ' True - perfect round-trip
 //! ```
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::value::{VBString, VBVariant};
 
 /// Implementation of the `Join` function.

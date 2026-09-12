@@ -35,8 +35,8 @@ mod tests {
 
     use crate::builtins::call_builtin;
     use vb6core::error::err_number;
-    use vb6runtime::state::{file, resources};
     use vb6runtime::VBVariant;
+    use vb6runtime::state::{file, resources};
 
     /// Serializes these tests against each other: the file backend and the
     /// linked resource file are process-global, so parallel tests would

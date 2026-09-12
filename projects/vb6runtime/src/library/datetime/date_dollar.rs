@@ -276,7 +276,7 @@
 //! - Cannot specify date format (use `Format$` for custom formats)
 
 use crate::error::VBResult;
-use crate::value::{date_serial_to_string, VBString};
+use crate::value::{VBString, date_serial_to_string};
 
 /// Implementation of the `Date$` function.
 ///

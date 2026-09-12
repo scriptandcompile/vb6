@@ -595,7 +595,7 @@ mod tests {
     use vb6core::error::err_number;
 
     use super::is_error;
-    use crate::{error::VBError, value::VBVariant, ArrayDimension, VBObject, VBType};
+    use crate::{ArrayDimension, VBObject, VBType, error::VBError, value::VBVariant};
 
     #[derive(Debug)]
     struct TestObject(&'static str);

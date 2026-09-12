@@ -4,7 +4,7 @@
 //! bounds (`Dim x(1 To 5)`). [`ArrayValue`] stores elements in a flat buffer
 //! with one inclusive [`ArrayDimension`] per rank.
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::types::VBType;
 use crate::value::VBVariant;
 

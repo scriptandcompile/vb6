@@ -260,7 +260,7 @@
 //! - Some Unicode characters may not display correctly depending on font support
 
 use crate::{
-    error::{err_number, VBError, VBResult},
+    error::{VBError, VBResult, err_number},
     value::{VBLong, VBString},
 };
 

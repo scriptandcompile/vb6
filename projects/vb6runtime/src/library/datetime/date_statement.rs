@@ -161,8 +161,8 @@ pub fn date_statement(value: &VBVariant) -> VBResult<()> {
 #[cfg(test)]
 mod tests {
     use super::date_statement;
-    use crate::state::test_support::TEST_LOCK;
     use crate::VBVariant;
+    use crate::state::test_support::TEST_LOCK;
 
     #[test]
     fn sets_date_from_literal() {

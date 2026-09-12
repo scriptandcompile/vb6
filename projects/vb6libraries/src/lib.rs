@@ -48,7 +48,6 @@
 
 #![warn(missing_docs)]
 
-
 /// Library detection and analysis
 pub mod detection {
     use std::collections::HashSet;

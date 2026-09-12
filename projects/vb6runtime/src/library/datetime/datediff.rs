@@ -562,7 +562,7 @@
 //! - `Time`: Returns current time
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBDate, VBLong, VBString, VBVariant};
+use crate::value::{VBDate, VBLong, VBString, VBVariant, date_serial_to_datetime};
 
 /// Implementation of the `DateDiff` function.
 ///

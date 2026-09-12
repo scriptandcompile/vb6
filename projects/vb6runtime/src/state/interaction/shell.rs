@@ -6,7 +6,7 @@
 //! the six documented constants — so backends only ever see a well-formed
 //! request.
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 
 // ---------------------------------------------------------------------------
 // Window styles

@@ -31,7 +31,7 @@ mod tests;
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
-use vb6core::error::{err_number, VBError, VBResult};
+use vb6core::error::{VBError, VBResult, err_number};
 use vb6runtime::value::VBVariant;
 
 /// Declarative builtin signature spec.

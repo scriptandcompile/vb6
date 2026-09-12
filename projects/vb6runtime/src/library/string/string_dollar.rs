@@ -575,7 +575,7 @@
 //! - Cannot specify different characters at different positions
 
 use crate::{
-    error::{err_number, VBError, VBResult},
+    error::{VBError, VBResult, err_number},
     value::{VBLong, VBString, VBVariant},
 };
 /// Resolves `character` to a single repeating `char` for the `String` function.

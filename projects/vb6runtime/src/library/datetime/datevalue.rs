@@ -595,7 +595,7 @@
 //! - `CVDate`: Converts expression to `Date` (legacy function)
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, parse_vb_date, VBVariant};
+use crate::value::{VBVariant, date_serial_to_datetime, parse_vb_date};
 
 /// Implementation of the `DateValue` function.
 ///
@@ -642,7 +642,7 @@ const MAX_SAFE_DAYS: f64 = 7_304_484.0;
 mod tests {
     use super::date_value;
     use crate::error::err_number;
-    use crate::value::{date_serial_to_datetime, VBVariant};
+    use crate::value::{VBVariant, date_serial_to_datetime};
 
     fn dv(input: &VBVariant) -> f64 {
         let result = date_value(input).unwrap();

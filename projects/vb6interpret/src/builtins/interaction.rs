@@ -13,13 +13,13 @@
 
 use super::{Builtin, Registry};
 use crate::typed_builtin;
+use vb6runtime::VBVariant;
 use vb6runtime::library::interaction::beep::beep;
 use vb6runtime::library::interaction::command::command;
 use vb6runtime::library::interaction::command_dollar::command_dollar;
 use vb6runtime::library::interaction::doevents::do_events;
 use vb6runtime::library::interaction::msgbox::msg_box;
 use vb6runtime::library::interaction::shell::shell;
-use vb6runtime::VBVariant;
 
 /// Register the interaction functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {
@@ -55,8 +55,8 @@ pub(super) fn register(registry: &mut Registry) {
 #[cfg(test)]
 mod tests {
     use super::super::call_builtin;
-    use vb6runtime::state::interaction::{self, MsgBoxButton};
     use vb6runtime::VBVariant;
+    use vb6runtime::state::interaction::{self, MsgBoxButton};
 
     #[test]
     fn beep_dispatches() {

@@ -501,8 +501,8 @@ pub fn date() -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::date;
-    use crate::state::test_support::TEST_LOCK;
     use crate::VBVariant;
+    use crate::state::test_support::TEST_LOCK;
 
     #[test]
     fn returns_date_variant() {

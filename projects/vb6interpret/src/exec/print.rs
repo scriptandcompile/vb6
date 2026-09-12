@@ -1,10 +1,10 @@
 //! `Print` / `Debug.Print` output emission, including `Print #filenumber`.
 
 use vb6core::error::VBError;
-use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
-use vb6runtime::library::file as filefn;
+use vb6parse::parsers::cst::CstNode;
 use vb6runtime::VBVariant;
+use vb6runtime::library::file as filefn;
 
 use crate::error::RunResult;
 use crate::interpreter::Interpreter;

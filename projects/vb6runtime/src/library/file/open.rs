@@ -62,8 +62,8 @@ use vb6core::error::err_number;
 use crate::error::{VBError, VBResult};
 use crate::state::file;
 use crate::state::file::{
-    backend::{AccessMode, LockMode, OpenMode},
     MAX_FILE_NUMBER, MIN_FILE_NUMBER,
+    backend::{AccessMode, LockMode, OpenMode},
 };
 use crate::value::VBVariant;
 

@@ -323,11 +323,7 @@ pub fn format_dollar(
     }
     let first_day_of_week = firstdayofweek.map_or(1, |v| {
         let n = v.as_i32();
-        if (1..=7).contains(&n) {
-            n
-        } else {
-            1
-        }
+        if (1..=7).contains(&n) { n } else { 1 }
     });
     let first_week_of_year = firstweekofyear.map_or(1, |v| v.as_i32());
 
@@ -911,11 +907,7 @@ fn format_number_custom(value: f64, format: &str) -> VBResult<String> {
     let negative = value < 0.0;
     let zero = value == 0.0;
     let index = if negative {
-        if sections.len() > 1 {
-            1
-        } else {
-            0
-        }
+        if sections.len() > 1 { 1 } else { 0 }
     } else if zero && sections.len() > 2 {
         2
     } else {
@@ -1163,19 +1155,11 @@ pub(crate) fn date_parts(serial: f64) -> Option<DateParts> {
 /// The 12-hour clock hour for a 0-23 hour.
 fn hour12(hour: u8) -> u8 {
     let r = hour % 12;
-    if r == 0 {
-        12
-    } else {
-        r
-    }
+    if r == 0 { 12 } else { r }
 }
 
 fn ampm(hour: u8) -> &'static str {
-    if hour < 12 {
-        "AM"
-    } else {
-        "PM"
-    }
+    if hour < 12 { "AM" } else { "PM" }
 }
 
 fn pad2(v: i32) -> String {

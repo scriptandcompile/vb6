@@ -4,7 +4,7 @@
 //! on the system ANSI code page. This runtime models that code page as
 //! Windows-1252, the default on Western Windows systems.
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 
 /// Encodes the first character of `input` to its Windows-1252 (ANSI) byte.
 ///

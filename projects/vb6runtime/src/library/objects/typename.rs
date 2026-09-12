@@ -273,7 +273,7 @@ pub fn type_name(value: &VBVariant) -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::type_name;
-    use crate::{value::VBVariant, ArrayDimension, ArrayValue, VBType};
+    use crate::{ArrayDimension, ArrayValue, VBType, value::VBVariant};
     use vb6core::error::err_number;
 
     #[derive(Debug)]

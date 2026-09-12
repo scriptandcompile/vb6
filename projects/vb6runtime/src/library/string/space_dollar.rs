@@ -395,7 +395,7 @@
 //! - Maximum string length limited by VB6 string constraints (~2 GB)
 
 use crate::{
-    error::{err_number, VBError, VBResult},
+    error::{VBError, VBResult, err_number},
     value::{VBLong, VBString},
 };
 

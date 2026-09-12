@@ -728,7 +728,7 @@ pub fn rnd(number: Option<&VBSingle>) -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::rnd;
-    use crate::state::random::{set_seed, DEFAULT_SEED, MODULUS};
+    use crate::state::random::{DEFAULT_SEED, MODULUS, set_seed};
     use crate::state::test_support::TEST_LOCK;
     use crate::{
         error::err_number,

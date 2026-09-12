@@ -6,9 +6,9 @@ use serde_wasm_bindgen::to_value;
 use wasm_bindgen::prelude::*;
 
 use super::{WasmDebugState, WasmDebugTrace, WasmRunError, WasmRunOutput, WasmVariableInfo};
+use crate::Interpreter;
 use crate::error::RunError;
 use crate::interpreter::{DebugSnapshot, DebugVariable};
-use crate::Interpreter;
 use vb6runtime::state::clock as clock_state;
 use vb6runtime::state::file as file_state;
 
@@ -131,7 +131,7 @@ pub fn interpret_vb6_code(code: &str) -> Result<JsValue, JsError> {
                 paused: false,
                 error: Some(error),
                 debug: empty_debug_state(),
-            })?)
+            })?);
         }
     };
 
@@ -166,7 +166,7 @@ pub fn debug_vb6_code(code: &str, pause_after_steps: u32) -> Result<JsValue, JsE
                 paused: false,
                 error: Some(error),
                 debug: empty_debug_state(),
-            })?)
+            })?);
         }
     };
 
@@ -198,7 +198,7 @@ pub fn build_debug_trace(code: &str) -> Result<JsValue, JsError> {
                 successful: false,
                 error: Some(error),
                 snapshots: Vec::new(),
-            })?)
+            })?);
         }
     };
 

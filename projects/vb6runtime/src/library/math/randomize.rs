@@ -106,7 +106,7 @@ mod tests {
     use super::randomize;
     use crate::error::err_number;
     use crate::library::math::rnd::rnd;
-    use crate::state::random::{seed, set_seed, MODULUS};
+    use crate::state::random::{MODULUS, seed, set_seed};
     use crate::state::test_support::TEST_LOCK;
     use crate::value::VBSingle;
     use crate::value::VBVariant;

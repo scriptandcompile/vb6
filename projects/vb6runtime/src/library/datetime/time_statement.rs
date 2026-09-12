@@ -175,8 +175,8 @@ pub fn time_statement(value: &VBVariant) -> VBResult<()> {
 #[cfg(test)]
 mod tests {
     use super::time_statement;
-    use crate::state::test_support::TEST_LOCK;
     use crate::VBVariant;
+    use crate::state::test_support::TEST_LOCK;
 
     #[test]
     fn sets_time_from_string() {

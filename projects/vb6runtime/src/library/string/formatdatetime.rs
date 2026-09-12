@@ -578,7 +578,7 @@ use crate::{
     value::{VBLong, VBVariant},
 };
 
-use super::format_dollar::{date_parts, format_named_date, NamedDateFormat};
+use super::format_dollar::{NamedDateFormat, date_parts, format_named_date};
 
 /// Returns a date/time value expressed as a string in the named format.
 ///

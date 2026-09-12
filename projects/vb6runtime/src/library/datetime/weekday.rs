@@ -590,7 +590,7 @@
 
 use super::datepart::{first_day, weekday as weekday_offset};
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBDate, VBLong, VBVariant};
+use crate::value::{VBDate, VBLong, VBVariant, date_serial_to_datetime};
 
 /// Implementation of the `Weekday` function.
 ///

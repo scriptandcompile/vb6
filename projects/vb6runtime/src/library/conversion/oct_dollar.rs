@@ -245,7 +245,7 @@
 //! - No validation that a string contains valid octal digits
 //! - Returns unsigned representation for negative numbers (two's complement)
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::value::{VBString, VBVariant};
 
 /// Implementation of the `Oct$` function.

@@ -2,11 +2,11 @@
 //! interaction (`AppActivate`, `SendKeys`), graphics (`SavePicture`), and
 //! in-place string mutation (`LSet`/`RSet`/`Mid`/`MidB` assignment forms).
 
-use vb6core::error::{err_number, VBError, VBResult};
-use vb6parse::parsers::cst::CstNode;
+use vb6core::error::{VBError, VBResult, err_number};
 use vb6parse::parsers::SyntaxKind;
-use vb6runtime::value::{VBLong, VBString};
+use vb6parse::parsers::cst::CstNode;
 use vb6runtime::VBVariant;
+use vb6runtime::value::{VBLong, VBString};
 
 use super::super::program;
 use crate::error::RunResult;
@@ -350,7 +350,7 @@ impl Interpreter {
                         "Mid/MidB requires a replacement expression after '='",
                     ),
                     None,
-                ))
+                ));
             }
         };
         let value = self.eval_expr(value_node)?;

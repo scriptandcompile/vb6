@@ -506,7 +506,7 @@
 //! - `Time`: Returns current time
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBDate, VBDouble, VBString, VBVariant};
+use crate::value::{VBDate, VBDouble, VBString, VBVariant, date_serial_to_datetime};
 
 /// Implementation of the `DateAdd` function.
 ///
@@ -571,11 +571,7 @@ fn days_in_month(year: i64, month: i64) -> i64 {
         4 | 6 | 9 | 11 => 30,
         2 => {
             let leap = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
-            if leap {
-                29
-            } else {
-                28
-            }
+            if leap { 29 } else { 28 }
         }
         _ => 0,
     }

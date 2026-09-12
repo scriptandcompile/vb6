@@ -1,8 +1,8 @@
 //! File I/O statements: `Open` and `Close`.
 
 use vb6core::error::VBError;
-use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
+use vb6parse::parsers::cst::CstNode;
 use vb6runtime::library::file as filefn;
 use vb6runtime::state::file as file_state;
 

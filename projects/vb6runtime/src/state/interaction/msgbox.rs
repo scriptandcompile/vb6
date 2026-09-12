@@ -6,7 +6,7 @@
 //! error 5 ("Invalid procedure call or argument") for impossible
 //! combinations — so backends only ever see a well-formed request.
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 
 // ---------------------------------------------------------------------------
 // Buttons

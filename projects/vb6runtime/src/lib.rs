@@ -38,7 +38,7 @@ pub use error::{VBError, VBResult};
 pub use types::VBType;
 
 pub use stdpicture::StdPicture;
-pub use value::{VBObject, VBVariant, CURRENCY_SCALE};
+pub use value::{CURRENCY_SCALE, VBObject, VBVariant};
 
 /// Library version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

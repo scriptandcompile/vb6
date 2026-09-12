@@ -641,7 +641,7 @@ pub fn environ(arg: &VBVariant) -> VBResult<VBVariant> {
 mod tests {
     use super::*;
     use crate::state::environment;
-    use crate::state::test_support::{position_of, TEST_LOCK};
+    use crate::state::test_support::{TEST_LOCK, position_of};
 
     fn reset_with_sample_env() {
         environment::reset();

@@ -281,7 +281,7 @@
 //! - No direct support for multi-byte characters (use `ChrB$` for DBCS)
 
 use crate::{
-    error::{err_number, VBError, VBResult},
+    error::{VBError, VBResult, err_number},
     value::{VBLong, VBString},
 };
 

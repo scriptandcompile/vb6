@@ -386,7 +386,7 @@ pub fn str_dollar(number: &VBVariant) -> VBResult<VBString> {
         }
         VBVariant::String(_) => number.as_f64()?.to_string(),
         VBVariant::Nothing | VBVariant::Object(_) | VBVariant::Array(_) => {
-            return Err(VBError::type_mismatch())
+            return Err(VBError::type_mismatch());
         }
         _ => number.as_string()?,
     };

@@ -557,8 +557,8 @@ pub fn time() -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::time;
-    use crate::state::test_support::TEST_LOCK;
     use crate::VBVariant;
+    use crate::state::test_support::TEST_LOCK;
 
     fn seconds_since_midnight() -> f64 {
         let instant = crate::state::clock::get();

@@ -610,7 +610,7 @@ pub fn is_null(value: &VBVariant) -> VBResult<VBVariant> {
 #[cfg(test)]
 mod tests {
     use super::is_null;
-    use crate::{value::VBVariant, ArrayDimension, VBObject, VBType};
+    use crate::{ArrayDimension, VBObject, VBType, value::VBVariant};
     use vb6core::error::err_number;
 
     #[derive(Debug)]

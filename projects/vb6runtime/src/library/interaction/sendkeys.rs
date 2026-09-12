@@ -210,7 +210,7 @@ pub fn send_keys(keys: &VBString, wait: bool) -> VBResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::state::interaction::{memory::MemoryBackend, SendKeysRecord};
+    use crate::state::interaction::{SendKeysRecord, memory::MemoryBackend};
     use crate::state::test_support::lock_test;
 
     #[test]

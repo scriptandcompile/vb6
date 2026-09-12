@@ -19,9 +19,9 @@ mod util;
 
 pub(crate) use util::{coerce, count_newlines};
 
-use vb6core::error::{err_number, VBError};
-use vb6parse::parsers::cst::CstNode;
+use vb6core::error::{VBError, err_number};
 use vb6parse::parsers::SyntaxKind;
+use vb6parse::parsers::cst::CstNode;
 
 use crate::error::{BuiltinCallInfo, RunError, RunResult};
 use crate::interpreter::{Flow, Interpreter};

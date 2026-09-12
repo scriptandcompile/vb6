@@ -225,7 +225,7 @@
 //! - Does not provide error source or context.
 //! - Message text may change between VB versions.
 
-use crate::error::{default_description, VBResult};
+use crate::error::{VBResult, default_description};
 use crate::state::err as err_state;
 use crate::value::VBVariant;
 

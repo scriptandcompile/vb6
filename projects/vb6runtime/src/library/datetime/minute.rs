@@ -699,7 +699,7 @@
 //! - `Format`: Formats date/time as string
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBDate, VBVariant};
+use crate::value::{VBDate, VBVariant, date_serial_to_datetime};
 
 /// Implementation of the `Minute` function.
 ///

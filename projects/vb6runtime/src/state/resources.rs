@@ -15,7 +15,7 @@
 
 use std::sync::{Mutex, OnceLock};
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::library::resources::resfile::ResFile;
 
 /// The linked resource file: its path, and the parsed file once loaded.

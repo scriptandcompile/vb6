@@ -554,7 +554,7 @@ pub fn weekday_name(
 
 #[cfg(test)]
 mod tests {
-    use super::{weekday_name, ABBREVIATED_NAMES, FULL_NAMES};
+    use super::{ABBREVIATED_NAMES, FULL_NAMES, weekday_name};
     use crate::error::err_number;
     use crate::value::{VBBoolean, VBLong, VBVariant};
     use std::convert::TryFrom;

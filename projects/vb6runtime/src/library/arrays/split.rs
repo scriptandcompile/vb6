@@ -732,7 +732,7 @@
 //! ```
 
 use crate::array::ArrayValue;
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::types::VBType;
 use crate::value::{VBLong, VBString, VBVariant};
 

@@ -47,7 +47,7 @@
 //! ```
 
 use crate::{
-    error::{err_number, VBError, VBResult},
+    error::{VBError, VBResult, err_number},
     value::{VBLong, VBString},
 };
 

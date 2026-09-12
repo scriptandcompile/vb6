@@ -635,7 +635,7 @@
 //! to provide comprehensive reference material for VB6 developers working with user interaction and
 //! message display operations.
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 use crate::state;
 use crate::value::{VBLong, VBString, VBVariant};
 
@@ -680,7 +680,7 @@ pub fn msg_box(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::state::interaction::{memory::MemoryBackend, MsgBoxButton};
+    use crate::state::interaction::{MsgBoxButton, memory::MemoryBackend};
     use crate::state::test_support::lock_test;
 
     fn set_backend(backend: MemoryBackend) {

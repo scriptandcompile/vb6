@@ -16,6 +16,7 @@
 
 use super::{Builtin, Registry};
 use crate::typed_builtin;
+use vb6runtime::VBVariant;
 use vb6runtime::library::file::ch_dir::chdir;
 use vb6runtime::library::file::ch_drive::chdrive;
 use vb6runtime::library::file::curdir::curdir;
@@ -37,7 +38,6 @@ use vb6runtime::library::file::name::name_statement;
 use vb6runtime::library::file::rmdir::rmdir;
 use vb6runtime::library::file::seek::seek;
 use vb6runtime::library::file::setattr::setattr;
-use vb6runtime::VBVariant;
 
 /// Register the file functions in `registry`.
 pub(super) fn register(registry: &mut Registry) {

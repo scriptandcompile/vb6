@@ -10,7 +10,7 @@ use std::fmt;
 
 use crate::array::{ArrayDimension, ArrayValue};
 use crate::error::{VBError, VBResult};
-use crate::types::{vartype, VBType};
+use crate::types::{VBType, vartype};
 
 /// Number of scaled units per currency value (`1.00` == `10_000`).
 pub const CURRENCY_SCALE: i64 = 10_000;
@@ -1196,8 +1196,8 @@ fn pad2(v: i64) -> String {
 
 /// Convert an OLE automation date serial to a civil datetime.
 pub(crate) fn date_serial_to_datetime(serial: f64) -> Option<jiff::civil::DateTime> {
-    use jiff::civil::{Date, DateTime};
     use jiff::Span;
+    use jiff::civil::{Date, DateTime};
 
     if !serial.is_finite() {
         return None;

@@ -523,7 +523,7 @@
 //! - Cannot extract century separately (must calculate from year)
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBDate, VBVariant};
+use crate::value::{VBDate, VBVariant, date_serial_to_datetime};
 
 /// Implementation of the `Year` function.
 ///

@@ -543,7 +543,7 @@
 //! - `CDate`: Converts an expression to a Date
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBLong, VBVariant};
+use crate::value::{VBLong, VBVariant, date_serial_to_datetime};
 
 /// Implementation of the `DateSerial` function.
 ///
@@ -562,11 +562,7 @@ pub fn date_serial(year: &VBLong, month: &VBLong, day: &VBLong) -> VBResult<VBVa
     let day = day.as_i32();
 
     let year = if (0..=99).contains(&year) {
-        if year <= 29 {
-            year + 2000
-        } else {
-            year + 1900
-        }
+        if year <= 29 { year + 2000 } else { year + 1900 }
     } else {
         year
     };

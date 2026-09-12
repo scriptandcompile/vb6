@@ -684,12 +684,12 @@
 //! - `SavePicture`: Save picture object to file
 //! - `Set`: Assign object references
 
-use super::resfile::{rt, ResEntry, ResFile, ResId, VB_RES_BITMAP, VB_RES_CURSOR, VB_RES_ICON};
+use super::resfile::{ResEntry, ResFile, ResId, VB_RES_BITMAP, VB_RES_CURSOR, VB_RES_ICON, rt};
 use super::{index_to_res_id, resource_not_found};
+use crate::StdPicture;
 use crate::error::VBResult;
 use crate::state::resources;
 use crate::value::VBVariant;
-use crate::StdPicture;
 
 /// Byte offset of `biWidth` within a `BITMAPINFOHEADER`.
 const BI_WIDTH_OFFSET: usize = 4;

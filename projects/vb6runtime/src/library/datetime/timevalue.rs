@@ -351,7 +351,7 @@
 //! - Error on invalid input (not Null)
 
 use crate::error::{VBError, VBResult};
-use crate::value::{parse_time_part, parse_vb_date, VBVariant};
+use crate::value::{VBVariant, parse_time_part, parse_vb_date};
 
 /// Implementation of the `TimeValue` function.
 ///
@@ -384,7 +384,7 @@ pub fn time_value(time: &VBVariant) -> VBResult<VBVariant> {
 mod tests {
     use super::time_value;
     use crate::error::err_number;
-    use crate::value::{date_serial_to_datetime, VBVariant};
+    use crate::value::{VBVariant, date_serial_to_datetime};
 
     fn tv(input: &VBVariant) -> f64 {
         let result = time_value(input).unwrap();

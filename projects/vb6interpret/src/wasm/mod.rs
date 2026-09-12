@@ -14,9 +14,9 @@ use run_bridge::{build_debug_state, build_debug_state_from_snapshot, byte_offset
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::{render_error_report, render_report_at_line, RunError};
-use crate::interpreter::DebugSnapshot;
 use crate::Interpreter;
+use crate::error::{RunError, render_error_report, render_report_at_line};
+use crate::interpreter::DebugSnapshot;
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
 

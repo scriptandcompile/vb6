@@ -14,7 +14,7 @@
 //! Variant-returning functions that propagate Null instead of raising 94
 //! (decision F1).
 
-use vb6core::error::{err_number, VBError, VBResult};
+use vb6core::error::{VBError, VBResult, err_number};
 
 use crate::value::VBVariant;
 

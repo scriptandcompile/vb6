@@ -574,7 +574,7 @@
 //! - `Format`: Formats a date as a string (alternative for custom formatting)
 
 use crate::error::{VBError, VBResult};
-use crate::value::{date_serial_to_datetime, VBDate, VBLong, VBString, VBVariant};
+use crate::value::{VBDate, VBLong, VBString, VBVariant, date_serial_to_datetime};
 
 /// Implementation of the `DatePart` function.
 ///

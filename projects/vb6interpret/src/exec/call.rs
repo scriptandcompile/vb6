@@ -1,9 +1,9 @@
 //! The `Call` statement family: explicit `Call`, bare sub invocations,
 //! `MsgBox`/`Beep`/`Shell` statement forms, and `Debug.Print` routing.
 
-use vb6core::error::{err_number, VBError};
-use vb6parse::parsers::cst::CstNode;
+use vb6core::error::{VBError, err_number};
 use vb6parse::parsers::SyntaxKind;
+use vb6parse::parsers::cst::CstNode;
 
 use super::super::program;
 use crate::error::{BuiltinCallInfo, RunResult};

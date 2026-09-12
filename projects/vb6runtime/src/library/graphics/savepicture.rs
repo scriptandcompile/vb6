@@ -100,10 +100,10 @@
 //!
 //! - [SavePicture Statement - Microsoft Docs](https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa268097(v=vs.60))
 
+use crate::StdPicture;
 use crate::error::{VBError, VBResult};
 use crate::state::file::{self, AccessMode, LockMode, OpenMode};
 use crate::value::{VBString, VBVariant};
-use crate::StdPicture;
 use std::path::Path;
 use vb6core::error::err_number;
 
@@ -265,7 +265,7 @@ mod tests {
             assert_eq!(i32::from_le_bytes(bytes[22..26].try_into().unwrap()), 3); // height
             assert_eq!(u16::from_le_bytes(bytes[26..28].try_into().unwrap()), 1); // planes
             assert_eq!(u16::from_le_bytes(bytes[28..30].try_into().unwrap()), 24); // bpp
-                                                                                   // Every pixel is white (0xFF), padding bytes are zeroed.
+            // Every pixel is white (0xFF), padding bytes are zeroed.
             assert!(bytes[54..60].iter().all(|&b| b == 0xFF));
             assert!(bytes[60..62].iter().all(|&b| b == 0));
         });

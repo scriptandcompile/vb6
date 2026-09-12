@@ -40,7 +40,7 @@
 //!
 //! [Mid Statement - Microsoft Docs](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/mid-statement)
 
-use vb6core::error::{err_number, VBError, VBResult};
+use vb6core::error::{VBError, VBResult, err_number};
 
 use crate::value::{VBLong, VBString};
 

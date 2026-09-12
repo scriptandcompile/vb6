@@ -72,7 +72,7 @@ pub fn app_activate(title: &VBString, wait: bool) -> VBResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::state::interaction::{memory::MemoryBackend, AppActivateRecord};
+    use crate::state::interaction::{AppActivateRecord, memory::MemoryBackend};
     use crate::state::test_support::lock_test;
 
     #[test]
