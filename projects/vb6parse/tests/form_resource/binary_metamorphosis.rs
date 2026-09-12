@@ -14,7 +14,10 @@ fn binary_metamorphosis_v1_frx() {
     entries.sort_by_key(|(offset, _)| *offset);
 
     // These .frx files contain actual data
-    assert!(!entries.is_empty());
+    assert_ne!(
+        entries,
+        [] as [(usize, &vb6parse::files::resource::ResourceEntry); 0]
+    );
 }
 
 #[test]
@@ -31,7 +34,7 @@ fn binary_metamorphosis_v2_frx() {
     entries.sort_by_key(|(offset, _)| *offset);
 
     // These .frx files contain actual data
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &vb6parse::files::resource::ResourceEntry); 0]);
 }
 
 #[test]
@@ -48,5 +51,5 @@ fn binary_metamorphosis_v3_frx() {
     entries.sort_by_key(|(offset, _)| *offset);
 
     // These .frx files contain actual data
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &vb6parse::files::resource::ResourceEntry); 0]);
 }

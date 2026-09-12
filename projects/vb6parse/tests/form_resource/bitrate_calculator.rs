@@ -13,7 +13,7 @@ fn bitrate_calculator_about_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &vb6parse::files::resource::ResourceEntry); 0]);
 }
 
 #[test]
@@ -29,5 +29,5 @@ fn bitrate_calculator_main_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert!(!entries.is_empty());
+    assert_ne!(entries, [] as [(usize, &vb6parse::files::resource::ResourceEntry); 0]);
 }
