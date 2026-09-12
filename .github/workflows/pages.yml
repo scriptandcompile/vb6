@@ -38,19 +38,13 @@ jobs:
       - name: Install Python dependencies
         run: pip install markdown
 
-      - name: Create staging directory
-        run: |
-          mkdir -p _site/assets
-          cp docs/vb6runtime/index.html _site/index.html
-          cp -r docs/vb6parse/assets/* _site/assets/
-
       - name: Generate library documentation
-        run: python3 scripts/generate-library-docs.py --clean --output _site/library
+        run: python3 scripts/generate-library-docs.py --clean
 
       - name: Upload docs artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: docs
 
       - name: Deploy to GitHub Pages
         id: deployment
