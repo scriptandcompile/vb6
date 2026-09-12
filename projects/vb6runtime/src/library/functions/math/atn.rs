@@ -355,7 +355,7 @@ mod tests {
         {
             return;
         }
-        
+
         let diff = (actual - expected).abs();
         assert!(
             diff < 1e-12,

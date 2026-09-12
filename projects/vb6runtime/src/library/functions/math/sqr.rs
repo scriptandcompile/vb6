@@ -606,7 +606,6 @@
 //! - `^` operator: Raises number to a power (x^0.5 = Sqr(x))
 //!
 
-
 use crate::{
     error::{VBError, VBResult},
     value::VBVariant,

@@ -333,8 +333,11 @@ mod tests {
             VBVariant::from_bool(true)
         );
         assert_eq!(
-            call_builtin("IsError", &[VBVariant::from_error(vb6core::error::VBError::new(13))])
-                .unwrap(),
+            call_builtin(
+                "IsError",
+                &[VBVariant::from_error(vb6core::error::VBError::new(13))]
+            )
+            .unwrap(),
             VBVariant::from_bool(true)
         );
         assert_eq!(

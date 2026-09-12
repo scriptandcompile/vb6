@@ -339,8 +339,7 @@ mod tests {
         let s = date_dollar().unwrap();
         let after = jiff::Zoned::now().date();
         let (month, day, year) = parse_parts(s.as_str());
-        let parsed =
-            jiff::civil::Date::new(year as i16, month as i8, day as i8).unwrap();
+        let parsed = jiff::civil::Date::new(year as i16, month as i8, day as i8).unwrap();
         assert!(parsed >= before && parsed <= after);
     }
 }

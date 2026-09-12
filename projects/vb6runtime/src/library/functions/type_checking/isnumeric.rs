@@ -707,14 +707,7 @@ mod tests {
     #[test]
     fn returns_true_for_numeric_strings() {
         for s in [
-            "123",
-            "-1.5",
-            "45000.5",
-            "1e3",
-            "&H1F",
-            "&O17",
-            "12.5!",
-            "100#",
+            "123", "-1.5", "45000.5", "1e3", "&H1F", "&O17", "12.5!", "100#",
         ] {
             assert_eq!(
                 is_numeric(&VBVariant::from_string(s)).unwrap(),

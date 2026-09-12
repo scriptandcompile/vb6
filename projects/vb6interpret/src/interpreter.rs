@@ -377,7 +377,11 @@ impl Interpreter {
     }
 
     /// Invoke a Function procedure, returning its result value.
-    pub(crate) fn call_function(&mut self, name: &str, args: Vec<VBVariant>) -> RunResult<VBVariant> {
+    pub(crate) fn call_function(
+        &mut self,
+        name: &str,
+        args: Vec<VBVariant>,
+    ) -> RunResult<VBVariant> {
         let procedure = self.lookup_procedure(name)?;
         let return_type = procedure.return_type.clone();
         let body = procedure.body.clone();
