@@ -483,7 +483,7 @@ struct AspenConfig {
 /// Returns an error when a config file is found but cannot be parsed — a
 /// silently-ignored config looks identical to a config that selected nothing,
 /// which makes debugging rules selection nearly impossible.
-#[must_use]
+#[must_use = "The lint settings should be used to configure the linter"]
 pub fn load_lint_settings(project_path: &Path) -> Result<LintConfig> {
     let config_root = if project_path.is_dir() {
         project_path.to_path_buf()
