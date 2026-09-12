@@ -96,18 +96,19 @@ fn load_dir(
             components.push(name);
             load_dir(state, &entry.path(), depth + 1, components);
             components.pop();
-        } else if depth == 2 && is_file {
-            if let Ok(value) = fs::read_to_string(entry.path()) {
-                components.push(name);
-                let path = PathCase {
-                    appname: components[0].clone(),
-                    section: components[1].clone(),
-                    key: components[2].clone(),
-                };
-                let key = super::index_key(&path.appname, &path.section, &path.key);
-                state.insert(key, Entry { path, value });
-                components.pop();
-            }
+        } else if depth == 2
+            && is_file
+            && let Ok(value) = fs::read_to_string(entry.path())
+        {
+            components.push(name);
+            let path = PathCase {
+                appname: components[0].clone(),
+                section: components[1].clone(),
+                key: components[2].clone(),
+            };
+            let key = super::index_key(&path.appname, &path.section, &path.key);
+            state.insert(key, Entry { path, value });
+            components.pop();
         }
     }
 }
@@ -139,25 +140,24 @@ impl SettingsBackend for FileBackend {
 
     fn remove_key(&self, appname: &str, section: &str, key: &str) -> io::Result<()> {
         // Use case-insensitive lookup to find the actual file
-        if let Some(app_dir) = find_child(&self.root, appname) {
-            if let Some(section_dir) = find_child(&app_dir, section) {
-                if let Some(key_file) = find_child(&section_dir, key) {
-                    let _ = fs::remove_file(&key_file);
-                    // Best-effort removal of now-empty section and appname directories.
-                    let _ = fs::remove_dir(&section_dir);
-                    let _ = fs::remove_dir(&app_dir);
-                }
-            }
+        if let Some(app_dir) = find_child(&self.root, appname)
+            && let Some(section_dir) = find_child(&app_dir, section)
+            && let Some(key_file) = find_child(&section_dir, key)
+        {
+            let _ = fs::remove_file(&key_file);
+            // Best-effort removal of now-empty section and appname directories.
+            let _ = fs::remove_dir(&section_dir);
+            let _ = fs::remove_dir(&app_dir);
         }
         Ok(())
     }
 
     fn remove_section(&self, appname: &str, section: &str) -> io::Result<()> {
         if let Some(app_dir) = find_child(&self.root, appname) {
-            if let Some(section_dir) = find_child(&app_dir, section) {
-                if section_dir.is_dir() {
-                    fs::remove_dir_all(&section_dir)?;
-                }
+            if let Some(section_dir) = find_child(&app_dir, section)
+                && section_dir.is_dir()
+            {
+                fs::remove_dir_all(&section_dir)?;
             }
             let _ = fs::remove_dir(app_dir);
         }
@@ -165,10 +165,10 @@ impl SettingsBackend for FileBackend {
     }
 
     fn remove_appname(&self, appname: &str) -> io::Result<()> {
-        if let Some(app_dir) = find_child(&self.root, appname) {
-            if app_dir.is_dir() {
-                fs::remove_dir_all(&app_dir)?;
-            }
+        if let Some(app_dir) = find_child(&self.root, appname)
+            && app_dir.is_dir()
+        {
+            fs::remove_dir_all(&app_dir)?;
         }
         Ok(())
     }
@@ -188,10 +188,10 @@ impl SettingsBackend for FileBackend {
             for entry in entries.flatten() {
                 if entry.file_type().map(|t| t.is_file()).unwrap_or(false) {
                     let name = entry.file_name().to_string_lossy().into_owned();
-                    if valid_component(&name) {
-                        if let Ok(value) = fs::read_to_string(entry.path()) {
-                            out.push((name, value));
-                        }
+                    if valid_component(&name)
+                        && let Ok(value) = fs::read_to_string(entry.path())
+                    {
+                        out.push((name, value));
                     }
                 }
             }

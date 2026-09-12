@@ -1,8 +1,8 @@
 //! Declaration statements: `Dim`, `Const`, `ReDim`, and `Erase`.
 
 use vb6core::error::VBError;
-use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
+use vb6parse::parsers::cst::CstNode;
 use vb6runtime::{ArrayValue, VBVariant};
 
 use super::coerce;
@@ -156,10 +156,10 @@ impl Interpreter {
             .unwrap_or(vb6core::types::VBType::Variant);
         if index < significant.len() && significant[index].kind() == SyntaxKind::AsKeyword {
             index += 1;
-            if index < significant.len() {
-                if let Some(parsed) = type_from_keyword(significant[index]) {
-                    ty = parsed;
-                }
+            if index < significant.len()
+                && let Some(parsed) = type_from_keyword(significant[index])
+            {
+                ty = parsed;
             }
         }
 

@@ -95,14 +95,13 @@ impl Interpreter {
     pub fn capture_final_debug_snapshot(&mut self) {
         let previous = self.debug_snapshots.last().cloned();
         self.capture_debug_snapshot();
-        if let (Some(before), Some(after)) = (previous, self.debug_snapshots.last()) {
-            if before.steps == after.steps
-                && before.current_line == after.current_line
-                && before.output_text == after.output_text
-                && before.terminated == after.terminated
-            {
-                self.debug_snapshots.pop();
-            }
+        if let (Some(before), Some(after)) = (previous, self.debug_snapshots.last())
+            && before.steps == after.steps
+            && before.current_line == after.current_line
+            && before.output_text == after.output_text
+            && before.terminated == after.terminated
+        {
+            self.debug_snapshots.pop();
         }
     }
 }

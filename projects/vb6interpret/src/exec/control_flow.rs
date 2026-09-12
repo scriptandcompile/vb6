@@ -2,13 +2,13 @@
 //! `While`/`Wend`, `Select Case`, and `Exit`.
 
 use vb6core::error::VBError;
-use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
+use vb6parse::parsers::cst::CstNode;
 use vb6runtime::VBVariant;
 
 use super::count_newlines;
 use crate::error::RunResult;
-use crate::eval::{arith, ArithmeticOperator};
+use crate::eval::{ArithmeticOperator, arith};
 use crate::interpreter::{Flow, Interpreter};
 use crate::program::is_statement_kind;
 
@@ -193,11 +193,10 @@ impl Interpreter {
         if let Some(step_idx) = significant
             .iter()
             .position(|c| c.kind() == SyntaxKind::StepKeyword)
+            && let Some(step_node) = significant.get(step_idx + 1)
         {
-            if let Some(step_node) = significant.get(step_idx + 1) {
-                step = self.eval_expr(step_node)?;
-                step_cursor = Some((significant[step_idx].start_offset(), step_node.end_offset()));
-            }
+            step = self.eval_expr(step_node)?;
+            step_cursor = Some((significant[step_idx].start_offset(), step_node.end_offset()));
         }
 
         let start = self.eval_expr(start_node)?;

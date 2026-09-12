@@ -6,8 +6,8 @@
 use std::collections::HashMap;
 
 use vb6core::types::VBType;
-use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
+use vb6parse::parsers::cst::CstNode;
 
 /// A reference to the VB6 data type named by a type keyword in the CST.
 pub(crate) fn type_from_keyword(node: &CstNode) -> Option<VBType> {
@@ -165,12 +165,11 @@ fn procedure_return_type(node: &CstNode) -> VBType {
     // keyword. The parameter list's own `As` tokens are nested inside the
     // `ParameterList` node, so any `AsKeyword` at this level is the return type.
     while let Some(child) = significant.next() {
-        if child.kind() == SyntaxKind::AsKeyword {
-            if let Some(next) = significant.next() {
-                if let Some(ty) = type_from_keyword(next) {
-                    return ty;
-                }
-            }
+        if child.kind() == SyntaxKind::AsKeyword
+            && let Some(next) = significant.next()
+            && let Some(ty) = type_from_keyword(next)
+        {
+            return ty;
         }
     }
     VBType::Variant
@@ -211,10 +210,10 @@ fn parse_params(parameter_list: &CstNode) -> Vec<Param> {
                 }
             }
             _ => {
-                if let Some(ty) = type_from_keyword(child) {
-                    if let Some(param) = current.as_mut() {
-                        param.ty = ty;
-                    }
+                if let Some(ty) = type_from_keyword(child)
+                    && let Some(param) = current.as_mut()
+                {
+                    param.ty = ty;
                 }
             }
         }

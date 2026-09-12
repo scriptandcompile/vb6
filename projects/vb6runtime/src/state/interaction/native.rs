@@ -74,7 +74,7 @@
 //! - **Anything else / headless**: the request is logged to stderr and the
 //!   call succeeds, so programs remain runnable without an input injector.
 
-use crate::error::{err_number, VBError, VBResult};
+use crate::error::{VBError, VBResult, err_number};
 
 use super::appactivate::AppActivateRequest;
 use super::backend::InteractionBackend;
@@ -415,13 +415,13 @@ mod windows {
 
     use windows_sys::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
     use windows_sys::Win32::UI::WindowsAndMessaging::{
-        DialogBoxIndirectParamW, EndDialog, GetDialogBaseUnits, GetDlgItemTextW, MessageBoxW,
-        SetDlgItemTextW, BS_DEFPUSHBUTTON, BS_PUSHBUTTON, DS_CENTER, DS_MODALFRAME, ES_AUTOHSCROLL,
-        IDCANCEL, IDOK, MB_ABORTRETRYIGNORE, MB_DEFBUTTON1, MB_DEFBUTTON2, MB_DEFBUTTON3,
-        MB_DEFBUTTON4, MB_HELP, MB_ICONERROR, MB_ICONINFORMATION, MB_ICONQUESTION, MB_ICONWARNING,
-        MB_OK, MB_OKCANCEL, MB_RETRYCANCEL, MB_RIGHT, MB_RTLREADING, MB_SETFOREGROUND,
-        MB_SYSTEMMODAL, MB_YESNO, MB_YESNOCANCEL, WM_COMMAND, WM_INITDIALOG, WS_BORDER, WS_CAPTION,
-        WS_CHILD, WS_GROUP, WS_POPUP, WS_SYSMENU, WS_TABSTOP, WS_VISIBLE,
+        BS_DEFPUSHBUTTON, BS_PUSHBUTTON, DS_CENTER, DS_MODALFRAME, DialogBoxIndirectParamW,
+        ES_AUTOHSCROLL, EndDialog, GetDialogBaseUnits, GetDlgItemTextW, IDCANCEL, IDOK,
+        MB_ABORTRETRYIGNORE, MB_DEFBUTTON1, MB_DEFBUTTON2, MB_DEFBUTTON3, MB_DEFBUTTON4, MB_HELP,
+        MB_ICONERROR, MB_ICONINFORMATION, MB_ICONQUESTION, MB_ICONWARNING, MB_OK, MB_OKCANCEL,
+        MB_RETRYCANCEL, MB_RIGHT, MB_RTLREADING, MB_SETFOREGROUND, MB_SYSTEMMODAL, MB_YESNO,
+        MB_YESNOCANCEL, MessageBoxW, SetDlgItemTextW, WM_COMMAND, WM_INITDIALOG, WS_BORDER,
+        WS_CAPTION, WS_CHILD, WS_GROUP, WS_POPUP, WS_SYSMENU, WS_TABSTOP, WS_VISIBLE,
     };
 
     use super::super::appactivate::AppActivateRequest;
@@ -507,7 +507,7 @@ mod windows {
     /// and focused.
     pub(super) fn activate_window(request: &AppActivateRequest) -> bool {
         use windows_sys::Win32::UI::WindowsAndMessaging::{
-            EnumWindows, IsIconic, SetForegroundWindow, ShowWindow, SW_RESTORE,
+            EnumWindows, IsIconic, SW_RESTORE, SetForegroundWindow, ShowWindow,
         };
 
         unsafe extern "system" fn enum_proc(hwnd: HWND, lparam: LPARAM) -> windows_sys::core::BOOL {
@@ -1022,7 +1022,7 @@ mod windows {
     pub(super) fn spawn_process(request: &ShellRequest) -> std::io::Result<f64> {
         use windows_sys::Win32::Foundation::CloseHandle;
         use windows_sys::Win32::System::Threading::{
-            CreateProcessW, CREATE_UNICODE_ENVIRONMENT, PROCESS_INFORMATION, STARTF_USESHOWWINDOW,
+            CREATE_UNICODE_ENVIRONMENT, CreateProcessW, PROCESS_INFORMATION, STARTF_USESHOWWINDOW,
             STARTUPINFOW,
         };
 
@@ -1273,7 +1273,7 @@ mod macos {
                 _ => 106, // F16
             },
             SendKey::Break | SendKey::PrintScreen | SendKey::ScrollLock | SendKey::Insert => {
-                return None
+                return None;
             }
             SendKey::Char(_) => return None, // handled by `keystroke`
         };
@@ -1571,13 +1571,15 @@ mod linux {
         let mut ran_any = false;
         let mut text_run = String::new();
         for stroke in &request.strokes {
-            if let SendKey::Char(c) = stroke.key {
-                if !stroke.shift && !stroke.ctrl && !stroke.alt {
-                    // Plain typing accumulates so one `type` call carries
-                    // the whole run.
-                    text_run.push(c);
-                    continue;
-                }
+            if let SendKey::Char(c) = stroke.key
+                && !stroke.shift
+                && !stroke.ctrl
+                && !stroke.alt
+            {
+                // Plain typing accumulates so one `type` call carries
+                // the whole run.
+                text_run.push(c);
+                continue;
             }
             flush_type(&mut text_run, &mut ran_any);
             press(stroke, &mut ran_any);

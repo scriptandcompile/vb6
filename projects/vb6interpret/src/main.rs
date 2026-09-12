@@ -2,7 +2,7 @@
 //!
 //! Execute VB6 code directly without compilation.
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -214,13 +214,14 @@ fn suggest_similar_path(requested: &Path) -> Vec<PathBuf> {
     scan_dir_for_similar(&dir, file_name, &mut candidates);
 
     // Nothing in the target directory: look one level down.
-    if candidates.is_empty() && dir.is_dir() {
-        if let Ok(entries) = std::fs::read_dir(&dir) {
-            for entry in entries.flatten() {
-                let sub = entry.path();
-                if sub.is_dir() {
-                    scan_dir_for_similar(&sub, file_name, &mut candidates);
-                }
+    if candidates.is_empty()
+        && dir.is_dir()
+        && let Ok(entries) = std::fs::read_dir(&dir)
+    {
+        for entry in entries.flatten() {
+            let sub = entry.path();
+            if sub.is_dir() {
+                scan_dir_for_similar(&sub, file_name, &mut candidates);
             }
         }
     }

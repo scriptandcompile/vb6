@@ -184,11 +184,12 @@ impl<'g, R: Rng> Generator<'g, R> {
 
         // For lexer keyword rules, try to emit the keyword text directly
         // rather than expanding case-insensitive fragment rules char-by-char.
-        if rule.is_lexer_rule() && !rule.is_fragment {
-            if let Some(text) = try_emit_keyword(rule, &self.grammar.rules) {
-                self.output.push_str(&text);
-                return;
-            }
+        if rule.is_lexer_rule()
+            && !rule.is_fragment
+            && let Some(text) = try_emit_keyword(rule, &self.grammar.rules)
+        {
+            self.output.push_str(&text);
+            return;
         }
 
         self.depth += 1;
@@ -340,15 +341,13 @@ fn try_emit_keyword(rule: &Rule, all_rules: &HashMap<String, Rule>) -> Option<St
         match elem {
             Element::StringLiteral(s) => text.push_str(s),
             Element::RuleRef(frag_name) => {
-                if let Some(frag) = all_rules.get(frag_name) {
-                    if frag.is_fragment {
-                        if let Some(Element::StringLiteral(ch)) =
-                            frag.alternatives.first().and_then(|a| a.elements.first())
-                        {
-                            text.push_str(ch);
-                            continue;
-                        }
-                    }
+                if let Some(frag) = all_rules.get(frag_name)
+                    && frag.is_fragment
+                    && let Some(Element::StringLiteral(ch)) =
+                        frag.alternatives.first().and_then(|a| a.elements.first())
+                {
+                    text.push_str(ch);
+                    continue;
                 }
                 return None;
             }
@@ -356,11 +355,7 @@ fn try_emit_keyword(rule: &Rule, all_rules: &HashMap<String, Rule>) -> Option<St
         }
     }
 
-    if text.is_empty() {
-        None
-    } else {
-        Some(text)
-    }
+    if text.is_empty() { None } else { Some(text) }
 }
 
 fn char_in_ranges(c: char, ranges: &[CharRange]) -> bool {

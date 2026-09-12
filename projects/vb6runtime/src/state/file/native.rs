@@ -61,12 +61,11 @@ impl FileBackend for NativeBackend {
         record_length: i32,
     ) -> io::Result<OpenFile> {
         // Create parent directories if they don't exist for Output/Append modes
-        if mode == OpenMode::Output || mode == OpenMode::Append {
-            if let Some(parent) = path.parent() {
-                if !parent.exists() {
-                    std::fs::create_dir_all(parent)?;
-                }
-            }
+        if (mode == OpenMode::Output || mode == OpenMode::Append)
+            && let Some(parent) = path.parent()
+            && !parent.exists()
+        {
+            std::fs::create_dir_all(parent)?;
         }
 
         let file = match mode {

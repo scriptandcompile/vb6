@@ -2,8 +2,8 @@
 //! elements, function return slots, and implicit declaration.
 
 use vb6core::error::{VBError, VBResult};
-use vb6parse::parsers::cst::CstNode;
 use vb6parse::parsers::SyntaxKind;
+use vb6parse::parsers::cst::CstNode;
 use vb6runtime::VBVariant;
 
 use super::super::program;
@@ -84,13 +84,14 @@ impl Interpreter {
     /// slot when the name matches the function itself.
     fn assign_to_name(&mut self, name: &str, value: VBVariant) {
         // Assigning to the Function's name sets its return value.
-        if let Some(frame) = self.frames.last() {
-            if frame.is_function && name.to_lowercase() == frame.name.to_lowercase() {
-                if let Some(frame) = self.frames.last_mut() {
-                    frame.return_value = Some(value);
-                }
-                return;
+        if let Some(frame) = self.frames.last()
+            && frame.is_function
+            && name.to_lowercase() == frame.name.to_lowercase()
+        {
+            if let Some(frame) = self.frames.last_mut() {
+                frame.return_value = Some(value);
             }
+            return;
         }
         self.set_variable(name, value);
     }
@@ -139,13 +140,13 @@ impl Interpreter {
 
     /// Set a variable, implicit-declaring it in the current scope if needed.
     pub(crate) fn set_variable(&mut self, name: &str, value: VBVariant) {
-        if !self.frames.is_empty() {
-            if let Some(frame) = self.frames.last_mut() {
-                if frame.locals.set(name, value.clone()) {
-                    return;
-                }
-            }
+        if !self.frames.is_empty()
+            && let Some(frame) = self.frames.last_mut()
+            && frame.locals.set(name, value.clone())
+        {
+            return;
         }
+
         if self.globals.set(name, value.clone()) {
             return;
         }

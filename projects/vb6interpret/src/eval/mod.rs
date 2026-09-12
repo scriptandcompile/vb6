@@ -10,15 +10,15 @@ mod literals;
 mod operators;
 
 pub(crate) use literals::literal_value;
-pub(crate) use operators::{arith, ArithmeticOperator};
+pub(crate) use operators::{ArithmeticOperator, arith};
 
 use crate::builtins;
 use crate::error::{BuiltinCallInfo, RunError, RunResult};
 use crate::interpreter::Interpreter;
 use crate::scope::normalize;
-use vb6core::error::{err_number, VBError, VBResult};
-use vb6parse::parsers::cst::CstNode;
+use vb6core::error::{VBError, VBResult, err_number};
 use vb6parse::parsers::SyntaxKind;
+use vb6parse::parsers::cst::CstNode;
 use vb6runtime::VBVariant;
 
 impl Interpreter {
@@ -341,10 +341,10 @@ impl Interpreter {
     /// Look up a variable in the current frame, then in globals.
     pub(crate) fn lookup(&self, name: &str) -> Option<&VBVariant> {
         let key = normalize(name);
-        if let Some(frame) = self.frames.last() {
-            if let Some(value) = frame.locals.get(&key) {
-                return Some(value);
-            }
+        if let Some(frame) = self.frames.last()
+            && let Some(value) = frame.locals.get(&key)
+        {
+            return Some(value);
         }
         self.globals.get(&key)
     }
