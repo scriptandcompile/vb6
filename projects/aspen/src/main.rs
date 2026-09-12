@@ -10,7 +10,14 @@ use anyhow::Result;
 use clap::{Arg, Command, builder::PossibleValue, command, value_parser};
 
 fn main() -> Result<()> {
+    let explain_flag = Arg::new("explain")
+        .long("explain")
+        .required(false)
+        .action(clap::ArgAction::SetTrue)
+        .help("list every lint rule with its default and fixability");
+
     let matches = command!()
+        .arg(&explain_flag)
         .subcommand(
             Command::new("check")
                 .about("Check the project")
@@ -116,6 +123,11 @@ fn main() -> Result<()> {
         )
         .arg_required_else_help(true)
         .get_matches();
+
+    if matches.get_flag("explain") {
+        check::explain_rules();
+        return Ok(());
+    }
 
     if let Some(matches) = matches.subcommand_matches("check") {
         let current_dir = current_dir()?;
