@@ -7,7 +7,6 @@ on:
       - main
     paths:
       - '.github/workflows/playground-wasm.yml'
-      - '.github/workflows/wasm-semantic.yml'
       - 'projects/vb6parse/**'
       - 'projects/vb6semantic/**'
       - 'projects/vb6interpret/**'
@@ -34,7 +33,6 @@ jobs:
           filters: |
             parse:
               - '.github/workflows/playground-wasm.yml'
-              - '.github/workflows/wasm-semantic.yml'
               - 'projects/vb6parse/**'
               - '!projects/vb6parse/tests/**'
               - '!projects/vb6parse/benches/**'
@@ -45,14 +43,12 @@ jobs:
               - '!projects/vb6parse/docs/**'
             semantic:
               - '.github/workflows/playground-wasm.yml'
-              - '.github/workflows/wasm-semantic.yml'
               - 'projects/vb6semantic/**'
               - '!projects/vb6semantic/README.md'
               - '!projects/vb6semantic/LICENSE'
               - '!projects/vb6semantic/docs/**'
             interpret:
               - '.github/workflows/playground-wasm.yml'
-              - '.github/workflows/wasm-semantic.yml'
               - 'projects/vb6interpret/**'
               - '!projects/vb6interpret/README.md'
               - '!projects/vb6interpret/docs/**'
@@ -129,6 +125,7 @@ jobs:
           BUILD_INTERPRET: ${{ needs.detect.outputs.interpret }}
         run: |
           set -euo pipefail
+          git clean -fd docs/vb6parse/assets/wasm/ docs/vb6semantic/assets/wasm/ docs/vb6interpret/assets/wasm/
           git pull --rebase --autostash
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
