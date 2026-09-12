@@ -1106,7 +1106,6 @@ impl ConcreteSyntaxTree {
 
 #[cfg(test)]
 mod tests {
-    use crate::parsers::cst::navigation::CstNode;
     use crate::parsers::{ConcreteSyntaxTree, SyntaxKind};
 
     // Navigation method tests
