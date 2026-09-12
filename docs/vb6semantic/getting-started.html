@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Semantic - Getting Started with semantic analysis for Visual Basic 6 code">
+    <title>Getting Started - VB6Semantic</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="hero hero-subproject">
+        <a class="workspace-link" href="../index.html">&larr; VB6 Workspace</a>
+        <div class="container">
+            <h1>VB6Semantic</h1>
+            <p class="tagline">Semantic analysis and symbol table construction for Visual Basic 6 code</p>
+            <div class="badges">
+                <a href="https://crates.io/crates/vb6semantic" target="_blank">
+                    <img src="https://img.shields.io/crates/v/vb6semantic.svg" alt="Crates.io">
+                </a>
+                <a href="https://docs.rs/vb6semantic" target="_blank">
+                    <img src="https://docs.rs/vb6semantic/badge.svg" alt="Documentation">
+                </a>
+                <a href="https://opensource.org/licenses/MIT" target="_blank">
+                    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container nav-inner">
+            <a href="index.html">Overview</a>
+            <a href="#features">Features</a>
+            <a href="#architecture">Architecture</a>
+            <a href="getting-started.html" class="active">Getting Started</a>
+            <a href="playground.html">Playground</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container page-body">
+        <section id="overview">
+            <h2>Getting Started with VB6Semantic</h2>
+            <p>
+                Add VB6Semantic to your analysis pipeline by including it as a dependency. 
+                It works with parsed VB6 project files from <a href="https://scriptandcompile.github.io/vb6/vb6parse/">vb6parse</a> 
+                to produce fully-resolved symbol tables, scopes, and type information.
+            </p>
+        </section>
+
+        <section id="analyzing-a-project">
+            <h2>Analyzing a Project</h2>
+            <pre data-lang="rust"><code class="language-rust">use vb6semantic::SemanticAnalyzer;
+use vb6parse::io::SourceFile;
+use vb6parse::files::ProjectFile;
+
+let mut analyzer = SemanticAnalyzer::new();
+let project_source =
+    SourceFile::from_file("MyProject.vbp").expect("Failed to read project file");
+let (project_opt, failures) = ProjectFile::parse(&project_source).unpack();
+if !failures.is_empty() {
+    eprintln!("Failed to parse project file: {:?}", failures);
+    return;
+}
+
+let project = project_opt.expect("Project file should have parsed successfully");
+
+let analysis_result =
+    analyzer.analyze_project(&project).expect("Failed to analyze project");
+println!(
+    "Analysis completed with {} errors and {} warnings",
+    analysis_result.errors.len(),
+    analysis_result.warnings.len()
+);</code></pre>
+        </section>
+
+        <section id="supported-file-types">
+            <h2>Supported File Types</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File Type</th>
+                        <th>Analyzer Entry Point</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>.vbp</code> Project files</td>
+                        <td><code>analyze_project</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>.cls</code> Class modules</td>
+                        <td><code>analyze_class</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>.bas</code> Code modules</td>
+                        <td><code>analyze_module</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>.frm</code> Forms</td>
+                        <td><code>analyze_form</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Semantic is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>
