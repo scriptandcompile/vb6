@@ -1,4 +1,4 @@
-name: Deploy VB6Parse Workspace Docs
+name: Deploy VB6Runtime Library Docs
 
 on:
   push:
@@ -38,13 +38,19 @@ jobs:
       - name: Install Python dependencies
         run: pip install markdown
 
+      - name: Create staging directory
+        run: |
+          mkdir -p _site/assets
+          cp docs/vb6runtime/index.html _site/index.html
+          cp -r docs/vb6parse/assets/* _site/assets/
+
       - name: Generate library documentation
-        run: python3 scripts/generate-library-docs.py --clean
+        run: python3 scripts/generate-library-docs.py --clean --output _site/library
 
       - name: Upload docs artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
