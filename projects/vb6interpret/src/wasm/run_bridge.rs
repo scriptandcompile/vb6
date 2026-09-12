@@ -5,9 +5,8 @@
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::prelude::*;
 
-use super::{WasmDebugState, WasmDebugTrace, WasmRunError, WasmRunOutput, WasmVariableInfo};
+use super::{WasmDebugState, WasmDebugTrace, WasmRunOutput, WasmVariableInfo};
 use crate::Interpreter;
-use crate::error::RunError;
 use crate::interpreter::{DebugSnapshot, DebugVariable};
 use vb6runtime::state::clock as clock_state;
 use vb6runtime::state::file as file_state;

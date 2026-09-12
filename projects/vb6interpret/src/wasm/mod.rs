@@ -44,21 +44,31 @@ pub struct WasmRunError {
     pub param_name: Option<String>,
 }
 
+/// Information about a single variable in the browser debug UI.
 #[derive(Serialize, Deserialize)]
 pub struct WasmVariableInfo {
+    /// The variable name.
     pub name: String,
+    /// The variable type as a string.
     pub type_name: String,
+    /// The variable value as a string.
     pub value: String,
 }
 
 /// Current interpreter position and scope state for the browser debug UI.
 #[derive(Serialize, Deserialize)]
 pub struct WasmDebugState {
+    /// Number of statements executed so far.
     pub current_steps: u64,
+    /// 1-based current source line.
     pub current_line: usize,
+    /// Executing procedure name, when known.
     pub current_procedure: Option<String>,
+    /// Current call stack depth.
     pub stack_depth: usize,
+    /// Global variables in the current scope.
     pub globals: Vec<WasmVariableInfo>,
+    /// Local variables in the current scope.
     pub locals: Vec<WasmVariableInfo>,
     /// 1-based `[start_line, start_column, end_line, end_column]` of the
     /// sub-line element currently being executed (e.g. a loop's counter,
@@ -71,8 +81,11 @@ pub struct WasmDebugState {
 /// stepping in the browser.
 #[derive(Serialize, Deserialize)]
 pub struct WasmDebugTrace {
+    /// Whether the execution was successful.
     pub successful: bool,
+    /// Runtime or parse error details, if any.
     pub error: Option<WasmRunError>,
+    /// Sequence of interpreter snapshots for each statement executed.
     pub snapshots: Vec<WasmRunOutput>,
 }
 
