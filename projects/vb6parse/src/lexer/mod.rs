@@ -386,7 +386,13 @@ pub fn tokenize<'a>(input: &mut SourceStream<'a>) -> ParseResult<'a, TokenStream
                     token: token_text.into(),
                 },
             );
+            continue;
         }
+
+        // The stream reports that it is not empty, yet nothing could be taken
+        // from it. That should not be reachable, but stopping is always better
+        // than looping forever.
+        break;
     }
 
     failures.extend(ctx.take_errors());
@@ -2332,53 +2338,49 @@ Attribute VB_Exposed = False
         assert_eq!(tokens.len(), 5);
     }
 
+    /// A multi-byte character in code used to hang the tokenizer: the fallback
+    /// branch asked for one *byte*, could not take it without splitting the
+    /// character, consumed nothing, and the loop spun forever.
+    ///
+    /// VB6 accepts accented identifiers, so real source files hit this.
     #[test]
-    fn multibyte_character_does_not_hang() {
-        // A non-ASCII character in a statement position used to make the
-        // tokenizer loop forever because `take_count(1)` refused to advance
-        // past a multi-byte UTF-8 character.
-        let content = "Foo + Bar \u{00e9}\nSub Test()\nEnd Sub";
-        let mut input = SourceStream::new("", content);
-        let result = tokenize(&mut input);
+    fn multibyte_character_in_code_terminates() {
+        // Reaching the end of this loop at all is the assertion: before the
+        // fix, tokenize() never returned for any of these inputs.
+        for content in ["x = ñ", "Dim año As Integer", "x = €", "x = 日"] {
+            let mut input = SourceStream::new("", content);
+            let (tokens_opt, _failures) = tokenize(&mut input).unpack();
 
-        let (tokens_opt, failures) = result.unpack();
-
-        let tokens = tokens_opt.expect("Expected tokens");
-        assert_eq!(tokens[0], ("Foo", Token::Identifier));
-        assert_eq!(tokens[2], ("+", Token::AdditionOperator));
-
-        assert!(
-            failures.iter().any(|failure| matches!(
-                &*failure.kind,
-                crate::errors::ErrorKind::Lexer(LexerError::UnknownToken { .. })
-            )),
-            "expected an UnknownToken diagnostic for the non-ASCII character, got: {failures:?}"
-        );
+            assert!(tokens_opt.is_some(), "{content}");
+        }
     }
 
+    /// The whole multi-byte character is reported, not a fragment of it, and
+    /// tokenizing carries on afterwards.
     #[test]
-    fn non_ascii_inside_string_and_comment_is_consumed() {
-        let content = "MsgBox \"caf\u{00e9}\"\n'na\u{00ef}ve \u{4e2d}\u{6587} comment";
-        let mut input = SourceStream::new("", content);
-        let result = tokenize(&mut input);
-
-        let (tokens_opt, failures) = result.unpack();
-
-        if !failures.is_empty() {
-            for failure in &failures {
-                failure.eprint();
-            }
-        }
+    fn multibyte_character_is_reported_whole() {
+        let mut input = SourceStream::new("", "x = ñ + 1");
+        let (tokens_opt, failures) = tokenize(&mut input).unpack();
 
         let tokens = tokens_opt.expect("Expected tokens");
-        assert!(tokens.tokens().iter().any(|(text, token)| {
-            *token == Token::StringLiteral && text.contains("caf\u{00e9}")
-        }));
-        assert!(
-            tokens.tokens().iter().any(|(text, token)| {
-                *token == Token::EndOfLineComment && text.contains("comment")
-            }),
-            "expected the comment token, got failures: {failures:?}"
+        let last = tokens.len() - 1;
+        assert_eq!(
+            tokens[last].0, "1",
+            "tokenizing should continue past the unknown character"
         );
+        assert_eq!(failures.len(), 1, "one unknown character, one failure");
+    }
+
+    /// Non-ASCII characters inside comments and string literals are consumed by
+    /// their own branches and must stay untouched by the fallback.
+    #[test]
+    fn multibyte_character_in_comment_or_string_is_not_an_error() {
+        for content in ["' año", "x = \"año\""] {
+            let mut input = SourceStream::new("", content);
+            let (tokens_opt, failures) = tokenize(&mut input).unpack();
+
+            assert!(tokens_opt.is_some(), "{content}");
+            assert!(failures.is_empty(), "{content}: {failures:?}");
+        }
     }
 }

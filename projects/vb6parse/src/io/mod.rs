@@ -25,5 +25,5 @@
 pub mod source_file;
 pub mod source_stream;
 
-pub use source_file::SourceFile;
+pub use source_file::{SourceFile, UnrepresentableCharacter, encode_windows_1252};
 pub use source_stream::{Comparator, SourceStream};

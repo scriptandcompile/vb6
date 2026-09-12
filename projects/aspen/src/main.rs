@@ -6,23 +6,58 @@
 mod check;
 mod fmt;
 
-use check::check_subcommand;
-use fmt::fmt_subcommand;
-
-use anyhow::Result;
-
 use std::{env::current_dir, path::PathBuf};
 
+use fmt::fmt_subcommand;
+use vb6parse::lint::LintSettings;
+
+use anyhow::Result;
 use clap::{Arg, Command, builder::PossibleValue, command, value_parser};
 
 fn main() -> Result<()> {
+    let explain_flag = Arg::new("explain")
+        .long("explain")
+        .required(false)
+        .action(clap::ArgAction::SetTrue)
+        .help("list every lint rule with its default and fixability");
+
     let matches = command!()
+        .arg(&explain_flag)
         .subcommand(
-            Command::new("check").about("Check the project").arg(
-                Arg::new("project path")
-                    .required(false)
-                    .value_parser(value_parser!(PathBuf)),
-            ),
+            Command::new("check")
+                .about("Check the project")
+                .arg(
+                    Arg::new("select")
+                        .long("select")
+                        .required(false)
+                        // One value per flag, repeatable, comma-separated. Not
+                        // `num_args(1..)`: that swallows the positional path.
+                        .num_args(1)
+                        .action(clap::ArgAction::Append)
+                        .value_delimiter(',')
+                        .help("lint rule codes or code prefixes to run, e.g. N001 or N"),
+                )
+                .arg(
+                    Arg::new("ignore")
+                        .long("ignore")
+                        .required(false)
+                        .num_args(1)
+                        .action(clap::ArgAction::Append)
+                        .value_delimiter(',')
+                        .help("lint rule codes or code prefixes to skip"),
+                )
+                .arg(
+                    Arg::new("explain")
+                        .long("explain")
+                        .required(false)
+                        .action(clap::ArgAction::SetTrue)
+                        .help("list every lint rule with its default and fixability"),
+                )
+                .arg(
+                    Arg::new("project path")
+                        .required(false)
+                        .value_parser(value_parser!(PathBuf)),
+                ),
         )
         .subcommand(
             Command::new("fmt")
@@ -94,6 +129,11 @@ fn main() -> Result<()> {
         .arg_required_else_help(true)
         .get_matches();
 
+    if matches.get_flag("explain") {
+        check::explain_rules();
+        return Ok(());
+    }
+
     if let Some(matches) = matches.subcommand_matches("check") {
         let current_dir = current_dir()?;
 
@@ -102,9 +142,50 @@ fn main() -> Result<()> {
             .unwrap_or(&current_dir)
             .to_path_buf();
 
-        let check_settings = check::CheckSettings { project_path };
+        if matches.get_flag("explain") {
+            check::explain_rules();
+            return Ok(());
+        }
 
-        check_subcommand(check_settings)?;
+        let configured = check::load_lint_settings(&project_path)?;
+        let from_cli = |name: &str| -> Option<Vec<String>> {
+            matches
+                .get_many::<String>(name)
+                .map(|values| values.cloned().collect())
+        };
+
+        let select = from_cli("select").unwrap_or(configured.select);
+        let ignore = from_cli("ignore").unwrap_or(configured.ignore);
+
+        let unknown: Vec<&String> = select
+            .iter()
+            .chain(ignore.iter())
+            .filter(|code| {
+                !vb6parse::lint::RULES
+                    .iter()
+                    .any(|rule| rule.code.starts_with(code.as_str()))
+            })
+            .collect();
+
+        if !unknown.is_empty() {
+            // A typo in a rule code must not quietly select nothing.
+            anyhow::bail!(
+                "unknown rule code(s): {}. `aspen check --explain` lists them.",
+                unknown
+                    .iter()
+                    .map(|code| code.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            );
+        }
+
+        let lint_settings = LintSettings::from_selection(&select, &ignore);
+        let check_settings = check::CheckSettings {
+            project_path,
+            lint: &lint_settings,
+        };
+
+        check::check_subcommand(&check_settings)?;
 
         return Ok(());
     }

@@ -654,46 +654,4 @@
 //! - `Space`: Creates string of spaces
 //! - `Len`: Returns string length
 
-use crate::{error::VBResult, value::VBString, value::VBVariant};
-
-use super::rtrim_dollar::rtrim_dollar;
-
-/// Returns the string with trailing spaces (ASCII 32) removed.
-///
-/// Only the space character is trimmed, matching VB6; tabs and other
-/// whitespace are preserved.
-///
-/// `RTrim` is the Variant-returning counterpart of `RTrim$`; a `Null` input
-/// propagates as `Null`.
-pub fn rtrim(input: &VBString) -> VBResult<VBVariant> {
-    rtrim_dollar(input).map(VBVariant::from)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn trims_trailing_spaces() {
-        assert_eq!(
-            rtrim(&VBString::from("  Hello World  ")).unwrap(),
-            VBVariant::from_string("  Hello World")
-        );
-        assert_eq!(
-            rtrim(&VBString::from("Hello")).unwrap(),
-            VBVariant::from_string("Hello")
-        );
-    }
-
-    #[test]
-    fn handles_empty_and_all_spaces() {
-        assert_eq!(
-            rtrim(&VBString::from("")).unwrap(),
-            VBVariant::from_string("")
-        );
-        assert_eq!(
-            rtrim(&VBString::from("   ")).unwrap(),
-            VBVariant::from_string("")
-        );
-    }
-}
+use crate::{error::VBResult, value::VBVariant};

@@ -287,25 +287,6 @@ impl<'a> SourceStream<'a> {
         }
     }
 
-    /// Takes a single character (one full UTF-8 code point) from the stream and
-    /// advances the offset past it.
-    ///
-    /// Unlike [`Self::take_count`], this advances by the character's full UTF-8
-    /// byte length, so it always makes progress even for multi-byte characters.
-    ///
-    /// Returns `None` if the stream is at the end of the contents.
-    #[must_use]
-    pub fn take_character(&mut self) -> Option<&'a str> {
-        if self.is_empty() {
-            return None;
-        }
-        let current_char = self.contents[self.offset..].chars().next()?;
-        let end_offset = self.offset + current_char.len_utf8();
-        let result = &self.contents[self.offset..end_offset];
-        self.offset = end_offset;
-        Some(result)
-    }
-
     /// Takes characters from the stream until a character that matches the
     /// compare `str` is encountered or the end of the stream is reached.
     ///

@@ -339,3 +339,256 @@ fn builtin_name(name: &str) -> String {
         .unwrap_or(trimmed)
         .to_lowercase()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn builtin_name_preserves_dollar_suffix() {
+        assert_eq!(builtin_name("Format$"), "format$");
+        assert_eq!(builtin_name("format"), "format");
+        assert_eq!(builtin_name("Left$"), "left$");
+        assert_eq!(builtin_name("Left"), "left");
+        assert_eq!(builtin_name("ChrW%"), "chrw");
+    }
+
+    #[test]
+    fn format_and_format_dollar_dispatch() {
+        let args = vec![
+            VBVariant::Double(1234.5),
+            VBVariant::from(VBString::from("#,##0.00")),
+        ];
+        let result = call_builtin("Format$", &args).unwrap();
+        assert_eq!(result.as_string().unwrap(), "1,234.50");
+        let result = call_builtin("Format", &args).unwrap();
+        assert_eq!(result.as_string().unwrap(), "1,234.50");
+    }
+
+    #[test]
+    fn dollar_variants_share_string_implementations() {
+        let result = call_builtin(
+            "Left$",
+            &[VBVariant::from_string("abcdef"), VBVariant::Long(3)],
+        )
+        .unwrap();
+        assert_eq!(result.as_string().unwrap(), "abc");
+        let result = call_builtin("LCase$", &[VBVariant::from_string("ABC")]).unwrap();
+        assert_eq!(result.as_string().unwrap(), "abc");
+        let result = call_builtin("Chr$", &[VBVariant::Long(65)]).unwrap();
+        assert_eq!(result.as_string().unwrap(), "A");
+    }
+
+    #[test]
+    fn non_dollar_variants_propagate_null() {
+        assert_eq!(
+            call_builtin("Left", &[VBVariant::Null, VBVariant::Long(3)]).unwrap(),
+            VBVariant::Null
+        );
+        assert_eq!(
+            call_builtin("LCase", &[VBVariant::Null]).unwrap(),
+            VBVariant::Null
+        );
+        assert_eq!(
+            call_builtin("Trim", &[VBVariant::Null]).unwrap(),
+            VBVariant::Null
+        );
+        assert_eq!(
+            call_builtin("Mid", &[VBVariant::Null, VBVariant::Long(1)]).unwrap(),
+            VBVariant::Null
+        );
+        assert_eq!(
+            call_builtin("Chr", &[VBVariant::Null]).unwrap(),
+            VBVariant::Null
+        );
+    }
+
+    #[test]
+    fn dollar_variants_reject_null() {
+        let err = call_builtin("Left$", &[VBVariant::Null, VBVariant::Long(3)]).unwrap_err();
+        assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+        let err = call_builtin("LCase$", &[VBVariant::Null]).unwrap_err();
+        assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+        let err = call_builtin("Chr$", &[VBVariant::Null]).unwrap_err();
+        assert_eq!(err.number, vb6core::error::err_number::INVALID_USE_OF_NULL);
+    }
+
+    #[test]
+    fn math_functions_dispatch() {
+        assert_eq!(
+            call_builtin("Abs", &[VBVariant::from_integer(-5)]).unwrap(),
+            VBVariant::from_integer(5)
+        );
+        assert_eq!(
+            call_builtin("Sqr", &[VBVariant::from_double(16.0)]).unwrap(),
+            VBVariant::from_double(4.0)
+        );
+        assert_eq!(
+            call_builtin("Round", &[VBVariant::from_double(2.5)]).unwrap(),
+            VBVariant::from_double(2.0)
+        );
+        assert_eq!(
+            call_builtin("Sgn", &[VBVariant::from_integer(-7)]).unwrap(),
+            VBVariant::from_integer(-1)
+        );
+    }
+
+    #[test]
+    fn rnd_accepts_zero_or_one_argument() {
+        let value = call_builtin("Rnd", &[]).unwrap().as_f32().unwrap();
+        assert!((0.0..1.0).contains(&value));
+        let value = call_builtin("Rnd", &[VBVariant::from_long(1)])
+            .unwrap()
+            .as_f32()
+            .unwrap();
+        assert!((0.0..1.0).contains(&value));
+    }
+
+    #[test]
+    fn wrong_argument_count_is_450() {
+        let err = call_builtin("Len", &[]).unwrap_err();
+        assert_eq!(
+            err.number,
+            vb6core::error::err_number::WRONG_NUMBER_OF_ARGUMENTS
+        );
+        let err = call_builtin(
+            "Len",
+            &[VBVariant::from_string("a"), VBVariant::from_string("b")],
+        )
+        .unwrap_err();
+        assert_eq!(
+            err.number,
+            vb6core::error::err_number::WRONG_NUMBER_OF_ARGUMENTS
+        );
+    }
+
+    #[test]
+    fn unknown_function_is_error_35() {
+        let err = call_builtin("DefinitelyNotAFunction", &[]).unwrap_err();
+        assert_eq!(err.number, 35);
+    }
+
+    #[test]
+    fn logic_functions_dispatch() {
+        let result = call_builtin(
+            "IIf",
+            &[
+                VBVariant::from_bool(true),
+                VBVariant::from_string("yes"),
+                VBVariant::from_string("no"),
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_string().unwrap(), "yes");
+
+        let result = call_builtin(
+            "Choose",
+            &[
+                VBVariant::Long(2),
+                VBVariant::from_string("a"),
+                VBVariant::from_string("b"),
+                VBVariant::from_string("c"),
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_string().unwrap(), "b");
+
+        let result = call_builtin(
+            "Switch",
+            &[
+                VBVariant::from_bool(false),
+                VBVariant::from_string("a"),
+                VBVariant::from_bool(true),
+                VBVariant::from_string("b"),
+            ],
+        )
+        .unwrap();
+        assert_eq!(result.as_string().unwrap(), "b");
+    }
+
+    #[test]
+    fn logic_variadic_functions_validate_arity() {
+        let err = call_builtin("Switch", &[VBVariant::from_bool(true)]).unwrap_err();
+        assert_eq!(
+            err.number,
+            vb6core::error::err_number::WRONG_NUMBER_OF_ARGUMENTS
+        );
+        let err = call_builtin("Choose", &[VBVariant::Long(1)]).unwrap_err();
+        assert_eq!(
+            err.number,
+            vb6core::error::err_number::WRONG_NUMBER_OF_ARGUMENTS
+        );
+    }
+
+    #[test]
+    fn type_checking_functions_dispatch() {
+        assert_eq!(
+            call_builtin("IsEmpty", &[VBVariant::Empty]).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin("IsNull", &[VBVariant::Null]).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin(
+                "IsError",
+                &[VBVariant::from_error(vb6core::error::VBError::new(13))]
+            )
+            .unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin("IsDate", &[VBVariant::from_string("12/25/2025")]).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin("IsNumeric", &[VBVariant::from_string("123")]).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin(
+                "IsArray",
+                &[VBVariant::array_dynamic(vb6runtime::VBType::Integer)]
+            )
+            .unwrap(),
+            VBVariant::from_bool(true)
+        );
+    }
+
+    #[test]
+    fn type_checking_returns_false_for_other_values() {
+        assert_eq!(
+            call_builtin("IsEmpty", &[VBVariant::Null]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            call_builtin("IsNull", &[VBVariant::Empty]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            call_builtin("IsDate", &[VBVariant::from_string("not a date")]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            call_builtin("IsNumeric", &[VBVariant::from_string("abc")]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+
+    #[test]
+    fn is_missing_reports_omitted_argument() {
+        assert_eq!(
+            call_builtin("IsMissing", &[]).unwrap(),
+            VBVariant::from_bool(true)
+        );
+        assert_eq!(
+            call_builtin("IsMissing", &[VBVariant::Empty]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+        assert_eq!(
+            call_builtin("IsMissing", &[VBVariant::Null]).unwrap(),
+            VBVariant::from_bool(false)
+        );
+    }
+}

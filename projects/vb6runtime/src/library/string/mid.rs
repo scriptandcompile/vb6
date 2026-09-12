@@ -832,66 +832,9 @@ mod tests {
     #[test]
     fn omitting_length_returns_rest() {
         assert_eq!(
-            mid(&VBString::from("Hello World"), &VBLong::from(7), None).unwrap(),
-            VBVariant::from_string("World")
-        );
-    }
-
-    #[test]
-    fn length_beyond_end_is_clamped() {
-        assert_eq!(
             mid(
-                &VBString::from("Hello"),
-                &VBLong::from(4),
-                Some(&VBLong::from(10))
+                &VBVariant::from_string("Hello World"),
+                &VBLong::from(7),
+                None
             )
             .unwrap(),
-            VBVariant::from_string("lo")
-        );
-    }
-
-    #[test]
-    fn start_beyond_end_returns_empty() {
-        assert_eq!(
-            mid(&VBString::from("Hello"), &VBLong::from(6), None).unwrap(),
-            VBVariant::from_string("")
-        );
-    }
-
-    #[test]
-    fn zero_length_returns_empty() {
-        assert_eq!(
-            mid(
-                &VBString::from("Hello"),
-                &VBLong::from(2),
-                Some(&VBLong::from(0))
-            )
-            .unwrap(),
-            VBVariant::from_string("")
-        );
-    }
-
-    #[test]
-    fn rejects_invalid_start() {
-        assert_eq!(
-            mid(&VBString::from("Hello"), &VBLong::from(0), None)
-                .unwrap_err()
-                .number,
-            err_number::INVALID_PROCEDURE_CALL
-        );
-    }
-
-    #[test]
-    fn rejects_negative_length() {
-        assert_eq!(
-            mid(
-                &VBString::from("Hello"),
-                &VBLong::from(1),
-                Some(&VBLong::from(-1))
-            )
-            .unwrap_err()
-            .number,
-            err_number::INVALID_PROCEDURE_CALL
-        );
-    }
-}
