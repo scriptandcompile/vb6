@@ -332,6 +332,7 @@ fn position(line_starts: &[usize], source: &str, offset: usize) -> (usize, usize
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::lint;
 
     fn with(codes: &[&str]) -> LintSettings {
         let select: Vec<String> = codes.iter().map(|code| (*code).to_string()).collect();
@@ -371,7 +372,10 @@ mod tests {
             "End Sub\r\n",
         );
 
-        assert!(lint_source(source, &with(&["N001"])).is_empty());
+        assert_eq!(
+            lint_source(source, &with(&["N001"])),
+            [] as [lint::Diagnostic; 0]
+        );
     }
 
     /// The `REM` check must not slice a line at a fixed byte offset: on a
@@ -386,14 +390,20 @@ mod tests {
             "End Sub\r\n",
         );
 
-        assert!(lint_source(source, &with(&["N001"])).is_empty());
+        assert_eq!(
+            lint_source(source, &with(&["N001"])),
+            [] as [lint::Diagnostic; 0]
+        );
     }
 
     #[test]
     fn ascii_only_code_is_clean() {
         let source = "Public Function Anadir() As String\r\nEnd Function\r\n";
 
-        assert!(lint_source(source, &with(&["N001"])).is_empty());
+        assert_eq!(
+            lint_source(source, &with(&["N001"])),
+            [] as [lint::Diagnostic; 0]
+        );
     }
 
     #[test]
@@ -411,8 +421,14 @@ mod tests {
 
     #[test]
     fn consistent_line_endings_are_clean() {
-        assert!(lint_source("Dim a\r\nDim b\r\n", &with(&["W001"])).is_empty());
-        assert!(lint_source("Dim a\nDim b\n", &with(&["W001"])).is_empty());
+        assert_eq!(
+            lint_source("Dim a\r\nDim b\r\n", &with(&["W001"])),
+            [] as [lint::Diagnostic; 0]
+        );
+        assert_eq!(
+            lint_source("Dim a\nDim b\n", &with(&["W001"])),
+            [] as [lint::Diagnostic; 0]
+        );
     }
 
     #[test]
