@@ -85,6 +85,43 @@ main {
     color: white;
     padding: 72px 0;
     box-shadow: 0 12px 32px var(--shadow-color);
+    position: relative;
+    width: 100%;
+}
+
+.hero-subproject {
+    padding: 40px 0 52px;
+    width: 100%;
+    position: relative;
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.workspace-link {
+    display: inline-block;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.18);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s ease;
+    z-index: 10;
+}
+
+.workspace-link:hover {
+    background: rgba(255, 255, 255, 0.28);
+    text-decoration: none;
 }
 
 .hero-slim {
