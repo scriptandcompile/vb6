@@ -385,6 +385,12 @@ Currently, only latin-1 source code is supported."
 /// Returns the first character that Windows-1252 cannot represent, together
 /// with its byte offset in `content`.
 ///
+/// # Panics
+///
+/// This function will panic if `WINDOWS_1252.encode` reports an unmappable character
+/// but the character cannot be found in the input string, or if the encode buffer
+/// overflows usize.
+///
 /// # Example
 ///
 /// ```rust
@@ -446,7 +452,10 @@ mod encode_tests {
 
         let encoded = encode_windows_1252(source.as_ref()).expect("encodes");
 
-        assert_eq!(encoded, bytes, "the file must survive a decode/encode cycle");
+        assert_eq!(
+            encoded, bytes,
+            "the file must survive a decode/encode cycle"
+        );
     }
 
     #[test]
