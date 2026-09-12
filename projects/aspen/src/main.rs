@@ -1,13 +1,12 @@
 mod check;
 mod fmt;
 
-use check::check_subcommand;
-use fmt::fmt_subcommand;
-
-use anyhow::Result;
-
 use std::{env::current_dir, path::PathBuf};
 
+use fmt::fmt_subcommand;
+use vb6parse::lint::LintSettings;
+
+use anyhow::Result;
 use clap::{Arg, Command, builder::PossibleValue, command, value_parser};
 
 fn main() -> Result<()> {
@@ -163,12 +162,13 @@ fn main() -> Result<()> {
             );
         }
 
+        let lint_settings = LintSettings::from_selection(&select, &ignore);
         let check_settings = check::CheckSettings {
             project_path,
-            lint: vb6parse::lint::LintSettings::from_selection(&select, &ignore),
+            lint: &lint_settings,
         };
 
-        check_subcommand(check_settings)?;
+        check::check_subcommand(&check_settings)?;
 
         return Ok(());
     }

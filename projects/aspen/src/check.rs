@@ -9,9 +9,10 @@ use vb6parse::{ProjectFile, SourceFile};
 
 use walkdir::WalkDir;
 
-pub struct CheckSettings {
+/// Settings for the `check` subcommand, including the project path and lint rules.
+pub struct CheckSettings<'a> {
     pub project_path: PathBuf,
-    pub lint: LintSettings,
+    pub lint: &'a LintSettings,
 }
 
 /// Runs the selected lint rules over the files a project refers to.
@@ -50,17 +51,25 @@ fn run_lint_rules(paths: &[PathBuf], settings: &LintSettings) -> Vec<String> {
     findings
 }
 
+/// Results from running the `check` subcommand on a project, including parsing errors,
+/// non-English files, missing files, warnings, and lint findings.
 pub struct CheckResults {
+    /// The path to the project that was checked.
     pub project_path: String,
+    /// Parsing errors encountered while checking the project.
     pub parsing_errors: Vec<Error>,
+    /// Non-English files encountered while checking the project.
     pub non_english_files: Vec<String>,
+    /// Files that were expected but missing in the project.
     pub missing_files: Vec<String>,
+    /// Warnings generated during the check.
     pub warnings: Vec<String>,
     /// Findings from the lint rules, already formatted for display.
     pub lint_findings: Vec<String>,
 }
 
-pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
+/// Runs the `check` subcommand on a project, returning the results.
+pub fn check_subcommand(check_settings: &CheckSettings) -> Result<()> {
     if !check_settings.project_path.exists() {
         println!(
             "No project file found at '{:?}'",
@@ -71,50 +80,30 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
 
     let mut check_summary = Vec::new();
 
-    let lint = check_settings.lint.clone();
-
     if check_settings.project_path.is_dir() {
-        let search_path = check_settings.project_path.to_str().unwrap();
-        let walker = WalkDir::new(search_path).into_iter();
+        let search_path = check_settings.project_path.to_string_lossy();
+        let walker = WalkDir::new(&*search_path).into_iter();
 
         println!("Searching '{}' for .vbp project files.", search_path);
 
-        let found_projects: Vec<_> = walker.into_iter().filter(is_project_file).collect();
+        let found_projects: Vec<_> = walker
+            .into_iter()
+            .filter_map(|entry| entry.ok())
+            .filter(is_project_file)
+            .collect();
 
         found_projects
             .par_iter()
             .map(|project_path| {
-                if project_path.is_err() {
-                    let check_result = CheckResults {
-                        project_path: project_path
-                            .as_ref()
-                            .unwrap()
-                            .path()
-                            .to_str()
-                            .unwrap()
-                            .to_string(),
-                        parsing_errors: Vec::new(),
-                        non_english_files: Vec::new(),
-                        missing_files: vec![format!(
-                            "Failed to load {}",
-                            project_path.as_ref().err().unwrap()
-                        )],
-                        warnings: Vec::new(),
-                        lint_findings: Vec::new(),
-                    };
-
-                    return check_result;
-                }
-
-                let check_settings = CheckSettings {
-                    project_path: project_path.as_ref().unwrap().path().to_path_buf(),
-                    lint: lint.clone(),
+                let check_settings = &CheckSettings {
+                    project_path: project_path.path().to_path_buf(),
+                    lint: check_settings.lint,
                 };
 
-                match check_project(&check_settings) {
+                match check_project(check_settings) {
                     Ok(result) => result,
                     Err(e) => CheckResults {
-                        project_path: check_settings.project_path.to_str().unwrap().to_string(),
+                        project_path: project_path.path().to_string_lossy().into_owned(),
                         parsing_errors: vec![e],
                         non_english_files: Vec::new(),
                         missing_files: Vec::new(),
@@ -125,10 +114,10 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
             })
             .collect_into_vec(&mut check_summary);
     } else {
-        let check_result = match check_project(&check_settings) {
+        let check_result = match check_project(check_settings) {
             Ok(result) => result,
             Err(e) => CheckResults {
-                project_path: check_settings.project_path.to_str().unwrap().to_string(),
+                project_path: check_settings.project_path.to_string_lossy().into_owned(),
                 parsing_errors: vec![e],
                 non_english_files: Vec::new(),
                 missing_files: Vec::new(),
@@ -162,6 +151,8 @@ pub fn check_subcommand(check_settings: CheckSettings) -> Result<()> {
     Ok(())
 }
 
+/// Reports the results of a single project check, including parsing errors,
+/// non-English files, missing files, warnings, and lint findings.
 fn report_check(check_results: &CheckResults) {
     if check_results.parsing_errors.is_empty()
         && check_results.non_english_files.is_empty()
@@ -284,12 +275,7 @@ fn report_check_summary(summary: Vec<CheckResults>) {
     }
 }
 
-fn is_project_file(entry: &Result<walkdir::DirEntry, walkdir::Error>) -> bool {
-    if entry.is_err() {
-        return false;
-    }
-
-    let entry = entry.as_ref().unwrap();
+fn is_project_file(entry: &walkdir::DirEntry) -> bool {
     entry.path().extension() == Some("vbp".as_ref())
 }
 
@@ -415,7 +401,7 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
         }
     }
 
-    check_results.lint_findings = run_lint_rules(&source_paths, &check_settings.lint);
+    check_results.lint_findings = run_lint_rules(&source_paths, check_settings.lint);
 
     // Analyze the project with vb6semantic. This resolves names, builds symbol
     // tables, and reports semantic errors and warnings across all of the
@@ -453,14 +439,18 @@ fn check_project(check_settings: &CheckSettings) -> Result<CheckResults> {
 /// is already read from the same file.
 #[derive(Debug, Clone, Default, serde::Deserialize)]
 pub struct LintConfig {
+    /// The `[lint]` section's `select` field specifies which lint rules to run by default.
     #[serde(default)]
     pub select: Vec<String>,
+    /// The `[lint]` section's `ignore` field specifies which lint rules to skip.
     #[serde(default)]
     pub ignore: Vec<String>,
 }
 
+/// The global section of `.aspen.toml`, which may contain a `[lint]` section.
 #[derive(Debug, Clone, serde::Deserialize)]
 struct AspenConfig {
+    /// The `[lint]` section of the configuration, if present.
     lint: Option<LintConfig>,
 }
 
@@ -508,8 +498,8 @@ pub fn load_lint_settings(project_path: &Path) -> LintConfig {
 /// Prints every rule with its default and fixability.
 pub fn explain_rules() {
     println!(
-        "{:<6} {:<24} {:<8} {:<8} {}",
-        "CODE", "NAME", "DEFAULT", "FIX", "SUMMARY"
+        "{:<6} {:<24} {:<8} {:<8} SUMMARY",
+        "CODE", "NAME", "DEFAULT", "FIX"
     );
 
     for rule in vb6parse::lint::RULES {
