@@ -13,5 +13,5 @@ Planned features:
 Recommended approach:
 
 1. Use `vb6parse` as the parsing core.
-2. USe `vb6semantic` as the semantic engine.
+2. Use `vb6semantic` as the semantic engine.
 3. Implement LSP protocol via `tower-lsp` or equivalent.
