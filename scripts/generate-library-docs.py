@@ -380,7 +380,7 @@ def markdown_to_html(md_content: str) -> str:
 
 
 def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, str]], 
-                      output_path: Path, base_path: str = "../../") -> None:
+                       output_path: Path) -> None:
     """
     Generate an HTML page with consistent styling.
     
@@ -389,10 +389,13 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
         content: HTML content for main section
         breadcrumbs: List of (text, url) tuples for breadcrumb navigation
         output_path: Path where HTML file will be saved
-        base_path: Relative path to docs root (for CSS/JS)
     """
+    rel = output_path.relative_to(Path("docs/vb6runtime"))
+    depth = len(rel.parts) - 2
+    base = "../" * (depth + 1)
+    
     breadcrumb_html = ' / '.join([
-        f'<a href="{base_path}{url}">{text}</a>' if url else text
+        f'<a href="{base}{url}">{text}</a>' if url else text
         for text, url in breadcrumbs
     ])
     
@@ -403,10 +406,10 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="VB6Runtime Library Reference - {title}">
     <title>{title} - VB6Runtime Library Reference</title>
-    <link rel="stylesheet" href="{base_path}assets/css/style.css">
-    <link rel="stylesheet" href="{base_path}assets/css/docs-style.css">
+    <link rel="stylesheet" href="{base}assets/css/style.css">
+    <link rel="stylesheet" href="{base}assets/css/docs-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="{base_path}assets/js/theme-switcher.js"></script>
+    <script src="{base}assets/js/theme-switcher.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
     <script>hljs.highlightAll();</script>
@@ -421,9 +424,9 @@ def generate_html_page(title: str, content: str, breadcrumbs: List[Tuple[str, st
 
     <nav class="docs-nav">
         <div class="container">
-            <a href="{base_path}index.html">Home</a>
-            <a href="{base_path}library/index.html">Library Reference</a>
-            <a href="{base_path}documentation.html">Documentation</a>
+            <a href="{base}index.html">Home</a>
+            <a href="{base}library/index.html">Library Reference</a>
+            <a href="{base}documentation.html">Documentation</a>
             <a href="https://docs.rs/vb6runtime" target="_blank">API Docs</a>
             <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">GitHub</a>
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
@@ -530,7 +533,6 @@ def generate_library_index(functions: List[Category], statements: List[Category]
         content,
         breadcrumbs,
         output_dir / "index.html",
-        base_path="../../"
     )
 
 
@@ -579,7 +581,6 @@ def generate_category_index(category: Category, item_type: str, output_dir: Path
         content,
         breadcrumbs,
         output_dir / "index.html",
-        base_path="../../"
     )
 
 
@@ -589,6 +590,10 @@ def generate_item_page(item: LibraryItem, category: Category, output_dir: Path) 
     # Convert markdown to HTML
     html_content = markdown_to_html(item.doc_content)
     
+    rel = output_dir.relative_to(Path("docs/vb6runtime/library"))
+    depth = len(rel.parts)
+    base = "../" * (depth + 1)
+    
     content = f"""
         <article class="library-item">
             {html_content}
@@ -597,7 +602,7 @@ def generate_item_page(item: LibraryItem, category: Category, output_dir: Path) 
         <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
             <p>
                 <a href="index.html">← Back to {category.display_name}</a> |
-                <a href="../index.html">View all {item.item_type}s</a>
+                <a href="{base}index.html">View all {item.item_type}s</a>
             </p>
         </div>
 """
@@ -614,7 +619,6 @@ def generate_item_page(item: LibraryItem, category: Category, output_dir: Path) 
         content,
         breadcrumbs,
         output_dir / item.html_filename,
-        base_path="../../"
     )
 
 
