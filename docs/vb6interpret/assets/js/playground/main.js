@@ -165,7 +165,7 @@ async function initPlayground() {
 
     try {
         await Editor.initEditor("editor-container", state.initialCode);
-        await init(buildWasmUrl());
+        await init(WASM_RELEASE_URL);
         init_panic_hook();
         state.wasmReady = true;
         loadSettingsFromLocalStorage();
@@ -186,10 +186,6 @@ async function initPlayground() {
         setStatus("WASM error", "error");
         renderError({ message: `Failed to initialize WASM: ${error.message}` });
     }
-}
-
-function buildWasmUrl() {
-    return WASM_RELEASE_URL;
 }
 
 function bindEvents() {

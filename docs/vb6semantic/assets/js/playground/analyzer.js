@@ -12,20 +12,18 @@ const WASM_RELEASE_URL = 'https://github.com/scriptandcompile/vb6/releases/downl
 let wasmInitialized = false;
 
 /**
- * Initialize the WASM module by fetching from GitHub Release.
+ * Initialize the WASM module.
+ *
+ * On GitHub Pages, local .wasm files are Git LFS pointer text, not actual
+ * binaries, so we always load from GitHub Releases where real binaries live.
  */
 export async function initWasm() {
     try {
         console.log('Fetching vb6semantic WASM from release...');
-        const response = await fetch(WASM_RELEASE_URL);
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        const wasmBuffer = await response.arrayBuffer();
-        await init(wasmBuffer);
+        await init(WASM_RELEASE_URL);
         init_panic_hook();
         wasmInitialized = true;
-        console.log('✅ vb6semantic WASM initialized');
+        console.log('vb6semantic WASM initialized');
         return true;
     } catch (error) {
         console.error('Failed to initialize vb6semantic WASM:', error);
