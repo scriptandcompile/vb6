@@ -3,8 +3,6 @@ import { getDefaultExample, getExample } from "./examples.js";
 import * as Editor from "./editor.js";
 import { createZip } from "./zip.js";
 
-const WASM_RELEASE_URL = "https://github.com/scriptandcompile/vb6/releases/download/v1.2.4/vb6interpret_bg.wasm";
-
 const state = {
     wasmReady: false,
     activeTab: "output",
@@ -165,7 +163,7 @@ async function initPlayground() {
 
     try {
         await Editor.initEditor("editor-container", state.initialCode);
-        await init(WASM_RELEASE_URL);
+        await init();
         init_panic_hook();
         state.wasmReady = true;
         loadSettingsFromLocalStorage();

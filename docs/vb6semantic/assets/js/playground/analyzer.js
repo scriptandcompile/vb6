@@ -7,20 +7,15 @@
 
 import init, { analyze_vb6_code, init_panic_hook } from "../../wasm/vb6semantic.js";
 
-const WASM_RELEASE_URL = 'https://github.com/scriptandcompile/vb6/releases/download/v1.2.4/vb6semantic_bg.wasm';
-
 let wasmInitialized = false;
 
 /**
- * Initialize the WASM module.
- *
- * On GitHub Pages, local .wasm files are Git LFS pointer text, not actual
- * binaries, so we always load from GitHub Releases where real binaries live.
+ * Initialize the WASM module from the bundled asset.
  */
 export async function initWasm() {
     try {
-        console.log('Fetching vb6semantic WASM from release...');
-        await init(WASM_RELEASE_URL);
+        console.log('Loading vb6semantic WASM from bundled asset...');
+        await init();
         init_panic_hook();
         wasmInitialized = true;
         console.log('vb6semantic WASM initialized');

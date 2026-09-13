@@ -7,20 +7,15 @@
 
 import init, { tokenize_vb6_code, parse_vb6_code } from "../../wasm/vb6parse.js";
 
-const WASM_RELEASE_URL = 'https://github.com/scriptandcompile/vb6/releases/download/v1.2.4/vb6parse_bg.wasm';
-
 let wasmInitialized = false;
 
 /**
- * Initialize the WASM module.
- *
- * On GitHub Pages, local .wasm files are Git LFS pointer text, not actual
- * binaries, so we always load from GitHub Releases where real binaries live.
+ * Initialize the WASM module from the bundled asset.
  */
 export async function initWasm() {
     try {
-        console.log('Fetching vb6parse WASM from release...');
-        await init(WASM_RELEASE_URL);
+        console.log('Loading vb6parse WASM from bundled asset...');
+        await init();
         wasmInitialized = true;
         console.log('vb6parse WASM initialized');
         return true;
