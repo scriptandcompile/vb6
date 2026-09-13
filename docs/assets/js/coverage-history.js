@@ -140,7 +140,7 @@ function displayFiles(files) {
     const allFiles = [];
 
     files.forEach(file => {
-        const fileName = file.filename.replace(/^.*\/src\//, 'src/');
+        const fileName = file.filename.replace(/^.*\/projects\/[^\/]+\//, '');
         const lines = file.summary.lines;
         const functions = file.summary.functions;
         const regions = file.summary.regions;

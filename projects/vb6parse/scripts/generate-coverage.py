@@ -153,12 +153,15 @@ def run_coverage():
     
     try:
         subprocess.run(
-            ["cargo", "llvm-cov", "--lib", "--tests", "--json", "--output-path", str(COVERAGE_FILE)],
+            ["cargo", "llvm-cov", "--package", "vb6parse", "--lib", "--tests", "--json", "--output-path", str(COVERAGE_FILE)],
             check=True
         )
     except subprocess.CalledProcessError as e:
-        print(f"Error running coverage: {e}", file=sys.stderr)
-        sys.exit(1)
+        print(f"Warning: cargo llvm-cov failed ({e})", file=sys.stderr)
+        if not COVERAGE_FILE.exists():
+            print("No existing coverage.json found. Exiting.", file=sys.stderr)
+            sys.exit(1)
+        print(f"Using existing coverage.json: {COVERAGE_FILE}")
 
 
 def generate_html_coverage():
@@ -173,6 +176,7 @@ def generate_html_coverage():
             [
                 "cargo", 
                 "llvm-cov", 
+                "--package", "vb6parse",
                 "--lib",
                 "--tests",
                 "--html",
@@ -188,8 +192,132 @@ def generate_html_coverage():
         print(f"✓ HTML coverage reports generated in {output_dir}")
         return output_dir
     except subprocess.CalledProcessError as e:
-        print(f"Error generating HTML coverage: {e}", file=sys.stderr)
-        sys.exit(1)
+        print(f"Warning: cargo llvm-cov --html failed ({e})", file=sys.stderr)
+    
+    src_dir = output_dir / 'src'
+    if src_dir.exists():
+        html_files = list(src_dir.rglob('*.html'))
+        if html_files:
+            print(f"Reprocessing {len(html_files)} existing HTML files...")
+            fix_coverage_html_paths(src_dir, output_dir)
+        else:
+            print("Warning: No existing HTML files found in src/", file=sys.stderr)
+    else:
+        print("Warning: No existing src/ directory found", file=sys.stderr)
+    
+    return output_dir
+
+
+def fix_coverage_html_paths(src_dir, output_dir):
+    """Fix paths in existing coverage HTML files in src/ directory."""
+    import re
+    from pathlib import Path
+    
+    # Patterns to match coverage-generated paths
+    project_root = Path.cwd()
+    pattern = re.compile(r"(href|src)='coverage/[^']*?/src/", re.IGNORECASE)
+    replacement = r"\1='src/"
+    abs_pattern = re.compile(r"(href|src)='[^']*?/" + re.escape(project_root.name) + r"/src/", re.IGNORECASE)
+    source_title_pattern = re.compile(
+        r"<div class='source-name-title'><pre>.*?/" + re.escape(project_root.name) + r"/(src/[^<]+)</pre></div>",
+        re.IGNORECASE
+    )
+    github_url = "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse/"
+    
+    def source_title_replacement(match):
+        relative_path = match.group(1)
+        return f"<div class='source-name-title'><a href='{github_url}{relative_path}'>{relative_path}</a></div>"
+    
+    files_processed = 0
+    for html_file in src_dir.rglob('*.html'):
+        content = html_file.read_text(encoding='utf-8')
+        
+        relative_to_src = html_file.relative_to(src_dir)
+        depth_from_src = len(relative_to_src.parts) - 1
+        
+        # CSS/JS are at docs/assets/ - from coverage/src/: 4 levels up to docs/
+        # coverage/src/ -> coverage/ -> assets/ -> vb6parse/ -> docs/
+        css_depth = depth_from_src + 4
+        css_base = '../' * css_depth + 'assets/css/'
+        
+        control_up = depth_from_src + 1
+        control_path = '../' * control_up + 'control.js'
+        
+        js_path = '../' * css_depth + 'assets/js/'
+        
+        css_link = f"<link rel='stylesheet' type='text/css' href='{css_base}llvm-cov.css'>"
+        style_link = f"<link rel='stylesheet' type='text/css' href='{css_base}style.css'>"
+        theme_script_src = f'<script src="{js_path}theme-switcher.js"></script>'
+        
+        # Replace ALL CSS links - first one is llvm-cov, second is style
+        css_links = re.findall(r"<link rel='stylesheet' type='text/css' href='[^']*\.css'>", content)
+        if len(css_links) >= 1:
+            content = content.replace(css_links[0], css_link, 1)
+        if len(css_links) >= 2:
+            content = content.replace(css_links[1], style_link, 1)
+        # Add style link if we only had llvm-cov
+        if 'style.css' not in content and len(css_links) == 1:
+            content = content.replace(css_link, css_link + '\n' + style_link)
+        
+        # Replace ALL control.js src attributes
+        control_matches = re.findall(r"src='[^']*control\.js'", content)
+        for match in control_matches:
+            content = content.replace(match, f"src='{control_path}'", 1)
+        
+        # Replace theme-switcher.js script tag (handle both quote styles)
+        theme_matches = re.findall(r"<script src=[\"'][^\"']*theme-switcher\.js[\"']></script>", content)
+        for match in theme_matches:
+            content = content.replace(match, theme_script_src, 1)
+        if 'theme-switcher.js' not in content:
+            content = content.replace('<body>', '<body>\n' + theme_script_src)
+        
+        # Remove duplicate control spans that appear after theme-switcher
+        # Match from > after </script> to </span> of the control span
+        content = re.sub(r"</script>\s*<span class='control'[^>]*>.*?</span>", "</script>", content, flags=re.DOTALL)
+        
+        # Calculate nav paths - from src/ to vb6parse/ is 3 levels up
+        # coverage/src/ → coverage/ → assets/ → vb6parse/
+        nav_up_depth = depth_from_src + 3
+        docs_path = '../' * nav_up_depth + 'index.html'
+        coverage_page_path = '../' * nav_up_depth + 'coverage.html'
+        
+        # Check if header already has our custom nav structure
+        has_custom_header = 'VB6Parse Coverage Report</h1>' in content
+        
+        if not has_custom_header:
+            header_html = f"""<header>
+    <div class="container">
+        <h1>VB6Parse Coverage Report</h1>
+        <p class="tagline">Generated from llvm-cov</p>
+    </div>
+</header>
+<nav>
+    <div class="container">
+        <a href='{coverage_page_path}'>Coverage Report</a>
+        <a href='{docs_path}'>Overview</a>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+            <span class="theme-icon">🌙</span>
+        </button>
+    </div>
+</nav>
+<span class='control'><a href='javascript:next_line()'>next uncovered line (L)</a>, <a href='javascript:next_region()'>next uncovered region (R)</a>, <a href='javascript:next_branch()'>next uncovered branch (B)</a></span>"""
+            
+            content = re.sub(r'<body>', '<body>' + header_html, content, count=1)
+            content = re.sub(r'<h2>Coverage Report</h2><h4>Created: [^<]+</h4>', '', content, count=1)
+        else:
+            # Update existing header nav paths
+            content = re.sub(r"<a href='[^']*'>Coverage Report</a>", f"<a href='{coverage_page_path}'>Coverage Report</a>", content)
+            content = re.sub(r"<a href='[^']*'>Overview</a>", f"<a href='{docs_path}'>Overview</a>", content)
+        
+        content = source_title_pattern.sub(source_title_replacement, content)
+        content = pattern.sub(replacement, content)
+        content = abs_pattern.sub(replacement, content)
+        content = re.sub(r"href='([^']*?)\.(rs|toml|md|txt|json|yml|yaml)\.html'", r"href='\1.html'", content)
+        
+        html_file.write_text(content, encoding='utf-8')
+        files_processed += 1
+    
+    return files_processed
 
 
 def restructure_coverage_html(output_dir):
@@ -263,121 +391,11 @@ def restructure_coverage_html(output_dir):
     if html_dir.exists():
         shutil.rmtree(html_dir)
     
-    # Post-process HTML files to fix internal paths
-    # Pattern to match: href='coverage/home/.../vb6parse/src/...'
-    # Replace with: href='src/...'
-    project_root_str = str(project_root)
-    # Create pattern that matches the nested path structure
-    pattern = re.compile(r"(href|src)='coverage/[^']*?/src/", re.IGNORECASE)
-    replacement = r"\1='src/"
-    
-    # Also handle case where paths might just start with the full absolute path
-    abs_pattern = re.compile(r"(href|src)='[^']*?/" + re.escape(project_root.name) + r"/src/", re.IGNORECASE)
-    
-    # Pattern to fix absolute paths in source file titles and link to GitHub
-    # Matches: <div class='source-name-title'><pre>/absolute/path/to/vb6parse/src/file.rs</pre></div>
-    source_title_pattern = re.compile(
-        r"<div class='source-name-title'><pre>.*?/" + re.escape(project_root.name) + r"/(src/[^<]+)</pre></div>",
-        re.IGNORECASE
-    )
-    github_url = "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse/"
-    
-    def source_title_replacement(match):
-        """Replace absolute path with relative path linked to GitHub."""
-        relative_path = match.group(1)  # e.g., "src/lexer/mod.rs"
-        return f"<div class='source-name-title'><a href='{github_url}{relative_path}'>{relative_path}</a></div>"
-    
     # Fix paths in all HTML files in src/ directory
     src_dir = output_dir / 'src'
     if src_dir.exists():
-        for html_file in src_dir.rglob('*.html'):
-            # Source files need to adjust their relative paths to CSS/JS
-            # Calculate correct depth based on directory nesting
-            try:
-                content = html_file.read_text(encoding='utf-8')
-                
-                # Calculate how deep this file is relative to src/ directory
-                relative_to_src = html_file.relative_to(src_dir)
-                depth_from_src = len(relative_to_src.parts) - 1  # -1 because we don't count the file itself
-                
-                # Calculate path to CSS (up to docs/assets/, then into css/)
-                # From src/ we're already 1 level deep in coverage/, so total depth is depth_from_src + 1
-                css_depth = depth_from_src + 2  # +1 for src/, +1 for coverage/
-                css_base = '../' * css_depth + 'css/'
-                
-                # Calculate path to control.js (stays in coverage directory)
-                js_prefix = '../' * (depth_from_src + 1)  # +1 to go from src/ to coverage/
-                
-                # Replace CSS references - only use llvm-cov.css (has all styles + theme support)
-                css_link = f"<link rel='stylesheet' type='text/css' href='{css_base}llvm-cov.css'>"
-                content = re.sub(r"<link rel='stylesheet' type='text/css' href='(?:\.\./)+style\.css'>", css_link, content)
-                
-                # Replace JS references (handles excessive ../ paths from llvm-cov)
-                content = re.sub(r"src='(?:\.\./)+control\.js'", f"src='{js_prefix}control.js'", content)
-                
-                # Inject consolidated style.css for base styles (before body)
-                style_link = f"<link rel='stylesheet' type='text/css' href='{css_base}../../assets/css/style.css'>"
-                content = re.sub(r'<body>', '<body>' + style_link, content, count=1)
-                
-                # Replace inline theme script with reference to consolidated theme-switcher.js
-                theme_script_src = f'<script src="{css_base}../../assets/js/theme-switcher.js"></script>'
-                content = re.sub(r'<script>\n// Sync theme with main site.*?</script>', theme_script_src, content, flags=re.DOTALL)
-                
-                # Inject coverage header after <body> tag (for source files)
-                # Calculate path back to main overview from this depth
-                docs_depth = depth_from_src + 2  # +1 for src/, +1 for coverage/
-                docs_path = '../' * docs_depth + '../index.html'
-                
-                # Get back to coverage page (main docs coverage, not llvm-cov index)
-                coverage_page_path = '../' * docs_depth + '../coverage.html'
-                
-                header_html = f"""<header>
-    <div class="container">
-        <h1>VB6Parse Coverage Report</h1>
-        <p class="tagline">Generated from llvm-cov</p>
-    </div>
-</header>
-<nav>
-    <div class="container">
-        <a href='{coverage_page_path}'>Coverage Report</a>
-        <a href='{docs_path}'>Overview</a>
-        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-            <span class="theme-icon">🌙</span>
-        </button>
-    </div>
-</nav>"""
-                
-                # Inject header and nav after <body> tag
-                content = re.sub(r'<body>', '<body>' + header_html, content, count=1)
-                
-                # Remove the old llvm-cov header elements (<h2>Coverage Report</h2><h4>Created: ...</h4>)
-                content = re.sub(r'<h2>Coverage Report</h2><h4>Created: [^<]+</h4>', '', content, count=1)
-                
-                # Fix absolute path in source title and link to GitHub
-                content = source_title_pattern.sub(source_title_replacement, content)
-                
-                # Fix file links
-                content = pattern.sub(replacement, content)
-                content = abs_pattern.sub(replacement, content)
-                
-                # Fix internal links to other coverage files (remove source extensions)
-                # Pattern: href='path/to/file.rs.html' -> href='path/to/file.html'
-                content = re.sub(r"href='([^']*?)\.(rs|toml|md|txt|json|yml|yaml)\.html'", r"href='\1.html'", content)
-                
-                html_file.write_text(content, encoding='utf-8')
-            except Exception as e:
-                print(f"Warning: Could not fix paths in {html_file}: {e}")
-        
-        # Rename .rs.html files to .html (remove the source extension)
-        for html_file in src_dir.rglob('*.html'):
-            file_name = html_file.name
-            # Check if file has a source extension before .html
-            if any(file_name.endswith(ext + '.html') for ext in ['.rs', '.toml', '.md', '.txt', '.json', '.yml', '.yaml']):
-                # Remove the source extension
-                new_name = re.sub(r'\.(rs|toml|md|txt|json|yml|yaml)\.html$', '.html', file_name)
-                if new_name != file_name:
-                    new_path = html_file.parent / new_name
-                    html_file.rename(new_path)
+        files_processed = fix_coverage_html_paths(src_dir, output_dir)
+        print(f"  Processed {files_processed} HTML files")
     
     print("  ✓ Restructured HTML files to use workspace-relative paths")
 
