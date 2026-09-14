@@ -1,4 +1,19 @@
-// Benchmark data loading and display for VB6Parse documentation
+// Benchmark data loading and display
+
+// Default project configuration - each page can override via window.ProjectConfig
+const projectConfig = {
+    repoUrl: 'https://github.com/scriptandcompile/vb6',
+    projectSlug: '',
+    fileTypes: {
+        'vbp': 'Project Files',
+        'cls': 'Class Files',
+        'bas': 'Module Files',
+        'frm': 'Form Files',
+        'frx': 'Form Resources'
+    }
+};
+
+const config = window.ProjectConfig ? { ...projectConfig, ...window.ProjectConfig } : projectConfig;
 
 // Format nanoseconds to readable time
 function formatTime(ns) {
@@ -46,14 +61,7 @@ function parseBenchmarkName(name) {
 
 // Get file type category from extension
 function getFileTypeCategory(extension) {
-    const categories = {
-        'vbp': 'Project Files',
-        'cls': 'Class Files',
-        'bas': 'Module Files',
-        'frm': 'Form Files',
-        'frx': 'Form Resources'
-    };
-    return categories[extension] || 'Other';
+    return config.fileTypes[extension] || 'Other';
 }
 
 // Format benchmark name for display
@@ -107,7 +115,8 @@ function formatTrendBadge(trend) {
 async function loadBenchmarks() {
     try {
         // Load current snapshot
-        const response = await fetch('assets/data/benchmarks.json');
+        const dataPath = config.dataPath || 'assets/data/vb6parse';
+        const response = await fetch(`${dataPath}/benchmarks.json`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -116,7 +125,7 @@ async function loadBenchmarks() {
         // Try to load historical data
         let history = null;
         try {
-            const historyResponse = await fetch('assets/data/benchmarks-history.json');
+            const historyResponse = await fetch(`${dataPath}/benchmarks-history.json`);
             if (historyResponse.ok) {
                 history = await historyResponse.json();
             }

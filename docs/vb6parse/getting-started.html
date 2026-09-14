@@ -16,7 +16,14 @@
         // Load code examples from GitHub
         const CDN_BASE = 'https://raw.githubusercontent.com/scriptandcompile/vb6/master/projects/vb6parse/examples/docs/';
         
-        document.addEventListener('DOMContentLoaded', function() {
+        // Highlight static code blocks directly (runs after DOMContentLoaded since script is in head)
+        // This avoids conflict with theme-switcher.js which also calls hljs.highlightAll()
+        window.addEventListener('load', function() {
+            if (typeof hljs !== 'undefined') {
+                hljs.highlightAll();
+            }
+            
+            // Fetch and highlight async code examples
             document.querySelectorAll('pre[data-github-example]').forEach(async (pre) => {
                 const filename = pre.getAttribute('data-github-example');
                 const code = pre.querySelector('code');
@@ -26,8 +33,10 @@
                     if (!response.ok) throw new Error('Failed to load');
                     const text = await response.text();
                     code.textContent = text;
-                    code.classList.remove('loading-state', 'error-fallback');
-                    hljs.highlightElement(code);
+                    code.classList.remove('loading-state');
+                    if (typeof hljs !== 'undefined') {
+                        hljs.highlightElement(code);
+                    }
                 } catch (error) {
                     code.textContent = '⚠️ Failed to load example from GitHub.\n\nPlease check your connection or view the example directly at:\nhttps://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse/examples/docs/' + filename;
                     code.classList.remove('loading-state');
@@ -51,16 +60,19 @@
 <body>
     <header class="docs-header">
         <div class="container">
-            <h1><a href="index.html">VB6Parse</a> / <a href="documentation.html">Documentation</a> / Getting Started</h1>
+            <h1><a href="index.html">VB6Parse</a> / Getting Started</h1>
             <p class="tagline">Step-by-step tutorial for parsing Visual Basic 6 code</p>
         </div>
     </header>
 
-    <nav class="docs-nav">
-        <div class="container">
-            <a href="index.html">Home</a>
+    <nav>
+        <div class="container nav-inner">
+            <a href="index.html">Overview</a>
+            <a href="coverage.html">Coverage</a>
+            <a href="benchmarks.html">Benchmarks</a>
+            <a href="getting-started.html"><u>Getting Started</u></a>
             <a href="documentation.html">Documentation</a>
-            <a href="https://docs.rs/vb6parse" target="_blank">API Docs</a>
+            <a href="playground.html">Playground</a>
             <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse" target="_blank">GitHub</a>
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                 <span class="theme-icon">🌙</span>
@@ -70,7 +82,10 @@
 
     <main class="container">
         <section id="introduction">
+            <div class="section-heading">
+            <p class="eyebrow">read vb6 code with rust</p>
             <h2>Introduction</h2>
+            </div>
             <p>
                 This guide will walk you through using VB6Parse, from installation to advanced parsing scenarios.
                 By the end, you'll understand how to parse VB6 projects, handle errors, navigate syntax trees, and
@@ -79,7 +94,9 @@
         </section>
 
         <section id="prerequisites">
+            <div class="section-heading">
             <h2>Prerequisites</h2>
+            </div>
             <ul>
                 <li><strong>Rust:</strong> Version 1.70 or later (Install from <a href="https://rustup.rs" target="_blank">rustup.rs</a>)</li>
                 <li><strong>Basic Rust knowledge:</strong> Understanding of Result types, ownership, and cargo</li>
@@ -88,7 +105,9 @@
         </section>
 
         <section id="installation">
+            <div class="section-heading">
             <h2>Installation</h2>
+            </div>
             
             <div class="step-card">
                 <span class="step-number">1</span>
@@ -102,7 +121,7 @@ cd vb6parse-demo</code></pre>
                 <h3>Add VB6Parse to Cargo.toml</h3>
             </div>
             <pre data-file="Cargo.toml" data-lang="toml"><code class="language-toml">[dependencies]
-vb6parse = "0.5.1"</code></pre>
+vb6parse = "1.2.3"</code></pre>
 
             <div class="step-card">
                 <span class="step-number">3</span>
@@ -112,7 +131,9 @@ vb6parse = "0.5.1"</code></pre>
         </section>
 
         <section id="hello-world">
+            <div class="section-heading">
             <h2>Your First Parse: Hello World</h2>
+            </div>
             <p>Let's start with the simplest possible example - parsing a VB6 module with a single subroutine.</p>
 
             <div class="step-card">
@@ -137,7 +158,9 @@ vb6parse = "0.5.1"</code></pre>
         </section>
 
         <section id="project-parsing">
+            <div class="section-heading">
             <h2>Parsing VB6 Projects</h2>
+            </div>
             <p>VB6 projects (.vbp files) list all modules, forms, and references. Let's parse one:</p>
 
             <pre data-file="examples/docs/project_parsing.rs" data-lang="rust" data-github-example="project_parsing.rs"><code class="language-rust loading-state">Loading example from GitHub...</code></pre>
@@ -149,7 +172,9 @@ vb6parse = "0.5.1"</code></pre>
         </section>
 
         <section id="error-handling">
+            <div class="section-heading">
             <h2>Handling Parse Errors</h2>
+            </div>
             <p>VB6Parse is designed to handle malformed input gracefully. Even with syntax errors, you often get partial results:</p>
 
             <pre data-file="examples/docs/error_handling.rs" data-lang="rust" data-github-example="error_handling.rs"><code class="language-rust loading-state">Loading example from GitHub...</code></pre>
@@ -161,14 +186,18 @@ vb6parse = "0.5.1"</code></pre>
         </section>
 
         <section id="tokenization">
+            <div class="section-heading">
             <h2>Tokenization</h2>
+            </div>
             <p>For lower-level analysis, you can tokenize VB6 code without building a full parse tree:</p>
 
             <pre data-file="examples/docs/tokenization.rs" data-lang="rust" data-github-example="tokenization.rs"><code class="language-rust loading-state">Loading example from GitHub...</code></pre>
         </section>
 
         <section id="cst-navigation">
+            <div class="section-heading">
             <h2>Navigating the Concrete Syntax Tree</h2>
+            </div>
             <p>The CST preserves all source information including whitespace and comments, making it perfect for code analysis tools:</p>
 
             <pre data-file="examples/docs/cst_navigation.rs" data-lang="rust" data-github-example="cst_navigation.rs"><code class="language-rust loading-state">Loading example from GitHub...</code></pre>
@@ -176,7 +205,9 @@ vb6parse = "0.5.1"</code></pre>
         </section>
 
         <section id="form-parsing">
+            <div class="section-heading">
             <h2>Parsing Forms and Controls</h2>
+            </div>
             <p>Forms are the most complex VB6 file type, containing both UI controls and code:</p>
 
             <pre data-file="examples/docs/form_parsing.rs" data-lang="rust" data-github-example="form_parsing.rs"><code class="language-rust loading-state">Loading example from GitHub...</code></pre>
@@ -184,7 +215,9 @@ vb6parse = "0.5.1"</code></pre>
         </section>
 
         <section id="use-cases">
+            <div class="section-heading">
             <h2>Common Use Cases</h2>
+            </div>
             <p>Here are some practical applications you can build with VB6Parse:</p>
 
             <div class="use-case-grid">
@@ -227,7 +260,9 @@ vb6parse = "0.5.1"</code></pre>
         </section>
 
         <section id="next-steps">
+            <div class="section-heading">
             <h2>Next Steps</h2>
+            </div>
             <p>Now that you understand the basics, explore these resources:</p>
 
             <div class="doc-links">

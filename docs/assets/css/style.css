@@ -955,3 +955,53 @@ pre[data-file]::before {
     font-family: 'Courier New', monospace;
     font-size: 0.9rem;
 }
+
+/* Step cards with numbered items */
+.step-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: var(--card-bg, var(--surface-color));
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 24px 0;
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    background: var(--primary-color);
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.step-card h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+
+.step-card p {
+    margin: 8px 0 0 0;
+    color: var(--muted-text-color);
+}
+
+/* Code blocks with language/file labels */
+pre[data-lang],
+pre[data-file] {
+    position: relative;
+    margin: 24px 0;
+}
+
+pre[data-lang] code,
+pre[data-file] code {
+    padding-top: 24px;
+}

@@ -22,11 +22,14 @@
         </div>
     </header>
 
-    <nav class="docs-nav">
-        <div class="container">
-            <a href="index.html">Home</a>
-            <a href="documentation.html" class="active">Documentation</a>
-            <a href="https://docs.rs/vb6parse" target="_blank">API Docs</a>
+    <nav>
+        <div class="container nav-inner">
+            <a href="index.html">Overview</a>
+            <a href="coverage.html">Coverage</a>
+            <a href="benchmarks.html">Benchmarks</a>
+            <a href="getting-started.html">Getting Started</a>
+            <a href="documentation.html"><u>Documentation</u></a>
+            <a href="playground.html">Playground</a>
             <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse" target="_blank">GitHub</a>
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                 <span class="theme-icon">🌙</span>
@@ -110,7 +113,7 @@
             </p>
 
             <div class="doc-links">
-                <a href="technical/frx-format.html" class="doc-link">
+                <a href="documentation/frx-format.html" class="doc-link">
                     <h3>FRX Format Specification</h3>
                     <p>Complete specification of the Visual Basic 6 Form Resource file format (.frx).</p>
                     <ul>
@@ -127,7 +130,7 @@
                     </div>
                 </a>
 
-                <a href="technical/frm-format.html" class="doc-link">
+                <a href="documentation/frm-format.html" class="doc-link">
                     <h3>Form File Parsing Architecture</h3>
                     <p>In-depth explanation of the FormFile parser architecture and design decisions.</p>
                     <ul>
@@ -144,7 +147,7 @@
                     </div>
                 </a>
 
-                <a href="technical/antlr4-spec.html" class="doc-link">
+                <a href="documentation/antlr4-spec.html" class="doc-link">
                     <h3>ANTLR4 Grammar Specification</h3>
                     <p>Reference documentation for the Visual Basic 6.0 ANTLR4 grammar specification.</p>
                     <ul>
@@ -226,29 +229,6 @@
             </div>
         </section>
 
-        <section id="additional-resources">
-            <div class="section-heading">
-                <h2>Additional Resources</h2>
-            </div>
-            <div class="doc-links">
-                <div class="doc-link" style="cursor: default;">
-                    <h3>Control Types</h3>
-                    <p>Reference for 50+ VB6 control types including all properties, supported in the
-                    type-safe control system.</p>
-                </div>
-
-                <div class="doc-link" style="cursor: default;">
-                    <h3>Testing Guide</h3>
-                    <p>Information about the <span class="test-count-rounded">5,600</span>+ test suite including unit tests, integration tests,
-                    snapshot testing, and fuzz testing.</p>
-                </div>
-
-                <div class="doc-link" style="cursor: default;">
-                    <h3>Benchmarking</h3>
-                    <p>Performance benchmarks and optimization guidelines for parsing VB6 projects at scale.</p>
-                </div>
-            </div>
-        </section>
     </main>
 
     <footer>

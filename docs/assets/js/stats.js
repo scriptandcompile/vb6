@@ -1,8 +1,11 @@
 // Load test statistics
 (function() {
+    const config = window.ProjectConfig || {};
+    const dataPath = config.dataPath || '../assets/data/vb6parse';
+
     async function loadStats() {
         try {
-            const response = await fetch('assets/data/stats.json');
+            const response = await fetch(`${dataPath}/stats.json`);
             if (!response.ok) {
                 console.log('Stats not available - stats.json not found');
                 return;

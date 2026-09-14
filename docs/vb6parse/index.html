@@ -7,12 +7,18 @@
     <meta name="keywords" content="vb6, parser, visual basic 6, rust, legacy code, code analysis">
     <title>VB6Parse - Visual Basic 6 Parser Library</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/docs-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="../assets/js/theme-switcher.js"></script>
     <script src="../assets/js/stats.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>
+        window.ProjectConfig = {
+            dataPath: '../assets/data/vb6parse',
+        };
+    </script>
     <script>hljs.highlightAll();</script>
 </head>
 <body>
@@ -38,8 +44,8 @@
     <nav>
         <div class="container nav-inner">
             <a href="#overview">Overview</a>
-            <a href="#features">Features</a>
-            <a href="#architecture">Architecture</a>
+            <a href="coverage.html">Coverage</a>
+            <a href="benchmarks.html">Benchmarks</a>
             <a href="getting-started.html">Getting Started</a>
             <a href="documentation.html">Documentation</a>
             <a href="playground.html">Playground</a>
@@ -52,7 +58,10 @@
 
     <main class="container page-body">
         <section id="overview">
-            <h2>Overview</h2>
+            <div class="section-heading">
+                <p class="eyebrow">starting to parse</p>
+                <h2>Documentation Overview</h2>
+            </div>
             <p>
                 VB6Parse is designed as a foundational library for tools that analyze, convert, or process Visual Basic 6 code. 
                 While capable of supporting real-time syntax highlighting and language servers, its primary focus is on 
@@ -61,7 +70,9 @@
         </section>
 
         <section id="features">
-            <h2>Key Features</h2>
+            <div class="section-heading">
+                <h2>Key Features</h2>
+            </div>
             <div class="feature-grid">
                 <div class="feature-card">
                     <h3>🚀 High Performance</h3>
@@ -87,7 +98,9 @@
         </section>
 
         <section id="architecture">
-            <h2>Architecture</h2>
+            <div class="section-heading">
+                <h2>Architecture</h2>
+            </div>
             <p>
                 VB6Parse uses a seven-layer parsing pipeline that transforms raw bytes into structured VB6 objects.
                 Each layer builds on the previous one, providing clean separation of concerns and allowing you to 
@@ -130,7 +143,9 @@
             </div>
 
             <div class="architecture-details" style="margin-top: 2rem;">
-                <h3>Layer Details</h3>
+                <div class="section-heading">
+                    <h2>Layer Details</h2>
+                </div>
                 <div class="layer-grid">
                     <div class="layer-card">
                         <h4>I/O Layer</h4>
@@ -175,7 +190,9 @@
         </section>
 
         <section id="testing">
+            <div class="section-heading">
             <h2>Testing & Quality</h2>
+            </div>
             <div id="stats-loading" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 3rem 2rem; text-align: center; margin: 2rem 0;">
                 <div style="width: 48px; height: 48px; border: 4px solid var(--border-color); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
                 <p style="color: var(--text-secondary); margin: 0;">Test statistics being generated...</p>
@@ -212,7 +229,9 @@
         </section>
 
         <section id="community">
-            <h2>Community & Contributing</h2>
+            <div class="section-heading">
+                <h2>Community & Contributing</h2>
+            </div>
             <p>
                 VB6Parse is open source and welcomes contributions! Whether you're reporting bugs, 
                 suggesting features, or submitting pull requests, your help is appreciated.

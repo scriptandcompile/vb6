@@ -10,22 +10,34 @@
     <link rel="stylesheet" href="../assets/css/coverage.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="../assets/js/stats.js"></script>
     <script src="../assets/js/theme-switcher.js"></script>
-    <script src="../assets/js/coverage-history.js"></script>
+    <script>
+        window.ProjectConfig = {
+            repoUrl: 'https://github.com/scriptandcompile/vb6',
+            projectSlug: 'vb6parse',
+            dataPath: '../assets/data/vb6parse',
+            csvFilename: 'vb6parse-coverage-history.csv',
+        };
+    </script>
+    <script src="../assets/js/coverage/coverage-history.js"></script>
 </head>
 <body>
     <header class="docs-header">
         <div class="container">
-            <h1><a href="index.html">VB6Parse</a> / <a href="documentation.html">Documentation</a> / Coverage Report</h1>
+            <h1><a href="index.html">VB6Parse</a> / Coverage Report</h1>
             <p class="tagline">Test Coverage Metrics for <span id="test-count-header">5,000+</span> Tests</p>
         </div>
     </header>
 
-    <nav class="docs-nav">
-        <div class="container">
-            <a href="index.html">Home</a>
+    <nav>
+        <div class="container nav-inner">
+            <a href="index.html">Overview</a>
+            <a href="coverage.html"><u>Coverage</u></a>
+            <a href="benchmarks.html">Benchmarks</a>
+            <a href="getting-started.html">Getting Started</a>
             <a href="documentation.html">Documentation</a>
-            <a href="https://docs.rs/vb6parse" target="_blank">API Docs</a>
+            <a href="playground.html">Playground</a>
             <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse" target="_blank">GitHub</a>
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                 <span class="theme-icon">🌙</span>
