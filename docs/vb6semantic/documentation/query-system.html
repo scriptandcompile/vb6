@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Query system in vb6semantic -- a bidirectional index for IDE features like go-to-definition and find-references">
+    <title>Query System - VB6Semantic Documentation</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../index.html">VB6Semantic</a> / Documentation</h1>
+            <p class="tagline">The Query Index for IDE Features Explained</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../index.html">Home</a>
+            <a href="../getting-started.html">Getting Started</a>
+            <a href="playground.html">Playground</a>
+            <a href="symbol-tables.html">Symbol Tables</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6semantic" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container docs-content">
+        <aside class="toc">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#purpose">Purpose &amp; IDE Features</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#data-types">Core Data Types</a></li>
+                <li><a href="#two-pass">Two-Pass Collection</a></li>
+                <li><a href="#query-methods">Query Methods</a></li>
+                <li><a href="#deduplication">Deduplication</a></li>
+                <li><a href="#integration">Integration with Analysis</a></li>
+                <li><a href="#external">External Exposure</a></li>
+                <li><a href="#design">Design Decisions</a></li>
+                <li><a href="#related">Related Documentation</a></li>
+            </ul>
+        </aside>
+
+        <article>
+            <h2 id="overview">Overview</h2>
+            <p>
+                The Query system in vb6semantic is an <strong>editor-oriented index</strong> built over the
+                semantic analyzer's resolved identifier occurrences. Its sole purpose is to power IDE features:
+                go-to-definition, find-all-references, and hover information for any identifier in a VB6 source file.
+            </p>
+            <p>
+                Rather than storing declarations (which belongs to the symbol table), the query index stores
+                <em>occurrences</em> -- every place a resolved identifier appears in the source code, classified
+                by the role that occurrence plays for its symbol. It provides two complementary query directions:
+            </p>
+            <ul>
+                <li><strong>Symbol-to-occurrences:</strong> Given a scope and name, find every place that symbol
+                appears, including its definition.</li>
+                <li><strong>Position-to-symbol:</strong> Given a file and cursor position, determine which symbol
+                the identifier at that position resolves to, and from there find all its occurrences.</li>
+            </ul>
+            <div class="info-box">
+                <p><strong>Key principle:</strong> The query index is built during semantic analysis via a
+                two-pass collection process -- first recording definitions at declaration sites, then recording
+                usages and type references after all declarations in a project are registered. This ensures that
+                forward references (calling a function before its declaration) are resolved correctly.</p>
+            </div>
+
+            <h2 id="purpose">Purpose &amp; IDE Features</h2>
+            <p>
+                The query index serves as the backbone for three core IDE capabilities in the VB6 ecosystem:
+            </p>
+
+            <h3>Go-to-Definition</h3>
+            <p>
+                When a user places the cursor on an identifier and requests go-to-definition, the query index
+                performs a position lookup to find the symbol under the cursor, then returns the <code>Reference</code>
+                with <code>ReferenceKind::Definition</code>. This works even when the cursor is on a usage site --
+                the index finds the definition location in a different file or a later line in the same file.
+            </p>
+            <pre><code class="language-rust">// Given cursor at (Runner.bas, line 5, column 11)
+// where `Greet` is called:
+
+let def = index.definition_at("Runner", 5, 11);
+// Returns Reference at (Greeter.bas, line 3, column 17)
+// The actual `Public Function Greet(...)` declaration</code></pre>
+
+            <h3>Find-All-References</h3>
+            <p>
+                When a user requests find-references for a symbol, the index returns all occurrences
+                (definition + usages + type references) across the project. The returned references include
+                precise source locations and byte offsets, enabling tools to highlight or list every usage
+                with exact positions.
+            </p>
+            <pre><code class="language-rust">let refs = index.references_at("Runner", 5, 11).unwrap();
+// Returns: 3 references
+//   1. Greeter.bas:3:17 -- Definition (declaration)
+//   2. Greeter.bas:4:5  -- Usage (Greet = ...)
+//   3. Runner.bas:5:11  -- Usage (call site in Runner)</code></pre>
+
+            <h3>Hover Information</h3>
+            <p>
+                For hover tooltips, the query index identifies which symbol the cursor is on. The host tool
+                then combines this with the symbol table (for type information, visibility, and documentation)
+                to produce a rich hover display.
+            </p>
+            <div class="info-box">
+                <p><strong>Separation of concerns:</strong> The query index answers "which symbol is here?" and
+                "where else does it appear?". The symbol table answers "what is this symbol?" (type, visibility,
+                declaration). Both are needed for complete IDE features, and both are produced by the same
+                semantic analysis pass.</p>
+            </div>
+
+            <h2 id="architecture">Architecture</h2>
+            <p>
+                The query index sits at the base of the analysis pipeline, collecting occurrences during
+                symbol processing and then serving queries after analysis completes.
+            </p>
+            <div class="architecture-diagram">
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600;">Source Files (VB6 .bas, .cls, .frm)</div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div class="vertical-arrow" style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600;">vb6parse → CST</div>
+                        <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(Concrete Syntax Tree)</div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div class="vertical-arrow" style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600;">SemanticAnalyzer</div>
+                        <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(scopes, symbols, types)</div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div class="vertical-arrow" style="font-size: 1.5rem;">↙</div>
+                        <div class="vertical-arrow" style="font-size: 1.5rem;">↘</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px;">
+                        <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; background: var(--code-background); text-align: center;">
+                            <div style="font-weight: 600;">ScopeManager</div>
+                            <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(hierarchical scopes + symbols)</div>
+                        </div>
+                        <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; background: var(--code-background); text-align: center;">
+                            <div style="font-weight: 600;">QueryIndex</div>
+                            <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(bidirectional occurrence index)</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div class="vertical-arrow" style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600;">AnalysisOutput</div>
+                        <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(scopes + symbols + references + diagnostics)</div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div class="vertical-arrow" style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 20px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600; font-size: 1.1rem;">IDE Features</div>
+                        <div style="font-size: 0.9rem; color: var(--text-color); opacity: 0.8; text-align: left;">
+                            - Go-to-Definition (definition_at)<br>
+                            - Find-All-References (references_at)<br>
+                            - Hover (symbol_at + symbol table)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 id="data-types">Core Data Types</h2>
+            <p>
+                The query system is built on three types defined in
+                <code>projects/vb6semantic/src/query.rs</code>:
+            </p>
+
+            <h3>ReferenceKind</h3>
+            <p>
+                An enum that classifies the role an identifier occurrence plays for its symbol:
+            </p>
+            <pre><code class="language-rust">pub enum ReferenceKind {
+    /// The declaration that defines the symbol.
+    Definition,
+
+    /// A use of the symbol as a value or call target.
+    Usage,
+
+    /// A use of the symbol as a type name (As clause, New target).
+    TypeReference,
+}</code></pre>
+            <div class="info-box">
+                <p><strong>Examples:</strong></p>
+                <ul>
+                    <li><code>Definition</code>: <code>Public Function Square(x As Double) As Double</code> -- the "Square" identifier</li>
+                    <li><code>Usage</code>: <code>Square = x * x</code> -- both "Square" self-assignment and the "x" operands</li>
+                    <li><code>TypeReference</code>: <code>Dim origin As Point</code> -- the "Point" type name in the As clause</li>
+                </ul>
+            </div>
+
+            <h3>Reference</h3>
+            <p>
+                A single occurrence of a symbol in the source, carrying its classification, precise location,
+                and byte offsets:
+            </p>
+            <pre><code class="language-rust">pub struct Reference {
+    pub kind: ReferenceKind,
+    pub location: SourceLocation,  // file, line (1-based), column (1-based)
+    pub start_offset: u32,          // inclusive start byte offset
+    pub end_offset: u32,            // exclusive end byte offset
+    pub end_column: usize,          // exclusive end column
+}</code></pre>
+            <p>
+                The byte offsets (<code>start_offset</code> and <code>end_offset</code>) come directly from
+                the CST token's range, enabling tools to extract the exact source text. The <code>end_column</code>
+                is 1-based and exclusive, consistent with LSP position semantics. VB6 identifiers are stored
+                in source text and can span multiple columns for longer names.
+            </p>
+
+            <h3>SymbolKey</h3>
+            <p>
+                The unique identity of a symbol inside the query index, consisting of a scope ID and the
+                lowercase name. Names are lowercased because VB6 is case-insensitive:
+            </p>
+            <pre><code class="language-rust">pub struct SymbolKey {
+    pub scope_id: usize,   // which scope the symbol lives in
+    pub name: String,      // lowercased symbol name
+}</code></pre>
+            <p>
+                The <code>scope_id</code> distinguishes between symbols with the same name in different scopes.
+                For example, a module-level variable <code>counter</code> and a procedure-local variable
+                <code>counter</code> have different scope IDs even though their names are identical.
+            </p>
+
+            <h2 id="two-pass">Two-Pass Collection</h2>
+            <p>
+                The query index is populated during semantic analysis through a carefully ordered two-pass
+                process. This ordering ensures that forward references -- calling a function before its
+                declaration appears in the source -- resolve correctly.
+            </p>
+
+            <h3>Pass 1: Record Definitions</h3>
+            <p>
+                As the analyzer walks declaration nodes in the CST, it records each symbol's <code>Definition</code>
+                occurrence. This includes module-level procedures (Public and Private), module-level variables,
+                parameters, class members, and enum values.
+            </p>
+            <pre><code class="language-rust">fn record_definition(
+    &mut self,
+    scope_id: usize,
+    name: &str,
+    start_offset: u32,
+    end_offset: u32,
+) {
+    let reference = QueryReference::new(
+        ReferenceKind::Definition,
+        self.location_at(start_offset),
+        start_offset,
+        end_offset,
+    );
+    self.query_index.record(scope_id, name, reference);
+}</code></pre>
+
+            <h3>Pass 2: Collect Usages</h3>
+            <p>
+                After all declarations are registered, the analyzer walks identifier usages in each module's
+                CST. For each identifier token that resolves against the scope manager, it records a
+                <code>Usage</code> or <code>TypeReference</code> occurrence:
+            </p>
+            <pre><code class="language-rust">fn collect_usages_in(&mut self, node: &CstNode) -> Result&lt;()&gt; {
+    for child in node.descendants() {
+        if child.kind() != SyntaxKind::Identifier {
+            continue;
+        }
+        // Type references: preceded by `As` or `New` keywords
+        let is_type_reference = matches!(
+            prev_significant_kind,
+            Some(SyntaxKind::AsKeyword) | Some(SyntaxKind::NewKeyword)
+        );
+
+        // Skip already-recorded tokens (definitions)
+        if self.query_index.is_recorded(...) {
+            continue;
+        }
+
+        // Resolve identifier against scope manager
+        let Some(symbol) = self.scope_manager.lookup(child.text()) else {
+            continue;
+        };
+
+        // Record usage or type reference
+        self.query_index.record(symbol.scope_id, &symbol.name, reference);
+    }
+}</code></pre>
+
+            <h3>Deferred Resolution</h3>
+            <p>
+                When analyzing a complete project (as opposed to a single module), reference resolution is
+                deferred until all files in the project are registered. This ensures that cross-module
+                references resolve correctly -- a call to <code>Greeter.Greet()</code> in one module can
+                find the <code>Greet</code> function declared in a different module.
+            </p>
+            <pre><code class="language-rust">// In analyze_project():
+self.defer_resolution = true;
+
+// Register all modules first (definitions only)
+for file in project_files {
+    analyzer.analyze_module(file);
+}
+
+// Then resolve all references across modules
+for file in project_files {
+    analyzer.resolve_file(file);
+}
+
+// Finalize: sort position index for binary search
+self.query_index.finalize();</code></pre>
+
+            <div class="info-box">
+                <p><strong>Why deferred?</strong> In VB6, modules can reference symbols in other modules freely.
+                If the analyzer tried to resolve <code>Greet("World")</code> in <code>Runner.bas</code> before
+                registering <code>Greet()</code> in <code>Greeter.bas</code>, the reference would go
+                unresolved. Deferring resolution until all modules are registered guarantees correctness.</p>
+            </div>
+
+            <h2 id="query-methods">Query Methods</h2>
+            <p>
+                The <code>QueryIndex</code> struct provides six public methods for querying the index,
+                organized into symbol-based and position-based query categories:
+            </p>
+
+            <h3>Symbol-Based Queries</h3>
+            <pre><code class="language-rust">// Find all occurrences of a symbol by scope and name
+let refs = index.references_for(scope_id, "square");
+// Returns: [Definition at (MathUtils, 8:17), Usage at (9:5),
+//          Usage at (15:13), Usage at (16:17)]
+
+// Names are matched case-insensitively
+index.references_for(scope_id, "SQUARE")  // same result
+index.references_for(scope_id, "Square")  // same result</code></pre>
+
+            <h3>Position-Based Queries</h3>
+            <p>
+                Position-based queries first find which symbol the cursor is on, then look up that symbol's
+                full set of occurrences. The position lookup uses binary search over a sorted position index,
+                built by calling <code>finalize()</code> after collection completes.
+            </p>
+            <pre><code class="language-rust">// Find the symbol at a cursor position
+let key = index.symbol_at("MathUtils", 9, 5);
+// Returns SymbolKey { scope_id: 1, name: "square" }
+
+// Get all occurrences of that symbol
+let all_refs = index.references_at("MathUtils", 9, 5).unwrap();
+// Returns the same 4 references as references_for() above
+
+// Jump directly to the definition
+let def = index.definition_at("MathUtils", 9, 5).unwrap();
+// Returns Reference { kind: Definition, location: (MathUtils, 8:17) }</code></pre>
+
+            <h3>Iteration &amp; Metadata</h3>
+            <p>
+                For tools that need to inspect the entire index (for diagnostics, visualization, or caching):
+            </p>
+            <pre><code class="language-rust">// Iterate over every symbol and its occurrences
+for (key, refs) in index.iter() {
+    println!("{} in scope {}: {} occurrences", key.name, key.scope_id, refs.len());
+}
+
+// Total number of recorded occurrences
+let total = index.len();
+
+// Whether the index is empty
+let empty = index.is_empty();</code></pre>
+
+            <h2 id="deduplication">Deduplication</h2>
+            <p>
+                The query index tracks every recorded occurrence's byte range in a <code>HashSet</code> to
+                prevent duplicate entries during usage collection. This matters when the same identifier token
+                could be visited by multiple analysis paths.
+            </p>
+            <pre><code class="language-rust">pub fn record(&mut self, scope_id: usize, name: &str, reference: Reference) {
+    // Track for deduplication
+    self.recorded_ranges.insert((
+        reference.location.file.clone(),
+        reference.start_offset,
+        reference.end_offset,
+    ));
+    // Store in by_symbol and by_position maps...
+}
+
+pub fn is_recorded(&self, file: &str, start: u32, end: u32) -> bool {
+    self.recorded_ranges.contains(&(file.to_string(), start, end))
+}</code></pre>
+            <p>
+                The <code>is_recorded</code> check happens in <code>collect_usages_in()</code> before resolving
+                an identifier. If the byte range was already recorded (e.g., it's a definition that was already
+                added in Pass 1), the occurrence is skipped.
+            </p>
+            <div class="info-box">
+                <p><strong>Why byte offsets, not line/column?</strong> Byte offset deduplication is more precise
+                than positional matching. Two identifiers on the same line at the same column could appear in
+                different files -- the byte range includes the file path, ensuring unique identification across
+                the entire project.</p>
+            </div>
+
+            <h2 id="integration">Integration with Analysis</h2>
+            <p>
+                The query index is a field on <code>SemanticAnalyzer</code> and is populated automatically
+                during the analysis process. Users access it through the <code>query_index()</code> getter
+                after analysis completes:
+            </p>
+            <pre><code class="language-rust">let mut analyzer = SemanticAnalyzer::new();
+analyzer.analyze_project(&project).expect("analysis");
+
+// Access the query index after analysis
+let index = analyzer.query_index();
+
+// Query for all references to a symbol in a module scope
+let refs = index.references_for(module_scope_id, "report")
+    .expect("report symbol not found");
+
+for r in refs {
+    println!("{}:{}:{} {:?}",
+        r.location.file, r.location.line, r.location.column, r.kind);
+}</code></pre>
+
+            <h3>Call Sites in the Analyzer</h3>
+            <p>
+                The query index is recorded at these key points during analysis:
+            </p>
+            <ul>
+                <li><strong>Procedure declarations:</strong> When a Sub, Function, Property Get/Let/Set, or event handler is encountered, its name is recorded as a <code>Definition</code> at the procedure keyword position.</li>
+                <li><strong>Module-level declarations:</strong> Public/Private variables, constants, type definitions, and enum values are recorded as <code>Definition</code> at their declaration position.</li>
+                <li><strong>Parameters:</strong> Procedure parameters are recorded as <code>Definition</code> in the procedure's scope.</li>
+                <li><strong>Identifier tokens:</strong> Every identifier in the CST that resolves against the scope manager is recorded as <code>Usage</code> (value use) or <code>TypeReference</code> (type use in As clauses).</li>
+            </ul>
+
+            <h3>What Is Not Collected</h3>
+            <p>
+                Procedure-local <code>Dim</code> variables and <code>Const</code> declarations are intentionally
+                excluded from the query index in version 1. These symbols have procedure scope and their usages
+                are visible only within the same procedure, making the cross-reference information less valuable
+                for the primary IDE use cases. This also keeps the index size manageable.
+            </p>
+            <pre><code class="language-rust">// These procedure-local symbols are NOT collected:
+// Dim origin As Point     // "origin" not in index
+// Dim value As Double     // "value" not in index</code></pre>
+
+            <h2 id="external">External Exposure</h2>
+            <p>
+                The query index is exposed to external consumers (IDEs, the playground, WASM hosts) through
+                serialization. In the WASM module, each <code>Reference</code> is converted to
+                <code>WasmSymbolReference</code> and included in the <code>AnalysisOutput.references</code>
+                field alongside scopes and diagnostics.
+            </p>
+            <pre><code class="language-rust">pub struct WasmSymbolReference {
+    pub scope_id: usize,
+    pub name: String,           // lowercased
+    pub kind: String,           // "Definition", "Usage", or "TypeReference"
+    pub location: LocationInfo,  // file, line, column
+    pub start_offset: u32,
+    pub end_offset: u32,
+    pub end_column: usize,
+}</code></pre>
+            <p>
+                This allows JavaScript consumers in the playground or an editor extension to run semantic
+                analysis in the browser and query the results client-side, without needing a server.
+            </p>
+
+            <h2 id="design">Design Decisions</h2>
+
+            <div class="consideration">
+                <h3>1. Separate from Symbol Table</h3>
+                <p>
+                    The query index is separate from the symbol table, which stores declarations and type metadata.
+                    This separation provides several benefits:
+                </p>
+                <ul>
+                    <li>✅ <strong>Focused data structures:</strong> Symbol table stores what exists; query index stores where things are used.</li>
+                    <li>✅ <strong>Independent evolution:</strong> The query index can optimize for position-based lookups without affecting the symbol table.</li>
+                    <li>✅ <strong>Smaller memory footprint:</strong> Tools that only need declarations can skip the query index entirely.</li>
+                    <li>⚠️ <strong>Coordination:</strong> Both structures must be populated during the same analysis pass.</li>
+                </ul>
+            </div>
+
+            <div class="consideration">
+                <h3>2. Case-Insensitive Storage</h3>
+                <p>
+                    VB6 source is case-insensitive, so symbol names are stored lowercased in the query index.
+                    Query methods normalize their input the same way, ensuring that <code>"Foo"</code>,
+                    <code>"foo"</code>, and <code>"FOO"</code> all resolve to the same symbol.
+                </p>
+                <ul>
+                    <li>✅ <strong>Correct:</strong> Matches VB6 runtime behavior exactly.</li>
+                    <li>✅ <strong>Simple:</strong> No need for case-insensitive map variants.</li>
+                    <li>⚠️ <strong>Information loss:</strong> The original casing is not preserved in the index. For tools that need to display the original casing, it must come from the CST or symbol table instead.</li>
+                </ul>
+            </div>
+
+            <div class="consideration">
+                <h3>3. Binary Search for Position Queries</h3>
+                <p>
+                    Position-based lookups (<code>symbol_at</code>, <code>references_at</code>,
+                    <code>definition_at</code>) use a sorted position list with manual binary search
+                    (implemented via <code>partition_point</code>). This is more memory-efficient than
+                    building a full R-tree or interval tree, and sufficient given that most IDE interactions
+                    involve a single cursor position at a time.
+                </p>
+                <ul>
+                    <li>✅ <strong>O(log n) lookups:</strong> Binary search over position-sorted list.</li>
+                    <li>✅ <strong>Low memory overhead:</strong> A single sorted <code>Vec</code>, no tree nodes.</li>
+                    <li>⚠️ <strong>Linear scan tie-breaking:</strong> When multiple identifiers share a line, a short linear scan finds the correct one (rare in practice).</li>
+                </ul>
+            </div>
+
+            <div class="consideration">
+                <h3>4. 1-Based Positioning</h3>
+                <p>
+                    All positions in the query index use 1-based line and column numbers, consistent with
+                    the CST and with LSP/LSUT position conventions used by most editor protocols. Byte offsets
+                    are 0-based from the file start, matching Rust string indexing.
+                </p>
+                <pre><code class="language-vbnet">' Line 1, Column 1 is the first character of the file
+Attribute VB_Name = "MyModule"</code></pre>
+
+            </div>
+
+            <div class="consideration">
+                <h3>5. No Procedure-Local Variables in v1</h3>
+                <p>
+                    Local variables declared with <code>Dim</code> inside procedures are intentionally excluded
+                    from the query index in version 1. The rationale:
+                </p>
+                <ul>
+                    <li>Most local variables are used only within their declaring procedure, so find-references provides limited value.</li>
+                    <li>Excluding them keeps the index size manageable for large projects with many procedures.</li>
+                    <li>The primary IDE use cases (navigation to definitions, cross-file reference finding) don't require local variable tracking.</li>
+                </ul>
+                <p>
+                    This can be revisited if demand arises for local-variable-aware refactoring features.
+                </p>
+            </div>
+
+            <h2>Summary</h2>
+            <p>
+                The Query system in vb6semantic is a lean, bidirectional index that bridges the gap between
+                the semantic analyzer's symbol data and the practical needs of IDE tools. By recording every
+                resolved identifier occurrence with precise positions and byte offsets, it enables go-to-definition,
+                find-references, and hover features with minimal overhead.
+            </p>
+            <ol>
+                <li><strong>Two-pass collection</strong> during analysis ensures all forward references resolve correctly.</li>
+                <li><strong>Bidirectional lookup</strong> -- symbol-to-occurrences and position-to-symbol -- covers the full range of IDE query patterns.</li>
+                <li><strong>Case-insensitive design</strong> matches VB6 semantics exactly.</li>
+                <li><strong>WASM exposure</strong> enables browser-based playgrounds and editor extensions.</li>
+            </ol>
+            <div class="info-box">
+                <p><strong>The query index was designed because:</strong></p>
+                <ul>
+                    <li>✅ VB6 IDE tools need fast lookups from any identifier to its declaration and all usages</li>
+                    <li>✅ Position-based queries require a separate index from the symbol table (which is scope-based)</li>
+                    <li>✅ Case-insensitive matching is essential for VB6 correctness</li>
+                    <li>✅ Browser-based analysis needs all data serializable to JSON</li>
+                    <li>✅ Cross-module references are common and must resolve across files</li>
+                </ul>
+            </div>
+
+            <div class="related-docs">
+                <h3>Related Documentation</h3>
+                <ul>
+                    <li><a href="symbol-tables.html">Symbol Tables and Scope Management</a> -- The declaration-side data structure</li>
+                    <li><a href="https://docs.rs/vb6semantic/latest/vb6semantic/query/index.html" target="_blank">QueryIndex API</a> -- Rust documentation</li>
+                    <li><a href="https://github.com/scriptandcompile/vb6/blob/master/projects/vb6semantic/src/query.rs" target="_blank">query.rs</a> -- Source code</li>
+                    <li><a href="https://github.com/scriptandcompile/vb6/blob/master/projects/vb6semantic/tests/references.rs" target="_blank">references.rs</a> -- Integration tests</li>
+                    <li><a href="../getting-started.html">Getting Started</a> -- Using vb6semantic in your project</li>
+                </ul>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Semantic is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>
