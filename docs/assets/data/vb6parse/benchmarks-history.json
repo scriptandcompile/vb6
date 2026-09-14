@@ -1,0 +1,2248 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-09-13T00:58:34Z",
+  "snapshots": [
+    {
+      "timestamp": "2026-09-13T00:58:34Z",
+      "commit_sha": "7c60ff21909ff30e202dd3857903c825ead98034",
+      "commit_message": "fix: pass WASM release URL string to init() instead of buffer",
+      "benchmarks": [
+        {
+          "name": "large_Brightness_API_Brightness2.frx",
+          "mean": 2376.1733892545235,
+          "median": 2375.592625523459,
+          "std_dev": 4.391167309104958,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Brightness_DIBs_Brightness3.frx",
+          "mean": 3071.617276788363,
+          "median": 3071.006374140565,
+          "std_dev": 5.786389942272977,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Brightness_FasterDIBs_Brightness.frx",
+          "mean": 2568.7746186137847,
+          "median": 2568.0319043143836,
+          "std_dev": 4.585246381784719,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Brightness_VB6_Brightness.frx",
+          "mean": 2467.44914100781,
+          "median": 2464.4314203365043,
+          "std_dev": 9.287585808432327,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Curves.frm",
+          "mean": 633728.6934810126,
+          "median": 633884.6392405063,
+          "std_dev": 1543.5888606502215,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Curves.frm",
+          "mean": 235497.9430006385,
+          "median": 235095.8404891304,
+          "std_dev": 1870.3989163213225,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Curves.frm",
+          "mean": 347855.80851598555,
+          "median": 347488.26133578434,
+          "std_dev": 2622.6049523294846,
+          "unit": "ns"
+        },
+        {
+          "name": "large_CustomFilters.frm",
+          "mean": 823139.8875409839,
+          "median": 823119.5327868853,
+          "std_dev": 3522.061769083687,
+          "unit": "ns"
+        },
+        {
+          "name": "large_FormPhysics.frm",
+          "mean": 138067.14004421743,
+          "median": 137987.44463196862,
+          "std_dev": 380.44522732863436,
+          "unit": "ns"
+        },
+        {
+          "name": "large_FormPhysics.frm",
+          "mean": 178246.18275420036,
+          "median": 178002.05726817044,
+          "std_dev": 903.9157923910202,
+          "unit": "ns"
+        },
+        {
+          "name": "large_FormPhysics.frx",
+          "mean": 3894.2502841525984,
+          "median": 3892.0115148019995,
+          "std_dev": 10.64757871341562,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Grayscale.frm",
+          "mean": 880212.3623684209,
+          "median": 879987.0263157894,
+          "std_dev": 2279.8805633265642,
+          "unit": "ns"
+        },
+        {
+          "name": "large_HistogramsAdv_Histogram.frm",
+          "mean": 811920.8260162604,
+          "median": 811528.2804878049,
+          "std_dev": 2547.8162948199465,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Levels_Main.frm",
+          "mean": 667502.5557333333,
+          "median": 667103.7166666667,
+          "std_dev": 1868.3856078085819,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Levels_Main.frm",
+          "mean": 274809.82652049826,
+          "median": 274707.0954254079,
+          "std_dev": 432.99528226670867,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Levels_Main.frm",
+          "mean": 361985.280513286,
+          "median": 361744.4014957265,
+          "std_dev": 2327.890730778177,
+          "unit": "ns"
+        },
+        {
+          "name": "large_MapEditor_Main Editor.frx",
+          "mean": 10368.261964551899,
+          "median": 10360.165702160493,
+          "std_dev": 34.8928475981852,
+          "unit": "ns"
+        },
+        {
+          "name": "large_NatureFilters.frm",
+          "mean": 834373.7524999997,
+          "median": 833886.2041666666,
+          "std_dev": 3110.2622838134794,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Organism.cls",
+          "mean": 104546.51784256122,
+          "median": 104403.46949832776,
+          "std_dev": 922.7019194063292,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Organism.cls",
+          "mean": 161155.9814729049,
+          "median": 161069.44504373177,
+          "std_dev": 561.5206649242483,
+          "unit": "ns"
+        },
+        {
+          "name": "large_Organism.cls",
+          "mean": 2461732.400487805,
+          "median": 2461574.658536585,
+          "std_dev": 14029.16734588509,
+          "unit": "ns"
+        },
+        {
+          "name": "large_cCommonDialog.cls",
+          "mean": 296798.83747636783,
+          "median": 296567.87003968254,
+          "std_dev": 1203.1027636742263,
+          "unit": "ns"
+        },
+        {
+          "name": "large_cCommonDialog.cls",
+          "mean": 358568.904327078,
+          "median": 358187.74717391306,
+          "std_dev": 2135.7644325567253,
+          "unit": "ns"
+        },
+        {
+          "name": "large_cCommonDialog.cls",
+          "mean": 5191529.856,
+          "median": 5185217.375,
+          "std_dev": 35402.14393014672,
+          "unit": "ns"
+        },
+        {
+          "name": "large_frmHMM.frm",
+          "mean": 906839.9937837836,
+          "median": 906777.1396396396,
+          "std_dev": 3024.222306976254,
+          "unit": "ns"
+        },
+        {
+          "name": "large_frmMain.frm",
+          "mean": 878179.1099130437,
+          "median": 877501.6130434782,
+          "std_dev": 3573.5769049110827,
+          "unit": "ns"
+        },
+        {
+          "name": "large_frmTransparency.frx",
+          "mean": 3425.5093754928703,
+          "median": 3424.2588889938593,
+          "std_dev": 4.764828661963107,
+          "unit": "ns"
+        },
+        {
+          "name": "large_pdOpenSaveDialog.cls",
+          "mean": 125250.50826443327,
+          "median": 125189.08126671123,
+          "std_dev": 254.97464384937334,
+          "unit": "ns"
+        },
+        {
+          "name": "large_pdOpenSaveDialog.cls",
+          "mean": 146071.42307099004,
+          "median": 145977.25136054424,
+          "std_dev": 679.9500526653287,
+          "unit": "ns"
+        },
+        {
+          "name": "large_pdOpenSaveDialog.cls",
+          "mean": 2433670.076585367,
+          "median": 2431598.7195121953,
+          "std_dev": 12135.730182173113,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Blacklight.frm",
+          "mean": 247689.919009901,
+          "median": 247649.76237623763,
+          "std_dev": 1020.3568032012546,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Brightness_API_Brightness2.frm",
+          "mean": 149262.52421130953,
+          "median": 149279.40029761905,
+          "std_dev": 497.2058614354134,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Brightness_DIBs_Brightness3.frm",
+          "mean": 323327.520935484,
+          "median": 322924.26451612904,
+          "std_dev": 1805.4165715901474,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Brightness_FasterDIBs_Brightness.frm",
+          "mean": 168563.04070588242,
+          "median": 168649.02016806725,
+          "std_dev": 700.0946066629676,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Brightness_VB6_Brightness.frm",
+          "mean": 137581.97716643743,
+          "median": 137565.15955983492,
+          "std_dev": 473.82752655283934,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Colorize.frm",
+          "mean": 502502.5861000001,
+          "median": 502169.96,
+          "std_dev": 2660.463604666553,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Contrast.frm",
+          "mean": 209457.00643006273,
+          "median": 209392.38517745305,
+          "std_dev": 863.3038745660833,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_EdgeDetection.frm",
+          "mean": 511736.11418367346,
+          "median": 510740.19132653065,
+          "std_dev": 8738.972652306556,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_EmbossEngrave.frm",
+          "mean": 545943.9173224043,
+          "median": 545484.6366120218,
+          "std_dev": 2382.8859300803633,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_FastDrawing.cls",
+          "mean": 68074.89806083255,
+          "median": 68026.32461072359,
+          "std_dev": 295.4132883180343,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_FastDrawing.cls",
+          "mean": 67425.185083348,
+          "median": 67386.7621408046,
+          "std_dev": 160.93081138789,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_FastDrawing.cls",
+          "mean": 1046329.2975789472,
+          "median": 1046043.1157894738,
+          "std_dev": 5734.971953107953,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_FormPhysics.frm",
+          "mean": 303751.6354545454,
+          "median": 303303.9590909091,
+          "std_dev": 3634.08391541032,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Gradient.frm",
+          "mean": 200022.5649698189,
+          "median": 200248.15191146883,
+          "std_dev": 1478.04720112437,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_HistogramsAdv_Main.frm",
+          "mean": 217024.11067245118,
+          "median": 216885.59110629067,
+          "std_dev": 1249.566404159786,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_HistogramsAdv_mod_PublicVars.bas",
+          "mean": 484290.16742464784,
+          "median": 484644.16755263705,
+          "std_dev": 4400.694057819307,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Histograms_Histogram.frm",
+          "mean": 334992.0969230769,
+          "median": 334676.9397993311,
+          "std_dev": 1774.4633421441752,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Histograms_Main.frm",
+          "mean": 142820.63398860395,
+          "median": 142685.49572649575,
+          "std_dev": 721.5774310748571,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Histograms_mod_PublicVars.bas",
+          "mean": 480770.47824252886,
+          "median": 480079.8017765311,
+          "std_dev": 3291.862715672974,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Levels_Histogram.frm",
+          "mean": 331067.4243377484,
+          "median": 330776.8079470199,
+          "std_dev": 1666.6867555519516,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Mandelbrot.frm",
+          "mean": 420607.06474789925,
+          "median": 420554.518907563,
+          "std_dev": 1917.6536679393444,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_MapEditor_Declarations.bas",
+          "mean": 72594.54039354813,
+          "median": 72547.1222007722,
+          "std_dev": 232.1760023734393,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_MapEditor_Declarations.bas",
+          "mean": 92397.73241854704,
+          "median": 92360.24828775562,
+          "std_dev": 287.518140237916,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_MapEditor_Declarations.bas",
+          "mean": 1795406.9340827032,
+          "median": 1796766.9671052631,
+          "std_dev": 13529.107687812388,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_MapEditor_FrmResize.frm",
+          "mean": 155484.50195652174,
+          "median": 155427.47748447204,
+          "std_dev": 597.7361877880057,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_MapEditor_Main Editor.frm",
+          "mean": 287485.28544668586,
+          "median": 287326.20605187316,
+          "std_dev": 1271.0951746491123,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Physics_Logic.bas",
+          "mean": 101508.6581830566,
+          "median": 101452.89968297101,
+          "std_dev": 306.2485690152503,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Physics_Logic.bas",
+          "mean": 124934.11114147917,
+          "median": 124880.34126984127,
+          "std_dev": 355.34813452666003,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Physics_Logic.bas",
+          "mean": 2212903.8269565213,
+          "median": 2212028.5,
+          "std_dev": 7865.331198960147,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_RandomizationFX.frm",
+          "mean": 473105.93298578204,
+          "median": 472839.981042654,
+          "std_dev": 1836.4470165233092,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_Sepia.frm",
+          "mean": 256698.68069053712,
+          "median": 256625.28388746805,
+          "std_dev": 1346.0786087203685,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_ShiftColors.frm",
+          "mean": 209972.62701680668,
+          "median": 209854.07352941175,
+          "std_dev": 868.5754442677858,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_cSystemColorDialog.cls",
+          "mean": 481303.6284134617,
+          "median": 481724.0216346154,
+          "std_dev": 3259.4938814774664,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_frmFill.frm",
+          "mean": 99625.79189431701,
+          "median": 99609.71984047856,
+          "std_dev": 206.69075047884954,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_frmFire.frm",
+          "mean": 389304.7906201551,
+          "median": 389244.761627907,
+          "std_dev": 1700.9933180303508,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_frmFire.frx",
+          "mean": 206.34628468292922,
+          "median": 206.12693788881208,
+          "std_dev": 0.7310878106617761,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_frmScanner.frm",
+          "mean": 231980.62673611115,
+          "median": 231843.28009259258,
+          "std_dev": 1246.1331542876114,
+          "unit": "ns"
+        },
+        {
+          "name": "medium_frmTransparency.frm",
+          "mean": 164437.54478618418,
+          "median": 164300.2228618421,
+          "std_dev": 825.0060782917183,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Advanced Histograms.vbp",
+          "mean": 12164.235122713784,
+          "median": 12168.845207942464,
+          "std_dev": 49.255786214874654,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Artificial Life.vbp",
+          "mean": 12170.667026634494,
+          "median": 12169.139628439038,
+          "std_dev": 25.308159775437375,
+          "unit": "ns"
+        },
+        {
+          "name": "small_ArtificialLife_Declarations.bas",
+          "mean": 180092.87958646673,
+          "median": 179819.0310428353,
+          "std_dev": 1589.123682187457,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Basic Histograms.vbp",
+          "mean": 12196.137487818045,
+          "median": 12191.4627940686,
+          "std_dev": 44.00346031037652,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Blacklight.vbp",
+          "mean": 11448.916758523483,
+          "median": 11442.57013827488,
+          "std_dev": 28.869097192299915,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Brightness.vbp",
+          "mean": 11165.16434735914,
+          "median": 11161.570781738137,
+          "std_dev": 42.32419101678602,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Brightness2.vbp",
+          "mean": 11197.54317025347,
+          "median": 11194.313783068783,
+          "std_dev": 29.974007201090966,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Brightness3.vbp",
+          "mean": 11570.192794144687,
+          "median": 11566.281925958428,
+          "std_dev": 40.6914068528678,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Colorize.vbp",
+          "mean": 11837.27157312842,
+          "median": 11824.859803921569,
+          "std_dev": 50.33909392724505,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Contrast.vbp",
+          "mean": 11738.68228550712,
+          "median": 11733.788506125342,
+          "std_dev": 32.28628017358846,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Curves.vbp",
+          "mean": 11488.198110966006,
+          "median": 11483.42013970339,
+          "std_dev": 39.5433117786599,
+          "unit": "ns"
+        },
+        {
+          "name": "small_CustomFilters.vbp",
+          "mean": 11748.576549981906,
+          "median": 11743.560198801744,
+          "std_dev": 46.695267598848524,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Declarations.bas",
+          "mean": 17394.913434770002,
+          "median": 17389.78784461153,
+          "std_dev": 30.046716675769023,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Declarations.bas",
+          "mean": 14944.215888749091,
+          "median": 14966.895922612855,
+          "std_dev": 156.9995335717522,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Diffuse.vbp",
+          "mean": 11959.603934600102,
+          "median": 11953.74389414512,
+          "std_dev": 53.39612520521801,
+          "unit": "ns"
+        },
+        {
+          "name": "small_EdgeDetection.vbp",
+          "mean": 11851.61577259958,
+          "median": 11850.991706037486,
+          "std_dev": 37.16421687328115,
+          "unit": "ns"
+        },
+        {
+          "name": "small_EmbossEngrave.vbp",
+          "mean": 12208.439674109866,
+          "median": 12203.588530978413,
+          "std_dev": 39.49364360272322,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Fill_Region.vbp",
+          "mean": 11099.58817605707,
+          "median": 11093.16593621399,
+          "std_dev": 37.93855268279329,
+          "unit": "ns"
+        },
+        {
+          "name": "small_FlameTest.vbp",
+          "mean": 11279.515044095075,
+          "median": 11276.507982265764,
+          "std_dev": 30.322575508562434,
+          "unit": "ns"
+        },
+        {
+          "name": "small_FormScreenCapture.frm",
+          "mean": 80075.53521982413,
+          "median": 79996.63229416466,
+          "std_dev": 355.20732762319767,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Gradient.frx",
+          "mean": 104.99235234074636,
+          "median": 104.71293261592962,
+          "std_dev": 1.33514352400562,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Gradient.vbp",
+          "mean": 11269.275572046357,
+          "median": 11266.966366248695,
+          "std_dev": 29.795411543608946,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Grayscale.vbp",
+          "mean": 11806.060904403132,
+          "median": 11804.615600925365,
+          "std_dev": 48.15058805277496,
+          "unit": "ns"
+        },
+        {
+          "name": "small_HMM.vbp",
+          "mean": 11226.361385546064,
+          "median": 11226.848091671127,
+          "std_dev": 39.40539328994803,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Image Levels.vbp",
+          "mean": 12111.973265994318,
+          "median": 12108.879659815733,
+          "std_dev": 34.77405021881311,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Levels_mod_PublicVars.bas",
+          "mean": 470230.10488765495,
+          "median": 470168.9486189139,
+          "std_dev": 4310.402098529487,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Mandelbrot.vbp",
+          "mean": 11508.448327074468,
+          "median": 11507.750539326367,
+          "std_dev": 26.622010282406425,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Map Editor.vbp",
+          "mean": 12214.104734132025,
+          "median": 12215.737324464153,
+          "std_dev": 36.33248121039916,
+          "unit": "ns"
+        },
+        {
+          "name": "small_MapEditor_Subs.bas",
+          "mean": 129584.47639604742,
+          "median": 129568.94792298363,
+          "std_dev": 526.0342039745616,
+          "unit": "ns"
+        },
+        {
+          "name": "small_NatureFilters.vbp",
+          "mean": 11685.966652685936,
+          "median": 11684.989452892069,
+          "std_dev": 37.91503187867096,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Physics.vbp",
+          "mean": 11595.23831413918,
+          "median": 11591.89845117215,
+          "std_dev": 28.000386547252244,
+          "unit": "ns"
+        },
+        {
+          "name": "small_RandomizationFX.vbp",
+          "mean": 11849.791474234837,
+          "median": 11840.045487244271,
+          "std_dev": 45.14988230922235,
+          "unit": "ns"
+        },
+        {
+          "name": "small_ScreenCapture.vbp",
+          "mean": 11784.408317522979,
+          "median": 11783.053217736371,
+          "std_dev": 39.32329680787723,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Sepia.vbp",
+          "mean": 11592.207692758411,
+          "median": 11588.461417008664,
+          "std_dev": 38.3178316255715,
+          "unit": "ns"
+        },
+        {
+          "name": "small_ShiftColor.vbp",
+          "mean": 11504.117845286219,
+          "median": 11497.108620689654,
+          "std_dev": 48.208232929588966,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Subs.bas",
+          "mean": 12743.540247097098,
+          "median": 12734.358855650524,
+          "std_dev": 38.64515313575433,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Subs.bas",
+          "mean": 10936.310475292308,
+          "median": 10928.463874048892,
+          "std_dev": 30.75189741133489,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Threshold.vbp",
+          "mean": 11748.414278256076,
+          "median": 11744.29537197232,
+          "std_dev": 31.427661053636182,
+          "unit": "ns"
+        },
+        {
+          "name": "small_Transparency.vbp",
+          "mean": 11852.219379176902,
+          "median": 11846.572870284477,
+          "std_dev": 41.72967249720145,
+          "unit": "ns"
+        },
+        {
+          "name": "small_VB_Scanner_Support.vbp",
+          "mean": 10816.050301528683,
+          "median": 10809.030005905053,
+          "std_dev": 30.707047796876775,
+          "unit": "ns"
+        },
+        {
+          "name": "small_frmHMM.frx",
+          "mean": 101.24759346610604,
+          "median": 101.1803157747234,
+          "std_dev": 0.25343668675188863,
+          "unit": "ns"
+        },
+        {
+          "name": "small_mod_PublicVars.bas",
+          "mean": 24743.166799926068,
+          "median": 24728.93436946118,
+          "std_dev": 111.87173359874156,
+          "unit": "ns"
+        },
+        {
+          "name": "small_mod_PublicVars.bas",
+          "mean": 32522.590464134308,
+          "median": 32532.37957229263,
+          "std_dev": 150.6136755355838,
+          "unit": "ns"
+        }
+      ]
+    }
+  ],
+  "benchmarks_summary": {
+    "large_Brightness_API_Brightness2.frx": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 2376.1733892545235,
+          "median": 2375.592625523459,
+          "std_dev": 4.391167309104958
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 2376.1733892545235,
+        "median": 2375.592625523459,
+        "std_dev": 4.391167309104958
+      }
+    },
+    "large_Brightness_DIBs_Brightness3.frx": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 3071.617276788363,
+          "median": 3071.006374140565,
+          "std_dev": 5.786389942272977
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 3071.617276788363,
+        "median": 3071.006374140565,
+        "std_dev": 5.786389942272977
+      }
+    },
+    "large_Brightness_FasterDIBs_Brightness.frx": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 2568.7746186137847,
+          "median": 2568.0319043143836,
+          "std_dev": 4.585246381784719
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 2568.7746186137847,
+        "median": 2568.0319043143836,
+        "std_dev": 4.585246381784719
+      }
+    },
+    "large_Brightness_VB6_Brightness.frx": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 2467.44914100781,
+          "median": 2464.4314203365043,
+          "std_dev": 9.287585808432327
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 2467.44914100781,
+        "median": 2464.4314203365043,
+        "std_dev": 9.287585808432327
+      }
+    },
+    "large_Curves.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 633728.6934810126,
+          "median": 633884.6392405063,
+          "std_dev": 1543.5888606502215
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 347855.80851598555,
+        "median": 347488.26133578434,
+        "std_dev": 2622.6049523294846
+      }
+    },
+    "large_CustomFilters.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 823139.8875409839,
+          "median": 823119.5327868853,
+          "std_dev": 3522.061769083687
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 823139.8875409839,
+        "median": 823119.5327868853,
+        "std_dev": 3522.061769083687
+      }
+    },
+    "large_FormPhysics.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 138067.14004421743,
+          "median": 137987.44463196862,
+          "std_dev": 380.44522732863436
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 178246.18275420036,
+        "median": 178002.05726817044,
+        "std_dev": 903.9157923910202
+      }
+    },
+    "large_FormPhysics.frx": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 3894.2502841525984,
+          "median": 3892.0115148019995,
+          "std_dev": 10.64757871341562
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 3894.2502841525984,
+        "median": 3892.0115148019995,
+        "std_dev": 10.64757871341562
+      }
+    },
+    "large_Grayscale.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 880212.3623684209,
+          "median": 879987.0263157894,
+          "std_dev": 2279.8805633265642
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 880212.3623684209,
+        "median": 879987.0263157894,
+        "std_dev": 2279.8805633265642
+      }
+    },
+    "large_HistogramsAdv_Histogram.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 811920.8260162604,
+          "median": 811528.2804878049,
+          "std_dev": 2547.8162948199465
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 811920.8260162604,
+        "median": 811528.2804878049,
+        "std_dev": 2547.8162948199465
+      }
+    },
+    "large_Levels_Main.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 667502.5557333333,
+          "median": 667103.7166666667,
+          "std_dev": 1868.3856078085819
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 361985.280513286,
+        "median": 361744.4014957265,
+        "std_dev": 2327.890730778177
+      }
+    },
+    "large_MapEditor_Main Editor.frx": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 10368.261964551899,
+          "median": 10360.165702160493,
+          "std_dev": 34.8928475981852
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 10368.261964551899,
+        "median": 10360.165702160493,
+        "std_dev": 34.8928475981852
+      }
+    },
+    "large_NatureFilters.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 834373.7524999997,
+          "median": 833886.2041666666,
+          "std_dev": 3110.2622838134794
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 834373.7524999997,
+        "median": 833886.2041666666,
+        "std_dev": 3110.2622838134794
+      }
+    },
+    "large_Organism.cls": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 104546.51784256122,
+          "median": 104403.46949832776,
+          "std_dev": 922.7019194063292
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 2461732.400487805,
+        "median": 2461574.658536585,
+        "std_dev": 14029.16734588509
+      }
+    },
+    "large_cCommonDialog.cls": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 296798.83747636783,
+          "median": 296567.87003968254,
+          "std_dev": 1203.1027636742263
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 5191529.856,
+        "median": 5185217.375,
+        "std_dev": 35402.14393014672
+      }
+    },
+    "large_frmHMM.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 906839.9937837836,
+          "median": 906777.1396396396,
+          "std_dev": 3024.222306976254
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 906839.9937837836,
+        "median": 906777.1396396396,
+        "std_dev": 3024.222306976254
+      }
+    },
+    "large_frmMain.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 878179.1099130437,
+          "median": 877501.6130434782,
+          "std_dev": 3573.5769049110827
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 878179.1099130437,
+        "median": 877501.6130434782,
+        "std_dev": 3573.5769049110827
+      }
+    },
+    "large_frmTransparency.frx": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 3425.5093754928703,
+          "median": 3424.2588889938593,
+          "std_dev": 4.764828661963107
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 3425.5093754928703,
+        "median": 3424.2588889938593,
+        "std_dev": 4.764828661963107
+      }
+    },
+    "large_pdOpenSaveDialog.cls": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 125250.50826443327,
+          "median": 125189.08126671123,
+          "std_dev": 254.97464384937334
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 2433670.076585367,
+        "median": 2431598.7195121953,
+        "std_dev": 12135.730182173113
+      }
+    },
+    "medium_Blacklight.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 247689.919009901,
+          "median": 247649.76237623763,
+          "std_dev": 1020.3568032012546
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 247689.919009901,
+        "median": 247649.76237623763,
+        "std_dev": 1020.3568032012546
+      }
+    },
+    "medium_Brightness_API_Brightness2.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 149262.52421130953,
+          "median": 149279.40029761905,
+          "std_dev": 497.2058614354134
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 149262.52421130953,
+        "median": 149279.40029761905,
+        "std_dev": 497.2058614354134
+      }
+    },
+    "medium_Brightness_DIBs_Brightness3.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 323327.520935484,
+          "median": 322924.26451612904,
+          "std_dev": 1805.4165715901474
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 323327.520935484,
+        "median": 322924.26451612904,
+        "std_dev": 1805.4165715901474
+      }
+    },
+    "medium_Brightness_FasterDIBs_Brightness.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 168563.04070588242,
+          "median": 168649.02016806725,
+          "std_dev": 700.0946066629676
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 168563.04070588242,
+        "median": 168649.02016806725,
+        "std_dev": 700.0946066629676
+      }
+    },
+    "medium_Brightness_VB6_Brightness.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 137581.97716643743,
+          "median": 137565.15955983492,
+          "std_dev": 473.82752655283934
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 137581.97716643743,
+        "median": 137565.15955983492,
+        "std_dev": 473.82752655283934
+      }
+    },
+    "medium_Colorize.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 502502.5861000001,
+          "median": 502169.96,
+          "std_dev": 2660.463604666553
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 502502.5861000001,
+        "median": 502169.96,
+        "std_dev": 2660.463604666553
+      }
+    },
+    "medium_Contrast.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 209457.00643006273,
+          "median": 209392.38517745305,
+          "std_dev": 863.3038745660833
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 209457.00643006273,
+        "median": 209392.38517745305,
+        "std_dev": 863.3038745660833
+      }
+    },
+    "medium_EdgeDetection.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 511736.11418367346,
+          "median": 510740.19132653065,
+          "std_dev": 8738.972652306556
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 511736.11418367346,
+        "median": 510740.19132653065,
+        "std_dev": 8738.972652306556
+      }
+    },
+    "medium_EmbossEngrave.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 545943.9173224043,
+          "median": 545484.6366120218,
+          "std_dev": 2382.8859300803633
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 545943.9173224043,
+        "median": 545484.6366120218,
+        "std_dev": 2382.8859300803633
+      }
+    },
+    "medium_FastDrawing.cls": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 68074.89806083255,
+          "median": 68026.32461072359,
+          "std_dev": 295.4132883180343
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 1046329.2975789472,
+        "median": 1046043.1157894738,
+        "std_dev": 5734.971953107953
+      }
+    },
+    "medium_FormPhysics.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 303751.6354545454,
+          "median": 303303.9590909091,
+          "std_dev": 3634.08391541032
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 303751.6354545454,
+        "median": 303303.9590909091,
+        "std_dev": 3634.08391541032
+      }
+    },
+    "medium_Gradient.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 200022.5649698189,
+          "median": 200248.15191146883,
+          "std_dev": 1478.04720112437
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 200022.5649698189,
+        "median": 200248.15191146883,
+        "std_dev": 1478.04720112437
+      }
+    },
+    "medium_HistogramsAdv_Main.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 217024.11067245118,
+          "median": 216885.59110629067,
+          "std_dev": 1249.566404159786
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 217024.11067245118,
+        "median": 216885.59110629067,
+        "std_dev": 1249.566404159786
+      }
+    },
+    "medium_HistogramsAdv_mod_PublicVars.bas": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 484290.16742464784,
+          "median": 484644.16755263705,
+          "std_dev": 4400.694057819307
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 484290.16742464784,
+        "median": 484644.16755263705,
+        "std_dev": 4400.694057819307
+      }
+    },
+    "medium_Histograms_Histogram.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 334992.0969230769,
+          "median": 334676.9397993311,
+          "std_dev": 1774.4633421441752
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 334992.0969230769,
+        "median": 334676.9397993311,
+        "std_dev": 1774.4633421441752
+      }
+    },
+    "medium_Histograms_Main.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 142820.63398860395,
+          "median": 142685.49572649575,
+          "std_dev": 721.5774310748571
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 142820.63398860395,
+        "median": 142685.49572649575,
+        "std_dev": 721.5774310748571
+      }
+    },
+    "medium_Histograms_mod_PublicVars.bas": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 480770.47824252886,
+          "median": 480079.8017765311,
+          "std_dev": 3291.862715672974
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 480770.47824252886,
+        "median": 480079.8017765311,
+        "std_dev": 3291.862715672974
+      }
+    },
+    "medium_Levels_Histogram.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 331067.4243377484,
+          "median": 330776.8079470199,
+          "std_dev": 1666.6867555519516
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 331067.4243377484,
+        "median": 330776.8079470199,
+        "std_dev": 1666.6867555519516
+      }
+    },
+    "medium_Mandelbrot.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 420607.06474789925,
+          "median": 420554.518907563,
+          "std_dev": 1917.6536679393444
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 420607.06474789925,
+        "median": 420554.518907563,
+        "std_dev": 1917.6536679393444
+      }
+    },
+    "medium_MapEditor_Declarations.bas": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 72594.54039354813,
+          "median": 72547.1222007722,
+          "std_dev": 232.1760023734393
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 1795406.9340827032,
+        "median": 1796766.9671052631,
+        "std_dev": 13529.107687812388
+      }
+    },
+    "medium_MapEditor_FrmResize.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 155484.50195652174,
+          "median": 155427.47748447204,
+          "std_dev": 597.7361877880057
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 155484.50195652174,
+        "median": 155427.47748447204,
+        "std_dev": 597.7361877880057
+      }
+    },
+    "medium_MapEditor_Main Editor.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 287485.28544668586,
+          "median": 287326.20605187316,
+          "std_dev": 1271.0951746491123
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 287485.28544668586,
+        "median": 287326.20605187316,
+        "std_dev": 1271.0951746491123
+      }
+    },
+    "medium_Physics_Logic.bas": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 101508.6581830566,
+          "median": 101452.89968297101,
+          "std_dev": 306.2485690152503
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 2212903.8269565213,
+        "median": 2212028.5,
+        "std_dev": 7865.331198960147
+      }
+    },
+    "medium_RandomizationFX.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 473105.93298578204,
+          "median": 472839.981042654,
+          "std_dev": 1836.4470165233092
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 473105.93298578204,
+        "median": 472839.981042654,
+        "std_dev": 1836.4470165233092
+      }
+    },
+    "medium_Sepia.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 256698.68069053712,
+          "median": 256625.28388746805,
+          "std_dev": 1346.0786087203685
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 256698.68069053712,
+        "median": 256625.28388746805,
+        "std_dev": 1346.0786087203685
+      }
+    },
+    "medium_ShiftColors.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 209972.62701680668,
+          "median": 209854.07352941175,
+          "std_dev": 868.5754442677858
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 209972.62701680668,
+        "median": 209854.07352941175,
+        "std_dev": 868.5754442677858
+      }
+    },
+    "medium_cSystemColorDialog.cls": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 481303.6284134617,
+          "median": 481724.0216346154,
+          "std_dev": 3259.4938814774664
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 481303.6284134617,
+        "median": 481724.0216346154,
+        "std_dev": 3259.4938814774664
+      }
+    },
+    "medium_frmFill.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 99625.79189431701,
+          "median": 99609.71984047856,
+          "std_dev": 206.69075047884954
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 99625.79189431701,
+        "median": 99609.71984047856,
+        "std_dev": 206.69075047884954
+      }
+    },
+    "medium_frmFire.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 389304.7906201551,
+          "median": 389244.761627907,
+          "std_dev": 1700.9933180303508
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 389304.7906201551,
+        "median": 389244.761627907,
+        "std_dev": 1700.9933180303508
+      }
+    },
+    "medium_frmFire.frx": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 206.34628468292922,
+          "median": 206.12693788881208,
+          "std_dev": 0.7310878106617761
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 206.34628468292922,
+        "median": 206.12693788881208,
+        "std_dev": 0.7310878106617761
+      }
+    },
+    "medium_frmScanner.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 231980.62673611115,
+          "median": 231843.28009259258,
+          "std_dev": 1246.1331542876114
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 231980.62673611115,
+        "median": 231843.28009259258,
+        "std_dev": 1246.1331542876114
+      }
+    },
+    "medium_frmTransparency.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 164437.54478618418,
+          "median": 164300.2228618421,
+          "std_dev": 825.0060782917183
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 164437.54478618418,
+        "median": 164300.2228618421,
+        "std_dev": 825.0060782917183
+      }
+    },
+    "small_Advanced Histograms.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 12164.235122713784,
+          "median": 12168.845207942464,
+          "std_dev": 49.255786214874654
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 12164.235122713784,
+        "median": 12168.845207942464,
+        "std_dev": 49.255786214874654
+      }
+    },
+    "small_Artificial Life.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 12170.667026634494,
+          "median": 12169.139628439038,
+          "std_dev": 25.308159775437375
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 12170.667026634494,
+        "median": 12169.139628439038,
+        "std_dev": 25.308159775437375
+      }
+    },
+    "small_ArtificialLife_Declarations.bas": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 180092.87958646673,
+          "median": 179819.0310428353,
+          "std_dev": 1589.123682187457
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 180092.87958646673,
+        "median": 179819.0310428353,
+        "std_dev": 1589.123682187457
+      }
+    },
+    "small_Basic Histograms.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 12196.137487818045,
+          "median": 12191.4627940686,
+          "std_dev": 44.00346031037652
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 12196.137487818045,
+        "median": 12191.4627940686,
+        "std_dev": 44.00346031037652
+      }
+    },
+    "small_Blacklight.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11448.916758523483,
+          "median": 11442.57013827488,
+          "std_dev": 28.869097192299915
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11448.916758523483,
+        "median": 11442.57013827488,
+        "std_dev": 28.869097192299915
+      }
+    },
+    "small_Brightness.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11165.16434735914,
+          "median": 11161.570781738137,
+          "std_dev": 42.32419101678602
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11165.16434735914,
+        "median": 11161.570781738137,
+        "std_dev": 42.32419101678602
+      }
+    },
+    "small_Brightness2.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11197.54317025347,
+          "median": 11194.313783068783,
+          "std_dev": 29.974007201090966
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11197.54317025347,
+        "median": 11194.313783068783,
+        "std_dev": 29.974007201090966
+      }
+    },
+    "small_Brightness3.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11570.192794144687,
+          "median": 11566.281925958428,
+          "std_dev": 40.6914068528678
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11570.192794144687,
+        "median": 11566.281925958428,
+        "std_dev": 40.6914068528678
+      }
+    },
+    "small_Colorize.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11837.27157312842,
+          "median": 11824.859803921569,
+          "std_dev": 50.33909392724505
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11837.27157312842,
+        "median": 11824.859803921569,
+        "std_dev": 50.33909392724505
+      }
+    },
+    "small_Contrast.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11738.68228550712,
+          "median": 11733.788506125342,
+          "std_dev": 32.28628017358846
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11738.68228550712,
+        "median": 11733.788506125342,
+        "std_dev": 32.28628017358846
+      }
+    },
+    "small_Curves.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11488.198110966006,
+          "median": 11483.42013970339,
+          "std_dev": 39.5433117786599
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11488.198110966006,
+        "median": 11483.42013970339,
+        "std_dev": 39.5433117786599
+      }
+    },
+    "small_CustomFilters.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11748.576549981906,
+          "median": 11743.560198801744,
+          "std_dev": 46.695267598848524
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11748.576549981906,
+        "median": 11743.560198801744,
+        "std_dev": 46.695267598848524
+      }
+    },
+    "small_Declarations.bas": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 17394.913434770002,
+          "median": 17389.78784461153,
+          "std_dev": 30.046716675769023
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 14944.215888749091,
+        "median": 14966.895922612855,
+        "std_dev": 156.9995335717522
+      }
+    },
+    "small_Diffuse.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11959.603934600102,
+          "median": 11953.74389414512,
+          "std_dev": 53.39612520521801
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11959.603934600102,
+        "median": 11953.74389414512,
+        "std_dev": 53.39612520521801
+      }
+    },
+    "small_EdgeDetection.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11851.61577259958,
+          "median": 11850.991706037486,
+          "std_dev": 37.16421687328115
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11851.61577259958,
+        "median": 11850.991706037486,
+        "std_dev": 37.16421687328115
+      }
+    },
+    "small_EmbossEngrave.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 12208.439674109866,
+          "median": 12203.588530978413,
+          "std_dev": 39.49364360272322
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 12208.439674109866,
+        "median": 12203.588530978413,
+        "std_dev": 39.49364360272322
+      }
+    },
+    "small_Fill_Region.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11099.58817605707,
+          "median": 11093.16593621399,
+          "std_dev": 37.93855268279329
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11099.58817605707,
+        "median": 11093.16593621399,
+        "std_dev": 37.93855268279329
+      }
+    },
+    "small_FlameTest.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11279.515044095075,
+          "median": 11276.507982265764,
+          "std_dev": 30.322575508562434
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11279.515044095075,
+        "median": 11276.507982265764,
+        "std_dev": 30.322575508562434
+      }
+    },
+    "small_FormScreenCapture.frm": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 80075.53521982413,
+          "median": 79996.63229416466,
+          "std_dev": 355.20732762319767
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 80075.53521982413,
+        "median": 79996.63229416466,
+        "std_dev": 355.20732762319767
+      }
+    },
+    "small_Gradient.frx": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 104.99235234074636,
+          "median": 104.71293261592962,
+          "std_dev": 1.33514352400562
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 104.99235234074636,
+        "median": 104.71293261592962,
+        "std_dev": 1.33514352400562
+      }
+    },
+    "small_Gradient.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11269.275572046357,
+          "median": 11266.966366248695,
+          "std_dev": 29.795411543608946
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11269.275572046357,
+        "median": 11266.966366248695,
+        "std_dev": 29.795411543608946
+      }
+    },
+    "small_Grayscale.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11806.060904403132,
+          "median": 11804.615600925365,
+          "std_dev": 48.15058805277496
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11806.060904403132,
+        "median": 11804.615600925365,
+        "std_dev": 48.15058805277496
+      }
+    },
+    "small_HMM.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11226.361385546064,
+          "median": 11226.848091671127,
+          "std_dev": 39.40539328994803
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11226.361385546064,
+        "median": 11226.848091671127,
+        "std_dev": 39.40539328994803
+      }
+    },
+    "small_Image Levels.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 12111.973265994318,
+          "median": 12108.879659815733,
+          "std_dev": 34.77405021881311
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 12111.973265994318,
+        "median": 12108.879659815733,
+        "std_dev": 34.77405021881311
+      }
+    },
+    "small_Levels_mod_PublicVars.bas": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 470230.10488765495,
+          "median": 470168.9486189139,
+          "std_dev": 4310.402098529487
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 470230.10488765495,
+        "median": 470168.9486189139,
+        "std_dev": 4310.402098529487
+      }
+    },
+    "small_Mandelbrot.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11508.448327074468,
+          "median": 11507.750539326367,
+          "std_dev": 26.622010282406425
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11508.448327074468,
+        "median": 11507.750539326367,
+        "std_dev": 26.622010282406425
+      }
+    },
+    "small_Map Editor.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 12214.104734132025,
+          "median": 12215.737324464153,
+          "std_dev": 36.33248121039916
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 12214.104734132025,
+        "median": 12215.737324464153,
+        "std_dev": 36.33248121039916
+      }
+    },
+    "small_MapEditor_Subs.bas": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 129584.47639604742,
+          "median": 129568.94792298363,
+          "std_dev": 526.0342039745616
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 129584.47639604742,
+        "median": 129568.94792298363,
+        "std_dev": 526.0342039745616
+      }
+    },
+    "small_NatureFilters.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11685.966652685936,
+          "median": 11684.989452892069,
+          "std_dev": 37.91503187867096
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11685.966652685936,
+        "median": 11684.989452892069,
+        "std_dev": 37.91503187867096
+      }
+    },
+    "small_Physics.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11595.23831413918,
+          "median": 11591.89845117215,
+          "std_dev": 28.000386547252244
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11595.23831413918,
+        "median": 11591.89845117215,
+        "std_dev": 28.000386547252244
+      }
+    },
+    "small_RandomizationFX.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11849.791474234837,
+          "median": 11840.045487244271,
+          "std_dev": 45.14988230922235
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11849.791474234837,
+        "median": 11840.045487244271,
+        "std_dev": 45.14988230922235
+      }
+    },
+    "small_ScreenCapture.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11784.408317522979,
+          "median": 11783.053217736371,
+          "std_dev": 39.32329680787723
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11784.408317522979,
+        "median": 11783.053217736371,
+        "std_dev": 39.32329680787723
+      }
+    },
+    "small_Sepia.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11592.207692758411,
+          "median": 11588.461417008664,
+          "std_dev": 38.3178316255715
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11592.207692758411,
+        "median": 11588.461417008664,
+        "std_dev": 38.3178316255715
+      }
+    },
+    "small_ShiftColor.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11504.117845286219,
+          "median": 11497.108620689654,
+          "std_dev": 48.208232929588966
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11504.117845286219,
+        "median": 11497.108620689654,
+        "std_dev": 48.208232929588966
+      }
+    },
+    "small_Subs.bas": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 12743.540247097098,
+          "median": 12734.358855650524,
+          "std_dev": 38.64515313575433
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 10936.310475292308,
+        "median": 10928.463874048892,
+        "std_dev": 30.75189741133489
+      }
+    },
+    "small_Threshold.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11748.414278256076,
+          "median": 11744.29537197232,
+          "std_dev": 31.427661053636182
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11748.414278256076,
+        "median": 11744.29537197232,
+        "std_dev": 31.427661053636182
+      }
+    },
+    "small_Transparency.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 11852.219379176902,
+          "median": 11846.572870284477,
+          "std_dev": 41.72967249720145
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 11852.219379176902,
+        "median": 11846.572870284477,
+        "std_dev": 41.72967249720145
+      }
+    },
+    "small_VB_Scanner_Support.vbp": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 10816.050301528683,
+          "median": 10809.030005905053,
+          "std_dev": 30.707047796876775
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 10816.050301528683,
+        "median": 10809.030005905053,
+        "std_dev": 30.707047796876775
+      }
+    },
+    "small_frmHMM.frx": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 101.24759346610604,
+          "median": 101.1803157747234,
+          "std_dev": 0.25343668675188863
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 101.24759346610604,
+        "median": 101.1803157747234,
+        "std_dev": 0.25343668675188863
+      }
+    },
+    "small_mod_PublicVars.bas": {
+      "history": [
+        {
+          "timestamp": "2026-09-13T00:58:34Z",
+          "mean": 24743.166799926068,
+          "median": 24728.93436946118,
+          "std_dev": 111.87173359874156
+        }
+      ],
+      "trend": null,
+      "latest": {
+        "mean": 32522.590464134308,
+        "median": 32532.37957229263,
+        "std_dev": 150.6136755355838
+      }
+    }
+  }
+}
