@@ -9,6 +9,9 @@ repository = "https://github.com/scriptandcompile/vb6"
 keywords = ["vb6", "visual-basic", "runtime", "stdlib"]
 categories = ["development-tools", "compilers"]
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 vb6parse.workspace = true
 vb6core.workspace = true
