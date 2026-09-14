@@ -4,10 +4,14 @@ version = "0.1.1"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Formatter for VB6 source files"
 repository.workspace = true
+description = "Formatter for VB6 source files"
 keywords = ["vb6", "formatter", "fmt"]
 categories = ["development-tools", "parsing"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 
 [dependencies]
 vb6parse.workspace = true

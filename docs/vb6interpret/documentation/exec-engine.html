@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The exec engine of vb6interpret: how statement execution works over the concrete syntax tree">
+    <title>Exec Engine - VB6Interpret Documentation</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            hljs.highlightAll();
+        });
+    </script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../index.html">VB6Interpret</a> / Documentation / Exec Engine</h1>
+            <p class="tagline">How Statement Execution Works Over the Concrete Syntax Tree</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../index.html">Home</a>
+            <a href="../documentation.html">Documentation</a>
+            <a href="../coverage.html">Coverage</a>
+            <a href="../getting-started.html">Getting Started</a>
+            <a href="expression-evaluation.html">Expression Evaluation</a>
+            <a href="playground.html">Playground</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container docs-content">
+        <aside class="toc">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#design-philosophy">Design Philosophy</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#interpreter">The Interpreter</a></li>
+                <li><a href="#statement-dispatch">Statement Dispatch</a></li>
+                <li><a href="#flow-control">Control Flow: the Flow Enum</a></li>
+                <li><a href="#execution-model">Execution Model</a></li>
+                <li><a href="#statement-families">Statement Execution Families</a>
+                    <ul>
+                        <li><a href="#declarations">Declarations</a></li>
+                        <li><a href="#assignments">Assignments</a></li>
+                        <li><a href="#control-flow-statements">Control Flow</a></li>
+                        <li><a href="#calls">Call Statements</a></li>
+                        <li><a href="#print-output">Print Output</a></li>
+                        <li><a href="#file-io">File I/O</a></li>
+                        <li><a href="#simple-statements">Simple Statements</a></li>
+                    </ul>
+                </li>
+                <li><a href="#expression-evaluation">Expression Evaluation</a></li>
+                <li><a href="#debug-trace">Debug &amp; Trace Support</a></li>
+                <li><a href="#step-budget">Step Budgeting</a></li>
+                <li><a href="#scoping">Scoping &amp; Variable Storage</a></li>
+                <li><a href="#program-model">Program &amp; Procedure Model</a></li>
+                <li><a href="#how-it-works">How It Works: End-to-End</a></li>
+                <li><a href="#related">Related Documentation</a></li>
+            </ul>
+        </aside>
+
+        <article>
+            <h2 id="overview">Overview</h2>
+            <p>
+                The exec engine is the statement-execution layer of <code>vb6interpret</code>. It receives a
+                parsed VB6 module (a <code>ModuleFile</code> with its concrete syntax tree) and walks the tree
+                to execute every statement directly, using runtime values from <code>vb6runtime</code>. There
+                is no intermediate compilation step: the interpreter operates on the CST produced by
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse" target="_blank">vb6parse</a>
+                in real time.
+            </p>
+            <p>
+                The exec engine is a <em>tree-walking interpreter</em>. Its central component, the
+                <code>Interpreter</code>, owns a global scope, a call frame stack, and the loaded procedures
+                extracted from the module. A single statement-dispatch method routes every supported VB6
+                statement to a specialized handler in one of the submodules under <code>exec/</code>.
+            </p>
+
+            <div class="info-box">
+                <p><strong>Key principle:</strong> The exec engine treats the CST as its source of truth.
+                Statements are not transformed, lowered, or compiled. Instead, handlers walk the tree
+                structure directly, extracting syntax nodes and evaluating sub-expressions on demand.</p>
+            </div>
+
+            <h2 id="design-philosophy">Design Philosophy</h2>
+            <p>
+                The exec engine makes three core design choices that shape everything about its implementation.
+            </p>
+
+            <h3>1. CST as Execution Graph</h3>
+            <p>
+                Unlike traditional interpreters that work over an AST or byte-code, vb6interpret's exec engine
+                receives the CST from <code>vb6parse</code> and executes against it directly. The CST preserves
+                the original source structure including whitespace, comments, and all syntax tokens. The
+                interpreter extracts only the significant children it needs for each statement type, skipping
+                trivia.
+            </p>
+
+            <h3>2. Flat Match-Dispatch Over SyntaxKind</h3>
+            <p>
+                The statement dispatcher in <code>exec/mod.rs</code> is a single large <code>match</code> on
+                <code>SyntaxKind</code>. Each branch routes to a handler method on <code>Interpreter</code>.
+                Handlers live in submodules grouped by statement family: <code>assignment.rs</code>,
+                <code>control_flow.rs</code>, <code>call.rs</code>, and so on. This keeps the dispatch logic
+                centralized while allowing specialized handlers to be modular.
+            </p>
+
+            <h3>3. Value-Centric Semantics via VBVariant</h3>
+            <p>
+                All runtime values flow through the <code>VBVariant</code> type from <code>vb6runtime</code>.
+                Every expression evaluates to a <code>VBVariant</code>. Every variable stores a
+                <code>VBVariant</code>. Every assignment copies or converts a <code>VBVariant</code>. The
+                type coercion helper in <code>exec/util.rs</code> handles VB6's implicit conversion semantics.
+            </p>
+
+            <h2 id="architecture">Architecture</h2>
+            <p>
+                The exec engine sits at the base of vb6interpret's execution pipeline. The flow is:
+            </p>
+
+            <div class="architecture-diagram">
+                <div style="max-width: 700px; margin: 0 auto;">
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600;">vb6parse (CST)</div>
+                        <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(concrete syntax tree with full source fidelity)</div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600;">build_program()</div>
+                        <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(extract procedures, find entry point)</div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px;">
+                        <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; background: var(--code-background); text-align: center;">
+                            <div style="font-weight: 600;">eval/</div>
+                            <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">Expression evaluation</div>
+                        </div>
+                        <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; background: var(--code-background); text-align: center;">
+                            <div style="font-weight: 600;">exec/</div>
+                            <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">Statement execution</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600;">Interpreter Engine</div>
+                        <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(scope, frame stack, step budget, debug snapshots)</div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600;">vb6runtime (VBVariant)</div>
+                        <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(runtime values, built-in functions, state management)</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Source Layout</h3>
+            <p>
+                The exec engine code lives in <code>projects/vb6interpret/src/</code> with the following
+                structure:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>exec/mod.rs</code></td>
+                        <td>Statement dispatch loop: routes <code>SyntaxKind</code> to submodules</td>
+                    </tr>
+                    <tr>
+                        <td><code>exec/assignment.rs</code></td>
+                        <td><code>Let</code> / <code>Set</code> statements, variable writes, array element assignment</td>
+                    </tr>
+                    <tr>
+                        <td><code>exec/call.rs</code></td>
+                        <td><code>Call</code> statement family: <code>Debug.Print</code>, <code>MsgBox</code>, <code>Beep</code>, <code>Shell</code>, sub-procedure calls</td>
+                    </tr>
+                    <tr>
+                        <td><code>exec/control_flow.rs</code></td>
+                        <td><code>If</code> / <code>ElseIf</code> / <code>Else</code>, <code>For</code> / <code>Next</code>, <code>Do</code> / <code>Loop</code>, <code>While</code> / <code>Wend</code>, <code>Select Case</code>, <code>Exit</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>exec/declarations.rs</code></td>
+                        <td><code>Dim</code>, <code>Const</code>, <code>ReDim</code>, <code>Erase</code> -- variable and array declarations</td>
+                    </tr>
+                    <tr>
+                        <td><code>exec/file_io.rs</code></td>
+                        <td><code>Open</code> / <code>Close</code> file operations</td>
+                    </tr>
+                    <tr>
+                        <td><code>exec/print.rs</code></td>
+                        <td><code>Debug.Print</code> and <code>Print #filenumber</code> output emission</td>
+                    </tr>
+                    <tr>
+                        <td><code>exec/statements.rs</code></td>
+                        <td>Simple statements: <code>Date</code> / <code>Time</code>, <code>AppActivate</code>, <code>SendKeys</code>, <code>SavePicture</code>, <code>LSet</code> / <code>RSet</code> / <code>Mid</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>exec/util.rs</code></td>
+                        <td>Shared helpers: <code>count_newlines</code>, <code>coerce</code> (type coercion)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="interpreter">The Interpreter</h2>
+            <p>
+                The <code>Interpreter</code> struct is the central engine. It owns the execution context
+                and provides all the methods that the exec handlers call.
+            </p>
+
+            <pre><code class="language-rust">pub struct Interpreter {
+    // Variable storage
+    pub(crate) globals: Scope,           // Module-level (global) variables
+    pub(crate) frames: Vec&lt;Frame&gt;,       // Call frame stack (one per active procedure)
+
+    // Program data
+    pub(crate) procedures: HashMap&lt;String, Procedure&gt;, // Named procedures by normalized name
+
+    // Output capture (Debug.Print / Print)
+    pub(crate) output: Vec&lt;String&gt;,      // Completed output lines
+    pub(crate) current_output: String,   // Partial line being built
+
+    // Execution state
+    pub(crate) step_limit: u64,          // Maximum statements before abort
+    pub(crate) steps: u64,               // Statements executed so far
+    pub(crate) current_stmt_line: usize, // 1-based line of current statement
+    pub(crate) terminated: bool,         // Whether `End` was executed
+
+    // Debug snapshot machinery
+    pub(crate) record_debug_snapshots: bool,
+    pub(crate) debug_snapshots: Vec&lt;DebugSnapshot&gt;,
+    pub(crate) pause_after_steps: Option&lt;u64&gt;,
+    pub(crate) current_stmt_range: Option&lt;(u32, u32)&gt;,
+}
+
+pub(crate) struct Frame {
+    pub(crate) name: String,             // Procedure name
+    pub(crate) is_function: bool,        // True for Function, false for Sub
+    pub(crate) locals: Scope,            // Local variables for this call
+    pub(crate) return_value: Option&lt;VBVariant&gt;, // Function return value
+}</code></pre>
+
+            <h3>Key Methods</h3>
+            <p>
+                The interpreter provides both public API methods and internal execution methods. The public
+                methods expose results to callers; the internal methods drive the execution machinery.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>run_source()</code></td>
+                        <td>Public: parse and execute a VB6 source string</td>
+                    </tr>
+                    <tr>
+                        <td><code>run_module()</code></td>
+                        <td>Public: execute a parsed <code>ModuleFile</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>call_sub()</code></td>
+                        <td>Public: invoke a Sub procedure with arguments</td>
+                    </tr>
+                    <tr>
+                        <td><code>call_function()</code></td>
+                        <td>Public: invoke a Function and return its value</td>
+                    </tr>
+                    <tr>
+                        <td><code>exec_statements()</code></td>
+                        <td>Internal: iterate children of a <code>StatementList</code>, dispatch each</td>
+                    </tr>
+                    <tr>
+                        <td><code>exec_stmt()</code></td>
+                        <td>Internal: single-statement dispatcher via <code>SyntaxKind</code> match</td>
+                    </tr>
+                    <tr>
+                        <td><code>step()</code></td>
+                        <td>Internal: charge one step, capture debug snapshot, enforce budget</td>
+                    </tr>
+                    <tr>
+                        <td><code>lookup()</code></td>
+                        <td>Internal: variable lookup (current frame locals, then globals)</td>
+                    </tr>
+                    <tr>
+                        <td><code>set_variable()</code></td>
+                        <td>Internal: set a variable, implicit-declaring it in current scope if needed</td>
+                    </tr>
+                    <tr>
+                        <td><code>output()</code></td>
+                        <td>Public: return captured output lines</td>
+                    </tr>
+                    <tr>
+                        <td><code>debug_snapshots()</code></td>
+                        <td>Public: return statement-boundary debug snapshots</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="statement-dispatch">Statement Dispatch</h2>
+            <p>
+                The core of the exec engine is the <code>exec_stmt()</code> method in
+                <code>exec/mod.rs</code>. It is a single large <code>match</code> on <code>SyntaxKind</code>
+                that routes every supported VB6 statement to its specialized handler:
+            </p>
+
+            <pre><code class="language-rust">impl Interpreter {
+    pub(crate) fn exec_stmt(&amp;mut self, node: &amp;CstNode, line: usize) -&gt; RunResult&lt;Flow&gt; {
+        match node.kind() {
+            SyntaxKind::AssignmentStatement | SyntaxKind::LetStatement
+                =&gt; { self.exec_assignment(node)?; Ok(Flow::Next) }
+
+            SyntaxKind::SetStatement
+                =&gt; { self.exec_set_statement(node)?; Ok(Flow::Next) }
+
+            SyntaxKind::DimStatement | SyntaxKind::ConstStatement
+                =&gt; { self.exec_dim(node)?; Ok(Flow::Next) }
+
+            SyntaxKind::ReDimStatement
+                =&gt; { self.exec_redim(node)?; Ok(Flow::Next) }
+
+            SyntaxKind::IfStatement
+                =&gt; self.exec_if(node, line),
+
+            SyntaxKind::ForStatement
+                =&gt; self.exec_for(node, line),
+
+            SyntaxKind::DoStatement
+                =&gt; self.exec_do(node, line),
+
+            SyntaxKind::WhileStatement
+                =&gt; self.exec_while(node, line),
+
+            SyntaxKind::SelectCaseStatement
+                =&gt; self.exec_select(node, line),
+
+            SyntaxKind::CallStatement
+                =&gt; self.exec_call(node),
+
+            SyntaxKind::PrintStatement
+                =&gt; { self.print_node(node)?; Ok(Flow::Next) }
+
+            SyntaxKind::OpenStatement
+                =&gt; { self.exec_open(node)?; Ok(Flow::Next) }
+
+            SyntaxKind::CloseStatement
+                =&gt; { self.exec_close(node)?; Ok(Flow::Next) }
+
+            SyntaxKind::ExitStatement
+                =&gt; self.exec_exit(node),
+
+            SyntaxKind::EndStatement
+                =&gt; { self.terminated = true; Ok(Flow::Terminate) }
+
+            SyntaxKind::StopStatement
+                =&gt; { /* debug pause or terminate */ }
+
+            SyntaxKind::BeepStatement
+                =&gt; { beep(); Ok(Flow::Next) }
+
+            // ... many more statement types
+
+            SyntaxKind::OptionStatement
+            | SyntaxKind::TypeStatement
+            | SyntaxKind::EnumStatement
+            | SyntaxKind::DeclareStatement
+                =&gt; Ok(Flow::Next), // Parsed but no runtime effect
+
+            other
+                =&gt; Err(self.unsupported(node, &amp;format!("statement {:?}", other))),
+        }
+    }
+}</code></pre>
+
+            <p>
+                The dispatch loop in <code>exec_statements()</code> walks the children of a
+                <code>StatementList</code> node, tracking line numbers by counting newline characters. Each
+                significant child (non-whitespace, non-comment, non-newline) that is a recognized statement
+                kind is dispatched. After execution, if the statement's <code>Flow</code> signal is not
+                <code>Next</code>, the loop short-circuits.
+            </p>
+
+            <pre><code class="language-rust">pub(crate) fn exec_statements(
+    &amp;mut self,
+    parent: &amp;CstNode,
+    start_line: usize,
+) -&gt; RunResult&lt;Flow&gt; {
+    let mut line = start_line;
+    for child in parent.children() {
+        match child.kind() {
+            SyntaxKind::Newline =&gt; line += 1,
+            SyntaxKind::Whitespace | SyntaxKind::EndOfLineComment
+            | SyntaxKind::RemComment =&gt; {}
+            SyntaxKind::LabelStatement =&gt; { /* Labels for GoTo/GoSub: unsupported */ }
+            kind if is_statement_kind(kind) =&gt; {
+                self.current_stmt_line = line;
+
+                // Loop headers get a snapshot but avoid duplicating
+                // the whole-line highlight
+                if self.record_debug_snapshots
+                    &amp;&amp; matches!(kind,
+                        SyntaxKind::ForStatement
+                        | SyntaxKind::DoStatement
+                        | SyntaxKind::WhileStatement)
+                {
+                    self.step_without_snapshot()?;
+                } else {
+                    self.step()?;
+                }
+
+                let flow = self.exec_stmt(child, line)?;
+                if flow != Flow::Next {
+                    return Ok(flow);
+                }
+                line += count_newlines(child);
+            }
+            _ =&gt; {}
+        }
+    }
+    Ok(Flow::Next)
+}</code></pre>
+
+            <div class="info-box">
+                <p><strong>💡 Design Note:</strong> Line number tracking uses a simple newline-counting
+                strategy. Since the CST preserves all original source characters, each syntax node knows its
+                text span. The <code>count_newlines()</code> helper counts <code>\n</code> characters in a
+                node's text to advance the line counter. This means nested block bodies (e.g., the body of
+                an <code>If</code> or <code>For</code>) automatically receive accurate start lines without
+                needing to walk and accumulate from the block's parent.</p>
+            </div>
+
+            <h2 id="flow-control">Control Flow: the Flow Enum</h2>
+            <p>
+                Statement execution returns a <code>Flow</code> signal that tells the dispatch loop how to
+                proceed. This enum replaces exceptions for control-flow interruption:
+            </p>
+
+            <pre><code class="language-rust">pub(crate) enum Flow {
+    Next,         // Proceed with the next statement
+    BreakLoop,    // `Exit For` / `Exit Do` / `Exit While`
+    Return,       // `Exit Sub` / `Exit Function` / end of procedure body
+    Terminate,    // `End` statement: terminate the whole program
+}</code></pre>
+
+            <p>
+                The <code>Flow</code> signal propagates up through the dispatch stack. When a handler
+                returns <code>BreakLoop</code>, the dispatch loop breaks out of the current block. When it
+                returns <code>Return</code>, the call stack frame is popped. When it returns
+                <code>Terminate</code>, the interpreter sets its <code>terminated</code> flag and stops.
+            </p>
+
+            <h2 id="execution-model">Execution Model</h2>
+            <p>
+                The execution model follows a three-phase startup pattern for each module:
+            </p>
+
+            <ol>
+                <li><strong>Setup:</strong> Register built-in VB6 constants (<code>vbCrLf</code>,
+                    <code>vbTab</code>, etc.), apply environment overrides and settings.</li>
+                <li><strong>Module-level statements:</strong> Execute <code>Dim</code>, <code>Const</code>,
+                    <code>Option</code>, and other module-level statements from the CST root.</li>
+                <li><strong>Entry procedure:</strong> Find the entry procedure (first <code>Sub</code> or
+                    <code>Function</code>, with <code>Sub Main</code> taking priority) and invoke it.</li>
+            </ol>
+
+            <p>
+                When the entry procedure is a <code>Sub</code>, <code>call_sub()</code> is used. When it's a
+                <code>Function</code>, <code>call_function()</code> is used. Both methods follow the same
+                sequence:
+            </p>
+
+            <pre><code class="language-vbnet">' Conceptual execution flow
+Sub Main()
+    Dim x As Integer    ' Module-level Dim executes before entry
+    x = 10              ' Procedure body statements follow
+    MsgBox "Hello"
+End Sub</code></pre>
+
+            <pre><code class="language-rust">// call_sub() execution flow:
+fn call_sub(&amp;mut self, name: &amp;str, args: Vec&lt;VBVariant&gt;) -&gt; RunResult&lt;Flow&gt; {
+    let procedure = self.lookup_procedure(name)?;
+
+    // 1. Push frame: create locals, bind parameters
+    self.push_frame(procedure, args)?;
+
+    // 2. Capture entry snapshot (debug mode)
+    if self.record_debug_snapshots {
+        self.capture_debug_snapshot();
+    }
+
+    // 3. Execute procedure body
+    let result = self.exec_statements(&amp;body_node, body_line);
+
+    // 4. On normal return, position on `End Sub` line
+    if matches!(&amp;result, Ok(Flow::Next)) {
+        self.current_stmt_line = end_line;
+        if self.record_debug_snapshots {
+            self.capture_debug_snapshot();
+        }
+    }
+
+    // 5. Pop frame and return
+    self.frames.pop();
+    result
+}</code></pre>
+
+            <p>
+                Parameter binding in <code>push_frame()</code> converts each argument to the parameter's
+                declared type using the <code>coerce()</code> helper. Optional parameters that have no
+                corresponding argument receive their type's default value. Missing required parameters
+                produce an error.
+            </p>
+
+            <h2 id="statement-families">Statement Execution Families</h2>
+
+            <h3 id="declarations">Declarations</h3>
+            <p>
+                Declaration statements are handled in <code>exec/declarations.rs</code>. The
+                <code>exec_dim()</code> method processes both <code>Dim</code> and <code>Const</code>
+                statements, supporting multiple comma-separated declarations per line, array bounds, and
+                type annotations:
+            </p>
+
+            <pre><code class="language-vbnet">' Supported declaration forms:
+Dim x As Integer
+Dim a, b, c As String
+Dim arr(1 To 10) As Long
+ReDim matrix(0 To 9, 0 To 9)
+Const PI As Double = 3.14159
+Erase arr</code></pre>
+
+            <p>
+                <code>exec_redim()</code> handles <code>ReDim</code> by first looking up the existing array
+                variable to preserve its element type (unless a new <code>As</code> type is specified), then
+                creating a new <code>ArrayValue</code> with the new bounds and replacing the variable's
+                contents.
+            </p>
+
+            <p>
+                <code>exec_erase()</code> distinguishes between fixed and dynamic arrays. Fixed arrays are
+                reset to their default values. Dynamic arrays are released by replacing them with an empty
+                <code>ArrayValue::new_dynamic()</code> of the same element type.
+            </p>
+
+            <h3 id="assignments">Assignments</h3>
+            <p>
+                Assignment is handled in <code>exec/assignment.rs</code>. Three kinds of assignment are
+                supported:
+            </p>
+
+            <pre><code class="language-rust">// exec_assignment: LHS = RHS (Let/Set statements)
+// 1. Evaluate RHS expression to VBVariant
+// 2. Route assignment by LHS kind:
+//    - IdentifierExpression: set variable in current scope
+//    - CallExpression: array element assignment
+//    - MemberAccessExpression: unsupported (objects not implemented)
+
+// assign_to_name: special-cases function return slot
+fn assign_to_name(&amp;mut self, name: &amp;str, value: VBVariant) {
+    // Assigning to the Function's own name sets its return value
+    if let Some(frame) = self.frames.last()
+        &amp;&amp; frame.is_function
+        &amp;&amp; name.to_lowercase() == frame.name.to_lowercase()
+    {
+        frame.return_value = Some(value);
+        return;
+    }
+    self.set_variable(name, value);
+}</code></pre>
+
+            <p>
+                The <code>set_variable()</code> method implements VB6's implicit declaration behavior: if a
+                variable doesn't exist in the current scope, it is declared there automatically. This
+                matches VB6's behavior when <code>Option Explicit</code> is not present.
+            </p>
+
+            <h3 id="control-flow-statements">Control Flow</h3>
+            <p>
+                Control flow is handled in <code>exec/control_flow.rs</code>. Each statement type has its
+                own handler that walks the CST to find the relevant components (conditions, bodies, bounds).
+            </p>
+
+            <h4>If / ElseIf / Else</h4>
+            <p>
+                The <code>exec_if()</code> handler supports both single-line and block forms. It finds the
+                <code>Then</code> keyword and evaluates the last significant child before it as the condition.
+                For block form, it walks the children after <code>Then</code>, tracking <code>ElseIfClause</code>
+                and <code>ElseClause</code> nodes and executing only the first matching branch:
+            </p>
+
+            <pre><code class="language-vbnet">If x &gt; 0 Then
+    Debug.Print "positive"
+ElseIf x &lt; 0 Then
+    Debug.Print "negative"
+Else
+    Debug.Print "zero"
+End If</code></pre>
+
+            <h4>For / Next</h4>
+            <p>
+                The <code>exec_for()</code> handler evaluates the start, end, and optional step expressions
+                once at loop entry. The loop body is executed while the counter is within bounds (direction
+                determined by step sign). Each loop iteration captures debug snapshots at specific sub-line
+                positions: the counter initialization on first pass, the end check on subsequent passes,
+                and the <code>Next</code> line after incrementing the counter.
+            </p>
+
+            <div class="info-box">
+                <p><strong>💡 Design Note:</strong> The <code>For</code> loop evaluates the start and end
+                expressions once at the top, not on every iteration. This matches VB6's semantics where
+                changing the loop bounds inside the loop body has no effect on the iteration count. The
+                counter is incremented by the step value at the bottom of each iteration.</p>
+            </div>
+
+            <h4>Do / Loop</h4>
+            <p>
+                The <code>exec_do()</code> handler supports four loop variants by checking for pre-test
+                conditions (<code>Do While</code> / <code>Do Until</code>) and post-test conditions
+                (<code>Loop While</code> / <code>Loop Until</code>). The <code>Until</code> conditions
+                are logically inverted relative to <code>While</code>:
+            </p>
+
+            <pre><code class="language-rust">let condition = self.eval_expr(cond)?.as_bool()?;
+// Until is inverted: exit when condition is FALSE
+if part.kind() == SyntaxKind::UntilKeyword {
+    if !condition { break; }
+} else {
+    // While: exit when condition is FALSE
+    if !condition { break; }
+}</code></pre>
+
+            <h4>While / Wend</h4>
+            <p>
+                <code>exec_while()</code> evaluates the condition before each iteration and continues while
+                it is true. Its structure mirrors <code>exec_do()</code> but without the pre/post-test
+                distinction.
+            </p>
+
+            <h4>Select Case</h4>
+            <p>
+                The <code>exec_select()</code> handler evaluates the selector expression once, then iterates
+                through <code>CaseClause</code> nodes. Each clause supports:
+            </p>
+            <ul>
+                <li><strong>Direct match:</strong> <code>Case 1</code> — equality comparison</li>
+                <li><strong>Range:</strong> <code>Case 2 To 5</code> — numeric or string range check</li>
+                <li><strong>IS comparison:</strong> <code>Case Is &gt; 10</code> — relational comparison with operator</li>
+                <li><strong>Multiple specs:</strong> <code>Case 1, 3, 5</code> — comma-separated (logical OR)</li>
+                <li><strong>Case Else:</strong> default branch</li>
+            </ul>
+
+            <h4>Exit</h4>
+            <p>
+                <code>exec_exit()</code> determines the exit target from the keyword on the statement and
+                returns the corresponding <code>Flow</code> variant: <code>BreakLoop</code> for
+                <code>Exit For</code> / <code>Exit Do</code> / <code>Exit While</code>, or
+                <code>Return</code> for <code>Exit Sub</code> / <code>Exit Function</code>.
+            </p>
+
+            <h3 id="calls">Call Statements</h3>
+            <p>
+                Call execution is handled in <code>exec/call.rs</code>. The <code>exec_call()</code> method
+                is a multi-path dispatcher:
+            </p>
+
+            <pre><code class="language-rust">fn exec_call(&amp;mut self, node: &amp;CstNode) -&gt; RunResult&lt;Flow&gt; {
+    // 1. Debug.Print → print_node()
+    // 2. User-defined Sub → call_sub()
+    // 3. Built-in Sub statements (MsgBox, Beep, Shell)
+    // 4. Unknown → error 35 (Sub or Function not defined)
+}</code></pre>
+
+            <p>
+                Built-in functions are routed through <code>builtins::call_builtin()</code> when used as
+                expressions. Statement forms (<code>MsgBox</code>, <code>Beep</code>, <code>Shell</code>)
+                are handled directly here because they are called as statements, not as function calls —
+                their return values are intentionally discarded.
+            </p>
+
+            <h3 id="print-output">Print Output</h3>
+            <p>
+                The <code>print_node()</code> method in <code>exec/print.rs</code> handles both
+                <code>Debug.Print</code> and <code>Print #filenumber</code>. It checks for the presence of
+                a <code>#</code> token to distinguish file output from console output:
+            </p>
+
+            <pre><code class="language-rust">// Debug.Print: append to interpreter output buffer
+// Commas → tab separator
+// Semicolons → no separator (consecutive output)
+// Trailing comma/semicolon → no newline appended
+
+// Print #filenumber: delegate to vb6runtime file backend
+// Arguments written with comma separators (tab) or semicolons (no gap)</code></pre>
+
+            <p>
+                For console output, the method accumulates values into <code>current_output</code>, using
+                tabs as comma separators. When a statement does not end with a semicolon or trailing comma,
+                the accumulated line is pushed to the <code>output</code> vector.
+            </p>
+
+            <h3 id="file-io">File I/O</h3>
+            <p>
+                File operations are handled in <code>exec/file_io.rs</code>. The <code>exec_open()</code>
+                method parses the full <code>Open</code> statement:
+            </p>
+
+            <pre><code class="language-vbnet">Open "data.txt" For Binary Access Read Lock Read As #1 Len 1024</code></pre>
+
+            <p>
+                The method extracts each component by walking the significant children of the CST node:
+            </p>
+            <ul>
+                <li><strong>Pathname:</strong> first expression node after <code>Open</code></li>
+                <li><strong>Mode:</strong> first <code>KeywordClause</code> after <code>For</code> (Input, Output, Append, Binary, Random)</li>
+                <li><strong>Access:</strong> second <code>KeywordClause</code> (Read, Write, ReadWrite)</li>
+                <li><strong>Lock:</strong> third <code>KeywordClause</code> (Shared, LockRead, LockWrite, LockReadWrite)</li>
+                <li><strong>Filenumber:</strong> expression after <code>As</code></li>
+                <li><strong>Record length:</strong> last <code>ExpressionClause</code> if two are present</li>
+            </ul>
+
+            <p>
+                The <code>exec_close()</code> method parses the argument list, which may contain multiple
+                file numbers or be empty (closing all files).
+            </p>
+
+            <h3 id="simple-statements">Simple Statements</h3>
+            <p>
+                Miscellaneous statements are handled in <code>exec/statements.rs</code>. This includes:
+            </p>
+            <ul>
+                <li><code>Date</code> / <code>Time</code> — set system or mock clock via <code>serial_to_timestamp()</code></li>
+                <li><code>AppActivate</code> / <code>SendKeys</code> — window interaction via runtime backend</li>
+                <li><code>SavePicture</code> — graphics output via runtime backend</li>
+                <li><code>LSet</code> / <code>RSet</code> — string alignment (left/right justify in-place)</li>
+                <li><code>Mid</code> / <code>MidB</code> — in-place string mutation with start position and optional length</li>
+            </ul>
+
+            <p>
+                The <code>Date</code> and <code>Time</code> statements have special handling for the
+                <code>allow_system_time</code> interpreter flag. When enabled, they attempt to write to the
+                real OS clock and clear the mock offset. When disabled, they only update the internal mock
+                clock, which advances in real time from the set point.
+            </p>
+
+            <h2 id="expression-evaluation">Expression Evaluation</h2>
+            <p>
+                Expression evaluation lives in <code>eval/mod.rs</code>. The
+                <code>eval_expr()</code> method matches on the expression's <code>SyntaxKind</code> and
+                dispatches to the appropriate handler:
+            </p>
+
+            <pre><code class="language-rust">fn eval_expr(&amp;mut self, node: &amp;CstNode) -&gt; RunResult&lt;VBVariant&gt; {
+    match node.kind() {
+        LiteralExpression | NumericLiteralExpression | StringLiteralExpression
+        | BooleanLiteralExpression | IntegerLiteral | LongLiteral | ...
+            =&gt; self.eval_literal(node),
+
+        IdentifierExpression
+            =&gt; self.eval_identifier(node),
+
+        BinaryExpression
+            =&gt; {
+                let [left, op, right] = significant_children;
+                self.eval_binary(left, op, right)
+            }
+
+        UnaryExpression
+            =&gt; {
+                let [op, operand] = significant_children;
+                self.eval_unary(op, operand)
+            }
+
+        ParenthesizedExpression
+            =&gt; self.eval_expr(inner_expression),
+
+        CallExpression
+            =&gt; self.eval_call(node),
+
+        // Unsupported (objects not implemented yet):
+        MemberAccessExpression =&gt; Err("Object member access not supported"),
+        TypeOfExpression =&gt; Err("TypeOf not supported"),
+        NewExpression =&gt; Err("New not supported"),
+        AddressOfExpression =&gt; Err("AddressOf not supported"),
+    }
+}</code></pre>
+
+            <p>
+                Binary operations are split into two categories: arithmetic/string operations that use the
+                typed <code>operators::arith()</code> helper, and comparison operations that use the typed
+                <code>operators::compare_ord()</code> helper. The <code>&amp;</code> operator is handled
+                specially as string concatenation rather than bitwise AND.
+            </p>
+
+            <p>
+                The <code>eval_call()</code> method follows a three-tier resolution for call expressions:
+            </p>
+            <ol>
+                <li><strong>Array element access:</strong> if the name resolves to an <code>ArrayValue</code>, extract the element at the given indices.</li>
+                <li><strong>User-defined function:</strong> if the name is a loaded procedure, invoke it via <code>call_function()</code>.</li>
+                <li><strong>Built-in function:</strong> delegate to <code>builtins::call_builtin()</code>.</li>
+            </ol>
+
+            <div class="info-box">
+                <p><strong>📝 Note:</strong> Variable lookup in <code>eval_identifier()</code> searches the
+                current frame's locals first, then falls back to globals. When a variable is not found and
+                <code>Option Explicit</code> is not in effect, the lookup returns <code>VBVariant::Empty</code>
+                — matching VB6's implicit declaration behavior.</p>
+            </div>
+
+            <h2 id="debug-trace">Debug &amp; Trace Support</h2>
+            <p>
+                The exec engine supports debug snapshot recording at statement boundaries. When enabled
+                via <code>set_record_debug_snapshots(true)</code>, every statement execution captures a
+                snapshot containing the current line number, procedure name, and variable values.
+            </p>
+
+            <p>
+                The step mechanism works in three variants:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Behavior</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>step()</code></td>
+                        <td>Capture snapshot with current line, charge 1 step</td>
+                    </tr>
+                    <tr>
+                        <td><code>step_without_snapshot()</code></td>
+                        <td>Charge 1 step without capturing snapshot (used for loop headers)</td>
+                    </tr>
+                    <tr>
+                        <td><code>step_marked(range)</code></td>
+                        <td>Capture snapshot with a sub-line byte range cursor (for highlighting specific elements like <code>To</code> in <code>For</code> or <code>Loop</code> keyword)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                Loop handlers use <code>step_marked()</code> to highlight specific sub-line elements during
+                trace. For example, the <code>For</code> loop highlights the counter assignment on the first
+                pass, the <code>To</code> clause on subsequent passes, the <code>Step</code> clause when
+                present, and the <code>Next</code> line after incrementing.
+            </p>
+
+            <p>
+                The <code>pause_after_steps</code> field enables a one-shot pause: when the step counter
+                reaches the configured value, execution pauses with a debug snapshot, allowing an IDE to
+                inspect state. This is used for "break after N steps" functionality.
+            </p>
+
+            <h2 id="step-budget">Step Budgeting</h2>
+            <p>
+                To prevent infinite loops from hanging the interpreter indefinitely, a step budget limits
+                execution. The default limit is 10 million statements, configurable via
+                <code>set_step_limit()</code>. Each step execution charges against this budget:
+            </p>
+
+            <pre><code class="language-rust">fn advance_steps(&amp;mut self) -&gt; RunResult&lt;()&gt; {
+    // One-shot pause check
+    if self.pause_after_steps
+        .is_some_and(|pause| self.steps &gt;= pause)
+    {
+        return Err(RunError::debug_pause()
+            .at_line(self.current_stmt_line)
+            .in_procedure(&amp;self.current_procedure_name()));
+    }
+
+    self.steps += 1;
+    if self.steps &gt; self.step_limit {
+        return Err(RunError::err_number(28)  // Out of stack space
+            .at_line(self.current_stmt_line));
+    }
+    Ok(())
+}</code></pre>
+
+            <p>
+                When the budget is exhausted, the interpreter returns a runtime error with VB6 error number
+                28 ("Out of stack space"), which is the standard VB6 error for infinite loop detection.
+            </p>
+
+            <h2 id="scoping">Scoping &amp; Variable Storage</h2>
+            <p>
+                Variable storage in vb6interpret uses a hierarchical scope model built on
+                <code>Scope</code> — a case-insensitive <code>HashMap</code> of normalized (lowercase) names
+                to <code>VBVariant</code> values.
+            </p>
+
+            <p>
+                There are two scope levels:
+            </p>
+            <ul>
+                <li><strong>Global scope</strong> (<code>interpreter.globals</code>) — holds module-level
+                    <code>Dim</code> and <code>Const</code> declarations</li>
+                <li><strong>Frame locals</strong> (<code>frame.locals</code>) — one per active procedure call,
+                    holding local variables and parameters</li>
+            </ul>
+
+            <p>
+                Variable lookup searches the current frame's locals first, then falls back to globals. This
+                shadowing behavior means local variables with the same name as a global take precedence.
+            </p>
+
+            <pre><code class="language-rust">pub(crate) fn lookup(&amp;self, name: &amp;str) -&gt; Option&lt;&amp;VBVariant&gt; {
+    let key = normalize(name);
+    // Check current frame locals first
+    if let Some(frame) = self.frames.last()
+        &amp;&amp; let Some(value) = frame.locals.get(&amp;key)
+    {
+        return Some(value);
+    }
+    // Fall back to globals
+    self.globals.get(&amp;key)
+}</code></pre>
+
+            <p>
+                The <code>coerce()</code> helper in <code>exec/util.rs</code> handles VB6's type conversion
+                semantics, converting values between types when required by assignments, function parameters,
+                and constant declarations. When a conversion fails, the original value is returned unchanged —
+                VB6's default-fallback behavior.
+            </p>
+
+            <h2 id="program-model">Program &amp; Procedure Model</h2>
+            <p>
+                Before execution begins, the module's CST is processed by
+                <code>build_program()</code> in <code>program.rs</code> to extract a <code>Program</code>
+                structure:
+            </p>
+
+            <pre><code class="language-rust">pub struct Program {
+    pub root: CstNode,                           // Module-level CST
+    pub procedures: HashMap&lt;String, Procedure&gt;,  // Procedures by normalized name
+    pub entry: String,                            // Entry point name (normalized)
+}
+
+pub struct Procedure {
+    pub name: String,            // Original casing
+    pub is_function: bool,       // Sub vs Function
+    pub params: Vec&lt;Param&gt;,      // Parameters in declaration order
+    pub return_type: VBType,     // Declared return type (Variant if untyped)
+    pub body: Option&lt;CstNode&gt;,   // StatementList body
+    pub line: usize,             // Declaration start line
+    pub end_line: usize,         // End Sub / End Function line
+}</code></pre>
+
+            <p>
+                The entry point resolution follows these rules:
+            </p>
+            <ol>
+                <li>If <code>Sub Main</code> exists, use it.</li>
+                <li>Otherwise, use the first <code>Sub</code> or <code>Function</code> found in the module.</li>
+                <li>If no procedures exist, default to <code>main</code> (which will produce a runtime error when looked up).</li>
+            </ol>
+
+            <p>
+                Parameter parsing extracts the name, type, passing convention (<code>ByVal</code> /
+                <code>ByRef</code>), and optional status from each parameter in the <code>ParameterList</code>.
+                Default type is <code>Variant</code> for untyped parameters, and default passing convention is
+                <code>ByRef</code> (VB6's default).
+            </p>
+
+            <h2 id="how-it-works">How It Works: End-to-End</h2>
+            <p>
+                Here is the complete flow from source text to captured output, using the simplest possible
+                example:
+            </p>
+
+            <pre><code class="language-vbnet">' module.bas
+Attribute VB_Name = "M"
+Sub Main()
+    Debug.Print "hello"
+End Sub</code></pre>
+
+            <ol>
+                <li><strong>Parse:</strong> <code>ModuleFile::parse()</code> produces a CST with the module
+                    header stripped (attributes are consumed by the parser) and the procedure body intact.</li>
+                <li><strong>Build program:</strong> <code>build_program()</code> extracts <code>Main</code> as
+                    the sole procedure, with an empty parameter list and <code>Variant</code> return type.</li>
+                <li><strong>Run module:</strong> <code>Interpreter::run_module()</code> runs module-level
+                    statements (none in this case) and calls <code>Main</code>.</li>
+                <li><strong>Call sub:</strong> <code>call_sub("Main", [])</code> pushes a frame, binds zero
+                    parameters, and executes the body.</li>
+                <li><strong>Execute statement:</strong> <code>exec_stmt()</code> routes the
+                    <code>CallStatement</code> to <code>exec_call()</code>, which detects
+                    <code>Debug.Print</code> and routes to <code>print_node()</code>.</li>
+                <li><strong>Emit output:</strong> <code>print_node()</code> evaluates the argument
+                    <code>"hello"</code>, appends it to <code>current_output</code>, and since the statement
+                    doesn't end with a semicolon, pushes the line to <code>output</code>.</li>
+                <li><strong>Return:</strong> The frame is popped, <code>call_sub()</code> returns, and
+                    <code>run_module()</code> returns <code>Ok(())</code>.</li>
+                <li><strong>Capture result:</strong> The public <code>run_source()</code> API returns
+                    <code>output</code> as <code>vec!["hello".to_string()]</code>.</li>
+            </ol>
+
+            <div class="info-box">
+                <p><strong>Key takeaway:</strong> The exec engine operates entirely at the CST level. There is
+                no AST transformation, no bytecode generation, no IR lowering. Every value is a
+                <code>VBVariant</code>, every variable is a <code>Scope</code> entry, and every statement is
+                a matched <code>SyntaxKind</code> routed to a specialized handler.</p>
+            </div>
+
+            <h2 id="related">Related Documentation</h2>
+            <ul style="margin-bottom: 60px;">
+                <li><a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse" target="_blank">vb6parse — VB6 CST Parser</a></li>
+                <li><a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">vb6runtime — Runtime values and built-in functions</a></li>
+                <li><a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6core" target="_blank">vb6core — Core type system</a></li>
+                <li><a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret" target="_blank">vb6interpret on GitHub</a></li>
+                <li><a href="../getting-started.html">Getting Started with vb6interpret</a></li>
+                <li><a href="query-system.html">Symbol Table Design (vb6semantic)</a></li>
+            </ul>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Interpret is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>

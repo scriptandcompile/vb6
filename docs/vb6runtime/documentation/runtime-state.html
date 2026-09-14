@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Runtime State System Architecture - Pluggable Backend Pattern for Process-Global Mutable State">
+    <title>Runtime State System - VB6Runtime Documentation</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../index.html">VB6Runtime</a> / Documentation</h1>
+            <p class="tagline">Pluggable Backend Pattern for Process-Global Mutable State</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../index.html">Home</a>
+            <a href="../library/index.html">Library Reference</a>
+            <a href="../documentation.html">Documentation</a>
+            <a href="https://docs.rs/vb6runtime" target="_blank">API Docs</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container docs-content">
+        <aside class="toc">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#what-is-managed">What Is Managed</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#backend-trait">The Backend Trait Pattern</a></li>
+                <li><a href="#state-categories">State Categories</a></li>
+                <li><a href="#file-state">File I/O State</a></li>
+                <li><a href="#clock-state">Clock State</a></li>
+                <li><a href="#environment-state">Environment State</a></li>
+                <li><a href="#random-state">Random State</a></li>
+                <li><a href="#interaction-state">Interaction State</a></li>
+                <li><a href="#settings-state">Settings State</a></li>
+                <li><a href="#error-state">Error State</a></li>
+                <li><a href="#resource-state">Resource State</a></li>
+                <li><a href="#state-transitions">State Evolution</a></li>
+                <li><a href="#consumer-integration">Consumer Integration</a></li>
+                <li><a href="#wasmsandbox">WASM Sandbox Mode</a></li>
+                <li><a href="#design-patterns">Design Patterns</a></li>
+                <li><a href="#summary">Summary</a></li>
+                <li><a href="#related">Related Documentation</a></li>
+            </ul>
+        </aside>
+
+        <article>
+            <h2 id="overview">Overview</h2>
+            <p>
+                The runtime state system in <code>vb6runtime</code> manages all process-global mutable state that spans 
+                individual VB6 function calls and statements. In real VB6, many operations rely on hidden, process-wide 
+                state that is not visible in the code itself: the environment table read by <code>Environ$</code>, the 
+                shared random number generator used by <code>Rnd</code> and <code>Randomize</code>, the current 
+                <code>Err.Number</code>, application settings persisted by <code>SaveSetting</code> and <code>GetSetting</code>, 
+                the system clock read by <code>Date</code> and <code>Time</code> statements, open file handles numbered 
+                1–511, and user interaction hooks for <code>MsgBox</code>, <code>Shell</code>, <code>SendKeys</code>, 
+                and more.
+            </p>
+            <p>
+                The vb6runtime replicates all of this process-global state using a 
+                <strong>pluggable backend architecture</strong> that allows the same API to work across native platforms 
+                (Windows, Linux, macOS), WASM environments, and fully deterministic test harnesses. This document 
+                describes the architecture of the state system, its individual components, and how it is consumed by 
+                the library and its consumers.
+            </p>
+
+            <div class="info-box">
+                <p><strong>Core principle:</strong> Every category of runtime state follows an identical structural 
+                pattern: a trait defining the interface, a native backend for real platform behavior, a memory backend 
+                for tests and WASM, and a public API module that delegates to whichever backend is active.</p>
+            </div>
+
+            <h2 id="what-is-managed">Categories of Managed State</h2>
+            <p>
+                The state system is organized into eight distinct categories, each managing a specific class of 
+                process-global mutable state:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Module</th>
+                        <th>Responsible VB6 Operations</th>
+                        <th>Backend Types</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>clock</code></td>
+                        <td><code>Date</code>, <code>Time</code>, <code>Date$</code>, <code>Time$</code></td>
+                        <td>Native, Memory</td>
+                    </tr>
+                    <tr>
+                        <td><code>environment</code></td>
+                        <td><code>Environ$(n)</code></td>
+                        <td>Native, Memory</td>
+                    </tr>
+                    <tr>
+                        <td><code>file</code></td>
+                        <td><code>Open</code>, <code>Close</code>, <code>Get</code>, <code>Put</code>, <code>Print#</code>, <code>Input#</code></td>
+                        <td>Native, Memory</td>
+                    </tr>
+                    <tr>
+                        <td><code>interaction</code></td>
+                        <td><code>Command$</code>, <code>DoEvents</code>, <code>Beep</code>, <code>MsgBox</code>, <code>InputBox</code>, <code>AppActivate</code>, <code>SendKeys</code>, <code>Shell</code></td>
+                        <td>Native, Memory</td>
+                    </tr>
+                    <tr>
+                        <td><code>random</code></td>
+                        <td><code>Rnd</code>, <code>Randomize</code></td>
+                        <td>Classic, Modern, Playback</td>
+                    </tr>
+                    <tr>
+                        <td><code>settings</code></td>
+                        <td><code>SaveSetting</code>, <code>GetSetting</code>, <code>GetAllSettings</code>, <code>DeleteSetting</code></td>
+                        <td>Registry, File, Memory</td>
+                    </tr>
+                    <tr>
+                        <td><code>err</code></td>
+                        <td><code>Err.Number</code>, omitted-argument <code>Error</code> / <code>Error$</code></td>
+                        <td>Atomic (no backend)</td>
+                    </tr>
+                    <tr>
+                        <td><code>resources</code></td>
+                        <td><code>LoadResString</code>, <code>LoadResPicture</code>, <code>LoadResData</code></td>
+                        <td>Linked file (no backend)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="architecture">Architecture</h2>
+            <p>
+                Every state category follows an identical structural pattern. Each category lives in its own module 
+                under <code>state/&lt;category&gt;</code> with the same file organization:
+            </p>
+
+            <div class="architecture-diagram">
+                <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 16px; margin: 8px 0;">
+                    <strong>state/&lt;category&gt;/</strong><br>
+                    <span style="color: var(--text-muted);">mod.rs</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ backend trait, singleton, public API<br>
+                    <span style="color: var(--text-muted);">backend.rs</span> &nbsp;&nbsp;&nbsp;&nbsp;→ (optional) separate trait file<br>
+                    <span style="color: var(--text-muted);">memory.rs</span> &nbsp;&nbsp;&nbsp;&nbsp;→ in-memory / test implementation<br>
+                    <span style="color: var(--text-muted);">native.rs</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ real OS implementation<br>
+                    <span style="color: var(--text-muted);">[additional].rs</span> → platform-specific or specialized backends
+                </div>
+            </div>
+
+            <p>
+                Each module exposes four key abstractions through its <code>mod.rs</code>:
+            </p>
+            <ol>
+                <li>A <strong>singleton trait object</strong> stored as <code>OnceLock&lt;Mutex&lt;Box&lt;dyn XxxBackend&gt;&gt;&gt;</code> 
+                for lazy, thread-safe initialization.</li>
+                <li>A <code>default_backend()</code> function that selects the appropriate backend for the current 
+                platform target.</li>
+                <li><code>set_backend()</code> and <code>reset_backend()</code> functions for runtime switching 
+                between backends.</li>
+                <li><strong>Public functions</strong> (e.g., <code>open_file()</code>, <code>now()</code>) that 
+                acquire the backend mutex and delegate to the active implementation.</li>
+            </ol>
+
+            <h2 id="backend-trait">The Backend Trait Pattern</h2>
+            <p>
+                Each state category defines a trait that abstracts all operations on that category of state. The trait 
+                defines the interface that every backend implementation must provide. Here is the pattern as used by 
+                the file I/O state:
+            </p>
+
+            <pre><code class="language-rust">trait FileBackend {
+    fn open(
+        &self,
+        path: &Path,
+        mode: OpenMode,
+        access: AccessMode,
+        lock: LockMode,
+    ) -> Result&lt;OpenFile, IoError&gt;;
+
+    fn close_file(&self, num: i16) -> Result&lt;(), IoError&gt;;
+    fn read_file(&self, num: i16, buf: &mut [u8]) -> Result&lt;usize, IoError&gt;;
+    fn write_file(&self, num: i16, buf: &[u8]) -> Result&lt;usize, IoError&gt;;
+    fn seek_file(&self, num: i16, pos: FileSeek) -> Result&lt;u64, IoError&gt;;
+    fn file_exists(&self, path: &Path) -> bool;
+    fn delete_file(&self, path: &Path) -> Result&lt;(), IoError&gt;;
+    // ... many more
+}
+</code></pre>
+
+            <p>
+                The <code>native.rs</code> implementation delegates to real OS APIs (e.g., <code>std::fs::File</code>), 
+                while <code>memory.rs</code> stores all data in an in-memory <code>HashMap&lt;String, Vec&lt;u8&gt;&gt;</code> 
+                representing a virtual filesystem. The public API in <code>mod.rs</code> then looks like:
+            </p>
+
+            <pre><code class="language-rust">// Singleton for the active backend
+static BACKEND: OnceLock&lt;Mutex&lt;Box&lt;dyn FileBackend&gt;&gt;&gt; = OnceLock::new();
+
+// Thread-local open file handles (VB6 numbers them 1–511)
+thread_local! {
+    static OPEN_FILES: RefCell&lt;HashMap&lt;i16, OpenFile&gt;&gt; = RefCell::new(HashMap::new());
+}
+
+pub fn open_file(
+    path: &Path,
+    mode: OpenMode,
+    access: AccessMode,
+    lock: LockMode,
+) -> Result&lt;i16, IoError&gt; {
+    let backend = get_backend();
+    let mut file = backend.open(path, mode, access, lock)?;
+    let num = next_file_number();
+    OPEN_FILES.with(|files| {
+        files.borrow_mut().insert(num, file.clone());
+    });
+    Ok(num)
+}
+
+fn get_backend() -> Box&lt;dyn FileBackend&gt; {
+    BACKEND.get().expect("File backend not initialized")
+        .lock().expect("File backend poisoned").clone()
+}
+</code></pre>
+
+            <div class="info-box">
+                <p><strong>Default backend selection:</strong> On native targets, the <code>NativeBackend</code> is 
+                used. On WASM (<code>target_arch = "wasm32"</code>), <code>MemoryBackend</code> is selected 
+                automatically, since real file system access is not available in browsers.</p>
+            </div>
+
+            <h2 id="state-categories">State Categories in Detail</h2>
+
+            <h3 id="file-state">File I/O State <code>(state/file/)</code></h3>
+            <p>
+                VB6 file I/O operates on numbered handles (1–511) rather than OS-level file descriptors. The file 
+                state system manages open file handles, their modes, positions, and print columns. Each <code>OpenFile</code> 
+                struct tracks:
+            </p>
+            <ul>
+                <li>The underlying file handle or memory buffer</li>
+                <li>The open mode (<code>Input</code>, <code>Output</code>, <code>Append</code>, <code>Binary</code>, 
+                <code>Random</code>)</li>
+                <li>The access mode (<code>Read</code>, <code>Write</code>, <code>ReadWrite</code>)</li>
+                <li>The lock mode (<code>Shared</code>, <code>DenyRead</code>, <code>DenyWrite</code>, <code>DenyReadWrite</code>)</li>
+                <li>Current read/write position</li>
+                <li>Print column position (for formatted output)</li>
+            </ul>
+
+            <p>
+                The file state also manages a <code>ROOT</code> override for relative path resolution, allowing tests 
+                and sandboxed environments to root all file operations to a virtual directory tree.
+            </p>
+
+            <pre><code class="language-rust">enum OpenMode { Input, Output, Append, Binary, Random }
+enum AccessMode { Read, Write, ReadWrite }
+enum LockMode { Shared, DenyRead, DenyWrite, DenyReadWrite }
+
+struct OpenFile {
+    num: i16,
+    mode: OpenMode,
+    access: AccessMode,
+    position: u64,
+    print_column: Option&lt;u32&gt;,
+    file: FileStorage,
+}
+</code></pre>
+
+            <h3 id="clock-state">Clock State <code>(state/clock/)</code></h3>
+            <p>
+                The clock state provides a two-layer architecture: a <strong>system clock</strong> backed by a 
+                pluggable backend, and a <strong>mock clock</strong> that adds a signed offset on top. This design 
+                allows both real-time accuracy and precise test control:
+            </p>
+
+            <div class="architecture-diagram">
+                <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 12px; margin: 8px 0; background: var(--bg-card);">
+                    <strong>Mock Clock</strong> <em>(signed offset for test control)</em>
+                    <div style="margin-top: 8px;">
+                        <span style="color: var(--text-muted);">MOCK_OFFSET: OnceLock&lt;Mutex&lt;Span&gt;&gt;</span>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 12px; margin: 8px 0; background: var(--bg-card);">
+                    <strong>System Clock</strong> <em>(pluggable: Native or Memory)</em>
+                    <div style="margin-top: 8px;">
+                        <span style="color: var(--text-muted);">BACKEND: OnceLock&lt;Mutex&lt;Box&lt;dyn ClockBackend&gt;&gt;&gt;</span>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                The <code>ClockBackend</code> trait defines two operations: <code>now()</code> to read the current 
+                time as a <code>jiff::Timestamp</code>, and <code>set()</code> to write a new time. The 
+                <code>NativeBackend</code> queries the real OS clock via <code>jiff::Timestamp::now()</code>, while 
+                the <code>MemoryBackend</code> stores a time that can be manually advanced.
+            </p>
+
+            <pre><code class="language-rust">trait ClockBackend: Send + Sync {
+    fn now(&self) -&gt; Timestamp;
+    fn set(&self, timestamp: Timestamp);
+}
+
+// Public API
+pub fn get() -&gt; DateTime {
+    let sys = system_get();
+    let offset = mock_offset();
+    sys.checked_add(offset).unwrap_or(sys)
+}
+
+pub fn set_date(year: u32, month: u32, day: u32) {
+    // Shift mock clock to a specific civil date/time
+}
+
+pub fn set_time(hour: u8, min: u8, sec: u8) {
+    // Shift mock clock to a specific time of day
+}
+</code></pre>
+
+            <div class="info-box">
+                <p><strong>Why two layers?</strong> The dual-layer design lets consumers (like <code>vb6interpret</code>) 
+                set an initial date/time for testing without needing to implement a full custom backend. They simply 
+                configure the mock offset, and all calls to <code>get()</code> return the mocked time.</p>
+            </div>
+
+            <h3 id="environment-state">Environment State <code>(state/environment/)</code></h3>
+            <p>
+                The environment state manages the process environment snapshot for <code>Environ$(n)</code>. Unlike 
+                most state categories, the environment uses a <strong>snapshot pattern</strong>: on first access, the 
+                backend is queried once to seed an ordered environment table (<code>EnvState</code>) that is then 
+                amended by subsequent calls to <code>set_env()</code>:
+            </p>
+
+            <pre><code class="language-rust">trait EnvironmentBackend: Send + Sync {
+    fn load(&self) -&gt; Vec&lt;(String, String)&gt;;
+}
+
+// The mutable snapshot, loaded once from backend
+static SNAPSHOT: OnceLock&lt;Mutex&lt;EnvState&gt;&gt; = OnceLock::new();
+
+pub fn env_at(n: u32) -&gt; Option&lt;String&gt; {
+    // 1-based indexing, matching VB6's Environ$(n)
+    let snapshot = get_snapshot();
+    snapshot.entry_at(n - 1)
+}
+
+pub fn set_env(key: &amp;str, value: &amp;str) {
+    let mut snapshot = get_snapshot();
+    snapshot.set(key, value);
+}
+</code></pre>
+
+            <p>
+                The <code>EnvState</code> struct maintains both an ordered <code>Vec</code> (for 1-based <code>Environ$(n)</code> 
+                access) and a case-insensitive <code>HashMap</code> (for key-based lookups).
+            </p>
+
+            <h3 id="random-state">Random State <code>(state/random/)</code></h3>
+            <p>
+                The random state manages the VB6 random number generator. VB6's <code>Rnd</code> function uses a 
+                specific 24-bit linear congruential generator (LCG), and the state system provides three backends:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Backend</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>ClassicBackend</code></td>
+                        <td>Exact VB6 LCG: <code>seed = (seed × 0x43FD43FD + 0x00C39EC3) mod 2²⁴</code></td>
+                        <td>Default — bitwise-compatible with real VB6</td>
+                    </tr>
+                    <tr>
+                        <td><code>ModernBackend</code></td>
+                        <td><code>rand::StdRng</code> from the <code>rand</code> crate</td>
+                        <td>Better statistical properties for simulations</td>
+                    </tr>
+                    <tr>
+                        <td><code>PlaybackBackend</code></td>
+                        <td>Cycles through a fixed list of pre-seeded values</td>
+                        <td>Deterministic testing</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                The <code>RandomBackend</code> trait defines four operations:
+            </p>
+
+            <pre><code class="language-rust">trait RandomBackend: Send + Sync {
+    fn next(&amp;self) -&gt; f64;
+    fn current(&amp;self) -&gt; i32;
+    fn seed_from_rnd_argument(&amp;mut self, arg: i32);
+    fn randomize(&amp;mut self);
+}
+</code></pre>
+
+            <p>
+                The <code>ClassicBackend</code> uses an <code>AtomicI32</code> for the seed, making it 
+                lock-free for the critical <code>next()</code> path. The <code>Randomize</code> statement is handled 
+                by a VB6-specific <code>splice()</code> method that adjusts the internal state to match real VB6's 
+                behavior when <code>Randomize</code> is called with a numeric argument.
+            </p>
+
+            <div class="info-box">
+                <p><strong>Why is <code>Rnd</code> stateful?</strong> In VB6, <code>Rnd</code> is not a pure 
+                function — calling <code>Rnd</code> with a negative argument reseeds the generator, and subsequent 
+                calls return values from a shared sequence. This means all VB6 modules share a single random 
+                number stream, and the order of <code>Rnd</code> calls across the entire program matters.</p>
+            </div>
+
+            <h3 id="interaction-state">Interaction State <code>(state/interaction/)</code></h3>
+            <p>
+                The interaction state covers all user-facing operations: <code>Command$</code>, <code>DoEvents</code>, 
+                <code>Beep</code>, <code>MsgBox</code>, <code>InputBox</code>, <code>AppActivate</code>, 
+                <code>SendKeys</code>, and <code>Shell</code>. This is the most diverse category, with each operation 
+                potentially requiring a different OS API:
+            </p>
+
+            <pre><code class="language-rust">trait InteractionBackend: Send + Sync {
+    fn command_args(&amp;self) -&gt; Vec&lt;String&gt;;
+    fn do_events(&amp;self) -&gt; bool;
+    fn beep(&amp;self) -&gt; bool;
+    fn stop(&amp;self) -&gt; bool;
+    fn msg_box(
+        &amp;self,
+        prompt: &amp;str,
+        style: MsgBoxStyle,
+        title: &amp;str,
+    ) -&gt; MsgBoxResult;
+    fn input_box(
+        &amp;self,
+        prompt: &amp;str,
+        title: &amp;str,
+        default: &amp;str,
+    ) -&gt; String;
+    fn app_activate(
+        &amp;self,
+        title: &amp;str,
+    ) -&gt; bool;
+    fn send_keys(
+        &amp;self,
+        keys: &amp;str,
+        wait: bool,
+    ) -&gt; bool;
+    fn shell(
+        &amp;self,
+        command: &amp;str,
+        style: AppWinStyle,
+    ) -&gt; Option&lt;u32&gt;;
+}
+</code></pre>
+
+            <p>
+                The <code>NativeBackend</code> uses platform-specific APIs: Win32 APIs on Windows (e.g., 
+                <code>MessageBoxW</code>, <code>ShellExecuteEx</code>, <code>SendInput</code>), 
+                <code>osascript</code> on macOS, and tools like <code>zenity</code> and <code>xdotool</code> on Linux. 
+                The <code>MemoryBackend</code> provides fully scripted deterministic behavior with FIFO response queues 
+                and request logs.
+            </p>
+
+            <h3 id="settings-state">Settings State <code>(state/settings/)</code></h3>
+            <p>
+                The settings state manages the in-memory settings cache for <code>SaveSetting</code> and 
+                <code>GetSetting</code>. Unlike the Windows registry, vb6runtime supports multiple backends for 
+                cross-platform compatibility:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Backend</th>
+                        <th>Storage</th>
+                        <th>Platform</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>RegistryBackend</code></td>
+                        <td>Windows Registry: <code>HKEY_CURRENT_USER\Software\VB and VBA Program Settings\</code></td>
+                        <td>Windows</td>
+                    </tr>
+                    <tr>
+                        <td><code>FileBackend</code></td>
+                        <td>Directory tree: <code>&lt;root&gt;/&lt;appname&gt;/&lt;section&gt;/&lt;key&gt;</code></td>
+                        <td>Linux, macOS</td>
+                    </tr>
+                    <tr>
+                        <td><code>MemoryBackend</code></td>
+                        <td>HashMap in memory</td>
+                        <td>WASM, tests</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                The <code>SettingsBackend</code> trait provides a full CRUD API for <code>(appname, section, key)</code> 
+                triples:
+            </p>
+
+            <pre><code class="language-rust">trait SettingsBackend: Send + Sync {
+    fn get(
+        &amp;self,
+        appname: &amp;str,
+        section: &amp;str,
+        key: Option&lt;&amp;str&gt;,
+    ) -&gt; SettingsResponse;
+    fn set(
+        &amp;self,
+        appname: &amp;str,
+        section: &amp;str,
+        key: Option&lt;&amp;str&gt;,
+        value: Option&lt;&amp;str&gt;,
+    ) -&gt; Result&lt;(), SettingError&gt;;
+    fn delete(
+        &amp;self,
+        appname: &amp;str,
+        section: Option&lt;&amp;str&gt;,
+        key: Option&lt;&amp;str&gt;,
+    ) -&gt; Result&lt;(), SettingError&gt;;
+    fn load(&amp;self) -&gt; Snapshot;
+}
+</code></pre>
+
+            <p>
+                The system keeps a <code>Snapshot</code> in memory — a <code>HashMap</code> with case-insensitive 
+                indexing — that is loaded once from the backend and then amended by <code>SaveSetting</code> and 
+                <code>DeleteSetting</code> calls without touching the persistent store on every access.
+            </p>
+
+            <h3 id="error-state">Error State <code>(state/err.rs)</code></h3>
+            <p>
+                The error state is the simplest category. It stores the current <code>Err.Number</code> as a single 
+                <code>AtomicI32</code>, with no pluggable backend needed:
+            </p>
+
+            <pre><code class="language-rust">static CURRENT_NUMBER: AtomicI32 = AtomicI32::new(0);
+
+pub fn current_number() -&gt; i32 {
+    CURRENT_NUMBER.load(Ordering::SeqCst)
+}
+
+pub fn set_number(n: i32) {
+    CURRENT_NUMBER.store(n, Ordering::SeqCst);
+}
+
+pub fn clear() {
+    CURRENT_NUMBER.store(0, Ordering::SeqCst);
+}
+</code></pre>
+
+            <p>
+                This is accessed by the omitted-argument forms of <code>Error</code> and <code>Error$</code>, which 
+                convert the current error number back into its description string.
+            </p>
+
+            <h3 id="resource-state">Resource State <code>(state/resources.rs)</code></h3>
+            <p>
+                The resource state links a compiled <code>.res</code> file to the runtime. When a VB6 project includes 
+                a resource file, vb6runtime loads and lazily parses it on first access by <code>LoadResString</code>, 
+                <code>LoadResPicture</code>, or <code>LoadResData</code>:
+            </p>
+
+            <pre><code class="language-rust">struct Linked {
+    path: PathBuf,
+    parsed: OnceLock&lt;Result&lt;ResFile, Error&gt;&gt;,
+}
+
+static RES_FILE: OnceLock&lt;Linked&gt; = OnceLock::new();
+
+pub fn set_file(path: PathBuf) {
+    RES_FILE.get_or_init(|| Linked { path, parsed: OnceLock::new() });
+}
+
+pub fn with_file&lt;T&gt;(f: impl FnOnce(&amp;ResFile) -&gt; T) -&gt; Result&lt;T, Error&gt; {
+    let linked = RES_FILE.get().ok_or(Error::NoResourceFile)?;
+    let res_file = linked.parsed.get_or_try_init(|| parse_res_file(&linked.path))?;
+    f(&amp;res_file?)
+}
+</code></pre>
+
+            <h2 id="state-transitions">State Evolution</h2>
+            <p>
+                The runtime state system does not use a traditional state machine with explicit transitions. Instead, 
+                state changes are <strong>event-driven mutations</strong> — each public API function acquires the 
+                backend mutex, delegates to the active backend, and returns the result. The state evolves through 
+                sequential method calls.
+            </p>
+
+            <div class="algorithm-box">
+                <p><strong>State lifecycle:</strong></p>
+                <ol>
+                    <li><strong>Initialization:</strong> On first access, the <code>OnceLock</code> lazy-initializes 
+                    the backend singleton via <code>get_or_init()</code>. The default backend is chosen by platform 
+                    detection.</li>
+                    <li><strong>Mutation:</strong> Each public function acquires the backend mutex, delegates to the 
+                    active backend, and returns the result. There are no explicit state transitions — the state 
+                    evolves through method calls.</li>
+                    <li><strong>Backend switching:</strong> <code>set_backend(new_backend)</code> replaces the boxed 
+                    trait object, immediately affecting all subsequent calls. The snapshot (for environment and 
+                    settings) is rebuilt from the new backend.</li>
+                    <li><strong>Reset:</strong> <code>reset_backend()</code> restores the platform-appropriate 
+                    default. <code>reset()</code> (where available) rebuilds the in-memory snapshot from the 
+                    backend.</li>
+                </ol>
+            </div>
+
+            <p>
+                Thread safety is provided at multiple levels. All pluggable backends are <code>Send + Sync</code> and 
+                wrapped in <code>Mutex&lt;Box&lt;dyn Trait&gt;&gt;</code>. The error number uses <code>AtomicI32</code> 
+                for lock-free access. The file I/O state uses <code>thread_local!</code> for the open file handle table, 
+                since VB6 file numbers are per-thread (or more precisely, per-cooperative-context).
+            </p>
+
+            <h2 id="consumer-integration">Consumer Integration</h2>
+
+            <h3>Vb6Interpret Configuration</h3>
+            <p>
+                The <code>vb6interpret</code> project is the primary consumer of vb6runtime's state system. Before 
+                executing a VB6 module, the interpreter stages values into the state system:
+            </p>
+
+            <pre><code class="language-rust">// In vb6interpret's config.rs
+impl InterpreterConfig {
+    pub fn set_environment(&amp;mut self, key: &amp;str, value: &amp;str) {
+        self.staged_env.push((key.to_string(), value.to_string()));
+    }
+
+    pub fn set_setting(
+        &amp;mut self,
+        appname: &amp;str,
+        section: &amp;str,
+        key: &amp;str,
+        value: &amp;str,
+    ) {
+        self.staged_settings.push((
+            appname.to_string(),
+            section.to_string(),
+            key.to_string(),
+            value.to_string(),
+        ));
+    }
+
+    pub fn set_file_backend(&amp;mut self, backend: Box&lt;dyn FileBackend&gt;) {
+        self.file_backend = Some(backend);
+    }
+
+    pub fn set_allow_system_time(&amp;mut self, allow: bool) {
+        self.mock_clock_enabled = !allow;
+    }
+}
+</code></pre>
+
+            <p>
+                At the start of every <code>run_module()</code>, the interpreter applies staged values into the 
+                shared state:
+            </p>
+
+            <pre><code class="language-rust">fn run_module(&amp;self, module: &amp;Module) -&gt; Result&lt;ModuleOutput, RuntimeError&gt; {
+    // 1. Write staged environment variables into the shared snapshot
+    for (key, value) in &amp;self.staged_env {
+        env_state::set_env(key, value);
+    }
+
+    // 2. Apply staged settings
+    for (app, section, key, value) in &amp;self.staged_settings {
+        settings_state::set(app, section, key, value);
+    }
+
+    // 3. Link resource file or clear it
+    if let Some(ref path) = self.resource_file {
+        resources_state::set_file(path.clone());
+    } else {
+        resources_state::clear();
+    }
+
+    // 4. Configure clock: reset to real time or set initial date/time for mock clock
+    if self.mock_clock_enabled {
+        if let Some(ref initial) = self.initial_datetime {
+            clock::set_date(initial.year(), initial.month() as u32, initial.day());
+            clock::set_time(initial.hour(), initial.minute(), initial.second());
+        }
+    }
+
+    // 5. Execute the module
+    self.interpreter.execute(module)
+}
+</code></pre>
+
+            <h3>Library Function Integration</h3>
+            <p>
+                The <code>library/</code> modules implement VB6 standard library functions that read and write state. 
+                Each function is a thin wrapper that delegates to the appropriate state module:
+            </p>
+
+            <pre><code class="language-rust">// library/statements/date.rs
+pub fn set_date(year: u32, month: u32, day: u32) -&gt; Result&lt;(), Error&gt; {
+    clock::set_date(year, month, day);
+    Ok(())
+}
+
+// library/statements/savesetting.rs
+pub fn save_setting(
+    app_name: &amp;str,
+    section: &amp;str,
+    key: &amp;str,
+    value: &amp;str,
+) -&gt; Result&lt;(), Error&gt; {
+    settings_state::set(app_name, section, Some(key), Some(value))?;
+    Ok(())
+}
+
+// library/random.rs
+pub fn rnd(arg: Option&lt;i32&gt;) -&gt; f64 {
+    let mut backend = random_state::get_backend();
+    if let Some(arg) = arg {
+        backend.seed_from_rnd_argument(arg);
+        random_state::set_backend(Box::new(backend));
+        return 0.0;
+    }
+    random_state::next()
+}
+</code></pre>
+
+            <h2 id="wasmsandbox">WASM Sandbox Mode</h2>
+            <p>
+                When compiled for the WASM target (<code>target_arch = "wasm32"</code>), vb6runtime operates in a 
+                fully sandboxed mode. The WASM bridge (<code>run_bridge.rs</code>) configures both the file and 
+                clock backends to <code>MemoryBackend</code> instances:
+            </p>
+
+            <div class="architecture-diagram">
+                <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 12px; margin: 8px 0; background: var(--bg-card);">
+                    <strong>JavaScript Host</strong><br>
+                    <span style="color: var(--text-muted);">In-memory file system, clock sync</span>
+                </div>
+                <div class="vertical-arrow">↕</div>
+                <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 12px; margin: 8px 0; background: var(--bg-card);">
+                    <strong>WASM Runtime (vb6runtime)</strong><br>
+                    <span style="color: var(--text-muted);">MemoryBackend (file + clock)</span>
+                </div>
+            </div>
+
+            <p>
+                This enables:
+            </p>
+            <ul>
+                <li><strong>File system sandboxing:</strong> All file operations target an in-memory <code>HashMap</code> 
+                that can be synced to/from the JS host.</li>
+                <li><strong>Live-advancing clock:</strong> The <code>MemoryBackend</code> is seeded with real time on 
+                initialization and advances in real time, providing natural behavior without OS clock access.</li>
+                <li><strong>Full determinism:</strong> By controlling both file state and clock state, the entire 
+                execution environment becomes deterministic for testing and demo purposes.</li>
+            </ul>
+
+            <h2 id="design-patterns">Design Patterns</h2>
+            <p>
+                The runtime state system employs several recurring design patterns:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pattern</th>
+                        <th>How It Is Used</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Strategy</strong></td>
+                        <td>Every state category has a trait with multiple implementations (Native, Memory, Registry, Playback)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Singleton + Lazy Init</strong></td>
+                        <td><code>OnceLock&lt;Mutex&lt;Box&lt;dyn Trait&gt;&gt;&gt;</code> for global backend access</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Snapshot</strong></td>
+                        <td>Environment and settings keep a mutable in-memory snapshot loaded from the backend, amended by calls</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Facade</strong></td>
+                        <td>Public module functions (e.g., <code>file::open_file()</code>) provide a clean API over the backend abstraction</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Platform Polymorphism</strong></td>
+                        <td><code>default_backend()</code> uses platform detection to select the appropriate backend</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dependency Injection</strong></td>
+                        <td><code>set_backend()</code> allows swapping in deterministic backends for testing</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Thread Safety</strong></td>
+                        <td><code>Mutex</code> for trait objects, <code>AtomicI32</code> for error number, <code>thread_local!</code> for file handles</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dual-Layer Clock</strong></td>
+                        <td>System clock (pluggable) + Mock clock (offset) gives both real-time accuracy and test control</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="future">Future Considerations</h2>
+
+            <div class="consideration">
+                <h3>1. Fine-Grained Concurrency</h3>
+                <p>
+                    Currently, all state categories use a single <code>Mutex</code> per backend, which serializes all 
+                    access. For multi-threaded VB6 scenarios (using <code>runtimes.dll</code> apartment threading), 
+                    finer-grained locking could improve throughput.
+                </p>
+                <p><strong>Trade-off:</strong> More complexity in the state management code, but better performance 
+                for multi-module concurrent execution.</p>
+            </div>
+
+            <div class="consideration">
+                <h3>2. State Checkpointing</h3>
+                <p>
+                    For debugging and test replay, the ability to snapshot and restore the entire runtime state would 
+                    be valuable:
+                </p>
+                <ul>
+                    <li>Save current state to a serializable format</li>
+                    <li>Restore from a checkpoint</li>
+                    <li>Diff two states for debugging</li>
+                </ul>
+                <p><strong>Benefit:</strong> Enable "time travel" debugging and robust test replay.</p>
+            </div>
+
+            <div class="consideration">
+                <h3>3. Additional State Categories</h3>
+                <p>
+                    Several VB6 stateful operations are not yet fully modeled:
+                </p>
+                <ul>
+                    <li>Current directory (<code>ChDrive</code>, <code>ChDir</code>)</li>
+                    <li>Default file mode (<code>Mode</code> statement)</li>
+                    <li>Trace output destination (<code>OutputTo</code>)</li>
+                </ul>
+                <p><strong>Priority:</strong> Lower — these are used less frequently in typical VB6 applications.</p>
+            </div>
+
+            <h2 id="summary">Summary</h2>
+            <p>
+                The runtime state system provides a clean, extensible foundation for managing all process-global mutable 
+                state in the VB6 runtime. Its key design decisions — the pluggable backend trait pattern, platform-aware 
+                defaults, snapshot caching, and dual-layer clock — work together to satisfy the diverse requirements of 
+                real VB6 behavior, cross-platform compatibility, test determinism, and WASM sandboxing.
+            </p>
+            <p>
+                The system was designed because:
+            </p>
+            <ol>
+                <li><strong>VB6 has hidden state:</strong> Many VB6 operations depend on process-wide mutable state that 
+                is not visible in the source code.</li>
+                <li><strong>One size does not fit all:</strong> Real OS behavior, in-memory testing, and WASM sandboxing 
+                require fundamentally different implementations of the same operations.</li>
+                <li><strong>Testability by design:</strong> Deterministic backends (Memory, Playback) allow full control 
+                over runtime state for reliable testing.</li>
+                <li><strong>Single API, multiple backends:</strong> Library functions and consumers use the same public 
+                API regardless of which backend is active.</li>
+                <li><strong>Cross-platform from the start:</strong> The backend abstraction was designed for Windows, 
+                Linux, macOS, and WASM from the beginning, not as an afterthought.</li>
+            </ol>
+
+            <div class="info-box">
+                <p><strong>The result:</strong> A unified runtime state system that powers accurate VB6 emulation 
+                across every target platform while remaining fully controllable for testing and debugging.</p>
+            </div>
+
+            <div class="related-docs">
+                <h3>Related Documentation</h3>
+                <ul>
+                    <li><a href="../library/index.html">Library Reference</a> - VB6 functions and statements that consume this state</li>
+                    <li><a href="../vb6interpret/index.html">VB6Interpret</a> - Primary consumer of the runtime state system</li>
+                    <li><a href="https://docs.rs/vb6runtime/latest/vb6runtime/state/" target="_blank">State Module API</a> - Rust documentation for state modules</li>
+                    <li><a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime/src/state" target="_blank">State Source Code</a> - Full implementation on GitHub</li>
+                </ul>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Runtime is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Expression Evaluation Architecture in vb6interpret">
+    <title>Expression Evaluation - VB6Interpret Documentation</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            hljs.highlightAll();
+        });
+    </script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../index.html">VB6Interpret</a> / <a href="../documentation.html">Documentation</a> / Expression Evaluation</h1>
+            <p class="tagline">VB6 Expression Evaluation Architecture Explained</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../index.html">Home</a>
+            <a href="../documentation.html">Documentation</a>
+            <a href="../coverage.html">Coverage</a>
+            <a href="../getting-started.html">Getting Started</a>
+            <a href="exec-engine.html">Exec Engine</a>
+            <a href="playground.html">Playground</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container docs-content">
+        <aside class="toc">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#architecture">Architecture</a>
+                    <ul>
+                        <li><a href="#design-philosophy">Design Philosophy</a></li>
+                        <li><a href="#module-structure">Module Structure</a></li>
+                        <li><a href="#integration">Integration with the Interpreter</a></li>
+                    </ul>
+                </li>
+                <li><a href="#literals">Literal Evaluation</a>
+                    <ul>
+                        <li><a href="#string-literals">String Literals</a></li>
+                        <li><a href="#numeric-literals">Numeric Literals</a></li>
+                        <li><a href="#radix-literals">Radix Literals</a></li>
+                        <li><a href="#type-suffixes">Type Suffixes</a></li>
+                        <li><a href="#date-literals">Date Literals</a></li>
+                        <li><a href="#boolean-keywords">Boolean Keywords</a></li>
+                    </ul>
+                </li>
+                <li><a href="#identifier-evaluation">Identifier Evaluation</a>
+                    <ul>
+                        <li><a href="#special-keywords">Special Keywords</a></li>
+                        <li><a href="#scope-lookup">Scope Lookup</a></li>
+                        <li><a href="#undeclared-variables">Undeclared Variables</a></li>
+                    </ul>
+                </li>
+                <li><a href="#binary-operators">Binary Operators</a>
+                    <ul>
+                        <li><a href="#arithmetic-operators">Arithmetic Operators</a></li>
+                        <li><a href="#integer-arithmetic">Integer Arithmetic Path</a></li>
+                        <li><a href="#floating-point-arithmetic">Floating-Point Arithmetic Path</a></li>
+                        <li><a href="#add-operator">The <code>+</code> Operator</a></li>
+                        <li><a href="#string-concatenation">String Concatenation</a></li>
+                        <li><a href="#comparison-operators">Comparison Operators</a></li>
+                        <li><a href="#logical-bitwise-operators">Logical and Bitwise Operators</a></li>
+                        <li><a href="#like-operator">The <code>Like</code> Operator</a></li>
+                        <li><a href="#is-operator">The <code>Is</code> Operator</a></li>
+                    </ul>
+                </li>
+                <li><a href="#unary-operators">Unary Operators</a></li>
+                <li><a href="#call-expressions">Call Expressions</a>
+                    <ul>
+                        <li><a href="#three-tier-dispatch">Three-Tier Dispatch</a></li>
+                        <li><a href="#array-indexing">Array Indexing</a></li>
+                        <li><a href="#user-defined-functions">User-Defined Functions</a></li>
+                        <li><a href="#builtin-functions">Built-in Functions</a></li>
+                        <li><a href="#argument-evaluation">Argument Evaluation</a></li>
+                    </ul>
+                </li>
+                <li><a href="#builtin-dispatch">Built-in Function Dispatch</a>
+                    <ul>
+                        <li><a href="#declarative-specs">Declarative Specifications</a></li>
+                        <li><a href="#typed-builtin-macro">The <code>typed_builtin!</code> Macro</a></li>
+                        <li><a href="#parameter-kinds">Parameter Kinds</a></li>
+                        <li><a href="#null-propagation">Null Propagation</a></li>
+                    </ul>
+                </li>
+                <li><a href="#like-matching">VB6 <code>Like</code> Pattern Matching</a>
+                    <ul>
+                        <li><a href="#supported-patterns">Supported Patterns</a></li>
+                        <li><a href="#character-classes">Character Classes</a></li>
+                        <li><a href="#bracket-idioms">Bracket Idioms</a></li>
+                        <li><a href="#memoized-algorithm">Memoized Matching Algorithm</a></li>
+                    </ul>
+                </li>
+                <li><a href="#type-coercion">Type Coercion and Variant Behavior</a>
+                    <ul>
+                        <li><a href="#variant-representation">Variant Representation</a></li>
+                        <li><a href="#implicit-coercion">Implicit Coercion</a></li>
+                        <li><a href="#null-handling">Null Handling</a></li>
+                    </ul>
+                </li>
+                <li><a href="#error-handling">Error Handling</a>
+                    <ul>
+                        <li><a href="#runtime-errors">Runtime Errors</a></li>
+                        <li><a href="#source-positioning">Source Positioning</a></li>
+                    </ul>
+                </li>
+                <li><a href="#example">End-to-End Example</a></li>
+                <li><a href="#further-reading">Further Reading</a></li>
+            </ul>
+        </aside>
+
+        <article>
+            <h2 id="overview">Overview</h2>
+            <p>
+                Expression evaluation is the core of <code>vb6interpret</code>'s execution engine. It takes a
+                Concrete Syntax Tree (CST) node produced by <a href="https://github.com/scriptandcompile/vb6" target="_blank">vb6parse</a>
+                and reduces it to a runtime value represented as a
+                <a href="https://docs.rs/vb6runtime" target="_blank"><code>VB6Variant</code></a> from
+                <code>vb6runtime</code>.
+            </p>
+            <p>
+                The evaluator operates as a tree-walk interpreter: it recursively descends the CST, evaluating
+                each expression node according to its kind. Pure operator semantics are separated from the
+                interpreter logic, allowing the operator functions to be tested and reasoned about independently
+                of any CST or interpreter state.
+            </p>
+
+            <div class="info-box">
+                <strong>Key Principle:</strong> Expression evaluation is <em>side-effect free</em> with respect to
+                the program state. It reads variable values from the current scope, evaluates function calls, and
+                returns a new <code>VB6Variant</code>. Only statement execution (assignments, control flow, etc.)
+                mutates state. This separation makes the operators module a pure library.
+            </div>
+
+            <h2 id="architecture">Architecture</h2>
+
+            <h3 id="design-philosophy">Design Philosophy</h3>
+            <p>
+                The expression evaluator is built on three architectural principles:
+            </p>
+            <ul>
+                <li><strong>Purity:</strong> Operator functions (<code>arith</code>, <code>add</code>,
+                    <code>bitwise</code>, <code>compare_ord</code>, <code>like_match</code>, <code>literal_value</code>)
+                    take <code>VB6Variant</code> values and return new ones. They know nothing about CST nodes, scopes, or
+                    the interpreter. They operate on values alone.</li>
+                <li><strong>Separation of Concerns:</strong> The <code>eval</code> module handles CST dispatch, scope
+                    lookup, and error positioning. The <code>operators</code> module handles VB6-specific numeric and
+                    logical semantics. The <code>literals</code> module handles VB6 literal syntax. The
+                    <code>like</code> module handles pattern matching.</li>
+                <li><strong>VB6 Fidelity:</strong> Every operator implements the exact semantics documented in the VB6
+                    language reference: Euclidean integer division, always-double exponentiation, case-insensitive
+                    string comparison, and the dual behavior of <code>+</code> (addition vs. concatenation).</li>
+            </ul>
+
+            <h3 id="module-structure">Module Structure</h3>
+            <p>
+                The expression evaluation subsystem lives in
+                <code>projects/vb6interpret/src/eval/</code> and is organized into four source files:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Lines</th>
+                        <th>Responsibility</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>mod.rs</code></td>
+                        <td>367</td>
+                        <td>CST dispatch table, scope lookup, call expression dispatch, error positioning</td>
+                    </tr>
+                    <tr>
+                        <td><code>operators.rs</code></td>
+                        <td>348</td>
+                        <td>Pure arithmetic, logical/bitwise, and comparison functions over <code>VB6Variant</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>literals.rs</code></td>
+                        <td>248</td>
+                        <td>Pure literal parsing: strings, numbers, dates, booleans, radix notation</td>
+                    </tr>
+                    <tr>
+                        <td><code>like.rs</code></td>
+                        <td>198</td>
+                        <td>Pure VB6 <code>Like</code> pattern matching with memoized recursion</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <strong>📝 Note:</strong> The <code>operators</code>, <code>literals</code>, and <code>like</code>
+                modules are fully unit-testable in isolation. Their test suites cover edge cases including overflow
+                behavior, null propagation, case sensitivity, and Unicode handling.
+            </div>
+
+            <h3 id="integration">Integration with the Interpreter</h3>
+            <p>
+                Expression evaluation is invoked from two places in the statement execution pipeline:
+            </p>
+
+            <pre><code class="language-rust">// From exec/assignment.rs — evaluating the RHS of an assignment
+let value = self.eval_expr(rhs)?;
+self.assign(lhs, value)
+
+// From exec/assignment.rs — evaluating a Let statement
+let value = self.eval_expr(rhs)?;
+self.assign(lhs, value)
+
+// From eval/mod.rs — evaluating a CallExpression
+let args = self.eval_args(list)?;
+builtins::call_builtin(&name, &args)</code></pre>
+
+            <p>
+                The data flow follows this pipeline:
+            </p>
+
+            <div style="text-align: center; margin: 24px 0;">
+                <div style="display: inline-block; text-align: center;">
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; background: var(--code-background); padding: 16px 24px; display: inline-block;">
+                        <strong>Vb6parse CST</strong><br>
+                        <span style="font-size: 0.9em; color: var(--secondary-color);">Concrete Syntax Tree</span>
+                    </div>
+                </div>
+                <div style="display: inline-block; padding: 0 16px; vertical-align: middle;">↓</div>
+                <div style="display: inline-block; text-align: center;">
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; background: var(--code-background); padding: 16px 24px; display: inline-block;">
+                        <strong>Evaluator</strong><br>
+                        <span style="font-size: 0.9em; color: var(--secondary-color);">eval_expr dispatch</span>
+                    </div>
+                </div>
+                <div style="display: inline-block; padding: 0 16px; vertical-align: middle;">↓</div>
+                <div style="display: inline-block; text-align: center;">
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; background: var(--code-background); padding: 16px 24px; display: inline-block;">
+                        <strong>VB6Variant</strong><br>
+                        <span style="font-size: 0.9em; color: var(--secondary-color);">Runtime Value</span>
+                    </div>
+                </div>
+            </div>
+
+            <h2 id="literals">Literal Evaluation</h2>
+
+            <p>
+                Literal evaluation converts raw token text into <code>VB6Variant</code> values. The function
+                <code>literal_value(text, kind)</code> in <code>literals.rs</code> is the single entry point,
+                dispatching on <code>SyntaxKind</code> to the appropriate parser.
+            </p>
+
+            <h3 id="string-literals">String Literals</h3>
+            <p>
+                String literals are unescaped by replacing doubled quote characters (<code>""</code>) with single
+                quotes (<code>"</code>), matching VB6's convention:
+            </p>
+
+            <pre><code class="language-vbnet">' Source code
+Dim s As String
+s = "She said ""Hello"""
+
+' After evaluation:
+' s = "She said "Hello""</code></pre>
+
+            <pre><code class="language-rust">SyntaxKind::StringLiteral => {
+    let inner = raw.strip_prefix('"')
+                   .and_then(|rest| rest.strip_suffix('"'))?;
+    let unescaped = inner.replace("\"\"", "\"");
+    Some(VBVariant::from_string(unescaped))
+}</code></pre>
+
+            <h3 id="numeric-literals">Numeric Literals</h3>
+            <p>
+                Numeric literals are parsed by kind, with type suffixes stripped before conversion. The parser
+                handles decimal, hexadecimal (<code>&amp;H</code>), and octal (<code>&amp;O</code>) notation:
+            </p>
+
+            <pre><code class="language-vbnet">' Decimal integers
+Dim a As Integer: a = 42%      ' Integer suffix
+Dim b As Long:   b = 100&       ' Long suffix
+
+' Hexadecimal
+Dim c As Long:   c = &HFF       ' 255 in decimal
+Dim d As Integer: d = &h7F      ' 127 in decimal
+
+' Octal
+Dim e As Long:   e = &O17       ' 15 in decimal</code></pre>
+
+            <h3 id="radix-literals">Radix Literals</h3>
+            <p>
+                Radix literals (hex and octal) follow VB6's two's-complement wrapping rules. Values above
+                <code>i32::MAX</code> but within <code>u32::MAX</code> wrap to their signed equivalent:
+            </p>
+
+            <pre><code class="language-rust">fn radix_value(digits: &str, radix: u32) -> Option&lt;VB6Variant&gt; {
+    let v = i64::from_str_radix(digits, radix).ok()?;
+    // &HFFFFFFFF wraps to -1 Long in VB6
+    if v &gt; i32::MAX as i64 &amp;&amp; v &lt;= u32::MAX as i64 {
+        return Some(VB6Variant::Long(v as i32));  // -1
+    }
+    Some(VB6Variant::from_i64(v))
+}</code></pre>
+
+            <div class="code-example">
+                <h4>Radix Wrapping Examples</h4>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Literal</th>
+                            <th>Raw Value</th>
+                            <th>Evaluated Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>&HFFFFFFFF</code></td>
+                            <td>4,294,967,295</td>
+                            <td><code>VB6Variant::Long(-1)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>&H80000000</code></td>
+                            <td>2,147,483,648</td>
+                            <td><code>VB6Variant::Long(-2,147,483,648)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>&H7FFFFFFF</code></td>
+                            <td>2,147,483,647</td>
+                            <td><code>VB6Variant::Long(2,147,483,647)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>&H100000000</code></td>
+                            <td>4,294,967,296</td>
+                            <td><code>VB6Variant::Double(4294967296.0)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 id="type-suffixes">Type Suffixes</h3>
+            <p>
+                VB6 supports single-character type declaration suffixes that are stripped before numeric parsing:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Suffix</th>
+                        <th>Type</th>
+                        <th>Example</th>
+                        <th>Rust Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>%</code></td>
+                        <td>Integer</td>
+                        <td><code>42%</code></td>
+                        <td><code>i16</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>&amp;</code></td>
+                        <td>Long</td>
+                        <td><code>100&</code></td>
+                        <td><code>i32</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>!</code></td>
+                        <td>Single</td>
+                        <td><code>3.14!</code></td>
+                        <td><code>f32</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>#</code></td>
+                        <td>Double</td>
+                        <td><code>3.14#</code></td>
+                        <td><code>f64</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>@</code></td>
+                        <td>Currency</td>
+                        <td><code>12.34@</code></td>
+                        <td><code>i64</code> (scaled)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="date-literals">Date Literals</h3>
+            <p>
+                Date literals are delimited by <code>#</code> characters and parsed into date serial values:
+            </p>
+
+            <pre><code class="language-vbnet">Dim d As Date
+d = #1/1/2000#      ' January 1, 2000
+d = #12:00:00#      ' Midnight
+d = #6/30/2024 3:30PM#</code></pre>
+
+            <pre><code class="language-rust">SyntaxKind::DateLiteral => {
+    let inner = raw.strip_prefix('#')
+                   .and_then(|rest| rest.strip_suffix('#'))?;
+   VBVariant::from_string(inner)
+        .as_date_serial()
+        .ok()
+        .map(VB6Variant::Date)
+}</code></pre>
+
+            <h3 id="boolean-keywords">Boolean Keywords</h3>
+            <p>
+                The <code>True</code> and <code>False</code> keywords are evaluated at the literal level:
+            </p>
+
+            <pre><code class="language-rust">SyntaxKind::TrueKeyword  => Some(VB6Variant::Boolean(true)),
+SyntaxKind::FalseKeyword => Some(VB6Variant::Boolean(false)),</code></pre>
+
+            <h2 id="identifier-evaluation">Identifier Evaluation</h2>
+
+            <p>
+                Identifier evaluation resolves a name to its current value from the interpreter's scope. Special
+                VB6 keywords are handled as a first pass before the scope lookup:
+            </p>
+
+            <pre><code class="language-rust">fn eval_identifier(&amp;mut self, node: &amp;CstNode) -&gt; RunResult&lt;VB6Variant&gt; {
+    let name = identifier_name(node);
+
+    match name.to_lowercase().as_str() {
+        "true"     => return Ok(VB6Variant::Boolean(true)),
+        "false"    => return Ok(VB6Variant::Boolean(false)),
+        "nothing"  => return Ok(VB6Variant::Nothing),
+        "null"     => return Ok(VB6Variant::Null),
+        "empty"    => return Ok(VB6Variant::Empty),
+        "me"       => /* error: not available in standard module */,
+        _ => {}
+    }
+
+    // Scope lookup: current frame locals, then globals
+    match self.lookup(&amp;name) {
+        Some(value) => Ok(value.clone()),
+        None        => Ok(VB6Variant::Empty),  // undeclared → Empty
+    }
+}</code></pre>
+
+            <h3 id="special-keywords">Special Keywords</h3>
+            <p>
+                The evaluator recognizes six special keywords that are not regular variables:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Keyword</th>
+                        <th>Evaluated Value</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>True</code></td>
+                        <td><code>VB6Variant::Boolean(true)</code></td>
+                        <td>Boolean true</td>
+                    </tr>
+                    <tr>
+                        <td><code>False</code></td>
+                        <td><code>VB6Variant::Boolean(false)</code></td>
+                        <td>Boolean false</td>
+                    </tr>
+                    <tr>
+                        <td><code>Nothing</code></td>
+                        <td><code>VB6Variant::Nothing</code></td>
+                        <td>Null object reference</td>
+                    </tr>
+                    <tr>
+                        <td><code>Null</code></td>
+                        <td><code>VB6Variant::Null</code></td>
+                        <td>No valid data</td>
+                    </tr>
+                    <tr>
+                        <td><code>Empty</code></td>
+                        <td><code>VB6Variant::Empty</code></td>
+                        <td>Uninitialized variable</td>
+                    </tr>
+                    <tr>
+                        <td><code>Me</code></td>
+                        <td>Runtime error</td>
+                        <td>Object reference (not supported in standard modules)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="scope-lookup">Scope Lookup</h3>
+            <p>
+                The <code>lookup</code> function searches for a variable in a two-level scope chain. All lookups
+                are case-insensitive (normalized via <code>normalize()</code>):
+            </p>
+
+            <pre><code class="language-rust">fn lookup(&amp;self, name: &amp;str) -&gt; Option&lt;&amp;VB6Variant&gt; {
+    let key = normalize(name);
+    // 1. Check current procedure's frame locals
+    if let Some(frame) = self.frames.last()
+        && let Some(value) = frame.locals.get(&amp;key)
+    {
+        return Some(value);
+    }
+    // 2. Check module-level globals
+    self.globals.get(&amp;key)
+}</code></pre>
+
+            <h3 id="undeclared-variables">Undeclared Variables</h3>
+            <p>
+                When <code>Option Explicit</code> is not set, VB6 allows referencing undeclared variables. The
+                interpreter follows VB6 semantics by returning <code>Empty</code> for such references:
+            </p>
+
+            <pre><code class="language-vbnet">' Without Option Explicit, this is valid:
+Sub Test()
+    Dim x As Integer
+    x = y   ' y is undeclared → evaluates to Empty (0 numerically)
+    Print x ' Prints 0
+End Sub</code></pre>
+
+            <div class="info-box">
+                <strong>🎯 Key Feature:</strong> This matches VB6's behavior exactly. In VB6, reading an undeclared
+                variable produces an <code>Empty</code> variant, which coerces to <code>0</code> for numeric
+                contexts and <code>""</code> for string contexts.
+            </div>
+
+            <h2 id="binary-operators">Binary Operators</h2>
+
+            <p>
+                Binary expressions are evaluated by <code>eval_binary</code>, which first evaluates both operands
+                and then dispatches to the appropriate operator function based on the operator token kind. There
+                are 20+ binary operator variants:
+            </p>
+
+            <div class="statement-grid">
+                <div class="statement-category">
+                    <h4>Arithmetic</h4>
+                    <ul>
+                        <li><code>+</code> — Addition / String concat</li>
+                        <li><code>-</code> — Subtraction</li>
+                        <li><code>*</code> — Multiplication</li>
+                        <li><code>/</code> — Division</li>
+                        <li><code>\</code> — Integer division</li>
+                        <li><code>Mod</code> — Modulo</li>
+                        <li><code>^</code> — Exponentiation</li>
+                    </ul>
+                </div>
+                <div class="statement-category">
+                    <h4>String</h4>
+                    <ul>
+                        <li><code>&amp;</code> — Concatenation</li>
+                    </ul>
+                </div>
+                <div class="statement-category">
+                    <h4>Equality</h4>
+                    <ul>
+                        <li><code>=</code> — Equality</li>
+                        <li><code>&lt;&gt;</code> — Inequality</li>
+                    </ul>
+                </div>
+                <div class="statement-category">
+                    <h4>Ordered Comparison</h4>
+                    <ul>
+                        <li><code>&lt;</code> — Less than</li>
+                        <li><code>&lt;=</code> — Less than or equal</li>
+                        <li><code>&gt;</code> — Greater than</li>
+                        <li><code>&gt;=</code> — Greater than or equal</li>
+                    </ul>
+                </div>
+                <div class="statement-category">
+                    <h4>Logical / Bitwise</h4>
+                    <ul>
+                        <li><code>And</code></li>
+                        <li><code>Or</code></li>
+                        <li><code>Xor</code></li>
+                        <li><code>Eqv</code></li>
+                        <li><code>Imp</code></li>
+                    </ul>
+                </div>
+                <div class="statement-category">
+                    <h4>Special</h4>
+                    <ul>
+                        <li><code>Like</code> — Pattern matching</li>
+                        <li><code>Is</code> — Object identity</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 id="arithmetic-operators">Arithmetic Operators</h3>
+            <p>
+                All arithmetic operations flow through the <code>arith</code> function, which implements a
+                two-path algorithm: an integer path for exact integral results, and a floating-point path for
+                everything else.
+            </p>
+
+            <h4 id="integer-arithmetic">Integer Arithmetic Path</h4>
+            <p>
+                When both operands are integral types and the operator is not division or exponentiation, the
+                evaluator uses <code>i64</code> arithmetic with checked operations:
+            </p>
+
+            <pre><code class="language-rust">pub(crate) fn arith(
+    lhs:VBVariant, rhs:VBVariant, op: ArithmeticOperator
+) -&gt; VBResult&lt;VB6Variant&gt; {
+    // Integer path: both operands must be integral
+    if op != ArithmeticOperator::Divide
+        &amp;&amp; op != ArithmeticOperator::Exponent
+        &amp;&amp; lhs.is_integral()
+        &amp;&amp; rhs.is_integral()
+    {
+        let li = lhs.as_i64().ok();
+        let ri = rhs.as_i64().ok();
+        if let (Some(left), Some(right)) = (li, ri) {
+            let result = match op {
+                ArithmeticOperator::Add          => left.checked_add(right),
+                ArithmeticOperator::Subtract     => left.checked_sub(right),
+                ArithmeticOperator::Multiply     => left.checked_mul(right),
+                ArithmeticOperator::IntegerDivide => {
+                    if right == 0 { return Err(division_by_zero()); }
+                    Some(left.div_euclid(right))    // Euclidean division
+                }
+                ArithmeticOperator::Modulus => {
+                    if right == 0 { return Err(division_by_zero()); }
+                    Some(left.rem_euclid(right))    // Euclidean modulo
+                }
+                _ => None,
+            };
+            if let Some(value) = result {
+                return Ok(VB6Variant::from_i64(value));
+            }
+        }
+    }
+    // Fallback to floating-point path below...
+}</code></pre>
+
+            <div class="info-box">
+                <strong>⚠️ Euclidean Division:</strong> The integer division operator <code>\</code> uses Euclidean
+                semantics, where the remainder always has the same sign as the divisor. This means:
+                <code>-7 \ 2 = -4</code> (not -3), and <code>-7 Mod 2 = 1</code>. This matches VB6's behavior.
+            </div>
+
+            <h4 id="floating-point-arithmetic">Floating-Point Arithmetic Path</h4>
+            <p>
+                When either operand is non-integral, or when the operator is division or exponentiation, the
+                operands are coerced to <code>f64</code> and operations proceed in floating-point:
+            </p>
+
+            <pre><code class="language-rust">let left = lhs.as_f64()?;
+let right = rhs.as_f64()?;
+let result = match op {
+    ArithmeticOperator::Add      => left + right,
+    ArithmeticOperator::Subtract => left - right,
+    ArithmeticOperator::Multiply => left * right,
+    ArithmeticOperator::Divide   => left / right,
+    ArithmeticOperator::IntegerDivide => (left / right).floor(),
+    ArithmeticOperator::Modulus  => left % right,
+    ArithmeticOperator::Exponent => left.powf(right),
+};
+Ok(VB6Variant::from_double(result))</code></pre>
+
+            <div class="info-box">
+                <strong>Key Detail:</strong> The <code>^</code> (exponentiation) operator always produces a
+                <code>Double</code>, even when both operands are integers. This is explicit in the code:
+                <code>ArithmeticOperator::Exponent</code> is excluded from the integer path.
+            </div>
+
+            <div class="code-example">
+                <h4>Integer Overflow Fallback</h4>
+                <p>
+                    When checked integer arithmetic overflows, the evaluator silently falls back to the floating-point
+                    path:
+                </p>
+
+                <pre><code class="language-vbnet">Dim a As Long
+Dim b As Long
+a = 9223372036854775807    ' i64::MAX
+b = 1
+' a + b overflows → silently becomes Double(9223372036854775808.0)</code></pre>
+            </div>
+
+            <h3 id="add-operator">The <code>+</code> Operator</h3>
+            <p>
+                The <code>+</code> operator has dual semantics in VB6: it performs numeric addition when both operands
+                are numeric, and string concatenation when both operands are strings. A type mismatch is raised when
+                one operand is a string and the other is numeric:
+            </p>
+
+            <pre><code class="language-rust">pub(crate) fn add(lhs:VBVariant, rhs:VBVariant) -&gt; VBResult&lt;VB6Variant&gt; {
+    match (&amp;lhs, &amp;rhs) {
+        // String + String → concatenation
+        (VB6Variant::String(_),VBVariant::String(_)) => {
+            let left = lhs.as_string()?;
+            let right = rhs.as_string()?;
+            Ok(VB6Variant::from_string(format!("{left}{right}")))
+        }
+        // String + Numeric or Numeric + String → type mismatch
+        (VB6Variant::String(_), _) | (_,VBVariant::String(_)) => Err(VBError::type_mismatch()),
+        // Both numeric → arithmetic path
+        _ => arith(lhs, rhs, ArithmeticOperator::Add),
+    }
+}</code></pre>
+
+            <pre><code class="language-vbnet">' Addition
+Dim x As Integer
+x = 3 + 5       ' 8
+
+' Concatenation
+Dim a As String, b As String
+a = "Hello"
+b = " World"
+Print a + b     ' "Hello World"
+
+' Type mismatch error
+Dim c As String
+c = "42" + 1     ' Type mismatch: can't add string and number</code></pre>
+
+            <h3 id="string-concatenation">String Concatenation</h3>
+            <p>
+                The <code>&amp;</code> operator always concatenates strings, performing implicit coercion of non-string
+                operands:
+            </p>
+
+            <pre><code class="language-rust">SyntaxKind::Ampersand => {
+    let left = lhs.as_string()?;
+    let right = rhs.as_string()?;
+    Ok(VB6Variant::from_string(format!("{left}{right}")))
+}</code></pre>
+
+            <pre><code class="language-vbnet">Dim x As Integer
+x = 42
+Print "The answer is: " &amp; x    ' "The answer is: 42"
+Print 10 &amp; 20                   ' "1020" (always string concatenation)</code></pre>
+
+            <div class="info-box">
+                <strong>Key Difference:</strong> Unlike <code>+</code>, the <code>&amp;</code> operator never raises a
+                type mismatch. It coerces all operands to strings before concatenation.
+            </div>
+
+            <h3 id="comparison-operators">Comparison Operators</h3>
+            <p>
+                Comparison operators use <code>compare_ord</code>, which dispatches to case-insensitive string
+                comparison when both operands are strings, or numeric comparison otherwise:
+            </p>
+
+            <pre><code class="language-rust">pub(crate) fn compare_ord(
+    lhs:VBVariant, rhs:VBVariant, ord: Ordering
+) -&gt; VBResult&lt;VB6Variant&gt; {
+    let ordering = match (&amp;lhs, &amp;rhs) {
+        // String comparison: case-insensitive (Option Compare Text)
+        (VB6Variant::String(left),VBVariant::String(right)) => {
+            compare_strings(left, right)
+        }
+        // Numeric comparison: magnitude-based
+        _ => match (lhs.as_f64(), rhs.as_f64()) {
+            (Ok(left), Ok(right)) => left.partial_cmp(&amp;right),
+            _ => return Err(VBError::type_mismatch()),
+        },
+    };
+    let result = matches!(
+        (ordering, ord),
+        (Some(std::cmp::Ordering::Less), Ordering::Less)
+            | (Some(std::cmp::Ordering::Equal), Ordering::LessOrEqual)
+            // ...
+    );
+    Ok(VB6Variant::Boolean(result))
+}</code></pre>
+
+            <div class="code-example">
+                <h4>Case-Insensitive String Comparison</h4>
+                <p>
+                    VB6's default <code>Option Compare</code> is <code>Text</code> (case-insensitive). All string
+                    comparisons are case-insensitive unless overridden:
+                </p>
+
+                <pre><code class="language-vbnet">' Case-insensitive comparisons
+Dim a As String, b As String
+a = "apple"
+b = "Apple"
+Print a &lt; b     ' True (case-insensitive)
+Print a = b     ' True (case-insensitive)</code></pre>
+            </div>
+
+            <h3 id="logical-bitwise-operators">Logical and Bitwise Operators</h3>
+            <p>
+                The operators <code>And</code>, <code>Or</code>, <code>Xor</code>, <code>Eqv</code>, and
+                <code>Imp</code> are handled by <code>bitwise</code>, which dispatches based on operand types:
+            </p>
+
+            <ul>
+                <li><strong>Boolean operands:</strong> Pure logical operations yielding <code>Boolean</code></li>
+                <li><strong>Integral operands:</strong> Bitwise operations on the integral value, yielding the integral type</li>
+            </ul>
+
+            <pre><code class="language-rust">pub(crate) fn bitwise(
+    lhs:VBVariant, rhs:VBVariant, op: LogicalOperator
+) -&gt; VBResult&lt;VB6Variant&gt; {
+    // Boolean → logical combination
+    if let (VB6Variant::Boolean(left),VBVariant::Boolean(right)) = (&amp;lhs, &amp;rhs) {
+        let result = match op {
+            LogicalOperator::And => *left &amp;&amp; *right,
+            LogicalOperator::Or  => *left || *right,
+            LogicalOperator::Xor => *left != *right,
+            LogicalOperator::Eqv => *left == *right,
+            LogicalOperator::Imp => !*left || *right,
+        };
+        return Ok(VB6Variant::Boolean(result));
+    }
+
+    // Integral → bitwise operation
+    let left = lhs.as_i64()?;
+    let right = rhs.as_i64()?;
+    let result = match op {
+        LogicalOperator::And => left &amp; right,
+        LogicalOperator::Or  => left | right,
+        LogicalOperator::Xor => left ^ right,
+        LogicalOperator::Eqv => !(left ^ right),
+        LogicalOperator::Imp => !left | right,
+    };
+    Ok(VB6Variant::from_i64(result))
+}</code></pre>
+
+            <pre><code class="language-vbnet">' Boolean logic
+Dim a As Boolean, b As Boolean
+a = True: b = False
+Print a And b     ' False
+Print a Or b      ' True
+Print a Xor b     ' True
+Print a Eqv b     ' False (not equivalent)
+Print a Imp b     ' False (True implies False is False)
+
+' Bitwise operations
+Dim x As Long, y As Long
+x = 6   ' 0110 binary
+y = 3   ' 0011 binary
+Print x And y     ' 2  (0010)
+Print x Or y      ' 7  (0111)
+Print x Xor y     ' 5  (0101)</code></pre>
+
+            <h3 id="like-operator">The <code>Like</code> Operator</h3>
+            <p>
+                The <code>Like</code> operator performs VB6-style pattern matching using the pure <code>like_match</code>
+                function. It is case-insensitive and supports <code>*</code>, <code>?</code>, <code>#</code>, and
+                <code>[charlist]</code> patterns without using regex:
+            </p>
+
+            <pre><code class="language-vbnet">Dim s As String
+s = "Hello123"
+
+Print s Like "Hello*"       ' True
+Print s Like "?????"        ' False (7 chars required)
+Print s Like "#####","      ' False (contains letters)
+Print s Like "[A-Z]*"       ' True
+Print s Like "[!0-9]*"      ' True (starts with non-digit)</code></pre>
+
+            <div class="info-box">
+                <strong>📝 Pattern Syntax:</strong> The <code>Like</code> implementation uses memoized recursive
+                descent (dynamic programming), not regular expressions. This avoids exponential backtracking on
+                patterns with multiple <code>*</code> wildcards.
+            </div>
+
+            <h3 id="is-operator">The <code>Is</code> Operator</h3>
+            <p>
+                The <code>Is</code> operator tests object identity. Since <code>vb6interpret</code> does not yet
+                implement the object model, it falls back to value equality:
+            </p>
+
+            <pre><code class="language-rust">SyntaxKind::IsKeyword => {
+    let result = match (&amp;lhs, &amp;rhs) {
+        (VB6Variant::Nothing,VBVariant::Nothing) => true,
+        (VB6Variant::Nothing, _) | (_,VBVariant::Nothing) => false,
+        _ => lhs == rhs,  // No object model yet: value equality
+    };
+    Ok(VB6Variant::Boolean(result))
+}</code></pre>
+
+            <h2 id="unary-operators">Unary Operators</h2>
+            <p>
+                Unary expressions are evaluated by <code>eval_unary</code>, supporting three operators:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Operator</th>
+                        <th>SyntaxKind</th>
+                        <th>Behavior</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>-</code></td>
+                        <td><code>SubtractionOperator</code></td>
+                        <td>Negation: <code>-value</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>+</code></td>
+                        <td><code>AdditionOperator</code></td>
+                        <td>Unary plus: <code>+value</code> (no-op)</td>
+                    </tr>
+                    <tr>
+                        <td><code>Not</code></td>
+                        <td><code>NotKeyword</code></td>
+                        <td>Logical NOT: <code>Not bool</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <pre><code class="language-rust">fn eval_unary(&amp;mut self, op: &amp;CstNode, operand: &amp;CstNode) -&gt; RunResult&lt;VB6Variant&gt; {
+    let value = self.eval_expr(operand)?;
+    match op.kind() {
+        SyntaxKind::SubtractionOperator => {
+            let number = value.as_f64()?;
+            Ok(VB6Variant::from_double(-number))
+        }
+        SyntaxKind::AdditionOperator => {
+            let number = value.as_f64()?;
+            Ok(VB6Variant::from_double(number))
+        }
+        SyntaxKind::NotKeyword => {
+            let boolean = value.as_bool()?;
+            Ok(VB6Variant::Boolean(!boolean))
+        }
+        // ...
+    }
+}</code></pre>
+
+            <pre><code class="language-vbnet">Dim x As Integer
+x = 5
+Print -x       ' -5
+Print +x       ' 5
+
+Dim b As Boolean
+b = True
+Print Not b    ' False</code></pre>
+
+            <h2 id="call-expressions">Call Expressions</h2>
+
+            <h3 id="three-tier-dispatch">Three-Tier Dispatch</h3>
+            <p>
+                Call expressions (<code>eval_call</code>) use a three-tier dispatch strategy. Given a call node, the
+                evaluator attempts each tier in order:
+            </p>
+
+            <div style="text-align: center; margin: 24px 0;">
+                <div style="display: inline-block; text-align: center;">
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; background: var(--code-background); padding: 16px 24px; display: inline-block;">
+                        <strong>Tier 1: Array Reference</strong><br>
+                        <span style="font-size: 0.9em; color: var(--secondary-color);">Lookup + Index</span>
+                    </div>
+                </div>
+                <div style="display: inline-block; padding: 0 8px; vertical-align: middle;">↓</div>
+                <div style="display: inline-block; text-align: center;">
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; background: var(--code-background); padding: 16px 24px; display: inline-block;">
+                        <strong>Tier 2: User Function</strong><br>
+                        <span style="font-size: 0.9em; color: var(--secondary-color);">Procedure Lookup</span>
+                    </div>
+                </div>
+                <div style="display: inline-block; padding: 0 8px; vertical-align: middle;">↓</div>
+                <div style="display: inline-block; text-align: center;">
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; background: var(--code-background); padding: 16px 24px; display: inline-block;">
+                        <strong>Tier 3: Built-in</strong><br>
+                        <span style="font-size: 0.9em; color: var(--secondary-color);">Registry Dispatch</span>
+                    </div>
+                </div>
+            </div>
+
+            <pre><code class="language-rust">fn eval_call(&amp;mut self, node: &amp;CstNode) -&gt; RunResult&lt;VB6Variant&gt; {
+    let name = identifier_name(node);
+    let args = match argument_list {
+        Some(list) => self.eval_args(list)?,
+        None       => Vec::new(),
+    };
+
+    // Tier 1: Array reference / element access
+    if let Some(VB6Variant::Array(_)) = self.lookup(&amp;name) {
+        // ... handle indexing
+    }
+
+    // Tier 2: User-defined function
+    let key = normalize(&amp;name);
+    if self.procedures.contains_key(&amp;key) {
+        return self.call_function(&amp;name, args);
+    }
+
+    // Tier 3: Built-in function
+    builtins::call_builtin(&amp;name, &amp;args)
+}</code></pre>
+
+            <h3 id="array-indexing">Array Indexing</h3>
+            <p>
+                When the name resolves to an array variable, the call expression performs array indexing. An empty
+                argument list (<code>arr()</code>) returns the entire array; any argument list indexes into the array:
+            </p>
+
+            <pre><code class="language-rust">// Array reference: arr() returns the whole array
+if args.is_empty() {
+    return Ok(array.clone());
+}
+
+// Element indexing: arr(0, 1) returns element at indices
+let indices: Vec&lt;i32&gt; = args.iter().map(|arg| arg.as_i32()).collect()?;
+let element = array.get(&amp;indices)?;
+Ok(element.clone())</code></pre>
+
+            <pre><code class="language-vbnet">Dim numbers(10) As Integer
+numbers(0) = 42
+numbers(5) = 100
+
+Dim val As Integer
+val = numbers(0)       ' 42
+Print numbers(5)       ' 100</code></pre>
+
+            <h3 id="user-defined-functions">User-Defined Functions</h3>
+            <p>
+                When the name resolves to a procedure in the loaded program, <code>call_function</code> is invoked:
+            </p>
+
+            <pre><code class="language-vbnet">Function Add(a As Integer, b As Integer) As Integer
+    Add = a + b
+End Function
+
+Sub Main()
+    Dim result As Integer
+    result = Add(3, 5)    ' Calls user-defined function
+    Print result           ' 8
+End Sub</code></pre>
+
+            <p>
+                The call framework pushes a new stack frame, binds arguments to parameters with type coercion,
+                executes the procedure body, and pops the frame to retrieve the return value.
+            </p>
+
+            <h3 id="builtin-functions">Built-in Functions</h3>
+            <p>
+                When the name does not resolve to a variable or user procedure, it is dispatched to the built-in
+                function registry. The registry contains all implemented VB6 standard library functions, organized
+                into categories:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Module</th>
+                        <th>Examples</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>String</td>
+                        <td><code>string.rs</code></td>
+                        <td><code>Left$</code>, <code>Mid$</code>, <code>Len</code>, <code>LCase$</code></td>
+                    </tr>
+                    <tr>
+                        <td>Conversion</td>
+                        <td><code>conversion.rs</code></td>
+                        <td><code>CInt</code>, <code>CDbl</code>, <code>CStr</code>, <code>CBool</code></td>
+                    </tr>
+                    <tr>
+                        <td>Math</td>
+                        <td><code>math.rs</code></td>
+                        <td><code>Sqr</code>, <code>Rnd</code>, <code>Abs</code>, <code>Fix</code></td>
+                    </tr>
+                    <tr>
+                        <td>Date/Time</td>
+                        <td><code>datetime.rs</code></td>
+                        <td><code>Date</code>, <code>Time</code>, <code>Now</code>, <code>DateAdd</code></td>
+                    </tr>
+                    <tr>
+                        <td>Interaction</td>
+                        <td><code>interaction.rs</code></td>
+                        <td><code>MsgBox</code>, <code>InputBox</code>, <code>Beep</code></td>
+                    </tr>
+                    <tr>
+                        <td>Type Checking</td>
+                        <td><code>type_checking.rs</code></td>
+                        <td><code>IsArray</code>, <code>IsNull</code>, <code>IsEmpty</code></td>
+                    </tr>
+                    <tr>
+                        <td>File</td>
+                        <td><code>file.rs</code></td>
+                        <td><code>FileLen</code>, <code>LOF</code></td>
+                    </tr>
+                    <tr>
+                        <td>Financial</td>
+                        <td><code>financial.rs</code></td>
+                        <td><code>PV</code>, <code>FV</code>, <code>Pmt</code></td>
+                    </tr>
+                    <tr>
+                        <td>Graphics</td>
+                        <td><code>graphics.rs</code></td>
+                        <td><code>QBColor</code></td>
+                    </tr>
+                    <tr>
+                        <td>Resources</td>
+                        <td><code>resources.rs</code></td>
+                        <td><code>LoadRes</code>, <code>LoadResString</code></td>
+                    </tr>
+                    <tr>
+                        <td>Environment</td>
+                        <td><code>environment.rs</code></td>
+                        <td><code>Environ$</code></td>
+                    </tr>
+                    <tr>
+                        <td>Logic</td>
+                        <td><code>logic.rs</code></td>
+                        <td><code>Switch</code></td>
+                    </tr>
+                    <tr>
+                        <td>Objects</td>
+                        <td><code>objects.rs</code></td>
+                        <td><code>CreateObject</code></td>
+                    </tr>
+                    <tr>
+                        <td>Arrays</td>
+                        <td><code>arrays.rs</code></td>
+                        <td><code>Filter</code>, <code>GetUpper</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="argument-evaluation">Argument Evaluation</h3>
+            <p>
+                Arguments are evaluated left-to-right before any function body executes. Each argument expression is
+                reduced to a <code>VB6Variant</code>:
+            </p>
+
+            <pre><code class="language-rust">fn eval_args(&amp;mut self, node: &amp;CstNode) -&gt; RunResult&lt;Vec&lt;VB6Variant&gt;&gt; {
+    let mut values = Vec::new();
+    for argument in node.children_by_kind(SyntaxKind::Argument) {
+        if let Some(expr) = argument.children()
+            .find(|child| !matches!(child.kind(), SyntaxKind::Comma))
+        {
+            values.push(self.eval_expr(expr)?);
+        }
+    }
+    Ok(values)
+}</code></pre>
+
+            <h2 id="builtin-dispatch">Built-in Function Dispatch</h2>
+
+            <p>
+                The built-in function system uses a registry-based approach where each function category registers
+                its functions in its own submodule. Adding a new function requires a single <code>Builtin</code>
+                entry in the category's <code>register</code> function.
+            </p>
+
+            <h3 id="declarative-specs">Declarative Specifications</h3>
+            <p>
+                Each built-in is specified declaratively with its name, minimum/maximum argument count, and the
+                type of every parameter. The <code>typed_builtin!</code> macro expands this specification into a
+                type-converted function call adapter.
+            </p>
+
+            <h3 id="typed-builtin-macro">The <code>typed_builtin!</code> Macro</h3>
+            <p>
+                The macro takes a function name, argument count bounds, parameter declarations, and a body. It
+                generates glue code that:
+            </p>
+
+            <ol>
+                <li>Iterates over the raw <code>&amp;[VB6Variant]</code> argument slice</li>
+                <li>Converts each argument to the declared type via <code>vb6runtime::boundary</code></li>
+                <li>Attaches parameter index and name information for error reporting</li>
+                <li>Invokes the body with the converted parameters</li>
+                <li>Returns a <code>VResult&lt;VB6Variant&gt;</code></li>
+            </ol>
+
+            <pre><code class="language-rust">// Declarative specification for Left$
+registry.insert(typed_builtin!("left$", 2, 2,
+    (input: string, length: long),
+    strfn::left_dollar(&amp;input, &amp;length).map(VB6Variant::from))
+);</code></pre>
+
+            <h3 id="parameter-kinds">Parameter Kinds</h3>
+            <p>
+                Each parameter kind maps to a VB6 declared type and determines how the argument is converted at the
+                boundary:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kind</th>
+                        <th>VB6 Type</th>
+                        <th>Conversion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>variant</code></td>
+                        <td><code>As Variant</code></td>
+                        <td>Raw <code>&amp;VB6Variant</code> (no coercion)</td>
+                    </tr>
+                    <tr>
+                        <td><code>string</code></td>
+                        <td><code>As String</code></td>
+                        <td><code>VString</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>long</code></td>
+                        <td><code>As Long</code></td>
+                        <td><code>VLong</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>integer</code></td>
+                        <td><code>As Integer</code></td>
+                        <td><code>VBInteger</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>boolean</code></td>
+                        <td><code>As Boolean</code></td>
+                        <td><code>VBoolean</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>single</code></td>
+                        <td><code>As Single</code></td>
+                        <td><code>VBSingle</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>double</code></td>
+                        <td><code>As Double</code></td>
+                        <td><code>VDouble</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>currency</code></td>
+                        <td><code>As Currency</code></td>
+                        <td><code>VBCurrency</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>date</code></td>
+                        <td><code>As Date</code></td>
+                        <td><code>VBDate</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>propstring</code></td>
+                        <td><code>As String</code></td>
+                        <td>Null-propagating string</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="null-propagation">Null Propagation</h3>
+            <p>
+                Certain parameter kinds support null propagation: if a <code>Null</code> argument is passed, the
+                builtin call short-circuits to return <code>Null</code> without invoking the function body:
+            </p>
+
+            <pre><code class="language-rust">($args:ident, $index:expr, propstring) => {{
+    if matches!($args.get($index), Some(VB6Variant::Null)) {
+        return Ok(VB6Variant::Null);
+    }
+    ::vb6runtime::boundary::arg::&lt;::vb6runtime::value::VString&gt;($args, $index)
+}};</code></pre>
+
+            <pre><code class="language-vbnet">' Null propagation
+Dim s As String, result As String
+s = Null
+result = Left$(s, 2)    ' Returns Null, not ""
+Print IsNull(result)    ' True</code></pre>
+
+            <h2 id="like-matching">VB6 <code>Like</code> Pattern Matching</h2>
+
+            <p>
+                The <code>Like</code> operator in VB6 performs pattern matching against strings using a small
+                pattern language. The implementation in <code>like.rs</code> is a pure, memoized recursive descent
+                parser — no regular expressions are used.
+            </p>
+
+            <h3 id="supported-patterns">Supported Patterns</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Matches</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>*</code></td>
+                        <td>Zero or more characters</td>
+                        <td><code>"Hello*" → "Hello", "HelloWorld"</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>?</code></td>
+                        <td>Exactly one character</td>
+                        <td><code>"H?llo" → "Hello", "Hallo"</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>#</code></td>
+                        <td>Exactly one digit (0-9)</td>
+                        <td><code>"###" → "123", "007"</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>[charlist]</code></td>
+                        <td>Any single character in charlist</td>
+                        <td><code>"[A-Z]" → "A", "Z"</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>[!charlist]</code></td>
+                        <td>Any single character NOT in charlist</td>
+                        <td><code>"[!0-9]" → "A", "z"</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="character-classes">Character Classes</h3>
+            <p>
+                Character classes support ranges via the <code>-</code> separator and case-insensitive matching:
+            </p>
+
+            <pre><code class="language-vbnet">Dim s As String
+s = "aB3c"
+
+Print s Like "[A-Za-z0-9]"    ' True (single alphanumeric char)
+Print s Like "[a-z]"          ' True (case-insensitive)
+Print s Like "[!a-z]"         ' True (matches '3')</code></pre>
+
+            <h3 id="bracket-idioms">Bracket Idioms</h3>
+            <p>
+                VB6 uses several idioms for matching literal bracket characters inside character classes:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Matches</th>
+                        <th>Explanation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>[]]</code></td>
+                        <td><code>]</code></td>
+                        <td>A <code>]</code> immediately after <code>[</code> is a literal member</td>
+                    </tr>
+                    <tr>
+                        <td><code>[!]]</code></td>
+                        <td>Any char except <code>]</code></td>
+                        <td>Negated form: everything except literal <code>]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>[[]</code></td>
+                        <td><code>[</code></td>
+                        <td>A <code>[</code> inside a class is literal</td>
+                    </tr>
+                    <tr>
+                        <td><code>[?]</code></td>
+                        <td><code>?</code></td>
+                        <td>Special characters inside brackets are literal</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="memoized-algorithm">Memoized Matching Algorithm</h3>
+            <p>
+                The matching algorithm uses memoization to avoid exponential backtracking on patterns with
+                overlapping <code>*</code> branches:
+            </p>
+
+            <pre><code class="language-rust">pub(crate) fn like_match(pattern: &amp;str, text: &amp;str) -&gt; bool {
+    let pat: Vec&lt;char&gt; = pattern.chars().collect();
+    let txt: Vec&lt;char&gt; = text.chars().collect();
+    // Memoization table: pat.len() × text.len()
+    let mut memo = vec![vec![None; txt.len() + 1]; pat.len() + 1];
+    like_match_at(&amp;pat, &amp;txt, 0, 0, &amp;mut memo)
+}
+
+fn like_match_at(
+    pat: &[char], txt: &[char],
+    pat_idx: usize, text_idx: usize,
+    memo: &amp;mut Vec&lt;Vec&lt;Option&lt;bool&gt;&gt;&gt;,
+) -&gt; bool {
+    // Check memoization table first
+    if let Some(cached) = memo[pat_idx][text_idx] {
+        return cached;
+    }
+
+    let result = if pat_idx == pat.len() {
+        text_idx == txt.len()
+    } else if pat[pat_idx] == '*' {
+        // Zero-or-more: try skipping * OR consuming a character
+        like_match_at(pat, txt, pat_idx + 1, text_idx, memo)
+            || (text_idx &lt; txt.len() &amp;&amp; like_match_at(pat, txt, pat_idx, text_idx + 1, memo))
+    } else if pat[pat_idx] == '[' {
+        // Character class matching...
+    } else {
+        // Literal or ? or # matching...
+    };
+
+    memo[pat_idx][text_idx] = Some(result);
+    result
+}</code></pre>
+
+            <div class="info-box">
+                <strong>Why Memoization?</strong> Without memoization, patterns like <code>*a*a*</code> matching
+                against <code>"xaxa"</code> would explore exponentially many branches. The memoized version runs
+                in <code>O(pat.len × text.len)</code> time.
+            </div>
+
+            <h2 id="type-coercion">Type Coercion and Variant Behavior</h2>
+
+            <h3 id="variant-representation">Variant Representation</h3>
+            <p>
+                All runtime values flow through <a href="https://docs.rs/vb6runtime" target="_blank"><code>VB6Variant</code></a>,
+                the variant-like value type from <code>vb6runtime</code>. It supports the following types:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>VB6Variant Kind</th>
+                        <th>Corresponds to VB6 Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>VB6Variant::Integer(i16)</code></td>
+                        <td><code>Integer</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::Long(i32)</code></td>
+                        <td><code>Long</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::Single(f32)</code></td>
+                        <td><code>Single</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::Double(f64)</code></td>
+                        <td><code>Double</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::Currency(i64)</code></td>
+                        <td><code>Currency</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::Boolean(bool)</code></td>
+                        <td><code>Boolean</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::String(String)</code></td>
+                        <td><code>String</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::Date(f64)</code></td>
+                        <td><code>Date</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::Array(Array)</code></td>
+                        <td><code>Array</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::Empty</code></td>
+                        <td><code>Empty</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::Null</code></td>
+                        <td><code>Null</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>VB6Variant::Nothing</code></td>
+                        <td><code>Nothing</code> (object reference)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="implicit-coercion">Implicit Coercion</h3>
+            <p>
+                The evaluator implicitly coerces values at type boundaries. When a numeric operator needs a numeric
+                operand, <code>VB6Variant</code> provides conversion methods (<code>as_f64</code>, <code>as_i64</code>,
+                <code>as_string</code>) that handle the variant's internal type:
+            </p>
+
+            <pre><code class="language-rust">// In eval_binary — all numeric operations use as_f64()
+let lhs = self.eval_expr(left)?;
+let rhs = self.eval_expr(right)?;
+let left = lhs.as_f64()?;   ' i64 → f64, f32 → f64, etc.
+let right = rhs.as_f64()?;</code></pre>
+
+            <h3 id="null-handling">Null Handling</h3>
+            <p>
+                VB6's <code>Null</code> value propagates through most operations: any operation involving <code>Null</code>
+                returns <code>Null</code>. The interpreter handles this at the coercion boundary:
+            </p>
+
+            <pre><code class="language-vbnet">Dim x As Variant
+x = Null
+Print x + 1     ' Null (propagates)
+Print x &amp; "abc" ' "Null" (string path coerces)
+Print x = 5     ' Null (comparison with Null yields Null)</code></pre>
+
+            <h2 id="error-handling">Error Handling</h2>
+
+            <h3 id="runtime-errors">Runtime Errors</h3>
+            <p>
+                Expression evaluation errors are wrapped in <code>RunError</code>, which carries:
+            </p>
+
+            <ul>
+                <li>The underlying <a href="https://docs.rs/vb6core" target="_blank"><code>VError</code></a> with an error number and description</li>
+                <li>The source line number of the statement containing the expression</li>
+                <li>The name of the currently executing procedure</li>
+                <li>Optional built-in call parameter information for argument mismatch errors</li>
+            </ul>
+
+            <pre><code class="language-rust">fn error_at(
+    &amp;self, node: &amp;CstNode, error: VError,
+    call_info: Option&lt;BuiltinCallInfo&gt;,
+) -&gt; RunError {
+    RunError::new(error)
+        .at_line(self.current_stmt_line)
+        .in_procedure(&amp;self.current_procedure_name())
+        .with_builtin_call(call_info)
+}</code></pre>
+
+            <h3 id="source-positioning">Source Positioning</h3>
+            <p>
+                While expression evaluation is pure, error positioning relies on the interpreter's state: the current
+                statement line and procedure name. The <code>error_at</code> method attaches this location context
+                to the error.
+            </p>
+
+            <pre><code class="language-vbnet">Sub Calculate()
+    Dim x As Integer
+    x = 1 / 0      ' Runtime error 11 (Division by zero)
+                   ' Error reports: line 4, procedure "Calculate"
+End Sub</code></pre>
+
+            <div class="warning-box">
+                <strong>⚠️ Error Granularity:</strong> Only binary operators for arithmetic and built-in calls attach
+                the operator node position for precise error highlighting. Comparison operators intentionally produce
+                unpositioned errors (as they always have historically). This is preserved for backward compatibility.
+            </div>
+
+            <h2 id="example">End-to-End Example</h2>
+            <p>
+                Consider this VB6 program and trace how each expression is evaluated:
+            </p>
+
+            <pre><code class="language-vbnet">' Example program
+Sub Main()
+    Dim a As Integer
+    Dim b As Integer
+    Dim result As Double
+
+    a = 10
+    b = 3
+
+    result = a \ b          ' Integer division: 3
+    result = a / b          ' Floating-point: 3.333...
+    result = a ^ 2          ' Exponentiation: 100.0
+    result = a & Mod  b      ' Modulo: 1
+
+    Print "Done:" &amp; result
+End Sub</code></pre>
+
+            <p>
+                The evaluation trace:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Expression</th>
+                        <th>Expression Kind</th>
+                        <th>Evaluation Path</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>10</code></td>
+                        <td><code>IntegerLiteral</code></td>
+                        <td><code>eval_literal</code> → <code>literal_value</code></td>
+                        <td><code>VB6Variant::Long(10)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>3</code></td>
+                        <td><code>IntegerLiteral</code></td>
+                        <td><code>eval_literal</code> → <code>literal_value</code></td>
+                        <td><code>VB6Variant::Long(3)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>a \ b</code></td>
+                        <td><code>BinaryExpression</code></td>
+                        <td><code>eval_binary</code> → <code>arith(IntDiv)</code> (integer path)</td>
+                        <td><code>VB6Variant::Long(3)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>a / b</code></td>
+                        <td><code>BinaryExpression</code></td>
+                        <td><code>eval_binary</code> → <code>arith(Divide)</code> (float path)</td>
+                        <td><code>VB6Variant::Double(3.333...)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>a ^ 2</code></td>
+                        <td><code>BinaryExpression</code></td>
+                        <td><code>eval_binary</code> → <code>arith(Exponent)</code> (float path)</td>
+                        <td><code>VB6Variant::Double(100.0)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>a Mod b</code></td>
+                        <td><code>BinaryExpression</code></td>
+                        <td><code>eval_binary</code> → <code>arith(Modulus)</code> (integer path)</td>
+                        <td><code>VB6Variant::Long(1)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>"Done:" & result</code></td>
+                        <td><code>BinaryExpression</code></td>
+                        <td><code>eval_binary</code> → string coercion + concat</td>
+                        <td><code>VB6Variant::String("Done:1")</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="further-reading">Further Reading</h2>
+
+            <ul style="margin-bottom: 60px;">
+                <li><a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6interpret" target="_blank">vb6interpret Source on GitHub</a></li>
+                <li><a href="https://docs.rs/vb6runtime" target="_blank">vb6runtime API Documentation</a></li>
+                <li><a href="https://docs.rs/vb6core" target="_blank">vb6core API Documentation</a></li>
+                <li><a href="https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa338033(v=vs.60)" target="_blank">VB6 Language Reference (MSDN Archive)</a></li>
+                <li><a href="../vb6parse/documentation/antlr4-spec.html">ANTLR4 VB6 Grammar Specification</a></li>
+                <li><a href="https://github.com/scriptandcompile/vb6" target="_blank">Main Project Repository</a></li>
+            </ul>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Interpret is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,17 +1,18 @@
 [package]
-authors = ["ScriptAndCompile"]
 name = "vb6parse"
 homepage = "https://scriptandcompile.github.io/vb6/vb6parse/index.html"
 documentation = "https://docs.rs/vb6parse"
 version = "1.2.4"
-edition = "2024"
-license = "MIT"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 description = "vb6parse is a library for parsing and analyzing VB6 code, from projects, to controls, to modules, and forms."
-repository = "https://github.com/scriptandcompile/vb6/tree/master/projects/vb6parse"
 keywords = ["vb6", "parser", "analyzer", "vb6parse"]
 categories = ["development-tools", "parsing", "parser-implementations"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 

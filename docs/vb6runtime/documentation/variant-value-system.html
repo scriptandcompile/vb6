@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Variant Value System and Type Coercion Architecture">
+    <title>Variant Value System - VB6Runtime Documentation</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../index.html">VB6Runtime</a> / Documentation</h1>
+            <p class="tagline">Variant Value System and Type Coercion Architecture</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../index.html">Home</a>
+            <a href="../library/index.html">Library Reference</a>
+            <a href="../documentation.html">Documentation</a>
+            <a href="https://docs.rs/vb6runtime" target="_blank">API Docs</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container docs-content">
+        <aside class="toc">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#the-enum">VBVariant Enum</a></li>
+                <li><a href="#wrapper-types">Typed Wrapper Types</a></li>
+                <li><a href="#coercion">Type Coercion System</a></li>
+                <li><a href="#numeric">Numeric Coercion</a></li>
+                <li><a href="#equality">Equality and Comparison</a></li>
+                <li><a href="#null">Null Propagation</a></li>
+                <li><a href="#date">Date Serialization</a></li>
+                <li><a href="#currency">Currency Representation</a></li>
+                <li><a href="#arrays">Array Support</a></li>
+                <li><a href="#boundary">Argument Boundary Layer</a></li>
+                <li><a href="#object-system">Object References</a></li>
+                <li><a href="#design-decisions">Design Decisions</a></li>
+                <li><a href="#future">Future Considerations</a></li>
+                <li><a href="#summary">Summary</a></li>
+                <li><a href="#related">Related Documentation</a></li>
+            </ul>
+        </aside>
+
+        <article>
+            <h2 id="overview">Overview</h2>
+            <p>
+                At the heart of VB6Runtime lies <code>VARIANT</code> — the dynamic value type that serves as the
+                universal carrier for all data in the Visual Basic 6.0 type system. Every function call, every
+                variable, every property access flows through <code>VARIANT</code>. In the Rust implementation, this
+                type is <code>VBVariant</code>, a single <code>enum</code> with <strong>14 variants</strong> that
+                faithfully replicates VB6's variant semantics: banker's rounding on integer conversion, <code>Null</code>
+                propagation as error 94, overflow as error 6, <code>CVErr</code> passthrough, and cross-type numeric
+                equality that differs from both Rust and the C++ <code>VARIANT</code> spec.
+            </p>
+            <p>
+                The value system is implemented in three files totaling roughly 2,100 lines:
+                <code>value.rs</code> (~1,600 lines) for the core <code>VBVariant</code> enum and its wrapper types,
+                <code>array.rs</code> (~268 lines) for array storage, and <code>boundary.rs</code> (~218 lines) for the
+                typed-argument boundary layer between untyped variant slices and library functions.
+            </p>
+
+            <div class="info-box">
+                <p><strong>Core principle:</strong> VB6 has no compile-time type checking for most values. A variable
+                declared as <code>Dim x</code> can hold an integer today and a string tomorrow. The runtime value system
+                must therefore carry both the data and its type, and perform coercion at every conversion boundary.</p>
+            </div>
+
+            <h2 id="the-enum">VBVariant Enum</h2>
+            <p>
+                The <code>VBVariant</code> enum is the dynamic counterpart of the static <code>VbType</code> enum and
+                represents a VB6 variant at runtime:
+            </p>
+
+            <pre><code class="language-rust">pub enum VBVariant {
+    Empty,           // Uninitialized variant (VB6: Dim x)
+    Null,            // Null value (unknown data)
+    Nothing,         // Object reference set to Nothing
+    Byte(u8),        // 8-bit unsigned integer
+    Integer(i16),    // 16-bit signed integer
+    Long(i32),       // 32-bit signed integer
+    Single(f32),     // 32-bit floating point
+    Double(f64),     // 64-bit floating point
+    Currency(i64),   // Scaled integer (raw / 10,000)
+    String(String),  // Unicode string
+    Boolean(bool),   // Boolean
+    Date(f64),       // OLE automation date serial
+    Error(VbError),  // Error value from CVErr
+    Object(Box&lt;dyn VbObject&gt;),  // Object reference
+    Array(ArrayValue),  // Array value
+}</code></pre>
+
+            <p>
+                Each variant maps to a VBA <code>VarType</code> code used by functions like <code>VarType()</code>
+                and <code>TypeName()</code>. Arrays are encoded as the bitwise OR of <code>vbArray (8192)</code> and
+                the element type code. The <code>type_of()</code> method returns the corresponding <code>VbType</code>,
+                while <code>var_type()</code> returns the integer code:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variant</th>
+                        <th>VarType Code</th>
+                        <th>VB6 Declaration</th>
+                        <th>Default Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>Empty</code></td><td>0</td><td><code>Dim x</code></td><td><code>Empty</code></td></tr>
+                    <tr><td><code>Null</code></td><td>1</td><td>N/A</td><td>N/A</td></tr>
+                    <tr><td><code>Byte</code></td><td>17</td><td><code>Dim x As Byte</code></td><td><code>0</code></td></tr>
+                    <tr><td><code>Integer</code></td><td>2</td><td><code>Dim x As Integer</code></td><td><code>0</code></td></tr>
+                    <tr><td><code>Long</code></td><td>3</td><td><code>Dim x As Long</code></td><td><code>0</code></td></tr>
+                    <tr><td><code>Single</code></td><td>4</td><td><code>Dim x As Single</code></td><td><code>0.0</code></td></tr>
+                    <tr><td><code>Double</code></td><td>5</td><td><code>Dim x As Double</code></td><td><code>0.0</code></td></tr>
+                    <tr><td><code>Currency</code></td><td>6</td><td><code>Dim x As Currency</code></td><td><code>0</code></td></tr>
+                    <tr><td><code>String</code></td><td>8</td><td><code>Dim x As String</code></td><td><code>""</code></td></tr>
+                    <tr><td><code>Boolean</code></td><td>11</td><td><code>Dim x As Boolean</code></td><td><code>False</code></td></tr>
+                    <tr><td><code>Date</code></td><td>7</td><td><code>Dim x As Date</code></td><td><code>0.0</code></td></tr>
+                    <tr><td><code>Error</code></td><td>10</td><td><code>CVErr(n)</code></td><td><code>CVErr(0)</code></td></tr>
+                    <tr><td><code>Object</code></td><td>9</td><td><code>Dim x As Object</code></td><td><code>Nothing</code></td></tr>
+                    <tr><td><code>Array</code></td><td>8192 + T</td><td><code>Dim x()</code></td><td>Uninitialized</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="wrapper-types">Typed Wrapper Types</h2>
+            <p>
+                Rather than exposing the <code>VBVariant</code> variants directly to library functions, the value
+                system uses a set of <strong>typed wrapper structs</strong> — one per numeric/fixed type — that encode
+                VB6 coercion semantics at the type level:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Wrapper</th>
+                        <th>Inner Type</th>
+                        <th>Conversion</th>
+                        <th>VB6 Function</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>VbString</code></td><td><code>String</code></td><td><code>TryFrom</code></td><td><code>CStr</code> / string conversion</td></tr>
+                    <tr><td><code>VbByte</code></td><td><code>u8</code></td><td><code>TryFrom</code></td><td><code>CByte</code></td></tr>
+                    <tr><td><code>VbLong</code></td><td><code>i32</code></td><td><code>TryFrom</code></td><td><code>CLng</code></td></tr>
+                    <tr><td><code>VbInteger</code></td><td><code>i16</code></td><td><code>TryFrom</code></td><td><code>CInt</code></td></tr>
+                    <tr><td><code>VbBoolean</code></td><td><code>bool</code></td><td><code>TryFrom</code></td><td><code>CBool</code></td></tr>
+                    <tr><td><code>VbDate</code></td><td><code>f64</code></td><td><code>TryFrom</code></td><td><code>CDate</code></td></tr>
+                    <tr><td><code>VbSingle</code></td><td><code>f32</code></td><td><code>TryFrom</code></td><td><code>CSng</code></td></tr>
+                    <tr><td><code>VbDouble</code></td><td><code>f64</code></td><td><code>TryFrom</code></td><td><code>CDbl</code></td></tr>
+                    <tr><td><code>VbCurrency</code></td><td><code>i64</code> (scaled)</td><td><code>TryFrom</code></td><td><code>CCur</code></td></tr>
+                </tbody>
+            </table>
+
+            <p>
+                Each wrapper implements both <code>From&lt;wrapper&gt; for VBVariant</code> (boxing the value) and
+                <code>TryFrom&lt;&amp;VBVariant&gt; for wrapper</code> (unboxing with coercion). This means every
+                conversion — whether from a typed wrapper or from a raw variant — follows the same VB6-specific rules:
+                banker's rounding for integer types, overflow as error 6, type mismatch as error 13, and
+                <code>Null</code> as error 94.
+            </p>
+
+            <pre><code class="language-rust">// Creating a variant from a typed wrapper
+let v = VbLong::from(42);
+// → VBVariant::Long(42)
+
+// Converting a variant to a typed wrapper (with coercion)
+let v = VBVariant::from_string("2.5");
+let n: VbLong = v.try_into().unwrap();  // CLng("2.5") → 2 (banker's rounding)
+// → VbLong::from(2)
+
+// The round-trip is lossy when coercion changes the value
+let v = VBVariant::from_double(2.5);
+let n: VbInteger = v.try_into().unwrap();
+assert_eq!(n.as_i16(), 2);  // CInt(2.5) = 2 (banker's rounding: round to even)</code></pre>
+
+            <div class="info-box">
+                <p><strong>Why wrappers instead of direct enum matching?</strong> The wrapper approach ensures that
+                coercion semantics cannot drift between call sites. Every <code>VbLong::try_from()</code> call
+                follows the <code>CLng</code> path through <code>VBVariant::as_i32()</code>, which implements
+                banker's rounding uniformly. If library functions matched the enum directly, each conversion path
+                could diverge.</p>
+            </div>
+
+            <h2 id="coercion">Type Coercion System</h2>
+            <p>
+                The coercion system is the core of the value type — it defines how a variant of one kind is
+                converted to another, following VB6's sometimes surprising rules. Every conversion is implemented as
+                a method on <code>VBVariant</code> that returns a <code>VbResult&lt;T&gt;</code>:
+            </p>
+
+            <pre><code class="language-rust">pub fn as_i64(&amp;self) -&gt; VbResult&lt;i64&gt;   // CLng: rounds to 64-bit int
+pub fn as_i32(&amp;self) -&gt; VbResult&lt;i32&gt;  // CLng: rounds to 32-bit long
+pub fn as_i16(&amp;self) -&gt; VbResult&lt;i16&gt;  // CInt: rounds to 16-bit integer
+pub fn as_byte(&amp;self) -&gt; VbResult&lt;u8&gt;  // CByte: rounds to 8-bit unsigned
+pub fn as_f64(&amp;self) -&gt; VbResult&lt;f64&gt;  // CDbl: converts to double
+pub fn as_f32(&amp;self) -&gt; VbResult&lt;f32&gt;  // CSng: converts to single
+pub fn as_currency_scaled(&amp;self) -&gt; VbResult&lt;i64&gt;  // CCur: scaled
+pub fn as_bool(&amp;self) -&gt; VbResult&lt;bool&gt;  // CBool: non-zero = true
+pub fn as_date_serial(&amp;self) -&gt; VbResult&lt;f64&gt;    // CDate: serial number
+pub fn as_string(&amp;self) -&gt; VbResult&lt;String&gt;      // CStr: to string</code></pre>
+
+            <p>
+                The <code>as_i64()</code> method is the canonical integer conversion path. Every typed integer
+                conversion (<code>as_i16</code>, <code>as_i32</code>, <code>as_byte</code>) routes through it,
+                ensuring consistent behavior:
+            </p>
+
+            <pre><code class="language-rust">pub fn as_i64(&amp;self) -&gt; VbResult&lt;i64&gt; {
+    match self {
+        VBVariant::Empty => Ok(0),
+        VBVariant::Null => Err(VbError::invalid_use_of_null()),  // error 94
+        VBVariant::Nothing | Object(_) | Array(_) => Err(VbError::type_mismatch()),  // error 13
+        VBVariant::Error(e) => Err(e.clone()),  // re-raise CVErr
+        VBVariant::Boolean(b) => Ok(if *b { -1 } else { 0 }),  // VB6: True = -1
+        VBVariant::Currency(raw) => {
+            round_half_even(*raw as f64 / CURRENCY_SCALE).ok_or_overflow()
+        }
+        VBVariant::Single(v) => round_half_even(*v as f64).ok_or_overflow(),
+        VBVariant::Double(v) => round_half_even(*v).ok_or_overflow(),
+        VBVariant::Date(v) => round_half_even(*v).ok_or_overflow(),
+        VBVariant::String(s) => {
+            let n = parse_vb_number(s).ok_or_type_mismatch()?;
+            round_half_even(n).ok_or_overflow()
+        }
+        // Byte, Integer, Long: direct extraction
+        _ => Ok(self.numeric_i64_exact()?.into()),
+    }
+}</code></pre>
+
+            <h2 id="numeric">Numeric Coercion Details</h2>
+
+            <h3>Banker's Rounding</h3>
+            <p>
+                VB6's <code>CInt</code>, <code>CLng</code>, and <code>CCur</code> functions use
+                <strong>banker's rounding</strong> (round half to even) rather than the familiar "round half up"
+                taught in most schools. This means <code>CInt(2.5) = 2</code> (rounds to the nearest even number)
+                while <code>CInt(3.5) = 4</code>:
+            </p>
+
+            <pre><code class="language-vbnet">' VB6 behavior:
+? CInt(2.5)   ' → 2  (2 is even)
+? CInt(3.5)   ' → 4  (4 is even)
+? CInt(-2.5)  ' → -2 (−2 is even)
+? CInt(-3.5)  ' → -4 (−4 is even)</code></pre>
+
+            <p>
+                The Rust implementation matches this exactly:
+            </p>
+
+            <pre><code class="language-rust">fn round_half_even(x: f64) -&gt; Option&lt;i64&gt; {
+    if !x.is_finite() { return None; }
+    let fl = x.floor();
+    let diff = x - fl;
+    let rounded = if diff &lt; 0.5 {
+        fl
+    } else if diff &gt; 0.5 {
+        fl + 1.0
+    } else if (fl as i64) % 2 == 0 {
+        fl   // tie: round to even
+    } else {
+        fl + 1.0
+    };
+    if rounded &lt; i64::MIN as f64 || rounded &gt; i64::MAX as f64 {
+        None  // overflow → error 6
+    } else {
+        Some(rounded as i64)
+    }
+}</code></pre>
+
+            <h3>Boolean Coercion</h3>
+            <p>
+                Boolean conversion follows <code>CBool</code> semantics: a value is <code>True</code> if and only if
+                it is non-zero. The special cases include:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Input</th>
+                        <th><code>CBool</code> Result</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>Empty</code></td><td><code>False</code></td><td>Uninitialized = zero</td></tr>
+                    <tr><td><code>Null</code></td><td>Error 94</td><td>Invalid use of Null</td></tr>
+                    <tr><td><code>Integer(0)</code></td><td><code>False</code></td><td>Zero</td></tr>
+                    <tr><td><code>Integer(1)</code></td><td><code>True</code></td><td>Non-zero</td></tr>
+                    <tr><td><code>Boolean(True)</code></td><td><code>True</code></td><td>Identity</td></tr>
+                    <tr><td><code>String("True")</code></td><td><code>True</code></td><td>Case-insensitive match</td></tr>
+                    <tr><td><code>String("False")</code></td><td><code>False</code></td><td>Case-insensitive match</td></tr>
+                    <tr><td><code>String("42")</code></td><td><code>True</code></td><td>Parseable number, non-zero</td></tr>
+                    <tr><td><code>String("abc")</code></td><td>Error 13</td><td>Type mismatch</td></tr>
+                </tbody>
+            </table>
+
+            <h3>String-to-Numeric Parsing</h3>
+            <p>
+                The <code>parse_vb_number()</code> function handles VB6's numeric string conventions:
+            </p>
+
+            <ul>
+                <li><code>&H</code> prefix for hexadecimal: <code>&H1F</code> → 31</li>
+                <li><code>&O</code> prefix for octal: <code>&O10</code> → 8</li>
+                <li>Type suffixes stripped before parsing: <code>%</code> (Integer), <code>&amp;</code> (Long),
+                <code>!</code> (Single), <code>#</code> (Double), <code>@</code> (Currency), <code>$</code> (String)</li>
+                <li>Standard decimal/floating-point parsing for all other strings</li>
+            </ul>
+
+            <pre><code class="language-rust">// parse_vb_number examples:
+parse_vb_number("&H1F")      → Some(31.0)
+parse_vb_number("&O10")      → Some(8.0)
+parse_vb_number("5%")        → Some(5.0)  // % suffix stripped
+parse_vb_number("-1.5")      → Some(-1.5)
+parse_vb_number("abc")       → None       // unparseable
+parse_vb_number("")          → None       // empty</code></pre>
+
+            <h2 id="equality">Equality and Comparison</h2>
+            <p>
+                The <code>PartialEq</code> implementation for <code>VBVariant</code> is one of the most subtle parts
+                of the value system, because VB6 equality involves implicit type coercion that differs from both
+                Rust's strict equality and the C++ <code>VARIANT</code> spec.
+            </p>
+
+            <div class="architecture-diagram">
+                <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 12px; margin: 8px 0; background: var(--bg-card);">
+                    <strong>Equality Resolution Order:</strong>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 12px; margin: 8px 0; background: var(--bg-card);">
+                    <strong>1. Same-type identity:</strong> Empty, Null, Nothing, Error, String, Boolean, Date, Array → direct comparison<br>
+                    <strong>2. Object identity:</strong> Object → pointer equality (not structural)<br>
+                    <strong>3. Currency equality:</strong> Currency ↔ Currency → scaled integer comparison<br>
+                    <strong>4. Exact i64:</strong> Both convert to i64 without loss? → compare i64<br>
+                    <strong>5. Coerced f64:</strong> Both convert to f64? → compare f64<br>
+                    <strong>6. Fallback:</strong> false
+                </div>
+            </div>
+
+            <p>
+                The two-stage coercion approach is key: first, try comparing via exact <code>i64</code> conversion
+                (preserving integer semantics), then fall back to <code>f64</code> coercion for floating-point:
+            </p>
+
+            <pre><code class="language-rust">// Equality follows VB6 coercion rules:
+assert_eq!(VBVariant::Integer(1), VBVariant::Double(1.0));   // ✓ numeric coercion
+assert_eq!(VBVariant::Integer(1), VBVariant::from_string("1"));  // ✓ string → number
+assert_eq!(VBVariant::from_currency_scaled(10000), VBVariant::Double(1.0));  // ✓ currency
+
+// But VB6's boolean coercion is specific:
+assert_eq!(VBVariant::Boolean(true), VBVariant::Integer(-1));    // ✓ VB6: True = -1
+assert_ne!(VBVariant::Boolean(true), VBVariant::Integer(1));     // ✗ True ≠ 1 in VB6
+assert_eq!(VBVariant::Boolean(false), VBVariant::Integer(0));    // ✓ False = 0
+
+// Empty acts as zero:
+assert_eq!(VBVariant::empty(), VBVariant::Long(0));             // ✓ Empty → 0
+
+// Null equals only itself:
+assert_ne!(VBVariant::null(), VBVariant::Long(0));               // ✗
+assert_ne!(VBVariant::null(), VBVariant::empty());               // ✗</code></pre>
+
+            <div class="warning-box">
+                <p><strong>⚠️ VB6 Boolean Equality Quirk:</strong> In VB6, the Boolean <code>True</code> coerces to
+                <code>-1</code> (not <code>1</code>) in numeric contexts. This means <code>True = -1</code> but
+                <code>True <> 1</code> in VB6. This is a well-known VB6 gotcha that the Rust implementation faithfully
+                reproduces via <code>numeric_i64_exact()</code> returning <code>Some(-1)</code> for
+                <code>Boolean(true)</code>.</p>
+            </div>
+
+            <p>
+                Object equality uses pointer identity, not structural equality. Two objects of the same type with the
+                same properties are <em>not</em> equal unless they are the same reference:
+            </p>
+
+            <pre><code class="language-rust">let obj = TestObject("Coll");
+let a = VBVariant::from_object(Box::new(obj));
+let b = VBVariant::from_object(Box::new(TestObject("Coll")));
+assert_ne!(a, b);  // different pointers, even if types match
+
+let a2 = a.clone();
+assert_ne!(a, a2);  // even a clone is a different reference!</code></pre>
+
+            <h2 id="null">Null Propagation</h2>
+            <p>
+                VB6 <code>Null</code> represents unknown or invalid data. It is <strong>distinct from</strong>
+                <code>Empty</code> (uninitialized) and <strong>cannot be converted</strong> to any concrete type
+                without raising error 94 (Invalid use of Null):
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Result</th>
+                        <th>VB6 Behavior</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>Null = Null</code></td><td><code>true</code></td><td>Null equals only itself</td></tr>
+                    <tr><td><code>Null + 5</code></td><td>Error 94</td><td>Null propagates through arithmetic</td></tr>
+                    <tr><td><code>CStr(Null)</code></td><td>Error 94</td><td>Cannot convert Null to string</td></tr>
+                    <tr><td><code>CInt(Null)</code></td><td>Error 94</td><td>Cannot convert Null to integer</td></tr>
+                    <tr><td><code>CBool(Null)</code></td><td>Error 94</td><td>Cannot convert Null to boolean</td></tr>
+                    <tr><td><code>CDbl(Null)</code></td><td>Error 94</td><td>Cannot convert Null to double</td></tr>
+                </tbody>
+            </table>
+
+            <p>
+                However, some operations treat <code>Null</code> specially. The <code>Nullable&lt;T&gt;</code> type in
+                the boundary layer allows certain function parameters to accept <code>Null</code> without raising an
+                error, propagating it as a result value instead:
+            </p>
+
+            <pre><code class="language-rust">// Regular typed parameter: Null → error 94
+let args = [VBVariant::Null];
+arg::<VbSingle>(&args, 0).unwrap_err();  // error 94: invalid use of Null
+
+// Nullable parameter: Null → None (no error)
+let converted: Nullable<VbDate> = arg(&null, 0).unwrap();
+assert!(converted.is_null());  // propagates, doesn't raise</code></pre>
+
+            <h2 id="date">Date Serialization</h2>
+            <p>
+                VB6 dates are stored as <code>f64</code> serial numbers representing the number of days since
+                <strong>December 30, 1899</strong> — the OLE Automation date epoch. This is a fractional value where
+                the integer part is the date and the fractional part represents the time of day:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Serial</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>0.0</code></td><td>12/30/1899</td><td>00:00:00</td></tr>
+                    <tr><td><code>1.0</code></td><td>12/31/1899</td><td>00:00:00</td></tr>
+                    <tr><td><code>2.0</code></td><td>1/1/1900</td><td>00:00:00</td></tr>
+                    <tr><td><code>0.5</code></td><td>12/30/1899</td><td>12:00:00</td></tr>
+                    <tr><td><code>-693594.0</code></td><td>12/30/1899</td><td>00:00:00</td><td>(same as 0 via leap year bug)</td></tr>
+                </tbody>
+            </table>
+
+            <p>
+                Date serialization converts from civil date/time to serial:
+            </p>
+
+            <pre><code class="language-rust">// Parse date string → serial
+parse_vb_date("1/1/2026")  → Some(46023.0)
+
+// Parse date + time → serial
+parse_vb_date("1/1/2026 14:30:00")  → Some(46023.5625)
+
+// Reverse: serial → civil
+date_serial_to_datetime(46023.0)  → DateTime(2026, 1, 1, 0, 0, 0)
+date_serial_to_string(0.0)        → "12/30/1899"</code></pre>
+
+            <p>
+                Date string parsing handles multiple formats including <code>M/D/YYYY</code>, <code>YYYY-M-D</code>,
+                <code>YYYYMMDD</code>, and 12/24-hour mixed time formats with AM/PM. Two-digit years follow VB6's
+                split: 0–29 map to 2000–2029, and 30–99 map to 1930–1999.
+            </p>
+
+            <h2 id="currency">Currency Representation</h2>
+            <p>
+                VB6's <code>Currency</code> type is a fixed-point 64-bit type stored as a scaled integer. The
+                <code>CURRENCY_SCALE</code> constant is 10,000, meaning that the value 1.25 is stored internally as
+                <code>12500</code>:
+            </p>
+
+            <pre><code class="language-rust">pub const CURRENCY_SCALE: i64 = 10_000;
+
+// Internal representation:
+VbCurrency::from(12500)    // → represents 1.25
+VbCurrency::from(10000)    // → represents 1.00
+VbCurrency::from(0)        // → represents 0.00
+
+// Conversion to/from decimal:
+VBVariant::from_currency(1.25)     // f64 → i64: 1.25 * 10000 = 12500
+VBVariant::from_currency_scaled(12500).as_string()  // "1.25"</code></pre>
+
+            <p>
+                Currency conversion uses banker's rounding (the same <code>round_half_even()</code> function) to
+                handle the f64 → scaled integer transition without introducing floating-point artifacts. String
+                formatting strips trailing zeros from the fractional part:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Scaled Value</th>
+                        <th>String Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>12500</code></td><td><code>"1.25"</code></td></tr>
+                    <tr><td><code>10000</code></td><td><code>"1"</code></td></tr>
+                    <tr><td><code>12345</code></td><td><code>"1.2345"</code></td></tr>
+                    <tr><td><code>-12500</code></td><td><code>"-1.25"</code></td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="arrays">Array Support</h2>
+            <p>
+                VB6 arrays are represented by the <code>ArrayValue</code> struct, which stores elements in a
+                <strong>flat buffer</strong> (<code>Vec&lt;VBVariant&gt;</code>) with one <code>ArrayDimension</code>
+                per rank. Unlike Rust slices (which are 0-based with upper-exclusive bounds), VB6 arrays use
+                <strong>inclusive bounds</strong> with a default lower bound of 1 — though any bounds are legal
+                (<code>Dim x(-2 To 5)</code> is valid):
+            </p>
+
+            <pre><code class="language-rust">pub struct ArrayValue {
+    element_type: VbType,
+    dimensions: Vec&lt;ArrayDimension&gt;,  // one per rank, inclusive bounds
+    data: Vec&lt;VBVariant&gt;,             // flat buffer, row-major order
+}
+
+pub struct ArrayDimension {
+    pub lower: i32,   // inclusive lower bound (default: 1)
+    pub upper: i32,   // inclusive upper bound
+}
+
+impl ArrayDimension {
+    pub fn len(&amp;self) -&gt; usize {
+        (self.upper as i64 - self.lower as i64 + 1).max(0) as usize
+    }
+}</code></pre>
+
+            <p>
+                Multi-dimensional arrays use row-major ordering (last dimension varies fastest), and the offset
+                calculation handles arbitrary bounds — negative, zero-based, or mixed:
+            </p>
+
+            <pre><code class="language-rust">// Arbitrary bounds are supported:
+let mut arr = ArrayValue::new_fixed(
+    VbType::String,
+    &[ArrayDimension::new(-2, 0)]  // -2, -1, 0 → 3 elements
+).unwrap();
+arr.set(&amp;[-2], VBVariant::from_string("a")).unwrap();
+arr.set(&amp;[0], VBVariant::from_string("c")).unwrap();
+
+// Multi-dimensional (row-major, 2×3):
+let dims = [
+    ArrayDimension::new(1, 2),  // first dimension: 1, 2
+    ArrayDimension::new(1, 3),  // second dimension: 1, 2, 3
+];
+let mut arr = ArrayValue::new_fixed(VbType::Integer, &dims).unwrap();
+arr.set(&amp;[2, 3], VBVariant::Long(23)).unwrap();  // row 2, col 3
+// Flat buffer: [11, 12, 13, 21, 22, 23]</code></pre>
+
+            <p>
+                Dynamic arrays (created with <code>Dim x()</code> or <code>New</code>) require <code>ReDim</code>
+                before access. The <code>is_initialized()</code> method tracks whether <code>ReDim</code> has been
+                called:
+            </p>
+
+            <pre><code class="language-rust">let arr = ArrayValue::new_dynamic(VbType::Integer);
+assert!(!arr.is_initialized());
+arr.get(&amp;[1]).unwrap_err();  // error 9: subscript out of range</code></pre>
+
+            <h2 id="boundary">Argument Boundary Layer</h2>
+            <p>
+                The boundary layer in <code>boundary.rs</code> is the single conversion point between the untyped
+                <code>[VBVariant]</code> argument slices that host environments pass to library functions and the
+                typed wrappers that library functions declare. It provides three families of helper functions:
+            </p>
+
+            <pre><code class="language-rust">// Convert argument at index, raising error 450 if absent
+pub fn arg&lt;'a, T&gt;(args: &amp;'a [VBVariant], index: usize) -&gt; VbResult&lt;T&gt;
+where T: TryFrom&lt;&amp;'a VBVariant, Error = VbError&gt;
+
+// Like arg, but absent → None; present still converts eagerly
+pub fn opt_arg&lt;'a, T&gt;(args: &amp;'a [VBVariant], index: usize) -&gt; VbResult&lt;Option&lt;T&gt;&gt;
+where T: TryFrom&lt;&amp;'a VBVariant, Error = VbError&gt;
+
+// Borrow raw variant without coercion (for predicates, Null-inspection)
+pub fn variant_arg(args: &[VBVariant], index: usize) -&gt; VbResult&lt;&amp;VBVariant&gt;
+
+// Null-propagating: Null → Nullable::Null instead of error 94
+pub enum Nullable&lt;T&gt; {
+    Value(T),
+    Null,
+}</code></pre>
+
+            <p>
+                The evaluation order is canonical and deterministic:
+            </p>
+            <ol>
+                <li><strong>Presence check</strong> — absent arguments raise error 450 (Wrong number of arguments)
+                before any conversion</li>
+                <li><strong>Left-to-right conversion</strong> — arguments are converted in declaration order, so the
+                leftmost offending argument's error wins</li>
+                <li><strong>Conversion</strong> — routes through the wrapper's <code>TryFrom</code>, which encodes
+                all VB6 coercion rules (error 6, 13, 94, or CVErr passthrough)</li>
+            </ol>
+
+            <div class="info-box">
+                <p><strong>Why the boundary layer matters:</strong> Without it, each library function could implement
+                its own argument checking and coercion, leading to inconsistent error numbers, wrong evaluation order,
+                and <code>CVErr</code> values being silently converted instead of re-raised. The boundary layer
+                centralizes all of this into a single, well-tested set of helpers.</p>
+            </div>
+
+            <h2 id="object-system">Object References</h2>
+            <p>
+                Object values in <code>VBVariant</code> are stored as <code>Box&lt;dyn VbObject&gt;</code>, where
+                <code>VbObject</code> is a trait that requires <code>Debug</code>, <code>Send + Sync</code>, and a
+                <code>clone_box</code> method for type-erased cloning:
+            </p>
+
+            <pre><code class="language-rust">pub trait VbObject: fmt::Debug + Send + Sync {
+    fn type_name(&amp;self) -&gt; &amp;str;   // e.g., "Collection", "StdPicture"
+    fn as_any(&amp;self) -&gt; &amp;dyn std::any::Any;
+    fn clone_box(&amp;self) -&gt; Box&lt;dyn VbObject&gt;;
+}
+
+// Implementation:
+impl Clone for VBVariant {
+    fn clone(&amp;self) -&gt; Self {
+        match self {
+            VBVariant::Object(o) -&gt; VBVariant::Object(o.clone_box()),
+            _ =&gt; /* ... */,
+        }
+    }
+}</code></pre>
+
+            <p>
+                Object equality is pointer-based: two objects are equal if and only if they are the same reference
+                (same memory address). This matches VB6's <code>Set a = b</code> semantics where object variables
+                hold references, not values.
+            </p>
+
+            <h2 id="design-decisions">Design Decisions</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Decision</th>
+                        <th>Options Considered</th>
+                        <th>Chosen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Flat buffer vs. recursive arrays</strong></td>
+                        <td>Flat <code>Vec&lt;VBVariant&gt;</code> vs. nested <code>Vec&lt;Self&gt;</code></td>
+                        <td>Flat — simpler bounds checking, matches C-style array layout, easier to serialize</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Currency as scaled i64 vs. f64</strong></td>
+                        <td>Scaled integer (fixed-point) vs. IEEE 754 double</td>
+                        <td>Scaled i64 — avoids floating-point artifacts in financial calculations, matches VB6's actual 64-bit scaled representation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Booleans as true/-1 vs. true/1</strong></td>
+                        <td>C convention (1/0) vs. VB6 convention (-1/0)</td>
+                        <td>VB6 convention — <code>True = -1</code> is required for correct equality and arithmetic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Object equality</strong></td>
+                        <td>Structural equality vs. pointer identity</td>
+                        <td>Pointer identity — matches VB6's reference semantics; structural equality would require deep comparison of unknown COM objects</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Array bounds</strong></td>
+                        <td>Rust-style 0-based exclusive vs. VB6-style inclusive</td>
+                        <td>Inclusive bounds with arbitrary lower — matches VB6's <code>Dim x(1 To 5)</code> and <code>Option Base</code> behavior</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Null handling</strong></td>
+                        <td>Null propagates as error vs. Null as a distinct value</td>
+                        <td>Distinct value that propagates through typed conversion (error 94) but is caught by <code>Nullable&lt;T&gt;</code> for Null-tolerant parameters</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Coercion path</strong></td>
+                        <td>Per-function coercion vs. centralized <code>TryFrom</code></td>
+                        <td>Centralized — every coercion goes through wrapper <code>TryFrom&lt;&amp;VBVariant&gt;</code> for uniform behavior</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="future">Future Considerations</h2>
+
+            <div class="consideration">
+                <h3>1. Arithmetic Operators on VBVariant</h3>
+                <p>
+                    Currently, arithmetic is performed by converting variants to their native types, applying the
+                    operator, then wrapping the result back. Implementing <code>ops::Add</code>, <code>ops::Mul</code>,
+                    etc. directly on <code>VBVariant</code> would provide:
+                </p>
+                <ul>
+                    <li>Type-promotion rules (e.g., Integer + Double → Double)</li>
+                    <li>Overflow detection at the operator level</li>
+                    <li>Null propagation at the operator level</li>
+                </ul>
+                <p><strong>Trade-off:</strong> Adding trait implementations to a large enum in Rust requires a match arm
+                per variant, increasing code size. But it would centralize arithmetic coercion logic.</p>
+            </div>
+
+            <div class="consideration">
+                <h3>2. Performance: Tagged Union vs. Arena</h3>
+                <p>
+                    Currently, <code>VBVariant</code> stores data inline (except objects and arrays which are heap-allocated
+                    via <code>Box</code>). For hot paths with many small numeric variants, an arena-based approach could
+                    reduce allocations:
+                </p>
+                <ul>
+                    <li>Store small values (f64 + tag) in a tight struct</li>
+                    <li>Heap-allocate only Strings, Objects, and Arrays</li>
+                    <li>Match the layout of the C++ <code>VARIANT</code> type more closely</li>
+                </ul>
+                <p><strong>Challenge:</strong> Rust's enum layout is already quite efficient, and the wrapper type system
+                adds indirection regardless. Benchmarks would be needed.</p>
+            </div>
+
+            <div class="consideration">
+                <h3>3. Type-Safe Variant Views</h3>
+                <p>
+                    The current <code>as_*</code> methods consume ownership. A borrow-only variant view system could
+                    enable read-only access without consuming the variant:
+                </p>
+                <ul>
+                    <li><code>v.as_number() -&gt; Option&lt;&amp;Numberv&gt;</code> returning a borrowed number view</li>
+                    <li>Avoids cloning for read-heavy paths</li>
+                </ul>
+                <p><strong>Benefit:</strong> Cleaner API for library functions that inspect but don't modify arguments.</p>
+            </div>
+
+            <h2 id="summary">Summary</h2>
+            <p>
+                The VBVariant value system is a carefully designed type coercion engine that faithfully replicates VB6's
+                dynamic typing in Rust. Its key characteristics:
+            </p>
+            <ol>
+                <li><strong>14-variant enum</strong> representing every VB6 value kind, including Empty, Null, Nothing,
+                and CVErr as distinct concepts</li>
+                <li><strong>Typed wrapper types</strong> (VbLong, VbInteger, etc.) that encode VB6 coercion semantics at
+                the type level via <code>TryFrom</code></li>
+                <li><strong>Banker's rounding</strong> for all integer conversions, matching VB6's <code>CInt</code> and
+                <code>CLng</code> exactly</li>
+                <li><strong>Two-stage numeric equality</strong> — exact i64 comparison first, then f64 coercion fallback
+                — that handles cross-type equality correctly</li>
+                <li><strong>Null as error 94</strong> — <code>Null</code> is distinct from <code>Empty</code> and raises
+                on typed conversion, but propagates through <code>Nullable&lt;T&gt;</code></li>
+                <li><strong>OLE Automation dates</strong> — 1899-12-30 epoch serial with fractional day for time</li>
+                <li><strong>Scaled integer currency</strong> — fixed-point i64 with CURRENCY_SCALE of 10,000</li>
+                <li><strong>Flat-buffer arrays</strong> — row-major storage with arbitrary inclusive bounds and
+                dynamic/static distinction</li>
+                <li><strong>Centralized boundary layer</strong> — single argument coercion path ensuring uniform error
+                handling and evaluation order</li>
+            </ol>
+
+            <div class="info-box">
+                <p><strong>The system was designed because:</strong></p>
+                <ul>
+                    <li>✅ VB6's type system is fundamentally dynamic — every value carries its type</li>
+                    <li>✅ Coercion semantics differ from both Rust and C++ VARIANT specifications</li>
+                    <li>✅ Uniform conversion paths prevent drift between library function implementations</li>
+                    <li>✅ Null and Empty are distinct concepts with different conversion rules</li>
+                    <li>✅ Boolean -1 (not 1) is required for correct VB6 arithmetic and equality</li>
+                    <li>✅ Currency needs fixed-point arithmetic, not floating-point</li>
+                </ul>
+            </div>
+
+            <div class="related-docs">
+                <h3>Related Documentation</h3>
+                <ul>
+                    <li><a href="runtime-state.html">Runtime State System</a> — Process-global state that variants carry through execution</li>
+                    <li><a href="../library/index.html">Library Reference</a> — Functions that consume and produce VBVariant values</li>
+                    <li><a href="https://docs.rs/vb6runtime/latest/vb6runtime/value/" target="_blank">VBVariant API</a> — Rust documentation for the value module</li>
+                    <li><a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime/src/value.rs" target="_blank">value.rs Source</a> — Full implementation (~1,600 lines)</li>
+                </ul>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Runtime is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>

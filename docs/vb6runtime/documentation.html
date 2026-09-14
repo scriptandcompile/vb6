@@ -25,9 +25,11 @@
     <nav class="docs-nav">
         <div class="container">
             <a href="index.html">Home</a>
-            <a href="library/index.html">Library Reference</a>
+            <a href="coverage.html">Coverage</a>
+            <!-- <a href="benchmarks.html">Benchmarks</a> -->
+             <a href=""getting-started.html">Getting started</a>
             <a href="documentation.html" class="active">Documentation</a>
-            <a href="https://docs.rs/vb6runtime" target="_blank">API Docs</a>
+            <a href="library/index.html">Library Reference</a>
             <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6runtime" target="_blank">GitHub</a>
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                 <span class="theme-icon">🌙</span>
@@ -95,6 +97,37 @@
                         <li>Dependency information</li>
                         <li>README and quick start</li>
                         <li>License and metadata</li>
+                    </ul>
+                </a>
+            </div>
+        </section>
+
+        <section id="technical-specs">
+            <div class="section-heading">
+                <p class="eyebrow">Technical Specifications</p>
+                <h2>White Papers</h2>
+            </div>
+            <div class="doc-links">
+                <a href="documentation/runtime-state.html" class="doc-link">
+                    <h3>Runtime State System</h3>
+                    <p>Architecture of the pluggable backend pattern used to manage all process-global mutable state across platforms and execution environments.</p>
+                    <ul>
+                        <li>Backend trait pattern</li>
+                        <li>Cross-platform backends</li>
+                        <li>Thread safety model</li>
+                        <li>WASM sandboxing</li>
+                    </ul>
+                </a>
+
+                <a href="documentation/variant-value-system.html" class="doc-link">
+                    <h3>VBVariant Value System</h3>
+                    <p>The VBVariant enum, typed wrapper coercion system, banker's rounding, Null propagation, and cross-type equality that faithfully replicates VB6's dynamic type system.</p>
+                    <ul>
+                        <li>14-variant enum with typed wrappers</li>
+                        <li>Banker's rounding (round half to even)</li>
+                        <li>Two-stage numeric equality</li>
+                        <li>Null/Empty distinction</li>
+                        <li>Scaled integer currency</li>
                     </ul>
                 </a>
             </div>
