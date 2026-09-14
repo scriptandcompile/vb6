@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-09-14T08:46:01Z",
+  "last_updated": "2026-09-14T11:39:13Z",
   "snapshots": [
     {
       "timestamp": "2026-09-13T19:22:06Z",
@@ -885,6 +885,40 @@
           "percent": 77.72
         }
       }
+    },
+    {
+      "timestamp": "2026-09-14T11:39:13Z",
+      "commit_sha": "346263c04cce0f68d994b743b1e3dac356e8eb12",
+      "commit_message": "Finally figured out what was causing my layout mistake. stupid live server for home testing was mounted to the wrong directory.",
+      "coverage": {
+        "line_coverage": 76.76,
+        "function_coverage": 66.12,
+        "region_coverage": 77.72
+      },
+      "tests": {
+        "total": 6142,
+        "lib_tests": 178,
+        "doc_tests": 123,
+        "integration_tests": 5841,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 14813,
+          "total": 19297,
+          "percent": 76.76
+        },
+        "functions": {
+          "covered": 970,
+          "total": 1467,
+          "percent": 66.12
+        },
+        "regions": {
+          "covered": 24035,
+          "total": 30925,
+          "percent": 77.72
+        }
+      }
     }
   ],
   "coverage_summary": {
@@ -913,10 +947,10 @@
       "average": 77.72
     },
     "test_count": {
-      "latest": 1945,
-      "trend": "stable",
-      "change_count": 0,
-      "growth_rate": 0.0
+      "latest": 6142,
+      "trend": "growing",
+      "change_count": 4197,
+      "growth_rate": 215.78
     }
   }
 }

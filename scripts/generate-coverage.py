@@ -573,24 +573,26 @@ def count_tests_from_list(args):
         return 0
 
 
-def collect_test_statistics():
-    """Collect test count breakdown."""
+def collect_test_statistics(package):
+    """Collect test count breakdown scoped to the specific package."""
     print("Collecting test statistics...")
     
-    lib_tests = count_tests_from_list(['cargo', 'test', '--lib', '--', '--list'])
-    doc_tests = count_tests_from_list(['cargo', 'test', '--doc', '--', '--list'])
+    lib_tests = count_tests_from_list(['cargo', 'test', '--package', package, '--lib', '--', '--list'])
+    doc_tests = count_tests_from_list(['cargo', 'test', '--package', package, '--doc', '--', '--list'])
     
     integration_tests = 0
-    test_files = glob.glob('tests/*.rs')
-    for test_file in test_files:
-        test_name = Path(test_file).stem
-        integration_tests += count_tests_from_list(
-            ['cargo', 'test', '--test', test_name, '--', '--list']
-        )
+    package_tests_dir = Path('projects') / package / 'tests'
+    if package_tests_dir.exists():
+        test_files = glob.glob(str(package_tests_dir / '*.rs'))
+        for test_file in test_files:
+            test_name = Path(test_file).stem
+            integration_tests += count_tests_from_list(
+                ['cargo', 'test', '--package', package, '--test', test_name, '--', '--list']
+            )
     
     test_count = lib_tests + doc_tests + integration_tests
     
-    fuzz_dir = Path('fuzz/fuzz_targets')
+    fuzz_dir = Path('fuzz') / package
     fuzz_targets = 0
     if fuzz_dir.exists():
         fuzz_targets = len(list(fuzz_dir.glob('*.rs')))
@@ -767,7 +769,7 @@ def main():
             html_dir = package_info["coverage_dir"]
         
         # Collect statistics
-        test_stats = collect_test_statistics()
+        test_stats = collect_test_statistics(args.project)
         coverage_metrics = extract_coverage_metrics(package_info["coverage_file"])
         write_stats(test_stats, coverage_metrics, package_info["stats_file"])
         
