@@ -6,7 +6,7 @@ on:
     paths:
       - 'projects/vb6parse/src/**'
       - 'projects/vb6parse/tests/**'
-      - 'projects/vb6parse/scripts/generate-coverage.py'
+      - 'scripts/generate-coverage.py'
       - 'Cargo.toml'
       - 'Cargo.lock'
   workflow_dispatch:
@@ -40,7 +40,7 @@ jobs:
           key: ${{ runner.os }}-cargo-coverage-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install cargo-llvm-cov
-        run: cargo install cargo-llvm-cov
+        run: cargo install cargo-llvm-cov --version 0.9.1
 
       - name: Install Python
         uses: actions/setup-python@v5
@@ -48,7 +48,7 @@ jobs:
           python-version: '3.x'
 
       - name: Generate coverage
-        run: python3 projects/vb6parse/scripts/generate-coverage.py
+        run: python3 scripts/generate-coverage.py --project vb6parse
 
       - name: Install Git LFS
         run: git lfs install
@@ -58,7 +58,7 @@ jobs:
           git pull --rebase --autostash
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add docs/vb6parse/assets/data/coverage.json docs/vb6parse/assets/data/stats.json docs/vb6parse/assets/data/coverage-history.json docs/vb6parse/assets/coverage/
+          git add docs/assets/data/vb6parse/coverage.json docs/assets/data/vb6parse/stats.json docs/assets/data/vb6parse/coverage-history.json docs/vb6parse/coverage/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
