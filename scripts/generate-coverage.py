@@ -409,7 +409,7 @@ def fix_coverage_html_paths(coverage_dir, package_name, project_root):
         relative_to_cov = html_file.relative_to(coverage_dir)
         depth_from_cov = len(relative_to_cov.parts) - 1
         
-        css_depth = depth_from_cov + 3
+        css_depth = depth_from_cov + 2
         css_base = '../' * css_depth + 'assets/css/'
         control_path = '../' * css_depth + 'assets/js/coverage/control.js'
         js_path = '../' * css_depth + 'assets/js/'
