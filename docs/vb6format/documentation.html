@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Format Documentation - API reference and technical specifications">
+    <title>Documentation - VB6Format</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="index.html">VB6Format</a> / Documentation</h1>
+            <p class="tagline">API Reference & Technical Specifications</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container nav-inner">
+            <a href="index.html">Overview</a>
+            <a href="coverage.html">Coverage</a>
+            <a href="getting-started.html">Getting Started</a>
+            <a href="documentation.html"><u>Documentation</u></a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container page-body">
+        <section id="overview">
+            <div class="section-heading">
+                <p class="eyebrow">Getting oriented</p>
+                <h2>Documentation Overview</h2>
+            </div>
+            <p>
+                VB6Format provides comprehensive documentation for both API usage and the internal workings
+                of the VB6 code formatter. Whether you're using the library or contributing to it,
+                you'll find the information you need here.
+            </p>
+        </section>
+
+        <section id="api-docs">
+            <div class="section-heading">
+                <h2>API Documentation</h2>
+            </div>
+            <div class="doc-links" id="api-doc-links">
+                <a href="getting-started.html" class="doc-link">
+                    <h3>Getting Started</h3>
+                    <p>Step-by-step tutorial covering installation, basic formatting, settings customization, and common use cases.</p>
+                    <ul>
+                        <li>Installation and setup</li>
+                        <li>Your first format</li>
+                        <li>Customizing settings</li>
+                        <li>File formatting workflows</li>
+                        <li>Common use cases</li>
+                    </ul>
+                </a>
+
+                <a href="https://docs.rs/vb6format" class="doc-link" target="_blank">
+                    <h3>API Reference (docs.rs)</h3>
+                    <p>Complete Rust API documentation with examples for all public types, functions, and modules.
+                    Generated from inline documentation comments.</p>
+                    <ul>
+                        <li>All public APIs documented</li>
+                        <li>Usage examples</li>
+                        <li>Type signatures and traits</li>
+                        <li>Module organization</li>
+                    </ul>
+                </a>
+
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format" class="doc-link" target="_blank">
+                    <h3>Project Repository</h3>
+                    <p>Source code, tests, and examples for VB6Format on GitHub.</p>
+                    <ul>
+                        <li>Source code and structure</li>
+                        <li>Test suite</li>
+                        <li>Build and development setup</li>
+                        <li>Contributing guidelines</li>
+                    </ul>
+                </a>
+
+                <a href="https://crates.io/crates/vb6format" class="doc-link" target="_blank">
+                    <h3>Crates.io Package</h3>
+                    <p>Official package page with version history, dependencies, and installation instructions.</p>
+                    <ul>
+                        <li>Version history and downloads</li>
+                        <li>Dependency information</li>
+                        <li>README and quick start</li>
+                        <li>License and metadata</li>
+                    </ul>
+                </a>
+            </div>
+        </section>
+
+        <section id="technical-docs">
+            <div class="section-heading">
+                <h2>Technical Documentation</h2>
+            </div>
+            <p>
+                Deep-dive technical specifications and architecture documentation for understanding
+                the VB6 formatting implementation and design decisions.
+            </p>
+
+            <div class="doc-links">
+                <a href="documentation/encoding-pipeline.html" class="doc-link">
+                    <h3>Encoding Pipeline</h3>
+                    <p>How vb6format operates on UTF-8 text while preserving Windows-1252 files — the decode → format → encode pipeline and lossless round-trip guarantee.</p>
+                    <ul>
+                        <li>Windows-1252 vs UTF-8 encoding challenges</li>
+                        <li>vb6parse's decoding layer with replacement</li>
+                        <li>Encoding-agnostic formatter core</li>
+                        <li>Round-trip safety and error reporting</li>
+                        <li>Lossless encode/decode cycle</li>
+                        <li>A pattern for legacy tooling</li>
+                    </ul>
+                    <div class="doc-summary">
+                        <strong>Topics covered:</strong> SourceFile decoding, encode_windows_1252,
+                        silent corruption prevention, round-trip tests, legacy encoding patterns
+                    </div>
+                </a>
+
+                <a href="documentation/multi-pass-formatting.html" class="doc-link">
+                    <h3>Multi-Pass Formatting</h3>
+                    <p>The formatter's multi-pass pipeline architecture — how each pass handles one aspect of formatting, from line endings to blank line deduplication.</p>
+                    <ul>
+                        <li>FormatPass trait and CST traversal</li>
+                        <li>PassManager orchestration and pass composition</li>
+                        <li>Line ending, compiler directive, and keyword case passes</li>
+                        <li>Layout pass for indentation and whitespace</li>
+                        <li>Top-level spacing and blank line deduplication</li>
+                        <li>Designer block preservation and idempotency</li>
+                    </ul>
+                    <div class="doc-summary">
+                        <strong>Topics covered:</strong> Pass architecture, TokenBuffer mutations,
+                        context sharing, CST walker, designer blocks, performance analysis
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section id="testing-performance">
+            <div class="section-heading">
+                <h2>Testing & Performance</h2>
+            </div>
+            <p>
+                Comprehensive testing and coverage metrics demonstrating code quality and formatter reliability.
+            </p>
+
+            <div class="doc-links two-col">
+                <a href="coverage.html" class="doc-link">
+                    <h3>Test Coverage Report</h3>
+                    <p>Comprehensive test coverage metrics generated from the test suite.</p>
+                    <ul>
+                        <li>Line, function, and region coverage percentages</li>
+                        <li>File-by-file coverage breakdown</li>
+                        <li>Interactive coverage explorer</li>
+                        <li>Real-time filtering and search</li>
+                    </ul>
+                    <div class="doc-summary">
+                        <strong>Topics covered:</strong> Coverage metrics from cargo llvm-cov,
+                        integration tests validating each formatting rule
+                    </div>
+                </a>
+
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format" class="doc-link" target="_blank">
+                    <h3>Test Suite</h3>
+                    <p>Explore the full test suite with snapshot tests for every formatting rule.</p>
+                    <ul>
+                        <li>Integration tests for each formatting pass</li>
+                        <li>Snapshot testing with insta</li>
+                        <li>Edge case coverage</li>
+                        <li>Regression test history</li>
+                    </ul>
+                    <div class="doc-summary">
+                        <strong>Topics covered:</strong> insta snapshots,
+                        formatting rule validation, edge cases, compiler directive tests
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section id="contributing">
+            <div class="section-heading">
+                <h2>Contributing</h2>
+            </div>
+            <div class="doc-links">
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format" class="doc-link" target="_blank">
+                    <h3>Contributing Guide</h3>
+                    <p>Guidelines for contributing to VB6Format including code style, testing, and PR process.</p>
+                </a>
+
+                <a href="https://github.com/scriptandcompile/vb6/issues" class="doc-link" target="_blank">
+                    <h3>Issues & Support</h3>
+                    <p>Report bugs, request features, or ask questions on GitHub Issues.</p>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Format is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>

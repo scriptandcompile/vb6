@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VB6Format - A high-performance formatter for Visual Basic 6 source code">
+    <meta name="keywords" content="vb6, formatter, visual basic 6, rust, code style, formatting">
+    <title>VB6Format - Visual Basic 6 Formatter Library</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../assets/js/theme-switcher.js"></script>
+    <script src="../assets/js/stats.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>
+        window.ProjectConfig = {
+            dataPath: '../assets/data/vb6format',
+        };
+    </script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <header class="hero hero-subproject">
+        <a class="workspace-link" href="../index.html">&larr; VB6 Workspace</a>
+        <div class="container">
+            <h1>VB6Format</h1>
+            <p class="tagline">A high-performance formatter library for Visual Basic 6 source code</p>
+            <div class="badges">
+                <a href="https://crates.io/crates/vb6format" target="_blank">
+                    <img src="https://img.shields.io/crates/v/vb6format.svg" alt="Crates.io">
+                </a>
+                <a href="https://docs.rs/vb6format" target="_blank">
+                    <img src="https://docs.rs/vb6format/badge.svg" alt="Documentation">
+                </a>
+                <a href="https://opensource.org/licenses/MIT" target="_blank">
+                    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container nav-inner">
+            <a href="#overview">Overview</a>
+            <a href="coverage.html">Coverage</a>
+            <a href="getting-started.html">Getting Started</a>
+            <a href="documentation.html">Documentation</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container page-body">
+        <section id="overview">
+            <div class="section-heading">
+                <p class="eyebrow">formatting vb6 code</p>
+                <h2>Documentation Overview</h2>
+            </div>
+            <p>
+                VB6Format is designed as a high-performance formatter for Visual Basic 6 source code. It takes
+                raw VB6 source files and produces consistently formatted output while preserving comments,
+                blank lines, and the original code's structure. Built on top of vb6parse's Concrete Syntax Tree,
+                it provides source-fidelity formatting that respects every detail of the original code.
+            </p>
+        </section>
+
+        <section id="features">
+            <div class="section-heading">
+                <h2>Key Features</h2>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🚀 High Performance</h3>
+                    <p>Fast formatting powered by Rust, with minimal allocations and efficient CST traversal</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📋 Full VB6 Support</h3>
+                    <p>Formats modules (.bas), classes (.cls), forms (.frm), and all VB6-specific constructs</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✨ Source Fidelity</h3>
+                    <p>Preserves all comments, blank lines, and formatting choices that don't conflict with rules</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔧 Configurable</h3>
+                    <p>Customizable indentation size, blank line handling around directives and top-level constructs</p>
+                </div>
+                <a href="coverage.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <h3>✅ Well Tested</h3>
+                    <p>Comprehensive test coverage with 50+ integration tests validating every formatting rule</p>
+                </a>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <div class="section-heading">
+                <h2>Architecture</h2>
+            </div>
+            <p>
+                VB6Format uses a pipeline-based approach that transforms raw source code into consistently formatted output.
+                The formatter leverages vb6parse's Concrete Syntax Tree to ensure no source information is lost,
+                then applies a series of formatting passes to produce clean, consistent output.
+            </p>
+            <div class="architecture-diagram">
+                <div class="pipeline-layer">
+                    <div class="layer-title">Input Layer</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">Source String</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">vb6parse<br><small>(CST)</small></div>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div class="pipeline-layer">
+                    <div class="layer-title">Formatting Passes</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">Layout Pass<br><small>(Indentation)</small></div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">Keyword Pass<br><small>(Case)</small></div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">Spacing Pass<br><small>(Blank Lines)</small></div>
+                    </div>
+                </div>
+                <div class="vertical-arrow">↓</div>
+                <div class="pipeline-layer">
+                    <div class="layer-title">Output Layer</div>
+                    <div class="pipeline-components">
+                        <div class="pipeline-box">Formatted<br><small>(String)</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="architecture-details" style="margin-top: 2rem;">
+                <div class="section-heading">
+                    <h2>Formatting Passes</h2>
+                </div>
+                <div class="layer-grid">
+                    <div class="layer-card">
+                        <h4>Layout Pass</h4>
+                        <p><strong>Input:</strong> CST from vb6parse</p>
+                        <p><strong>Output:</strong> Properly indented code</p>
+                        <p><strong>Purpose:</strong> Fixes indentation for block bodies, closing keywords, and nested constructs. Handles Sub/Function/Property, If/ElseIf/Else, For/Do/While/With/Select, and compiler directives.</p>
+                    </div>
+
+                    <div class="layer-card">
+                        <h4>Keyword Pass</h4>
+                        <p><strong>Input:</strong> Layout-passed CST</p>
+                        <p><strong>Output:</strong> Correctly cased keywords</p>
+                        <p><strong>Purpose:</strong> Normalizes keyword casing (e.g., 'sub' → 'Sub', 'end if' → 'End If') to match VB6 conventions.</p>
+                    </div>
+
+                    <div class="layer-card">
+                        <h4>Spacing Pass</h4>
+                        <p><strong>Input:</strong> Keyword-passed CST</p>
+                        <p><strong>Output:</strong> Consistent blank lines</p>
+                        <p><strong>Purpose:</strong> Manages blank lines between top-level constructs and around compiler directives, with configurable behavior.</p>
+                    </div>
+
+                    <div class="layer-card">
+                        <h4>Line Ending Pass</h4>
+                        <p><strong>Input:</strong> Spacing-passed CST</p>
+                        <p><strong>Output:</strong> Consistent line endings</p>
+                        <p><strong>Purpose:</strong> Normalizes line endings to a consistent format (CRLF for VB6 convention).</p>
+                    </div>
+
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 Chained Passes:</strong> Each formatting pass operates on the CST incrementally.
+                    The passes are designed to be independent and composable, allowing fine-grained control
+                    over which formatting rules are applied.
+                </div>
+            </div>
+        </section>
+
+        <section id="testing">
+            <div class="section-heading">
+            <h2>Testing & Quality</h2>
+            </div>
+            <div id="stats-loading" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 3rem 2rem; text-align: center; margin: 2rem 0;">
+                <div style="width: 48px; height: 48px; border: 4px solid var(--border-color); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+                <p style="color: var(--text-secondary); margin: 0;">Test statistics being generated...</p>
+                <style>
+                    @keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
+                </style>
+            </div>
+            <div class="stats-grid" id="stats-grid" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-number" data-stat="lib_tests"></div>
+                    <div class="stat-label">Library Tests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-stat="doc_tests"></div>
+                    <div class="stat-label">Doc Tests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-stat="integration_tests"></div>
+                    <div class="stat-label">Integration Tests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-stat="fuzz_targets"></div>
+                    <div class="stat-label">Fuzz Targets</div>
+                </div>
+            </div>
+            <p class="testing-info">
+                VB6Format uses comprehensive testing including unit tests, snapshot testing with 
+                <a href="https://docs.rs/insta" target="_blank">insta</a>, and benchmarking with 
+                <a href="https://github.com/bheisler/criterion.rs" target="_blank">criterion</a>.
+            </p>
+        </section>
+
+        <section id="community">
+            <div class="section-heading">
+                <h2>Community & Contributing</h2>
+            </div>
+            <p>
+                VB6Format is open source and welcomes contributions! Whether you're reporting bugs, 
+                suggesting features, or submitting pull requests, your help is appreciated.
+            </p>
+            <div class="community-links">
+                <a href="https://github.com/scriptandcompile/vb6/issues" class="community-btn" target="_blank">
+                    Report an Issue
+                </a>
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format" class="community-btn" target="_blank">
+                    Contributing Guide
+                </a>
+                <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format" class="community-btn" target="_blank">
+                    Changelog
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Format is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>

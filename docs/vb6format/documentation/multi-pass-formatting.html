@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Multi-Pass Formatting Pipeline Architecture of vb6format">
+    <title>Multi-Pass Formatting - VB6Format</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/docs-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="../../assets/js/theme-switcher.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbnet.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            hljs.highlightAll();
+        });
+    </script>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <h1><a href="../index.html">VB6Format</a> / Documentation</h1>
+            <p class="tagline">Multi-Pass Formatting Pipeline Architecture Explained</p>
+        </div>
+    </header>
+
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="../index.html">Home</a>
+            <a href="../documentation.html">Documentation</a>
+            <a href="../getting-started.html">Getting Started</a>
+            <a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format" target="_blank">GitHub</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container docs-content">
+        <aside class="toc">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#why-multipass">Why Multi-Pass?</a></li>
+                <li><a href="#pipeline">The Pipeline</a></li>
+                <li><a href="#formatpass">The FormatPass Trait</a></li>
+                <li><a href="#passmanager">PassManager Orchestration</a></li>
+                <li><a href="#line-ending">LineEndingPass</a></li>
+                <li><a href="#compiler-directive">CompilerDirectivePass</a></li>
+                <li><a href="#keyword-case">KeywordCasePass</a></li>
+                <li><a href="#layout">LayoutPass</a></li>
+                <li><a href="#top-level-spacing">TopLevelSpacingPass</a></li>
+                <li><a href="#deduplicate">DeduplicateBlankLinesPass</a></li>
+                <li><a href="#cst-formatter">CST Walk &amp; Emission</a></li>
+                <li><a href="#designer-preservation">Designer Block Preservation</a></li>
+                <li><a href="#composition">Pass Composition</a></li>
+                <li><a href="#idempotency">Idempotency Guarantee</a></li>
+                <li><a href="#future">Future Considerations</a></li>
+            </ul>
+        </aside>
+
+        <article>
+            <h2 id="overview">Overview</h2>
+            <p>
+                vb6format transforms VB6 source code through a <strong>multi-pass formatting pipeline</strong>. 
+                Rather than applying all formatting rules in a single traversal, the formatter delegates responsibility 
+                to six specialized passes, each handling one aspect of formatting: line endings, compiler directives, 
+                keyword casing, layout (indentation and whitespace), top-level spacing, and blank line deduplication.
+            </p>
+            <p>
+                This design mirrors the pipeline model used by modern formatters like Rustfmt and Black, but is tailored 
+                to the unique structural challenges of VB6: hybrid .frm files with designer blocks, compiler directives 
+                that affect indentation, compound keywords like <code>End If</code>, and the need to preserve the VB6 
+                IDE's opaque property blocks verbatim.
+            </p>
+
+            <div class="info-box">
+                <p><strong>Core principle:</strong> Each pass is independent and stateless except for shared context. 
+                This makes the pipeline easy to extend, reorder, or disable without affecting other passes.</p>
+            </div>
+
+            <h2 id="why-multipass">Why Multi-Pass?</h2>
+            <p>
+                A single-pass formatter would need to interleave all formatting logic, making it difficult to reason about, 
+                test, or modify individual rules. The multi-pass approach separates concerns cleanly:
+            </p>
+
+            <div class="phase-comparison">
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h5>✅ Multi-Pass</h5>
+                        <ul>
+                            <li><strong>Single responsibility:</strong> Each pass does one thing well</li>
+                            <li><strong>Testable:</strong> Pass behavior is isolated and verifiable</li>
+                            <li><strong>Composable:</strong> Passes share context; they compose modifications to a single token buffer</li>
+                            <li><strong>Configurable:</strong> Passes can be enabled/disabled via <code>FmtSettings</code></li>
+                            <li><strong>Extensible:</strong> New passes can be added by inserting into the pipeline order</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h5>⚠️ Trade-offs</h5>
+                        <ul>
+                            <li>Multiple traversals over the token stream (mitigated by the small constant of 6 passes)</li>
+                            <li>Shared context state must be carefully managed</li>
+                            <li>Pass order matters and must be documented</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                In practice, the performance cost is negligible. The pipeline processes tokens sequentially through all 
+                six passes per token — a constant factor of 6× — but each pass is a simple state machine with no 
+                backtracking or expensive data structures. The alternative of a monolithic formatter would be 
+                materially more complex with no meaningful performance gain.
+            </p>
+
+            <h2 id="pipeline">The Pipeline</h2>
+            <p>
+                The formatter applies six passes in a fixed order. Each pass receives the same <code>Context</code> 
+                and modifies the same <code>TokenBuffer</code>, allowing modifications to compose naturally:
+            </p>
+
+            <div class="architecture-diagram">
+                <div style="max-width: 500px; margin: 0 auto;">
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600;">CST (Concrete Syntax Tree)</div>
+                        <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(parsed from source by vb6parse)</div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div class="vertical-arrow" style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600;">Walk the CST tree recursively</div>
+                        <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8;">(emit_token for each token, emit_verbatim for designer nodes)</div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div class="vertical-arrow" style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 10px; margin-bottom: 5px; background: var(--code-background); text-align: center;">
+                        <div style="font-size: 0.85rem; color: var(--text-color); opacity: 0.8; font-weight: 600;">For each token, run passes in order:</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--code-background);">
+                        <div style="display: flex; align-items: center; gap: 8px; margin: 6px 0;">
+                            <span style="font-size: 1.2rem;">➊</span>
+                            <div style="font-weight: 600;">LineEndingPass</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">— detect &amp; normalize CRLF/LF</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin: 6px 0;">
+                            <span style="font-size: 1.2rem;">➋</span>
+                            <div style="font-weight: 600;">CompilerDirectivePass</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">— #If/#Else blank line handling</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin: 6px 0;">
+                            <span style="font-size: 1.2rem;">➌</span>
+                            <div style="font-weight: 600;">KeywordCasePass</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">— normalize keyword casing</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin: 6px 0;">
+                            <span style="font-size: 1.2rem;">➍</span>
+                            <div style="font-weight: 600;">LayoutPass</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">— indentation &amp; whitespace</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin: 6px 0;">
+                            <span style="font-size: 1.2rem;">➎</span>
+                            <div style="font-weight: 600;">TopLevelSpacingPass</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">— blank lines between declarations</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin: 6px 0;">
+                            <span style="font-size: 1.2rem;">➏</span>
+                            <div style="font-weight: 600;">DeduplicateBlankLinesPass</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">— collapse consecutive blank lines</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin: 5px 0;">
+                        <div class="vertical-arrow" style="font-size: 1.5rem;">↓</div>
+                    </div>
+                    <div style="border: 2px solid var(--primary-color); border-radius: 8px; padding: 20px; background: var(--code-background); text-align: center;">
+                        <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 10px;">Formatted Output (String)</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Why This Order Matters</h3>
+            <p>
+                The pass order is deliberate. Line ending detection must come first so all other passes can assume a 
+                consistent line ending style. Compiler directives and keyword casing can happen in either order since 
+                they operate on different tokens. Layout must come before top-level spacing, because top-level spacing 
+                needs to know where lines start. Blank line deduplication runs last, collapsing any blank lines that 
+                earlier passes may have inserted.
+            </p>
+
+            <h2 id="formatpass">The FormatPass Trait</h2>
+            <p>
+                Every pass implements the <code>FormatPass</code> trait, which provides three hook methods called 
+                during the CST traversal. Each method has a default empty implementation, so a pass only overrides 
+                what it needs:
+            </p>
+
+            <pre><code class="language-rust">pub trait FormatPass {
+    fn on_node_enter(&amp;self, _node: &amp;CstNode, _context: &amp;mut Context) {}
+
+    fn on_node_exit(&amp;self, _node: &amp;CstNode, _context: &amp;mut Context) {}
+
+    fn on_token(&amp;self, _token: &amp;CstNode, _context: &amp;mut Context, _buffer: &amp;mut TokenBuffer) {}
+}</code></pre>
+
+            <h3>Hooks Explained</h3>
+
+            <h4><code>on_node_enter</code></h4>
+            <p>
+                Called when the tree walker descends into a node, before processing its children. Used for 
+                one-time initialization (e.g., detecting line endings) and entering stateful scopes (e.g., 
+                incrementing compiler directive nesting depth).
+            </p>
+
+            <h4><code>on_node_exit</code></h4>
+            <p>
+                Called after all children of a node have been processed. Used for cleanup, such as decrementing 
+                a depth counter or signaling that a directive block has ended.
+            </p>
+
+            <h4><code>on_token</code></h4>
+            <p>
+                Called for every token in the CST. This is where the actual formatting mutations happen. The pass 
+                receives a <code>TokenBuffer</code> and can modify three fields:
+            </p>
+
+            <pre><code class="language-rust">pub struct TokenBuffer {
+    pub prefix: String,   // prepended to the emitted output
+    pub text: String,     // the main token text (can be rewritten)
+    pub emit: bool,       // if false, the token is suppressed entirely
+}</code></pre>
+
+            <div class="info-box">
+                <p><strong>Design insight:</strong> Using <code>prefix</code> for indentation and blank lines keeps 
+                token text and formatting whitespace separate. This makes it easy to reason about what the token 
+                represents versus how it should be formatted.</p>
+            </div>
+
+            <h2 id="passmanager">PassManager Orchestration</h2>
+            <p>
+                <code>PassManager</code> owns the vector of boxed <code>FormatPass</code> trait objects and iterates 
+                them in order during the CST walk. It provides three methods that mirror the trait hooks:
+            </p>
+
+            <pre><code class="language-rust">pub struct PassManager&lt;'a&gt; {
+    passes: Vec&lt;Box&lt;dyn FormatPass + 'a&gt;&gt;,
+}
+
+impl PassManager {
+    pub fn on_node_enter(&amp;self, node: &amp;CstNode, context: &amp;mut Context) {
+        for pass in &amp;self.passes {
+            pass.on_node_enter(node, context);
+        }
+    }
+
+    pub fn on_node_exit(&amp;self, node: &amp;CstNode, context: &amp;mut Context) {
+        for pass in &amp;self.passes {
+            pass.on_node_exit(node, context);
+        }
+    }
+
+    pub fn on_token(&amp;self, token: &amp;CstNode, context: &amp;mut Context) -&gt; TokenBuffer {
+        let mut buffer = TokenBuffer::from_token(token);
+        for pass in &amp;self.passes {
+            pass.on_token(token, context, &amp;mut buffer);
+        }
+        buffer
+    }
+}</code></pre>
+
+            <p>
+                The <code>on_token</code> method is where pass composition happens. Each pass receives the same 
+                <code>TokenBuffer</code> in sequence, so modifications stack:
+            </p>
+
+            <ul>
+                <li><strong>LineEndingPass</strong> sets <code>buffer.text</code> to the detected line ending</li>
+                <li><strong>KeywordCasePass</strong> rewrites <code>buffer.text</code> to the canonical casing</li>
+                <li><strong>LayoutPass</strong> sets <code>buffer.prefix</code> to the indent string</li>
+                <li><strong>TopLevelSpacingPass</strong> prepends an extra newline to <code>buffer.prefix</code></li>
+                <li>All passes can suppress tokens via <code>buffer.emit = false</code></li>
+            </ul>
+
+            <h2 id="line-ending">Pass 1: LineEndingPass</h2>
+            <p>
+                VB6 source files may use either <code>\r\n</code> (CRLF) or <code>\n</code> (LF) line endings. 
+                The formatter detects the source file's style and normalizes all newlines to match, preserving 
+                the original convention.
+            </p>
+
+            <h3>Implementation</h3>
+            <p>
+                <code>LineEndingPass</code> is a <strong>singleton pass</strong> — it runs its detection logic 
+                exactly once using a <code>Cell&lt;bool&gt;</code> guard:
+            </p>
+
+            <pre><code class="language-rust">pub struct LineEndingPass {
+    initialized: Cell&lt;bool&gt;,
+}
+
+impl FormatPass for LineEndingPass {
+    fn on_node_enter(&amp;self, node: &amp;CstNode, context: &amp;mut Context) {
+        if self.initialized.replace(true) { return; }
+        
+        // Detect line ending from root node text
+        if node.text().contains("\r\n") {
+            context.line_ending = LineEnding::Crlf;
+        } else {
+            context.line_ending = LineEnding::Lf;
+        }
+        
+        // First token needs indentation since it's the start of the file
+        context.pending_indent = true;
+    }
+
+    fn on_token(&amp;self, token: &amp;CstNode, context: &amp;mut Context, buffer: &amp;mut TokenBuffer) {
+        if token.kind() == SyntaxKind::Newline {
+            // Normalize to detected line ending style
+            buffer.text = context.line_ending.to_string();
+            buffer.emit = true;
+        }
+    }
+}</code></pre>
+
+            <h3>Shared State Management</h3>
+            <p>
+                The pass sets two context flags during its one-time initialization:
+            </p>
+            <ul>
+                <li><code>context.line_ending</code> — used by all subsequent passes when emitting newlines</li>
+                <li><code>context.pending_indent</code> — signals that the first token needs indentation (always true at file start)</li>
+            </ul>
+
+            <h2 id="compiler-directive">Pass 2: CompilerDirectivePass</h2>
+            <p>
+                VB6 compiler directives (<code>#If</code>, <code>#ElseIf</code>, <code>#Else</code>, <code>#End If</code>) 
+                are a unique challenge. They can be nested, they affect indentation of enclosed code blocks, and users 
+                may want blank lines around or inside directive blocks.
+            </p>
+
+            <h3>State Tracking</h3>
+            <p>
+                The pass tracks two pieces of state via <code>Context</code>:
+            </p>
+
+            <pre><code class="language-rust">// In Context:
+pub directive_phase: Option&lt;DirectivePhase&gt;  // BeforeDirective | BeforeBody | AfterDirective
+pub compiler_directive_depth: usize          // nesting depth of #If blocks</code></pre>
+
+            <h3>Blank Line Logic</h3>
+            <p>
+                The pass handles two independent formatting options:
+            </p>
+
+            <div class="phase-comparison">
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h5><code>blank_lines_around_directives</code> (default: false)</h5>
+                        <ul>
+                            <li>Inserts a blank line before <code>#If</code> and after <code>#End If</code></li>
+                            <li>Uses <code>pending_blank</code> flag and <code>directive_phase</code> to track positioning</li>
+                        </ul>
+                    </div>
+                    <div class="pros">
+                        <h5><code>blank_lines_inside_directives</code> (default: false)</h5>
+                        <ul>
+                            <li>Inserts a blank line between the directive block and the code it encloses</li>
+                            <li>Triggers when entering a <code>StatementList</code> inside a <code>CompilerDirective</code> node</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Nesting Depth</h3>
+            <p>
+                Nested directives like <code>#If A Then #If B Then ... #End If #End If</code> are handled by 
+                incrementing <code>compiler_directive_depth</code> on <code>on_node_enter</code> for 
+                <code>CompilerDirective</code> nodes and decrementing on <code>on_node_exit</code>. The depth is 
+                used to compute correct indentation for directive keywords.
+            </p>
+
+            <h2 id="keyword-case">Pass 3: KeywordCasePass</h2>
+            <p>
+                VB6 has a rich set of keywords, and teams may prefer different casing styles: <code>SUB</code>, 
+                <code>sub</code>, <code>Sub</code>, or <code>sub</code>. The pass normalizes all keywords to 
+                the configured style.
+            </p>
+
+            <h3>Canonical Keyword Extraction</h3>
+            <p>
+                VB6Parse's <code>SyntaxKind</code> enum uses a camelCase naming convention for keyword variants 
+                (e.g., <code>SubKeyword</code>, <code>EndIfKeyword</code>, <code>ForEachKeyword</code>). The 
+                pass strips the <code>Keyword</code> suffix to get the canonical text:
+            </p>
+
+            <pre><code class="language-rust">// SyntaxKind::SubKeyword -> "Sub"
+// SyntaxKind::EndIfKeyword -> "EndIf"
+// SyntaxKind::ForEachKeyword -> "ForEach"
+
+fn keyword_camel_text(kind: SyntaxKind) -&gt; Option&lt;&amp;str&gt; {
+    let name = std::any::type_name_of_val(&amp;kind);
+    name.strip_suffix("Keyword")
+}</code></pre>
+
+            <h3>Casing Styles</h3>
+            <p>
+                Four transformation modes are supported:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Style</th>
+                        <th><code>Sub</code></th>
+                        <th><code>End If</code></th>
+                        <th><code>For Each</code></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>"upper"</code></td>
+                        <td><code>SUB</code></td>
+                        <td><code>END IF</code></td>
+                        <td><code>FOR EACH</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>"lower"</code></td>
+                        <td><code>sub</code></td>
+                        <td><code>end if</code></td>
+                        <td><code>for each</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>"camel"</code> (default)</td>
+                        <td><code>Sub</code></td>
+                        <td><code>End If</code></td>
+                        <td><code>For Each</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>"first"</code></td>
+                        <td><code>Sub</code></td>
+                        <td><code>End if</code></td>
+                        <td><code>For each</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <p><strong>Design note:</strong> Compound keywords like <code>End If</code> are represented as 
+                two separate tokens in the CST (<code>End</code> + <code>If</code>). The pass applies the 
+                casing transformation to each token independently, which means <code>"camel"</code> produces 
+                <code>End If</code> while <code>"first"</code> produces <code>End if</code>.</p>
+            </div>
+
+            <h2 id="layout">Pass 4: LayoutPass</h2>
+            <p>
+                <code>LayoutPass</code> is the most complex pass, responsible for indentation (spaces) and 
+                whitespace normalization. It processes every token kind differently.
+            </p>
+
+            <h3>Token-Kind Dispatch</h3>
+            <p>
+                The pass matches on <code>SyntaxKind</code> and applies different logic per token type:
+            </p>
+
+            <pre><code class="language-rust">impl FormatPass for LayoutPass {
+    fn on_token(&amp;self, token: &amp;CstNode, context: &amp;mut Context, buffer: &amp;mut TokenBuffer) {
+        match token.kind() {
+            SyntaxKind::Whitespace => {
+                if context.pending_indent {
+                    // Suppress original whitespace — we'll generate it
+                    buffer.emit = false;
+                } else {
+                    // Collapse all whitespace to a single space
+                    buffer.text = " ".to_string();
+                }
+            }
+            SyntaxKind::Newline => {
+                // Handled by LineEndingPass — no action needed
+            }
+            SyntaxKind::EndOfLineComment | SyntaxKind::RemComment => {
+                if context.pending_indent {
+                    buffer.prefix = " ".repeat(context.indent_level * self.settings.indent_size);
+                }
+                context.pending_indent = false;
+                context.line_has_content = true;
+            }
+            _ => {
+                // Any content token — generate indent if needed
+                if context.pending_indent {
+                    buffer.prefix = " ".repeat(context.indent_level * self.settings.indent_size);
+                }
+                context.pending_indent = false;
+                context.line_has_content = true;
+            }
+        }
+    }
+}</code></pre>
+
+            <h3>Indentation Model</h3>
+            <p>
+                Indentation is managed by incrementing <code>context.indent_level</code> when entering a 
+                <code>StatementList</code> node in the CST walker and decrementing on exit. This covers:
+            </p>
+            <ul>
+                <li><code>Sub</code> / <code>Function</code> / <code>Property</code> procedure bodies</li>
+                <li><code>If</code> / <code>ElseIf</code> / <code>Else</code> branches</li>
+                <li><code>For</code> / <code>Do</code> / <code>While</code> loop bodies</li>
+                <li><code>With</code> blocks</li>
+                <li><code>Select Case</code> / <code>Case</code> branches</li>
+                <li><code>Type</code> / <code>Enum</code> blocks</li>
+            </ul>
+
+            <h3>Whitespace Normalization</h3>
+            <p>
+                Original whitespace (indentation spaces) is suppressed when <code>pending_indent</code> is true 
+                (i.e., at the start of a new line), because the pass generates fresh indentation. Between tokens 
+                on the same line, all sequences of whitespace are collapsed to a single space.
+            </p>
+
+            <h2 id="top-level-spacing">Pass 5: TopLevelSpacingPass</h2>
+            <p>
+                This pass inserts blank lines between top-level declarations — between procedures, between 
+                <code>Declare</code> blocks, and between <code>Option</code> statements. It avoids blank lines 
+                between consecutive declarations of the same kind (e.g., two <code>Private Sub</code> 
+                procedures in a row).
+            </p>
+
+            <h3>Top-Level Category Classification</h3>
+            <p>
+                Declarations are classified into three categories:
+            </p>
+
+            <pre><code class="language-rust">enum TopLevelCategory {
+    Option,    // Option Explicit, Option Compare, Option Base
+    Declare,   // Public Declare, Private Declare, Friend Declare
+    Other,     // Sub, Function, Property, Event, Enum, Type
+}</code></pre>
+
+            <p>
+                The classification scans the raw source text of each top-level block, checking the first 
+                significant word. Declarations with visibility modifiers (e.g., <code>Private Declare</code>, 
+                <code>Friend Sub</code>) are handled by checking both the modifier and the primary keyword.
+            </p>
+
+            <h3>Comment Attachment</h3>
+            <p>
+                A subtle but important case: comments preceding a declaration are treated as part of that 
+                declaration's block. A blank line is inserted <em>before the declaration</em>, not before the 
+                comment. This preserves the natural flow:
+            </p>
+
+            <pre><code class="language-vbnet">' This procedure does something important
+Sub Bar()            ' ← blank line inserted before this line
+    ...
+End Sub</code></pre>
+
+            <h3>Insertion Logic</h3>
+            <p>
+                On first <code>on_node_enter</code>, the pass parses the full source text and builds a sorted 
+                set of line numbers where blank lines should be inserted. Subsequent tokens at the start of 
+                a line check whether their line number is in this set:
+            </p>
+
+            <pre><code class="language-rust">fn on_token(&amp;self, ... buffer: &amp;mut TokenBuffer) {
+    if self.should_insert_blank_line(token, context) {
+        buffer.prefix.push('\n');  // Extra newline before the token
+    }
+}</code></pre>
+
+            <h3>Category Rules</h3>
+            <p>
+                Blank lines are inserted between two declarations unless both have the same category:
+            </p>
+
+            <div class="phase-comparison">
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h5>Blank line inserted</h5>
+                        <ul>
+                            <li><code>Option</code> → <code>Declare</code></li>
+                            <li><code>Declare</code> → <code>Sub</code></li>
+                            <li><code>Sub</code> → <code>Enum</code></li>
+                            <li><code>Enum</code> → <code>Option</code></li>
+                        </ul>
+                    </div>
+                    <div class="pros">
+                        <h5>No blank line</h5>
+                        <ul>
+                            <li><code>Sub</code> → <code>Sub</code> (same category)</li>
+                            <li><code>Option</code> → <code>Option</code> (same category)</li>
+                            <li><code>Declare</code> → <code>Declare</code> (same category)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h2 id="deduplicate">Pass 6: DeduplicateBlankLinesPass</h2>
+            <p>
+                The final pass is a safety net. Earlier passes (especially <code>CompilerDirectivePass</code> 
+                and <code>TopLevelSpacingPass</code>) may insert blank lines, and in edge cases multiple blank 
+                lines could accumulate. This pass collapses consecutive newlines to at most two (one blank line).
+            </p>
+
+            <h3>Implementation</h3>
+            <p>
+                The pass tracks a <code>Cell&lt;usize&gt;</code> counter of consecutive newlines and processes 
+                both <code>buffer.prefix</code> and <code>buffer.text</code>:
+            </p>
+
+            <pre><code class="language-rust">pub struct DeduplicateBlankLinesPass {
+    newline_streak: Cell&lt;usize&gt;,
+}
+
+impl FormatPass for DeduplicateBlankLinesPass {
+    fn on_token(&amp;self, ... buffer: &amp;mut TokenBuffer) {
+        buffer.prefix = self.sanitize_chunk(&buffer.prefix);
+        buffer.text = self.sanitize_chunk(&buffer.text);
+    }
+}
+
+fn sanitize_chunk(&amp;self, input: &amp;str) -&gt; String {
+    let mut result = String::new();
+    let mut streak = 0usize;
+    
+    for ch in input.chars() {
+        if ch == '\n' {
+            if streak &lt; 2 {
+                result.push(ch);
+            }
+            streak += 1;
+        } else {
+            streak = 0;
+            result.push(ch);
+        }
+    }
+    result
+}</code></pre>
+
+            <div class="info-box">
+                <p><strong>Why run this last?</strong> Because it operates character-by-character on the output 
+                buffer, running it after all other passes ensures it deduplicates blank lines produced by the 
+                entire pipeline, not just original blank lines in the source.</p>
+            </div>
+
+            <h2 id="cst-formatter">CST Walk &amp; Emission</h2>
+            <p>
+                <code>CstFormatter</code> owns the tree walk that drives all passes. It recursively walks the 
+                CST produced by <code>vb6parse</code>, dispatching each node to the appropriate handler:
+            </p>
+
+            <pre><code class="language-rust">struct CstFormatter&lt;'a&gt; {
+    cst: ConcreteSyntaxTree,
+    output: String,
+    context: Context,
+    passes: PassManager&lt;'a&gt;,
+}
+
+impl CstFormatter {
+    fn walk_node(&amp;mut self, node: &amp;CstNode) {
+        // 1. Tokens are emitted directly
+        if node.is_token() {
+            self.emit_token(node);
+            return;
+        }
+
+        // 2. Designer nodes are emitted verbatim (skip formatting)
+        if is_designer_node(node.kind()) {
+            self.emit_verbatim(node);
+            return;
+        }
+
+        // 3. Run on_node_enter hooks on all passes
+        self.passes.on_node_enter(node, &amp;mut self.context);
+
+        // 4. Walk children — increment indent for StatementList nodes
+        match node.kind() {
+            SyntaxKind::StatementList => {
+                self.context.indent_level += 1;
+                for child in node.children() {
+                    self.walk_node(child);
+                }
+                self.context.indent_level = self.context.indent_level.saturating_sub(1);
+            }
+            _ => {
+                for child in node.children() {
+                    self.walk_node(child);
+                }
+            }
+        }
+
+        // 5. Run on_node_exit hooks on all passes
+        self.passes.on_node_exit(node, &amp;mut self.context);
+    }
+
+    fn emit_token(&amp;mut self, token: &amp;CstNode) {
+        let buffer = self.passes.on_token(token, &amp;mut self.context);
+        if buffer.emit {
+            self.output.push_str(&buffer.prefix);
+            self.output.push_str(&buffer.text);
+        }
+    }
+}</code></pre>
+
+            <h3>Pre-allocated Output Buffer</h3>
+            <p>
+                The output <code>String</code> is pre-allocated to the size of the original source text, which 
+                avoids reallocations in the common case where formatting doesn't dramatically change file size:
+            </p>
+
+            <pre><code class="language-rust">let root = cst.to_root_node();
+let output = String::with_capacity(root.text().len());</code></pre>
+
+            <h2 id="designer-preservation">Designer Block Preservation</h2>
+            <p>
+                VB6 .frm, .cls, and .ctl files contain a <strong>designer block</strong> — a <code>BEGIN ... 
+                END</code> structure that describes form control geometry (position, size, properties). This 
+                block is written and rewritten by the VB6 IDE, and any modification to it will be lost on the 
+                next IDE save or risk corrupting the form layout.
+            </p>
+            <p>
+                <code>CstFormatter</code> detects designer nodes by their <code>SyntaxKind</code> and emits them 
+                <strong>verbatim</strong>, bypassing the entire pass pipeline:
+            </p>
+
+            <pre><code class="language-rust">fn is_designer_node(kind: SyntaxKind) -&gt; bool {
+    matches!(kind, SyntaxKind::VersionStatement | SyntaxKind::PropertiesBlock)
+}
+
+fn emit_verbatim(&amp;mut self, node: &amp;CstNode) {
+    let text = node.text();
+    let ends_line = text.ends_with('\n');
+    self.output.push_str(text);
+    
+    // Update context so formatting after the block is correct
+    self.context.pending_indent = ends_line;
+    self.context.line_has_content = !ends_line;
+    self.context.last_was_blank = false;
+}</code></pre>
+
+            <div class="info-box">
+                <p><strong>This is why a multi-pass approach was essential:</strong> a line-based formatter would 
+                need complex exception handling to skip designer blocks. By using a CST, designer blocks are 
+                first-class nodes that can be identified and skipped structurally. The pass pipeline then 
+                processes only the code section, which is where formatting rules apply.</p>
+            </div>
+
+            <h2 id="composition">Pass Composition</h2>
+            <p>
+                The power of the multi-pass design lies in how passes compose. Each pass operates independently 
+                on the shared <code>TokenBuffer</code> and <code>Context</code>, and their effects combine 
+                naturally:
+            </p>
+
+            <div class="algorithm-box">
+                <strong>Example: Formatting a single indented token</strong>
+                <pre><code class="language-vbnet">    Dim x As Integer    ' Original source</code></pre>
+                <p>Token stream: <code>Whitespace("    ")</code> → <code>DimKeyword</code> → <code>Whitespace(" ")</code> → <code>DimIdentifier</code> → ...</p>
+                <p>Processing through the pipeline:</p>
+                <ol>
+                    <li><strong>LineEndingPass</strong> — no-op for non-newline tokens</li>
+                    <li><strong>CompilerDirectivePass</strong> — no-op (not a directive token)</li>
+                    <li><strong>KeywordCasePass</strong> — rewrites <code>Dim</code> to match <code>keyword_case</code> setting</li>
+                    <li><strong>LayoutPass</strong> — suppresses original <code>Whitespace("    ")</code> (because <code>pending_indent</code> is true), then sets <code>buffer.prefix = "    "</code> (4 spaces for indent_level 1)</li>
+                    <li><strong>TopLevelSpacingPass</strong> — no-op (not a top-level declaration at this point)</li>
+                    <li><strong>DeduplicateBlankLinesPass</strong> — no-op (no consecutive newlines)</li>
+                </ol>
+                <p>Result: <code>buffer.prefix = "    "</code> + <code>buffer.text = "Dim"</code> → <code>"    Dim"</code></p>
+            </div>
+
+            <h3>Pass Independence</h3>
+            <p>
+                Because each pass only reads <code>Context</code> state and writes to <code>TokenBuffer</code>, 
+                passes can be reordered or removed without breaking others. For example:
+            </p>
+            <ul>
+                <li>Removing <code>KeywordCasePass</code> leaves all other formatting intact</li>
+                <li>Reordering <code>CompilerDirectivePass</code> and <code>KeywordCasePass</code> has no effect</li>
+                <li>Removing <code>DeduplicateBlankLinesPass</code> would allow multiple blank lines to persist in edge cases</li>
+            </ul>
+
+            <h2 id="idempotency">Idempotency Guarantee</h2>
+            <p>
+                A fundamental invariant of the formatter is <strong>idempotency</strong>: formatting a file twice 
+                produces the same output as formatting it once:
+            </p>
+
+            <pre><code class="language-rust">format(source) == format(format(source))</code></pre>
+
+            <p>
+                This is guaranteed by design:
+            </p>
+            <ul>
+                <li><strong>LayoutPass</strong> always generates the same indentation regardless of the input spacing</li>
+                <li><strong>KeywordCasePass</strong> always produces the same casing for each keyword</li>
+                <li><strong>LineEndingPass</strong> normalizes to the detected style, which is the same on the second pass</li>
+                <li><strong>DeduplicateBlankLinesPass</strong> ensures no more than one blank line exists</li>
+                <li><strong>TopLevelSpacingPass</strong> produces the same insertion set each time (it classifies top-level categories from the formatted text, which is stable)</li>
+            </ul>
+
+            <p>
+                Every test case asserts this invariant:
+            </p>
+
+            <pre><code class="language-rust">let formatted_once = fmt_source(source, &amp;settings).unwrap();
+let formatted_twice = fmt_source(&amp;formatted_once, &amp;settings).unwrap();
+assert_eq!(formatted_once, formatted_twice);</code></pre>
+
+            <h2 id="future">Future Considerations</h2>
+            <p>
+                The multi-pass architecture is well-positioned for future extensions:
+            </p>
+
+            <div class="consideration">
+                <h3>1. Linting Passes</h3>
+                <p>
+                    Additional passes could detect style violations (e.g., missing <code>Option Explicit</code>, 
+                    unused variables, naming convention violations) without modifying the output. These would 
+                    report errors through <code>Context</code> rather than modifying <code>TokenBuffer</code>.
+                </p>
+                <p><strong>Trade-off:</strong> Would require a new pass variant (e.g., <code>LintPass</code>) 
+                with different output semantics — collect errors instead of modifying tokens.</p>
+            </div>
+
+            <div class="consideration">
+                <h3>2. Trivia Passing</h3>
+                <p>
+                    Currently, comments and whitespace are preserved in the CST but the passes don't perform 
+                    sophisticated trivia handling (e.g., reflowing comments, moving trailing comments to 
+                    leading comments). A dedicated trivia pass could handle these cases.
+                </p>
+                <p><strong>Trade-off:</strong> More complexity in the layout pass or a new pass, but richer 
+                comment-aware formatting.</p>
+            </div>
+
+            <div class="consideration">
+                <h3>3. Extensibility</h3>
+                <p>
+                    The pass could be made configurable at runtime, allowing users to add custom passes via 
+                    a plugin system. This would enable team-specific formatting rules without modifying the 
+                    formatter core.
+                </p>
+                <p><strong>Trade-off:</strong> Would require an unstable plugin API and more complex pass 
+                registration. Could be deferred until there's demand.</p>
+            </div>
+
+            <h3 class="performance-table">Complexity Analysis</h3>
+            <p>
+                The pipeline has the following time and space characteristics:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Complexity</th>
+                        <th>Value</th>
+                        <th>Explanation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Time</strong></td>
+                        <td><code>O(n)</code></td>
+                        <td>6 passes × n tokens = constant factor × linear</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Space (output)</strong></td>
+                        <td><code>O(n)</code></td>
+                        <td>Output buffer sized to input</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Space (context)</strong></td>
+                        <td><code>O(depth)</code></td>
+                        <td>Recursion depth of CST walk</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Space (TopLevelSpacing)</strong></td>
+                        <td><code>O(n)</code></td>
+                        <td>Stores set of insertion line numbers</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <p><strong>Key insight:</strong> The constant factor of 6 passes is negligible compared to the 
+                cost of CST construction in <code>vb6parse</code>. The formatter is typically 5-10× faster than 
+                the parser, making the multi-pass overhead imperceptible in practice.</p>
+            </div>
+
+            <h2>Summary</h2>
+            <p>
+                vb6format's multi-pass formatting pipeline is a pragmatic design that separates formatting 
+                concerns into six focused, independently testable passes. The shared <code>Context</code> and 
+                <code>TokenBuffer</code> allow passes to compose their modifications naturally, while the CST 
+                structure provides the semantic context needed for VB6-specific challenges like designer block 
+                preservation, compiler directive handling, and compound keyword casing.
+            </p>
+
+            <ol>
+                <li><strong>LineEndingPass</strong> — normalizes line endings to match the source file</li>
+                <li><strong>CompilerDirectivePass</strong> — manages blank lines around and inside <code>#If</code> blocks</li>
+                <li><strong>KeywordCasePass</strong> — normalizes keyword casing to a configured style</li>
+                <li><strong>LayoutPass</strong> — handles indentation and whitespace normalization</li>
+                <li><strong>TopLevelSpacingPass</strong> — inserts blank lines between top-level declarations</li>
+                <li><strong>DeduplicateBlankLinesPass</strong> — collapses consecutive blank lines</li>
+            </ol>
+
+            <div class="info-box">
+                <p><strong>Why multi-pass was chosen because:</strong></p>
+                <ul>
+                    <li>✅ Each formatting concern is independent and has different triggering conditions</li>
+                    <li>✅ VB6's unique features (directives, designer blocks, compound keywords) require specialized handling</li>
+                    <li>✅ Individual passes are easier to test and reason about than a monolithic formatter</li>
+                    <li>✅ Pass composition is clean — each pass modifies <code>TokenBuffer</code> independently</li>
+                    <li>✅ The pipeline is idempotent by design — every pass produces stable output</li>
+                    <li>✅ Extensions (linting, custom rules) can be added as new passes without modifying existing ones</li>
+                </ul>
+            </div>
+
+            <p>
+                This architecture successfully handles the diverse formatting requirements of VB6 source code — 
+                from hybrid .frm files with opaque designer blocks to deeply nested compiler directives — while 
+                maintaining a clean, extensible, and performant implementation.
+            </p>
+
+            <div class="related-docs">
+                <h3>Related Documentation</h3>
+                <ul>
+                    <li><a href="frm-format.html">FormFile Architecture</a> — VB6 form file structure</li>
+                    <li><a href="https://docs.rs/vb6format/latest/vb6format/" target="_blank">vb6format API Reference</a> — Rust documentation</li>
+                    <li><a href="https://github.com/scriptandcompile/vb6/tree/master/projects/vb6format" target="_blank">vb6format on GitHub</a> — Source code</li>
+                </ul>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>VB6Format is licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
+            <p>Built with ❤️ by <a href="https://github.com/scriptandcompile" target="_blank">ScriptAndCompile</a></p>
+        </div>
+    </footer>
+</body>
+</html>
