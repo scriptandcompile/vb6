@@ -43,8 +43,9 @@ windows-sys.workspace = true
 # needs an OS entropy source; on wasm32-unknown-unknown that requires
 # getrandom's `wasm_js` backend.
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen.workspace = true
 getrandom = { workspace = true, features = ["wasm_js"] }
+web-sys = { version = "0.3", optional = true }
+wasm-bindgen = { workspace = true, optional = true }
 
 [dev-dependencies]
 tempfile.workspace = true
@@ -52,7 +53,9 @@ criterion.workspace = true
 
 [features]
 default = []
-com-interop = []  # Future: COM object support
+# com-interop = []  # Future: *might* be able to add COM object support.
+wasm = ["dep:web-sys", "dep:wasm-bindgen"]
+tauri = []
 
 [package.metadata.docs.rs]
 all-features = true

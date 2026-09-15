@@ -18,6 +18,7 @@
 
 pub mod array;
 pub mod boundary;
+pub mod layout;
 pub mod library;
 pub mod state;
 pub mod stdpicture;
