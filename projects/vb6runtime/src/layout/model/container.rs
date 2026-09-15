@@ -39,6 +39,72 @@ impl Default for LayoutContainer {
     }
 }
 
+/// Top-level form container that wraps the root node of a VB6 form.
+///
+/// This struct holds form-level metadata (name, position, size, style) alongside
+/// a `root_node` that contains all child controls. Runtime-writable state
+/// (caption, visible, enabled, current_value) is stored here.
+#[derive(Debug, Clone, PartialEq)]
+pub struct LayoutForm {
+    /// The name of the form (e.g. "Form1").
+    pub name: String,
+    /// The type of control (always `Form` for this struct).
+    pub control_type: LayoutControlType,
+    /// The index in a control array (0 for non-indexed forms).
+    pub index: i32,
+    /// Position of the form, in pixels.
+    pub position: LayoutPosition,
+    /// Size of the form, in pixels.
+    pub size: LayoutSize,
+    /// Computed CSS-compatible style properties.
+    pub style: LayoutStyle,
+    /// The root node containing all child controls.
+    pub root_node: LayoutNode,
+    /// Form caption / title text.
+    pub caption: String,
+    /// Whether the form is visible.
+    pub visible: bool,
+    /// Whether the form is enabled.
+    pub enabled: bool,
+    /// Runtime-writable current value (e.g. form caption).
+    pub current_value: Option<String>,
+}
+
+impl Default for LayoutForm {
+    fn default() -> Self {
+        Self {
+            name: String::new(),
+            control_type: LayoutControlType::Form,
+            index: 0,
+            position: LayoutPosition::default(),
+            size: LayoutSize::default(),
+            style: LayoutStyle::default(),
+            root_node: LayoutNode::Container(LayoutContainer::default()),
+            caption: String::new(),
+            visible: true,
+            enabled: true,
+            current_value: None,
+        }
+    }
+}
+
+impl LayoutForm {
+    /// Returns the node ID for this form.
+    #[must_use]
+    pub fn node_id(&self) -> NodeId {
+        NodeId {
+            name: self.name.clone(),
+            kind: self.control_type,
+            index: self.index,
+        }
+    }
+
+    /// Returns an iterator over the visible children of the root node.
+    pub fn visible_children(&self) -> impl Iterator<Item = &LayoutNode> {
+        self.root_node.visible_children()
+    }
+}
+
 /// A node in the layout tree — either a container with children or a leaf control.
 #[derive(Debug, Clone, PartialEq)]
 pub enum LayoutNode {
@@ -322,5 +388,69 @@ mod tests {
         let id = container.node_id();
         assert_eq!(id.name, "Frame1");
         assert_eq!(id.kind, LayoutControlType::Frame);
+    }
+
+    #[test]
+    fn layout_form_default() {
+        let form = LayoutForm::default();
+        assert_eq!(form.name, "");
+        assert_eq!(form.control_type, LayoutControlType::Form);
+        assert_eq!(form.index, 0);
+        assert!(form.visible);
+        assert!(form.enabled);
+        assert!(form.root_node.visible());
+    }
+
+    #[test]
+    fn layout_form_node_id() {
+        let form = LayoutForm {
+            name: "Form1".into(),
+            index: 2,
+            ..LayoutForm::default()
+        };
+        let id = form.node_id();
+        assert_eq!(id.name, "Form1");
+        assert_eq!(id.kind, LayoutControlType::Form);
+        assert_eq!(id.index, 2);
+    }
+
+    #[test]
+    fn layout_form_visible_children() {
+        let child = LayoutNode::Leaf(LayoutLeaf {
+            name: "cmdOK".into(),
+            control_type: LayoutControlType::CommandButton,
+            value: Some("OK".into()),
+            visible: true,
+            ..LayoutLeaf::default()
+        });
+        let hidden = LayoutNode::Leaf(LayoutLeaf {
+            name: "lblHidden".into(),
+            control_type: LayoutControlType::Label,
+            visible: false,
+            ..LayoutLeaf::default()
+        });
+        let form = LayoutForm {
+            name: "Form1".into(),
+            root_node: LayoutNode::Container(LayoutContainer {
+                children: vec![child, hidden],
+                ..LayoutContainer::default()
+            }),
+            ..LayoutForm::default()
+        };
+        let visible: Vec<_> = form.visible_children().collect();
+        assert_eq!(visible.len(), 1);
+        assert_eq!(visible[0].node_id().name, "cmdOK");
+    }
+
+    #[test]
+    fn layout_form_has_root_container() {
+        let form = LayoutForm::default();
+        match &form.root_node {
+            LayoutNode::Container(c) => {
+                assert_eq!(c.children.len(), 0);
+                assert!(c.visible);
+            }
+            LayoutNode::Leaf(_) => panic!("root_node should be a Container"),
+        }
     }
 }
