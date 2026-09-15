@@ -5,9 +5,10 @@
 //! - [`container`] — `LayoutNode`, `LayoutContainer`, `LayoutLeaf`
 //! - [`style`] — `LayoutStyle` (CSS-compatible style properties)
 
-/// Container node hierarchy: `LayoutContainer`, `LayoutLeaf`, `LayoutNode`.
 pub mod container;
-/// `LayoutStyle` struct — CSS-compatible style properties.
 pub mod style;
-/// Shared enums and structs: `LayoutControlType`, `LayoutPosition`, `LayoutSize`, `NodeId`.
 pub mod types;
+
+pub use container::{LayoutContainer, LayoutLeaf, LayoutNode};
+pub use style::{CssColor, LayoutStyle};
+pub use types::{LayoutControlType, LayoutPosition, LayoutSize, NodeId};
