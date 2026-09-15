@@ -119,9 +119,11 @@ mod tests {
 
     #[test]
     fn style_with_fonts() {
-        let mut style = LayoutStyle::default();
-        style.font_family = Some("Arial".into());
-        style.font_size = Some(12.0);
+        let style = LayoutStyle {
+            font_family: Some("Arial".into()),
+            font_size: Some(12.0),
+            ..LayoutStyle::default()
+        };
         let css = style_to_css(&style);
         assert!(css.contains("font-family: Arial"));
         assert!(css.contains("font-size: 12.0px"));
@@ -129,9 +131,11 @@ mod tests {
 
     #[test]
     fn style_with_colors() {
-        let mut style = LayoutStyle::default();
-        style.background_color = Some(CssColor::Rgb(255, 0, 0));
-        style.color = Some(CssColor::Rgb(0, 0, 0));
+        let style = LayoutStyle {
+            background_color: Some(CssColor::Rgb(255, 0, 0)),
+            color: Some(CssColor::Rgb(0, 0, 0)),
+            ..LayoutStyle::default()
+        };
         let css = style_to_css(&style);
         assert!(css.contains("background-color: rgb(255, 0, 0)"));
         assert!(css.contains("color: rgb(0, 0, 0)"));
@@ -139,8 +143,10 @@ mod tests {
 
     #[test]
     fn style_with_border() {
-        let mut style = LayoutStyle::default();
-        style.border = Some("1px solid rgb(0, 0, 0)".into());
+        let style = LayoutStyle {
+            border: Some("1px solid rgb(0, 0, 0)".into()),
+            ..LayoutStyle::default()
+        };
         let css = style_to_css(&style);
         assert!(css.contains("border: 1px solid rgb(0, 0, 0)"));
     }
@@ -154,17 +160,19 @@ mod tests {
 
     #[test]
     fn style_with_multiple_properties() {
-        let mut style = LayoutStyle::default();
-        style.font_family = Some("MS Sans Serif".into());
-        style.font_size = Some(11.0);
-        style.font_weight = Some("bold".into());
-        style.font_style = Some("italic".into());
-        style.color = Some(CssColor::Rgb(0, 0, 0));
-        style.background_color = Some(CssColor::Named("Window".into()));
-        style.text_align = Some("center".into());
-        style.border = Some("1px solid rgb(120, 120, 120)".into());
-        style.overflow = Some("hidden".into());
-        style.white_space = Some("pre-wrap".into());
+        let style = LayoutStyle {
+            font_family: Some("MS Sans Serif".into()),
+            font_size: Some(11.0),
+            font_weight: Some("bold".into()),
+            font_style: Some("italic".into()),
+            color: Some(CssColor::Rgb(0, 0, 0)),
+            background_color: Some(CssColor::Named("Window".into())),
+            text_align: Some("center".into()),
+            border: Some("1px solid rgb(120, 120, 120)".into()),
+            overflow: Some("hidden".into()),
+            white_space: Some("pre-wrap".into()),
+            ..LayoutStyle::default()
+        };
 
         let css = style_to_css(&style);
         assert!(css.contains("font-family: \"MS Sans Serif\""));
@@ -181,10 +189,12 @@ mod tests {
 
     #[test]
     fn style_with_shape_properties() {
-        let mut style = LayoutStyle::default();
-        style.border_radius = Some(8.0);
-        style.border_width = Some(2.0);
-        style.fill_color = Some(CssColor::Rgb(255, 255, 0));
+        let style = LayoutStyle {
+            border_radius: Some(8.0),
+            border_width: Some(2.0),
+            fill_color: Some(CssColor::Rgb(255, 255, 0)),
+            ..LayoutStyle::default()
+        };
         let css = style_to_css(&style);
         assert!(css.contains("border-radius: 8.0px"));
         assert!(css.contains("border-width: 2.0px"));
@@ -193,13 +203,15 @@ mod tests {
 
     #[test]
     fn style_with_line_properties() {
-        let mut style = LayoutStyle::default();
-        style.line_color = Some(CssColor::Rgb(255, 0, 0));
-        style.line_width = Some(1.5);
-        style.line_x1 = Some(0.0);
-        style.line_y1 = Some(0.0);
-        style.line_x2 = Some(100.0);
-        style.line_y2 = Some(50.0);
+        let style = LayoutStyle {
+            line_color: Some(CssColor::Rgb(255, 0, 0)),
+            line_width: Some(1.5),
+            line_x1: Some(0.0),
+            line_y1: Some(0.0),
+            line_x2: Some(100.0),
+            line_y2: Some(50.0),
+            ..LayoutStyle::default()
+        };
         let css = style_to_css(&style);
         assert!(css.contains("line-color: rgb(255, 0, 0)"));
         assert!(css.contains("line-width: 1.5px"));
@@ -211,8 +223,10 @@ mod tests {
 
     #[test]
     fn style_with_none_fields_omitted() {
-        let mut style = LayoutStyle::default();
-        style.font_family = Some("Arial".into());
+        let style = LayoutStyle {
+            font_family: Some("Arial".into()),
+            ..LayoutStyle::default()
+        };
         // All other fields remain None
         let css = style_to_css(&style);
         assert!(css.contains("font-family: Arial"));
