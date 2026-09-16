@@ -2,19 +2,14 @@
 //!
 //! Execute VB6 code directly without compilation.
 
-#[cfg(feature = "tauri")]
-#[path = "tauri_cmds.rs"]
-mod tauri_cmds;
-
-#[cfg(feature = "tauri")]
-#[path = "tauri_html.rs"]
-mod tauri_html;
-
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
+
+#[cfg(feature = "tauri")]
+use vb6interpret::tauri_cmds;
 
 use vb6interpret::{Interpreter, LoadedProject, StartupObject, project};
 use vb6parse::errors::{ErrorKind, SourceFileError};
@@ -111,7 +106,7 @@ fn run_cli() -> Result<()> {
                         CompileTargetType::Exe => {}
                         other => bail!("Unsupported project type: {:?}", other),
                     }
-                    let form_bytes = match &project.startup_object {
+                    match &project.startup_object {
                         StartupObject::SubMain { .. } => {
                             return run_console_project(project, &set, timeout, res.as_deref());
                         }
@@ -119,17 +114,18 @@ fn run_cli() -> Result<()> {
                             bail!("No startup object found in project");
                         }
                         StartupObject::Form { form_name } => {
-                            let loaded_form = project
+                            let form_bytes = project
                                 .forms
                                 .iter()
                                 .find(|f| f.name == *form_name)
                                 .ok_or_else(|| {
-                                anyhow::anyhow!("Form '{}' not found", form_name)
-                            })?;
-                            loaded_form.raw_bytes.clone()
+                                    anyhow::anyhow!("Form '{}' not found", form_name)
+                                })?
+                                .raw_bytes
+                                .clone();
+                            run_form_project(project, form_bytes)?;
                         }
-                    };
-                    run_form_project(expand_tilde(&path), form_bytes)?;
+                    }
                 }
                 Some(ext) => bail!("Unsupported file type: .{}", ext),
                 None => run_vbp_in_cwd(&set, timeout, res.as_deref())?,
@@ -319,12 +315,10 @@ fn run_bas_file(
     Ok(())
 }
 
-#[allow(unused_variables)]
-fn run_form_project(_path: PathBuf, form_bytes: Vec<u8>) -> Result<!> {
+fn run_form_project(project: LoadedProject, startup_form_bytes: Vec<u8>) -> Result<!> {
     #[cfg(feature = "tauri")]
     {
-        launch_tauri(form_bytes);
-        unreachable!()
+        launch_tauri(project, startup_form_bytes);
     }
     #[cfg(not(feature = "tauri"))]
     {
@@ -333,17 +327,26 @@ fn run_form_project(_path: PathBuf, form_bytes: Vec<u8>) -> Result<!> {
 }
 
 #[cfg(feature = "tauri")]
-fn launch_tauri(form_bytes: Vec<u8>) -> ! {
+fn launch_tauri(project: LoadedProject, startup_form_bytes: Vec<u8>) -> ! {
     use tauri::Manager;
     use tauri::generate_handler;
+
+    let engine_handle = tauri_cmds::spawn_engine(project);
 
     tauri::Builder::default()
         .invoke_handler(generate_handler![
             tauri_cmds::load_form,
             tauri_cmds::update_form,
+            tauri_cmds::run_project,
+            tauri_cmds::stop_engine,
+            tauri_cmds::form_event,
+            tauri_cmds::get_output,
+            tauri_cmds::set_variable,
+            tauri_cmds::get_variable,
         ])
-        .setup(|app| {
-            app.manage(form_bytes);
+        .setup(move |app| {
+            app.manage(startup_form_bytes);
+            app.manage(engine_handle);
             let window = tauri::WebviewWindowBuilder::new(
                 app,
                 "main",
@@ -410,12 +413,14 @@ fn run_vbp_in_cwd(set: &[String], timeout: u64, res: Option<&Path>) -> Result<()
                     bail!("No startup object found in project");
                 }
                 StartupObject::Form { form_name } => {
-                    let loaded_form = project
+                    let form_bytes = project
                         .forms
                         .iter()
                         .find(|f| f.name == *form_name)
-                        .ok_or_else(|| anyhow::anyhow!("Form '{}' not found", form_name))?;
-                    run_form_project(vbps[0].path(), loaded_form.raw_bytes.clone())?;
+                        .ok_or_else(|| anyhow::anyhow!("Form '{}' not found", form_name))?
+                        .raw_bytes
+                        .clone();
+                    run_form_project(project, form_bytes)?;
                 }
             }
         }

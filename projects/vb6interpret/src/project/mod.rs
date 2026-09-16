@@ -316,4 +316,35 @@ impl LoadedProject {
 
         StartupObject::None
     }
+
+    /// Render the startup form to HTML using the Tauri renderer.
+    ///
+    /// Only works when the startup object is a form. Returns the rendered
+    /// HTML string and the form handle used by the layout engine.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the project has no form startup object or if
+    /// the named form is not found among the loaded forms.
+    pub fn render_startup_form(&self) -> Result<(String, u32)> {
+        let form_name = match &self.startup_object {
+            StartupObject::Form { form_name } => form_name.clone(),
+            _ => anyhow::bail!("Project has no form startup object"),
+        };
+
+        let loaded_form = self
+            .forms
+            .iter()
+            .find(|f| f.name == form_name)
+            .ok_or_else(|| anyhow::anyhow!("Form '{}' not found", form_name))?;
+
+        let handle = vb6runtime::layout::load_form(
+            &loaded_form.parsed.form,
+            &vb6runtime::layout::LayoutConfig::default(),
+        );
+        let html =
+            vb6runtime::layout::render(handle, &vb6runtime::layout::renderer::TauriRenderer::new(false));
+
+        Ok((html, handle))
+    }
 }

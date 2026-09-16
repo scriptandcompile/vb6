@@ -45,7 +45,7 @@ static NEXT_ENGINE_HANDLE: LazyLock<Mutex<EngineHandle>> = LazyLock::new(|| Mute
 /// global engine store.
 ///
 /// Returns the handle assigned to the new engine.
-pub(crate) fn spawn_engine(project: crate::project::LoadedProject) -> EngineHandle {
+pub fn spawn_engine(project: crate::project::LoadedProject) -> EngineHandle {
     let (engine, _resp_rx) = TauriEngine::spawn(project);
     let mut handle = NEXT_ENGINE_HANDLE.lock().unwrap();
     let current = *handle;

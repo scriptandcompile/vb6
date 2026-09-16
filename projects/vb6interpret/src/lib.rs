@@ -16,13 +16,13 @@ pub mod program;
 pub mod project;
 pub mod scope;
 
-/// Tauri command handlers for form rendering (only compiled with `tauri` feature).
-#[cfg(feature = "tauri")]
-pub mod tauri_cmds;
-
 /// Tauri background engine with IPC channels (only compiled with `tauri` feature).
 #[cfg(feature = "tauri")]
 pub mod tauri_engine;
+
+/// Tauri command handlers for form rendering (only compiled with `tauri` feature).
+#[cfg(feature = "tauri")]
+pub mod tauri_cmds;
 
 #[cfg(feature = "tauri")]
 pub use tauri_engine::{TauriCommand, TauriEngine, TauriEngineHandle, TauriResponse};
