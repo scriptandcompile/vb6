@@ -342,8 +342,10 @@ impl LoadedProject {
             &loaded_form.parsed.form,
             &vb6runtime::layout::LayoutConfig::default(),
         );
-        let html =
-            vb6runtime::layout::render(handle, &vb6runtime::layout::renderer::TauriRenderer::new(false));
+        let html = vb6runtime::layout::render(
+            handle,
+            &vb6runtime::layout::renderer::TauriRenderer::new(false),
+        );
 
         Ok((html, handle))
     }
