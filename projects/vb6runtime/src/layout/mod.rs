@@ -965,7 +965,10 @@ mod tests {
         let handle = load_form(&FormRoot::Form(form), &config);
         let html = render(handle, &renderer::TauriRenderer::new(false));
         assert!(!html.is_empty());
-        assert!(html.contains("vb6-picturebox"), "missing vb6-picturebox in: {html}");
+        assert!(
+            html.contains("vb6-picturebox"),
+            "missing vb6-picturebox in: {html}"
+        );
         assert!(html.contains("vb6-frame"), "missing vb6-frame in: {html}");
         assert!(html.contains("vb6-label"), "missing vb6-label in: {html}");
         assert!(html.contains("Deeply nested"), "missing caption in: {html}");
@@ -1050,7 +1053,10 @@ mod tests {
         let html = render(handle, &renderer::TauriRenderer::new(false));
         assert!(!html.is_empty());
         assert!(html.contains("vb6-frame"), "missing vb6-frame in: {html}");
-        assert!(html.contains("vb6-picturebox"), "missing vb6-picturebox in: {html}");
+        assert!(
+            html.contains("vb6-picturebox"),
+            "missing vb6-picturebox in: {html}"
+        );
         assert!(html.contains("vb6-label"), "missing vb6-label in: {html}");
     }
 }

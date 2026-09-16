@@ -47,7 +47,7 @@ static STORE: LazyLock<Mutex<HashMap<FormHandle, LayoutForm>>> =
 /// Next handle ID to assign.
 ///
 /// Stored separately from the store so that handle allocation doesn't
-/// conflict with form data access. 
+/// conflict with form data access.
 static NEXT_HANDLE: LazyLock<Mutex<FormHandle>> = LazyLock::new(|| Mutex::new(0));
 
 /// Insert a form into the store and return its handle.

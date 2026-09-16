@@ -1,7 +1,12 @@
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, criterion_group, criterion_main};
 use std::hint::black_box;
-use vb6runtime::layout::{self, renderer::{Renderer, TauriRenderer}};
-use vb6runtime::layout::model::{LayoutControlType, LayoutLeaf, LayoutNode, LayoutPosition, LayoutSize};
+use vb6runtime::layout::model::{
+    LayoutControlType, LayoutLeaf, LayoutNode, LayoutPosition, LayoutSize,
+};
+use vb6runtime::layout::{
+    self,
+    renderer::{Renderer, TauriRenderer},
+};
 
 fn make_label_leaf(index: i32, value: &str) -> LayoutLeaf {
     let idx = index as f32;
@@ -13,7 +18,10 @@ fn make_label_leaf(index: i32, value: &str) -> LayoutLeaf {
             left: (idx * 200.0) % 500.0,
             top: ((index / 5) as f32) * 200.0,
         },
-        size: LayoutSize { width: 500.0, height: 200.0 },
+        size: LayoutSize {
+            width: 500.0,
+            height: 200.0,
+        },
         style: Default::default(),
         value: Some(value.to_string()),
         visible: true,
@@ -31,7 +39,10 @@ fn make_button_leaf(index: i32) -> LayoutLeaf {
             left: (idx * 300.0) % 600.0,
             top: 100.0 + ((index / 4) as f32) * 200.0,
         },
-        size: LayoutSize { width: 400.0, height: 200.0 },
+        size: LayoutSize {
+            width: 400.0,
+            height: 200.0,
+        },
         style: Default::default(),
         value: Some(format!("Button {}", index)),
         visible: true,
@@ -49,7 +60,10 @@ fn make_textbox_leaf(index: i32) -> LayoutLeaf {
             left: (idx * 250.0) % 550.0,
             top: 150.0 + ((index / 3) as f32) * 200.0,
         },
-        size: LayoutSize { width: 600.0, height: 250.0 },
+        size: LayoutSize {
+            width: 600.0,
+            height: 250.0,
+        },
         style: Default::default(),
         value: Some(format!("Text {}", index)),
         visible: true,
@@ -70,14 +84,20 @@ fn build_form_with_labels(count: usize) -> layout::model::LayoutForm {
         control_type: LayoutControlType::Form,
         index: 0,
         position: LayoutPosition::default(),
-        size: LayoutSize { width: 1000.0, height: 800.0 },
+        size: LayoutSize {
+            width: 1000.0,
+            height: 800.0,
+        },
         style: Default::default(),
         root_node: LayoutNode::Container(layout::model::LayoutContainer {
             name: "BenchmarkForm".to_string(),
             control_type: LayoutControlType::Form,
             index: 0,
             position: LayoutPosition::default(),
-            size: LayoutSize { width: 1000.0, height: 800.0 },
+            size: LayoutSize {
+                width: 1000.0,
+                height: 800.0,
+            },
             style: Default::default(),
             children,
             caption: Some("Benchmark Form".to_string()),
@@ -116,14 +136,20 @@ fn build_form_with_mixed_controls(count: usize) -> layout::model::LayoutForm {
         control_type: LayoutControlType::Form,
         index: 0,
         position: LayoutPosition::default(),
-        size: LayoutSize { width: 1200.0, height: 900.0 },
+        size: LayoutSize {
+            width: 1200.0,
+            height: 900.0,
+        },
         style: Default::default(),
         root_node: LayoutNode::Container(layout::model::LayoutContainer {
             name: "MixedForm".to_string(),
             control_type: LayoutControlType::Form,
             index: 0,
             position: LayoutPosition::default(),
-            size: LayoutSize { width: 1200.0, height: 900.0 },
+            size: LayoutSize {
+                width: 1200.0,
+                height: 900.0,
+            },
             style: Default::default(),
             children,
             caption: Some("Mixed Control Form".to_string()),
@@ -194,13 +220,13 @@ fn benchmark_diff_vs_full_render(c: &mut Criterion) {
         b.iter(|| {
             let mut f = form.clone();
             f.snapshot = Some(f.root_node.to_snapshot());
-            let diff = f.snapshot.as_ref().map(|snap| {
-                layout::DiffEngine::compute_diff(snap, &f.root_node)
-            });
-            black_box(renderer.render_node_with_diff(
-                black_box(&f.root_node),
-                black_box(diff.as_ref()),
-            ))
+            let diff = f
+                .snapshot
+                .as_ref()
+                .map(|snap| layout::DiffEngine::compute_diff(snap, &f.root_node));
+            black_box(
+                renderer.render_node_with_diff(black_box(&f.root_node), black_box(diff.as_ref())),
+            )
         })
     });
 
@@ -215,13 +241,13 @@ fn benchmark_diff_vs_full_render(c: &mut Criterion) {
             {
                 leaf.value = Some("MUTATED".to_string());
             }
-            let diff = f.snapshot.as_ref().map(|snap| {
-                layout::DiffEngine::compute_diff(snap, &f.root_node)
-            });
-            black_box(renderer.render_node_with_diff(
-                black_box(&f.root_node),
-                black_box(diff.as_ref()),
-            ))
+            let diff = f
+                .snapshot
+                .as_ref()
+                .map(|snap| layout::DiffEngine::compute_diff(snap, &f.root_node));
+            black_box(
+                renderer.render_node_with_diff(black_box(&f.root_node), black_box(diff.as_ref())),
+            )
         })
     });
 }

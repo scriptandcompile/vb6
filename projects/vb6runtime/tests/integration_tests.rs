@@ -65,11 +65,26 @@ mod integration_tests {
     #[test]
     fn simple_form_has_label_and_button() {
         let html = render_form("simple.frm");
-        assert!(html.contains("vb6-form"), "html should contain vb6-form class");
-        assert!(html.contains("vb6-label"), "html should contain vb6-label class");
-        assert!(html.contains("vb6-commandbutton"), "html should contain vb6-commandbutton class");
-        assert!(html.contains("Hello World"), "html should contain label caption");
-        assert!(html.contains("&amp;OK"), "html should contain escaped button caption");
+        assert!(
+            html.contains("vb6-form"),
+            "html should contain vb6-form class"
+        );
+        assert!(
+            html.contains("vb6-label"),
+            "html should contain vb6-label class"
+        );
+        assert!(
+            html.contains("vb6-commandbutton"),
+            "html should contain vb6-commandbutton class"
+        );
+        assert!(
+            html.contains("Hello World"),
+            "html should contain label caption"
+        );
+        assert!(
+            html.contains("&amp;OK"),
+            "html should contain escaped button caption"
+        );
     }
 
     #[test]
@@ -78,9 +93,18 @@ mod integration_tests {
         // Note: The .vb6-app scope root wrapper is not yet applied in render_container.
         // This test verifies the renderer works without panicking.
         let html = render_form_with_scope("simple.frm");
-        assert!(!html.is_empty(), "scoped render should produce non-empty HTML");
-        assert!(html.contains("vb6-form"), "scoped render should contain vb6-form");
-        assert!(html.contains("vb6-label"), "scoped render should contain vb6-label");
+        assert!(
+            !html.is_empty(),
+            "scoped render should produce non-empty HTML"
+        );
+        assert!(
+            html.contains("vb6-form"),
+            "scoped render should contain vb6-form"
+        );
+        assert!(
+            html.contains("vb6-label"),
+            "scoped render should contain vb6-label"
+        );
     }
 
     // ---- container.frm tests ----
@@ -98,12 +122,30 @@ mod integration_tests {
     fn container_form_has_frame_and_nested_label() {
         let html = render_form("container.frm");
         assert!(html.contains("vb6-form"));
-        assert!(html.contains("vb6-frame"), "html should contain vb6-frame class");
-        assert!(html.contains("<fieldset"), "frame should render as fieldset");
-        assert!(html.contains("<legend>"), "frame should have a legend element");
-        assert!(html.contains("Group Box"), "legend should contain frame caption");
-        assert!(html.contains("vb6-label"), "html should contain nested vb6-label");
-        assert!(html.contains("Inside Frame"), "nested label should have correct caption");
+        assert!(
+            html.contains("vb6-frame"),
+            "html should contain vb6-frame class"
+        );
+        assert!(
+            html.contains("<fieldset"),
+            "frame should render as fieldset"
+        );
+        assert!(
+            html.contains("<legend>"),
+            "frame should have a legend element"
+        );
+        assert!(
+            html.contains("Group Box"),
+            "legend should contain frame caption"
+        );
+        assert!(
+            html.contains("vb6-label"),
+            "html should contain nested vb6-label"
+        );
+        assert!(
+            html.contains("Inside Frame"),
+            "nested label should have correct caption"
+        );
     }
 
     // ---- multiline.frm tests ----
@@ -121,7 +163,10 @@ mod integration_tests {
     fn multiline_form_has_textbox() {
         let html = render_form("multiline.frm");
         assert!(html.contains("vb6-form"));
-        assert!(html.contains("vb6-textbox"), "html should contain vb6-textbox class");
+        assert!(
+            html.contains("vb6-textbox"),
+            "html should contain vb6-textbox class"
+        );
     }
 
     // ---- full_controls.frm tests ----
@@ -140,10 +185,16 @@ mod integration_tests {
         let html = render_form("full_controls.frm");
         assert!(html.contains("vb6-form"));
         assert!(html.contains("vb6-label"), "should have label");
-        assert!(html.contains("vb6-commandbutton"), "should have command button");
+        assert!(
+            html.contains("vb6-commandbutton"),
+            "should have command button"
+        );
         assert!(html.contains("vb6-frame"), "should have frame");
         assert!(html.contains("vb6-checkbox"), "should have checkbox");
-        assert!(html.contains("vb6-optionbutton"), "should have option button");
+        assert!(
+            html.contains("vb6-optionbutton"),
+            "should have option button"
+        );
         assert!(html.contains("vb6-picturebox"), "should have picturebox");
         assert!(html.contains("vb6-shape"), "should have shape");
         assert!(html.contains("vb6-combobox"), "should have combobox");
@@ -154,7 +205,10 @@ mod integration_tests {
     fn full_controls_form_has_captions() {
         let html = render_form("full_controls.frm");
         assert!(html.contains("Title Label"), "should have label caption");
-        assert!(html.contains("Options"), "should have frame caption in legend");
+        assert!(
+            html.contains("Options"),
+            "should have frame caption in legend"
+        );
         // Note: checkbox/optionbutton captions are not rendered in current implementation
         // (they use the value field for checked state instead of caption text)
     }
@@ -173,10 +227,22 @@ mod integration_tests {
     #[test]
     fn empty_form_has_no_control_elements() {
         let html = render_form("empty_form.frm");
-        assert!(html.contains("vb6-form"), "should still have form container");
-        assert!(!html.contains("vb6-label"), "should not have label controls");
-        assert!(!html.contains("vb6-textbox"), "should not have textbox controls");
-        assert!(!html.contains("vb6-commandbutton"), "should not have button controls");
+        assert!(
+            html.contains("vb6-form"),
+            "should still have form container"
+        );
+        assert!(
+            !html.contains("vb6-label"),
+            "should not have label controls"
+        );
+        assert!(
+            !html.contains("vb6-textbox"),
+            "should not have textbox controls"
+        );
+        assert!(
+            !html.contains("vb6-commandbutton"),
+            "should not have button controls"
+        );
     }
 
     // ---- render pipeline tests ----
@@ -195,7 +261,11 @@ mod integration_tests {
         let handle = layout::load_form(&form_file.form, &LayoutConfig::default());
         let width = layout::get_form(handle, |f| f.size.width);
         // 4000 twips at 96 DPI = 4000 / 15 = 266.67 px
-        assert!((width.unwrap() - 266.67).abs() < 0.1, "form width should be approximately 266.67px, got {}", width.unwrap());
+        assert!(
+            (width.unwrap() - 266.67).abs() < 0.1,
+            "form width should be approximately 266.67px, got {}",
+            width.unwrap()
+        );
     }
 
     #[test]
@@ -220,8 +290,16 @@ mod integration_tests {
             let handle = layout::load_form(&form_file.form, &LayoutConfig::default());
             let renderer = TauriRenderer::new(false);
             let html = layout::render(handle, &renderer);
-            assert!(!html.is_empty(), "rendering {} produced empty HTML", fixture);
-            assert!(html.contains("vb6-form"), "rendering {} should contain vb6-form", fixture);
+            assert!(
+                !html.is_empty(),
+                "rendering {} produced empty HTML",
+                fixture
+            );
+            assert!(
+                html.contains("vb6-form"),
+                "rendering {} should contain vb6-form",
+                fixture
+            );
         }
     }
 }
