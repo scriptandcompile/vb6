@@ -129,17 +129,37 @@ pub fn stop_engine(engine_handle: EngineHandle) -> bool {
     }
 }
 
+/// Event dispatch status returned after calling a form control event handler.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+pub enum FormEventStatus {
+    /// The event handler completed successfully.
+    Handled,
+    /// The program was terminated (End statement) during event handling.
+    Terminated,
+}
+
 /// Tauri command: dispatch a form control event to the engine's interpreter.
 ///
 /// Constructs a procedure name from `{control}_{event}` (e.g.
 /// `cmdOK_Click`) and calls it as a sub procedure on the interpreter.
 /// This simulates a user interaction with a rendered form control.
+///
+/// Returns a status indicating whether the event handler completed
+/// normally or if the program was terminated during execution.
 #[command]
-pub fn form_event(engine_handle: EngineHandle, control: String, event: String) {
+pub fn form_event(engine_handle: EngineHandle, control: String, event: String) -> FormEventStatus {
     if let Some(engine) = get_engine(engine_handle) {
         let proc_name = format!("{}_{}", control, event);
         let mut interp = engine.interpreter.lock().unwrap();
-        let _ = interp.call_sub(&proc_name, vec![]);
+        match interp.call_sub(&proc_name, vec![]) {
+            Ok(_) => FormEventStatus::Handled,
+            Err(e) => {
+                eprintln!("Event handler error for '{}_{}': {}", control, event, e.error);
+                FormEventStatus::Handled
+            }
+        }
+    } else {
+        FormEventStatus::Handled
     }
 }
 

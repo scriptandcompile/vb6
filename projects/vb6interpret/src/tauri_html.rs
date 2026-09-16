@@ -58,12 +58,16 @@ pub const HTML: &str = r#"<!DOCTYPE html>
                 if (el) {
                     el.addEventListener(event, async (e) => {
                         try {
-                            await invoke('form_event', {
+                            const status = await invoke('form_event', {
                                 engineHandle: engineHandle,
                                 control: control,
                                 event: event,
                             });
-                            window.statusEl.textContent = 'Event dispatched: ' + procedure;
+                            if (status === 'Handled') {
+                                window.statusEl.textContent = 'Event dispatched: ' + procedure;
+                            } else if (status === 'Terminated') {
+                                window.statusEl.textContent = 'Program terminated';
+                            }
                         } catch (err) {
                             window.statusEl.textContent = 'Event error: ' + err;
                         }
