@@ -74,3 +74,153 @@ fn alignment_css(alignment: Alignment) -> Option<String> {
         Alignment::LeftJustify => Some("left".to_string()),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::super::super::model::style::CssColor;
+    use super::*;
+    use vb6parse::language::Color;
+    use vb6parse::language::MultiLine;
+
+    fn test_config() -> LayoutConfig {
+        LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn basic_style_default() {
+        let props = TextBoxProperties {
+            font: None,
+            border_style: BorderStyle::None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        assert!(style.background_color.is_some());
+        assert!(style.color.is_some());
+        assert!(style.font_family.is_none());
+        assert_eq!(style.overflow, None);
+        assert_eq!(style.border, None);
+    }
+
+    #[test]
+    fn multiline_overflow() {
+        let props = TextBoxProperties {
+            multi_line: MultiLine::MultiLine,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        assert_eq!(style.overflow, Some("auto".to_string()));
+    }
+
+    #[test]
+    fn singleline_no_overflow() {
+        let props = TextBoxProperties {
+            multi_line: MultiLine::SingleLine,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        assert_eq!(style.overflow, None);
+    }
+
+    #[test]
+    fn border_fixed_single() {
+        let props = TextBoxProperties {
+            border_style: BorderStyle::FixedSingle,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        assert_eq!(style.border, Some("1px solid".to_string()));
+    }
+
+    #[test]
+    fn border_none() {
+        let props = TextBoxProperties {
+            border_style: BorderStyle::None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        assert_eq!(style.border, None);
+    }
+
+    #[test]
+    fn text_alignment_left() {
+        let props = TextBoxProperties {
+            alignment: Alignment::LeftJustify,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        assert_eq!(style.text_align, Some("left".to_string()));
+    }
+
+    #[test]
+    fn text_alignment_center() {
+        let props = TextBoxProperties {
+            alignment: Alignment::Center,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        assert_eq!(style.text_align, Some("center".to_string()));
+    }
+
+    #[test]
+    fn text_alignment_right() {
+        let props = TextBoxProperties {
+            alignment: Alignment::RightJustify,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        assert_eq!(style.text_align, Some("right".to_string()));
+    }
+
+    #[test]
+    fn font_properties_applied() {
+        let props = TextBoxProperties {
+            font: Some(vb6parse::language::Font {
+                name: "Times New Roman".into(),
+                size: 14.0,
+                weight: 400,
+                italic: false,
+                underline: false,
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        assert_eq!(style.font_family, Some("Times New Roman".to_string()));
+        assert!((style.font_size.unwrap() - 18.67).abs() < 0.01);
+        assert_eq!(style.font_style, Some("normal".to_string()));
+        assert_eq!(style.text_decoration, Some("none".to_string()));
+    }
+
+    #[test]
+    fn custom_colors() {
+        let props = TextBoxProperties {
+            back_color: Color::RGB {
+                red: 255,
+                green: 255,
+                blue: 0,
+            },
+            fore_color: Color::RGB {
+                red: 0,
+                green: 0,
+                blue: 255,
+            },
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        assert_eq!(style.background_color, Some(CssColor::Rgb(255, 255, 0)));
+        assert_eq!(style.color, Some(CssColor::Rgb(0, 0, 255)));
+    }
+}

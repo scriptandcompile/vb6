@@ -55,3 +55,73 @@ fn font_weight_css(weight: i32) -> Option<String> {
         _ => None,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::super::super::model::style::CssColor;
+    use super::*;
+    use vb6parse::language::Color;
+
+    fn test_config() -> LayoutConfig {
+        LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn basic_style_default() {
+        let props = ListBoxProperties {
+            font: None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_listbox_style(&props, &config);
+        assert!(style.background_color.is_some());
+        assert!(style.color.is_some());
+        assert!(style.font_family.is_none());
+        assert_eq!(style.overflow, Some("auto".to_string()));
+    }
+
+    #[test]
+    fn overflow_auto() {
+        let props = ListBoxProperties::default();
+        let config = test_config();
+        let style = build_listbox_style(&props, &config);
+        assert_eq!(style.overflow, Some("auto".to_string()));
+    }
+
+    #[test]
+    fn font_properties_set() {
+        let props = ListBoxProperties {
+            font: Some(vb6parse::language::Font {
+                name: "Consolas".into(),
+                size: 10.0,
+                weight: 400,
+                italic: false,
+                underline: false,
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_listbox_style(&props, &config);
+        assert_eq!(style.font_family, Some("Consolas".to_string()));
+        assert!((style.font_size.unwrap() - 13.33).abs() < 0.01);
+    }
+
+    #[test]
+    fn back_color_custom() {
+        let props = ListBoxProperties {
+            back_color: Color::RGB {
+                red: 255,
+                green: 255,
+                blue: 220,
+            },
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_listbox_style(&props, &config);
+        assert_eq!(style.background_color, Some(CssColor::Rgb(255, 255, 220)));
+    }
+}

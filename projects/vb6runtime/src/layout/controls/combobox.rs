@@ -53,3 +53,84 @@ fn font_weight_css(weight: i32) -> Option<String> {
         _ => None,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::super::super::model::style::CssColor;
+    use super::*;
+    use vb6parse::language::Color;
+
+    fn test_config() -> LayoutConfig {
+        LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn basic_style_default() {
+        let props = ComboBoxProperties {
+            font: None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_combobox_style(&props, &config);
+        assert!(style.background_color.is_some());
+        assert!(style.color.is_some());
+        assert!(style.font_family.is_none());
+    }
+
+    #[test]
+    fn font_properties_set() {
+        let props = ComboBoxProperties {
+            font: Some(vb6parse::language::Font {
+                name: "Segoe UI".into(),
+                size: 11.0,
+                weight: 400,
+                italic: false,
+                underline: false,
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_combobox_style(&props, &config);
+        assert_eq!(style.font_family, Some("Segoe UI".to_string()));
+        assert!((style.font_size.unwrap() - 14.67).abs() < 0.01);
+        assert_eq!(style.font_style, Some("normal".to_string()));
+    }
+
+    #[test]
+    fn back_color_custom() {
+        let props = ComboBoxProperties {
+            back_color: Color::RGB {
+                red: 240,
+                green: 240,
+                blue: 240,
+            },
+            fore_color: Color::RGB {
+                red: 30,
+                green: 30,
+                blue: 30,
+            },
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_combobox_style(&props, &config);
+        assert_eq!(style.background_color, Some(CssColor::Rgb(240, 240, 240)));
+        assert_eq!(style.color, Some(CssColor::Rgb(30, 30, 30)));
+    }
+
+    #[test]
+    fn font_not_set() {
+        let props = ComboBoxProperties {
+            font: None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_combobox_style(&props, &config);
+        assert!(style.font_family.is_none());
+        assert!(style.font_size.is_none());
+        assert!(style.font_weight.is_none());
+    }
+}

@@ -13,3 +13,43 @@ pub fn build_scrollbar_style(_props: &ScrollBarProperties, config: &LayoutConfig
     let _ = config;
     LayoutStyle::default()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_config() -> LayoutConfig {
+        LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn returns_default_style() {
+        let props = ScrollBarProperties::default();
+        let config = test_config();
+        let style = build_scrollbar_style(&props, &config);
+        assert_eq!(style, LayoutStyle::default());
+    }
+
+    #[test]
+    fn ignores_properties() {
+        let props = ScrollBarProperties::default();
+        let config = test_config();
+        let style = build_scrollbar_style(&props, &config);
+        assert!(style.background_color.is_none());
+        assert!(style.border.is_none());
+    }
+
+    #[test]
+    fn ignores_config() {
+        let props = ScrollBarProperties::default();
+        let config = LayoutConfig {
+            dpi: 192,
+            ..Default::default()
+        };
+        let style = build_scrollbar_style(&props, &config);
+        assert_eq!(style, LayoutStyle::default());
+    }
+}

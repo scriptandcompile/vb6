@@ -83,3 +83,128 @@ fn font_weight_css(weight: i32) -> Option<String> {
         _ => None,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::super::super::model::style::CssColor;
+    use super::*;
+    use vb6parse::language::Color;
+
+    fn test_config() -> LayoutConfig {
+        LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        }
+    }
+
+    // CheckBox tests
+    #[test]
+    fn checkbox_basic_style_default() {
+        let props = CheckBoxProperties {
+            font: None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_checkbox_style(&props, &config);
+        assert!(style.background_color.is_some());
+        assert!(style.color.is_some());
+        assert!(style.font_family.is_none());
+    }
+
+    #[test]
+    fn checkbox_font_properties_set() {
+        let props = CheckBoxProperties {
+            font: Some(vb6parse::language::Font {
+                name: "Tahoma".into(),
+                size: 8.0,
+                weight: 400,
+                italic: false,
+                underline: false,
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_checkbox_style(&props, &config);
+        assert_eq!(style.font_family, Some("Tahoma".to_string()));
+        assert!((style.font_size.unwrap() - 10.67).abs() < 0.01);
+        assert_eq!(style.font_style, Some("normal".to_string()));
+    }
+
+    #[test]
+    fn checkbox_back_color_custom() {
+        let props = CheckBoxProperties {
+            back_color: Color::RGB {
+                red: 255,
+                green: 200,
+                blue: 100,
+            },
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_checkbox_style(&props, &config);
+        assert_eq!(style.background_color, Some(CssColor::Rgb(255, 200, 100)));
+    }
+
+    #[test]
+    fn checkbox_font_not_set() {
+        let props = CheckBoxProperties {
+            font: None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_checkbox_style(&props, &config);
+        assert!(style.font_family.is_none());
+        assert!(style.font_size.is_none());
+        assert!(style.font_weight.is_none());
+    }
+
+    // OptionButton tests
+    #[test]
+    fn optionbutton_basic_style_default() {
+        let props = OptionButtonProperties {
+            font: None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_optionbutton_style(&props, &config);
+        assert!(style.background_color.is_some());
+        assert!(style.color.is_some());
+        assert!(style.font_family.is_none());
+    }
+
+    #[test]
+    fn optionbutton_font_properties_set() {
+        let props = OptionButtonProperties {
+            font: Some(vb6parse::language::Font {
+                name: "Verdana".into(),
+                size: 9.0,
+                weight: 700,
+                italic: true,
+                underline: false,
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_optionbutton_style(&props, &config);
+        assert_eq!(style.font_family, Some("Verdana".to_string()));
+        assert_eq!(style.font_weight, Some("bold".to_string()));
+        assert_eq!(style.font_style, Some("italic".to_string()));
+    }
+
+    #[test]
+    fn optionbutton_back_color_custom() {
+        let props = OptionButtonProperties {
+            back_color: Color::RGB {
+                red: 100,
+                green: 200,
+                blue: 50,
+            },
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_optionbutton_style(&props, &config);
+        assert_eq!(style.background_color, Some(CssColor::Rgb(100, 200, 50)));
+    }
+}

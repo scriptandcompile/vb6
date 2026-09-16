@@ -70,3 +70,176 @@ fn alignment_css(alignment: Alignment) -> Option<String> {
         Alignment::LeftJustify => Some("left".to_string()),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::super::super::model::style::CssColor;
+    use super::*;
+    use vb6parse::language::Color;
+
+    fn test_config() -> LayoutConfig {
+        LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        }
+    }
+
+    fn make_font(name: &str, size: f32) -> vb6parse::language::Font {
+        vb6parse::language::Font {
+            name: name.to_string(),
+            size,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn basic_style_default_font_none() {
+        let props = LabelProperties {
+            font: None,
+            back_style: BackStyle::Transparent,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert!(style.font_family.is_none());
+        assert!(style.font_size.is_none());
+        assert!(style.font_weight.is_none());
+        assert_eq!(style.background_color, None);
+        assert!(style.color.is_some());
+    }
+
+    #[test]
+    fn alignment_center() {
+        let props = LabelProperties {
+            alignment: Alignment::Center,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.text_align, Some("center".to_string()));
+    }
+
+    #[test]
+    fn alignment_right() {
+        let props = LabelProperties {
+            alignment: Alignment::RightJustify,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.text_align, Some("right".to_string()));
+    }
+
+    #[test]
+    fn word_wrap_wrapping() {
+        let props = LabelProperties {
+            word_wrap: WordWrap::Wrapping,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.white_space, Some("pre-wrap".to_string()));
+    }
+
+    #[test]
+    fn word_wrap_non_wrapping() {
+        let props = LabelProperties {
+            word_wrap: WordWrap::NonWrapping,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.white_space, Some("nowrap".to_string()));
+    }
+
+    #[test]
+    fn transparent_background() {
+        let props = LabelProperties {
+            back_style: BackStyle::Transparent,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.background_color, None);
+    }
+
+    #[test]
+    fn opaque_background() {
+        let props = LabelProperties {
+            back_style: BackStyle::Opaque,
+            back_color: Color::RGB {
+                red: 255,
+                green: 255,
+                blue: 255,
+            },
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert!(matches!(
+            style.background_color,
+            Some(CssColor::Rgb(255, 255, 255))
+        ));
+    }
+
+    #[test]
+    fn font_properties_applied() {
+        let props = LabelProperties {
+            font: Some(make_font("Arial", 12.0)),
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.font_family, Some("Arial".to_string()));
+        assert_eq!(style.font_size, Some(16.0));
+        assert_eq!(style.font_style, Some("normal".to_string()));
+    }
+
+    #[test]
+    fn italic_font() {
+        let props = LabelProperties {
+            font: Some(vb6parse::language::Font {
+                name: "Arial".into(),
+                size: 12.0,
+                italic: true,
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.font_style, Some("italic".to_string()));
+    }
+
+    #[test]
+    fn underline_font() {
+        let props = LabelProperties {
+            font: Some(vb6parse::language::Font {
+                name: "Arial".into(),
+                size: 12.0,
+                underline: true,
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.text_decoration, Some("underline".to_string()));
+    }
+
+    #[test]
+    fn bold_font_weight() {
+        let props = LabelProperties {
+            font: Some(vb6parse::language::Font {
+                name: "Arial".into(),
+                size: 12.0,
+                weight: 700,
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.font_weight, Some("bold".to_string()));
+    }
+}

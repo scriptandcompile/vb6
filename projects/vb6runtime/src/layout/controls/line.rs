@@ -23,3 +23,83 @@ pub fn build_line_style(props: &LineProperties, config: &LayoutConfig) -> Layout
         ..LayoutStyle::default()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::super::super::model::style::CssColor;
+    use super::*;
+    use vb6parse::language::Color;
+
+    fn test_config() -> LayoutConfig {
+        LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn line_color_set() {
+        let props = LineProperties {
+            border_color: Color::RGB {
+                red: 255,
+                green: 0,
+                blue: 0,
+            },
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_line_style(&props, &config);
+        assert_eq!(style.line_color, Some(CssColor::Rgb(255, 0, 0)));
+    }
+
+    #[test]
+    fn line_width_set() {
+        let props = LineProperties {
+            border_width: 2,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_line_style(&props, &config);
+        assert_eq!(style.line_width, Some(2.0));
+    }
+
+    #[test]
+    fn coordinates_set() {
+        let props = LineProperties {
+            x1: 1440,
+            y1: 720,
+            x2: 2880,
+            y2: 1440,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_line_style(&props, &config);
+        // 1440 twips at 96 DPI = 96 pixels
+        assert_eq!(style.line_x1, Some(96.0));
+        assert_eq!(style.line_y1, Some(48.0));
+        assert_eq!(style.line_x2, Some(192.0));
+        assert_eq!(style.line_y2, Some(96.0));
+    }
+
+    #[test]
+    fn line_color_system() {
+        let props = LineProperties {
+            border_color: Color::System { index: 0x07 },
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_line_style(&props, &config);
+        assert!(matches!(style.line_color, Some(CssColor::Named(_))));
+    }
+
+    #[test]
+    fn zero_width_line() {
+        let props = LineProperties {
+            border_width: 0,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_line_style(&props, &config);
+        assert_eq!(style.line_width, Some(0.0));
+    }
+}

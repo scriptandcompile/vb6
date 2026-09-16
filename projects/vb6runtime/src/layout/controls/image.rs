@@ -12,3 +12,44 @@ pub fn build_image_style(_props: &ImageProperties, config: &LayoutConfig) -> Lay
     let _ = config;
     LayoutStyle::default()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_config() -> LayoutConfig {
+        LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn returns_default_style() {
+        let props = ImageProperties::default();
+        let config = test_config();
+        let style = build_image_style(&props, &config);
+        assert_eq!(style, LayoutStyle::default());
+    }
+
+    #[test]
+    fn ignores_properties() {
+        let props = ImageProperties::default();
+        let config = test_config();
+        let style = build_image_style(&props, &config);
+        assert!(style.background_color.is_none());
+        assert!(style.border.is_none());
+        assert!(style.font_family.is_none());
+    }
+
+    #[test]
+    fn ignores_config() {
+        let props = ImageProperties::default();
+        let config = LayoutConfig {
+            dpi: 120,
+            ..Default::default()
+        };
+        let style = build_image_style(&props, &config);
+        assert_eq!(style, LayoutStyle::default());
+    }
+}
