@@ -180,9 +180,55 @@ pub fn dark_theme() -> Vb6Theme {
     }
 }
 
+/// Trait for injecting CSS into the host environment.
+///
+/// Implemented by platform-specific renderers to inject theme CSS:
+/// - WASM (`WebSysRenderer`): injects a `<style>` tag into `<head>`
+/// - Tauri (`TauriRenderer`): injects a `<style>` tag via webview eval
+///
+/// # Example
+///
+/// ```no_run
+/// use vb6runtime::layout::theme::{Vb6Theme, ThemeRenderer};
+///
+/// fn apply_theme(renderer: &dyn ThemeRenderer, theme: &Vb6Theme) {
+///     renderer.inject_theme(theme);
+/// }
+/// ```
+pub trait ThemeRenderer {
+    /// Inject a theme's CSS into the host environment.
+    ///
+    /// The theme is converted to a CSS string via [`Vb6Theme::to_css`]
+    /// and injected into the document/webview.
+    fn inject_theme(&self, theme: &Vb6Theme);
+}
+
+/// Inject CSS directly into the host environment.
+///
+/// This is a convenience wrapper that allows the renderer to inject
+/// arbitrary CSS (not just theme CSS) via its own platform-specific mechanism.
+pub trait CssInjector {
+    /// Inject a raw CSS string into the host environment.
+    fn inject_css(&self, css: &str);
+}
+
+/// Apply a theme to a [`ThemeRenderer`].
+///
+/// This is a convenience function that generates the CSS from the theme
+/// and injects it via the renderer's [`ThemeRenderer::inject_theme`] method.
+pub fn apply_theme(renderer: &dyn ThemeRenderer, theme: &Vb6Theme) {
+    renderer.inject_theme(theme);
+}
+
+/// Apply a raw CSS string to a [`CssInjector`].
+pub fn apply_css(renderer: &dyn CssInjector, css: &str) {
+    renderer.inject_css(css);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::cell::RefCell;
 
     #[test]
     fn default_theme_produces_valid_css() {
@@ -251,5 +297,49 @@ mod tests {
         assert!(css.contains("--vb6-disabled-opacity"));
         assert!(css.contains("--vb6-font-family"));
         assert!(css.contains("--vb6-font-size"));
+    }
+
+    /// Stub renderer for testing the ThemeRenderer trait.
+    struct TestRenderer {
+        pub last_theme_css: RefCell<Option<String>>,
+    }
+
+    impl ThemeRenderer for TestRenderer {
+        fn inject_theme(&self, theme: &Vb6Theme) {
+            *self.last_theme_css.borrow_mut() = Some(theme.to_css());
+        }
+    }
+
+    #[test]
+    fn theme_renderer_injects_css() {
+        let renderer = TestRenderer { last_theme_css: RefCell::new(None) };
+        let theme = default_theme();
+        renderer.inject_theme(&theme);
+        assert!(renderer.last_theme_css.borrow().is_some());
+        let css = renderer.last_theme_css.borrow().as_ref().unwrap().clone();
+        assert!(css.contains(".vb6-app {"));
+        assert!(css.contains("--vb6-bg: rgb(192, 192, 192)"));
+    }
+
+    #[test]
+    fn apply_theme_function_works() {
+        let renderer = TestRenderer { last_theme_css: RefCell::new(None) };
+        apply_theme(&renderer, &dark_theme());
+        assert!(renderer.last_theme_css.borrow().is_some());
+        let css = renderer.last_theme_css.borrow().as_ref().unwrap().clone();
+        assert!(css.contains("--vb6-bg: #1e1e1e"));
+    }
+
+    #[test]
+    fn partial_theme_injects_only_set_fields() {
+        let renderer = TestRenderer { last_theme_css: RefCell::new(None) };
+        let theme = Vb6Theme {
+            bg: Some("#ff0000".into()),
+            ..Default::default()
+        };
+        renderer.inject_theme(&theme);
+        let css = renderer.last_theme_css.borrow().as_ref().unwrap().clone();
+        assert!(css.contains("--vb6-bg: #ff0000"));
+        assert!(!css.contains("--vb6-fg"));
     }
 }
