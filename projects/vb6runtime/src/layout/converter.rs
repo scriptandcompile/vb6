@@ -165,6 +165,8 @@ fn convert_form_impl(form: &Form, config: &LayoutConfig) -> LayoutResult<LayoutF
         visible: form.properties.visible == Visibility::Visible,
         enabled: form.properties.enabled == Activation::Enabled,
         current_value: None,
+        snapshot: None,
+        render_id: 0,
     })
 }
 
@@ -224,6 +226,8 @@ fn convert_mdi_form_impl(mdi: &MDIForm, config: &LayoutConfig) -> LayoutResult<L
         visible: mdi.properties.visible == Visibility::Visible,
         enabled: mdi.properties.enabled == Activation::Enabled,
         current_value: None,
+        snapshot: None,
+        render_id: 0,
     })
 }
 

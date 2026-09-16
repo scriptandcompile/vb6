@@ -44,6 +44,9 @@ impl Default for LayoutContainer {
 /// This struct holds form-level metadata (name, position, size, style) alongside
 /// a `root_node` that contains all child controls. Runtime-writable state
 /// (caption, visible, enabled, current_value) is stored here.
+///
+/// Diffing support: [`snapshot`] captures the form state after each render for
+/// incremental diff-based updates; [`render_id`] increments on each render call.
 #[derive(Debug, Clone, PartialEq)]
 pub struct LayoutForm {
     /// The name of the form (e.g. "Form1").
@@ -68,6 +71,12 @@ pub struct LayoutForm {
     pub enabled: bool,
     /// Runtime-writable current value (e.g. form caption).
     pub current_value: Option<String>,
+    /// Snapshot of the form state captured after the last render, used for
+    /// incremental diff-based rendering. `None` before the first render.
+    pub snapshot: Option<super::super::snapshot::SnapshotNode>,
+    /// Monotonically increasing render counter. Increments on each call to
+    /// [`capture_snapshot`][super::super::capture_snapshot].
+    pub render_id: u64,
 }
 
 impl Default for LayoutForm {
@@ -84,6 +93,8 @@ impl Default for LayoutForm {
             visible: true,
             enabled: true,
             current_value: None,
+            snapshot: None,
+            render_id: 0,
         }
     }
 }
@@ -295,7 +306,10 @@ mod tests {
             control_type: LayoutControlType::Form,
             index: 0,
             position: LayoutPosition::default(),
-            size: LayoutSize { width: 400.0, height: 300.0 },
+            size: LayoutSize {
+                width: 400.0,
+                height: 300.0,
+            },
             style: LayoutStyle::default(),
             children: vec![],
             caption: Some("My Form".into()),
@@ -328,7 +342,10 @@ mod tests {
             control_type: LayoutControlType::Form,
             index: 0,
             position: LayoutPosition::default(),
-            size: LayoutSize { width: 400.0, height: 300.0 },
+            size: LayoutSize {
+                width: 400.0,
+                height: 300.0,
+            },
             style: LayoutStyle::default(),
             children: vec![],
             caption: Some("My Form".into()),
@@ -346,10 +363,7 @@ mod tests {
             ..default_leaf("lblHidden")
         });
         let container = LayoutContainer {
-            children: vec![
-                LayoutNode::Leaf(default_leaf("lblVisible")),
-                child,
-            ],
+            children: vec![LayoutNode::Leaf(default_leaf("lblVisible")), child],
             ..default_container("frmParent")
         };
         let visible: Vec<_> = container.visible_children().collect();
@@ -452,5 +466,38 @@ mod tests {
             }
             LayoutNode::Leaf(_) => panic!("root_node should be a Container"),
         }
+    }
+
+    #[test]
+    fn layout_form_snapshot_default_none() {
+        let form = LayoutForm::default();
+        assert!(form.snapshot.is_none());
+    }
+
+    #[test]
+    fn layout_form_render_id_default_zero() {
+        let form = LayoutForm::default();
+        assert_eq!(form.render_id, 0);
+    }
+
+    #[test]
+    fn layout_form_snapshot_set_and_clone() {
+        let mut form = LayoutForm {
+            name: "Form1".into(),
+            caption: "Form1".into(),
+            ..LayoutForm::default()
+        };
+        // Update the root container name so the snapshot captures it
+        if let LayoutNode::Container(ref mut rc) = form.root_node {
+            rc.name = "Form1".into();
+        }
+        let snap = form.root_node.to_snapshot();
+        form.snapshot = Some(snap);
+        assert!(form.snapshot.is_some());
+        assert_eq!(form.snapshot.as_ref().unwrap().id.name, "Form1");
+
+        let cloned = form.clone();
+        assert!(cloned.snapshot.is_some());
+        assert_eq!(cloned.snapshot.unwrap().id.name, "Form1");
     }
 }
