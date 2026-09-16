@@ -1,11 +1,13 @@
 //! WebAssembly bindings for the VB6 interpreter.
 //!
 //! This module exposes a browser-friendly API for running a single VB6 module
-//! from source text and capturing its output.
+//! from source text and capturing its output, as well as multi-file VBP-style
+//! projects via [`WasmProject`].
 //!
 //! Submodules hold the browser entry points and debug-state builders
-//! ([`run_bridge`]) and the runtime-state tab bindings ([`state_bridge`]);
-//! this file keeps the wire structs and the output converters they share.
+//! ([`run_bridge`]), the runtime-state tab bindings ([`state_bridge`]), and
+//! the form-rendering bridge ([`form_bridge`]); this file keeps the wire
+//! structs and the output converters they share.
 
 mod form_bridge;
 mod run_bridge;
@@ -14,6 +16,7 @@ mod state_bridge;
 use run_bridge::{build_debug_state, build_debug_state_from_snapshot, byte_offset_to_line_column};
 
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::*;
 
 use crate::Interpreter;
 use crate::error::{RunError, render_error_report, render_report_at_line};
@@ -88,6 +91,58 @@ pub struct WasmDebugTrace {
     pub error: Option<WasmRunError>,
     /// Sequence of interpreter snapshots for each statement executed.
     pub snapshots: Vec<WasmRunOutput>,
+}
+
+/// A VB6 project loaded from JS-provided byte maps for multi-file VBP-style
+/// projects in the browser.
+///
+/// The JS layer constructs a `WasmProject` by populating the `forms`,
+/// `modules`, and `classes` fields with [`JsMap`] instances whose keys are
+/// file names and whose values are `Uint8Array` (raw file bytes).  The
+/// `startup` field holds the startup object name (form name or module name).
+///
+/// # Examples
+///
+/// Constructed on the JS side from a file picker or a build tool:
+///
+/// ```js
+/// const project = new WasmProject();
+/// project.forms.set("Form1.frm", form1Bytes);
+/// project.modules.set("Module1.bas", module1Bytes);
+/// project.startup = "Sub Main";
+/// ```
+#[wasm_bindgen]
+pub struct WasmProject {
+    /// Map of file name → raw bytes for form (`.frm`) files.
+    #[wasm_bindgen(skip)]
+    pub forms: JsValue,
+    /// Map of file name → raw bytes for module (`.bas`) files.
+    #[wasm_bindgen(skip)]
+    pub modules: JsValue,
+    /// Map of file name → raw bytes for class (`.cls`) files.
+    #[wasm_bindgen(skip)]
+    pub classes: JsValue,
+    /// The startup object name (form name or module name).
+    #[wasm_bindgen(getter_with_clone)]
+    pub startup: String,
+}
+
+#[wasm_bindgen]
+impl WasmProject {
+    /// Create a new, empty `WasmProject`.
+    ///
+    /// Callers on the JS side should populate `forms`, `modules`, and
+    /// `classes` with [`JsMap`] instances and set `startup` before passing
+    /// the project to a WASM function.
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> WasmProject {
+        WasmProject {
+            forms: JsValue::UNDEFINED,
+            modules: JsValue::UNDEFINED,
+            classes: JsValue::UNDEFINED,
+            startup: String::new(),
+        }
+    }
 }
 
 /// Output returned from the interpreter playground.
