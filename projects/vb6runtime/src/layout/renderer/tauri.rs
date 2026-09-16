@@ -251,13 +251,6 @@ impl Renderer for TauriRenderer {
     }
 
     fn render_container(&self, container: &LayoutContainer) -> String {
-        let tag = match container.control_type {
-            LayoutControlType::Form | LayoutControlType::MDIForm => "div",
-            LayoutControlType::Frame => "fieldset",
-            LayoutControlType::PictureBox => "div",
-            _ => "div",
-        };
-
         let style = self.style_attr(&container.style, container.visible, container.enabled);
         let caption = container.caption.as_deref().unwrap_or("");
 
@@ -276,7 +269,7 @@ impl Renderer for TauriRenderer {
                 html.push_str(&format!(
                     r#"<div id="{}" class="vb6-{}" style="{}">"#,
                     html_escape(&container.name),
-                    tag,
+                    container.control_type.css_class(),
                     style
                 ));
             }
@@ -561,7 +554,7 @@ mod tests {
         let container = make_container("picBox", LayoutControlType::PictureBox);
         let html = renderer.render_container(&container);
         assert!(html.contains("<div"));
-        assert!(html.contains("vb6-div"));
+        assert!(html.contains("vb6-picturebox"));
         assert!(html.contains("</div>"));
     }
 
