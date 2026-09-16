@@ -84,11 +84,7 @@ pub trait Renderer {
     /// to produce partial output for changed nodes only.
     ///
     /// If `diff` is `None` or empty, behaves identically to `render_node`.
-    fn render_node_with_diff(
-        &self,
-        node: &LayoutNode,
-        diff: Option<&DiffTree>,
-    ) -> Self::Output {
+    fn render_node_with_diff(&self, node: &LayoutNode, diff: Option<&DiffTree>) -> Self::Output {
         match diff {
             Some(d) if !d.is_empty() => self.render_node(node),
             _ => self.render_node(node),

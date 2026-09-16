@@ -512,10 +512,7 @@ pub fn load_lint_settings(project_path: &Path) -> Result<LintConfig> {
         match toml::from_str::<AspenConfig>(&contents) {
             Ok(config) => return Ok(config.lint.unwrap_or_default()),
             Err(e) => {
-                anyhow::bail!(
-                    "failed to parse config file '{}': {e}",
-                    path.display()
-                );
+                anyhow::bail!("failed to parse config file '{}': {e}", path.display());
             }
         }
     }

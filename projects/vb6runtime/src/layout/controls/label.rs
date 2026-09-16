@@ -24,10 +24,19 @@ pub fn build_label_style(props: &LabelProperties, config: &LayoutConfig) -> Layo
         },
         color: Some(color_to_css(&props.fore_color)),
         font_family: props.font.as_ref().map(|f| f.name.clone()),
-        font_size: props.font.as_ref().map(|f| font_points_to_px(f.size, config.dpi)),
+        font_size: props
+            .font
+            .as_ref()
+            .map(|f| font_points_to_px(f.size, config.dpi)),
         font_weight: props.font.as_ref().and_then(|f| font_weight_css(f.weight)),
-        font_style: props.font.as_ref().map(|f| if f.italic { "italic" } else { "normal" }.to_string()),
-        text_decoration: props.font.as_ref().map(|f| if f.underline { "underline" } else { "none" }.to_string()),
+        font_style: props
+            .font
+            .as_ref()
+            .map(|f| if f.italic { "italic" } else { "normal" }.to_string()),
+        text_decoration: props
+            .font
+            .as_ref()
+            .map(|f| if f.underline { "underline" } else { "none" }.to_string()),
         text_align: alignment_css(props.alignment),
         white_space: match props.word_wrap {
             WordWrap::NonWrapping => Some("nowrap".to_string()),

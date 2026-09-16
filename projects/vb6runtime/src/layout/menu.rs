@@ -273,16 +273,18 @@ mod tests {
             },
             items
                 .into_iter()
-                .map(|(n, c)| MenuControl::new(
-                    n.into(),
-                    String::new(),
-                    0,
-                    MenuProperties {
-                        caption: c.into(),
-                        ..Default::default()
-                    },
-                    vec![],
-                ))
+                .map(|(n, c)| {
+                    MenuControl::new(
+                        n.into(),
+                        String::new(),
+                        0,
+                        MenuProperties {
+                            caption: c.into(),
+                            ..Default::default()
+                        },
+                        vec![],
+                    )
+                })
                 .collect(),
         )
     }

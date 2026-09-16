@@ -30,7 +30,7 @@ pub fn twips_to_pixels(twips: i32, dpi: u32) -> f32 {
 
 /// Convert a value in a given ScaleMode to pixels at the given DPI.
 ///
- /// # Arguments
+/// # Arguments
 /// * `value` — value in the given scale mode's units
 /// * `scale_mode` — the [`ScaleMode`] of the value
 /// * `dpi` — dots per inch
@@ -171,10 +171,7 @@ mod tests {
 
     #[test]
     fn scale_mode_container_size_fallback() {
-        assert_eq!(
-            scale_mode_to_pixels(15, ScaleMode::ContainerSize, 96),
-            1.0
-        );
+        assert_eq!(scale_mode_to_pixels(15, ScaleMode::ContainerSize, 96), 1.0);
     }
 
     #[test]

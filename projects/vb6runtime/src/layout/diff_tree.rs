@@ -126,8 +126,8 @@ pub fn collect_all_changes(tree: &DiffTree) -> Vec<&DiffChange> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::model::{LayoutControlType, LayoutLeaf};
+    use super::*;
 
     fn test_node_id() -> NodeId {
         NodeId {

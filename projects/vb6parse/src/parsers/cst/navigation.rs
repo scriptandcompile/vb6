@@ -1467,7 +1467,10 @@ mod tests {
         let root = cst.to_serializable().root;
 
         let all_nodes: Vec<_> = root.descendants().collect();
-        assert_ne!(all_nodes, [] as [&crate::parsers::cst::navigation::CstNode; 0]);
+        assert_ne!(
+            all_nodes,
+            [] as [&crate::parsers::cst::navigation::CstNode; 0]
+        );
         assert_eq!(all_nodes[0].kind(), SyntaxKind::Root);
 
         // Count specific node types
@@ -1492,7 +1495,10 @@ mod tests {
         let cst = cst_opt.expect("Failed to parse source");
 
         let all_nodes: Vec<_> = cst.descendants().collect();
-        assert_ne!(all_nodes, [] as [crate::parsers::cst::navigation::CstNode; 0]);
+        assert_ne!(
+            all_nodes,
+            [] as [crate::parsers::cst::navigation::CstNode; 0]
+        );
 
         // Count specific node types
         let identifier_count = cst

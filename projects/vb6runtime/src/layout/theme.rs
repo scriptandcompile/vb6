@@ -312,7 +312,9 @@ mod tests {
 
     #[test]
     fn theme_renderer_injects_css() {
-        let renderer = TestRenderer { last_theme_css: RefCell::new(None) };
+        let renderer = TestRenderer {
+            last_theme_css: RefCell::new(None),
+        };
         let theme = default_theme();
         renderer.inject_theme(&theme);
         assert!(renderer.last_theme_css.borrow().is_some());
@@ -323,7 +325,9 @@ mod tests {
 
     #[test]
     fn apply_theme_function_works() {
-        let renderer = TestRenderer { last_theme_css: RefCell::new(None) };
+        let renderer = TestRenderer {
+            last_theme_css: RefCell::new(None),
+        };
         apply_theme(&renderer, &dark_theme());
         assert!(renderer.last_theme_css.borrow().is_some());
         let css = renderer.last_theme_css.borrow().as_ref().unwrap().clone();
@@ -332,7 +336,9 @@ mod tests {
 
     #[test]
     fn partial_theme_injects_only_set_fields() {
-        let renderer = TestRenderer { last_theme_css: RefCell::new(None) };
+        let renderer = TestRenderer {
+            last_theme_css: RefCell::new(None),
+        };
         let theme = Vb6Theme {
             bg: Some("#ff0000".into()),
             ..Default::default()

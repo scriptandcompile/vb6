@@ -75,38 +75,62 @@ mod tests {
 
     #[test]
     fn rgb_color_mapping() {
-        let vb_color = Color::RGB { red: 255, green: 128, blue: 0 };
+        let vb_color = Color::RGB {
+            red: 255,
+            green: 128,
+            blue: 0,
+        };
         let css = color_to_css(&vb_color);
         assert_eq!(css, CssColor::Rgb(255, 128, 0));
     }
 
     #[test]
     fn rgb_black() {
-        let css = color_to_css(&Color::RGB { red: 0, green: 0, blue: 0 });
+        let css = color_to_css(&Color::RGB {
+            red: 0,
+            green: 0,
+            blue: 0,
+        });
         assert_eq!(css, CssColor::Rgb(0, 0, 0));
     }
 
     #[test]
     fn rgb_white() {
-        let css = color_to_css(&Color::RGB { red: 255, green: 255, blue: 255 });
+        let css = color_to_css(&Color::RGB {
+            red: 255,
+            green: 255,
+            blue: 255,
+        });
         assert_eq!(css, CssColor::Rgb(255, 255, 255));
     }
 
     #[test]
     fn rgb_red() {
-        let css = color_to_css(&Color::RGB { red: 255, green: 0, blue: 0 });
+        let css = color_to_css(&Color::RGB {
+            red: 255,
+            green: 0,
+            blue: 0,
+        });
         assert_eq!(css, CssColor::Rgb(255, 0, 0));
     }
 
     #[test]
     fn rgb_green() {
-        let css = color_to_css(&Color::RGB { red: 0, green: 255, blue: 0 });
+        let css = color_to_css(&Color::RGB {
+            red: 0,
+            green: 255,
+            blue: 0,
+        });
         assert_eq!(css, CssColor::Rgb(0, 255, 0));
     }
 
     #[test]
     fn rgb_blue() {
-        let css = color_to_css(&Color::RGB { red: 0, green: 0, blue: 255 });
+        let css = color_to_css(&Color::RGB {
+            red: 0,
+            green: 0,
+            blue: 255,
+        });
         assert_eq!(css, CssColor::Rgb(0, 0, 255));
     }
 

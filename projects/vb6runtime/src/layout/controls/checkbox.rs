@@ -40,7 +40,10 @@ pub fn build_checkbox_style(props: &CheckBoxProperties, config: &LayoutConfig) -
 }
 
 /// Build CSS style for an OptionButton (radio button) control.
-pub fn build_optionbutton_style(props: &OptionButtonProperties, config: &LayoutConfig) -> LayoutStyle {
+pub fn build_optionbutton_style(
+    props: &OptionButtonProperties,
+    config: &LayoutConfig,
+) -> LayoutStyle {
     let mut style = LayoutStyle {
         background_color: Some(color_to_css(&props.back_color)),
         color: Some(color_to_css(&props.fore_color)),

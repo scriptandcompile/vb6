@@ -48,21 +48,13 @@ pub fn build_style_for_control(kind: &ControlKind, config: &LayoutConfig) -> Lay
         ControlKind::CommandButton { properties, .. } => {
             button::build_button_style(properties, config)
         }
-        ControlKind::Label { properties, .. } => {
-            label::build_label_style(properties, config)
-        }
-        ControlKind::TextBox { properties, .. } => {
-            textbox::build_textbox_style(properties, config)
-        }
-        ControlKind::Frame { properties, .. } => {
-            frame::build_frame_style(properties, config)
-        }
+        ControlKind::Label { properties, .. } => label::build_label_style(properties, config),
+        ControlKind::TextBox { properties, .. } => textbox::build_textbox_style(properties, config),
+        ControlKind::Frame { properties, .. } => frame::build_frame_style(properties, config),
         ControlKind::PictureBox { properties, .. } => {
             picturebox::build_picturebox_style(properties, config)
         }
-        ControlKind::Image { properties, .. } => {
-            image::build_image_style(properties, config)
-        }
+        ControlKind::Image { properties, .. } => image::build_image_style(properties, config),
         ControlKind::CheckBox { properties, .. } => {
             checkbox::build_checkbox_style(properties, config)
         }
@@ -72,20 +64,14 @@ pub fn build_style_for_control(kind: &ControlKind, config: &LayoutConfig) -> Lay
         ControlKind::ComboBox { properties, .. } => {
             combobox::build_combobox_style(properties, config)
         }
-        ControlKind::ListBox { properties, .. } => {
-            listbox::build_listbox_style(properties, config)
-        }
-        ControlKind::HScrollBar { properties, .. }
-        | ControlKind::VScrollBar { properties, .. } => {
+        ControlKind::ListBox { properties, .. } => listbox::build_listbox_style(properties, config),
+        ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
             scrollbar::build_scrollbar_style(properties, config)
         }
-        ControlKind::Shape { properties, .. } => {
-            shape::build_shape_style(properties, config)
-        }
-        ControlKind::Line { properties, .. } => {
-            line::build_line_style(properties, config)
-        }
-        ControlKind::Timer { .. } | ControlKind::Data { .. }
+        ControlKind::Shape { properties, .. } => shape::build_shape_style(properties, config),
+        ControlKind::Line { properties, .. } => line::build_line_style(properties, config),
+        ControlKind::Timer { .. }
+        | ControlKind::Data { .. }
         | ControlKind::DriveListBox { .. }
         | ControlKind::DirListBox { .. }
         | ControlKind::FileListBox { .. } => LayoutStyle::default(),

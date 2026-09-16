@@ -162,28 +162,38 @@ mod tests {
     fn store_invalid_handle() {
         let got = get(999, |f| f.name.clone());
         assert_eq!(got, None);
-        let got_mut = get_mut(999, |f| {
-            f.name.clone()
-        });
+        let got_mut = get_mut(999, |f| f.name.clone());
         assert_eq!(got_mut, None);
     }
 
     #[test]
     fn store_incrementing_handles() {
-        let f1 = insert(LayoutForm { name: "Form1".into(), ..LayoutForm::default() });
-        let f2 = insert(LayoutForm { name: "Form2".into(), ..LayoutForm::default() });
-        let f3 = insert(LayoutForm { name: "Form3".into(), ..LayoutForm::default() });
+        let f1 = insert(LayoutForm {
+            name: "Form1".into(),
+            ..LayoutForm::default()
+        });
+        let f2 = insert(LayoutForm {
+            name: "Form2".into(),
+            ..LayoutForm::default()
+        });
+        let f3 = insert(LayoutForm {
+            name: "Form3".into(),
+            ..LayoutForm::default()
+        });
         assert!(f1 < f2);
         assert!(f2 < f3);
         let names: Vec<_> = [f1, f2, f3]
             .iter()
             .map(|&h| get(h, |f| f.name.clone()))
             .collect();
-        assert_eq!(names, vec![
-            Some("Form1".into()),
-            Some("Form2".into()),
-            Some("Form3".into()),
-        ]);
+        assert_eq!(
+            names,
+            vec![
+                Some("Form1".into()),
+                Some("Form2".into()),
+                Some("Form3".into()),
+            ]
+        );
     }
 
     #[test]
@@ -205,15 +215,25 @@ mod tests {
 
     #[test]
     fn store_multiple_forms_independent() {
-        let f1 = insert(LayoutForm { name: "Form1".into(), visible: true, ..LayoutForm::default() });
-        let f2 = insert(LayoutForm { name: "Form2".into(), visible: false, ..LayoutForm::default() });
+        let f1 = insert(LayoutForm {
+            name: "Form1".into(),
+            visible: true,
+            ..LayoutForm::default()
+        });
+        let f2 = insert(LayoutForm {
+            name: "Form2".into(),
+            visible: false,
+            ..LayoutForm::default()
+        });
 
         let v1 = get(f1, |f| f.visible);
         let v2 = get(f2, |f| f.visible);
         assert_eq!(v1, Some(true));
         assert_eq!(v2, Some(false));
 
-        get_mut(f1, |f| { f.visible = false; });
+        get_mut(f1, |f| {
+            f.visible = false;
+        });
         let v1 = get(f1, |f| f.visible);
         let v2 = get(f2, |f| f.visible);
         assert_eq!(v1, Some(false));

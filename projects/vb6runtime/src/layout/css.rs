@@ -107,8 +107,8 @@ fn escape_font_family(name: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::model::style::CssColor;
+    use super::*;
 
     #[test]
     fn empty_style() {
@@ -240,6 +240,9 @@ mod tests {
     fn font_family_escaping() {
         assert_eq!(escape_font_family("Arial"), "Arial");
         assert_eq!(escape_font_family("MS Sans Serif"), "\"MS Sans Serif\"");
-        assert_eq!(escape_font_family("Times, New Roman"), "\"Times, New Roman\"");
+        assert_eq!(
+            escape_font_family("Times, New Roman"),
+            "\"Times, New Roman\""
+        );
     }
 }

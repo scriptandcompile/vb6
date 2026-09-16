@@ -196,7 +196,10 @@ mod tests {
         assert_eq!(LayoutControlType::MDIForm.css_class(), "mdiform");
         assert_eq!(LayoutControlType::Label.css_class(), "label");
         assert_eq!(LayoutControlType::TextBox.css_class(), "textbox");
-        assert_eq!(LayoutControlType::CommandButton.css_class(), "commandbutton");
+        assert_eq!(
+            LayoutControlType::CommandButton.css_class(),
+            "commandbutton"
+        );
         assert_eq!(LayoutControlType::Frame.css_class(), "frame");
         assert_eq!(LayoutControlType::PictureBox.css_class(), "picturebox");
         assert_eq!(LayoutControlType::Image.css_class(), "image");

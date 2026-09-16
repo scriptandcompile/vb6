@@ -339,4 +339,3 @@ fn builtin_name(name: &str) -> String {
         .unwrap_or(trimmed)
         .to_lowercase()
 }
-

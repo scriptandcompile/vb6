@@ -99,7 +99,8 @@ impl WebSysRenderer {
     #[must_use]
     pub fn build_scoped_root(&self, child: &Element) -> Element {
         let root = self.root_open();
-        root.append_child(child).expect("append child to scope root");
+        root.append_child(child)
+            .expect("append child to scope root");
         root
     }
 }
@@ -197,7 +198,10 @@ impl ThemeRenderer for WebSysRenderer {
     /// and appends it to the `<head>` of the document.
     fn inject_theme(&self, theme: &Vb6Theme) {
         let css = theme.to_css();
-        let style = self.doc.create_element("style").expect("create style element");
+        let style = self
+            .doc
+            .create_element("style")
+            .expect("create style element");
         style.set_text_content(Some(&css));
         if let Some(head) = self.doc.head() {
             let _ = head.append_child(&style);

@@ -128,14 +128,13 @@ impl LayoutNode {
     #[must_use]
     pub fn to_snapshot(&self) -> SnapshotNode {
         match self {
-            Self::Leaf(leaf) => {
-                SnapshotNode::leaf(leaf.node_id(), leaf.style.clone())
-                    .with_value(leaf.value.clone())
-                    .with_visible(leaf.visible)
-                    .with_enabled(leaf.enabled)
-            }
+            Self::Leaf(leaf) => SnapshotNode::leaf(leaf.node_id(), leaf.style.clone())
+                .with_value(leaf.value.clone())
+                .with_visible(leaf.visible)
+                .with_enabled(leaf.enabled),
             Self::Container(container) => {
-                let child_ids: Vec<NodeId> = container.children.iter().map(|c| c.node_id()).collect();
+                let child_ids: Vec<NodeId> =
+                    container.children.iter().map(|c| c.node_id()).collect();
                 SnapshotNode::container(container.node_id(), container.style.clone(), child_ids)
                     .with_visible(container.visible)
                     .with_enabled(container.enabled)
@@ -146,8 +145,10 @@ impl LayoutNode {
 
 #[cfg(test)]
 mod tests {
+    use super::super::model::{
+        LayoutContainer, LayoutControlType, LayoutLeaf, LayoutPosition, LayoutSize, LayoutStyle,
+    };
     use super::*;
-    use super::super::model::{LayoutContainer, LayoutControlType, LayoutLeaf, LayoutPosition, LayoutSize, LayoutStyle};
 
     fn test_leaf(name: &str) -> LayoutLeaf {
         LayoutLeaf {
@@ -169,7 +170,10 @@ mod tests {
             control_type: LayoutControlType::Form,
             index: 0,
             position: LayoutPosition::default(),
-            size: LayoutSize { width: 400.0, height: 300.0 },
+            size: LayoutSize {
+                width: 400.0,
+                height: 300.0,
+            },
             style: LayoutStyle::default(),
             children: vec![],
             caption: Some("My Form".into()),
@@ -216,8 +220,12 @@ mod tests {
     #[test]
     fn container_to_snapshot_with_children() {
         let mut container = test_container("frm1");
-        container.children.push(LayoutNode::Leaf(test_leaf("child1")));
-        container.children.push(LayoutNode::Leaf(test_leaf("child2")));
+        container
+            .children
+            .push(LayoutNode::Leaf(test_leaf("child1")));
+        container
+            .children
+            .push(LayoutNode::Leaf(test_leaf("child2")));
         let node = LayoutNode::Container(container);
         let snap = node.to_snapshot();
         assert_eq!(snap.id.name, "frm1");
@@ -274,8 +282,16 @@ mod tests {
         };
         let style = LayoutStyle::default();
         let children = vec![
-            NodeId { name: "lblInside".into(), kind: LayoutControlType::Label, index: 0 },
-            NodeId { name: "txtInside".into(), kind: LayoutControlType::TextBox, index: 0 },
+            NodeId {
+                name: "lblInside".into(),
+                kind: LayoutControlType::Label,
+                index: 0,
+            },
+            NodeId {
+                name: "txtInside".into(),
+                kind: LayoutControlType::TextBox,
+                index: 0,
+            },
         ];
         let snap = SnapshotNode::container(id, style, children.clone());
         assert_eq!(snap.child_ids, children);
@@ -332,7 +348,9 @@ mod tests {
     #[test]
     fn nested_container_snapshot() {
         let mut inner = test_container("inner");
-        inner.children.push(LayoutNode::Leaf(test_leaf("grandchild")));
+        inner
+            .children
+            .push(LayoutNode::Leaf(test_leaf("grandchild")));
         let mut outer = test_container("outer");
         outer.children.push(LayoutNode::Container(inner));
         let node = LayoutNode::Container(outer);
@@ -367,7 +385,10 @@ mod tests {
                 ..test_leaf(name)
             });
             let snap = leaf.to_snapshot();
-            assert_eq!(snap.id.kind, control_type, "control type mismatch for {name}");
+            assert_eq!(
+                snap.id.kind, control_type,
+                "control type mismatch for {name}"
+            );
         }
     }
 
@@ -375,12 +396,14 @@ mod tests {
     fn snapshot_child_ids_preserve_order() {
         let mut container = test_container("parent");
         container.children = (0..5)
-            .map(|i| LayoutNode::Leaf(LayoutLeaf {
-                name: format!("child{i}"),
-                control_type: LayoutControlType::Label,
-                index: i,
-                ..test_leaf(&format!("child{i}"))
-            }))
+            .map(|i| {
+                LayoutNode::Leaf(LayoutLeaf {
+                    name: format!("child{i}"),
+                    control_type: LayoutControlType::Label,
+                    index: i,
+                    ..test_leaf(&format!("child{i}"))
+                })
+            })
             .collect();
         let node = LayoutNode::Container(container);
         let snap = node.to_snapshot();

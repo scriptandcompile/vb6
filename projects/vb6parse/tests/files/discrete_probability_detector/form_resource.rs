@@ -12,5 +12,8 @@ fn discrete_probability_detector_dpd_frx() {
     let mut entries: Vec<_> = resource_file.iter_entries().collect();
     entries.sort_by_key(|(offset, _)| *offset);
 
-    assert_ne!(entries, [] as [(usize, &vb6parse::files::resource::ResourceEntry); 0]);
+    assert_ne!(
+        entries,
+        [] as [(usize, &vb6parse::files::resource::ResourceEntry); 0]
+    );
 }

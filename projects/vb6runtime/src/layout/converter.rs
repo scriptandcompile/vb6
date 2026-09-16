@@ -19,12 +19,12 @@ use vb6parse::language::{
     Visibility,
 };
 
+use super::model::LayoutControlType;
 use super::model::{
     LayoutContainer, LayoutForm, LayoutLeaf, LayoutNode, LayoutPosition, LayoutSize, LayoutStyle,
 };
 use super::scale::{scale_mode_to_pixels, twips_to_pixels};
-use super::model::LayoutControlType;
-use super::{color::color_to_css, font_points_to_px, LayoutConfig};
+use super::{LayoutConfig, color::color_to_css, font_points_to_px};
 
 use super::form_store::{self, FormHandle};
 
@@ -56,7 +56,11 @@ pub enum LayoutError {
 impl std::fmt::Display for LayoutError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            LayoutError::UnsupportedControl { name, kind, message } => {
+            LayoutError::UnsupportedControl {
+                name,
+                kind,
+                message,
+            } => {
                 write!(f, "Unsupported control '{name}': {kind} ({message})")
             }
             LayoutError::ConversionError { control, reason } => {
@@ -96,7 +100,10 @@ pub fn load_form(root: &vb6parse::language::FormRoot, config: &LayoutConfig) -> 
 /// # Errors
 ///
 /// Returns `Err` if a Custom or OLE control is encountered.
-pub fn convert_form(root: &vb6parse::language::FormRoot, config: &LayoutConfig) -> LayoutResult<LayoutForm> {
+pub fn convert_form(
+    root: &vb6parse::language::FormRoot,
+    config: &LayoutConfig,
+) -> LayoutResult<LayoutForm> {
     match root {
         vb6parse::language::FormRoot::Form(form) => convert_form_impl(form, config),
         vb6parse::language::FormRoot::MDIForm(mdi) => convert_mdi_form_impl(mdi, config),
@@ -308,9 +315,7 @@ fn convert_control(
 
     // Skip non-visual controls when not requested
     match control.kind() {
-        ControlKind::Timer { .. } | ControlKind::Data { .. }
-            if !config.include_nonvisual =>
-        {
+        ControlKind::Timer { .. } | ControlKind::Data { .. } if !config.include_nonvisual => {
             return Ok(None);
         }
         _ => {}
@@ -329,7 +334,10 @@ fn convert_control(
     // Build the node — containers recurse, leaves are terminal
     match control.kind() {
         // Container: Frame
-        ControlKind::Frame { properties, controls } => {
+        ControlKind::Frame {
+            properties,
+            controls,
+        } => {
             let mut child_nodes = Vec::new();
             for child in controls {
                 if let Some(node) = convert_control(child, _parent, scale_mode, dpi, config)? {
@@ -353,13 +361,17 @@ fn convert_control(
         }
 
         // Container: PictureBox
-        ControlKind::PictureBox { properties, controls } => {
+        ControlKind::PictureBox {
+            properties,
+            controls,
+        } => {
             let mut child_nodes = Vec::new();
             for child in controls {
                 // PictureBox may have its own scale_mode; use it if available,
                 // otherwise fall back to the parent form's scale_mode.
                 let child_scale_mode = properties.scale_mode;
-                if let Some(node) = convert_control(child, _parent, child_scale_mode, dpi, config)? {
+                if let Some(node) = convert_control(child, _parent, child_scale_mode, dpi, config)?
+                {
                     child_nodes.push(node);
                 }
             }
@@ -379,19 +391,17 @@ fn convert_control(
         }
 
         // Leaf controls
-        _ => {
-            Ok(Some(LayoutNode::Leaf(LayoutLeaf {
-                name: control.name().to_string(),
-                control_type: layout_type,
-                index: control.index(),
-                position,
-                size,
-                style,
-                value: extract_value(control.kind()),
-                visible,
-                enabled,
-            })))
-        }
+        _ => Ok(Some(LayoutNode::Leaf(LayoutLeaf {
+            name: control.name().to_string(),
+            control_type: layout_type,
+            index: control.index(),
+            position,
+            size,
+            style,
+            value: extract_value(control.kind()),
+            visible,
+            enabled,
+        }))),
     }
 }
 
@@ -472,13 +482,14 @@ fn extract_position_size_type(
             properties.width,
             properties.height,
         ),
-        ControlKind::HScrollBar { properties, .. }
-        | ControlKind::VScrollBar { properties, .. } => (
-            properties.left,
-            properties.top,
-            properties.width,
-            properties.height,
-        ),
+        ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
+            (
+                properties.left,
+                properties.top,
+                properties.width,
+                properties.height,
+            )
+        }
         ControlKind::Shape { properties, .. } => (
             properties.left,
             properties.top,
@@ -503,16 +514,28 @@ fn extract_position_size_type(
         }
         ControlKind::Timer { properties, .. } => (properties.left, properties.top, 0, 0),
         ControlKind::Data { properties, .. } => (
-            properties.left, properties.top, properties.width, properties.height,
+            properties.left,
+            properties.top,
+            properties.width,
+            properties.height,
         ),
         ControlKind::DriveListBox { properties, .. } => (
-            properties.left, properties.top, properties.width, properties.height,
+            properties.left,
+            properties.top,
+            properties.width,
+            properties.height,
         ),
         ControlKind::DirListBox { properties, .. } => (
-            properties.left, properties.top, properties.width, properties.height,
+            properties.left,
+            properties.top,
+            properties.width,
+            properties.height,
         ),
         ControlKind::FileListBox { properties, .. } => (
-            properties.left, properties.top, properties.width, properties.height,
+            properties.left,
+            properties.top,
+            properties.width,
+            properties.height,
         ),
         ControlKind::Custom { .. } | ControlKind::Ole { .. } | ControlKind::Menu { .. } => {
             unreachable!("Custom/Ole/Menu controls should be rejected before this point")
@@ -580,100 +603,46 @@ fn control_visible(kind: &ControlKind) -> bool {
             // CommandButton doesn't have a visible property
             true
         }
-        ControlKind::TextBox { properties, .. } => {
+        ControlKind::TextBox { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::Label { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::Frame { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::PictureBox { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::Image { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::CheckBox { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::OptionButton { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::ComboBox { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::ListBox { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
             properties.visible == Visibility::Visible
         }
-        ControlKind::Label { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::Frame { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::PictureBox { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::Image { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::CheckBox { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::OptionButton { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::ComboBox { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::ListBox { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::HScrollBar { properties, .. }
-        | ControlKind::VScrollBar { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::Shape { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::Line { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
+        ControlKind::Shape { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::Line { properties, .. } => properties.visible == Visibility::Visible,
         ControlKind::Timer { .. } => {
             // Timer doesn't have a visible property
             true
         }
-        ControlKind::Data { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::DriveListBox { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::DirListBox { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::FileListBox { properties, .. } => {
-            properties.visible == Visibility::Visible
-        }
-        ControlKind::Custom { .. } | ControlKind::Ole { .. } | ControlKind::Menu { .. } => {
-            true
-        }
+        ControlKind::Data { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::DriveListBox { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::DirListBox { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::FileListBox { properties, .. } => properties.visible == Visibility::Visible,
+        ControlKind::Custom { .. } | ControlKind::Ole { .. } | ControlKind::Menu { .. } => true,
     }
 }
 
 /// Extract enabled state from a [`ControlKind`].
 fn control_enabled(kind: &ControlKind) -> bool {
     match kind {
-        ControlKind::CommandButton { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::TextBox { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::Label { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::Frame { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::PictureBox { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::Image { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::CheckBox { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::OptionButton { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::ComboBox { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::ListBox { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::HScrollBar { properties, .. }
-        | ControlKind::VScrollBar { properties, .. } => {
+        ControlKind::CommandButton { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::TextBox { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::Label { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::Frame { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::PictureBox { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::Image { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::CheckBox { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::OptionButton { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::ComboBox { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::ListBox { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
             properties.enabled == Activation::Enabled
         }
         ControlKind::Shape { .. } => {
@@ -684,24 +653,12 @@ fn control_enabled(kind: &ControlKind) -> bool {
             // Line doesn't have an enabled property
             true
         }
-        ControlKind::Timer { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::Data { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::DriveListBox { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::DirListBox { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::FileListBox { properties, .. } => {
-            properties.enabled == Activation::Enabled
-        }
-        ControlKind::Custom { .. } | ControlKind::Ole { .. } | ControlKind::Menu { .. } => {
-            true
-        }
+        ControlKind::Timer { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::Data { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::DriveListBox { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::DirListBox { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::FileListBox { properties, .. } => properties.enabled == Activation::Enabled,
+        ControlKind::Custom { .. } | ControlKind::Ole { .. } | ControlKind::Menu { .. } => true,
     }
 }
 
@@ -718,20 +675,20 @@ fn extract_value(kind: &ControlKind) -> Option<String> {
         ControlKind::Label { properties, .. } => Some(properties.caption.clone()),
         ControlKind::TextBox { properties, .. } => Some(properties.text.clone()),
         ControlKind::CommandButton { properties, .. } => Some(properties.caption.clone()),
-        ControlKind::CheckBox { properties, .. } => {
-            Some(if properties.value == vb6parse::language::CheckBoxValue::Checked {
+        ControlKind::CheckBox { properties, .. } => Some(
+            if properties.value == vb6parse::language::CheckBoxValue::Checked {
                 "True".to_string()
             } else {
                 "False".to_string()
-            })
-        }
-        ControlKind::OptionButton { properties, .. } => {
-            Some(if properties.value == vb6parse::language::OptionButtonValue::Selected {
+            },
+        ),
+        ControlKind::OptionButton { properties, .. } => Some(
+            if properties.value == vb6parse::language::OptionButtonValue::Selected {
                 "True".to_string()
             } else {
                 "False".to_string()
-            })
-        }
+            },
+        ),
         ControlKind::Frame { properties, .. } => Some(properties.caption.clone()),
         ControlKind::PictureBox { properties, .. } => {
             properties.picture.as_ref().map(|p| format!("{:?}", p))
@@ -739,8 +696,7 @@ fn extract_value(kind: &ControlKind) -> Option<String> {
         ControlKind::Image { properties, .. } => {
             properties.picture.as_ref().map(|p| format!("{:?}", p))
         }
-        ControlKind::HScrollBar { properties, .. }
-        | ControlKind::VScrollBar { properties, .. } => {
+        ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
             Some(properties.value.to_string())
         }
         ControlKind::ComboBox { properties, .. } => Some(properties.text.clone()),
@@ -757,9 +713,7 @@ fn extract_value(kind: &ControlKind) -> Option<String> {
             }
         }
         ControlKind::Timer { properties, .. } => Some(properties.interval.to_string()),
-        ControlKind::Data { properties, .. } => {
-            Some(properties.connection.to_string())
-        }
+        ControlKind::Data { properties, .. } => Some(properties.connection.to_string()),
         ControlKind::DriveListBox { .. } => {
             // No path field in vb6parse - return empty
             Some(String::new())
@@ -798,11 +752,19 @@ fn font_weight_css(weight: i32) -> Option<String> {
 }
 
 fn font_style_css(italic: bool) -> String {
-    if italic { "italic".to_string() } else { "normal".to_string() }
+    if italic {
+        "italic".to_string()
+    } else {
+        "normal".to_string()
+    }
 }
 
 fn text_decoration_css(underline: bool) -> String {
-    if underline { "underline".to_string() } else { "none".to_string() }
+    if underline {
+        "underline".to_string()
+    } else {
+        "none".to_string()
+    }
 }
 
 fn form_border_style_css(style: FormBorderStyle) -> Option<String> {
@@ -853,12 +815,12 @@ fn mouse_pointer_css(pointer: vb6parse::language::MousePointer) -> Option<String
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::HashMap;
     use vb6parse::language::{
         CheckBoxProperties, CheckBoxValue, CommandButtonProperties, CustomControlProperties,
         DataProperties, FrameProperties, LabelProperties, LineProperties, OLEProperties,
         ScrollBarProperties, TextBoxProperties, TimerProperties,
     };
-    use std::collections::HashMap;
 
     /// Lock to serialize tests that share the global form store.
     fn lock_test() -> std::sync::MutexGuard<'static, ()> {
@@ -1307,7 +1269,10 @@ mod tests {
         let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
 
         let children: Vec<_> = layout_form.visible_children().collect();
-        assert!(children.is_empty(), "Timer should be skipped when include_nonvisual=false");
+        assert!(
+            children.is_empty(),
+            "Timer should be skipped when include_nonvisual=false"
+        );
     }
 
     #[test]
@@ -1338,7 +1303,10 @@ mod tests {
         let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
 
         let children: Vec<_> = layout_form.visible_children().collect();
-        assert!(children.is_empty(), "Data should be skipped when include_nonvisual=false");
+        assert!(
+            children.is_empty(),
+            "Data should be skipped when include_nonvisual=false"
+        );
     }
 
     #[test]
@@ -1346,7 +1314,9 @@ mod tests {
         let form = create_test_form_with_custom();
         let config = LayoutConfig::default();
         let result = convert_form(&vb6parse::language::FormRoot::Form(form), &config);
-        assert!(matches!(result, Err(LayoutError::UnsupportedControl { kind, .. }) if kind == "Custom"));
+        assert!(
+            matches!(result, Err(LayoutError::UnsupportedControl { kind, .. }) if kind == "Custom")
+        );
     }
 
     #[test]
@@ -1354,13 +1324,18 @@ mod tests {
         let form = create_test_form_with_ole();
         let config = LayoutConfig::default();
         let result = convert_form(&vb6parse::language::FormRoot::Form(form), &config);
-        assert!(matches!(result, Err(LayoutError::UnsupportedControl { kind, .. }) if kind == "OLE"));
+        assert!(
+            matches!(result, Err(LayoutError::UnsupportedControl { kind, .. }) if kind == "OLE")
+        );
     }
 
     #[test]
     fn twip_conversion_in_converter() {
         let form = create_test_form_with_sized_control();
-        let config = LayoutConfig { dpi: 96, ..Default::default() };
+        let config = LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        };
         let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
 
         // scale_width = 4000 twips at 96 DPI
@@ -1375,7 +1350,8 @@ mod tests {
     fn mdi_form_conversion() {
         let mdi = create_test_mdi_form();
         let config = LayoutConfig::default();
-        let layout_form = convert_form(&vb6parse::language::FormRoot::MDIForm(mdi), &config).unwrap();
+        let layout_form =
+            convert_form(&vb6parse::language::FormRoot::MDIForm(mdi), &config).unwrap();
 
         assert_eq!(layout_form.name, "MDIMain");
         // Width = 4800 twips at 96 DPI = 4800 * 96 / 1440 = 320 px
@@ -1436,7 +1412,11 @@ mod tests {
             include_nonvisual: false,
             ..Default::default()
         };
-        let layout = convert_form(&vb6parse::language::FormRoot::Form(form.clone()), &config_skip).unwrap();
+        let layout = convert_form(
+            &vb6parse::language::FormRoot::Form(form.clone()),
+            &config_skip,
+        )
+        .unwrap();
         let children: Vec<_> = layout.visible_children().collect();
         assert_eq!(children.len(), 4);
 
@@ -1445,7 +1425,8 @@ mod tests {
             include_nonvisual: true,
             ..Default::default()
         };
-        let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config_include).unwrap();
+        let layout =
+            convert_form(&vb6parse::language::FormRoot::Form(form), &config_include).unwrap();
         let children: Vec<_> = layout.visible_children().collect();
         assert_eq!(children.len(), 5);
     }
@@ -1470,7 +1451,10 @@ mod tests {
             menus: Vec::new(),
         };
 
-        let config = LayoutConfig { dpi: 96, ..Default::default() };
+        let config = LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        };
         let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
 
         // Form position: left=100 twips, top=200 twips at 96 DPI
@@ -1488,7 +1472,7 @@ mod tests {
             ControlKind::Label {
                 properties: LabelProperties {
                     caption: "Test".to_string(),
-                    left: 1440,  // 1 inch in twips
+                    left: 1440, // 1 inch in twips
                     top: 1440,
                     width: 1440,
                     height: 300,
@@ -1518,7 +1502,10 @@ mod tests {
         };
 
         // At 120 DPI: 1440 twips = 1440 * 120 / 1440 = 120 px
-        let config = LayoutConfig { dpi: 120, ..Default::default() };
+        let config = LayoutConfig {
+            dpi: 120,
+            ..Default::default()
+        };
         let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
 
         let children: Vec<_> = layout.visible_children().collect();
@@ -1551,7 +1538,10 @@ mod tests {
             menus: Vec::new(),
         };
 
-        let config = LayoutConfig { dpi: 96, ..Default::default() };
+        let config = LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        };
         let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
 
         // Pixel mode: 1:1 mapping, no conversion
@@ -1762,7 +1752,10 @@ mod tests {
             menus: Vec::new(),
         };
 
-        let config = LayoutConfig { dpi: 96, ..Default::default() };
+        let config = LayoutConfig {
+            dpi: 96,
+            ..Default::default()
+        };
         let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
 
         let children: Vec<_> = layout.visible_children().collect();
@@ -1873,8 +1866,8 @@ mod tests {
             properties: LineProperties {
                 x1: 0,
                 y1: 0,
-                x2: 150,   // 150 twips = 10 px at 96 DPI
-                y2: 300,   // 300 twips = 20 px at 96 DPI
+                x2: 150, // 150 twips = 10 px at 96 DPI
+                y2: 300, // 300 twips = 20 px at 96 DPI
                 ..Default::default()
             },
         };

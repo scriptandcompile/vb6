@@ -209,7 +209,9 @@ impl Renderer for TauriRenderer {
                     style
                 )
             }
-            LayoutControlType::DriveListBox | LayoutControlType::DirListBox | LayoutControlType::FileListBox => {
+            LayoutControlType::DriveListBox
+            | LayoutControlType::DirListBox
+            | LayoutControlType::FileListBox => {
                 format!(
                     r#"<select id="{}" class="vb6-{}" style="{}"></select>"#,
                     html_escape(&leaf.name),
@@ -561,7 +563,11 @@ mod tests {
     #[test]
     fn render_optionbutton_radio() {
         let renderer = TauriRenderer::new(false);
-        let leaf = make_leaf("optChoice", LayoutControlType::OptionButton, Some("True".into()));
+        let leaf = make_leaf(
+            "optChoice",
+            LayoutControlType::OptionButton,
+            Some("True".into()),
+        );
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains(r#"type="radio""#));
         assert!(html.contains("vb6-optionbutton"));

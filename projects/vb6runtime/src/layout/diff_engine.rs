@@ -77,11 +77,7 @@ impl DiffEngine {
     ///
     /// For the root node: compares value, visibility, and enabled state directly.
     /// For containers: compares child_ids and recurses into children.
-    fn walk_diff(
-        new_node: &LayoutNode,
-        old_snap: &SnapshotNode,
-        output: &mut DiffTree,
-    ) {
+    fn walk_diff(new_node: &LayoutNode, old_snap: &SnapshotNode, output: &mut DiffTree) {
         let node_id = new_node.node_id();
 
         // If the node IDs don't match, this is a structural mismatch.
@@ -150,7 +146,10 @@ impl DiffEngine {
                         //
                         // For a complete solution, the diff engine should take both
                         // the old layout node and the new layout node.
-                        let synthetic_snap = SnapshotNode::leaf(new_id.clone(), super::model::LayoutStyle::default());
+                        let synthetic_snap = SnapshotNode::leaf(
+                            new_id.clone(),
+                            super::model::LayoutStyle::default(),
+                        );
                         let mut child_diff = DiffTree::new();
                         Self::walk_recursive(new_child, &synthetic_snap, &mut child_diff);
                         if !child_diff.is_empty() {
@@ -176,11 +175,7 @@ impl DiffEngine {
     /// synthetic child snapshots for recursion. These have correct IDs but no
     /// value/visible/enabled data, so property-level changes can only be detected
     /// for the root node.
-    fn walk_recursive(
-        new_node: &LayoutNode,
-        _parent_snap: &SnapshotNode,
-        output: &mut DiffTree,
-    ) {
+    fn walk_recursive(new_node: &LayoutNode, _parent_snap: &SnapshotNode, output: &mut DiffTree) {
         let node_id = new_node.node_id();
 
         match new_node {
@@ -203,7 +198,10 @@ impl DiffEngine {
                     if !old_child_set.contains(&new_id) {
                         inserts.push((pos, new_child.clone()));
                         // Recurse into the new child to detect deeper changes.
-                        let synthetic_child_snap = SnapshotNode::leaf(new_id.clone(), super::model::LayoutStyle::default());
+                        let synthetic_child_snap = SnapshotNode::leaf(
+                            new_id.clone(),
+                            super::model::LayoutStyle::default(),
+                        );
                         Self::walk_recursive(new_child, &synthetic_child_snap, output);
                     }
                 }
@@ -249,11 +247,12 @@ impl DiffEngine {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::model::{
-        LayoutContainer, LayoutControlType, LayoutLeaf, LayoutPosition, LayoutSize, LayoutStyle, NodeId,
+        LayoutContainer, LayoutControlType, LayoutLeaf, LayoutPosition, LayoutSize, LayoutStyle,
+        NodeId,
     };
     use super::super::snapshot::SnapshotNode;
+    use super::*;
 
     fn make_leaf(
         name: &str,
@@ -282,7 +281,10 @@ mod tests {
             control_type: LayoutControlType::Form,
             index: 0,
             position: LayoutPosition::default(),
-            size: LayoutSize { width: 400.0, height: 300.0 },
+            size: LayoutSize {
+                width: 400.0,
+                height: 300.0,
+            },
             style: LayoutStyle::default(),
             children,
             caption: Some(name.into()),
@@ -305,7 +307,14 @@ mod tests {
 
     #[test]
     fn diff_no_changes_same_leaf() {
-        let old = make_leaf("lbl1", LayoutControlType::Label, 0, Some("Same".into()), true, true);
+        let old = make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("Same".into()),
+            true,
+            true,
+        );
         let old_snap = LayoutNode::Leaf(old.clone()).to_snapshot();
         let new = LayoutNode::Leaf(old);
 
@@ -315,9 +324,23 @@ mod tests {
 
     #[test]
     fn diff_value_changed() {
-        let old = make_leaf("lbl1", LayoutControlType::Label, 0, Some("Old".into()), true, true);
+        let old = make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("Old".into()),
+            true,
+            true,
+        );
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
-        let new = LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, Some("New".into()), true, true));
+        let new = LayoutNode::Leaf(make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("New".into()),
+            true,
+            true,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
         assert!(!diff.is_empty(), "Expected non-empty diff for value change");
@@ -330,58 +353,126 @@ mod tests {
 
     #[test]
     fn diff_visibility_changed() {
-        let old = make_leaf("lbl1", LayoutControlType::Label, 0, Some("Hello".into()), true, true);
+        let old = make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("Hello".into()),
+            true,
+            true,
+        );
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
-        let new = LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, Some("Hello".into()), false, true));
+        let new = LayoutNode::Leaf(make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("Hello".into()),
+            false,
+            true,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
         assert!(!diff.is_empty());
         assert_eq!(diff.leaf_changes.len(), 1);
         assert!(matches!(
             diff.leaf_changes[0].kind,
-            DiffKind::VisibilityChanged { old_visible: true, new_visible: false }
+            DiffKind::VisibilityChanged {
+                old_visible: true,
+                new_visible: false
+            }
         ));
     }
 
     #[test]
     fn diff_enabled_changed() {
-        let old = make_leaf("cmd1", LayoutControlType::CommandButton, 0, Some("Click".into()), true, true);
+        let old = make_leaf(
+            "cmd1",
+            LayoutControlType::CommandButton,
+            0,
+            Some("Click".into()),
+            true,
+            true,
+        );
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
-        let new = LayoutNode::Leaf(make_leaf("cmd1", LayoutControlType::CommandButton, 0, Some("Click".into()), true, false));
+        let new = LayoutNode::Leaf(make_leaf(
+            "cmd1",
+            LayoutControlType::CommandButton,
+            0,
+            Some("Click".into()),
+            true,
+            false,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
         assert!(!diff.is_empty());
         assert_eq!(diff.leaf_changes.len(), 1);
         assert!(matches!(
             diff.leaf_changes[0].kind,
-            DiffKind::EnabledChanged { old_enabled: true, new_enabled: false }
+            DiffKind::EnabledChanged {
+                old_enabled: true,
+                new_enabled: false
+            }
         ));
     }
 
     #[test]
     fn diff_multiple_property_changes() {
-        let old = make_leaf("lbl1", LayoutControlType::Label, 0, Some("Old".into()), true, true);
+        let old = make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("Old".into()),
+            true,
+            true,
+        );
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
-        let new = LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, Some("New".into()), false, false));
+        let new = LayoutNode::Leaf(make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("New".into()),
+            false,
+            false,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
         // When multiple properties change, only the first (value) is recorded
         assert!(!diff.is_empty());
         assert_eq!(diff.leaf_changes.len(), 1);
-        assert!(matches!(diff.leaf_changes[0].kind, DiffKind::ValueChanged { .. }));
+        assert!(matches!(
+            diff.leaf_changes[0].kind,
+            DiffKind::ValueChanged { .. }
+        ));
     }
 
     #[test]
     fn diff_value_to_none() {
-        let old = make_leaf("lbl1", LayoutControlType::Label, 0, Some("Has value".into()), true, true);
+        let old = make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("Has value".into()),
+            true,
+            true,
+        );
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
-        let new = LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, None, true, true));
+        let new = LayoutNode::Leaf(make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            None,
+            true,
+            true,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
         assert!(!diff.is_empty());
         assert!(matches!(
             diff.leaf_changes[0].kind,
-            DiffKind::ValueChanged { old_value: Some(_), new_value: None }
+            DiffKind::ValueChanged {
+                old_value: Some(_),
+                new_value: None
+            }
         ));
     }
 
@@ -389,13 +480,23 @@ mod tests {
     fn diff_from_none_to_value() {
         let old = make_leaf("lbl1", LayoutControlType::Label, 0, None, true, true);
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
-        let new = LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, Some("New value".into()), true, true));
+        let new = LayoutNode::Leaf(make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("New value".into()),
+            true,
+            true,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
         assert!(!diff.is_empty());
         assert!(matches!(
             diff.leaf_changes[0].kind,
-            DiffKind::ValueChanged { old_value: None, new_value: Some(_) }
+            DiffKind::ValueChanged {
+                old_value: None,
+                new_value: Some(_)
+            }
         ));
     }
 
@@ -404,7 +505,14 @@ mod tests {
         let container = make_container("frm1", vec![]);
         let old_snap = LayoutNode::Container(container).to_snapshot();
 
-        let new_child = LayoutNode::Leaf(make_leaf("new_child", LayoutControlType::Label, 0, Some("Hello".into()), true, true));
+        let new_child = LayoutNode::Leaf(make_leaf(
+            "new_child",
+            LayoutControlType::Label,
+            0,
+            Some("Hello".into()),
+            true,
+            true,
+        ));
         let new_container = make_container("frm1", vec![new_child.clone()]);
 
         let diff = DiffEngine::compute_diff(&old_snap, &LayoutNode::Container(new_container));
@@ -424,8 +532,22 @@ mod tests {
         let container = make_container("frm1", vec![]);
         let old_snap = LayoutNode::Container(container).to_snapshot();
 
-        let child1 = LayoutNode::Leaf(make_leaf("child1", LayoutControlType::Label, 0, None, true, true));
-        let child2 = LayoutNode::Leaf(make_leaf("child2", LayoutControlType::TextBox, 0, None, true, true));
+        let child1 = LayoutNode::Leaf(make_leaf(
+            "child1",
+            LayoutControlType::Label,
+            0,
+            None,
+            true,
+            true,
+        ));
+        let child2 = LayoutNode::Leaf(make_leaf(
+            "child2",
+            LayoutControlType::TextBox,
+            0,
+            None,
+            true,
+            true,
+        ));
         let new_container = make_container("frm1", vec![child1, child2]);
 
         let diff = DiffEngine::compute_diff(&old_snap, &LayoutNode::Container(new_container));
@@ -469,9 +591,17 @@ mod tests {
 
         // Use the old snapshot's child_ids to identify the child, then
         // create the expected child diff by manually constructing the result.
-        let new_container = make_container("frm1", vec![
-            LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, Some("New".into()), true, true)),
-        ]);
+        let new_container = make_container(
+            "frm1",
+            vec![LayoutNode::Leaf(make_leaf(
+                "lbl1",
+                LayoutControlType::Label,
+                0,
+                Some("New".into()),
+                true,
+                true,
+            ))],
+        );
 
         // Since the snapshot only has child_ids (not child snapshots), we can't
         // detect value changes in children through the standard API.
@@ -482,7 +612,11 @@ mod tests {
         // Container structure hasn't changed (same child_ids), so no childrenchanged.
         // Value changes in children aren't detectable without old layout node.
         // The diff should be empty for structural comparison.
-        assert!(diff.is_empty(), "Expected empty diff for structurally unchanged container, got {:?}", diff);
+        assert!(
+            diff.is_empty(),
+            "Expected empty diff for structurally unchanged container, got {:?}",
+            diff
+        );
     }
 
     #[test]
@@ -492,46 +626,105 @@ mod tests {
         let new_container = make_container("frm1", vec![]);
 
         let diff = DiffEngine::compute_diff(&old_snap, &LayoutNode::Container(new_container));
-        assert!(diff.is_empty(), "Expected empty diff for containers with no children");
+        assert!(
+            diff.is_empty(),
+            "Expected empty diff for containers with no children"
+        );
     }
 
     #[test]
     fn diff_different_control_types_same_name() {
         // Same name but different control types should be treated as different nodes
-        let old = make_leaf("ctrl1", LayoutControlType::Label, 0, Some("A".into()), true, true);
+        let old = make_leaf(
+            "ctrl1",
+            LayoutControlType::Label,
+            0,
+            Some("A".into()),
+            true,
+            true,
+        );
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
 
         // Different control type but same name — should NOT match
-        let new = LayoutNode::Leaf(make_leaf("ctrl1", LayoutControlType::TextBox, 0, Some("B".into()), true, true));
+        let new = LayoutNode::Leaf(make_leaf(
+            "ctrl1",
+            LayoutControlType::TextBox,
+            0,
+            Some("B".into()),
+            true,
+            true,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
         // Should be empty because the node IDs differ (different control type)
-        assert!(diff.is_empty(), "Expected empty diff for different control types with same name");
+        assert!(
+            diff.is_empty(),
+            "Expected empty diff for different control types with same name"
+        );
     }
 
     #[test]
     fn diff_different_indices_same_name_type() {
         // Same name and type but different indices should be treated as different nodes
-        let old = make_leaf("cmd1", LayoutControlType::CommandButton, 0, Some("A".into()), true, true);
+        let old = make_leaf(
+            "cmd1",
+            LayoutControlType::CommandButton,
+            0,
+            Some("A".into()),
+            true,
+            true,
+        );
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
 
-        let new = LayoutNode::Leaf(make_leaf("cmd1", LayoutControlType::CommandButton, 1, Some("B".into()), true, true));
+        let new = LayoutNode::Leaf(make_leaf(
+            "cmd1",
+            LayoutControlType::CommandButton,
+            1,
+            Some("B".into()),
+            true,
+            true,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
         // Should be empty because node IDs differ (different index)
-        assert!(diff.is_empty(), "Expected empty diff for different indices with same name and type");
+        assert!(
+            diff.is_empty(),
+            "Expected empty diff for different indices with same name and type"
+        );
     }
 
     #[test]
     fn diff_insert_at_position() {
-        let container = make_container("frm1", vec![
-            LayoutNode::Leaf(make_leaf("child1", LayoutControlType::Label, 0, None, true, true)),
-        ]);
+        let container = make_container(
+            "frm1",
+            vec![LayoutNode::Leaf(make_leaf(
+                "child1",
+                LayoutControlType::Label,
+                0,
+                None,
+                true,
+                true,
+            ))],
+        );
         let old_snap = LayoutNode::Container(container).to_snapshot();
 
         // Insert child2 at position 1
-        let new_child1 = LayoutNode::Leaf(make_leaf("child1", LayoutControlType::Label, 0, None, true, true));
-        let new_child2 = LayoutNode::Leaf(make_leaf("child2", LayoutControlType::Label, 1, None, true, true));
+        let new_child1 = LayoutNode::Leaf(make_leaf(
+            "child1",
+            LayoutControlType::Label,
+            0,
+            None,
+            true,
+            true,
+        ));
+        let new_child2 = LayoutNode::Leaf(make_leaf(
+            "child2",
+            LayoutControlType::Label,
+            1,
+            None,
+            true,
+            true,
+        ));
         let new_container = make_container("frm1", vec![new_child1, new_child2]);
 
         let diff = DiffEngine::compute_diff(&old_snap, &LayoutNode::Container(new_container));
@@ -550,7 +743,14 @@ mod tests {
     fn diff_compute_diff_with_empty_snapshot() {
         // Edge case: snapshot has no children, new node has children
         let snap = leaf_snapshot("lbl1", LayoutControlType::Label, 0);
-        let new = LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, Some("Hello".into()), true, true));
+        let new = LayoutNode::Leaf(make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("Hello".into()),
+            true,
+            true,
+        ));
 
         let diff = DiffEngine::compute_diff(&snap, &new);
         assert!(!diff.is_empty());
@@ -564,13 +764,23 @@ mod tests {
     fn diff_visibility_only_change() {
         let old = make_leaf("lbl1", LayoutControlType::Label, 0, None, true, true);
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
-        let new = LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, None, false, true));
+        let new = LayoutNode::Leaf(make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            None,
+            false,
+            true,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
         assert!(!diff.is_empty());
         assert_eq!(diff.leaf_changes.len(), 1);
         match &diff.leaf_changes[0].kind {
-            DiffKind::VisibilityChanged { old_visible, new_visible } => {
+            DiffKind::VisibilityChanged {
+                old_visible,
+                new_visible,
+            } => {
                 assert!(*old_visible);
                 assert!(!new_visible);
             }
@@ -580,15 +790,32 @@ mod tests {
 
     #[test]
     fn diff_enabled_only_change() {
-        let old = make_leaf("cmd1", LayoutControlType::CommandButton, 0, None, true, true);
+        let old = make_leaf(
+            "cmd1",
+            LayoutControlType::CommandButton,
+            0,
+            None,
+            true,
+            true,
+        );
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
-        let new = LayoutNode::Leaf(make_leaf("cmd1", LayoutControlType::CommandButton, 0, None, true, false));
+        let new = LayoutNode::Leaf(make_leaf(
+            "cmd1",
+            LayoutControlType::CommandButton,
+            0,
+            None,
+            true,
+            false,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
         assert!(!diff.is_empty());
         assert_eq!(diff.leaf_changes.len(), 1);
         match &diff.leaf_changes[0].kind {
-            DiffKind::EnabledChanged { old_enabled, new_enabled } => {
+            DiffKind::EnabledChanged {
+                old_enabled,
+                new_enabled,
+            } => {
                 assert!(*old_enabled);
                 assert!(!new_enabled);
             }
@@ -598,26 +825,63 @@ mod tests {
 
     #[test]
     fn diff_unchanged_container_with_children() {
-        let child = LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, Some("A".into()), true, true));
+        let child = LayoutNode::Leaf(make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("A".into()),
+            true,
+            true,
+        ));
         let container = make_container("frm1", vec![child]);
         let old_snap = LayoutNode::Container(container).to_snapshot();
 
         // Same structure, same values
-        let new_container = make_container("frm1", vec![
-            LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, Some("A".into()), true, true)),
-        ]);
+        let new_container = make_container(
+            "frm1",
+            vec![LayoutNode::Leaf(make_leaf(
+                "lbl1",
+                LayoutControlType::Label,
+                0,
+                Some("A".into()),
+                true,
+                true,
+            ))],
+        );
 
         let diff = DiffEngine::compute_diff(&old_snap, &LayoutNode::Container(new_container));
-        assert!(diff.is_empty(), "Expected empty diff for unchanged container, got {:?}", diff);
+        assert!(
+            diff.is_empty(),
+            "Expected empty diff for unchanged container, got {:?}",
+            diff
+        );
     }
 
     #[test]
     fn diff_unchanged_leaf() {
-        let old = make_leaf("lbl1", LayoutControlType::Label, 0, Some("Hello".into()), true, true);
+        let old = make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("Hello".into()),
+            true,
+            true,
+        );
         let old_snap = LayoutNode::Leaf(old).to_snapshot();
-        let new = LayoutNode::Leaf(make_leaf("lbl1", LayoutControlType::Label, 0, Some("Hello".into()), true, true));
+        let new = LayoutNode::Leaf(make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            0,
+            Some("Hello".into()),
+            true,
+            true,
+        ));
 
         let diff = DiffEngine::compute_diff(&old_snap, &new);
-        assert!(diff.is_empty(), "Expected empty diff for unchanged leaf, got {:?}", diff);
+        assert!(
+            diff.is_empty(),
+            "Expected empty diff for unchanged leaf, got {:?}",
+            diff
+        );
     }
 }
