@@ -21,7 +21,11 @@
 //! | HScrollBar/VScrollBar | `<input type="range" class="vb6-<type>scrollbar">` |
 //! | Shape | `<div class="vb6-shape">` |
 //! | Line | `<svg class="vb6-line">` |
-//! | Timer | *(omitted)* |
+//! | DriveListBox | `<select class="vb6-drivelistbox">` |
+//! | DirListBox | `<select class="vb6-dirlistbox">` |
+//! | FileListBox | `<select class="vb6-filelistbox">` |
+//! | Data/Custom | *(omitted — no visual output / not supported)* |
+//! | Timer | *(omitted — no visual output)* |
 
 use crate::layout::model::{LayoutContainer, LayoutLeaf, LayoutNode};
 use crate::layout::renderer::Renderer;
@@ -196,11 +200,21 @@ impl Renderer for TauriRenderer {
                 )
             }
             LayoutControlType::Image => {
+                // Image uses <img> element for proper web semantics and object-fit styling.
+                // The `value` field holds the image path/URL.
                 format!(
-                    r#"<div id="{}" class="vb6-image" style="{}">{}</div>"#,
+                    r#"<img id="{}" class="vb6-image" src="{}" style="{}" />"#,
                     html_escape(&leaf.name),
-                    style,
-                    html_escape(value)
+                    html_escape(value),
+                    style
+                )
+            }
+            LayoutControlType::DriveListBox | LayoutControlType::DirListBox | LayoutControlType::FileListBox => {
+                format!(
+                    r#"<select id="{}" class="vb6-{}" style="{}"></select>"#,
+                    html_escape(&leaf.name),
+                    leaf.control_type.css_class(),
+                    style
                 )
             }
             LayoutControlType::Shape => {
@@ -219,12 +233,10 @@ impl Renderer for TauriRenderer {
                 )
             }
             LayoutControlType::Timer => {
-                // Timer has no visual output — render as empty placeholder
-                format!(
-                    r#"<div id="{}" class="vb6-timer" style="{}"></div>"#,
-                    html_escape(&leaf.name),
-                    style
-                )
+                // Timer has no visual output — omit from DOM tree entirely.
+                // The converter should already filter these when include_nonvisual=false,
+                // but the renderer handles them gracefully if they reach this point.
+                String::new()
             }
             _ => {
                 format!(
@@ -487,5 +499,103 @@ mod tests {
         let rendered = renderer.render_children(&children);
         assert_eq!(rendered.len(), 1);
         assert!(rendered[0].contains("visible"));
+    }
+
+    #[test]
+    fn render_image_leaf() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("imgLogo", LayoutControlType::Image, Some("logo.png".into()));
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("<img"));
+        assert!(html.contains("vb6-image"));
+        assert!(html.contains("src=\"logo.png\""));
+    }
+
+    #[test]
+    fn render_image_leaf_empty_src() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("imgEmpty", LayoutControlType::Image, Some("".into()));
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("<img"));
+        assert!(html.contains("src=\"\""));
+    }
+
+    #[test]
+    fn render_timer_omitted() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("tmrTick", LayoutControlType::Timer, None);
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.is_empty());
+    }
+
+    #[test]
+    fn render_drive_listbox() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("drv drives", LayoutControlType::DriveListBox, None);
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("<select"));
+        assert!(html.contains("vb6-drivelistbox"));
+    }
+
+    #[test]
+    fn render_dir_listbox() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("dir1", LayoutControlType::DirListBox, None);
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("<select"));
+        assert!(html.contains("vb6-dirlistbox"));
+    }
+
+    #[test]
+    fn render_file_listbox() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("fil1", LayoutControlType::FileListBox, None);
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("<select"));
+        assert!(html.contains("vb6-filelistbox"));
+    }
+
+    #[test]
+    fn render_picture_box_container() {
+        let renderer = TauriRenderer::new(false);
+        let container = make_container("picBox", LayoutControlType::PictureBox);
+        let html = renderer.render_container(&container);
+        assert!(html.contains("<div"));
+        assert!(html.contains("vb6-div"));
+        assert!(html.contains("</div>"));
+    }
+
+    #[test]
+    fn render_optionbutton_radio() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("optChoice", LayoutControlType::OptionButton, Some("True".into()));
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"type="radio""#));
+        assert!(html.contains("vb6-optionbutton"));
+        assert!(html.contains("checked"));
+    }
+
+    #[test]
+    fn render_container_with_children() {
+        let renderer = TauriRenderer::new(false);
+        let mut container = make_container("fraGroup", LayoutControlType::Frame);
+        container.children.push(LayoutNode::Leaf(make_leaf(
+            "lblInside",
+            LayoutControlType::Label,
+            Some("Inside frame".into()),
+        )));
+        container.children.push(LayoutNode::Leaf(make_leaf(
+            "cmdInside",
+            LayoutControlType::CommandButton,
+            Some("Click".into()),
+        )));
+        let html = renderer.render_container(&container);
+        assert!(html.contains("<fieldset"));
+        assert!(html.contains("<legend>Test</legend>"));
+        assert!(html.contains("vb6-label"));
+        assert!(html.contains("Inside frame"));
+        assert!(html.contains("vb6-commandbutton"));
+        assert!(html.contains("Click"));
+        assert!(html.contains("</fieldset>"));
     }
 }

@@ -131,6 +131,8 @@ impl Renderer for WebSysRenderer {
                 el.set_text_content(Some(value));
             } else if tag_lower == "input" {
                 let _ = el.set_attribute("value", value);
+            } else if tag_lower == "img" {
+                let _ = el.set_attribute("src", value);
             } else {
                 el.set_text_content(Some(value));
             }
@@ -212,7 +214,7 @@ fn tag_for_control(control_type: LayoutControlType) -> &'static str {
         LayoutControlType::CommandButton => "button",
         LayoutControlType::Frame => "fieldset",
         LayoutControlType::PictureBox => "div",
-        LayoutControlType::Image => "div",
+        LayoutControlType::Image => "img",
         LayoutControlType::CheckBox => "input",
         LayoutControlType::OptionButton => "input",
         LayoutControlType::ComboBox => "select",
