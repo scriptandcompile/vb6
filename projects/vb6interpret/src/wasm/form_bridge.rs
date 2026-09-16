@@ -142,3 +142,57 @@ pub fn update_form(handle: u32) -> Result<(), JsError> {
 
     Ok(())
 }
+
+/// Load multiple forms from raw `.frm` file bytes and render each one into
+/// `#vb6-container`.
+///
+/// Each `(name, bytes)` pair is parsed as a VB6 form file.  All loaded
+/// forms are rendered in sequence inside the container, producing a stack
+/// of overlapping form DOM trees.
+///
+/// Returns a vector of handles — one per successfully loaded form — in the
+/// same order as the input.  Any form that fails to parse halts and returns
+/// an error for the first failing entry.
+#[wasm_bindgen]
+pub fn show_project_forms(form_files: Vec<(String, Vec<u8>)>) -> Result<Vec<u32>, JsError> {
+    let config = LayoutConfig::default();
+
+    let doc = window()
+        .ok_or("no window")?
+        .document()
+        .ok_or("no document")?;
+
+    let container = doc
+        .get_element_by_id("vb6-container")
+        .ok_or("#vb6-container element not found")?;
+    container.set_inner_html("");
+
+    let renderer = layout::renderer::WebSysRenderer::new(doc);
+    let mut handles = Vec::with_capacity(form_files.len());
+
+    for (file_name, bytes) in form_files {
+        let source_file = vb6parse::io::SourceFile::decode_with_replacement(&file_name, &bytes)
+            .map_err(|e| JsError::new(&e.kind.to_string()))?;
+        let form_file = vb6parse::FormFile::parse(&source_file)
+            .map(|r| r.ok().unwrap())
+            .map_err(|e| {
+                let message = e
+                    .first()
+                    .map(|em| em.kind.to_string())
+                    .unwrap_or_else(|| "Failed to parse form file".to_string());
+                JsError::new(&message)
+            })?;
+
+        let handle = layout::load_form(&form_file.form, &config);
+        let model = layout::get_form(handle, |f| f.root_node.clone())
+            .ok_or("form not found after loading")?;
+        let dom_root = renderer.render_node(&model);
+        container
+            .append_child(&dom_root)
+            .map_err(|_| "failed to append form to container")?;
+
+        handles.push(handle);
+    }
+
+    Ok(handles)
+}
