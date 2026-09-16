@@ -24,7 +24,7 @@ use crate::{
         color::{Color, VB_BUTTON_FACE},
         controls::{
             Activation, Appearance, CausesValidation, DragMode, Font, MousePointer, OLEDropMode,
-            ReferenceOrValue, Style, TabStop, TextDirection, UseMaskColor,
+            ReferenceOrValue, Style, TabStop, TextDirection, UseMaskColor, Visibility,
         },
     },
 };
@@ -96,6 +96,8 @@ pub struct CommandButtonProperties {
     pub use_mask_color: UseMaskColor,
     /// The "What's This?" help ID of the command button.
     pub whats_this_help_id: i32,
+    /// Indicates if the command button is visible.
+    pub visible: Visibility,
     /// The width of the command button.
     pub width: i32,
 }
@@ -130,6 +132,7 @@ impl Default for CommandButtonProperties {
             tool_tip_text: String::new(),
             top: 30,
             use_mask_color: UseMaskColor::DoNotUseMaskColor,
+            visible: Visibility::Visible,
             whats_this_help_id: 0,
             width: 100,
         }
@@ -143,7 +146,7 @@ impl Serialize for CommandButtonProperties {
     {
         use serde::ser::SerializeStruct;
 
-        let mut s = serializer.serialize_struct("CommandButtonProperties", 24)?;
+        let mut s = serializer.serialize_struct("CommandButtonProperties", 25)?;
         s.serialize_field("appearance", &self.appearance)?;
         s.serialize_field("back_color", &self.back_color)?;
         s.serialize_field("cancel", &self.cancel)?;
@@ -185,6 +188,7 @@ impl Serialize for CommandButtonProperties {
         s.serialize_field("tool_tip_text", &self.tool_tip_text)?;
         s.serialize_field("top", &self.top)?;
         s.serialize_field("use_mask_color", &self.use_mask_color)?;
+        s.serialize_field("visible", &self.visible)?;
         s.serialize_field("whats_this_help_id", &self.whats_this_help_id)?;
         s.serialize_field("width", &self.width)?;
 
@@ -245,6 +249,7 @@ impl From<Properties> for CommandButtonProperties {
         command_button_prop.top = prop.get_i32("Top", command_button_prop.top);
         command_button_prop.use_mask_color =
             prop.get_property("UseMaskColor", command_button_prop.use_mask_color);
+        command_button_prop.visible = prop.get_property("Visible", command_button_prop.visible);
         command_button_prop.whats_this_help_id =
             prop.get_i32("WhatsThisHelp", command_button_prop.whats_this_help_id);
         command_button_prop.width = prop.get_i32("Width", command_button_prop.width);
