@@ -20,16 +20,17 @@ use vb6runtime::VBVariant;
 /// Holds the interpreter and project under `Arc<Mutex<>>` so they can be
 /// shared between the main thread (which sends commands via the handle)
 /// and the background thread (which executes them).
+#[derive(Clone)]
 pub struct TauriEngine {
     /// The VB6 interpreter instance shared with the background thread.
-    interpreter: Arc<Mutex<Interpreter>>,
+    pub(crate) interpreter: Arc<Mutex<Interpreter>>,
     /// The loaded VB6 project shared with the background thread.
     #[allow(dead_code)]
     project: Arc<Mutex<LoadedProject>>,
     /// Indicates whether the background engine is currently running.
     running: Arc<AtomicBool>,
     /// The sender channel for commands to the background engine.
-    cmd_tx: Sender<TauriCommand>,
+    pub(crate) cmd_tx: Sender<TauriCommand>,
 }
 
 /// Commands that the Tauri frontend can send to the background engine.
@@ -70,6 +71,15 @@ pub enum TauriCommand {
     UnloadForm {
         /// The form name (from `Attribute VB_Name`).
         name: String,
+    },
+    /// Dispatch a form control event (e.g. button click) to the interpreter.
+    FormEvent {
+        /// The form name (from `Attribute VB_Name`).
+        form: String,
+        /// The control name that fired the event (e.g. "cmdOK").
+        control: String,
+        /// The event name (e.g. "Click", "Change").
+        event: String,
     },
     /// Stop the background engine.
     Stop,
@@ -169,6 +179,22 @@ impl TauriEngine {
                     Ok(TauriCommand::HideForm { .. }) | Ok(TauriCommand::UnloadForm { .. }) => {
                         // TODO: implement form hiding/unloading
                     }
+                    Ok(TauriCommand::FormEvent {
+                        form: _,
+                        control,
+                        event,
+                    }) => {
+                        let proc_name = format!("{}_{}", control, event);
+                        let result = {
+                            let mut interp = interpreter_clone.lock().unwrap();
+                            interp.call_sub(&proc_name, vec![])
+                        };
+                        if let Err(e) = result {
+                            resp_tx_clone
+                                .send(TauriResponse::Error(e.error.to_string()))
+                                .ok();
+                        }
+                    }
                     Ok(TauriCommand::Stop) => {
                         break;
                     }
@@ -260,7 +286,8 @@ impl TauriEngineHandle {
             | TauriCommand::ShowForm { .. }
             | TauriCommand::HideForm { .. }
             | TauriCommand::UnloadForm { .. }
-            | TauriCommand::Stop => false,
+            | TauriCommand::Stop
+            | TauriCommand::FormEvent { .. } => false,
         }
     }
 
