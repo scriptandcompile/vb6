@@ -15,6 +15,10 @@ pub mod interpreter;
 pub mod program;
 pub mod scope;
 
+/// Tauri command handlers for form rendering (only compiled with `tauri` feature).
+#[cfg(feature = "tauri")]
+pub mod tauri_cmds;
+
 /// Library version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 

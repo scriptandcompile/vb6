@@ -2,6 +2,10 @@
 //!
 //! Execute VB6 code directly without compilation.
 
+#[cfg(feature = "tauri")]
+#[path = "tauri_cmds.rs"]
+mod tauri_cmds;
+
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
 use std::io::Write;
@@ -75,7 +79,21 @@ enum Commands {
     },
 }
 
-fn main() -> Result<()> {
+fn main() {
+    #[cfg(feature = "tauri")]
+    {
+        run_tauri();
+        return;
+    }
+
+    let result = run_cli();
+    if let Err(e) = result {
+        eprintln!("Error: {}", e);
+        std::process::exit(1);
+    }
+}
+
+fn run_cli() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
@@ -152,6 +170,23 @@ fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+/// Tauri entry point — runs the Tauri application with form-rendering commands.
+///
+/// When the `tauri` feature is enabled, this function is called from `main()`
+/// and never returns. The Tauri runtime handles the event loop.
+#[cfg(feature = "tauri")]
+fn run_tauri() {
+    use tauri::generate_handler;
+
+    tauri::Builder::default()
+        .invoke_handler(generate_handler![
+            tauri_cmds::load_form,
+            tauri_cmds::update_form,
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri");
 }
 
 /// Write the interpreter's captured output to stdout, ensuring the output ends
