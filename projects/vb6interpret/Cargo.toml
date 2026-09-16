@@ -40,6 +40,8 @@ colored = { workspace = true, optional = true }
 # Tauri (optional, for native form/menu rendering)
 tauri = { workspace = true, optional = true }
 
+[build-dependencies]
+
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen.workspace = true
 serde-wasm-bindgen.workspace = true

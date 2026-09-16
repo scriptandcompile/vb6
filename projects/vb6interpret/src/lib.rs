@@ -20,6 +20,13 @@ pub mod scope;
 #[cfg(feature = "tauri")]
 pub mod tauri_cmds;
 
+/// Tauri background engine with IPC channels (only compiled with `tauri` feature).
+#[cfg(feature = "tauri")]
+pub mod tauri_engine;
+
+#[cfg(feature = "tauri")]
+pub use tauri_engine::{TauriCommand, TauriEngine, TauriEngineHandle, TauriResponse};
+
 /// Library version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
