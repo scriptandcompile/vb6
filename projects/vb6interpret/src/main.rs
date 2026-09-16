@@ -132,7 +132,10 @@ fn run_cli() -> Result<()> {
             }
         }
         Some(Commands::Repl) => {
-            println!("TODO: Start REPL");
+            #[cfg(feature = "repl")]
+            run_repl()?;
+            #[cfg(not(feature = "repl"))]
+            eprintln!("REPL not enabled. Compile with --features repl");
         }
         None => run_vbp_in_cwd(&[], 0, None)?,
         Some(Commands::Debug { path, r#break }) => {
@@ -159,6 +162,107 @@ fn run_cli() -> Result<()> {
 ///
 /// When the `tauri` feature is enabled, this function is called from `main()`
 /// and never returns. The Tauri runtime handles the event loop.
+
+#[cfg(feature = "repl")]
+fn run_repl() -> Result<()> {
+    let mut editor = rustyline::DefaultEditor::new()
+        .map_err(|e| anyhow::anyhow!("Failed to create REPL editor: {}", e))?;
+    let mut interpreter = Interpreter::new();
+
+    loop {
+        match editor.readline("vb6> ") {
+            Ok(line) => {
+                let trimmed = line.trim();
+                match trimmed {
+                    "" => continue,
+                    ".quit" | ".exit" => break,
+                    ".help" => print_repl_help(),
+                    ".clear" => {
+                        interpreter.clear();
+                        println!("State cleared.");
+                    }
+                    ".globals" => {
+                        for (name, value) in interpreter.globals().iter() {
+                            println!("{} = {}", name, value);
+                        }
+                        if interpreter.globals().is_empty() {
+                            println!("(no global variables)");
+                        }
+                    }
+                    ".run" => {
+                        match interpreter.run_startup() {
+                            Ok(()) => print_output(&interpreter),
+                            Err(e) => eprintln!("Error: {}", e.error),
+                        }
+                    }
+                    s if s.starts_with(".run ") => {
+                        let path = expand_tilde(Path::new(&s[5..]));
+                        match load_source_into(&mut interpreter, &path) {
+                            Ok(()) => {
+                                print_output(&interpreter);
+                                match interpreter.run_startup() {
+                                    Ok(()) => print_output(&interpreter),
+                                    Err(e) => eprintln!("Error: {}", e.error),
+                                }
+                            }
+                            Err(e) => eprintln!("Error loading '{}': {}", path.display(), e),
+                        }
+                    }
+                    ".load" => {
+                        println!("Usage: .load <path>");
+                    }
+                    s if s.starts_with(".load ") => {
+                        let path_str = &s[6..];
+                        let path = expand_tilde(Path::new(path_str));
+                        match load_source_into(&mut interpreter, &path) {
+                            Ok(()) => println!("Loaded {}", path.display()),
+                            Err(e) => eprintln!("Error loading '{}': {}", path.display(), e),
+                        }
+                    }
+                    code => match interpreter.run_source(code) {
+                        Ok(()) => print_output(&interpreter),
+                        Err(e) => eprintln!("Error: {}", e.error),
+                    },
+                }
+                let _ = editor.add_history_entry(trimmed);
+            }
+            Err(_) => break,
+        }
+    }
+    Ok(())
+}
+
+#[cfg(feature = "repl")]
+fn print_repl_help() {
+    println!("REPL commands:");
+    println!("  .load <path>   Load a .bas or .vbp file");
+    println!("  .run [path]    Run the current or loaded file");
+    println!("  .clear         Clear all state");
+    println!("  .globals       List global variables");
+    println!("  .help          Show this help");
+    println!("  .quit/.exit    Exit REPL");
+    println!();
+    println!("Any other input is treated as VB6 code and executed immediately.");
+}
+
+#[cfg(feature = "repl")]
+fn load_source_into(interpreter: &mut Interpreter, path: &Path) -> Result<()> {
+    let source_file = SourceFile::from_file(path)
+        .map_err(|e| anyhow::anyhow!("Failed to read '{}': {}", path.display(), e))?;
+    match path.extension().and_then(|e| e.to_str()) {
+        Some("bas") => {
+            let module = ModuleFile::parse(&source_file).unwrap_or_fail();
+            interpreter.merge_module(&module)?;
+        }
+        Some("vbp") => {
+            let project = project::LoadedProject::load(path)?;
+            interpreter.merge_project(&project)?;
+        }
+        Some(ext) => bail!("Unsupported file type: .{}", ext),
+        None => bail!("No file extension. Expected .bas or .vbp"),
+    }
+    Ok(())
+}
 #[cfg(feature = "tauri")]
 fn run_tauri() {
     use tauri::generate_handler;

@@ -375,6 +375,73 @@ impl Interpreter {
         Ok(())
     }
 
+    /// Merge a module's procedures and module-level statements into the
+    /// interpreter without clearing existing state.
+    ///
+    /// Procedures from the module are added to the existing procedure map.
+    /// Module-level statements execute immediately so that globals declared
+    /// in the module are available right away.
+    pub fn merge_module(&mut self, module: &ModuleFile) -> RunResult<()> {
+        self.register_builtin_constants();
+        let root = module.cst.to_root_node();
+        let program = crate::program::build_program(&root, &module.name);
+        self.procedures.extend(program.procedures);
+        self.module_name = module.name.clone();
+        self.source_line_offset = module.line_offset;
+        self.exec_statements(&root, 1)?;
+        Ok(())
+    }
+
+    /// Merge all procedures from a loaded project into the interpreter
+    /// without clearing existing state.
+    ///
+    /// Procedures are merged from modules, classes, and forms. Module-level
+    /// statements of modules execute immediately.
+    pub fn merge_project(&mut self, project: &crate::project::LoadedProject) -> RunResult<()> {
+        self.register_builtin_constants();
+        self.procedures.clear();
+
+        for module in &project.modules {
+            let root = module.parsed.cst.to_root_node();
+            let program = crate::program::build_program(&root, &module.name);
+            self.procedures.extend(program.procedures);
+            self.module_name = module.name.clone();
+            self.source_line_offset = module.parsed.line_offset;
+            self.exec_statements(&root, 1)?;
+            if self.terminated {
+                return Ok(());
+            }
+        }
+
+        for class in &project.classes {
+            let root = class.parsed.cst.to_root_node();
+            let program = crate::program::build_program(&root, &class.name);
+            self.procedures.extend(program.procedures);
+        }
+
+        for form in &project.forms {
+            let root = form.parsed.cst.to_root_node();
+            let program = crate::program::build_program(&root, &form.name);
+            self.procedures.extend(program.procedures);
+        }
+
+        Ok(())
+    }
+
+    /// Find and call the entry procedure (Sub Main) from the merged
+    /// procedures, if one is present.
+    pub fn run_startup(&mut self) -> RunResult<()> {
+        let entry = self.procedures.get("main").cloned();
+        if let Some(proc) = entry {
+            if proc.is_function {
+                self.call_function(&proc.name, Vec::new())?;
+            } else {
+                self.call_sub(&proc.name, Vec::new())?;
+            }
+        }
+        Ok(())
+    }
+
     /// The completed `Debug.Print`/`Print` output lines.
     pub fn output(&self) -> &[String] {
         &self.output
