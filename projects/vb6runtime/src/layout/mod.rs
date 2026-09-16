@@ -509,4 +509,51 @@ mod tests {
         let diff = get_diff(handle).unwrap();
         assert!(!diff.is_empty(), "Expected diff to detect child insertion");
     }
+
+    #[test]
+    fn load_form_returns_valid_handle() {
+        let _lock = lock_test();
+        form_store::reset();
+        let bytes = make_test_form_bytes();
+        let source_file = vb6parse::io::SourceFile::decode_with_replacement("form.frm", &bytes)
+            .expect("failed to decode form");
+        let form_file = vb6parse::FormFile::parse(&source_file).unwrap_or_fail();
+        let handle = load_form(&form_file.form, &LayoutConfig::default());
+        let name = get_form(handle, |f| f.name.clone());
+        assert_eq!(name, Some("Form1".to_string()));
+    }
+
+    #[test]
+    fn render_form_with_label() {
+        let _lock = lock_test();
+        form_store::reset();
+        let bytes = make_test_form_bytes();
+        let source_file = vb6parse::io::SourceFile::decode_with_replacement("form.frm", &bytes)
+            .expect("failed to decode form");
+        let form_file = vb6parse::FormFile::parse(&source_file).unwrap_or_fail();
+        let handle = load_form(&form_file.form, &LayoutConfig::default());
+        let html = render(handle, &renderer::TauriRenderer::new(false));
+        assert!(html.contains("vb6-form"));
+        assert!(html.contains("vb6-label"));
+        assert!(html.contains("Hello"));
+    }
+
+    fn make_test_form_bytes() -> Vec<u8> {
+        String::from(
+            "VERSION 5.00\r\n\
+             Begin VB.Form Form1\r\n\
+                Caption         =   \"Test\"\r\n\
+                ClientHeight    =   3000\r\n\
+                ClientWidth     =   4000\r\n\
+                Begin VB.Label Label1\r\n\
+                   Caption       =   \"Hello\"\r\n\
+                   Height        =   375\r\n\
+                   Left          =   120\r\n\
+                   Top           =   120\r\n\
+                   Width         =   2000\r\n\
+                End\r\n\
+             End\r\n",
+        )
+        .into_bytes()
+    }
 }

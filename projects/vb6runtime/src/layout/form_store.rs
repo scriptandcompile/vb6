@@ -112,16 +112,11 @@ pub fn remove(handle: FormHandle) -> Option<LayoutForm> {
 
 /// Reset the store to its initial empty state.
 ///
-/// # Panics
-///
-/// Panics if the mutexes cannot be locked.
-///
-/// # Test Usage
-///
-/// This function is `pub` to support test isolation. In production code,
-/// the store's lifetime matches the process lifetime.
+/// This function is `pub(crate)` to support test isolation within the
+/// `vb6runtime` crate. In production code, the store's lifetime matches
+/// the process lifetime.
 #[cfg(test)]
-pub fn reset() {
+pub(crate) fn reset() {
     STORE.lock().unwrap().clear();
     *NEXT_HANDLE.lock().unwrap() = 0;
 }
