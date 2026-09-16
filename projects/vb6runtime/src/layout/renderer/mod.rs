@@ -42,6 +42,11 @@ pub mod web_sys;
 #[cfg(target_arch = "wasm32")]
 pub use web_sys::WebSysRenderer;
 
+#[cfg(target_arch = "wasm32")]
+use super::model::NodeId;
+#[cfg(target_arch = "wasm32")]
+use web_sys::Element;
+
 /// Trait for converting a [`LayoutNode`] tree into platform-specific output.
 ///
 /// Implement this once per platform:
@@ -124,5 +129,65 @@ pub trait Renderer {
     fn apply_diff(&self, _node: &LayoutNode, _change: &DiffChange) -> String {
         // No-op by default. Incremental renderers override this.
         String::new()
+    }
+
+    /// Render a node tree using the diff to skip unchanged subtrees.
+    ///
+    /// The default implementation falls back to a full re-render via
+    /// [`render_node`](Renderer::render_node). `WebSysRenderer` overrides this
+    /// method to perform incremental DOM patching — updating only the
+    /// properties that changed (text content, visibility, enabled state)
+    /// and re-creating only inserted or removed elements.
+    ///
+    /// # DOM Node Cache
+    ///
+    /// When the diff contains `DiffKind::Inserted`, this method creates new
+    /// DOM elements and caches them by node ID in `dom_nodes`. The cache
+    /// allows subsequent `VisibilityChanged` and `ValueChanged` updates
+    /// to find existing elements for in-place mutation.
+    ///
+    /// # Arguments
+    /// * `node` — The layout node to render.
+    /// * `diff` — Optional diff tree describing changes since last render.
+    /// * `parent` — Optional parent DOM element for appending inserted children.
+    /// * `dom_nodes` — Mutable cache of node ID → DOM element, maintained across renders.
+    ///
+    /// # Returns
+    /// The rendered `Element`. For unchanged subtrees (`DiffKind::Same`),
+    /// returns the cached element. For changed subtrees, returns the updated
+    /// or newly created element.
+    #[cfg(target_arch = "wasm32")]
+    fn render_node_with_diff_dom(
+        &self,
+        _node: &LayoutNode,
+        _diff: Option<&DiffTree>,
+        _parent: Option<&Element>,
+        _dom_nodes: &mut std::cell::RefCell<std::collections::HashMap<NodeId, Element>>,
+    ) -> Element {
+        // Default: full re-render. Override in WebSysRenderer.
+        self.render_node(_node)
+    }
+
+    /// Apply a diff change directly to the DOM.
+    ///
+    /// Called by the diffing pipeline to update individual DOM elements
+    /// without re-rendering the entire subtree. Used for leaf-level changes
+    /// like text updates, visibility toggles, and enabled state changes.
+    ///
+    /// # Arguments
+    /// * `node` — The layout node that was changed.
+    /// * `change` — The diff change describing what was modified.
+    /// * `parent` — The parent DOM element for inserting new nodes.
+    /// * `dom_nodes` — Mutable cache of node ID → DOM element, maintained across renders.
+    #[cfg(target_arch = "wasm32")]
+    fn apply_diff_dom(
+        &self,
+        _node: &LayoutNode,
+        _change: &DiffChange,
+        _parent: Option<&Element>,
+        _dom_nodes: &mut std::cell::RefCell<std::collections::HashMap<NodeId, Element>>,
+    ) -> Option<Element> {
+        // Default: no-op, returns None to signal full re-render.
+        None
     }
 }
