@@ -245,3 +245,230 @@ fn run_project_multiple_modules_merged() {
     assert_eq!(output[0], "helper called");
     assert_eq!(output[1], "done");
 }
+
+fn write_form_with_code(dir: &TempDir, name: &str, controls: &str, code: &str) {
+    let content = format!(
+        "VERSION 5.00\nBegin VB.Form Form1\n   Caption         =   \"Test Form\"\n   ClientHeight    =   3000\n   ClientWidth     =   4000\n{controls}End\nAttribute VB_Name = \"Form1\"\n{code}",
+        controls = controls,
+        code = code,
+    );
+    write_file(dir, name, &content);
+}
+
+#[test]
+fn form_event_bindings_click() {
+    let dir = temp_dir();
+    write_form_with_code(
+        &dir,
+        "Form1.frm",
+        "   Begin VB.CommandButton cmdOK\n      Caption         =   \"&OK\"\n      Height          =   495\n      Left            =   120\n      TabIndex        =   0\n      Top             =   120\n      Width           =   1215\n   End\n",
+        r#"
+Private Sub cmdOK_Click()
+    Debug.Print "ok clicked"
+End Sub
+"#,
+    );
+    write_vbp(
+        &dir,
+        "TYPE=Exe\n\
+         Form=Form1.frm\n\
+         Startup=\"Form1\"\n",
+    );
+
+    let project = load_project(&dir);
+    let bindings = project.forms[0].event_bindings();
+
+    assert_eq!(bindings.len(), 1);
+    assert!(bindings.contains_key(&(
+        "cmdOK".to_string(),
+        "Click".to_string(),
+    )));
+    assert_eq!(
+        bindings[&("cmdOK".to_string(), "Click".to_string())],
+        "cmdOK_Click"
+    );
+}
+
+#[test]
+fn form_event_bindings_multiple_controls() {
+    let dir = temp_dir();
+    write_form_with_code(
+        &dir,
+        "Form1.frm",
+        r#"   Begin VB.CommandButton cmdOK
+      Caption         =   "&OK"
+      Height          =   495
+      Left            =   120
+      TabIndex        =   0
+      Top             =   120
+      Width           =   1215
+   End
+   Begin VB.CommandButton cmdCancel
+      Caption         =   "&Cancel"
+      Height          =   495
+      Left            =   120
+      TabIndex        =   1
+      Top             =   600
+      Width           =   1215
+   End
+   Begin VB.TextBox Text1
+      Height          =   285
+      Left            =   120
+      TabIndex        =   2
+      Top             =   1200
+      Width           =   1215
+   End
+"#,
+        r#"
+Private Sub cmdOK_Click()
+    Debug.Print "ok"
+End Sub
+
+Private Sub cmdCancel_Click()
+    Debug.Print "cancel"
+End Sub
+
+Private Sub Text1_Change()
+    Debug.Print "changed"
+End Sub
+"#,
+    );
+    write_vbp(
+        &dir,
+        "TYPE=Exe\n\
+         Form=Form1.frm\n\
+         Startup=\"Form1\"\n",
+    );
+
+    let project = load_project(&dir);
+    let bindings = project.forms[0].event_bindings();
+
+    assert_eq!(bindings.len(), 3);
+    assert!(bindings.contains_key(&(
+        "cmdOK".to_string(),
+        "Click".to_string(),
+    )));
+    assert!(bindings.contains_key(&(
+        "cmdCancel".to_string(),
+        "Click".to_string(),
+    )));
+    assert!(bindings.contains_key(&(
+        "Text1".to_string(),
+        "Change".to_string(),
+    )));
+}
+
+#[test]
+fn form_event_bindings_no_controls() {
+    let dir = temp_dir();
+    write_file(
+        &dir,
+        "Form1.frm",
+        "VERSION 5.00\nBegin VB.Form Form1\nEnd\nAttribute VB_Name = \"Form1\"\n",
+    );
+    write_vbp(
+        &dir,
+        "TYPE=Exe\n\
+         Form=Form1.frm\n\
+         Startup=\"Form1\"\n",
+    );
+
+    let project = load_project(&dir);
+    let bindings = project.forms[0].event_bindings();
+    assert_eq!(bindings.len(), 0);
+}
+
+#[test]
+fn form_event_bindings_empty_form() {
+    let dir = temp_dir();
+    write_form_with_code(
+        &dir,
+        "Form1.frm",
+        "",
+        "",
+    );
+    write_vbp(
+        &dir,
+        "TYPE=Exe\n\
+         Form=Form1.frm\n\
+         Startup=\"Form1\"\n",
+    );
+
+    let project = load_project(&dir);
+    let bindings = project.forms[0].event_bindings();
+    assert_eq!(bindings.len(), 0);
+}
+
+#[test]
+fn form_event_bindings_keypress() {
+    let dir = temp_dir();
+    write_form_with_code(
+        &dir,
+        "Form1.frm",
+        "   Begin VB.TextBox Text1\n      Height          =   285\n      Left            =   120\n      TabIndex        =   0\n      Top             =   120\n      Width           =   1215\n   End\n",
+        r#"
+Private Sub Text1_KeyPress(KeyAscii As Integer)
+    If KeyAscii = 13 Then
+        Debug.Print "enter pressed"
+    End If
+End Sub
+"#,
+    );
+    write_vbp(
+        &dir,
+        "TYPE=Exe\n\
+         Form=Form1.frm\n\
+         Startup=\"Form1\"\n",
+    );
+
+    let project = load_project(&dir);
+    let bindings = project.forms[0].event_bindings();
+
+    assert_eq!(bindings.len(), 1);
+    assert!(bindings.contains_key(&(
+        "Text1".to_string(),
+        "KeyPress".to_string(),
+    )));
+    assert_eq!(
+        bindings[&("Text1".to_string(), "KeyPress".to_string())],
+        "Text1_KeyPress"
+    );
+}
+
+#[test]
+fn form_event_bindings_mouse_events() {
+    let dir = temp_dir();
+    write_form_with_code(
+        &dir,
+        "Form1.frm",
+        "   Begin VB.Label Label1\n      Caption         =   \"Label\"\n      Height          =   495\n      Left            =   120\n      TabIndex        =   0\n      Top             =   120\n      Width           =   1215\n   End\n",
+        r#"
+Private Sub Label1_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    Debug.Print "down"
+End Sub
+
+Private Sub Label1_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    Debug.Print "up"
+End Sub
+"#,
+    );
+    write_vbp(
+        &dir,
+        "TYPE=Exe\n\
+         Form=Form1.frm\n\
+         Startup=\"Form1\"\n",
+    );
+
+    let project = load_project(&dir);
+    let bindings = project.forms[0].event_bindings();
+
+    assert_eq!(bindings.len(), 2);
+    assert!(bindings.contains_key(&(
+        "Label1".to_string(),
+        "MouseDown".to_string(),
+    )));
+    assert!(bindings.contains_key(&(
+        "Label1".to_string(),
+        "MouseUp".to_string(),
+    )));
+}

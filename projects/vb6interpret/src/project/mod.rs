@@ -4,6 +4,7 @@
 //! parses them, and provides a `LoadedProject` containing everything needed for
 //! multi-module execution.
 
+use std::collections::HashMap;
 use std::path::Path;
 
 use anyhow::Result;
@@ -11,6 +12,7 @@ use vb6parse::files::project::ProjectFile;
 use vb6parse::files::project::properties::CompileTargetType;
 use vb6parse::files::{ClassFile, FormFile, ModuleFile};
 use vb6parse::io::SourceFile;
+use vb6parse::parsers::SyntaxKind;
 
 /// An owned file entry from a `.vbp` file.
 #[derive(Debug, Clone)]
@@ -113,6 +115,179 @@ pub struct LoadedClass {
     pub parsed: ClassFile,
     /// The raw file bytes.
     pub raw_bytes: Vec<u8>,
+}
+
+impl LoadedForm {
+    /// Return a map of event bindings: (control_name, event_name) → procedure_name.
+    ///
+    /// VB6 uses an implicit event binding scheme where control event handlers
+    /// follow the naming convention `controlName_eventName` (e.g., `cmdOK_Click`,
+    /// `Text1_Change`). This method extracts those bindings from the parsed form
+    /// by correlating control names with procedure declarations in the form's
+    /// code section.
+    ///
+    /// The returned map contains entries for every procedure that matches the
+    /// pattern `namedControl_event`. Procedures that don't match any control
+    /// (like `Form_Load` or `Sub Main`) are not included.
+    ///
+    /// # Example
+    ///
+    /// Given a form with a control named `cmdOK` and a procedure:
+    /// ```vb
+    /// Private Sub cmdOK_Click()
+    ///     ...
+    /// End Sub
+    /// ```
+    ///
+    /// The returned map would contain: `(("cmdOK", "Click"), "cmdOK_Click")`.
+    pub fn event_bindings(&self) -> HashMap<(String, String), String> {
+        let mut bindings = HashMap::new();
+
+        // Get the form name (used for special handlers like Form_Load)
+        let form_name = self.name.clone();
+
+        // Collect all control names recursively (including nested in containers)
+        let all_control_names: Vec<String> = {
+            let mut names = Vec::new();
+            match &self.parsed.form {
+                vb6parse::language::FormRoot::Form(form) => {
+                    for ctrl in &form.controls {
+                        collect_control_names(ctrl, &mut names);
+                    }
+                }
+                vb6parse::language::FormRoot::MDIForm(mdi) => {
+                    for ctrl in &mdi.controls {
+                        collect_control_names(ctrl, &mut names);
+                    }
+                }
+            }
+            names
+        };
+
+        // Get procedure names from the CST
+        let root = self.parsed.cst.to_root_node();
+        for child in root.children() {
+            match child.kind() {
+                SyntaxKind::SubStatement | SyntaxKind::FunctionStatement => {
+                    let proc_name = procedure_name(child);
+                    if proc_name.is_empty() {
+                        continue;
+                    }
+
+                    // Check if the procedure name matches a control event pattern:
+                    // The format is: controlName_eventName
+                    // We try to find the control by checking suffixes.
+                    // Event names in VB6 are like: Click, Change, KeyDown, etc.
+                    // We need to handle controls with names like "txtAudioBitrate0" (indexed)
+                    // by checking if the prefix matches any control name.
+
+                    if let Some((ctrl, event)) =
+                        find_event_binding(&proc_name, &all_control_names, &form_name)
+                    {
+                        bindings.insert((ctrl, event), proc_name);
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        bindings
+    }
+}
+
+/// Recursively collect control names from a control and its children.
+fn collect_control_names(control: &vb6parse::language::Control, names: &mut Vec<String>) {
+    names.push(control.name().to_string());
+    if let vb6parse::language::ControlKind::Custom {
+        properties: _,
+        property_groups: _,
+    } = control.kind()
+    {
+        // Custom controls don't typically contain nested controls in the
+        // same way frames/pictures do - nested controls appear as siblings
+        // in the form's control list.
+    }
+}
+
+/// Check if a procedure name matches a control's event binding.
+/// Returns (control_name, event_name) if the procedure name follows the
+/// controlName_eventName pattern.
+fn find_event_binding(
+    proc_name: &str,
+    control_names: &[String],
+    form_name: &str,
+) -> Option<(String, String)> {
+    // Split the procedure name by underscores to find potential control+event
+    // VB6 event names are typically single words: Click, Change, DblClick, etc.
+    // But control names can contain underscores, so we need to try progressively
+    // shorter event suffixes.
+
+    // Common VB6 events
+    let vb6_events = [
+        "Click",
+        "DblClick",
+        "MouseDown",
+        "MouseMove",
+        "MouseUp",
+        "Change",
+        "GotFocus",
+        "LostFocus",
+        "KeyPress",
+        "KeyDown",
+        "KeyUp",
+        "BeforeUpdate",
+        "AfterUpdate",
+        "OnDirty",
+        "Dirty",
+        "Enter",
+        "Exit",
+        "Error",
+        "AddNew",
+        "WriteComplete",
+        "WantsAccelerator",
+        "Validate",
+        "Paint",
+        "Resize",
+        "Initialize",
+        "Terminate",
+        "SelectionChange",
+    ];
+
+    for event in &vb6_events {
+        let pattern = format!("_{}", event);
+        if proc_name.ends_with(&pattern) {
+            let ctrl_name = &proc_name[..proc_name.len() - pattern.len()];
+            if ctrl_name.is_empty() {
+                continue;
+            }
+            // Check if the extracted control name matches a real control or is a prefix of one
+            // (for indexed controls like Text1(0), the procedure would be Text1_Click)
+            if control_names.iter().any(|cn| cn.as_str() == ctrl_name) {
+                return Some((ctrl_name.to_string(), event.to_string()));
+            }
+        }
+    }
+
+    // Handle form-level events (no control prefix)
+    // These are events like Form_Load, Form_Activate, etc.
+    // They follow the pattern: FormName_EventName or just Form events
+    if proc_name.starts_with(&format!("{}_", form_name)) {
+        let event_part = &proc_name[form_name.len() + 1..]; // +1 for underscore
+        if event_part.contains(|c: char| c.is_ascii_uppercase()) {
+            // It's likely a form event like Form_Load
+            return Some((form_name.to_string(), event_part.to_string()));
+        }
+    }
+
+    None
+}
+
+/// Extract the procedure name from a Sub or Function statement CST node.
+fn procedure_name(node: &vb6parse::parsers::cst::CstNode) -> String {
+    node.significant_children()
+        .find(|c| c.kind() == SyntaxKind::Identifier)
+        .map(|c| c.text().trim().to_string())
+        .unwrap_or_default()
 }
 
 impl LoadedProject {
