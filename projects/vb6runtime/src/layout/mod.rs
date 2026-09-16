@@ -7,6 +7,7 @@
 //! The engine is structured in layers:
 //! - [`model`] — core layout types (nodes, positions, sizes, styles)
 //! - [`converter`] — transforms parsed `FormRoot` into the layout model
+//! - [`diff_tree`] — diff types for incremental rendering
 //! - [`scale`] — twip-to-pixel and ScaleMode conversion
 //! - [`color`] — VB6 Color to CSS color mapping
 //! - [`css`] — `LayoutStyle` to CSS declaration string
@@ -22,6 +23,8 @@ pub mod color;
 pub mod controls;
 /// Tree walker: FormRoot → LayoutNode tree → form store.
 pub mod converter;
+/// Diff types for incremental layout rendering.
+pub mod diff_tree;
 /// LayoutStyle → CSS declaration string.
 pub mod css;
 /// Mutable state store for loaded forms.
