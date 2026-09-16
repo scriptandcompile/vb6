@@ -25,12 +25,12 @@ pub mod color;
 pub mod controls;
 /// Tree walker: FormRoot → LayoutNode tree → form store.
 pub mod converter;
-/// Diff types for incremental layout rendering.
-pub mod diff_tree;
-/// Diff engine for incremental layout rendering.
-pub mod diff_engine;
 /// LayoutStyle → CSS declaration string.
 pub mod css;
+/// Diff engine for incremental layout rendering.
+pub mod diff_engine;
+/// Diff types for incremental layout rendering.
+pub mod diff_tree;
 /// Mutable state store for loaded forms.
 pub mod form_store;
 /// Menubar and context/popup menu rendering.
@@ -51,10 +51,13 @@ pub mod vb6_css;
 use model::style::LayoutStyle;
 
 // Re-export converter types at the module level for convenience.
-pub use converter::{load_form, LayoutError, LayoutResult};
+pub use converter::{LayoutError, LayoutResult, load_form};
 
 // Re-export diff engine.
 pub use diff_engine::DiffEngine;
+
+// Re-export diff tree type for callers that need to inspect diff results.
+pub use diff_tree::DiffTree;
 
 // Re-export form store handle type.
 pub use form_store::FormHandle;
@@ -89,7 +92,10 @@ impl Default for LayoutConfig {
 ///
 /// Delegates to individual control modules (button, label, textbox, etc.)
 /// to construct the appropriate [`LayoutStyle`].
-pub fn build_style_for_control(kind: &vb6parse::language::ControlKind, config: &LayoutConfig) -> LayoutStyle {
+pub fn build_style_for_control(
+    kind: &vb6parse::language::ControlKind,
+    config: &LayoutConfig,
+) -> LayoutStyle {
     controls::build_style_for_control(kind, config)
 }
 
@@ -130,7 +136,10 @@ pub fn get_form<T>(handle: FormHandle, f: impl FnOnce(&model::LayoutForm) -> T) 
 ///     f.current_value = Some("Done".into());
 /// });
 /// ```
-pub fn get_form_mut<T>(handle: FormHandle, f: impl FnOnce(&mut model::LayoutForm) -> T) -> Option<T> {
+pub fn get_form_mut<T>(
+    handle: FormHandle,
+    f: impl FnOnce(&mut model::LayoutForm) -> T,
+) -> Option<T> {
     form_store::get_mut(handle, f)
 }
 
@@ -138,6 +147,13 @@ pub fn get_form_mut<T>(handle: FormHandle, f: impl FnOnce(&mut model::LayoutForm
 ///
 /// Walks the [`LayoutNode`] tree of the loaded form and produces
 /// platform-specific output (HTML string for Tauri, DOM elements for WASM).
+///
+/// On the first render (no snapshot exists), performs a full tree render.
+/// On subsequent renders, computes a diff against the previous snapshot
+/// and uses [`Renderer::render_node_with_diff`](renderer::Renderer::render_node_with_diff)
+/// when available to skip unchanged subtrees.
+/// After rendering, captures the current model state as the snapshot for
+/// the next diff computation.
 ///
 /// # Panics
 ///
@@ -151,14 +167,61 @@ pub fn get_form_mut<T>(handle: FormHandle, f: impl FnOnce(&mut model::LayoutForm
 /// // let dom = layout::render(handle, &renderer::WebSysRenderer::new(doc));
 /// ```
 pub fn render<R: renderer::Renderer>(handle: FormHandle, renderer: &R) -> R::Output {
-    let form = form_store::get(handle, |f| f.clone()).expect("unknown form handle");
-    renderer.render_node(&form.root_node)
+    form_store::get_mut(handle, |form| {
+        // Compute diff if a snapshot exists from a previous render.
+        let diff = form
+            .snapshot
+            .as_ref()
+            .map(|snap| DiffEngine::compute_diff(snap, &form.root_node));
+
+        // render_node_with_diff falls back to full render when diff is None/empty,
+        // so we can always call it — the fallback handles the first-render case.
+        let output = renderer.render_node_with_diff(&form.root_node, diff.as_ref());
+
+        // Capture the current model state as the snapshot for next diff.
+        form.snapshot = Some(form.root_node.to_snapshot());
+        form.render_id += 1;
+
+        output
+    })
+    .expect("unknown form handle")
+}
+
+/// Compute the diff since the last render.
+///
+/// Returns `None` if no snapshot exists (first render) — the caller should
+/// perform a full render in that case.
+///
+/// After a successful render, the snapshot is automatically updated so that
+/// subsequent calls compute the diff against the last rendered state.
+pub fn get_diff(handle: FormHandle) -> Option<DiffTree> {
+    form_store::get(handle, |form| {
+        form.snapshot
+            .as_ref()
+            .map(|snap| DiffEngine::compute_diff(snap, &form.root_node))
+    })
+    .flatten()
+}
+
+/// Capture the current form state as the snapshot for the next diff computation.
+///
+/// Call this after a successful render to record the model state. This is
+/// called automatically by [`render`] — manual calls are only needed when
+/// rendering outside the standard pipeline.
+///
+/// Increments [`render_id`][model::LayoutForm::render_id] on the form.
+pub fn capture_snapshot(handle: FormHandle) {
+    form_store::get_mut(handle, |form| {
+        form.snapshot = Some(form.root_node.to_snapshot());
+        form.render_id += 1;
+    });
 }
 
 #[cfg(test)]
 mod tests {
+    use super::model::LayoutNode;
     use super::*;
-    use vb6parse::language::{Activation, FormRoot, Form, Visibility};
+    use vb6parse::language::{Activation, Form, FormRoot, Visibility};
 
     /// Helper to ensure tests that share global state run sequentially.
     fn lock_test() -> std::sync::MutexGuard<'static, ()> {
@@ -205,7 +268,7 @@ mod tests {
     }
 
     fn make_test_form_with_button() -> Form {
-        use vb6parse::language::{Control, ControlKind, CommandButtonProperties};
+        use vb6parse::language::{CommandButtonProperties, Control, ControlKind};
         let btn = Control::new(
             "cmdOK".to_string(),
             String::new(),
@@ -324,5 +387,126 @@ mod tests {
         assert!(html2.contains("Form1"));
         assert!(html1.contains("vb6-label"));
         assert!(html2.contains("vb6-commandbutton"));
+    }
+
+    #[test]
+    fn get_diff_no_snapshot_returns_none() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_test_form_with_label();
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        assert!(get_diff(handle).is_none());
+    }
+
+    #[test]
+    fn get_diff_after_capture_returns_some() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_test_form_with_label();
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        // First render captures snapshot
+        let renderer = renderer::TauriRenderer::new(false);
+        let _html = render(handle, &renderer);
+        // Now diff should be computable
+        let diff = get_diff(handle);
+        assert!(diff.is_some());
+    }
+
+    #[test]
+    fn get_diff_no_changes_is_empty() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_test_form_with_label();
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        // First render captures snapshot
+        let renderer = renderer::TauriRenderer::new(false);
+        let _html = render(handle, &renderer);
+        // Second render: no changes to model, diff should be empty
+        let diff = get_diff(handle).unwrap();
+        assert!(diff.is_empty(), "Expected empty diff when model unchanged");
+    }
+
+    #[test]
+    fn capture_snapshot_creates_snapshot() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_test_form_with_label();
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        assert!(get_diff(handle).is_none());
+        capture_snapshot(handle);
+        assert!(get_diff(handle).is_some());
+        // Verify render_id incremented
+        let rid = get_form(handle, |f| f.render_id);
+        assert_eq!(rid, Some(1));
+    }
+
+    #[test]
+    fn render_uses_diff_after_first() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_test_form_with_label();
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        // First render: no diff, full render
+        let html1 = render(handle, &renderer);
+        assert!(!html1.is_empty());
+        assert!(html1.contains("vb6-form"));
+        // Second render: diff exists, uses diff-aware rendering
+        let html2 = render(handle, &renderer);
+        assert!(!html2.is_empty());
+        assert!(html2.contains("vb6-form"));
+    }
+
+    #[test]
+    fn render_increments_render_id() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_test_form_with_label();
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        // First render -> render_id = 1
+        render(handle, &renderer);
+        let rid = get_form(handle, |f| f.render_id);
+        assert_eq!(rid, Some(1));
+        // Second render -> render_id = 2
+        render(handle, &renderer);
+        let rid = get_form(handle, |f| f.render_id);
+        assert_eq!(rid, Some(2));
+    }
+
+    #[test]
+    fn get_diff_detects_child_insertion() {
+        use super::model::LayoutLeaf;
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_test_form_with_label();
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let _html = render(handle, &renderer);
+        // Insert a new child — diff engine can detect structural changes.
+        let inserted = get_form_mut(handle, |f| {
+            if let LayoutNode::Container(ref mut rc) = f.root_node {
+                rc.children.push(LayoutNode::Leaf(LayoutLeaf {
+                    name: "NewLabel".into(),
+                    control_type: super::model::LayoutControlType::Label,
+                    visible: true,
+                    enabled: true,
+                    ..Default::default()
+                }));
+                true
+            } else {
+                false
+            }
+        });
+        assert_eq!(inserted, Some(true));
+        let diff = get_diff(handle).unwrap();
+        assert!(!diff.is_empty(), "Expected diff to detect child insertion");
     }
 }

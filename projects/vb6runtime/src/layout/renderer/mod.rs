@@ -19,6 +19,7 @@
 //! - [`WebSysRenderer`] (behind `wasm` feature) — creates `web_sys::Element` objects
 //!   for direct DOM manipulation in the browser.
 
+use super::diff_tree::DiffTree;
 use super::model::{LayoutContainer, LayoutLeaf, LayoutNode, LayoutStyle};
 
 pub mod tauri;
@@ -73,5 +74,24 @@ pub trait Renderer {
             }
         }
         css
+    }
+
+    /// Render a node tree, using the diff to skip unchanged subtrees.
+    ///
+    /// The default implementation falls back to a full re-render via
+    /// [`render_node`](Renderer::render_node). Renderers that support
+    /// incremental updates (e.g. `TauriRenderer`) override this method
+    /// to produce partial output for changed nodes only.
+    ///
+    /// If `diff` is `None` or empty, behaves identically to `render_node`.
+    fn render_node_with_diff(
+        &self,
+        node: &LayoutNode,
+        diff: Option<&DiffTree>,
+    ) -> Self::Output {
+        match diff {
+            Some(d) if !d.is_empty() => self.render_node(node),
+            _ => self.render_node(node),
+        }
     }
 }
