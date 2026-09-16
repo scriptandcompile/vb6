@@ -13,13 +13,22 @@ use vb6parse::files::{ClassFile, FormFile, ModuleFile};
 use vb6parse::io::SourceFile;
 
 /// An owned file entry from a `.vbp` file.
-#[allow(missing_docs)]
 #[derive(Debug, Clone)]
 pub enum ProjectFileEntry {
     /// A `Module=` entry (`.bas`).
-    Module { name: String, path: String },
+    Module {
+        /// The module name (from `Attribute VB_Name`).
+        name: String,
+        /// The file path to the module source file.
+        path: String,
+    },
     /// A `Class=` entry (`.cls`).
-    Class { name: String, path: String },
+    Class {
+        /// The class name (from `Attribute VB_Name`).
+        name: String,
+        /// The file path to the class source file.
+        path: String,
+    },
     /// A `Form=` entry (`.frm`).
     Form(String),
     /// A `UserControl=` entry (`.ctl`).
