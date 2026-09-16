@@ -113,15 +113,9 @@ fn run_cli() -> Result<()> {
                         StartupObject::None => {
                             bail!("No startup object found in project");
                         }
-                        StartupObject::Form { form_name } => {
-                            let form_bytes = project
-                                .forms
-                                .iter()
-                                .find(|f| f.name == *form_name)
-                                .ok_or_else(|| anyhow::anyhow!("Form '{}' not found", form_name))?
-                                .raw_bytes
-                                .clone();
-                            run_form_project(project, form_bytes)?;
+                        StartupObject::Form { form_name: _ } => {
+                            let html = project.render_startup_form()?;
+                            run_form_project(project, html)?;
                         }
                     }
                 }
@@ -314,10 +308,10 @@ fn run_bas_file(
 }
 
 #[allow(unused_variables)]
-fn run_form_project(project: LoadedProject, startup_form_bytes: Vec<u8>) -> Result<!> {
+fn run_form_project(project: LoadedProject, startup_form_html: (String, u32)) -> Result<!> {
     #[cfg(feature = "tauri")]
     {
-        launch_tauri(project, startup_form_bytes);
+        launch_tauri(project, startup_form_html);
     }
     #[cfg(not(feature = "tauri"))]
     {
@@ -329,7 +323,7 @@ fn run_form_project(project: LoadedProject, startup_form_bytes: Vec<u8>) -> Resu
 }
 
 #[cfg(feature = "tauri")]
-fn launch_tauri(project: LoadedProject, startup_form_bytes: Vec<u8>) -> ! {
+fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
     use tauri::Manager;
     use tauri::generate_handler;
 
@@ -337,7 +331,6 @@ fn launch_tauri(project: LoadedProject, startup_form_bytes: Vec<u8>) -> ! {
 
     tauri::Builder::default()
         .invoke_handler(generate_handler![
-            tauri_cmds::load_form,
             tauri_cmds::update_form,
             tauri_cmds::run_project,
             tauri_cmds::stop_engine,
@@ -347,7 +340,7 @@ fn launch_tauri(project: LoadedProject, startup_form_bytes: Vec<u8>) -> ! {
             tauri_cmds::get_variable,
         ])
         .setup(move |app| {
-            app.manage(startup_form_bytes);
+            app.manage(startup_form_html);
             app.manage(engine_handle);
             let window = tauri::WebviewWindowBuilder::new(
                 app,
@@ -358,6 +351,12 @@ fn launch_tauri(project: LoadedProject, startup_form_bytes: Vec<u8>) -> ! {
             .inner_size(1024.0, 768.0)
             .resizable(true)
             .build()?;
+
+            let (html, _handle) = startup_form_html;
+            let _ = window.eval(&format!(
+                "document.getElementById('root').innerHTML = {html:?}; document.getElementById('status').textContent = 'Form loaded';"
+            ));
+
             let _ = window;
             Ok(())
         })
@@ -414,15 +413,9 @@ fn run_vbp_in_cwd(set: &[String], timeout: u64, res: Option<&Path>) -> Result<()
                 StartupObject::None => {
                     bail!("No startup object found in project");
                 }
-                StartupObject::Form { form_name } => {
-                    let form_bytes = project
-                        .forms
-                        .iter()
-                        .find(|f| f.name == *form_name)
-                        .ok_or_else(|| anyhow::anyhow!("Form '{}' not found", form_name))?
-                        .raw_bytes
-                        .clone();
-                    run_form_project(project, form_bytes)?;
+                StartupObject::Form { form_name: _ } => {
+                    let html = project.render_startup_form()?;
+                    run_form_project(project, html)?;
                 }
             }
         }

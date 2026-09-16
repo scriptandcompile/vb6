@@ -28,12 +28,6 @@ pub const HTML: &str = r#"<!DOCTYPE html>
     <script type="module">
         import { invoke } from '@tauri-apps/api/core';
 
-        window.loadForm = async function(data) {
-            const handle = await invoke('load_form', { formData: Array.from(data) });
-            window.statusEl.textContent = 'Form loaded (handle: ' + handle + ')';
-            return handle;
-        };
-
         window.updateForm = async function(handle) {
             try {
                 const html = await invoke('update_form', { handle });
