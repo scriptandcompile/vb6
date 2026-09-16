@@ -47,25 +47,7 @@ static STORE: LazyLock<Mutex<HashMap<FormHandle, LayoutForm>>> =
 /// Next handle ID to assign.
 ///
 /// Stored separately from the store so that handle allocation doesn't
-/// conflict with form data access. Actually, we can store it inside
-/// the store. Let me reconsider...
-///
-/// Actually, we need to track the next handle ID. Since the store is
-/// a `LazyLock<Mutex<...>>`, we need to be able to access it on first
-/// insert. The simplest approach is to use a separate static for the
-/// counter. But that creates a two-static pattern which is messy.
-///
-/// Better approach: store the counter inside the HashMap as a special key.
-/// But that's hacky.
-///
-/// Simplest correct approach: just start from 0 and track it in the
-/// HashMap itself. When we insert, scan for the max key and add 1.
-/// This is O(n) for handle allocation but forms are few in Phase 1.
-///
-/// Actually, the cleanest approach is to store both counter and forms
-/// in the HashMap. But HashMap can't hold different types.
-///
-/// Final approach: use a separate LazyLock for the counter.
+/// conflict with form data access. 
 static NEXT_HANDLE: LazyLock<Mutex<FormHandle>> = LazyLock::new(|| Mutex::new(0));
 
 /// Insert a form into the store and return its handle.
@@ -112,11 +94,10 @@ pub fn remove(handle: FormHandle) -> Option<LayoutForm> {
 
 /// Reset the store to its initial empty state.
 ///
-/// This function is `pub(crate)` to support test isolation within the
-/// `vb6runtime` crate. In production code, the store's lifetime matches
-/// the process lifetime.
-#[cfg(test)]
-pub(crate) fn reset() {
+/// This function is useful for test isolation. In production code, the
+/// store's lifetime matches the process lifetime.
+#[doc(hidden)]
+pub fn reset() {
     STORE.lock().unwrap().clear();
     *NEXT_HANDLE.lock().unwrap() = 0;
 }
