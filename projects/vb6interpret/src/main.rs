@@ -12,9 +12,10 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use vb6interpret::Interpreter;
+use vb6interpret::{Interpreter, LoadedProject, StartupObject, project};
 use vb6parse::errors::{ErrorKind, SourceFileError};
 use vb6parse::files::ModuleFile;
+use vb6parse::files::project::properties::CompileTargetType;
 use vb6parse::io::SourceFile;
 use vb6runtime::VBVariant;
 
@@ -80,12 +81,6 @@ enum Commands {
 }
 
 fn main() {
-    #[cfg(feature = "tauri")]
-    {
-        run_tauri();
-        return;
-    }
-
     let result = run_cli();
     if let Err(e) = result {
         eprintln!("Error: {}", e);
@@ -104,54 +99,42 @@ fn run_cli() -> Result<()> {
             res,
         }) => {
             let path = expand_tilde(&path);
-            let source_file = read_source_file(&path)?;
-            let module = ModuleFile::parse(&source_file).unwrap_or_fail();
-
-            let mut interpreter = Interpreter::new();
-            if timeout > 0 {
-                interpreter.set_step_limit(u64::MAX);
-            }
-            // Link the project's resource file, as VB6's ResFile32= does.
-            if let Some(res) = &res {
-                interpreter.set_resource_file(expand_tilde(res).to_string_lossy().to_string());
-            }
-            for assignment in &set {
-                let (name, raw) = assignment.split_once('=').ok_or_else(|| {
-                    anyhow::anyhow!("Invalid --set '{assignment}' (expected VAR=VALUE)")
-                })?;
-                interpreter.set_global(name, parse_value(raw));
-            }
-
-            let started = Instant::now();
-            let result = interpreter.run_module(&module);
-            if cli.trace {
-                eprintln!("{:?} statements executed", interpreter.steps());
-            }
-            let timed_out = match result {
-                Ok(()) => timeout > 0 && started.elapsed() > Duration::from_secs(timeout),
-                Err(error) => {
-                    print_output(&interpreter);
-                    eprintln!("Runtime error: {}", error.error);
-                    if let Some(report) = vb6interpret::error::render_error_report(
-                        &path.display().to_string(),
-                        source_file.as_ref(),
-                        &error,
-                        module.line_offset,
-                    ) {
-                        eprintln!();
-                        eprintln!("{report}");
+            match path.extension().and_then(|e| e.to_str()) {
+                Some("bas") => run_bas_file(&path, &set, timeout, res.as_deref(), cli.trace)?,
+                Some("vbp") => {
+                    let project = project::LoadedProject::load(&path)?;
+                    match project.project_type {
+                        CompileTargetType::Exe => {}
+                        other => bail!("Unsupported project type: {:?}", other),
                     }
-                    std::process::exit(1);
+                    let form_bytes = match &project.startup_object {
+                        StartupObject::SubMain { .. } => {
+                            return run_console_project(project, &set, timeout, res.as_deref());
+                        }
+                        StartupObject::None => {
+                            bail!("No startup object found in project");
+                        }
+                        StartupObject::Form { form_name } => {
+                            let loaded_form = project
+                                .forms
+                                .iter()
+                                .find(|f| f.name == *form_name)
+                                .ok_or_else(|| {
+                                anyhow::anyhow!("Form '{}' not found", form_name)
+                            })?;
+                            loaded_form.raw_bytes.clone()
+                        }
+                    };
+                    run_form_project(expand_tilde(&path), form_bytes)?;
                 }
-            };
-            print_output(&interpreter);
-            if timed_out {
-                bail!("Execution timed out after {}s", timeout);
+                Some(ext) => bail!("Unsupported file type: .{}", ext),
+                None => run_vbp_in_cwd(&set, timeout, res.as_deref())?,
             }
         }
-        Some(Commands::Repl) | None => {
+        Some(Commands::Repl) => {
             println!("TODO: Start REPL");
         }
+        None => run_vbp_in_cwd(&[], 0, None)?,
         Some(Commands::Debug { path, r#break }) => {
             let path = expand_tilde(&path);
             println!("TODO: Debug {}", path.display());
@@ -187,6 +170,175 @@ fn run_tauri() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri");
+}
+
+fn run_bas_file(
+    path: &Path,
+    set: &[String],
+    timeout: u64,
+    res: Option<&Path>,
+    trace: bool,
+) -> Result<()> {
+    let source_file = read_source_file(path)?;
+    let module = ModuleFile::parse(&source_file).unwrap_or_fail();
+
+    let mut interpreter = Interpreter::new();
+    if timeout > 0 {
+        interpreter.set_step_limit(u64::MAX);
+    }
+    if let Some(res) = &res {
+        interpreter.set_resource_file(expand_tilde(res).to_string_lossy().to_string());
+    }
+    for assignment in set {
+        let (name, raw) = assignment
+            .split_once('=')
+            .ok_or_else(|| anyhow::anyhow!("Invalid --set '{assignment}' (expected VAR=VALUE)"))?;
+        interpreter.set_global(name, parse_value(raw));
+    }
+
+    let started = Instant::now();
+    let result = interpreter.run_module(&module);
+    if trace {
+        eprintln!("{:?} statements executed", interpreter.steps());
+    }
+    let timed_out = match result {
+        Ok(()) => timeout > 0 && started.elapsed() > Duration::from_secs(timeout),
+        Err(error) => {
+            print_output(&interpreter);
+            eprintln!("Runtime error: {}", error.error);
+            if let Some(report) = vb6interpret::error::render_error_report(
+                &path.display().to_string(),
+                source_file.as_ref(),
+                &error,
+                module.line_offset,
+            ) {
+                eprintln!();
+                eprintln!("{report}");
+            }
+            std::process::exit(1);
+        }
+    };
+    print_output(&interpreter);
+    if timed_out {
+        bail!("Execution timed out after {}s", timeout);
+    }
+    Ok(())
+}
+
+fn run_form_project(_path: PathBuf, _form_bytes: Vec<u8>) -> Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        launch_tauri(_path, _form_bytes);
+        Ok(())
+    }
+    #[cfg(not(feature = "tauri"))]
+    {
+        bail!("Form applications require the tauri feature. Rebuild with --features tauri")
+    }
+}
+
+#[cfg(feature = "tauri")]
+fn launch_tauri(path: &Path, form_bytes: Vec<u8>) -> ! {
+    use tauri::Manager;
+    use tauri::generate_handler;
+
+    tauri::Builder::default()
+        .invoke_handler(generate_handler![
+            tauri_cmds::load_form,
+            tauri_cmds::update_form,
+        ])
+        .setup(|app| {
+            app.manage(form_bytes);
+            let window = tauri::WebviewWindowBuilder::new(
+                app,
+                "main",
+                tauri::WebviewUrl::App("index.html".into()),
+            )
+            .title("VB6 Form Viewer")
+            .inner_size(1024.0, 768.0)
+            .resizable(true)
+            .build()?;
+            let _ = window;
+            Ok(())
+        })
+        .run(tauri::generate_context())
+        .expect("error while running tauri");
+
+    unreachable!()
+}
+
+fn run_console_project(
+    project: LoadedProject,
+    set: &[String],
+    timeout: u64,
+    res: Option<&Path>,
+) -> Result<()> {
+    let mut interpreter = Interpreter::new();
+    if timeout > 0 {
+        interpreter.set_step_limit(u64::MAX);
+    }
+    if let Some(res) = &res {
+        interpreter.set_resource_file(expand_tilde(res).to_string_lossy().to_string());
+    }
+    for assignment in set {
+        let (name, raw) = assignment
+            .split_once('=')
+            .ok_or_else(|| anyhow::anyhow!("Invalid --set '{assignment}' (expected VAR=VALUE)"))?;
+        interpreter.set_global(name, parse_value(raw));
+    }
+
+    let result = interpreter.run_project(&project);
+    print_output(&interpreter);
+    result.map_err(|e| anyhow::anyhow!("Runtime error: {}", e.error))?;
+    Ok(())
+}
+
+fn run_vbp_in_cwd(set: &[String], timeout: u64, res: Option<&Path>) -> Result<()> {
+    let cwd = std::env::current_dir()?;
+    let vbps: Vec<_> = cwd
+        .read_dir()?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension() == Some("vbp".as_ref()))
+        .collect();
+
+    match vbps.len() {
+        0 => bail!("No .vbp file found in current directory"),
+        1 => {
+            let project = project::LoadedProject::load(&vbps[0].path())?;
+            match project.project_type {
+                CompileTargetType::Exe => {}
+                other => bail!("Unsupported project type: {:?}", other),
+            }
+            match &project.startup_object {
+                StartupObject::SubMain { .. } => {
+                    return run_console_project(project, set, timeout, res);
+                }
+                StartupObject::None => {
+                    bail!("No startup object found in project");
+                }
+                StartupObject::Form { form_name } => {
+                    let loaded_form = project
+                        .forms
+                        .iter()
+                        .find(|f| f.name == *form_name)
+                        .ok_or_else(|| anyhow::anyhow!("Form '{}' not found", form_name))?;
+                    run_form_project(vbps[0].path(), loaded_form.raw_bytes.clone())?;
+                }
+            }
+        }
+        _ => {
+            let paths: Vec<String> = vbps
+                .iter()
+                .map(|e| e.path().display().to_string())
+                .collect();
+            bail!(
+                "Multiple .vbp files found: {}\nSpecify a file path.",
+                paths.join(", ")
+            )
+        }
+    }
+
+    Ok(())
 }
 
 /// Write the interpreter's captured output to stdout, ensuring the output ends
