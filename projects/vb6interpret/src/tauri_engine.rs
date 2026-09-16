@@ -283,9 +283,7 @@ impl TauriEngineHandle {
                 let _ = interp.global(&name);
                 true
             }
-            TauriCommand::ExecuteSub { name, args } => {
-                matches!(interp.call_sub(&name, args), Ok(_))
-            }
+            TauriCommand::ExecuteSub { name, args } => interp.call_sub(&name, args).is_ok(),
             TauriCommand::RunProject
             | TauriCommand::ShowForm { .. }
             | TauriCommand::HideForm { .. }

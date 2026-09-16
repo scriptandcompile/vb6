@@ -361,7 +361,7 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
             .build()?;
 
             let form_name = startup_form_name.clone();
-            let _ = window.eval(&format!(
+            let _ = window.eval(format!(
                 "document.getElementById('root').innerHTML = {html:?}; document.getElementById('status').textContent = 'Form loaded'; \
                  window.__vb6FormName__ = {form_name:?}; window.__vb6EngineHandle__ = {engine_handle};"
             ));
