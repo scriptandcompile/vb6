@@ -14,6 +14,8 @@
 pub enum LayoutControlType {
     /// A Form control.
     Form,
+    /// An MDI Form control.
+    MDIForm,
     /// A Label control.
     Label,
     /// A TextBox control.
@@ -62,6 +64,7 @@ impl LayoutControlType {
     pub fn css_class(&self) -> &'static str {
         match self {
             Self::Form => "form",
+            Self::MDIForm => "mdiform",
             Self::Label => "label",
             Self::TextBox => "textbox",
             Self::CommandButton => "commandbutton",
@@ -164,6 +167,7 @@ mod tests {
     #[test]
     fn layout_control_type_variants() {
         let _ = LayoutControlType::Form;
+        let _ = LayoutControlType::MDIForm;
         let _ = LayoutControlType::Label;
         let _ = LayoutControlType::TextBox;
         let _ = LayoutControlType::CommandButton;
@@ -189,6 +193,7 @@ mod tests {
     #[test]
     fn css_class_names() {
         assert_eq!(LayoutControlType::Form.css_class(), "form");
+        assert_eq!(LayoutControlType::MDIForm.css_class(), "mdiform");
         assert_eq!(LayoutControlType::Label.css_class(), "label");
         assert_eq!(LayoutControlType::TextBox.css_class(), "textbox");
         assert_eq!(LayoutControlType::CommandButton.css_class(), "commandbutton");
