@@ -40,6 +40,12 @@ pub const HTML: &str = r#"<!DOCTYPE html>
 
         window.rootEl = document.getElementById('root');
         window.statusEl = document.getElementById('status');
+
+        new MutationObserver(() => {
+            if (window.rootEl.innerHTML.trim()) {
+                window.statusEl.textContent = 'Form loaded';
+            }
+        }).observe(window.rootEl, { childList: true, subtree: true, characterData: true, attributes: true });
     </script>
 </body>
 </html>"#;
