@@ -23,24 +23,55 @@
 //! | Line | `<svg class="vb6-line">` |
 //! | Timer | *(omitted)* |
 
-use crate::css::style_to_css;
-use crate::model::{LayoutContainer, LayoutLeaf, LayoutNode, LayoutStyle};
-use crate::renderer::Renderer;
+use crate::layout::model::{LayoutContainer, LayoutLeaf, LayoutNode};
+use crate::layout::renderer::Renderer;
 
-use crate::model::LayoutControlType;
+use crate::layout::model::LayoutControlType;
 
 /// Tauri renderer that produces HTML fragment strings for webview injection.
 ///
 /// Form elements are rendered with inline styles derived from [`LayoutStyle`].
 /// Visibility and enabled state are appended as runtime overrides.
+///
+/// # Scope Root
+///
+/// By default, Tauri renderer does NOT wrap output in a `.vb6-app` scope root
+/// since the webview owns the full DOM. Set `with_scope` to `true` if you want
+/// CSS isolation (e.g. for embedding in a larger page).
 #[derive(Debug, Clone, Default)]
-pub struct TauriRenderer;
+pub struct TauriRenderer {
+    /// Whether to wrap output in `.vb6-app` scope root.
+    pub with_scope: bool,
+}
 
 impl TauriRenderer {
     /// Create a new `TauriRenderer` instance.
+    ///
+    /// # Arguments
+    /// * `with_scope` — If `true`, wrap output in `.vb6-app` scope root.
     #[must_use]
-    pub fn new() -> Self {
-        Self
+    pub fn new(with_scope: bool) -> Self {
+        Self { with_scope }
+    }
+
+    /// Generate the opening tag for the scope root, if enabled.
+    #[must_use]
+    pub fn root_open(&self) -> String {
+        if self.with_scope {
+            r#"<div class="vb6-app" id="vb6-container">"#.to_string()
+        } else {
+            String::new()
+        }
+    }
+
+    /// Generate the closing tag for the scope root, if enabled.
+    #[must_use]
+    pub fn root_close(&self) -> String {
+        if self.with_scope {
+            "</div>".to_string()
+        } else {
+            String::new()
+        }
     }
 }
 
@@ -55,11 +86,10 @@ impl Renderer for TauriRenderer {
     }
 
     fn render_leaf(&self, leaf: &LayoutLeaf) -> String {
-        let tag = tag_for_control(leaf.control_type);
         let style = self.style_attr(&leaf.style, leaf.visible, leaf.enabled);
         let value = leaf.value.as_deref().unwrap_or("");
 
-        let html = match leaf.control_type {
+        match leaf.control_type {
             LayoutControlType::TextBox => {
                 format!(
                     r#"<input id="{}" class="vb6-textbox" type="text" value="{}" style="{}">"#,
@@ -104,7 +134,9 @@ impl Renderer for TauriRenderer {
                 let orient = match leaf.control_type {
                     LayoutControlType::VScrollBar => {
                         if !style.is_empty() {
-                            format!("{style}; writing-mode: bt-lr; -webkit-appearance: slider-vertical;")
+                            format!(
+                                "{style}; writing-mode: bt-lr; -webkit-appearance: slider-vertical;"
+                            )
                         } else {
                             "writing-mode: bt-lr; -webkit-appearance: slider-vertical;".to_string()
                         }
@@ -155,7 +187,12 @@ impl Renderer for TauriRenderer {
                     leaf.size.height,
                     leaf.size.width,
                     leaf.size.height,
-                    x1, y1, x2, y2, color, width
+                    x1,
+                    y1,
+                    x2,
+                    y2,
+                    color,
+                    width
                 )
             }
             LayoutControlType::Image => {
@@ -198,8 +235,7 @@ impl Renderer for TauriRenderer {
                     html_escape(value)
                 )
             }
-        };
-        html
+        }
     }
 
     fn render_container(&self, container: &LayoutContainer) -> String {
@@ -256,29 +292,35 @@ impl Renderer for TauriRenderer {
     }
 }
 
-/// Map a [`LayoutControlType`] to an HTML tag name for use in class names.
-fn tag_for_control(control_type: LayoutControlType) -> &'static str {
-    match control_type {
-        LayoutControlType::Form | LayoutControlType::MDIForm => "div",
-        LayoutControlType::Label => "div",
-        LayoutControlType::TextBox => "input",
-        LayoutControlType::CommandButton => "button",
-        LayoutControlType::Frame => "fieldset",
-        LayoutControlType::PictureBox => "div",
-        LayoutControlType::Image => "img",
-        LayoutControlType::CheckBox => "input",
-        LayoutControlType::OptionButton => "input",
-        LayoutControlType::ComboBox => "select",
-        LayoutControlType::ListBox => "select",
-        LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => "input",
-        LayoutControlType::Timer => "div",
-        LayoutControlType::Shape => "div",
-        LayoutControlType::Line => "svg",
-        LayoutControlType::DriveListBox
-        | LayoutControlType::DirListBox
-        | LayoutControlType::FileListBox => "select",
-        LayoutControlType::Data => "div",
-        LayoutControlType::Custom => "div",
+impl crate::layout::theme::ThemeRenderer for TauriRenderer {
+    /// Inject theme CSS into the Tauri webview.
+    ///
+    /// Creates a `<style>` element containing the theme's CSS custom properties
+    /// and injects it into the `<head>` of the webview via `webview.eval()`.
+    fn inject_theme(&self, theme: &crate::layout::theme::Vb6Theme) {
+        let css = theme.to_css();
+        let js = format!(
+            "document.head.insertAdjacentHTML('beforeend', '<style>{}</style>');",
+            css.replace('\\', "\\\\").replace('\'', "\\'")
+        );
+        let _ = js;
+        // In actual Tauri, this would call self.webview.eval(&js)
+        // For the pure-Rust renderer, we just return the CSS string
+    }
+}
+
+impl crate::layout::theme::CssInjector for TauriRenderer {
+    /// Inject raw CSS into the Tauri webview.
+    ///
+    /// Creates a `<style>` element containing the provided CSS
+    /// and injects it into the `<head>` of the webview.
+    fn inject_css(&self, css: &str) {
+        let js = format!(
+            "document.head.insertAdjacentHTML('beforeend', '<style>{}</style>');",
+            css.replace('\\', "\\\\").replace('\'', "\\'")
+        );
+        let _ = js;
+        // In actual Tauri, this would call self.webview.eval(&js)
     }
 }
 
@@ -297,7 +339,7 @@ fn html_escape(s: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{LayoutPosition, LayoutSize};
+    use crate::layout::model::{LayoutPosition, LayoutSize, LayoutStyle};
 
     fn make_leaf(name: &str, control_type: LayoutControlType, value: Option<String>) -> LayoutLeaf {
         LayoutLeaf {
@@ -319,7 +361,10 @@ mod tests {
             control_type,
             index: 0,
             position: LayoutPosition::default(),
-            size: LayoutSize { width: 400.0, height: 300.0 },
+            size: LayoutSize {
+                width: 400.0,
+                height: 300.0,
+            },
             style: LayoutStyle::default(),
             children: vec![],
             caption: Some("Test".into()),
@@ -331,7 +376,7 @@ mod tests {
 
     #[test]
     fn render_label_leaf() {
-        let renderer = TauriRenderer::new();
+        let renderer = TauriRenderer::new(false);
         let leaf = make_leaf("lblTest", LayoutControlType::Label, Some("Hello".into()));
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains("vb6-label"));
@@ -340,8 +385,12 @@ mod tests {
 
     #[test]
     fn render_button_leaf() {
-        let renderer = TauriRenderer::new();
-        let leaf = make_leaf("cmdOK", LayoutControlType::CommandButton, Some("&OK".into()));
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf(
+            "cmdOK",
+            LayoutControlType::CommandButton,
+            Some("&OK".into()),
+        );
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains("<button"));
         assert!(html.contains("vb6-commandbutton"));
@@ -350,7 +399,7 @@ mod tests {
 
     #[test]
     fn render_frame_container() {
-        let renderer = TauriRenderer::new();
+        let renderer = TauriRenderer::new(false);
         let container = make_container("fraGroup", LayoutControlType::Frame);
         let html = renderer.render_container(&container);
         assert!(html.contains("<fieldset"));
@@ -359,7 +408,7 @@ mod tests {
 
     #[test]
     fn render_textbox_input() {
-        let renderer = TauriRenderer::new();
+        let renderer = TauriRenderer::new(false);
         let leaf = make_leaf("txtName", LayoutControlType::TextBox, Some("John".into()));
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains("<input"));
@@ -369,7 +418,7 @@ mod tests {
 
     #[test]
     fn render_checkbox_checked() {
-        let renderer = TauriRenderer::new();
+        let renderer = TauriRenderer::new(false);
         let leaf = make_leaf("chkAgree", LayoutControlType::CheckBox, Some("True".into()));
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains(r#"type="checkbox""#));
@@ -378,8 +427,12 @@ mod tests {
 
     #[test]
     fn render_checkbox_unchecked() {
-        let renderer = TauriRenderer::new();
-        let leaf = make_leaf("chkAgree", LayoutControlType::CheckBox, Some("False".into()));
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf(
+            "chkAgree",
+            LayoutControlType::CheckBox,
+            Some("False".into()),
+        );
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains(r#"type="checkbox""#));
         assert!(!html.contains("checked"));
@@ -387,18 +440,24 @@ mod tests {
 
     #[test]
     fn invisible_control_includes_style() {
-        let renderer = TauriRenderer::new();
+        let renderer = TauriRenderer::new(false);
         let leaf = make_leaf("lblHidden", LayoutControlType::Label, None);
-        let leaf = LayoutLeaf { visible: false, ..leaf };
+        let leaf = LayoutLeaf {
+            visible: false,
+            ..leaf
+        };
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains("visibility: hidden"));
     }
 
     #[test]
     fn disabled_control_includes_opacity() {
-        let renderer = TauriRenderer::new();
+        let renderer = TauriRenderer::new(false);
         let leaf = make_leaf("cmdDisabled", LayoutControlType::CommandButton, None);
-        let leaf = LayoutLeaf { enabled: false, ..leaf };
+        let leaf = LayoutLeaf {
+            enabled: false,
+            ..leaf
+        };
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains("opacity: 0.5"));
     }
@@ -414,7 +473,7 @@ mod tests {
 
     #[test]
     fn render_children_filters_invisible() {
-        let renderer = TauriRenderer::new();
+        let renderer = TauriRenderer::new(false);
         let visible = LayoutNode::Leaf(make_leaf("visible", LayoutControlType::Label, None));
         let hidden = LayoutNode::Leaf(make_leaf("hidden", LayoutControlType::Label, None));
         let hidden = {

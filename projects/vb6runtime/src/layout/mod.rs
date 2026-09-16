@@ -15,6 +15,7 @@
 //! - [`menu`] — menubar and context/popup menu rendering
 //! - [`renderer`] — platform-abstract rendering trait + Tauri backend
 //! - [`theme`] — CSS custom property theming + injection API
+//! - [`vb6_css`] — complete VB6 CSS stylesheet with scoped selectors
 
 pub mod color;
 /// Per-control style builder dispatch.
@@ -35,6 +36,8 @@ pub mod renderer;
 pub mod scale;
 /// CSS custom property theming + injection API.
 pub mod theme;
+/// Full VB6 CSS stylesheet with scoped selectors for platform isolation.
+pub mod vb6_css;
 
 use model::style::LayoutStyle;
 
