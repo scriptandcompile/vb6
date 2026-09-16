@@ -17,6 +17,7 @@
 //! - [`renderer`] — platform-abstract rendering trait + Tauri backend
 //! - [`theme`] — CSS custom property theming + injection API
 //! - [`vb6_css`] — complete VB6 CSS stylesheet with scoped selectors
+//! - [`snapshot`] — snapshot types for incremental layout diffing
 
 pub mod color;
 /// Per-control style builder dispatch.
@@ -37,6 +38,8 @@ pub mod model;
 pub mod renderer;
 /// Twip-to-pixel and ScaleMode conversion.
 pub mod scale;
+/// Snapshot types for incremental layout diffing.
+pub mod snapshot;
 /// CSS custom property theming + injection API.
 pub mod theme;
 /// Full VB6 CSS stylesheet with scoped selectors for platform isolation.
@@ -49,6 +52,9 @@ pub use converter::{load_form, LayoutError, LayoutResult};
 
 // Re-export form store handle type.
 pub use form_store::FormHandle;
+
+// Re-export snapshot type for diff-based rendering.
+pub use snapshot::SnapshotNode;
 
 /// Configuration for the layout conversion.
 #[derive(Debug, Clone, Copy)]
