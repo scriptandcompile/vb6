@@ -556,4 +556,501 @@ mod tests {
         )
         .into_bytes()
     }
+
+    // -----------------------------------------------------------------------
+    // Step 5.3 — Edge case tests
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn form_with_zero_controls() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = Form {
+            name: "EmptyForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "EmptyForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let html = render(handle, &renderer::TauriRenderer::new(false));
+        assert!(!html.is_empty());
+        assert!(html.contains("vb6-form"));
+    }
+
+    #[test]
+    fn form_with_scale_mode_user() {
+        let _lock = lock_test();
+        form_store::reset();
+        let label = vb6parse::language::Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            vb6parse::language::ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "User scale".to_string(),
+                    left: 120,
+                    top: 120,
+                    width: 1000,
+                    height: 300,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let form = Form {
+            name: "UserScaleForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                scale_mode: vb6parse::language::ScaleMode::User,
+                caption: "UserScaleForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![label],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        // ScaleMode::User falls back to twip conversion — should not panic
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let html = render(handle, &renderer::TauriRenderer::new(false));
+        assert!(!html.is_empty());
+    }
+
+    #[test]
+    fn form_with_scale_mode_pixel() {
+        let _lock = lock_test();
+        form_store::reset();
+        let label = vb6parse::language::Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            vb6parse::language::ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Pixel scale".to_string(),
+                    left: 120,
+                    top: 120,
+                    width: 1000,
+                    height: 300,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let form = Form {
+            name: "PixelScaleForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                scale_mode: vb6parse::language::ScaleMode::Pixel,
+                caption: "PixelScaleForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![label],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let html = render(handle, &renderer::TauriRenderer::new(false));
+        assert!(!html.is_empty());
+    }
+
+    #[test]
+    fn form_with_start_up_position_center_screen() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = Form {
+            name: "CenterScreenForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                start_up_position: vb6parse::language::StartUpPosition::CenterScreen,
+                caption: "CenterScreenForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let name = get_form(handle, |f| f.name.clone());
+        assert_eq!(name, Some("CenterScreenForm".into()));
+    }
+
+    #[test]
+    fn form_with_start_up_position_center_owner() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = Form {
+            name: "CenterOwnerForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                start_up_position: vb6parse::language::StartUpPosition::CenterOwner,
+                caption: "CenterOwnerForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let name = get_form(handle, |f| f.name.clone());
+        assert_eq!(name, Some("CenterOwnerForm".into()));
+    }
+
+    #[test]
+    fn form_with_start_up_position_windows_default() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = Form {
+            name: "WinDefaultForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                start_up_position: vb6parse::language::StartUpPosition::WindowsDefault,
+                caption: "WinDefaultForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let name = get_form(handle, |f| f.name.clone());
+        assert_eq!(name, Some("WinDefaultForm".into()));
+    }
+
+    #[test]
+    fn form_with_start_up_position_manual() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = Form {
+            name: "ManualForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                start_up_position: vb6parse::language::StartUpPosition::Manual {
+                    client_height: 3000,
+                    client_width: 4000,
+                    client_top: 100,
+                    client_left: 200,
+                },
+                caption: "ManualForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let name = get_form(handle, |f| f.name.clone());
+        assert_eq!(name, Some("ManualForm".into()));
+    }
+
+    #[test]
+    fn controls_at_position_zero() {
+        let _lock = lock_test();
+        form_store::reset();
+        let label = vb6parse::language::Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            vb6parse::language::ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "At Origin".to_string(),
+                    left: 0,
+                    top: 0,
+                    width: 1000,
+                    height: 300,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let form = Form {
+            name: "OriginForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "OriginForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![label],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let html = render(handle, &renderer::TauriRenderer::new(false));
+        assert!(!html.is_empty());
+        assert!(html.contains("vb6-label"));
+    }
+
+    #[test]
+    fn controls_at_negative_position() {
+        let _lock = lock_test();
+        form_store::reset();
+        let label = vb6parse::language::Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            vb6parse::language::ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Negative Position".to_string(),
+                    left: -500,
+                    top: -200,
+                    width: 1000,
+                    height: 300,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let form = Form {
+            name: "NegativeForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "NegativeForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![label],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let html = render(handle, &renderer::TauriRenderer::new(false));
+        assert!(!html.is_empty());
+        assert!(html.contains("vb6-label"));
+    }
+
+    #[test]
+    fn deeply_nested_containers() {
+        let _lock = lock_test();
+        form_store::reset();
+        // Form → PictureBox → Frame → Label
+        let label = vb6parse::language::Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            vb6parse::language::ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Deeply nested".to_string(),
+                    left: 200,
+                    top: 200,
+                    width: 800,
+                    height: 300,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let frame = vb6parse::language::Control::new(
+            "Frame1".to_string(),
+            String::new(),
+            0,
+            vb6parse::language::ControlKind::Frame {
+                properties: vb6parse::language::FrameProperties {
+                    caption: "Frame".to_string(),
+                    left: 100,
+                    top: 100,
+                    width: 1500,
+                    height: 1000,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+                controls: vec![label],
+            },
+        );
+        let picturebox = vb6parse::language::Control::new(
+            "PictureBox1".to_string(),
+            String::new(),
+            0,
+            vb6parse::language::ControlKind::PictureBox {
+                properties: vb6parse::language::PictureBoxProperties {
+                    left: 50,
+                    top: 50,
+                    width: 2000,
+                    height: 1500,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+                controls: vec![frame],
+            },
+        );
+        let form = Form {
+            name: "NestedForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 5000,
+                scale_height: 4000,
+                caption: "NestedForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![picturebox],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let html = render(handle, &renderer::TauriRenderer::new(false));
+        assert!(!html.is_empty());
+        assert!(html.contains("vb6-picturebox"), "missing vb6-picturebox in: {html}");
+        assert!(html.contains("vb6-frame"), "missing vb6-frame in: {html}");
+        assert!(html.contains("vb6-label"), "missing vb6-label in: {html}");
+        assert!(html.contains("Deeply nested"), "missing caption in: {html}");
+    }
+
+    #[test]
+    fn triple_nested_containers() {
+        let _lock = lock_test();
+        form_store::reset();
+        // Form → Frame → PictureBox → Label
+        let label = vb6parse::language::Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            vb6parse::language::ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Triple nested".to_string(),
+                    left: 100,
+                    top: 100,
+                    width: 500,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let picturebox = vb6parse::language::Control::new(
+            "PictureBox1".to_string(),
+            String::new(),
+            0,
+            vb6parse::language::ControlKind::PictureBox {
+                properties: vb6parse::language::PictureBoxProperties {
+                    left: 100,
+                    top: 100,
+                    width: 1500,
+                    height: 1000,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+                controls: vec![label],
+            },
+        );
+        let frame = vb6parse::language::Control::new(
+            "Frame1".to_string(),
+            String::new(),
+            0,
+            vb6parse::language::ControlKind::Frame {
+                properties: vb6parse::language::FrameProperties {
+                    caption: "Outer Frame".to_string(),
+                    left: 50,
+                    top: 50,
+                    width: 2000,
+                    height: 1500,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+                controls: vec![picturebox],
+            },
+        );
+        let form = Form {
+            name: "TripleNestedForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 5000,
+                scale_height: 4000,
+                caption: "TripleNestedForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![frame],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), &config);
+        let html = render(handle, &renderer::TauriRenderer::new(false));
+        assert!(!html.is_empty());
+        assert!(html.contains("vb6-frame"), "missing vb6-frame in: {html}");
+        assert!(html.contains("vb6-picturebox"), "missing vb6-picturebox in: {html}");
+        assert!(html.contains("vb6-label"), "missing vb6-label in: {html}");
+    }
 }
