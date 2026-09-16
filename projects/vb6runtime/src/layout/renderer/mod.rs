@@ -11,8 +11,23 @@
 //! - [`Renderer::render_container`] — renders a container control (Form, Frame, PictureBox)
 //! - [`Renderer::render_children`] — renders visible child nodes of a container
 //! - [`Renderer::style_attr`] — builds a CSS style attribute string
+//!
+//! # Renderers
+//!
+//! - [`TauriRenderer`] — produces HTML fragment strings for Tauri webview injection.
+//!   Supports optional `.vb6-app` scope wrapping via the `with_scope` flag.
+//! - [`WebSysRenderer`] (behind `wasm` feature) — creates `web_sys::Element` objects
+//!   for direct DOM manipulation in the browser.
 
 use super::model::{LayoutContainer, LayoutLeaf, LayoutNode, LayoutStyle};
+
+pub mod tauri;
+pub use tauri::TauriRenderer;
+
+#[cfg(target_arch = "wasm32")]
+pub mod web_sys;
+#[cfg(target_arch = "wasm32")]
+pub use web_sys::WebSysRenderer;
 
 /// Trait for converting a [`LayoutNode`] tree into platform-specific output.
 ///
