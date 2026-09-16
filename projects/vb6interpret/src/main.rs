@@ -118,9 +118,7 @@ fn run_cli() -> Result<()> {
                                 .forms
                                 .iter()
                                 .find(|f| f.name == *form_name)
-                                .ok_or_else(|| {
-                                    anyhow::anyhow!("Form '{}' not found", form_name)
-                                })?
+                                .ok_or_else(|| anyhow::anyhow!("Form '{}' not found", form_name))?
                                 .raw_bytes
                                 .clone();
                             run_form_project(project, form_bytes)?;
@@ -315,6 +313,7 @@ fn run_bas_file(
     Ok(())
 }
 
+#[allow(unused_variables)]
 fn run_form_project(project: LoadedProject, startup_form_bytes: Vec<u8>) -> Result<!> {
     #[cfg(feature = "tauri")]
     {
@@ -322,7 +321,10 @@ fn run_form_project(project: LoadedProject, startup_form_bytes: Vec<u8>) -> Resu
     }
     #[cfg(not(feature = "tauri"))]
     {
-        bail!("Form applications require the tauri feature. Rebuild with --features tauri")
+        bail!(
+            "{} is a Form application and requires the tauri feature. Rebuild with --features tauri",
+            project.project_name
+        )
     }
 }
 
