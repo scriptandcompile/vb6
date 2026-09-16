@@ -30,8 +30,8 @@ use std::collections::HashMap;
 
 use crate::layout::css::style_to_css;
 use crate::layout::diff_tree::{DiffChange, DiffKind, DiffTree};
-use crate::layout::model::{LayoutContainer, LayoutLeaf, LayoutNode, LayoutStyle};
 use crate::layout::model::NodeId;
+use crate::layout::model::{LayoutContainer, LayoutLeaf, LayoutNode, LayoutStyle};
 use crate::layout::renderer::Renderer;
 use crate::layout::theme::{CssInjector, ThemeRenderer, Vb6Theme};
 
@@ -159,12 +159,10 @@ impl WebSysRenderer {
         if let Some(el) = self.dom_nodes.borrow().get(id) {
             return Some(el.clone());
         }
-        self.doc
-            .get_element_by_id(&id.name)
-            .and_then(|e| {
-                self.dom_nodes.borrow_mut().insert(id.clone(), e.clone());
-                Some(e)
-            })
+        self.doc.get_element_by_id(&id.name).and_then(|e| {
+            self.dom_nodes.borrow_mut().insert(id.clone(), e.clone());
+            Some(e)
+        })
     }
 
     /// Find the parent DOM element for an inserted node.
@@ -348,7 +346,7 @@ impl WebSysRenderer {
                 }
             }
             Some(DiffChange {
-                kind: DiffKind::Inserted { ref node: inserted },
+                kind: DiffKind::Inserted { node: ref inserted },
                 ..
             }) => {
                 let parent_el = parent
@@ -411,9 +409,7 @@ impl WebSysRenderer {
     /// Get a child element by its node ID from a parent element.
     #[cfg(target_arch = "wasm32")]
     fn get_child_element(&self, parent: &Element, child: &LayoutNode) -> Option<Element> {
-        parent
-            .get_element_by_id(&child.node_id().name)
-            .cloned()
+        parent.get_element_by_id(&child.node_id().name).cloned()
     }
 }
 
@@ -525,17 +521,18 @@ impl Renderer for WebSysRenderer {
         dom_nodes: &mut RefCell<HashMap<NodeId, Element>>,
     ) -> Option<Element> {
         match &change.kind {
-            DiffKind::Same => {
-                dom_nodes.borrow().get(&node.node_id()).cloned()
-            }
-            DiffKind::Inserted { ref node: inserted } => {
-                let parent_el = parent.cloned()
+            DiffKind::Same => dom_nodes.borrow().get(&node.node_id()).cloned(),
+            DiffKind::Inserted { node: ref inserted } => {
+                let parent_el = parent
+                    .cloned()
                     .or_else(|| self.find_parent_for(inserted.as_ref(), None));
                 let el = self.render_node_with_diff(inserted.as_ref(), None, parent_el.as_ref());
                 if let Some(ref p) = parent_el {
                     let _ = p.append_child(&el);
                 }
-                dom_nodes.borrow_mut().insert(inserted.node_id(), el.clone());
+                dom_nodes
+                    .borrow_mut()
+                    .insert(inserted.node_id(), el.clone());
                 Some(el)
             }
             DiffKind::Removed => {
@@ -668,33 +665,12 @@ mod tests {
     fn tag_for_control_mapping() {
         // Verify tag mapping exists for all control types.
         // This test runs on all targets since it just checks the match.
-        assert_eq!(
-            tag_for_control(LayoutControlType::Label),
-            "div"
-        );
-        assert_eq!(
-            tag_for_control(LayoutControlType::TextBox),
-            "input"
-        );
-        assert_eq!(
-            tag_for_control(LayoutControlType::CommandButton),
-            "button"
-        );
-        assert_eq!(
-            tag_for_control(LayoutControlType::Frame),
-            "fieldset"
-        );
-        assert_eq!(
-            tag_for_control(LayoutControlType::Image),
-            "img"
-        );
-        assert_eq!(
-            tag_for_control(LayoutControlType::CheckBox),
-            "input"
-        );
-        assert_eq!(
-            tag_for_control(LayoutControlType::ComboBox),
-            "select"
-        );
+        assert_eq!(tag_for_control(LayoutControlType::Label), "div");
+        assert_eq!(tag_for_control(LayoutControlType::TextBox), "input");
+        assert_eq!(tag_for_control(LayoutControlType::CommandButton), "button");
+        assert_eq!(tag_for_control(LayoutControlType::Frame), "fieldset");
+        assert_eq!(tag_for_control(LayoutControlType::Image), "img");
+        assert_eq!(tag_for_control(LayoutControlType::CheckBox), "input");
+        assert_eq!(tag_for_control(LayoutControlType::ComboBox), "select");
     }
 }
