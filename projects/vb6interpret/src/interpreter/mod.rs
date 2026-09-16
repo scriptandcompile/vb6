@@ -260,6 +260,121 @@ impl Interpreter {
         Ok(())
     }
 
+    /// Execute a loaded VB6 project, running all module-level statements then
+    /// calling the startup procedure.
+    ///
+    /// Procedures are merged from all modules, classes, and forms in the
+    /// project. Module-level statements execute in VBP file order.
+    pub fn run_project(&mut self, project: &crate::project::LoadedProject) -> RunResult<()> {
+        self.clear();
+        self.register_builtin_constants();
+
+        for (name, value) in &self.environment {
+            env_state::set_env(name, value);
+        }
+        for (appname, section, key, value) in &self.settings {
+            let _ = settings_state::set(appname, section, key, value);
+        }
+        match &self.resource_file {
+            Some(path) => resources_state::set_file(path),
+            None => resources_state::clear(),
+        }
+        if !self.allow_system_time {
+            vb6runtime::state::clock::reset();
+            if let Some(date) = self.initial_date {
+                vb6runtime::state::clock::set_date(date);
+            }
+            if let Some(time) = self.initial_time {
+                vb6runtime::state::clock::set_time(time);
+            }
+        } else {
+            vb6runtime::state::clock::reset();
+        }
+
+        // Merge all procedures from modules, classes, and forms.
+        self.procedures.clear();
+
+        for module in &project.modules {
+            let root = module.parsed.cst.to_root_node();
+            let program = crate::program::build_program(&root, &module.name);
+            self.procedures.extend(program.procedures);
+        }
+
+        for class in &project.classes {
+            let root = class.parsed.cst.to_root_node();
+            let program = crate::program::build_program(&root, &class.name);
+            self.procedures.extend(program.procedures);
+        }
+
+        for form in &project.forms {
+            let root = form.parsed.cst.to_root_node();
+            let program = crate::program::build_program(&root, &form.name);
+            self.procedures.extend(program.procedures);
+        }
+
+        // Module-level statements execute in VBP file order (modules only).
+        for entry in &project.file_entries {
+            if let crate::project::ProjectFileEntry::Module { name, .. } = entry
+                && let Some(mod_) = project.modules.iter().find(|m| m.name == *name)
+            {
+                let root = mod_.parsed.cst.to_root_node();
+                self.module_name = mod_.name.clone();
+                self.source_line_offset = mod_.parsed.line_offset;
+                self.exec_statements(&root, 1)?;
+                if self.terminated {
+                    return Ok(());
+                }
+            }
+        }
+
+        if self.terminated {
+            return Ok(());
+        }
+
+        // Run the startup procedure.
+        // Extract (name, is_function) as owned values so the borrow on
+        // `self.procedures` drops at the end of this match instead of
+        // keeping the whole map live while we call back into `self`.
+        let startup_call = match &project.startup_object {
+            crate::project::StartupObject::SubMain {
+                module_name,
+                sub_name,
+            } => {
+                let key = sub_name.to_lowercase();
+                if let Some(procedure) = self.procedures.get(&key) {
+                    Some((procedure.name.clone(), procedure.is_function))
+                } else if module_name.is_empty() {
+                    self.procedures
+                        .values()
+                        .find(|p| p.name.to_lowercase() == "main")
+                        .map(|p| (p.name.clone(), p.is_function))
+                } else {
+                    self.procedures
+                        .values()
+                        .find(|p| p.name == *sub_name)
+                        .map(|p| (p.name.clone(), p.is_function))
+                }
+            }
+            crate::project::StartupObject::Form { form_name } => {
+                let key = format!("{}_load", form_name.to_lowercase());
+                self.procedures
+                    .get(&key)
+                    .map(|p| (p.name.clone(), p.is_function))
+            }
+            crate::project::StartupObject::None => None,
+        };
+
+        if let Some((name, is_function)) = startup_call {
+            if is_function {
+                self.call_function(&name, Vec::new())?;
+            } else {
+                self.call_sub(&name, Vec::new())?;
+            }
+        }
+
+        Ok(())
+    }
+
     /// The completed `Debug.Print`/`Print` output lines.
     pub fn output(&self) -> &[String] {
         &self.output

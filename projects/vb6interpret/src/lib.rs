@@ -13,6 +13,7 @@ pub mod eval;
 pub mod exec;
 pub mod interpreter;
 pub mod program;
+pub mod project;
 pub mod scope;
 
 /// Tauri command handlers for form rendering (only compiled with `tauri` feature).
@@ -24,6 +25,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub use error::{RunError, RunResult};
 pub use interpreter::Interpreter;
+pub use project::{LoadedClass, LoadedForm, LoadedModule, LoadedProject, StartupObject};
 pub use scope::Scope;
 pub use vb6runtime::{VBError, VBVariant};
 
@@ -49,5 +51,14 @@ pub use vb6runtime::{VBError, VBVariant};
 pub fn run_source(source: &str) -> Result<Vec<String>, RunError> {
     let mut interpreter = Interpreter::new();
     interpreter.run_source(source)?;
+    Ok(interpreter.output().to_vec())
+}
+
+/// Execute a loaded VB6 project, capturing `Debug.Print` output.
+///
+/// Returns the captured output lines.
+pub fn run_project(project: &LoadedProject) -> Result<Vec<String>, RunError> {
+    let mut interpreter = Interpreter::new();
+    interpreter.run_project(project)?;
     Ok(interpreter.output().to_vec())
 }
