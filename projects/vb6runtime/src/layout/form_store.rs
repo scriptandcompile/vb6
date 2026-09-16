@@ -110,6 +110,22 @@ pub fn remove(handle: FormHandle) -> Option<LayoutForm> {
     STORE.lock().unwrap().remove(&handle)
 }
 
+/// Reset the store to its initial empty state.
+///
+/// # Panics
+///
+/// Panics if the mutexes cannot be locked.
+///
+/// # Test Usage
+///
+/// This function is `pub` to support test isolation. In production code,
+/// the store's lifetime matches the process lifetime.
+#[cfg(test)]
+pub fn reset() {
+    STORE.lock().unwrap().clear();
+    *NEXT_HANDLE.lock().unwrap() = 0;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

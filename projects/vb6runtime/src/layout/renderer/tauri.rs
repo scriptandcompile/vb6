@@ -1,1 +1,432 @@
 //! Tauri renderer — produces HTML fragment strings for webview injection.
+//!
+//! Generates self-contained HTML with inline styles from the [`LayoutNode`] tree.
+//! Used by Tauri to inject VB6-rendered forms into a webview via `webview.eval()`.
+//!
+//! # Control-to-HTML Mapping
+//!
+//! | VB6 Control | HTML Element |
+//! |-------------|-------------|
+//! | Form | `<div class="vb6-form">` |
+//! | Label | `<div class="vb6-label">` |
+//! | TextBox | `<input type="text">` or `<textarea>` |
+//! | CommandButton | `<button class="vb6-commandbutton">` |
+//! | Frame | `<fieldset class="vb6-frame">` with `<legend>` |
+//! | PictureBox | `<div class="vb6-picturebox">` |
+//! | Image | `<img class="vb6-image">` |
+//! | CheckBox | `<input type="checkbox" class="vb6-checkbox">` |
+//! | OptionButton | `<input type="radio" class="vb6-optionbutton">` |
+//! | ComboBox | `<select class="vb6-combobox">` |
+//! | ListBox | `<select class="vb6-listbox">` |
+//! | HScrollBar/VScrollBar | `<input type="range" class="vb6-<type>scrollbar">` |
+//! | Shape | `<div class="vb6-shape">` |
+//! | Line | `<svg class="vb6-line">` |
+//! | Timer | *(omitted)* |
+
+use crate::css::style_to_css;
+use crate::model::{LayoutContainer, LayoutLeaf, LayoutNode, LayoutStyle};
+use crate::renderer::Renderer;
+
+use crate::model::LayoutControlType;
+
+/// Tauri renderer that produces HTML fragment strings for webview injection.
+///
+/// Form elements are rendered with inline styles derived from [`LayoutStyle`].
+/// Visibility and enabled state are appended as runtime overrides.
+#[derive(Debug, Clone, Default)]
+pub struct TauriRenderer;
+
+impl TauriRenderer {
+    /// Create a new `TauriRenderer` instance.
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Renderer for TauriRenderer {
+    type Output = String;
+
+    fn render_node(&self, node: &LayoutNode) -> String {
+        match node {
+            LayoutNode::Container(c) => self.render_container(c),
+            LayoutNode::Leaf(l) => self.render_leaf(l),
+        }
+    }
+
+    fn render_leaf(&self, leaf: &LayoutLeaf) -> String {
+        let tag = tag_for_control(leaf.control_type);
+        let style = self.style_attr(&leaf.style, leaf.visible, leaf.enabled);
+        let value = leaf.value.as_deref().unwrap_or("");
+
+        let html = match leaf.control_type {
+            LayoutControlType::TextBox => {
+                format!(
+                    r#"<input id="{}" class="vb6-textbox" type="text" value="{}" style="{}">"#,
+                    html_escape(&leaf.name),
+                    html_escape(value),
+                    style
+                )
+            }
+            LayoutControlType::CheckBox => {
+                let checked = leaf.value.as_deref() == Some("True");
+                format!(
+                    r#"<input id="{}" class="vb6-checkbox" type="checkbox" {} style="{}">"#,
+                    html_escape(&leaf.name),
+                    if checked { "checked" } else { "" },
+                    style
+                )
+            }
+            LayoutControlType::OptionButton => {
+                let checked = leaf.value.as_deref() == Some("True");
+                format!(
+                    r#"<input id="{}" class="vb6-optionbutton" type="radio" name="{}" {} style="{}">"#,
+                    html_escape(&leaf.name),
+                    html_escape(&leaf.name),
+                    if checked { "checked" } else { "" },
+                    style
+                )
+            }
+            LayoutControlType::CommandButton => {
+                format!(
+                    r#"<button id="{}" class="vb6-commandbutton" style="{}">{}</button>"#,
+                    html_escape(&leaf.name),
+                    style,
+                    html_escape(value)
+                )
+            }
+            LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => {
+                let input_type = match leaf.control_type {
+                    LayoutControlType::HScrollBar => "range",
+                    LayoutControlType::VScrollBar => "range",
+                    _ => "text",
+                };
+                let orient = match leaf.control_type {
+                    LayoutControlType::VScrollBar => {
+                        if !style.is_empty() {
+                            format!("{style}; writing-mode: bt-lr; -webkit-appearance: slider-vertical;")
+                        } else {
+                            "writing-mode: bt-lr; -webkit-appearance: slider-vertical;".to_string()
+                        }
+                    }
+                    _ => style,
+                };
+                format!(
+                    r#"<input id="{}" class="vb6-{}" type="{}" value="{}" style="{}">"#,
+                    html_escape(&leaf.name),
+                    leaf.control_type.css_class(),
+                    input_type,
+                    html_escape(value),
+                    orient
+                )
+            }
+            LayoutControlType::ComboBox => {
+                format!(
+                    r#"<select id="{}" class="vb6-combobox" style="{}"></select>"#,
+                    html_escape(&leaf.name),
+                    style
+                )
+            }
+            LayoutControlType::ListBox => {
+                format!(
+                    r#"<select id="{}" class="vb6-listbox" style="{}"></select>"#,
+                    html_escape(&leaf.name),
+                    style
+                )
+            }
+            LayoutControlType::Line => {
+                // Line control renders as SVG
+                let x1 = leaf.style.line_x1.unwrap_or(0.0);
+                let y1 = leaf.style.line_y1.unwrap_or(0.0);
+                let x2 = leaf.style.line_x2.unwrap_or(0.0);
+                let y2 = leaf.style.line_y2.unwrap_or(0.0);
+                let color = leaf
+                    .style
+                    .line_color
+                    .as_ref()
+                    .map(|c| c.to_css_string())
+                    .unwrap_or_else(|| "rgb(0, 0, 0)".to_string());
+                let width = leaf.style.line_width.unwrap_or(1.0);
+                format!(
+                    r#"<svg id="{}" class="vb6-line" style="{}" width="{}" height="{}" viewBox="0 0 {} {}"><line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" stroke-width="{}" /></svg>"#,
+                    html_escape(&leaf.name),
+                    style,
+                    leaf.size.width,
+                    leaf.size.height,
+                    leaf.size.width,
+                    leaf.size.height,
+                    x1, y1, x2, y2, color, width
+                )
+            }
+            LayoutControlType::Image => {
+                format!(
+                    r#"<div id="{}" class="vb6-image" style="{}">{}</div>"#,
+                    html_escape(&leaf.name),
+                    style,
+                    html_escape(value)
+                )
+            }
+            LayoutControlType::Shape => {
+                let mut s = style;
+                if let Some(radius) = leaf.style.border_radius {
+                    if !s.is_empty() {
+                        s.push_str(&format!("; border-radius: {radius}px"));
+                    } else {
+                        s.push_str(&format!("border-radius: {radius}px"));
+                    }
+                }
+                format!(
+                    r#"<div id="{}" class="vb6-shape" style="{}"></div>"#,
+                    html_escape(&leaf.name),
+                    s
+                )
+            }
+            LayoutControlType::Timer => {
+                // Timer has no visual output — render as empty placeholder
+                format!(
+                    r#"<div id="{}" class="vb6-timer" style="{}"></div>"#,
+                    html_escape(&leaf.name),
+                    style
+                )
+            }
+            _ => {
+                format!(
+                    r#"<div id="{}" class="vb6-{}" style="{}">{}</div>"#,
+                    html_escape(&leaf.name),
+                    leaf.control_type.css_class(),
+                    style,
+                    html_escape(value)
+                )
+            }
+        };
+        html
+    }
+
+    fn render_container(&self, container: &LayoutContainer) -> String {
+        let tag = match container.control_type {
+            LayoutControlType::Form | LayoutControlType::MDIForm => "div",
+            LayoutControlType::Frame => "fieldset",
+            LayoutControlType::PictureBox => "div",
+            _ => "div",
+        };
+
+        let style = self.style_attr(&container.style, container.visible, container.enabled);
+        let caption = container.caption.as_deref().unwrap_or("");
+
+        let mut html = String::new();
+
+        match container.control_type {
+            LayoutControlType::Frame => {
+                html.push_str(&format!(
+                    r#"<fieldset id="{}" class="vb6-frame" style="{}">"#,
+                    html_escape(&container.name),
+                    style
+                ));
+                html.push_str(&format!("<legend>{}</legend>", html_escape(caption)));
+            }
+            _ => {
+                html.push_str(&format!(
+                    r#"<div id="{}" class="vb6-{}" style="{}">"#,
+                    html_escape(&container.name),
+                    tag,
+                    style
+                ));
+            }
+        }
+
+        for child in &container.children {
+            html.push_str(&self.render_node(child));
+        }
+
+        html.push_str(if container.control_type == LayoutControlType::Frame {
+            "</fieldset>"
+        } else {
+            "</div>"
+        });
+
+        html
+    }
+
+    fn render_children(&self, children: &[LayoutNode]) -> Vec<String> {
+        children
+            .iter()
+            .filter(|n| n.visible())
+            .map(|n| self.render_node(n))
+            .collect()
+    }
+}
+
+/// Map a [`LayoutControlType`] to an HTML tag name for use in class names.
+fn tag_for_control(control_type: LayoutControlType) -> &'static str {
+    match control_type {
+        LayoutControlType::Form | LayoutControlType::MDIForm => "div",
+        LayoutControlType::Label => "div",
+        LayoutControlType::TextBox => "input",
+        LayoutControlType::CommandButton => "button",
+        LayoutControlType::Frame => "fieldset",
+        LayoutControlType::PictureBox => "div",
+        LayoutControlType::Image => "img",
+        LayoutControlType::CheckBox => "input",
+        LayoutControlType::OptionButton => "input",
+        LayoutControlType::ComboBox => "select",
+        LayoutControlType::ListBox => "select",
+        LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => "input",
+        LayoutControlType::Timer => "div",
+        LayoutControlType::Shape => "div",
+        LayoutControlType::Line => "svg",
+        LayoutControlType::DriveListBox
+        | LayoutControlType::DirListBox
+        | LayoutControlType::FileListBox => "select",
+        LayoutControlType::Data => "div",
+        LayoutControlType::Custom => "div",
+    }
+}
+
+/// Escape special HTML characters in a string.
+///
+/// Handles `&`, `<`, `>`, `"`, and `'` to prevent XSS when injecting
+/// untrusted content into HTML.
+fn html_escape(s: &str) -> String {
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&#x27;")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::{LayoutPosition, LayoutSize};
+
+    fn make_leaf(name: &str, control_type: LayoutControlType, value: Option<String>) -> LayoutLeaf {
+        LayoutLeaf {
+            name: name.into(),
+            control_type,
+            index: 0,
+            position: LayoutPosition::default(),
+            size: LayoutSize::default(),
+            style: LayoutStyle::default(),
+            value,
+            visible: true,
+            enabled: true,
+        }
+    }
+
+    fn make_container(name: &str, control_type: LayoutControlType) -> LayoutContainer {
+        LayoutContainer {
+            name: name.into(),
+            control_type,
+            index: 0,
+            position: LayoutPosition::default(),
+            size: LayoutSize { width: 400.0, height: 300.0 },
+            style: LayoutStyle::default(),
+            children: vec![],
+            caption: Some("Test".into()),
+            visible: true,
+            enabled: true,
+            current_value: None,
+        }
+    }
+
+    #[test]
+    fn render_label_leaf() {
+        let renderer = TauriRenderer::new();
+        let leaf = make_leaf("lblTest", LayoutControlType::Label, Some("Hello".into()));
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("vb6-label"));
+        assert!(html.contains("Hello"));
+    }
+
+    #[test]
+    fn render_button_leaf() {
+        let renderer = TauriRenderer::new();
+        let leaf = make_leaf("cmdOK", LayoutControlType::CommandButton, Some("&OK".into()));
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("<button"));
+        assert!(html.contains("vb6-commandbutton"));
+        assert!(html.contains("&amp;OK"));
+    }
+
+    #[test]
+    fn render_frame_container() {
+        let renderer = TauriRenderer::new();
+        let container = make_container("fraGroup", LayoutControlType::Frame);
+        let html = renderer.render_container(&container);
+        assert!(html.contains("<fieldset"));
+        assert!(html.contains("<legend>Test</legend>"));
+    }
+
+    #[test]
+    fn render_textbox_input() {
+        let renderer = TauriRenderer::new();
+        let leaf = make_leaf("txtName", LayoutControlType::TextBox, Some("John".into()));
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("<input"));
+        assert!(html.contains(r#"type="text""#));
+        assert!(html.contains("value=\"John\""));
+    }
+
+    #[test]
+    fn render_checkbox_checked() {
+        let renderer = TauriRenderer::new();
+        let leaf = make_leaf("chkAgree", LayoutControlType::CheckBox, Some("True".into()));
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"type="checkbox""#));
+        assert!(html.contains("checked"));
+    }
+
+    #[test]
+    fn render_checkbox_unchecked() {
+        let renderer = TauriRenderer::new();
+        let leaf = make_leaf("chkAgree", LayoutControlType::CheckBox, Some("False".into()));
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"type="checkbox""#));
+        assert!(!html.contains("checked"));
+    }
+
+    #[test]
+    fn invisible_control_includes_style() {
+        let renderer = TauriRenderer::new();
+        let leaf = make_leaf("lblHidden", LayoutControlType::Label, None);
+        let leaf = LayoutLeaf { visible: false, ..leaf };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("visibility: hidden"));
+    }
+
+    #[test]
+    fn disabled_control_includes_opacity() {
+        let renderer = TauriRenderer::new();
+        let leaf = make_leaf("cmdDisabled", LayoutControlType::CommandButton, None);
+        let leaf = LayoutLeaf { enabled: false, ..leaf };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("opacity: 0.5"));
+    }
+
+    #[test]
+    fn html_escape_special_chars() {
+        assert!(html_escape("&").contains("&amp;"));
+        assert!(html_escape("<").contains("&lt;"));
+        assert!(html_escape(">").contains("&gt;"));
+        assert!(html_escape("\"").contains("&quot;"));
+        assert!(html_escape("'").contains("&#x27;"));
+    }
+
+    #[test]
+    fn render_children_filters_invisible() {
+        let renderer = TauriRenderer::new();
+        let visible = LayoutNode::Leaf(make_leaf("visible", LayoutControlType::Label, None));
+        let hidden = LayoutNode::Leaf(make_leaf("hidden", LayoutControlType::Label, None));
+        let hidden = {
+            let mut h = hidden;
+            if let LayoutNode::Leaf(ref mut l) = h {
+                l.visible = false;
+            }
+            h
+        };
+        let children = vec![visible, hidden];
+        let rendered = renderer.render_children(&children);
+        assert_eq!(rendered.len(), 1);
+        assert!(rendered[0].contains("visible"));
+    }
+}

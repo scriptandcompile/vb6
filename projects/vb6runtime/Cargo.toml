@@ -19,6 +19,9 @@ thiserror.workspace = true
 serde.workspace = true
 anyhow.workspace = true
 
+# Tauri (optional, for native menu rendering)
+tauri = { workspace = true, optional = true }
+
 # For numeric operations
 num-traits.workspace = true
 
@@ -55,7 +58,7 @@ criterion.workspace = true
 default = []
 # com-interop = []  # Future: *might* be able to add COM object support.
 wasm = ["dep:web-sys", "dep:wasm-bindgen"]
-tauri = []
+tauri = ["dep:tauri"]
 
 [package.metadata.docs.rs]
 all-features = true

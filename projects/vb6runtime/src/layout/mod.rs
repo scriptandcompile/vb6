@@ -38,6 +38,9 @@ pub mod theme;
 
 use model::style::LayoutStyle;
 
+// Re-export converter types at the module level for convenience.
+pub use converter::{load_form, LayoutError, LayoutResult};
+
 /// Configuration for the layout conversion.
 #[derive(Debug, Clone, Copy)]
 pub struct LayoutConfig {
