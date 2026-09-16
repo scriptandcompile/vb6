@@ -8,6 +8,7 @@
 //! - [`model`] — core layout types (nodes, positions, sizes, styles)
 //! - [`converter`] — transforms parsed `FormRoot` into the layout model
 //! - [`diff_tree`] — diff types for incremental rendering
+//! - [`diff_engine`] — engine for computing diffs between snapshots and live trees
 //! - [`scale`] — twip-to-pixel and ScaleMode conversion
 //! - [`color`] — VB6 Color to CSS color mapping
 //! - [`css`] — `LayoutStyle` to CSS declaration string
@@ -26,6 +27,8 @@ pub mod controls;
 pub mod converter;
 /// Diff types for incremental layout rendering.
 pub mod diff_tree;
+/// Diff engine for incremental layout rendering.
+pub mod diff_engine;
 /// LayoutStyle → CSS declaration string.
 pub mod css;
 /// Mutable state store for loaded forms.
@@ -49,6 +52,9 @@ use model::style::LayoutStyle;
 
 // Re-export converter types at the module level for convenience.
 pub use converter::{load_form, LayoutError, LayoutResult};
+
+// Re-export diff engine.
+pub use diff_engine::DiffEngine;
 
 // Re-export form store handle type.
 pub use form_store::FormHandle;
