@@ -38,12 +38,71 @@ pub const HTML: &str = r#"<!DOCTYPE html>
             }
         };
 
+        // Attach DOM event listeners to rendered form controls based on the
+        // event bindings provided by the Rust backend.
+        //
+        // The `bindings` array contains objects with {control, event, procedure}
+        // fields. For each binding, this function finds the DOM element whose
+        // id matches the control name and attaches a listener for the specified
+        // event that dispatches to the Tauri IPC handler.
+        window.attachFormEvents = async function(engineHandle, formName, bindings) {
+            if (!bindings || bindings.length === 0) {
+                window.statusEl.textContent = 'No event bindings to attach';
+                return;
+            }
+
+            for (const binding of bindings) {
+                const { control, event, procedure } = binding;
+                // The Tauri renderer uses id="controlName" for all controls
+                const el = document.getElementById(control);
+                if (el) {
+                    el.addEventListener(event, async (e) => {
+                        try {
+                            await invoke('form_event', {
+                                engineHandle: engineHandle,
+                                control: control,
+                                event: event,
+                            });
+                            window.statusEl.textContent = 'Event dispatched: ' + procedure;
+                        } catch (err) {
+                            window.statusEl.textContent = 'Event error: ' + err;
+                        }
+                    });
+                }
+            }
+
+            window.statusEl.textContent = 'Events attached: ' + bindings.length + ' binding(s)';
+        };
+
+        // Auto-attach event bindings after the form HTML is loaded.
+        // This is triggered by the Rust side setting window.__vb6FormName__.
+        window.attachFormEventsAutomatically = async function(engineHandle) {
+            if (!window.__vb6FormName__) {
+                return;
+            }
+
+            try {
+                const bindings = await invoke('form_event_bindings', {
+                    engineHandle: engineHandle,
+                    formName: window.__vb6FormName__,
+                });
+                await window.attachFormEvents(engineHandle, window.__vb6FormName__, bindings);
+            } catch (err) {
+                window.statusEl.textContent = 'Event attach error: ' + err;
+            }
+        };
+
         window.rootEl = document.getElementById('root');
         window.statusEl = document.getElementById('status');
 
         new MutationObserver(() => {
             if (window.rootEl.innerHTML.trim()) {
                 window.statusEl.textContent = 'Form loaded';
+                // After first render, try to auto-attach event bindings.
+                // This runs once when the engine handle is available.
+                if (window.__vb6EngineHandle__ !== undefined) {
+                    window.attachFormEventsAutomatically(window.__vb6EngineHandle__);
+                }
             }
         }).observe(window.rootEl, { childList: true, subtree: true, characterData: true, attributes: true });
     </script>

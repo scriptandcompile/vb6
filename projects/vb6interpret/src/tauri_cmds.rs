@@ -181,6 +181,47 @@ pub fn get_variable(engine_handle: EngineHandle, name: String) -> Option<String>
     None
 }
 
+/// A single form event binding returned to the frontend.
+///
+/// Represents one control event handler mapping: a `{control, event}` pair
+/// pointing to a procedure name in the VB6 code.
+#[derive(Clone, serde::Serialize, Debug)]
+pub struct FormEventBinding {
+    /// The VB6 control name (e.g. "cmdOK").
+    pub control: String,
+    /// The event name (e.g. "Click", "Change").
+    pub event: String,
+    /// The full procedure name (e.g. "cmdOK_Click").
+    pub procedure: String,
+}
+
+/// Tauri command: get all event bindings for a form in the given engine.
+///
+/// Returns a list of `{control, event, procedure}` tuples that the frontend
+/// can use to attach DOM event listeners to rendered controls. The bindings
+/// are extracted from the loaded form's parsed structure using the
+/// `LoadedForm::event_bindings()` method.
+#[command]
+pub fn form_event_bindings(engine_handle: EngineHandle, form_name: String) -> Vec<FormEventBinding> {
+    if let Some(engine) = get_engine(engine_handle) {
+        let project = engine.project();
+        for loaded_form in &project.forms {
+            if loaded_form.name == form_name {
+                let bindings = loaded_form.event_bindings();
+                return bindings
+                    .into_iter()
+                    .map(|((control, event), procedure)| FormEventBinding {
+                        control,
+                        event,
+                        procedure,
+                    })
+                    .collect();
+            }
+        }
+    }
+    Vec::new()
+}
+
 // ---------------------------------------------------------------------------
 // Variant serialization helper
 // ---------------------------------------------------------------------------

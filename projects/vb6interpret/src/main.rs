@@ -327,6 +327,12 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
     use tauri::Manager;
     use tauri::generate_handler;
 
+    // Extract startup form name before the project is moved into the engine.
+    let startup_form_name = match &project.startup_object {
+        StartupObject::Form { form_name } => form_name.clone(),
+        _ => String::new(),
+    };
+
     let engine_handle = tauri_cmds::spawn_engine(project);
 
     tauri::Builder::default()
@@ -335,12 +341,14 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
             tauri_cmds::run_project,
             tauri_cmds::stop_engine,
             tauri_cmds::form_event,
+            tauri_cmds::form_event_bindings,
             tauri_cmds::get_output,
             tauri_cmds::set_variable,
             tauri_cmds::get_variable,
         ])
         .setup(move |app| {
-            app.manage(startup_form_html);
+            let (html, _handle) = startup_form_html;
+            app.manage((html.clone(), _handle));
             app.manage(engine_handle);
             let window = tauri::WebviewWindowBuilder::new(
                 app,
@@ -352,9 +360,10 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
             .resizable(true)
             .build()?;
 
-            let (html, _handle) = startup_form_html;
+            let form_name = startup_form_name.clone();
             let _ = window.eval(&format!(
-                "document.getElementById('root').innerHTML = {html:?}; document.getElementById('status').textContent = 'Form loaded';"
+                "document.getElementById('root').innerHTML = {html:?}; document.getElementById('status').textContent = 'Form loaded'; \
+                 window.__vb6FormName__ = {form_name:?}; window.__vb6EngineHandle__ = {engine_handle};"
             ));
 
             let _ = window;

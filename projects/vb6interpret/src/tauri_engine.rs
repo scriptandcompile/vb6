@@ -25,7 +25,6 @@ pub struct TauriEngine {
     /// The VB6 interpreter instance shared with the background thread.
     pub(crate) interpreter: Arc<Mutex<Interpreter>>,
     /// The loaded VB6 project shared with the background thread.
-    #[allow(dead_code)]
     project: Arc<Mutex<LoadedProject>>,
     /// Indicates whether the background engine is currently running.
     running: Arc<AtomicBool>,
@@ -247,6 +246,11 @@ impl TauriEngine {
     /// Whether the engine is still running.
     pub fn is_running(&self) -> bool {
         self.running.load(Ordering::SeqCst)
+    }
+
+    /// Get a reference to the loaded project for inspection by Tauri commands.
+    pub(crate) fn project(&self) -> std::sync::MutexGuard<'_, LoadedProject> {
+        self.project.lock().unwrap()
     }
 }
 
