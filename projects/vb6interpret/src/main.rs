@@ -6,6 +6,10 @@
 #[path = "tauri_cmds.rs"]
 mod tauri_cmds;
 
+#[cfg(feature = "tauri")]
+#[path = "tauri_html.rs"]
+mod tauri_html;
+
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
 use std::io::Write;
@@ -189,12 +193,10 @@ fn run_repl() -> Result<()> {
                             println!("(no global variables)");
                         }
                     }
-                    ".run" => {
-                        match interpreter.run_startup() {
-                            Ok(()) => print_output(&interpreter),
-                            Err(e) => eprintln!("Error: {}", e.error),
-                        }
-                    }
+                    ".run" => match interpreter.run_startup() {
+                        Ok(()) => print_output(&interpreter),
+                        Err(e) => eprintln!("Error: {}", e.error),
+                    },
                     s if s.starts_with(".run ") => {
                         let path = expand_tilde(Path::new(&s[5..]));
                         match load_source_into(&mut interpreter, &path) {
@@ -263,18 +265,6 @@ fn load_source_into(interpreter: &mut Interpreter, path: &Path) -> Result<()> {
     }
     Ok(())
 }
-#[cfg(feature = "tauri")]
-fn run_tauri() {
-    use tauri::generate_handler;
-
-    tauri::Builder::default()
-        .invoke_handler(generate_handler![
-            tauri_cmds::load_form,
-            tauri_cmds::update_form,
-        ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri");
-}
 
 fn run_bas_file(
     path: &Path,
@@ -329,11 +319,12 @@ fn run_bas_file(
     Ok(())
 }
 
-fn run_form_project(_path: PathBuf, _form_bytes: Vec<u8>) -> Result<()> {
+#[allow(unused_variables)]
+fn run_form_project(_path: PathBuf, form_bytes: Vec<u8>) -> Result<!> {
     #[cfg(feature = "tauri")]
     {
-        launch_tauri(_path, _form_bytes);
-        Ok(())
+        launch_tauri(form_bytes);
+        unreachable!()
     }
     #[cfg(not(feature = "tauri"))]
     {
@@ -342,7 +333,7 @@ fn run_form_project(_path: PathBuf, _form_bytes: Vec<u8>) -> Result<()> {
 }
 
 #[cfg(feature = "tauri")]
-fn launch_tauri(path: &Path, form_bytes: Vec<u8>) -> ! {
+fn launch_tauri(form_bytes: Vec<u8>) -> ! {
     use tauri::Manager;
     use tauri::generate_handler;
 
@@ -365,7 +356,7 @@ fn launch_tauri(path: &Path, form_bytes: Vec<u8>) -> ! {
             let _ = window;
             Ok(())
         })
-        .run(tauri::generate_context())
+        .run(tauri::generate_context!())
         .expect("error while running tauri");
 
     unreachable!()
@@ -414,9 +405,7 @@ fn run_vbp_in_cwd(set: &[String], timeout: u64, res: Option<&Path>) -> Result<()
                 other => bail!("Unsupported project type: {:?}", other),
             }
             match &project.startup_object {
-                StartupObject::SubMain { .. } => {
-                    return run_console_project(project, set, timeout, res);
-                }
+                StartupObject::SubMain { .. } => run_console_project(project, set, timeout, res),
                 StartupObject::None => {
                     bail!("No startup object found in project");
                 }
@@ -441,8 +430,6 @@ fn run_vbp_in_cwd(set: &[String], timeout: u64, res: Option<&Path>) -> Result<()
             )
         }
     }
-
-    Ok(())
 }
 
 /// Write the interpreter's captured output to stdout, ensuring the output ends
