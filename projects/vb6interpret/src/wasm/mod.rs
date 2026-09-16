@@ -7,6 +7,7 @@
 //! ([`run_bridge`]) and the runtime-state tab bindings ([`state_bridge`]);
 //! this file keeps the wire structs and the output converters they share.
 
+mod form_bridge;
 mod run_bridge;
 mod state_bridge;
 
