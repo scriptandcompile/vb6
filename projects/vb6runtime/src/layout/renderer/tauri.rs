@@ -30,6 +30,7 @@
 use crate::layout::model::{LayoutContainer, LayoutLeaf, LayoutNode};
 use crate::layout::renderer::Renderer;
 
+use crate::layout::diff_tree::{DiffChange, DiffKind, DiffTree};
 use crate::layout::model::LayoutControlType;
 
 /// Tauri renderer that produces HTML fragment strings for webview injection.
@@ -297,6 +298,33 @@ impl Renderer for TauriRenderer {
             .map(|n| self.render_node(n))
             .collect()
     }
+
+    fn render_node_with_diff(&self, node: &LayoutNode, diff: Option<&DiffTree>) -> String {
+        match diff {
+            Some(d) if !d.is_empty() => {
+                let node_id = node.node_id();
+                if let Some(change) = d.get_change(&node_id) {
+                    match &change.kind {
+                        DiffKind::Same => String::new(),
+                        DiffKind::Inserted { node } => self.render_node(node.as_ref()),
+                        _ => self.render_node(node),
+                    }
+                } else {
+                    self.render_node(node)
+                }
+            }
+            _ => self.render_node(node),
+        }
+    }
+
+    fn apply_diff(&self, node: &LayoutNode, change: &DiffChange) -> String {
+        match &change.kind {
+            DiffKind::Same => String::new(),
+            DiffKind::Inserted { node } => self.render_node(node.as_ref()),
+            DiffKind::Removed => String::new(),
+            _ => self.render_node(node),
+        }
+    }
 }
 
 impl crate::layout::theme::ThemeRenderer for TauriRenderer {
@@ -346,7 +374,7 @@ fn html_escape(s: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::model::{LayoutPosition, LayoutSize, LayoutStyle};
+    use crate::layout::model::{LayoutPosition, LayoutSize, LayoutStyle, NodeId};
 
     fn make_leaf(name: &str, control_type: LayoutControlType, value: Option<String>) -> LayoutLeaf {
         LayoutLeaf {
@@ -596,5 +624,270 @@ mod tests {
         assert!(html.contains("vb6-commandbutton"));
         assert!(html.contains("Click"));
         assert!(html.contains("</fieldset>"));
+    }
+
+    #[test]
+    fn incremental_render_same_returns_empty() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lbl1", LayoutControlType::Label, Some("Hello".into()));
+        let diff = DiffTree {
+            leaf_changes: vec![DiffChange {
+                id: leaf.node_id(),
+                kind: DiffKind::Same,
+                child_diff: DiffTree::default(),
+            }],
+            unchanged_containers: vec![],
+        };
+        let result = renderer.render_node_with_diff(&LayoutNode::Leaf(leaf), Some(&diff));
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn incremental_render_insert_returns_full_html() {
+        let renderer = TauriRenderer::new(false);
+        let new_node = LayoutNode::Leaf(make_leaf(
+            "new_label",
+            LayoutControlType::Label,
+            Some("Inserted".into()),
+        ));
+        let diff = DiffTree {
+            leaf_changes: vec![DiffChange {
+                id: new_node.node_id(),
+                kind: DiffKind::Inserted {
+                    node: Box::new(new_node.clone()),
+                },
+                child_diff: DiffTree::default(),
+            }],
+            unchanged_containers: vec![],
+        };
+        let result = renderer.render_node_with_diff(&new_node, Some(&diff));
+        assert!(!result.is_empty());
+        assert!(result.contains("Inserted"));
+        assert!(result.contains("vb6-label"));
+    }
+
+    #[test]
+    fn incremental_render_unknown_change_falls_back_to_full() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lbl1", LayoutControlType::Label, Some("Updated".into()));
+        let diff = DiffTree {
+            leaf_changes: vec![DiffChange {
+                id: leaf.node_id(),
+                kind: DiffKind::ValueChanged {
+                    old_value: Some("Old".into()),
+                    new_value: Some("Updated".into()),
+                },
+                child_diff: DiffTree::default(),
+            }],
+            unchanged_containers: vec![],
+        };
+        let result = renderer.render_node_with_diff(&LayoutNode::Leaf(leaf), Some(&diff));
+        assert!(!result.is_empty());
+        assert!(result.contains("Updated"));
+    }
+
+    #[test]
+    fn incremental_render_no_diff_performs_full_render() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lbl1", LayoutControlType::Label, Some("Hello".into()));
+        let result = renderer.render_node_with_diff(&LayoutNode::Leaf(leaf), None);
+        assert!(!result.is_empty());
+        assert!(result.contains("Hello"));
+    }
+
+    #[test]
+    fn incremental_render_empty_diff_performs_full_render() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lbl1", LayoutControlType::Label, Some("Hello".into()));
+        let empty_diff = DiffTree::default();
+        let result = renderer.render_node_with_diff(&LayoutNode::Leaf(leaf), Some(&empty_diff));
+        assert!(!result.is_empty());
+        assert!(result.contains("Hello"));
+    }
+
+    #[test]
+    fn incremental_render_node_id_not_in_diff_performs_full_render() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lbl1", LayoutControlType::Label, Some("Hello".into()));
+        let diff = DiffTree {
+            leaf_changes: vec![DiffChange {
+                id: NodeId {
+                    name: "other".into(),
+                    kind: LayoutControlType::TextBox,
+                    index: 0,
+                },
+                kind: DiffKind::Same,
+                child_diff: DiffTree::default(),
+            }],
+            unchanged_containers: vec![],
+        };
+        let result = renderer.render_node_with_diff(&LayoutNode::Leaf(leaf), Some(&diff));
+        assert!(!result.is_empty());
+        assert!(result.contains("Hello"));
+    }
+
+    #[test]
+    fn incremental_apply_diff_same_returns_empty() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lbl1", LayoutControlType::Label, Some("Hello".into()));
+        let change = DiffChange {
+            id: leaf.node_id(),
+            kind: DiffKind::Same,
+            child_diff: DiffTree::default(),
+        };
+        let result = renderer.apply_diff(&LayoutNode::Leaf(leaf.clone()), &change);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn incremental_apply_diff_insert_returns_full_html() {
+        let renderer = TauriRenderer::new(false);
+        let inserted_node = LayoutNode::Leaf(make_leaf(
+            "new_ctrl",
+            LayoutControlType::CommandButton,
+            Some("New Button".into()),
+        ));
+        let change = DiffChange {
+            id: inserted_node.node_id(),
+            kind: DiffKind::Inserted {
+                node: Box::new(inserted_node.clone()),
+            },
+            child_diff: DiffTree::default(),
+        };
+        let result = renderer.apply_diff(&inserted_node, &change);
+        assert!(!result.is_empty());
+        assert!(result.contains("New Button"));
+        assert!(result.contains("vb6-commandbutton"));
+    }
+
+    #[test]
+    fn incremental_apply_diff_removed_returns_empty() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lbl1", LayoutControlType::Label, Some("Hello".into()));
+        let change = DiffChange {
+            id: leaf.node_id(),
+            kind: DiffKind::Removed,
+            child_diff: DiffTree::default(),
+        };
+        let result = renderer.apply_diff(&LayoutNode::Leaf(leaf), &change);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn incremental_apply_diff_value_changed_returns_full_html() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            Some("Updated Value".into()),
+        );
+        let change = DiffChange {
+            id: leaf.node_id(),
+            kind: DiffKind::ValueChanged {
+                old_value: Some("Old".into()),
+                new_value: Some("Updated Value".into()),
+            },
+            child_diff: DiffTree::default(),
+        };
+        let result = renderer.apply_diff(&LayoutNode::Leaf(leaf), &change);
+        assert!(!result.is_empty());
+        assert!(result.contains("Updated Value"));
+    }
+
+    #[test]
+    fn incremental_apply_diff_visibility_changed_returns_full_html() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lbl1", LayoutControlType::Label, Some("Hello".into()));
+        let leaf = LayoutLeaf {
+            visible: false,
+            ..leaf
+        };
+        let change = DiffChange {
+            id: leaf.node_id(),
+            kind: DiffKind::VisibilityChanged {
+                old_visible: true,
+                new_visible: false,
+            },
+            child_diff: DiffTree::default(),
+        };
+        let result = renderer.apply_diff(&LayoutNode::Leaf(leaf), &change);
+        assert!(!result.is_empty());
+        assert!(result.contains("visibility: hidden"));
+    }
+
+    #[test]
+    fn incremental_apply_diff_enabled_changed_returns_full_html() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf(
+            "cmd1",
+            LayoutControlType::CommandButton,
+            Some("Click".into()),
+        );
+        let leaf = LayoutLeaf {
+            enabled: false,
+            ..leaf
+        };
+        let change = DiffChange {
+            id: leaf.node_id(),
+            kind: DiffKind::EnabledChanged {
+                old_enabled: true,
+                new_enabled: false,
+            },
+            child_diff: DiffTree::default(),
+        };
+        let result = renderer.apply_diff(&LayoutNode::Leaf(leaf), &change);
+        assert!(!result.is_empty());
+        assert!(result.contains("opacity: 0.5"));
+    }
+
+    #[test]
+    fn incremental_apply_diff_children_changed_returns_full_html() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lbl1", LayoutControlType::Label, Some("Hello".into()));
+        let change = DiffChange {
+            id: leaf.node_id(),
+            kind: DiffKind::ChildrenChanged { inserts: vec![] },
+            child_diff: DiffTree::default(),
+        };
+        let result = renderer.apply_diff(&LayoutNode::Leaf(leaf), &change);
+        assert!(!result.is_empty());
+    }
+
+    #[test]
+    fn incremental_render_container_same_returns_empty() {
+        let renderer = TauriRenderer::new(false);
+        let container = make_container("frm1", LayoutControlType::Form);
+        let diff = DiffTree {
+            leaf_changes: vec![DiffChange {
+                id: container.node_id(),
+                kind: DiffKind::Same,
+                child_diff: DiffTree::default(),
+            }],
+            unchanged_containers: vec![],
+        };
+        let result = renderer.render_node_with_diff(&LayoutNode::Container(container), Some(&diff));
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn incremental_render_container_value_changed_returns_full_html() {
+        let renderer = TauriRenderer::new(false);
+        let mut container = make_container("frm1", LayoutControlType::Form);
+        container.visible = false;
+        let diff = DiffTree {
+            leaf_changes: vec![DiffChange {
+                id: container.node_id(),
+                kind: DiffKind::VisibilityChanged {
+                    old_visible: true,
+                    new_visible: false,
+                },
+                child_diff: DiffTree::default(),
+            }],
+            unchanged_containers: vec![],
+        };
+        let result = renderer.render_node_with_diff(&LayoutNode::Container(container), Some(&diff));
+        assert!(!result.is_empty());
+        assert!(result.contains("visibility: hidden"));
+        assert!(result.contains("vb6-form"));
     }
 }

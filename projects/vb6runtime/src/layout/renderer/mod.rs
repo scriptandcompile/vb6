@@ -103,20 +103,26 @@ pub trait Renderer {
         }
     }
 
-    /// Apply a leaf-level diff change to the rendered output.
+    /// Apply a leaf-level diff change and produce an HTML fragment.
     ///
-    /// The default implementation is a no-op. Renderers that support
-    /// fine-grained incremental DOM updates (e.g. `WebSysRenderer`)
-    /// override this to mutate existing DOM nodes in place.
+    /// The default implementation is a no-op returning an empty string.
+    /// Renderers that support incremental updates override this to produce
+    /// a minimal HTML fragment for the changed node instead of the full
+    /// re-render output from [`render_node`](Renderer::render_node).
     ///
-    /// This method is primarily used by diff-aware rendering pipelines
-    /// to update individual control properties (text, visibility, enabled
-    /// state) without re-rendering the entire tree.
+    /// This method is used by diff-aware rendering pipelines to update
+    /// individual control properties (text, visibility, enabled state)
+    /// with the smallest possible output.
     ///
     /// # Arguments
-    /// * `target` — The rendered output (HTML string or DOM element) to apply changes to.
+    /// * `node` — The current layout node that was changed.
     /// * `change` — The diff change describing what was modified.
-    fn apply_diff(&self, _target: &Self::Output, _change: &DiffChange) {
+    ///
+    /// # Returns
+    /// An HTML fragment string for the changed node, or an empty string
+    /// if the renderer cannot produce an incremental update for this change type.
+    fn apply_diff(&self, _node: &LayoutNode, _change: &DiffChange) -> String {
         // No-op by default. Incremental renderers override this.
+        String::new()
     }
 }
