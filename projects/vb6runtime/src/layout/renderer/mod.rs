@@ -11,6 +11,18 @@
 //! - [`Renderer::render_container`] — renders a container control (Form, Frame, PictureBox)
 //! - [`Renderer::render_children`] — renders visible child nodes of a container
 //! - [`Renderer::style_attr`] — builds a CSS style attribute string
+//! - [`Renderer::render_node_with_diff`] — incremental render using a diff tree
+//! - [`Renderer::apply_diff`] — apply a leaf-level diff change to the output
+//!
+//! # Diff-Aware Rendering
+//!
+//! For incremental updates, renderers can override:
+//! - [`render_node_with_diff`](Renderer::render_node_with_diff) — render only changed nodes
+//! - [`apply_diff`](Renderer::apply_diff) — apply individual diff changes (default: no-op)
+//!
+//! The default implementations fall back to full re-render (for `render_node_with_diff`)
+//! or do nothing (for `apply_diff`). Renderers that support incremental updates
+//! (`TauriRenderer`, `WebSysRenderer`) override these methods.
 //!
 //! # Renderers
 //!
@@ -19,7 +31,7 @@
 //! - [`WebSysRenderer`] (behind `wasm` feature) — creates `web_sys::Element` objects
 //!   for direct DOM manipulation in the browser.
 
-use super::diff_tree::DiffTree;
+use super::diff_tree::{DiffChange, DiffTree};
 use super::model::{LayoutContainer, LayoutLeaf, LayoutNode, LayoutStyle};
 
 pub mod tauri;
@@ -89,5 +101,22 @@ pub trait Renderer {
             Some(d) if !d.is_empty() => self.render_node(node),
             _ => self.render_node(node),
         }
+    }
+
+    /// Apply a leaf-level diff change to the rendered output.
+    ///
+    /// The default implementation is a no-op. Renderers that support
+    /// fine-grained incremental DOM updates (e.g. `WebSysRenderer`)
+    /// override this to mutate existing DOM nodes in place.
+    ///
+    /// This method is primarily used by diff-aware rendering pipelines
+    /// to update individual control properties (text, visibility, enabled
+    /// state) without re-rendering the entire tree.
+    ///
+    /// # Arguments
+    /// * `target` — The rendered output (HTML string or DOM element) to apply changes to.
+    /// * `change` — The diff change describing what was modified.
+    fn apply_diff(&self, _target: &Self::Output, _change: &DiffChange) {
+        // No-op by default. Incremental renderers override this.
     }
 }
