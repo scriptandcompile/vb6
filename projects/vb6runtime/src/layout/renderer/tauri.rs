@@ -93,82 +93,93 @@ impl Renderer for TauriRenderer {
     fn render_leaf(&self, leaf: &LayoutLeaf) -> String {
         let style = self.style_attr(&leaf.style, leaf.visible, leaf.enabled);
         let value = leaf.value.as_deref().unwrap_or("");
+        // Interactive form controls get the disabled attribute instead of just
+        // an opacity hint; non-interactive controls keep the style-only hint.
+        let disabled = if leaf.enabled { "" } else { " disabled" };
 
         match leaf.control_type {
             LayoutControlType::TextBox => {
-                format!(
-                    r#"<input id="{}" class="vb6-textbox" type="text" value="{}" style="{}">"#,
-                    html_escape(&leaf.name),
-                    html_escape(value),
-                    style
-                )
+                // Multi-line text boxes render as <textarea> so vertical
+                // scrolling and wrapped text behave like VB6.
+                if leaf.style.multi_line {
+                    format!(
+                        r#"<textarea id="{}" class="vb6-textbox" style="{}"{}>{}</textarea>"#,
+                        html_escape(&leaf.name),
+                        html_escape(&style),
+                        disabled,
+                        html_escape(value)
+                    )
+                } else {
+                    format!(
+                        r#"<input id="{}" class="vb6-textbox" type="text" value="{}" style="{}"{}>"#,
+                        html_escape(&leaf.name),
+                        html_escape(value),
+                        html_escape(&style),
+                        disabled
+                    )
+                }
             }
             LayoutControlType::CheckBox => {
                 let checked = leaf.value.as_deref() == Some("True");
                 format!(
-                    r#"<input id="{}" class="vb6-checkbox" type="checkbox" {} style="{}">"#,
+                    r#"<input id="{}" class="vb6-checkbox" type="checkbox" {} style="{}"{}>"#,
                     html_escape(&leaf.name),
                     if checked { "checked" } else { "" },
-                    style
+                    html_escape(&style),
+                    disabled
                 )
             }
             LayoutControlType::OptionButton => {
                 let checked = leaf.value.as_deref() == Some("True");
+                // Radio buttons are grouped by their container (form or frame)
+                // so selecting one clears the others in the same group.
+                let group = leaf.style.group.as_deref().unwrap_or(&leaf.name);
                 format!(
-                    r#"<input id="{}" class="vb6-optionbutton" type="radio" name="{}" {} style="{}">"#,
+                    r#"<input id="{}" class="vb6-optionbutton" type="radio" name="{}" {} style="{}"{}>"#,
                     html_escape(&leaf.name),
-                    html_escape(&leaf.name),
+                    html_escape(group),
                     if checked { "checked" } else { "" },
-                    style
+                    html_escape(&style),
+                    disabled
                 )
             }
             LayoutControlType::CommandButton => {
                 format!(
-                    r#"<button id="{}" class="vb6-commandbutton" style="{}">{}</button>"#,
+                    r#"<button id="{}" class="vb6-commandbutton" style="{}"{}>{}</button>"#,
                     html_escape(&leaf.name),
-                    style,
+                    html_escape(&style),
+                    disabled,
                     html_escape(value)
                 )
             }
             LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => {
-                let input_type = match leaf.control_type {
-                    LayoutControlType::HScrollBar => "range",
-                    LayoutControlType::VScrollBar => "range",
-                    _ => "text",
-                };
-                let orient = match leaf.control_type {
-                    LayoutControlType::VScrollBar => {
-                        if !style.is_empty() {
-                            format!(
-                                "{style}; writing-mode: bt-lr; -webkit-appearance: slider-vertical;"
-                            )
-                        } else {
-                            "writing-mode: bt-lr; -webkit-appearance: slider-vertical;".to_string()
-                        }
-                    }
-                    _ => style,
-                };
+                // Scrollbars render as <input type="range">; the vertical bar
+                // gets its orientation entirely from the CSS class (writing-mode),
+                // never as an inline override that could disable the custom
+                // track/thumb styling.
                 format!(
-                    r#"<input id="{}" class="vb6-{}" type="{}" value="{}" style="{}">"#,
+                    r#"<input id="{}" class="vb6-{}" type="range" value="{}" min="0" max="100" style="{}"{}>"#,
                     html_escape(&leaf.name),
                     leaf.control_type.css_class(),
-                    input_type,
                     html_escape(value),
-                    orient
+                    html_escape(&style),
+                    disabled
                 )
             }
             LayoutControlType::ComboBox => {
                 format!(
-                    r#"<select id="{}" class="vb6-combobox" style="{}"></select>"#,
+                    r#"<select id="{}" class="vb6-combobox" style="{}"{}></select>"#,
                     html_escape(&leaf.name),
-                    style
+                    html_escape(&style),
+                    disabled
                 )
             }
             LayoutControlType::ListBox => {
                 format!(
-                    r#"<select id="{}" class="vb6-listbox" style="{}"></select>"#,
+                    r#"<select id="{}" class="vb6-listbox" style="{}"{}></select>"#,
                     html_escape(&leaf.name),
-                    style
+                    html_escape(&style),
+                    disabled
                 )
             }
             LayoutControlType::Line => {
@@ -187,7 +198,7 @@ impl Renderer for TauriRenderer {
                 format!(
                     r#"<svg id="{}" class="vb6-line" style="{}" width="{}" height="{}" viewBox="0 0 {} {}"><line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" stroke-width="{}" /></svg>"#,
                     html_escape(&leaf.name),
-                    style,
+                    html_escape(&style),
                     leaf.size.width,
                     leaf.size.height,
                     leaf.size.width,
@@ -207,17 +218,18 @@ impl Renderer for TauriRenderer {
                     r#"<img id="{}" class="vb6-image" src="{}" style="{}" />"#,
                     html_escape(&leaf.name),
                     html_escape(value),
-                    style
+                    html_escape(&style)
                 )
             }
             LayoutControlType::DriveListBox
             | LayoutControlType::DirListBox
             | LayoutControlType::FileListBox => {
                 format!(
-                    r#"<select id="{}" class="vb6-{}" style="{}"></select>"#,
+                    r#"<select id="{}" class="vb6-{}" style="{}"{}></select>"#,
                     html_escape(&leaf.name),
                     leaf.control_type.css_class(),
-                    style
+                    html_escape(&style),
+                    disabled
                 )
             }
             LayoutControlType::Shape => {
@@ -232,7 +244,7 @@ impl Renderer for TauriRenderer {
                 format!(
                     r#"<div id="{}" class="vb6-shape" style="{}"></div>"#,
                     html_escape(&leaf.name),
-                    s
+                    html_escape(&s)
                 )
             }
             LayoutControlType::Timer => {
@@ -246,7 +258,7 @@ impl Renderer for TauriRenderer {
                     r#"<div id="{}" class="vb6-{}" style="{}">{}</div>"#,
                     html_escape(&leaf.name),
                     leaf.control_type.css_class(),
-                    style,
+                    html_escape(&style),
                     html_escape(value)
                 )
             }
@@ -260,20 +272,69 @@ impl Renderer for TauriRenderer {
         let mut html = String::new();
 
         match container.control_type {
+            LayoutControlType::Form => {
+                // The form's background/foreground come from its own BackColor /
+                // ForeColor properties via the computed LayoutStyle; no hard-coded
+                // override so custom form colors (e.g. white forms) are honored.
+                let mut form_style = style;
+                if container.size.width > 0.0 {
+                    if !form_style.is_empty() {
+                        form_style.push_str("; ");
+                    }
+                    form_style.push_str(&format!("width: {:.1}px", container.size.width));
+                }
+                if container.size.height > 0.0 {
+                    if !form_style.is_empty() {
+                        form_style.push_str("; ");
+                    }
+                    form_style.push_str(&format!("height: {:.1}px", container.size.height));
+                }
+                html.push_str(&format!(
+                    r#"<div id="{}" class="vb6-form" style="{}">"#,
+                    html_escape(&container.name),
+                    html_escape(&form_style)
+                ));
+            }
             LayoutControlType::Frame => {
+                let mut frame_style = style;
+                if container.size.width > 0.0 {
+                    if !frame_style.is_empty() {
+                        frame_style.push_str("; ");
+                    }
+                    frame_style.push_str(&format!("width: {:.1}px", container.size.width));
+                }
+                if container.size.height > 0.0 {
+                    if !frame_style.is_empty() {
+                        frame_style.push_str("; ");
+                    }
+                    frame_style.push_str(&format!("height: {:.1}px", container.size.height));
+                }
                 html.push_str(&format!(
                     r#"<fieldset id="{}" class="vb6-frame" style="{}">"#,
                     html_escape(&container.name),
-                    style
+                    html_escape(&frame_style)
                 ));
                 html.push_str(&format!("<legend>{}</legend>", html_escape(caption)));
             }
             _ => {
+                let mut container_style = style;
+                if container.size.width > 0.0 {
+                    if !container_style.is_empty() {
+                        container_style.push_str("; ");
+                    }
+                    container_style.push_str(&format!("width: {:.1}px", container.size.width));
+                }
+                if container.size.height > 0.0 {
+                    if !container_style.is_empty() {
+                        container_style.push_str("; ");
+                    }
+                    container_style.push_str(&format!("height: {:.1}px", container.size.height));
+                }
                 html.push_str(&format!(
                     r#"<div id="{}" class="vb6-{}" style="{}">"#,
                     html_escape(&container.name),
                     container.control_type.css_class(),
-                    style
+                    html_escape(&container_style)
                 ));
             }
         }

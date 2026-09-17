@@ -58,6 +58,9 @@ pub fn style_to_css(style: &LayoutStyle) -> String {
     if let Some(ref v) = style.border_style {
         parts.push(format!("border-style: {}", v));
     }
+    if let Some(ref v) = style.box_shadow {
+        parts.push(format!("box-shadow: {}", v));
+    }
     if let Some(ref v) = style.align {
         parts.push(format!("align: {}", v));
     }
@@ -219,6 +222,16 @@ mod tests {
         assert!(css.contains("line-y1: 0.0px"));
         assert!(css.contains("line-x2: 100.0px"));
         assert!(css.contains("line-y2: 50.0px"));
+    }
+
+    #[test]
+    fn style_with_box_shadow() {
+        let style = LayoutStyle {
+            box_shadow: Some("inset -1px 0 0 rgb(128, 128, 128)".into()),
+            ..LayoutStyle::default()
+        };
+        let css = style_to_css(&style);
+        assert!(css.contains("box-shadow: inset -1px 0 0 rgb(128, 128, 128)"));
     }
 
     #[test]

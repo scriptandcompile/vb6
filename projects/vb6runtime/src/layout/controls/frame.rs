@@ -5,7 +5,7 @@
 //! - `fore_color` → `color`
 //! - `font` → `font_family`, `font_size`, `font_weight`, `font_style`, `text_decoration`
 
-use vb6parse::language::FrameProperties;
+use vb6parse::language::{BorderStyle, FrameProperties};
 
 use super::super::LayoutConfig;
 use super::super::color::color_to_css;
@@ -18,6 +18,13 @@ pub fn build_frame_style(props: &FrameProperties, config: &LayoutConfig) -> Layo
         background_color: Some(color_to_css(&props.back_color)),
         color: Some(color_to_css(&props.fore_color)),
         ..LayoutStyle::default()
+    };
+
+    // Frames always have a border in VB6 unless BorderStyle is None.
+    // The `<fieldset>` element supplies the caption notch on the top edge.
+    style.border = match props.border_style {
+        BorderStyle::None => Some("none".to_string()),
+        BorderStyle::FixedSingle => Some("1px solid rgb(120, 120, 120)".to_string()),
     };
 
     if let Some(ref font) = props.font {
@@ -35,8 +42,6 @@ pub fn build_frame_style(props: &FrameProperties, config: &LayoutConfig) -> Layo
             Some("none".to_string())
         };
     }
-
-    style.border = Some("1px solid".to_string());
 
     style
 }
@@ -73,6 +78,7 @@ mod tests {
     fn basic_style_default() {
         let props = FrameProperties {
             font: None,
+            border_style: BorderStyle::FixedSingle,
             ..Default::default()
         };
         let config = test_config();
@@ -80,7 +86,18 @@ mod tests {
         assert!(style.background_color.is_some());
         assert!(style.color.is_some());
         assert!(style.font_family.is_none());
-        assert_eq!(style.border, Some("1px solid".to_string()));
+        assert_eq!(style.border, Some("1px solid rgb(120, 120, 120)".to_string()));
+    }
+
+    #[test]
+    fn border_none_is_none() {
+        let props = FrameProperties {
+            border_style: BorderStyle::None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_frame_style(&props, &config);
+        assert_eq!(style.border, Some("none".to_string()));
     }
 
     #[test]

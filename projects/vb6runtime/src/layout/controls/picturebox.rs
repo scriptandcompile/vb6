@@ -21,6 +21,13 @@ pub fn build_picturebox_style(props: &PictureBoxProperties, config: &LayoutConfi
         ..LayoutStyle::default()
     };
 
+    // A border is provided by the .vb6-picturebox class; an explicit
+    // BorderStyle::None must override it so borderless pictureboxes stay borderless.
+    style.border = match props.border_style {
+        BorderStyle::None => Some("none".to_string()),
+        BorderStyle::FixedSingle => None,
+    };
+
     if let Some(ref font) = props.font {
         style.font_family = Some(font.name.clone());
         style.font_size = Some(font_points_to_px(font.size, config.dpi));
@@ -35,10 +42,6 @@ pub fn build_picturebox_style(props: &PictureBoxProperties, config: &LayoutConfi
         } else {
             Some("none".to_string())
         };
-    }
-
-    if props.border_style == BorderStyle::FixedSingle {
-        style.border = Some("1px solid".to_string());
     }
 
     style.overflow = Some("hidden".to_string());
@@ -65,6 +68,7 @@ fn font_weight_css(weight: i32) -> Option<String> {
 mod tests {
     use super::super::super::model::style::CssColor;
     use super::*;
+    use vb6parse::language::BorderStyle;
     use vb6parse::language::Color;
 
     fn test_config() -> LayoutConfig {
@@ -89,25 +93,27 @@ mod tests {
     }
 
     #[test]
-    fn border_fixed_single() {
+    fn border_via_css_class() {
+        // PictureBox border is handled by CSS class .vb6-picturebox
+        // which sets border: 1px solid var(--vb6-button-border), not by inline style.
         let props = PictureBoxProperties {
             border_style: BorderStyle::FixedSingle,
             ..Default::default()
         };
         let config = test_config();
         let style = build_picturebox_style(&props, &config);
-        assert_eq!(style.border, Some("1px solid".to_string()));
+        assert!(style.border.is_none());
     }
 
     #[test]
-    fn border_none() {
+    fn border_none_is_none() {
         let props = PictureBoxProperties {
             border_style: BorderStyle::None,
             ..Default::default()
         };
         let config = test_config();
         let style = build_picturebox_style(&props, &config);
-        assert_eq!(style.border, None);
+        assert_eq!(style.border, Some("none".to_string()));
     }
 
     #[test]

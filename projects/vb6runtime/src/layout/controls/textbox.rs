@@ -23,6 +23,15 @@ pub fn build_textbox_style(props: &TextBoxProperties, config: &LayoutConfig) -> 
         ..LayoutStyle::default()
     };
 
+    // A border is provided by the .vb6-textbox class; an explicit
+    // BorderStyle::None must override it so borderless textboxes stay borderless.
+    style.border = match props.border_style {
+        BorderStyle::None => Some("none".to_string()),
+        BorderStyle::FixedSingle => None,
+    };
+
+    style.multi_line = props.multi_line == vb6parse::language::MultiLine::MultiLine;
+
     if let Some(ref font) = props.font {
         style.font_family = Some(font.name.clone());
         style.font_size = Some(font_points_to_px(font.size, config.dpi));
@@ -43,10 +52,6 @@ pub fn build_textbox_style(props: &TextBoxProperties, config: &LayoutConfig) -> 
 
     if props.multi_line == vb6parse::language::MultiLine::MultiLine {
         style.overflow = Some("auto".to_string());
-    }
-
-    if props.border_style == BorderStyle::FixedSingle {
-        style.border = Some("1px solid".to_string());
     }
 
     style
@@ -79,6 +84,7 @@ fn alignment_css(alignment: Alignment) -> Option<String> {
 mod tests {
     use super::super::super::model::style::CssColor;
     use super::*;
+    use vb6parse::language::BorderStyle;
     use vb6parse::language::Color;
     use vb6parse::language::MultiLine;
 
@@ -102,7 +108,7 @@ mod tests {
         assert!(style.color.is_some());
         assert!(style.font_family.is_none());
         assert_eq!(style.overflow, None);
-        assert_eq!(style.border, None);
+        assert_eq!(style.border, Some("none".to_string()));
     }
 
     #[test]
@@ -114,6 +120,7 @@ mod tests {
         let config = test_config();
         let style = build_textbox_style(&props, &config);
         assert_eq!(style.overflow, Some("auto".to_string()));
+        assert!(style.multi_line);
     }
 
     #[test]
@@ -125,17 +132,20 @@ mod tests {
         let config = test_config();
         let style = build_textbox_style(&props, &config);
         assert_eq!(style.overflow, None);
+        assert!(!style.multi_line);
     }
 
     #[test]
-    fn border_fixed_single() {
+    fn border_via_css_class() {
+        // TextBox border is handled by CSS class .vb6-textbox
+        // which sets border: 1px solid var(--vb6-button-border), not by inline style.
         let props = TextBoxProperties {
             border_style: BorderStyle::FixedSingle,
             ..Default::default()
         };
         let config = test_config();
         let style = build_textbox_style(&props, &config);
-        assert_eq!(style.border, Some("1px solid".to_string()));
+        assert!(style.border.is_none());
     }
 
     #[test]
@@ -146,7 +156,7 @@ mod tests {
         };
         let config = test_config();
         let style = build_textbox_style(&props, &config);
-        assert_eq!(style.border, None);
+        assert_eq!(style.border, Some("none".to_string()));
     }
 
     #[test]

@@ -462,12 +462,21 @@ impl Renderer for WebSysRenderer {
         let el = self.doc.create_element(tag).expect("create element");
 
         el.set_id(&container.name);
-        el.set_class_name(&format!("vb6-{}", tag));
-        el.set_attribute(
-            "style",
-            &self.style_attr(&container.style, container.visible, container.enabled),
-        )
-        .ok();
+        el.set_class_name(&format!("vb6-{}", container.control_type.css_class()));
+        let mut style_css = self.style_attr(&container.style, container.visible, container.enabled);
+        if container.size.width > 0.0 {
+            if !style_css.is_empty() {
+                style_css.push_str("; ");
+            }
+            style_css.push_str(&format!("width: {:.1}px", container.size.width));
+        }
+        if container.size.height > 0.0 {
+            if !style_css.is_empty() {
+                style_css.push_str("; ");
+            }
+            style_css.push_str(&format!("height: {:.1}px", container.size.height));
+        }
+        el.set_attribute("style", &style_css).ok();
 
         if let Some(ref caption) = container.caption {
             if tag == "fieldset" {

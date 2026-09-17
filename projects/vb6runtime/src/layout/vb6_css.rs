@@ -64,15 +64,50 @@ pub fn scoped_css() -> String {
     format!("{base}\n{controls}\n{themes}")
 }
 
+/// Generate the root-level CSS with bare selectors (CSS custom property definitions).
+///
+/// Defines the `--vb6-*` custom properties at `:root` so per-control selectors
+/// can reference them via `var()`. This is the bare equivalent of `root_css()`
+/// for Tauri where there is no `.vb6-app` scope root.
+#[must_use]
+pub fn bare_root_css() -> String {
+    r#":root {
+  /* VB6 color scheme (Windows classic) */
+  --vb6-bg: rgb(192, 192, 192);
+  --vb6-fg: rgb(0, 0, 0);
+  --vb6-window-bg: #ffffff;
+  --vb6-window-text: #000000;
+  --vb6-button-bg: rgb(192, 192, 192);
+  --vb6-button-border: rgb(120, 120, 120);
+  --vb6-highlight: rgb(0, 0, 128);
+  --vb6-highlight-text: #ffffff;
+  --vb6-focus-border: rgb(0, 0, 128);
+  --vb6-disabled-opacity: 0.5;
+  --vb6-font-family: "MS Sans Serif", Tahoma, sans-serif;
+  --vb6-font-size: 11px;
+}
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: var(--vb6-bg);
+  font-family: var(--vb6-font-family);
+  font-size: var(--vb6-font-size);
+  line-height: 1.2;
+}"#
+    .to_string()
+}
+
 /// Generate the full VB6 CSS stylesheet with bare selectors (no `.vb6-app` prefix).
 ///
 /// Used by Tauri renderer where the webview owns the full DOM. Same selectors
 /// as `scoped_css()` but without the `.vb6-app` ancestor prefix.
 #[must_use]
 pub fn bare_css() -> String {
+    let root = bare_root_css();
     let controls = bare_control_css();
     let themes = bare_theme_overrides_css();
-    format!("{controls}\n{themes}")
+    format!("{root}\n{controls}\n{themes}")
 }
 
 /// Generate a CSS override for the dark theme.
@@ -237,12 +272,33 @@ fn scoped_control_rules() -> Vec<String> {
         vb6_rule(".vb6-app .vb6-listbox", &listbox_style()),
         vb6_rule(".vb6-app .vb6-hscrollbar", &hscrollbar_style()),
         vb6_rule(".vb6-app .vb6-vscrollbar", &vscrollbar_style()),
+        vb6_rule(
+            ".vb6-app .vb6-hscrollbar::-webkit-slider-runnable-track",
+            &track_style(),
+        ),
+        vb6_rule(".vb6-app .vb6-hscrollbar::-webkit-slider-thumb", &thumb_style()),
+        vb6_rule(
+            ".vb6-app .vb6-vscrollbar::-webkit-slider-runnable-track",
+            &v_track_style(),
+        ),
+        vb6_rule(".vb6-app .vb6-vscrollbar::-webkit-slider-thumb", &v_thumb_style()),
         vb6_rule(".vb6-app .vb6-shape", &shape_style()),
         vb6_rule(".vb6-app .vb6-line", &line_style()),
         vb6_rule(".vb6-app .vb6-timer", &timer_style()),
         vb6_rule(".vb6-app .vb6-dritelb", &drive_listbox_style()),
         vb6_rule(".vb6-app .vb6-dirlistbox", &dir_listbox_style()),
         vb6_rule(".vb6-app .vb6-filelistbox", &file_listbox_style()),
+        vb6_rule(
+            ".vb6-app .vb6-commandbutton:disabled, \
+             .vb6-app .vb6-textbox:disabled, \
+             .vb6-app .vb6-checkbox:disabled, \
+             .vb6-app .vb6-optionbutton:disabled, \
+             .vb6-app .vb6-combobox:disabled, \
+             .vb6-app .vb6-listbox:disabled, \
+             .vb6-app .vb6-hscrollbar:disabled, \
+             .vb6-app .vb6-vscrollbar:disabled",
+            &disabled_control_style(),
+        ),
     ]
 }
 
@@ -262,12 +318,33 @@ fn bare_control_rules() -> Vec<String> {
         vb6_rule(".vb6-listbox", &listbox_style()),
         vb6_rule(".vb6-hscrollbar", &hscrollbar_style()),
         vb6_rule(".vb6-vscrollbar", &vscrollbar_style()),
+        vb6_rule(
+            ".vb6-hscrollbar::-webkit-slider-runnable-track",
+            &track_style(),
+        ),
+        vb6_rule(".vb6-hscrollbar::-webkit-slider-thumb", &thumb_style()),
+        vb6_rule(
+            ".vb6-vscrollbar::-webkit-slider-runnable-track",
+            &v_track_style(),
+        ),
+        vb6_rule(".vb6-vscrollbar::-webkit-slider-thumb", &v_thumb_style()),
         vb6_rule(".vb6-shape", &shape_style()),
         vb6_rule(".vb6-line", &line_style()),
         vb6_rule(".vb6-timer", &timer_style()),
         vb6_rule(".vb6-dritelb", &drive_listbox_style()),
         vb6_rule(".vb6-dirlistbox", &dir_listbox_style()),
         vb6_rule(".vb6-filelistbox", &file_listbox_style()),
+        vb6_rule(
+            ".vb6-commandbutton:disabled, \
+             .vb6-textbox:disabled, \
+             .vb6-checkbox:disabled, \
+             .vb6-optionbutton:disabled, \
+             .vb6-combobox:disabled, \
+             .vb6-listbox:disabled, \
+             .vb6-hscrollbar:disabled, \
+             .vb6-vscrollbar:disabled",
+            &disabled_control_style(),
+        ),
     ]
 }
 
@@ -300,7 +377,8 @@ fn textbox_style() -> String {
   color: var(--vb6-window-text);
   font-family: var(--vb6-font-family);
   font-size: var(--vb6-font-size);
-  border: 1px solid var(--vb6-button-border);"#
+  border: 1px solid var(--vb6-button-border);
+  resize: none;"#
         .to_string()
 }
 
@@ -320,7 +398,7 @@ fn frame_style() -> String {
   color: var(--vb6-fg);
   font-family: var(--vb6-font-family);
   font-size: var(--vb6-font-size);
-  border: none;"#
+  border-radius: 2px;"#
         .to_string()
 }
 
@@ -329,7 +407,8 @@ fn picturebox_style() -> String {
   color: var(--vb6-fg);
   font-family: var(--vb6-font-family);
   font-size: var(--vb6-font-size);
-  border: 1px solid var(--vb6-button-border);"#
+  border: 1px solid var(--vb6-button-border);
+  overflow: hidden;"#
         .to_string()
 }
 
@@ -356,7 +435,8 @@ fn combobox_style() -> String {
   color: var(--vb6-window-text);
   font-family: var(--vb6-font-family);
   font-size: var(--vb6-font-size);
-  border: 1px solid var(--vb6-button-border);"#
+  border: 1px solid var(--vb6-button-border);
+  border-radius: 0;"#
         .to_string()
 }
 
@@ -365,21 +445,27 @@ fn listbox_style() -> String {
   color: var(--vb6-window-text);
   font-family: var(--vb6-font-family);
   font-size: var(--vb6-font-size);
-  border: 1px solid var(--vb6-button-border);"#
+  border: 1px solid var(--vb6-button-border);
+  border-radius: 0;"#
         .to_string()
 }
 
 fn hscrollbar_style() -> String {
-    r#"  background-color: transparent;
-  border: none;"#
+    r#"  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  height: 16px;"#
         .to_string()
 }
 
 fn vscrollbar_style() -> String {
-    r#"  background-color: transparent;
+    r#"  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
   border: none;
-  writing-mode: bt-lr;
-  -webkit-appearance: slider-vertical;"#
+  width: 16px;
+  writing-mode: vertical-lr;"#
         .to_string()
 }
 
@@ -395,6 +481,55 @@ fn line_style() -> String {
 
 fn timer_style() -> String {
     String::new()
+}
+
+/// Classic Windows 95 style scrollbar track (horizontal).
+fn track_style() -> String {
+    r#"  height: 8px;
+  background: var(--vb6-button-bg);
+  border: 1px solid var(--vb6-button-border);
+  border-radius: 0;"#
+        .to_string()
+}
+
+/// Classic Windows 95 style scrollbar thumb (horizontal).
+fn thumb_style() -> String {
+    r#"  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 8px;
+  background: linear-gradient(to right, rgb(255, 255, 255), rgb(192, 192, 192));
+  border: 1px solid var(--vb6-button-border);
+  border-radius: 0;"#
+        .to_string()
+}
+
+/// Classic Windows 95 style scrollbar track (vertical).
+fn v_track_style() -> String {
+    r#"  width: 8px;
+  height: 100%;
+  background: var(--vb6-button-bg);
+  border: 1px solid var(--vb6-button-border);
+  border-radius: 0;"#
+        .to_string()
+}
+
+/// Classic Windows 95 style scrollbar thumb (vertical).
+fn v_thumb_style() -> String {
+    r#"  -webkit-appearance: none;
+  appearance: none;
+  width: 8px;
+  height: 12px;
+  background: linear-gradient(to top, rgb(255, 255, 255), rgb(192, 192, 192));
+  border: 1px solid var(--vb6-button-border);
+  border-radius: 0;"#
+        .to_string()
+}
+
+/// Grayed text for disabled interactive controls (native controls also gray
+/// themselves; this keeps themed controls readable).
+fn disabled_control_style() -> String {
+    "  color: rgb(128, 128, 128);".to_string()
 }
 
 fn drive_listbox_style() -> String {
@@ -487,6 +622,20 @@ mod tests {
         let css = bare_css();
         // bare_css should not contain the .vb6-app root selector
         assert!(!css.contains(".vb6-app {"));
+    }
+
+    #[test]
+    fn bare_css_contains_root_variables() {
+        let css = bare_css();
+        // bare_css should define CSS custom properties at :root for Tauri
+        assert!(css.contains(":root {"));
+        assert!(css.contains("--vb6-bg: rgb(192, 192, 192)"));
+        assert!(css.contains("--vb6-fg: rgb(0, 0, 0)"));
+        assert!(css.contains("--vb6-window-bg: #ffffff"));
+        assert!(css.contains("--vb6-button-bg: rgb(192, 192, 192)"));
+        assert!(css.contains("--vb6-button-border: rgb(120, 120, 120)"));
+        assert!(css.contains("--vb6-font-family:"));
+        assert!(css.contains("--vb6-font-size: 11px"));
     }
 
     #[test]

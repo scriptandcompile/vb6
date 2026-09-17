@@ -67,6 +67,12 @@ pub struct LayoutStyle {
     pub border: Option<String>,
     /// CSS border-style property ('solid', 'dashed', 'none').
     pub border_style: Option<String>,
+    /// CSS box-shadow shorthand (e.g. raised 3D bevel for buttons).
+    pub box_shadow: Option<String>,
+    /// Whether a control renders as a multi-line editor (e.g. `<textarea>`).
+    pub multi_line: bool,
+    /// Radio-group name used to group OptionButton controls within a container.
+    pub group: Option<String>,
 
     /// Alignment for controls with the VB6 Align property ('top', 'bottom', 'left', 'right', 'none').
     pub align: Option<String>,
@@ -116,6 +122,9 @@ mod tests {
         assert!(s.vertical_align.is_none());
         assert!(s.border.is_none());
         assert!(s.border_style.is_none());
+        assert!(s.box_shadow.is_none());
+        assert!(!s.multi_line);
+        assert!(s.group.is_none());
         assert!(s.align.is_none());
         assert!(s.border_radius.is_none());
         assert!(s.border_width.is_none());

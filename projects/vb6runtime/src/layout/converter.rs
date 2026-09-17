@@ -139,6 +139,9 @@ fn convert_form_impl(form: &Form, config: &LayoutConfig) -> LayoutResult<LayoutF
         }
     }
 
+    // Build form-level style
+    let style = build_form_style(&form.properties, dpi);
+
     // Build the root container (represents the form's client area)
     let root_container = LayoutContainer {
         name: form.name.clone(),
@@ -148,11 +151,9 @@ fn convert_form_impl(form: &Form, config: &LayoutConfig) -> LayoutResult<LayoutF
         caption: Some(form.properties.caption.clone()),
         visible: form.properties.visible == Visibility::Visible,
         enabled: form.properties.enabled == Activation::Enabled,
+        style: style.clone(),
         ..LayoutContainer::default()
     };
-
-    // Build form-level style
-    let style = build_form_style(&form.properties, dpi);
 
     // Form-level position (screen coordinates, in twips → pixels)
     let position = LayoutPosition {
@@ -202,6 +203,9 @@ fn convert_mdi_form_impl(mdi: &MDIForm, config: &LayoutConfig) -> LayoutResult<L
         }
     }
 
+    // Build form-level style
+    let style = build_mdi_form_style(&mdi.properties, dpi);
+
     let root_container = LayoutContainer {
         name: mdi.name.clone(),
         control_type: LayoutControlType::Form,
@@ -210,11 +214,9 @@ fn convert_mdi_form_impl(mdi: &MDIForm, config: &LayoutConfig) -> LayoutResult<L
         caption: Some(mdi.properties.caption.clone()),
         visible: mdi.properties.visible == Visibility::Visible,
         enabled: mdi.properties.enabled == Activation::Enabled,
+        style: style.clone(),
         ..LayoutContainer::default()
     };
-
-    // Build form-level style
-    let style = build_mdi_form_style(&mdi.properties, dpi);
 
     let position = LayoutPosition {
         left: twips_to_pixels(mdi.properties.left, dpi),
@@ -294,7 +296,7 @@ fn build_mdi_form_style(props: &vb6parse::language::MDIFormProperties, dpi: u32)
 /// Returns `Err` if the control is Custom or OLE (not supported in Phase 1).
 fn convert_control(
     control: &Control,
-    _parent: &LayoutContainer,
+    parent: &LayoutContainer,
     scale_mode: ScaleMode,
     dpi: u32,
     config: &LayoutConfig,
@@ -322,7 +324,13 @@ fn convert_control(
     }
 
     // Build style for this control
-    let style = super::build_style_for_control(control.kind(), config);
+    let mut style = super::build_style_for_control(control.kind(), config);
+
+    // Option buttons are grouped by their container (form or frame) so that
+    // selecting one deselects the others in the same group.
+    if matches!(control.kind(), ControlKind::OptionButton { .. }) {
+        style.group = Some(parent.name.clone());
+    }
 
     // Determine visibility and enabled state
     let visible = control_visible(control.kind());
@@ -338,25 +346,30 @@ fn convert_control(
             properties,
             controls,
         } => {
-            let mut child_nodes = Vec::new();
-            for child in controls {
-                if let Some(node) = convert_control(child, _parent, scale_mode, dpi, config)? {
-                    child_nodes.push(node);
-                }
-            }
-
-            Ok(Some(LayoutNode::Container(LayoutContainer {
+            let frame_container = LayoutContainer {
                 name: control.name().to_string(),
                 control_type: layout_type,
                 index: control.index(),
                 position,
                 size,
                 style,
-                children: child_nodes,
                 caption: Some(properties.caption.clone()),
                 visible,
                 enabled,
                 ..Default::default()
+            };
+
+            let mut child_nodes = Vec::new();
+            for child in controls {
+                if let Some(node) = convert_control(child, &frame_container, scale_mode, dpi, config)?
+                {
+                    child_nodes.push(node);
+                }
+            }
+
+            Ok(Some(LayoutNode::Container(LayoutContainer {
+                children: child_nodes,
+                ..frame_container
             })))
         }
 
@@ -365,28 +378,37 @@ fn convert_control(
             properties,
             controls,
         } => {
-            let mut child_nodes = Vec::new();
-            for child in controls {
-                // PictureBox may have its own scale_mode; use it if available,
-                // otherwise fall back to the parent form's scale_mode.
-                let child_scale_mode = properties.scale_mode;
-                if let Some(node) = convert_control(child, _parent, child_scale_mode, dpi, config)?
-                {
-                    child_nodes.push(node);
-                }
-            }
-
-            Ok(Some(LayoutNode::Container(LayoutContainer {
+            let picture_container = LayoutContainer {
                 name: control.name().to_string(),
                 control_type: layout_type,
                 index: control.index(),
                 position,
                 size,
                 style,
-                children: child_nodes,
                 visible,
                 enabled,
                 ..Default::default()
+            };
+
+            let mut child_nodes = Vec::new();
+            for child in controls {
+                // PictureBox may have its own scale_mode; use it if available,
+                // otherwise fall back to the parent form's scale_mode.
+                let child_scale_mode = properties.scale_mode;
+                if let Some(node) = convert_control(
+                    child,
+                    &picture_container,
+                    child_scale_mode,
+                    dpi,
+                    config,
+                )? {
+                    child_nodes.push(node);
+                }
+            }
+
+            Ok(Some(LayoutNode::Container(LayoutContainer {
+                children: child_nodes,
+                ..picture_container
             })))
         }
 
@@ -1690,7 +1712,9 @@ mod tests {
     }
 
     #[test]
-    fn form_style_has_background_color() {
+    fn form_background_from_back_color() {
+        // The form renders its own BackColor inline so custom form colors
+        // (e.g. white forms) are honored instead of always using CSS var().
         let form = create_test_form();
         let config = LayoutConfig::default();
         let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
