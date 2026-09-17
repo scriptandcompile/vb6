@@ -13,7 +13,7 @@ form:
       back_color:
         System:
           index: 15
-      border_style: Sizable
+      border_style: FixedSingle
       caption: Bitrate calculator GPL
       client_height: 5070
       client_left: 45
@@ -49,9 +49,9 @@ form:
       left: 0
       link_mode: None
       link_topic: Form1
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -67,7 +67,7 @@ form:
       scale_top: 0
       scale_width: 9015
       show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -119,7 +119,7 @@ form:
               tool_tip_text: Check to keep aspect ratio
               top: 1560
               use_mask_color: DoNotUseMaskColor
-              value: Unchecked
+              value: Checked
               visible: Visible
               whats_this_help_id: 0
               width: 255
@@ -154,8 +154,8 @@ form:
               ole_drag_mode: Manual
               ole_drop_mode: None
               right_to_left: LeftToRight
-              sorted: false
-              style: DropDownCombo
+              sorted: true
+              style: DropDownList
               tab_index: 18
               tab_stop: Included
               text: ""
@@ -203,7 +203,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -252,7 +252,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -277,7 +277,7 @@ form:
               link_mode: None
               link_timeout: 50
               link_topic: ""
-              locked: false
+              locked: true
               max_length: 0
               mouse_icon: ~
               mouse_pointer: Default
@@ -301,7 +301,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -350,7 +350,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -375,7 +375,7 @@ form:
               link_mode: None
               link_timeout: 50
               link_topic: ""
-              locked: false
+              locked: true
               max_length: 0
               mouse_icon: ~
               mouse_pointer: Default
@@ -399,7 +399,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -448,7 +448,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -473,7 +473,7 @@ form:
               link_mode: None
               link_timeout: 50
               link_topic: ""
-              locked: false
+              locked: true
               max_length: 0
               mouse_icon: ~
               mouse_pointer: Default
@@ -497,7 +497,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -522,7 +522,7 @@ form:
               link_mode: None
               link_timeout: 50
               link_topic: ""
-              locked: false
+              locked: true
               max_length: 0
               mouse_icon: ~
               mouse_pointer: Default
@@ -546,7 +546,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               back_color:
                 System:
@@ -595,7 +595,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               back_color:
                 System:
@@ -644,7 +644,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -693,7 +693,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -742,7 +742,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               back_color:
                 System:
@@ -817,7 +817,7 @@ form:
               ole_drop_mode: None
               right_to_left: LeftToRight
               sorted: false
-              style: DropDownCombo
+              style: DropDownList
               tab_index: 12
               tab_stop: Included
               text: ""
@@ -832,7 +832,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               back_color:
                 System:
@@ -859,7 +859,7 @@ form:
               link_mode: None
               link_timeout: 50
               link_topic: ""
-              locked: false
+              locked: true
               max_length: 0
               mouse_icon: ~
               mouse_pointer: Default
@@ -874,7 +874,7 @@ form:
               text: Hooking OFF
               tool_tip_text: ""
               top: 3720
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 1695
       - name: txtAspectRatio
@@ -883,7 +883,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -908,7 +908,7 @@ form:
               link_mode: None
               link_timeout: 50
               link_topic: ""
-              locked: false
+              locked: true
               max_length: 0
               mouse_icon: ~
               mouse_pointer: Default
@@ -958,7 +958,7 @@ form:
               ole_drop_mode: None
               right_to_left: LeftToRight
               sorted: false
-              style: DropDownCombo
+              style: DropDownList
               tab_index: 49
               tab_stop: Included
               text: ""
@@ -973,7 +973,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -1022,7 +1022,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -1047,7 +1047,7 @@ form:
               link_mode: None
               link_timeout: 50
               link_topic: ""
-              locked: false
+              locked: true
               max_length: 0
               mouse_icon: ~
               mouse_pointer: Default
@@ -1071,7 +1071,7 @@ form:
         kind:
           TextBox:
             properties:
-              alignment: LeftJustify
+              alignment: RightJustify
               appearance: ThreeD
               back_color:
                 System:
@@ -1096,7 +1096,7 @@ form:
               link_mode: None
               link_timeout: 50
               link_topic: ""
-              locked: false
+              locked: true
               max_length: 0
               mouse_icon: ~
               mouse_pointer: Default
@@ -1369,7 +1369,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1412,7 +1412,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1526,7 +1526,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1569,7 +1569,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1612,7 +1612,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1655,7 +1655,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1698,7 +1698,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1741,7 +1741,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1784,7 +1784,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1827,7 +1827,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1870,7 +1870,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1913,7 +1913,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1956,7 +1956,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -1999,7 +1999,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -2075,7 +2075,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -2118,7 +2118,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -2161,7 +2161,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -2204,7 +2204,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -2247,7 +2247,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -2290,7 +2290,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -2333,7 +2333,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -2376,7 +2376,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -2419,7 +2419,7 @@ form:
             properties:
               alignment: LeftJustify
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15

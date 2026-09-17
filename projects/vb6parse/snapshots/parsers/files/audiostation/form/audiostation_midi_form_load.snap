@@ -9,11 +9,11 @@ form:
     index: 0
     properties:
       appearance: ThreeD
-      auto_redraw: Manual
+      auto_redraw: Automatic
       back_color:
         System:
           index: 15
-      border_style: Sizable
+      border_style: FixedDialog
       caption: Midi Player
       client_height: 3615
       client_left: 300
@@ -49,16 +49,16 @@ form:
       left: 0
       link_mode: None
       link_topic: Form1
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
       negotiate_menus: true
       ole_drop_mode: None
       palette: ~
-      palette_mode: HalfTone
+      palette_mode: UseZOrder
       picture: ~
       right_to_left: LeftToRight
       scale_height: 3615
@@ -66,14 +66,14 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 8430
-      show_in_taskbar: Show
+      show_in_taskbar: Hide
       start_up_position: WindowsDefault
       top: 0
-      visible: Visible
+      visible: Hidden
       whats_this_button: Excluded
       whats_this_help: F1Help
       width: 240
-      window_state: Normal
+      window_state: Minimized
     controls:
       - name: TextIndicator1
         tag: ""
@@ -82,7 +82,7 @@ form:
           TextBox:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
+              appearance: Flat
               back_color:
                 System:
                   index: 5
@@ -106,7 +106,7 @@ form:
               link_mode: None
               link_timeout: 50
               link_topic: ""
-              locked: false
+              locked: true
               max_length: 0
               mouse_icon: ~
               mouse_pointer: Default
@@ -169,7 +169,7 @@ form:
               top: 2640
               use_mask_color: DoNotUseMaskColor
               value: Unchecked
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 1335
       - name: TimerEnd
@@ -178,7 +178,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 0
               left: 420
               top: 0
@@ -220,7 +220,7 @@ form:
               tool_tip_text: ""
               top: 2340
               use_mask_color: DoNotUseMaskColor
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 1695
       - name: TimerMidiError
@@ -229,7 +229,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 0
               left: 300
               top: 0
@@ -270,7 +270,7 @@ form:
               down_picture: ~
               drag_icon: ~
               drag_mode: Manual
-              enabled: Enabled
+              enabled: Disabled
               height: 255
               help_context_id: 0
               left: 6660
@@ -284,7 +284,7 @@ form:
               ole_drop_mode: None
               picture: ~
               right_to_left: LeftToRight
-              style: Standard
+              style: Graphical
               tab_index: 4
               tab_stop: Included
               tool_tip_text: ""
@@ -347,7 +347,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 0
               left: 180
               top: 0
@@ -594,7 +594,7 @@ form:
                         kind:
                           CommandButton:
                             properties:
-                              appearance: ThreeD
+                              appearance: Flat
                               back_color:
                                 System:
                                   index: 5
@@ -635,7 +635,7 @@ form:
                         kind:
                           CommandButton:
                             properties:
-                              appearance: ThreeD
+                              appearance: Flat
                               back_color:
                                 System:
                                   index: 5
@@ -676,7 +676,7 @@ form:
                         kind:
                           CommandButton:
                             properties:
-                              appearance: ThreeD
+                              appearance: Flat
                               back_color:
                                 System:
                                   index: 5
@@ -717,7 +717,7 @@ form:
                         kind:
                           Label:
                             properties:
-                              alignment: LeftJustify
+                              alignment: Center
                               appearance: ThreeD
                               auto_size: Fixed
                               back_color:
@@ -1029,7 +1029,7 @@ form:
                 kind:
                   ComboBox:
                     properties:
-                      appearance: ThreeD
+                      appearance: Flat
                       back_color:
                         System:
                           index: 5
@@ -1055,7 +1055,7 @@ form:
                       ole_drop_mode: None
                       right_to_left: LeftToRight
                       sorted: false
-                      style: DropDownCombo
+                      style: DropDownList
                       tab_index: 21
                       tab_stop: Included
                       text: ""
@@ -1397,12 +1397,12 @@ form:
                   Label:
                     properties:
                       alignment: LeftJustify
-                      appearance: ThreeD
+                      appearance: Flat
                       auto_size: Fixed
                       back_color:
                         System:
                           index: 5
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "File name:"
                       data_field: ""
@@ -1439,13 +1439,13 @@ form:
                 kind:
                   Label:
                     properties:
-                      alignment: LeftJustify
-                      appearance: ThreeD
+                      alignment: Center
+                      appearance: Flat
                       auto_size: Fixed
                       back_color:
                         System:
                           index: 5
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: LabelPlayerFile
                       data_field: ""
@@ -1483,12 +1483,12 @@ form:
                   Label:
                     properties:
                       alignment: LeftJustify
-                      appearance: ThreeD
+                      appearance: Flat
                       auto_size: Fixed
                       back_color:
                         System:
                           index: 5
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "Output Device:"
                       data_field: ""
@@ -1579,7 +1579,7 @@ form:
               visible: Visible
               whats_this_help_id: 0
               width: 4455
-              word_wrap: NonWrapping
+              word_wrap: Wrapping
     menus: []
 objects:
   - uuid: f9043c88-f6f2-101a-a3c9-08002b2f49fb

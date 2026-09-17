@@ -13,13 +13,13 @@ form:
       back_color:
         System:
           index: 15
-      border_style: Sizable
+      border_style: FixedDialog
       caption: About MyApp
       client_height: 3555
       client_left: 2340
       client_top: 1935
       client_width: 5730
-      clip_controls: Clipped
+      clip_controls: Unbounded
       control_box: Included
       draw_mode: CopyPen
       draw_style: Solid
@@ -49,9 +49,9 @@ form:
       left: 0
       link_mode: None
       link_topic: Form2
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -63,10 +63,10 @@ form:
       right_to_left: LeftToRight
       scale_height: 240
       scale_left: 0
-      scale_mode: Twip
+      scale_mode: User
       scale_top: 0
       scale_width: 240
-      show_in_taskbar: Show
+      show_in_taskbar: Hide
       start_up_position: WindowsDefault
       top: 0
       visible: Visible
@@ -84,13 +84,13 @@ form:
               align: None
               appearance: ThreeD
               auto_redraw: Manual
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15
               border_style: FixedSingle
               causes_validation: "Yes"
-              clip_controls: Clipped
+              clip_controls: Unbounded
               data_field: ""
               data_format: ""
               data_member: ""
@@ -126,7 +126,7 @@ form:
               right_to_left: LeftToRight
               scale_height: 100
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: User
               scale_top: 0
               scale_width: 100
               tab_index: 1
@@ -147,10 +147,10 @@ form:
               back_color:
                 System:
                   index: 15
-              cancel: false
+              cancel: true
               caption: OK
               causes_validation: "Yes"
-              default: false
+              default: true
               disabled_picture: ~
               down_picture: ~
               drag_icon: ~
@@ -230,7 +230,7 @@ form:
                   red: 128
                   green: 128
                   blue: 128
-              border_style: Solid
+              border_style: InsideSolid
               border_width: 1
               draw_mode: CopyPen
               visible: Visible

@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/audiostation/form.rs
-assertion_line: 196
 expression: form_file
 ---
 form:
@@ -16,7 +15,7 @@ form:
           red: 192
           green: 192
           blue: 192
-      border_style: Sizable
+      border_style: FixedDialog
       caption: Normalize
       client_height: 3630
       client_left: 45
@@ -52,9 +51,9 @@ form:
       left: 0
       link_mode: None
       link_topic: Form1
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -69,8 +68,8 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 3435
-      show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      show_in_taskbar: Hide
+      start_up_position: CenterOwner
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -251,13 +250,13 @@ form:
                   TextBox:
                     properties:
                       alignment: LeftJustify
-                      appearance: ThreeD
+                      appearance: Flat
                       back_color:
                         RGB:
                           red: 0
                           green: 0
                           blue: 0
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       data_field: ""
                       data_format: ""
@@ -265,7 +264,7 @@ form:
                       data_source: ""
                       drag_icon: ~
                       drag_mode: Manual
-                      enabled: Enabled
+                      enabled: Disabled
                       fore_color:
                         RGB:
                           red: 0
@@ -309,7 +308,7 @@ form:
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "%"
                       data_field: ""
@@ -413,13 +412,13 @@ form:
                   TextBox:
                     properties:
                       alignment: LeftJustify
-                      appearance: ThreeD
+                      appearance: Flat
                       back_color:
                         RGB:
                           red: 0
                           green: 0
                           blue: 0
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       data_field: ""
                       data_format: ""
@@ -427,7 +426,7 @@ form:
                       data_source: ""
                       drag_icon: ~
                       drag_mode: Manual
-                      enabled: Enabled
+                      enabled: Disabled
                       fore_color:
                         RGB:
                           red: 0
@@ -471,7 +470,7 @@ form:
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "%"
                       data_field: ""
@@ -575,13 +574,13 @@ form:
                   TextBox:
                     properties:
                       alignment: LeftJustify
-                      appearance: ThreeD
+                      appearance: Flat
                       back_color:
                         RGB:
                           red: 0
                           green: 0
                           blue: 0
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       data_field: ""
                       data_format: ""
@@ -589,7 +588,7 @@ form:
                       data_source: ""
                       drag_icon: ~
                       drag_mode: Manual
-                      enabled: Enabled
+                      enabled: Disabled
                       fore_color:
                         RGB:
                           red: 0
@@ -633,7 +632,7 @@ form:
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "%"
                       data_field: ""
@@ -714,7 +713,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Normalize to
               data_field: ""
@@ -802,7 +801,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: below
               data_field: ""
@@ -845,7 +844,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: or above
               data_field: ""

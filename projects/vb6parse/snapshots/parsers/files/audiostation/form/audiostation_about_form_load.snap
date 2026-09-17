@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/audiostation/form.rs
-assertion_line: 36
 expression: form_file
 ---
 form:
@@ -16,7 +15,7 @@ form:
           red: 192
           green: 192
           blue: 192
-      border_style: Sizable
+      border_style: FixedDialog
       caption: "-"
       client_height: 5430
       client_left: 2565
@@ -48,13 +47,13 @@ form:
       height: 240
       help_context_id: 0
       icon: ~
-      key_preview: false
+      key_preview: true
       left: 0
       link_mode: None
       link_topic: Form1
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -69,8 +68,8 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 6090
-      show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      show_in_taskbar: Hide
+      start_up_position: CenterOwner
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -93,7 +92,7 @@ form:
                   red: 255
                   green: 255
                   blue: 255
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -178,11 +177,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: Audiostation
                       data_field: ""
@@ -221,11 +220,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: The old school media player
                       data_field: ""
@@ -271,7 +270,7 @@ form:
                   red: 255
                   green: 255
                   blue: 255
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -346,15 +345,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Verdana\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: Label10
@@ -365,11 +364,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "Visit our website:"
                       data_field: ""
@@ -412,7 +411,7 @@ form:
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "$\"Form_About.frx\":031"
                       data_field: ""
@@ -451,11 +450,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: Copyright © Sibra-Soft 2009 - 2026
                       data_field: ""
@@ -494,11 +493,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: Alex van den Berg
                       data_field: ""
@@ -537,11 +536,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "Application designer and programmer:"
                       data_field: ""
@@ -580,11 +579,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: Unknown
                       data_field: ""
@@ -623,11 +622,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "Current version:"
                       data_field: ""
@@ -704,7 +703,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "$\"Form_About.frx\":03"
               data_field: ""
@@ -747,7 +746,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Audiostation is a program to play music files. The program supports all common media files like (*.mp3, *.wav, *.mid, etc) "
               data_field: ""

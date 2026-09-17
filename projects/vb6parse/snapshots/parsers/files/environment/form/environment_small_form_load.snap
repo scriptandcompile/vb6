@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/environment/form.rs
-assertion_line: 438
 expression: form_file
 ---
 form:
@@ -9,14 +8,14 @@ form:
     tag: ""
     index: 0
     properties:
-      appearance: ThreeD
-      auto_redraw: Manual
+      appearance: Flat
+      auto_redraw: Automatic
       back_color:
         RGB:
           red: 255
           green: 128
           blue: 0
-      border_style: Sizable
+      border_style: FixedToolWindow
       caption: M2000
       client_height: 570
       client_left: -47955
@@ -48,17 +47,17 @@ form:
       height: 240
       help_context_id: 0
       icon: ~
-      key_preview: false
+      key_preview: true
       left: 0
       link_mode: None
       link_topic: Form3
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
       min_button: Included
       mouse_icon: ~
       mouse_pointer: Default
-      moveable: Moveable
-      negotiate_menus: true
+      moveable: Fixed
+      negotiate_menus: false
       ole_drop_mode: None
       palette: ~
       palette_mode: HalfTone
@@ -72,11 +71,11 @@ form:
       show_in_taskbar: Show
       start_up_position: WindowsDefault
       top: 0
-      visible: Visible
+      visible: Hidden
       whats_this_button: Excluded
       whats_this_help: F1Help
       width: 240
-      window_state: Normal
+      window_state: Minimized
     controls:
       - name: Timer1
         tag: ""

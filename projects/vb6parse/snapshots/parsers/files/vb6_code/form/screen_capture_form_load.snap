@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/vb6_code/form.rs
-assertion_line: 945
 expression: form_file
 ---
 form:
@@ -10,7 +9,7 @@ form:
     index: 0
     properties:
       appearance: ThreeD
-      auto_redraw: Manual
+      auto_redraw: Automatic
       back_color:
         RGB:
           red: 192
@@ -48,7 +47,7 @@ form:
       height: 240
       help_context_id: 0
       icon: ~
-      key_preview: false
+      key_preview: true
       left: 0
       link_mode: None
       link_topic: Form1
@@ -66,11 +65,11 @@ form:
       right_to_left: LeftToRight
       scale_height: 240
       scale_left: 0
-      scale_mode: Twip
+      scale_mode: Pixel
       scale_top: 0
       scale_width: 445
       show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -86,11 +85,11 @@ form:
             properties:
               alignment: LeftJustify
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Screen Capture Demo -- www.tannerhelland.com
               data_field: ""
@@ -131,11 +130,11 @@ form:
             properties:
               alignment: LeftJustify
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Screen Capture Demo -- www.tannerhelland.com
               data_field: ""

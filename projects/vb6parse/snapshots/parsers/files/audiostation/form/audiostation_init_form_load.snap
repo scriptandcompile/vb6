@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/audiostation/form.rs
-assertion_line: 100
 expression: form_file
 ---
 form:
@@ -16,7 +15,7 @@ form:
           red: 0
           green: 0
           blue: 0
-      border_style: Sizable
+      border_style: FixedDialog
       caption: Audiostation
       client_height: 9105
       client_left: 2565
@@ -48,13 +47,13 @@ form:
       height: 240
       help_context_id: 0
       icon: ~
-      key_preview: false
+      key_preview: true
       left: 0
       link_mode: None
       link_topic: Form1
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -69,8 +68,8 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 9810
-      show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      show_in_taskbar: Hide
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -84,7 +83,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 2000
               left: 2640
               top: 0
@@ -94,7 +93,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 500
               left: 1200
               top: 0
@@ -114,7 +113,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 500
               left: 1680
               top: 0
@@ -124,7 +123,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 500
               left: 2160
               top: 0
@@ -134,7 +133,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 500
               left: 720
               top: 0
@@ -151,7 +150,7 @@ form:
               back_color:
                 System:
                   index: 15
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -193,7 +192,7 @@ form:
               scale_top: 0
               scale_width: 5685
               tab_index: 2
-              tab_stop: Included
+              tab_stop: ProgrammaticOnly
               tool_tip_text: ""
               top: 480
               visible: Visible
@@ -246,7 +245,7 @@ form:
               back_color:
                 System:
                   index: 15
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -288,7 +287,7 @@ form:
               scale_top: 0
               scale_width: 5685
               tab_index: 1
-              tab_stop: Included
+              tab_stop: ProgrammaticOnly
               tool_tip_text: ""
               top: 480
               visible: Visible
@@ -341,7 +340,7 @@ form:
               back_color:
                 System:
                   index: 15
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -383,7 +382,7 @@ form:
               scale_top: 0
               scale_width: 5685
               tab_index: 0
-              tab_stop: Included
+              tab_stop: ProgrammaticOnly
               tool_tip_text: ""
               top: 480
               visible: Visible
@@ -448,11 +447,11 @@ form:
             properties:
               alignment: LeftJustify
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "When all the settings have been set, the program will restart automatically."
               data_field: ""
@@ -491,13 +490,13 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Checking device drivers...
               data_field: ""
@@ -536,13 +535,13 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Current Status:"
               data_field: ""
@@ -583,11 +582,11 @@ form:
             properties:
               alignment: LeftJustify
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Please wait while audiostation configures the program settings for the first time.
               data_field: ""
@@ -628,11 +627,11 @@ form:
             properties:
               alignment: LeftJustify
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Thanks for choosing Audiostation
               data_field: ""

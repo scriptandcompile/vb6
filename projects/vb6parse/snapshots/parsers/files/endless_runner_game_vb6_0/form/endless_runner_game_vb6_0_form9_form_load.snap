@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/endless_runner_game_vb6_0/form.rs
-assertion_line: 398
 expression: form_file
 ---
 form:
@@ -21,7 +20,7 @@ form:
       client_top: 465
       client_width: 20880
       clip_controls: Clipped
-      control_box: Included
+      control_box: Excluded
       draw_mode: CopyPen
       draw_style: Solid
       draw_width: 1
@@ -68,13 +67,13 @@ form:
       scale_top: 0
       scale_width: 20880
       show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
       whats_this_help: F1Help
       width: 240
-      window_state: Normal
+      window_state: Maximized
     controls:
       - name: ProgressBar1
         tag: ""
@@ -109,7 +108,7 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               auto_size: Fixed
               back_color:
@@ -154,7 +153,7 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               auto_size: Fixed
               back_color:
@@ -215,7 +214,7 @@ form:
               ole_drag_mode: Manual
               ole_drop_mode: None
               picture: ~
-              stretch: false
+              stretch: true
               tool_tip_text: ""
               top: 1800
               visible: Visible
@@ -232,7 +231,7 @@ form:
                   red: 0
                   green: 192
                   blue: 192
-              back_style: Transparent
+              back_style: Opaque
               border_color:
                 System:
                   index: 8

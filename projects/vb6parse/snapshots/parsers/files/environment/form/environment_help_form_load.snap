@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/environment/form.rs
-assertion_line: 252
 expression: form_file
 ---
 form:
@@ -10,18 +9,18 @@ form:
     index: 0
     properties:
       appearance: ThreeD
-      auto_redraw: Manual
+      auto_redraw: Automatic
       back_color:
         System:
           index: 24
-      border_style: Sizable
+      border_style: None
       caption: Form1
       client_height: 4650
       client_left: 11925
       client_top: -6825
       client_width: 7080
       clip_controls: Clipped
-      control_box: Included
+      control_box: Excluded
       draw_mode: CopyPen
       draw_style: Solid
       draw_width: 1
@@ -46,7 +45,7 @@ form:
       height: 240
       help_context_id: 0
       icon: ~
-      key_preview: false
+      key_preview: true
       left: 0
       link_mode: None
       link_topic: Form4
@@ -54,9 +53,9 @@ form:
       mdi_child: false
       min_button: Included
       mouse_icon: ~
-      mouse_pointer: Default
+      mouse_pointer: Size
       moveable: Moveable
-      negotiate_menus: true
+      negotiate_menus: false
       ole_drop_mode: None
       palette: ~
       palette_mode: HalfTone
@@ -67,10 +66,10 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 7080
-      show_in_taskbar: Show
+      show_in_taskbar: Hide
       start_up_position: WindowsDefault
       top: 0
-      visible: Visible
+      visible: Hidden
       whats_this_button: Excluded
       whats_this_help: F1Help
       width: 240
@@ -89,10 +88,10 @@ form:
                 Height: "3825"
                 Left: "330"
                 Max: "1"
-                ShowBar: "0   'False"
+                ShowBar: "0"
                 TabIndex: "0"
                 Top: "300"
-                Vertical: "-1  'True"
+                Vertical: "-1"
                 Width: "6015"
             property_groups:
               - name: Font
@@ -101,15 +100,15 @@ form:
                   Charset:
                     Left: "0"
                   Italic:
-                    Left: "0   'False"
+                    Left: "0"
                   Name:
                     Left: "\"Arial\""
                   Size:
                     Left: "12"
                   Strikethrough:
-                    Left: "0   'False"
+                    Left: "0"
                   Underline:
-                    Left: "0   'False"
+                    Left: "0"
                   Weight:
                     Left: "700"
     menus: []

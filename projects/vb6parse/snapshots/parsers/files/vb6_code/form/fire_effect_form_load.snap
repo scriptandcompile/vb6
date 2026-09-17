@@ -8,7 +8,7 @@ form:
     tag: ""
     index: 0
     properties:
-      appearance: ThreeD
+      appearance: Flat
       auto_redraw: Manual
       back_color:
         System:
@@ -63,11 +63,11 @@ form:
       right_to_left: LeftToRight
       scale_height: 292
       scale_left: 0
-      scale_mode: Twip
+      scale_mode: Pixel
       scale_top: 0
       scale_width: 531
       show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -190,7 +190,7 @@ form:
           TextBox:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
+              appearance: Flat
               back_color:
                 System:
                   index: 5
@@ -239,7 +239,7 @@ form:
           TextBox:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
+              appearance: Flat
               back_color:
                 System:
                   index: 5
@@ -287,7 +287,7 @@ form:
         kind:
           CommandButton:
             properties:
-              appearance: ThreeD
+              appearance: Flat
               back_color:
                 System:
                   index: 15
@@ -328,7 +328,7 @@ form:
         kind:
           CommandButton:
             properties:
-              appearance: ThreeD
+              appearance: Flat
               back_color:
                 System:
                   index: 15
@@ -370,7 +370,7 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
+              appearance: Flat
               auto_redraw: Manual
               auto_size: Fixed
               back_color:
@@ -380,7 +380,7 @@ form:
                   blue: 0
               border_style: FixedSingle
               causes_validation: "Yes"
-              clip_controls: Clipped
+              clip_controls: Unbounded
               data_field: ""
               data_format: ""
               data_member: ""
@@ -395,7 +395,7 @@ form:
                 System:
                   index: 0
               fill_style: Transparent
-              font_transparent: Transparent
+              font_transparent: Opaque
               fore_color:
                 System:
                   index: 8
@@ -416,7 +416,7 @@ form:
               right_to_left: LeftToRight
               scale_height: 128
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 512
               tab_index: 0
@@ -434,12 +434,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
-              auto_size: Fixed
+              appearance: Flat
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Blue:"
               data_field: ""
@@ -477,12 +477,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
-              auto_size: Fixed
+              appearance: Flat
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Green:"
               data_field: ""
@@ -520,12 +520,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
-              auto_size: Fixed
+              appearance: Flat
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Red:"
               data_field: ""
@@ -568,7 +568,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Note: changes will not take place until the fire is restarted."
               data_field: ""
@@ -608,12 +608,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
+              appearance: Flat
               auto_size: Fixed
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Frame Rate...
               data_field: ""
@@ -656,7 +656,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Width:"
               data_field: ""
@@ -699,7 +699,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Height:"
               data_field: ""
@@ -737,12 +737,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
-              auto_size: Fixed
+              appearance: Flat
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Uniformity:"
               data_field: ""

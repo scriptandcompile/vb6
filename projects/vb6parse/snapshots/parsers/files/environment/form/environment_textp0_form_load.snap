@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/environment/form.rs
-assertion_line: 531
 expression: form_file
 ---
 form:
@@ -10,20 +9,20 @@ form:
     index: 0
     properties:
       appearance: ThreeD
-      auto_redraw: Manual
+      auto_redraw: Automatic
       back_color:
         RGB:
           red: 0
           green: 0
           blue: 0
-      border_style: Sizable
+      border_style: None
       caption: Form1
       client_height: 6345
       client_left: 120
       client_top: 120
       client_width: 9765
       clip_controls: Clipped
-      control_box: Included
+      control_box: Excluded
       draw_mode: CopyPen
       draw_style: Solid
       draw_width: 1
@@ -48,7 +47,7 @@ form:
       height: 240
       help_context_id: 0
       icon: ~
-      key_preview: false
+      key_preview: true
       left: 0
       link_mode: None
       link_topic: Form1
@@ -57,9 +56,9 @@ form:
       min_button: Included
       mouse_icon: ~
       mouse_pointer: Default
-      moveable: Moveable
+      moveable: Fixed
       negotiate_menus: true
-      ole_drop_mode: None
+      ole_drop_mode: Manual
       palette: ~
       palette_mode: HalfTone
       picture: ~
@@ -69,10 +68,10 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 9765
-      show_in_taskbar: Show
+      show_in_taskbar: Hide
       start_up_position: WindowsDefault
       top: 0
-      visible: Visible
+      visible: Hidden
       whats_this_button: Excluded
       whats_this_help: F1Help
       width: 240
@@ -138,7 +137,7 @@ form:
               tab_stop: Included
               tool_tip_text: ""
               top: 0
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 450
             controls: []
@@ -149,13 +148,13 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
+              appearance: Flat
+              auto_redraw: Automatic
               auto_size: Fixed
               back_color:
                 System:
                   index: 5
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -197,10 +196,10 @@ form:
               scale_top: 0
               scale_width: 780
               tab_index: 1
-              tab_stop: Included
+              tab_stop: ProgrammaticOnly
               tool_tip_text: ""
               top: 1170
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 780
             controls: []
@@ -211,13 +210,13 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
-              auto_size: Fixed
+              appearance: Flat
+              auto_redraw: Automatic
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -259,10 +258,10 @@ form:
               scale_top: 0
               scale_width: 1185
               tab_index: 0
-              tab_stop: Included
+              tab_stop: ProgrammaticOnly
               tool_tip_text: ""
               top: 4965
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 1185
             controls: []
@@ -279,10 +278,10 @@ form:
                 Left: "7485"
                 Max: "1"
                 TabIndex: "3"
-                TabStop: "0   'False"
+                TabStop: "0"
                 Top: "2955"
-                Vertical: "-1  'True"
-                Visible: "0   'False"
+                Vertical: "-1"
+                Visible: "0"
                 Width: "1530"
             property_groups:
               - name: Font
@@ -291,15 +290,15 @@ form:
                   Charset:
                     Left: "0"
                   Italic:
-                    Left: "0   'False"
+                    Left: "0"
                   Name:
                     Left: "\"Arial\""
                   Size:
                     Left: "12"
                   Strikethrough:
-                    Left: "0   'False"
+                    Left: "0"
                   Underline:
-                    Left: "0   'False"
+                    Left: "0"
                   Weight:
                     Left: "400"
       - name: List1
@@ -315,10 +314,10 @@ form:
                 Left: "7755"
                 Max: "1"
                 TabIndex: "4"
-                TabStop: "0   'False"
+                TabStop: "0"
                 Top: "510"
-                Vertical: "-1  'True"
-                Visible: "0   'False"
+                Vertical: "-1"
+                Visible: "0"
                 Width: "1530"
             property_groups:
               - name: Font
@@ -327,15 +326,15 @@ form:
                   Charset:
                     Left: "0"
                   Italic:
-                    Left: "0   'False"
+                    Left: "0"
                   Name:
                     Left: "\"Arial\""
                   Size:
                     Left: "12"
                   Strikethrough:
-                    Left: "0   'False"
+                    Left: "0"
                   Underline:
-                    Left: "0   'False"
+                    Left: "0"
                   Weight:
                     Left: "400"
       - name: view1
@@ -345,30 +344,30 @@ form:
           Custom:
             properties:
               property_store:
-                AlignLeft: "0   'False"
-                AutoArrange: "-1  'True"
+                AlignLeft: "0"
+                AutoArrange: "-1"
                 ExtentX: "14111"
                 ExtentY: "10583"
                 Height: "6000"
-                HideFileNames: "0   'False"
+                HideFileNames: "0"
                 Left: "360"
                 Location: ""
-                NoClientEdge: "-1  'True"
-                NoFolders: "0   'False"
-                NoWebView: "0   'False"
+                NoClientEdge: "-1"
+                NoFolders: "0"
+                NoWebView: "0"
                 Offline: "0"
                 RegisterAsBrowser: "0"
                 RegisterAsDropTarget: "0"
                 Silent: "0"
-                SingleClick: "0   'False"
-                SingleSelection: "0   'False"
+                SingleClick: "0"
+                SingleSelection: "0"
                 TabIndex: "2"
-                TabStop: "0   'False"
+                TabStop: "0"
                 Top: "120"
-                Transparent: "0   'False"
+                Transparent: "0"
                 ViewID: "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
                 ViewMode: "1"
-                Visible: "0   'False"
+                Visible: "0"
                 Width: "7995"
             property_groups: []
       - name: DIS
@@ -378,13 +377,13 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
+              appearance: Flat
+              auto_redraw: Automatic
               auto_size: Fixed
               back_color:
                 System:
                   index: 12
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -401,7 +400,7 @@ form:
                 System:
                   index: 0
               fill_style: Transparent
-              font_transparent: Transparent
+              font_transparent: Opaque
               fore_color:
                 System:
                   index: 8
@@ -414,7 +413,7 @@ form:
               link_timeout: 50
               link_topic: ""
               mouse_icon: ~
-              mouse_pointer: Default
+              mouse_pointer: Arrow
               negotiate: false
               ole_drag_mode: Manual
               ole_drop_mode: None
@@ -429,7 +428,7 @@ form:
               tab_stop: Included
               tool_tip_text: ""
               top: 300
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 5640
             controls: []

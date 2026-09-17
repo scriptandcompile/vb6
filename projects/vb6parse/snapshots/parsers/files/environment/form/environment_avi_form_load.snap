@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/environment/form.rs
-assertion_line: 33
 expression: form_file
 ---
 form:
@@ -9,12 +8,12 @@ form:
     tag: ""
     index: 0
     properties:
-      appearance: ThreeD
-      auto_redraw: Manual
+      appearance: Flat
+      auto_redraw: Automatic
       back_color:
         System:
           index: 5
-      border_style: Sizable
+      border_style: None
       caption: Form1
       client_height: 1065
       client_left: 6285
@@ -46,7 +45,7 @@ form:
       height: 240
       help_context_id: 0
       icon: ~
-      key_preview: false
+      key_preview: true
       left: 0
       link_mode: None
       link_topic: Form1
@@ -67,7 +66,7 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 1380
-      show_in_taskbar: Show
+      show_in_taskbar: Hide
       start_up_position: WindowsDefault
       top: 0
       visible: Visible
@@ -82,7 +81,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 0
               left: 285
               top: 0

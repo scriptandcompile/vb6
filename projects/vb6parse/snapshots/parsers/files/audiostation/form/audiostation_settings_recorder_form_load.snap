@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/audiostation/form.rs
-assertion_line: 326
 expression: form_file
 ---
 form:
@@ -16,7 +15,7 @@ form:
           red: 192
           green: 192
           blue: 192
-      border_style: Sizable
+      border_style: FixedDialog
       caption: "-"
       client_height: 3045
       client_left: 2760
@@ -52,9 +51,9 @@ form:
       left: 0
       link_mode: None
       link_topic: Form1
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -69,7 +68,7 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 6525
-      show_in_taskbar: Show
+      show_in_taskbar: Hide
       start_up_position: WindowsDefault
       top: 0
       visible: Visible
@@ -237,7 +236,7 @@ form:
                       ole_drop_mode: None
                       right_to_left: LeftToRight
                       sorted: false
-                      style: DropDownCombo
+                      style: DropDownList
                       tab_index: 4
                       tab_stop: Included
                       text: ""
@@ -278,7 +277,7 @@ form:
                       ole_drop_mode: None
                       right_to_left: LeftToRight
                       sorted: false
-                      style: DropDownCombo
+                      style: DropDownList
                       tab_index: 2
                       tab_stop: Included
                       text: ""
@@ -295,11 +294,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "Output:"
                       data_field: ""
@@ -338,11 +337,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "Rate:"
                       data_field: ""
@@ -381,11 +380,11 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: "Input device:"
                       data_field: ""

@@ -63,11 +63,11 @@ form:
       right_to_left: LeftToRight
       scale_height: 414
       scale_left: 0
-      scale_mode: Twip
+      scale_mode: Pixel
       scale_top: 0
       scale_width: 660
       show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -261,7 +261,7 @@ form:
         kind:
           CommandButton:
             properties:
-              appearance: ThreeD
+              appearance: Flat
               back_color:
                 System:
                   index: 15
@@ -303,9 +303,9 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
-              auto_size: Fixed
+              appearance: Flat
+              auto_redraw: Automatic
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
@@ -325,7 +325,7 @@ form:
               fill_color:
                 System:
                   index: 0
-              fill_style: Transparent
+              fill_style: Solid
               font_transparent: Transparent
               fore_color:
                 System:
@@ -347,7 +347,7 @@ form:
               right_to_left: LeftToRight
               scale_height: 333
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 636
               tab_index: 0
@@ -365,9 +365,9 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
-              auto_size: Fixed
+              appearance: Flat
+              auto_redraw: Automatic
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
@@ -409,14 +409,14 @@ form:
               right_to_left: LeftToRight
               scale_height: 333
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 636
               tab_index: 1
               tab_stop: Included
               tool_tip_text: ""
               top: 720
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 9570
             controls: []
@@ -427,12 +427,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
+              appearance: Flat
               auto_size: Fixed
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Line Length:"
               data_field: ""
@@ -470,12 +470,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
-              auto_size: Fixed
+              appearance: Flat
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Iterations:"
               data_field: ""

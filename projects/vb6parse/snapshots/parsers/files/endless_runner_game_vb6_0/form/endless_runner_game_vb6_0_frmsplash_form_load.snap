@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/endless_runner_game_vb6_0/form.rs
-assertion_line: 431
 expression: form_file
 ---
 form:
@@ -14,14 +13,14 @@ form:
       back_color:
         System:
           index: 15
-      border_style: Sizable
+      border_style: FixedDialog
       caption: Form1
       client_height: 4245
       client_left: 255
       client_top: 1410
       client_width: 7380
-      clip_controls: Clipped
-      control_box: Included
+      clip_controls: Unbounded
+      control_box: Excluded
       draw_mode: CopyPen
       draw_style: Solid
       draw_width: 1
@@ -46,13 +45,13 @@ form:
       height: 240
       help_context_id: 0
       icon: ~
-      key_preview: false
+      key_preview: true
       left: 0
       link_mode: None
       link_topic: Form2
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -67,8 +66,8 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 7380
-      show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      show_in_taskbar: Hide
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -131,7 +130,7 @@ form:
                       ole_drag_mode: Manual
                       ole_drop_mode: None
                       picture: ~
-                      stretch: false
+                      stretch: true
                       tool_tip_text: ""
                       top: 795
                       visible: Visible
@@ -272,9 +271,9 @@ form:
                 kind:
                   Label:
                     properties:
-                      alignment: LeftJustify
+                      alignment: RightJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -315,9 +314,9 @@ form:
                 kind:
                   Label:
                     properties:
-                      alignment: LeftJustify
+                      alignment: RightJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -360,7 +359,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15
@@ -401,7 +400,7 @@ form:
                 kind:
                   Label:
                     properties:
-                      alignment: LeftJustify
+                      alignment: RightJustify
                       appearance: ThreeD
                       auto_size: Fixed
                       back_color:
@@ -446,7 +445,7 @@ form:
                     properties:
                       alignment: LeftJustify
                       appearance: ThreeD
-                      auto_size: Fixed
+                      auto_size: Resize
                       back_color:
                         System:
                           index: 15

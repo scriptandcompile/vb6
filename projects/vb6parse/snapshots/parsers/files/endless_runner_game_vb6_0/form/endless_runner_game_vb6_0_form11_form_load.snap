@@ -67,13 +67,13 @@ form:
       scale_top: 0
       scale_width: 4560
       show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
       whats_this_help: F1Help
       width: 240
-      window_state: Normal
+      window_state: Maximized
     controls:
       - name: nametxt
         tag: ""
@@ -360,7 +360,7 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               auto_size: Fixed
               back_color:
@@ -405,7 +405,7 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               auto_size: Fixed
               back_color:
@@ -460,7 +460,7 @@ form:
                 Top: "6600"
                 URL: ""
                 Width: "3015"
-                autoStart: "-1  'True"
+                autoStart: "-1"
                 balance: "0"
                 baseURL: ""
                 captioningID: ""
@@ -469,18 +469,18 @@ form:
                 cx: "5318"
                 cy: "3836"
                 defaultFrame: ""
-                enableContextMenu: "-1  'True"
-                enableErrorDialogs: "0   'False"
-                enabled: "-1  'True"
-                fullScreen: "0   'False"
-                invokeURLs: "-1  'True"
-                mute: "0   'False"
+                enableContextMenu: "-1"
+                enableErrorDialogs: "0"
+                enabled: "-1"
+                fullScreen: "0"
+                invokeURLs: "-1"
+                mute: "0"
                 playCount: "1"
                 rate: "1"
-                stretchToFit: "0   'False"
+                stretchToFit: "0"
                 uiMode: full
                 volume: "50"
-                windowlessVideo: "0   'False"
+                windowlessVideo: "0"
             property_groups: []
       - name: Label1
         tag: ""
@@ -488,7 +488,7 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               auto_size: Fixed
               back_color:
@@ -538,13 +538,13 @@ form:
                   red: 64
                   green: 64
                   blue: 64
-              back_style: Transparent
+              back_style: Opaque
               border_color:
                 RGB:
                   red: 0
                   green: 0
                   blue: 0
-              border_style: Solid
+              border_style: InsideSolid
               border_width: 1
               draw_mode: CopyPen
               fill_color:

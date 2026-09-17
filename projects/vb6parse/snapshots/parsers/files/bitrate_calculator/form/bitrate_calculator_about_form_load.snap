@@ -13,7 +13,7 @@ form:
       back_color:
         System:
           index: 15
-      border_style: Sizable
+      border_style: FixedDialog
       caption: About...
       client_height: 4110
       client_left: 45
@@ -49,9 +49,9 @@ form:
       left: 0
       link_mode: None
       link_topic: Form1
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -66,8 +66,8 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 4095
-      show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      show_in_taskbar: Hide
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -164,12 +164,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
-              auto_size: Fixed
+              appearance: Flat
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Free and Open Source GNU/GPL
               data_field: ""
@@ -207,12 +207,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
-              auto_size: Fixed
+              appearance: Flat
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: ©2012 philippe734
               data_field: ""
@@ -250,12 +250,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
+              appearance: Flat
               auto_size: Fixed
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "$\"frmAbout.frx\":000"
               data_field: ""
@@ -315,7 +315,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Donate
               data_field: ""
@@ -337,7 +337,7 @@ form:
               link_timeout: 50
               link_topic: ""
               mouse_icon: ~
-              mouse_pointer: Default
+              mouse_pointer: Custom
               ole_drop_mode: None
               right_to_left: LeftToRight
               tab_index: 4
@@ -360,7 +360,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Source code and last version
               data_field: ""
@@ -382,7 +382,7 @@ form:
               link_timeout: 50
               link_topic: ""
               mouse_icon: ~
-              mouse_pointer: Default
+              mouse_pointer: Custom
               ole_drop_mode: None
               right_to_left: LeftToRight
               tab_index: 2
@@ -400,12 +400,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
-              auto_size: Fixed
+              appearance: Flat
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: App title
               data_field: ""

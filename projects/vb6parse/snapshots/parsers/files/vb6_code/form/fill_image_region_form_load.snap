@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/vb6_code/form.rs
-assertion_line: 497
 expression: form_file
 ---
 form:
@@ -9,8 +8,8 @@ form:
     tag: ""
     index: 0
     properties:
-      appearance: ThreeD
-      auto_redraw: Manual
+      appearance: Flat
+      auto_redraw: Automatic
       back_color:
         System:
           index: 5
@@ -29,7 +28,7 @@ form:
       fill_color:
         System:
           index: 0
-      fill_style: Transparent
+      fill_style: Solid
       font:
         name: "\"Arial\""
         size: 8.25
@@ -66,7 +65,7 @@ form:
       right_to_left: LeftToRight
       scale_height: 441
       scale_left: 0
-      scale_mode: Twip
+      scale_mode: Pixel
       scale_top: 0
       scale_width: 523
       show_in_taskbar: Show
@@ -85,7 +84,7 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
+              appearance: Flat
               auto_redraw: Manual
               auto_size: Fixed
               back_color:
@@ -107,7 +106,7 @@ form:
               fill_color:
                 System:
                   index: 0
-              fill_style: Transparent
+              fill_style: Solid
               font_transparent: Transparent
               fore_color:
                 System:
@@ -129,7 +128,7 @@ form:
               right_to_left: LeftToRight
               scale_height: 399
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 503
               tab_index: 1
@@ -147,12 +146,12 @@ form:
           Label:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
+              appearance: Flat
               auto_size: Fixed
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Use the left mouse button to draw lines, and the right button to fill a region with color."
               data_field: ""

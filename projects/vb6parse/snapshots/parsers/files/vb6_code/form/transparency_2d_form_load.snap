@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/vb6_code/form.rs
-assertion_line: 1041
 expression: form_file
 ---
 form:
@@ -9,7 +8,7 @@ form:
     tag: ""
     index: 0
     properties:
-      appearance: ThreeD
+      appearance: Flat
       auto_redraw: Manual
       back_color:
         RGB:
@@ -66,11 +65,11 @@ form:
       right_to_left: LeftToRight
       scale_height: 382
       scale_left: 0
-      scale_mode: Twip
+      scale_mode: Pixel
       scale_top: 0
       scale_width: 422
       show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -112,8 +111,8 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
+              appearance: Flat
+              auto_redraw: Automatic
               auto_size: Fixed
               back_color:
                 System:
@@ -156,7 +155,7 @@ form:
               right_to_left: LeftToRight
               scale_height: 300
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 400
               tab_index: 2
@@ -174,9 +173,9 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
-              auto_size: Fixed
+              appearance: Flat
+              auto_redraw: Automatic
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
@@ -218,14 +217,14 @@ form:
               right_to_left: LeftToRight
               scale_height: 300
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 400
               tab_index: 1
               tab_stop: Included
               tool_tip_text: ""
               top: 120
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 6030
             controls: []
@@ -236,9 +235,9 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
-              auto_size: Fixed
+              appearance: Flat
+              auto_redraw: Automatic
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
@@ -280,14 +279,14 @@ form:
               right_to_left: LeftToRight
               scale_height: 300
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 400
               tab_index: 0
               tab_stop: Included
               tool_tip_text: ""
               top: 120
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 6030
             controls: []
@@ -297,13 +296,13 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
-              appearance: ThreeD
+              alignment: Center
+              appearance: Flat
               auto_size: Fixed
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Percent Transparency:"
               data_field: ""

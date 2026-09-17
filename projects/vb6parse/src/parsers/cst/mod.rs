@@ -947,7 +947,10 @@ impl<'a> Parser<'a> {
         let value_start = self.pos;
         let mut in_resource_reference = false;
 
-        while !self.is_at_end() && !self.at_token(Token::Newline) {
+        while !self.is_at_end()
+            && !self.at_token(Token::Newline)
+            && !self.at_token(Token::EndOfLineComment)
+        {
             if let Some((_, token)) = self.tokens.get(self.pos) {
                 let token_copy = *token;
 
@@ -4088,6 +4091,45 @@ End Sub
         let (key, value) = property.expect("Expected property to be parsed");
         assert_eq!(key, "Caption");
         assert_eq!(value, "\"Hello World\"");
+    }
+
+    #[test]
+    fn parse_property_direct_with_trailing_comment() {
+        for (source, expected) in [
+            ("Enabled = 0   'False\n", "0"),
+            ("MultiLine = -1  'True\n", "-1"),
+            ("Style = 1  'Graphical\n", "1"),
+            ("Appearance = 0    'Flat\n", "0"),
+        ] {
+            let mut stream = SourceStream::new("test.frm".to_string(), source);
+            let (token_stream_opt, _) = tokenize(&mut stream).unpack();
+            let token_stream = token_stream_opt.expect("Tokenization failed");
+            let tokens = token_stream.into_tokens();
+
+            let mut parser = Parser::new_direct_extraction(tokens, 0);
+            let property = parser.parse_property_direct();
+
+            assert!(property.is_some(), "Expected property to be parsed");
+            let (key, value) = property.expect("Expected property to be parsed");
+            assert_eq!(value, expected, "value for {key} should not include the comment");
+        }
+    }
+
+    #[test]
+    fn parse_property_direct_string_with_apostrophe() {
+        let source = "Text = \"It's a test\"  'comment\n";
+        let mut stream = SourceStream::new("test.frm".to_string(), source);
+        let (token_stream_opt, _) = tokenize(&mut stream).unpack();
+        let token_stream = token_stream_opt.expect("Tokenization failed");
+        let tokens = token_stream.into_tokens();
+
+        let mut parser = Parser::new_direct_extraction(tokens, 0);
+        let property = parser.parse_property_direct();
+
+        assert!(property.is_some());
+        let (key, value) = property.expect("Expected property to be parsed");
+        assert_eq!(key, "Text");
+        assert_eq!(value, "\"It's a test\"");
     }
 
     #[test]

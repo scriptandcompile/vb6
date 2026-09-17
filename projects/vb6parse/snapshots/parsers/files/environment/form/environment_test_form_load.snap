@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/environment/form.rs
-assertion_line: 469
 expression: form_file
 ---
 form:
@@ -10,13 +9,13 @@ form:
     index: 0
     properties:
       appearance: ThreeD
-      auto_redraw: Manual
+      auto_redraw: Automatic
       back_color:
         RGB:
           red: 59
           green: 59
           blue: 59
-      border_style: Sizable
+      border_style: None
       caption: Form1
       client_height: 5295
       client_left: 3000
@@ -48,13 +47,13 @@ form:
       height: 240
       help_context_id: 0
       icon: ~
-      key_preview: false
+      key_preview: true
       left: 0
       link_mode: None
       link_topic: Form2
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -66,10 +65,10 @@ form:
       right_to_left: LeftToRight
       scale_height: 5295
       scale_left: 0
-      scale_mode: Twip
+      scale_mode: User
       scale_top: 0
       scale_width: 7860
-      show_in_taskbar: Show
+      show_in_taskbar: Hide
       start_up_position: WindowsDefault
       top: 0
       visible: Visible
@@ -93,10 +92,10 @@ form:
                 Height: "1920"
                 Left: "4050"
                 Max: "1"
-                ShowBar: "0   'False"
+                ShowBar: "0"
                 TabIndex: "5"
                 Top: "810"
-                Vertical: "-1  'True"
+                Vertical: "-1"
                 Width: "3705"
             property_groups:
               - name: Font
@@ -105,15 +104,15 @@ form:
                   Charset:
                     Left: "0"
                   Italic:
-                    Left: "0   'False"
+                    Left: "0"
                   Name:
                     Left: "\"Arial\""
                   Size:
                     Left: "12"
                   Strikethrough:
-                    Left: "0   'False"
+                    Left: "0"
                   Underline:
-                    Left: "0   'False"
+                    Left: "0"
                   Weight:
                     Left: "700"
       - name: gList3
@@ -132,9 +131,9 @@ form:
                 Left: "90"
                 Max: "1"
                 TabIndex: "2"
-                TabStop: "0   'False"
+                TabStop: "0"
                 Top: "810"
-                Vertical: "-1  'True"
+                Vertical: "-1"
                 Width: "3930"
             property_groups:
               - name: Font
@@ -143,15 +142,15 @@ form:
                   Charset:
                     Left: "161"
                   Italic:
-                    Left: "0   'False"
+                    Left: "0"
                   Name:
                     Left: "\"Arial\""
                   Size:
                     Left: "11.25"
                   Strikethrough:
-                    Left: "0   'False"
+                    Left: "0"
                   Underline:
-                    Left: "0   'False"
+                    Left: "0"
                   Weight:
                     Left: "700"
       - name: gList0
@@ -168,10 +167,10 @@ form:
                 Height: "555"
                 Left: "90"
                 Max: "1"
-                ShowBar: "0   'False"
+                ShowBar: "0"
                 TabIndex: "1"
                 Top: "4620"
-                Vertical: "-1  'True"
+                Vertical: "-1"
                 Width: "7665"
             property_groups:
               - name: Font
@@ -180,15 +179,15 @@ form:
                   Charset:
                     Left: "0"
                   Italic:
-                    Left: "0   'False"
+                    Left: "0"
                   Name:
                     Left: "\"Arial\""
                   Size:
                     Left: "11.25"
                   Strikethrough:
-                    Left: "0   'False"
+                    Left: "0"
                   Underline:
-                    Left: "0   'False"
+                    Left: "0"
                   Weight:
                     Left: "700"
       - name: gList1
@@ -205,10 +204,10 @@ form:
                 Height: "1800"
                 Left: "90"
                 Max: "1"
-                ShowBar: "0   'False"
+                ShowBar: "0"
                 TabIndex: "0"
                 Top: "2775"
-                Vertical: "-1  'True"
+                Vertical: "-1"
                 Width: "7665"
             property_groups:
               - name: Font
@@ -217,15 +216,15 @@ form:
                   Charset:
                     Left: "0"
                   Italic:
-                    Left: "0   'False"
+                    Left: "0"
                   Name:
                     Left: "\"Arial\""
                   Size:
                     Left: "11.25"
                   Strikethrough:
-                    Left: "0   'False"
+                    Left: "0"
                   Underline:
-                    Left: "0   'False"
+                    Left: "0"
                   Weight:
                     Left: "700"
       - name: gList3
@@ -243,11 +242,11 @@ form:
                 Index: "1"
                 Left: "90"
                 Max: "1"
-                ShowBar: "0   'False"
+                ShowBar: "0"
                 TabIndex: "3"
-                TabStop: "0   'False"
+                TabStop: "0"
                 Top: "1455"
-                Vertical: "-1  'True"
+                Vertical: "-1"
                 Width: "3930"
             property_groups:
               - name: Font
@@ -256,15 +255,15 @@ form:
                   Charset:
                     Left: "0"
                   Italic:
-                    Left: "0   'False"
+                    Left: "0"
                   Name:
                     Left: "\"Arial\""
                   Size:
                     Left: "11.25"
                   Strikethrough:
-                    Left: "0   'False"
+                    Left: "0"
                   Underline:
-                    Left: "0   'False"
+                    Left: "0"
                   Weight:
                     Left: "700"
       - name: gList3
@@ -282,11 +281,11 @@ form:
                 Index: "2"
                 Left: "90"
                 Max: "1"
-                ShowBar: "0   'False"
+                ShowBar: "0"
                 TabIndex: "4"
-                TabStop: "0   'False"
+                TabStop: "0"
                 Top: "2115"
-                Vertical: "-1  'True"
+                Vertical: "-1"
                 Width: "3930"
             property_groups:
               - name: Font
@@ -295,15 +294,15 @@ form:
                   Charset:
                     Left: "0"
                   Italic:
-                    Left: "0   'False"
+                    Left: "0"
                   Name:
                     Left: "\"Arial\""
                   Size:
                     Left: "11.25"
                   Strikethrough:
-                    Left: "0   'False"
+                    Left: "0"
                   Underline:
-                    Left: "0   'False"
+                    Left: "0"
                   Weight:
                     Left: "700"
       - name: gList2
@@ -315,7 +314,7 @@ form:
               property_store:
                 Backcolor: "3881787"
                 CapColor: "16777215"
-                Enabled: "-1  'True"
+                Enabled: "-1"
                 ExtentX: "13467"
                 ExtentY: "873"
                 ForeColor: "16777215"
@@ -323,9 +322,9 @@ form:
                 Left: "105"
                 Max: "1"
                 TabIndex: "6"
-                TabStop: "0   'False"
+                TabStop: "0"
                 Top: "135"
-                Vertical: "-1  'True"
+                Vertical: "-1"
                 Width: "7635"
             property_groups:
               - name: Font
@@ -334,15 +333,15 @@ form:
                   Charset:
                     Left: "161"
                   Italic:
-                    Left: "0   'False"
+                    Left: "0"
                   Name:
                     Left: "\"Arial\""
                   Size:
                     Left: "14.25"
                   Strikethrough:
-                    Left: "0   'False"
+                    Left: "0"
                   Underline:
-                    Left: "0   'False"
+                    Left: "0"
                   Weight:
                     Left: "400"
     menus: []

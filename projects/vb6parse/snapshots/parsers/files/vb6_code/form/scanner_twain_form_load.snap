@@ -8,7 +8,7 @@ form:
     tag: ""
     index: 0
     properties:
-      appearance: ThreeD
+      appearance: Flat
       auto_redraw: Manual
       back_color:
         System:
@@ -63,7 +63,7 @@ form:
       right_to_left: LeftToRight
       scale_height: 500
       scale_left: 0
-      scale_mode: Twip
+      scale_mode: Pixel
       scale_top: 0
       scale_width: 704
       show_in_taskbar: Show
@@ -81,7 +81,7 @@ form:
         kind:
           Frame:
             properties:
-              appearance: ThreeD
+              appearance: Flat
               back_color:
                 System:
                   index: 5
@@ -115,7 +115,7 @@ form:
                   OptionButton:
                     properties:
                       alignment: LeftJustify
-                      appearance: ThreeD
+                      appearance: Flat
                       back_color:
                         System:
                           index: 5
@@ -159,7 +159,7 @@ form:
                   OptionButton:
                     properties:
                       alignment: LeftJustify
-                      appearance: ThreeD
+                      appearance: Flat
                       back_color:
                         System:
                           index: 5
@@ -203,9 +203,9 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
-              auto_size: Fixed
+              appearance: Flat
+              auto_redraw: Automatic
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
@@ -247,14 +247,14 @@ form:
               right_to_left: LeftToRight
               scale_height: 39
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 39
               tab_index: 4
               tab_stop: Included
               tool_tip_text: ""
               top: 5400
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 615
             controls: []
@@ -265,8 +265,8 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
+              appearance: Flat
+              auto_redraw: Automatic
               auto_size: Fixed
               back_color:
                 System:
@@ -309,7 +309,7 @@ form:
               right_to_left: LeftToRight
               scale_height: 463
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 463
               tab_index: 2
@@ -414,7 +414,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "(If a scanner is not manually selected, the program will use the default system scanner)"
               data_field: ""
@@ -453,13 +453,13 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
-              appearance: ThreeD
+              alignment: Center
+              appearance: Flat
               auto_size: Fixed
               back_color:
                 System:
                   index: 5
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: Image acquired successfully!
               data_field: ""
@@ -488,7 +488,7 @@ form:
               tool_tip_text: ""
               top: 4320
               use_mnemonic: true
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 2895
               word_wrap: NonWrapping

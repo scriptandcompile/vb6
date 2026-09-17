@@ -73,7 +73,7 @@ form:
       whats_this_button: Excluded
       whats_this_help: F1Help
       width: 240
-      window_state: Normal
+      window_state: Maximized
     controls:
       - name: coins
         tag: ""
@@ -153,7 +153,7 @@ form:
               tab_stop: Included
               tool_tip_text: ""
               top: 5280
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 9615
             controls:
@@ -191,13 +191,13 @@ form:
                       ole_drop_mode: None
                       picture: ~
                       right_to_left: LeftToRight
-                      style: Standard
+                      style: Graphical
                       tab_index: 9
                       tab_stop: Included
                       tool_tip_text: ""
                       top: 4440
-                      use_mask_color: DoNotUseMaskColor
-                      visible: Visible
+                      use_mask_color: UseMaskColor
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 2055
               - name: Command2
@@ -234,13 +234,13 @@ form:
                       ole_drop_mode: None
                       picture: ~
                       right_to_left: LeftToRight
-                      style: Standard
+                      style: Graphical
                       tab_index: 8
                       tab_stop: Included
                       tool_tip_text: ""
                       top: 4320
                       use_mask_color: DoNotUseMaskColor
-                      visible: Visible
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 2055
       - name: Timer8
@@ -266,7 +266,7 @@ form:
               back_color:
                 System:
                   index: 15
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -369,7 +369,7 @@ form:
               ole_drop_mode: None
               picture: ~
               right_to_left: LeftToRight
-              style: Standard
+              style: Graphical
               tab_index: 3
               tab_stop: Included
               tool_tip_text: ""
@@ -412,13 +412,13 @@ form:
               ole_drop_mode: None
               picture: ~
               right_to_left: LeftToRight
-              style: Standard
+              style: Graphical
               tab_index: 1
               tab_stop: Included
               tool_tip_text: ""
               top: 13200
               use_mask_color: DoNotUseMaskColor
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 1695
       - name: Timer7
@@ -499,12 +499,12 @@ form:
             properties:
               align: None
               appearance: ThreeD
-              auto_redraw: Manual
+              auto_redraw: Automatic
               auto_size: Fixed
               back_color:
                 System:
                   index: 15
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -513,8 +513,8 @@ form:
               data_source: ""
               drag_icon: ~
               drag_mode: Manual
-              draw_mode: CopyPen
-              draw_style: Solid
+              draw_mode: Whiteness
+              draw_style: Transparent
               draw_width: 1
               enabled: Enabled
               fill_color:
@@ -527,7 +527,7 @@ form:
               fore_color:
                 System:
                   index: 18
-              has_dc: HasContext
+              has_dc: NoContext
               height: 6615
               help_context_id: 0
               left: -15000
@@ -561,7 +561,7 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               auto_size: Fixed
               back_color:
@@ -606,7 +606,7 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               auto_size: Fixed
               back_color:
@@ -796,7 +796,7 @@ form:
                   red: 255
                   green: 128
                   blue: 0
-              back_style: Transparent
+              back_style: Opaque
               border_color:
                 System:
                   index: 8
@@ -905,7 +905,7 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               auto_size: Fixed
               back_color:
@@ -950,7 +950,7 @@ form:
         kind:
           Label:
             properties:
-              alignment: LeftJustify
+              alignment: Center
               appearance: ThreeD
               auto_size: Fixed
               back_color:
@@ -1005,7 +1005,7 @@ form:
                 Top: "3360"
                 URL: ""
                 Width: "615"
-                autoStart: "-1  'True"
+                autoStart: "-1"
                 balance: "0"
                 baseURL: ""
                 captioningID: ""
@@ -1014,18 +1014,18 @@ form:
                 cx: "1085"
                 cy: "1085"
                 defaultFrame: ""
-                enableContextMenu: "-1  'True"
-                enableErrorDialogs: "0   'False"
-                enabled: "-1  'True"
-                fullScreen: "0   'False"
-                invokeURLs: "-1  'True"
-                mute: "0   'False"
+                enableContextMenu: "-1"
+                enableErrorDialogs: "0"
+                enabled: "-1"
+                fullScreen: "0"
+                invokeURLs: "-1"
+                mute: "0"
                 playCount: "1"
                 rate: "1"
-                stretchToFit: "0   'False"
+                stretchToFit: "0"
                 uiMode: full
                 volume: "50"
-                windowlessVideo: "0   'False"
+                windowlessVideo: "0"
             property_groups: []
       - name: Image6
         tag: ""
@@ -1094,7 +1094,7 @@ form:
                   red: 192
                   green: 192
                   blue: 192
-              back_style: Transparent
+              back_style: Opaque
               border_color:
                 System:
                   index: 8
@@ -1124,7 +1124,7 @@ form:
                   red: 192
                   green: 192
                   blue: 192
-              back_style: Transparent
+              back_style: Opaque
               border_color:
                 System:
                   index: 8
@@ -1154,7 +1154,7 @@ form:
                   red: 255
                   green: 0
                   blue: 0
-              back_style: Transparent
+              back_style: Opaque
               border_color:
                 System:
                   index: 8
@@ -1184,7 +1184,7 @@ form:
                   red: 0
                   green: 255
                   blue: 0
-              back_style: Transparent
+              back_style: Opaque
               border_color:
                 System:
                   index: 8
@@ -1231,7 +1231,7 @@ form:
               left: 21480
               shape: Rectangle
               top: 15120
-              visible: Visible
+              visible: Hidden
               width: 975
       - name: hreen
         tag: ""
@@ -1261,7 +1261,7 @@ form:
               left: 22440
               shape: Rectangle
               top: 15120
-              visible: Visible
+              visible: Hidden
               width: 975
       - name: obs2
         tag: ""
@@ -1302,7 +1302,7 @@ form:
                   red: 255
                   green: 0
                   blue: 0
-              back_style: Transparent
+              back_style: Opaque
               border_color:
                 System:
                   index: 8
@@ -1390,7 +1390,7 @@ form:
               data_member: ""
               data_source: ""
               drag_icon: ~
-              drag_mode: Manual
+              drag_mode: Automatic
               enabled: Enabled
               height: 2265
               left: 22440
@@ -1418,7 +1418,7 @@ form:
               data_member: ""
               data_source: ""
               drag_icon: ~
-              drag_mode: Manual
+              drag_mode: Automatic
               enabled: Enabled
               height: 2265
               left: -14760
@@ -1444,7 +1444,7 @@ form:
                   red: 255
                   green: 128
                   blue: 0
-              back_style: Transparent
+              back_style: Opaque
               border_color:
                 System:
                   index: 8
@@ -1479,7 +1479,7 @@ form:
                 Top: "240"
                 URL: ""
                 Width: "975"
-                autoStart: "-1  'True"
+                autoStart: "-1"
                 balance: "0"
                 baseURL: ""
                 captioningID: ""
@@ -1488,18 +1488,18 @@ form:
                 cx: "1720"
                 cy: "1720"
                 defaultFrame: ""
-                enableContextMenu: "-1  'True"
-                enableErrorDialogs: "0   'False"
-                enabled: "-1  'True"
-                fullScreen: "0   'False"
-                invokeURLs: "-1  'True"
-                mute: "0   'False"
+                enableContextMenu: "-1"
+                enableErrorDialogs: "0"
+                enabled: "-1"
+                fullScreen: "0"
+                invokeURLs: "-1"
+                mute: "0"
                 playCount: "1"
                 rate: "1"
-                stretchToFit: "0   'False"
+                stretchToFit: "0"
                 uiMode: full
                 volume: "50"
-                windowlessVideo: "0   'False"
+                windowlessVideo: "0"
             property_groups: []
       - name: Shape1
         tag: ""

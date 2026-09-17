@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/vb6_code/form.rs
-assertion_line: 200
 expression: form_file
 ---
 form:
@@ -10,7 +9,7 @@ form:
     index: 0
     properties:
       appearance: ThreeD
-      auto_redraw: Manual
+      auto_redraw: Automatic
       back_color:
         RGB:
           red: 192
@@ -66,11 +65,11 @@ form:
       right_to_left: LeftToRight
       scale_height: 368
       scale_left: 0
-      scale_mode: Twip
+      scale_mode: Pixel
       scale_top: 0
       scale_width: 415
       show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -112,7 +111,7 @@ form:
           CheckBox:
             properties:
               alignment: LeftJustify
-              appearance: ThreeD
+              appearance: Flat
               back_color:
                 RGB:
                   red: 192
@@ -151,7 +150,7 @@ form:
               tool_tip_text: ""
               top: 4800
               use_mask_color: DoNotUseMaskColor
-              value: Unchecked
+              value: Checked
               visible: Visible
               whats_this_help_id: 0
               width: 2295
@@ -162,8 +161,8 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
+              appearance: Flat
+              auto_redraw: Automatic
               auto_size: Fixed
               back_color:
                 System:
@@ -206,7 +205,7 @@ form:
               right_to_left: LeftToRight
               scale_height: 300
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 400
               tab_index: 4
@@ -224,9 +223,9 @@ form:
           PictureBox:
             properties:
               align: None
-              appearance: ThreeD
-              auto_redraw: Manual
-              auto_size: Fixed
+              appearance: Flat
+              auto_redraw: Automatic
+              auto_size: Resize
               back_color:
                 System:
                   index: 5
@@ -268,7 +267,7 @@ form:
               right_to_left: LeftToRight
               scale_height: 300
               scale_left: 0
-              scale_mode: Twip
+              scale_mode: Pixel
               scale_top: 0
               scale_width: 400
               tab_index: 0
@@ -287,7 +286,7 @@ form:
             properties:
               alignment: LeftJustify
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 RGB:
                   red: 192

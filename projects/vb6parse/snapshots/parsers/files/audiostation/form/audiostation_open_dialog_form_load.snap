@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/audiostation/form.rs
-assertion_line: 228
 expression: form_file
 ---
 form:
@@ -16,7 +15,7 @@ form:
           red: 192
           green: 192
           blue: 192
-      border_style: Sizable
+      border_style: FixedDialog
       caption: Open Stream
       client_height: 5535
       client_left: 45
@@ -52,9 +51,9 @@ form:
       left: 0
       link_mode: None
       link_topic: Form1
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -69,7 +68,7 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 8295
-      show_in_taskbar: Show
+      show_in_taskbar: Hide
       start_up_position: WindowsDefault
       top: 0
       visible: Visible
@@ -87,8 +86,8 @@ form:
               property_store:
                 BackColor: "12632256"
                 ControlCount: "2"
-                ControlEnabled: "-1  'True"
-                Enabled: "0   'False"
+                ControlEnabled: "-1"
+                Enabled: "0"
                 ExtentX: "14208"
                 ExtentY: "8493"
                 Height: "4815"

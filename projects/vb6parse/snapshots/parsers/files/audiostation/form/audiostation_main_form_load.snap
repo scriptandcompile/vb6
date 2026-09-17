@@ -15,7 +15,7 @@ form:
           red: 0
           green: 0
           blue: 0
-      border_style: Sizable
+      border_style: FixedSingle
       caption: Audiostation
       client_height: 10005
       client_left: 4695
@@ -51,14 +51,14 @@ form:
       left: 0
       link_mode: None
       link_topic: Form1
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
       min_button: Included
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
       negotiate_menus: true
-      ole_drop_mode: None
+      ole_drop_mode: Manual
       palette: ~
       palette_mode: HalfTone
       picture: ~
@@ -69,7 +69,7 @@ form:
       scale_top: 0
       scale_width: 12960
       show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      start_up_position: CenterScreen
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -107,14 +107,14 @@ form:
             properties:
               align: None
               appearance: ThreeD
-              auto_redraw: Manual
+              auto_redraw: Automatic
               auto_size: Fixed
               back_color:
                 RGB:
                   red: 255
                   green: 255
                   blue: 0
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -192,7 +192,7 @@ form:
                   red: 0
                   green: 0
                   blue: 0
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -316,7 +316,7 @@ form:
                                 DigitDisplay: "00:00:00"
                                 DigitFormat: "2"
                                 DigitJustify: "0"
-                                DigitOutLine: "0   'False"
+                                DigitOutLine: "0"
                                 DigitSize: "1"
                                 ExtentX: "3122"
                                 ExtentY: "714"
@@ -334,11 +334,11 @@ form:
                             properties:
                               alignment: LeftJustify
                               appearance: ThreeD
-                              auto_size: Fixed
+                              auto_size: Resize
                               back_color:
                                 System:
                                   index: 15
-                              back_style: Opaque
+                              back_style: Transparent
                               border_style: None
                               caption: Copyright © 2009 - 2025 Sibra-Soft
                               data_field: ""
@@ -379,11 +379,11 @@ form:
                             properties:
                               alignment: LeftJustify
                               appearance: ThreeD
-                              auto_size: Fixed
+                              auto_size: Resize
                               back_color:
                                 System:
                                   index: 15
-                              back_style: Opaque
+                              back_style: Transparent
                               border_style: None
                               caption: "--"
                               data_field: ""
@@ -422,7 +422,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 500
               left: 9840
               top: 0
@@ -432,7 +432,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 110
               left: 10440
               top: 0
@@ -442,7 +442,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 10
               left: 10320
               top: 0
@@ -604,7 +604,7 @@ form:
         kind:
           Timer:
             properties:
-              enabled: Enabled
+              enabled: Disabled
               interval: 80
               left: 10440
               top: 0
@@ -623,7 +623,7 @@ form:
                   red: 0
                   green: 0
                   blue: 0
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -680,32 +680,32 @@ form:
                     properties:
                       property_store:
                         Alignment: "0"
-                        AutoFrameRate: "0   'False"
-                        AutoSize: "0   'False"
+                        AutoFrameRate: "0"
+                        AutoSize: "0"
                         BackGroundColor: "-16777201"
                         BorderStyle: "0"
                         Caption: MIDI
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         FontColor: "-16777208"
                         Height: "14"
                         Left: "6600"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
+                        OptionSaveAllProperties: "0"
                         OuterMarginBottom: "0"
                         OuterMarginLeft: "0"
                         OuterMarginRight: "0"
                         OuterMarginTop: "0"
                         ShadowColor: "16777215"
-                        ShadowShow: "-1  'True"
+                        ShadowShow: "-1"
                         ShadowXOffset: "-1"
                         ShadowYOffset: "-1"
                         TabIndex: "116"
                         Top: "1185"
-                        Transparent: "-1  'True"
+                        Transparent: "-1"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "57"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: Font
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -713,15 +713,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: iLabelX3
@@ -732,32 +732,32 @@ form:
                     properties:
                       property_store:
                         Alignment: "0"
-                        AutoFrameRate: "0   'False"
-                        AutoSize: "0   'False"
+                        AutoFrameRate: "0"
+                        AutoSize: "0"
                         BackGroundColor: "-16777201"
                         BorderStyle: "0"
                         Caption: CD
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         FontColor: "-16777208"
                         Height: "14"
                         Left: "4440"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
+                        OptionSaveAllProperties: "0"
                         OuterMarginBottom: "0"
                         OuterMarginLeft: "0"
                         OuterMarginRight: "0"
                         OuterMarginTop: "0"
                         ShadowColor: "16777215"
-                        ShadowShow: "-1  'True"
+                        ShadowShow: "-1"
                         ShadowXOffset: "-1"
                         ShadowYOffset: "-1"
                         TabIndex: "152"
                         Top: "1185"
-                        Transparent: "-1  'True"
+                        Transparent: "-1"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "57"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: Font
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -765,15 +765,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: iLabelX4
@@ -784,32 +784,32 @@ form:
                     properties:
                       property_store:
                         Alignment: "0"
-                        AutoFrameRate: "0   'False"
-                        AutoSize: "0   'False"
+                        AutoFrameRate: "0"
+                        AutoSize: "0"
                         BackGroundColor: "-16777201"
                         BorderStyle: "0"
                         Caption: DAT
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         FontColor: "-16777208"
                         Height: "14"
                         Left: "5520"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
+                        OptionSaveAllProperties: "0"
                         OuterMarginBottom: "0"
                         OuterMarginLeft: "0"
                         OuterMarginRight: "0"
                         OuterMarginTop: "0"
                         ShadowColor: "16777215"
-                        ShadowShow: "-1  'True"
+                        ShadowShow: "-1"
                         ShadowXOffset: "-1"
                         ShadowYOffset: "-1"
                         TabIndex: "108"
                         Top: "1185"
-                        Transparent: "-1  'True"
+                        Transparent: "-1"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "57"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: Font
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -817,15 +817,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: ILaMaster
@@ -836,32 +836,32 @@ form:
                     properties:
                       property_store:
                         Alignment: "0"
-                        AutoFrameRate: "0   'False"
-                        AutoSize: "0   'False"
+                        AutoFrameRate: "0"
+                        AutoSize: "0"
                         BackGroundColor: "12632256"
                         BorderStyle: "0"
                         Caption: Master
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         FontColor: "-16777208"
                         Height: "13"
                         Left: "120"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
+                        OptionSaveAllProperties: "0"
                         OuterMarginBottom: "0"
                         OuterMarginLeft: "0"
                         OuterMarginRight: "0"
                         OuterMarginTop: "0"
                         ShadowColor: "16777215"
-                        ShadowShow: "-1  'True"
+                        ShadowShow: "-1"
                         ShadowXOffset: "-1"
                         ShadowYOffset: "-1"
                         TabIndex: "73"
                         Top: "1192"
-                        Transparent: "-1  'True"
+                        Transparent: "-1"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "81"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: Font
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -869,15 +869,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: iLabelX2
@@ -888,32 +888,32 @@ form:
                     properties:
                       property_store:
                         Alignment: "0"
-                        AutoFrameRate: "0   'False"
-                        AutoSize: "0   'False"
+                        AutoFrameRate: "0"
+                        AutoSize: "0"
                         BackGroundColor: "-16777201"
                         BorderStyle: "0"
                         Caption: REC
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         FontColor: "-16777208"
                         Height: "14"
                         Left: "3210"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
+                        OptionSaveAllProperties: "0"
                         OuterMarginBottom: "0"
                         OuterMarginLeft: "0"
                         OuterMarginRight: "0"
                         OuterMarginTop: "0"
                         ShadowColor: "16777215"
-                        ShadowShow: "-1  'True"
+                        ShadowShow: "-1"
                         ShadowXOffset: "-1"
                         ShadowYOffset: "-1"
                         TabIndex: "67"
                         Top: "1185"
-                        Transparent: "-1  'True"
+                        Transparent: "-1"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "60"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: Font
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -921,15 +921,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: Slider_Master
@@ -1017,19 +1017,19 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "4210752"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "81"
                                 Left: "0"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -1049,12 +1049,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "0"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "66"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "17"
                             property_groups: []
               - name: Slider_Record
@@ -1164,10 +1164,10 @@ form:
                   Custom:
                     properties:
                       property_store:
-                        Active: "-1  'True"
+                        Active: "-1"
                         ActiveColor: "16776960"
-                        AutoFrameRate: "0   'False"
-                        AutoLedSize: "-1  'True"
+                        AutoFrameRate: "0"
+                        AutoLedSize: "-1"
                         BackGroundColor: "12632256"
                         BorderHighlightColor: "-16777196"
                         BorderShadowColor: "8421504"
@@ -1175,15 +1175,15 @@ form:
                         BorderStyle: "0"
                         Caption: MASTER
                         CaptionAlignment: "1"
-                        CaptionFontBold: "0   'False"
+                        CaptionFontBold: "0"
                         CaptionFontColor: "-16777208"
-                        CaptionFontItalic: "0   'False"
+                        CaptionFontItalic: "0"
                         CaptionFontName: Tahoma
                         CaptionFontSize: "8"
-                        CaptionFontStrikeOut: "0   'False"
-                        CaptionFontUnderline: "0   'False"
+                        CaptionFontStrikeOut: "0"
+                        CaptionFontUnderline: "0"
                         CaptionMargin: "5"
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         Glyph: "\"Form_Main.frx\":B9BDF"
                         Height: "18"
                         IndicatorAlignment: "3"
@@ -1193,14 +1193,14 @@ form:
                         Left: "7560"
                         MomentaryStyle: "0"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
-                        ShowFocusRect: "0   'False"
+                        OptionSaveAllProperties: "0"
+                        ShowFocusRect: "0"
                         TabIndex: "118"
                         Top: "300"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "65"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: CaptionFont
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -1208,15 +1208,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: Switch_Rec
@@ -1226,10 +1226,10 @@ form:
                   Custom:
                     properties:
                       property_store:
-                        Active: "-1  'True"
+                        Active: "-1"
                         ActiveColor: "65280"
-                        AutoFrameRate: "0   'False"
-                        AutoLedSize: "-1  'True"
+                        AutoFrameRate: "0"
+                        AutoLedSize: "-1"
                         BackGroundColor: "12632256"
                         BorderHighlightColor: "-16777196"
                         BorderShadowColor: "8421504"
@@ -1237,15 +1237,15 @@ form:
                         BorderStyle: "0"
                         Caption: REC
                         CaptionAlignment: "1"
-                        CaptionFontBold: "0   'False"
+                        CaptionFontBold: "0"
                         CaptionFontColor: "-16777208"
-                        CaptionFontItalic: "0   'False"
+                        CaptionFontItalic: "0"
                         CaptionFontName: Tahoma
                         CaptionFontSize: "8"
-                        CaptionFontStrikeOut: "0   'False"
-                        CaptionFontUnderline: "0   'False"
+                        CaptionFontStrikeOut: "0"
+                        CaptionFontUnderline: "0"
                         CaptionMargin: "5"
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         Glyph: "\"Form_Main.frx\":B9C35"
                         Height: "18"
                         IndicatorAlignment: "3"
@@ -1255,14 +1255,14 @@ form:
                         Left: "1680"
                         MomentaryStyle: "0"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
-                        ShowFocusRect: "0   'False"
+                        OptionSaveAllProperties: "0"
+                        ShowFocusRect: "0"
                         TabIndex: "119"
                         Top: "400"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "65"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: CaptionFont
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -1270,15 +1270,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: Switch_CD
@@ -1288,10 +1288,10 @@ form:
                   Custom:
                     properties:
                       property_store:
-                        Active: "-1  'True"
+                        Active: "-1"
                         ActiveColor: "65280"
-                        AutoFrameRate: "0   'False"
-                        AutoLedSize: "-1  'True"
+                        AutoFrameRate: "0"
+                        AutoLedSize: "-1"
                         BackGroundColor: "12632256"
                         BorderHighlightColor: "-16777196"
                         BorderShadowColor: "8421504"
@@ -1299,15 +1299,15 @@ form:
                         BorderStyle: "0"
                         Caption: CD
                         CaptionAlignment: "1"
-                        CaptionFontBold: "0   'False"
+                        CaptionFontBold: "0"
                         CaptionFontColor: "-16777208"
-                        CaptionFontItalic: "0   'False"
+                        CaptionFontItalic: "0"
                         CaptionFontName: Tahoma
                         CaptionFontSize: "8"
-                        CaptionFontStrikeOut: "0   'False"
-                        CaptionFontUnderline: "0   'False"
+                        CaptionFontStrikeOut: "0"
+                        CaptionFontUnderline: "0"
                         CaptionMargin: "5"
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         Glyph: "\"Form_Main.frx\":B9C8B"
                         Height: "18"
                         IndicatorAlignment: "3"
@@ -1317,14 +1317,14 @@ form:
                         Left: "1680"
                         MomentaryStyle: "0"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
-                        ShowFocusRect: "0   'False"
+                        OptionSaveAllProperties: "0"
+                        ShowFocusRect: "0"
                         TabIndex: "120"
                         Top: "720"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "65"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: CaptionFont
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -1332,15 +1332,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: Switch_Dat
@@ -1350,10 +1350,10 @@ form:
                   Custom:
                     properties:
                       property_store:
-                        Active: "-1  'True"
+                        Active: "-1"
                         ActiveColor: "65280"
-                        AutoFrameRate: "0   'False"
-                        AutoLedSize: "-1  'True"
+                        AutoFrameRate: "0"
+                        AutoLedSize: "-1"
                         BackGroundColor: "12632256"
                         BorderHighlightColor: "-16777196"
                         BorderShadowColor: "8421504"
@@ -1361,15 +1361,15 @@ form:
                         BorderStyle: "0"
                         Caption: DAT
                         CaptionAlignment: "1"
-                        CaptionFontBold: "0   'False"
+                        CaptionFontBold: "0"
                         CaptionFontColor: "-16777208"
-                        CaptionFontItalic: "0   'False"
+                        CaptionFontItalic: "0"
                         CaptionFontName: Tahoma
                         CaptionFontSize: "8"
-                        CaptionFontStrikeOut: "0   'False"
-                        CaptionFontUnderline: "0   'False"
+                        CaptionFontStrikeOut: "0"
+                        CaptionFontUnderline: "0"
                         CaptionMargin: "5"
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         Glyph: "\"Form_Main.frx\":B9CE1"
                         Height: "18"
                         IndicatorAlignment: "3"
@@ -1379,14 +1379,14 @@ form:
                         Left: "7560"
                         MomentaryStyle: "0"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
-                        ShowFocusRect: "0   'False"
+                        OptionSaveAllProperties: "0"
+                        ShowFocusRect: "0"
                         TabIndex: "150"
                         Top: "610"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "65"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: CaptionFont
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -1394,15 +1394,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: Switch_Midi
@@ -1412,10 +1412,10 @@ form:
                   Custom:
                     properties:
                       property_store:
-                        Active: "-1  'True"
+                        Active: "-1"
                         ActiveColor: "65280"
-                        AutoFrameRate: "0   'False"
-                        AutoLedSize: "-1  'True"
+                        AutoFrameRate: "0"
+                        AutoLedSize: "-1"
                         BackGroundColor: "12632256"
                         BorderHighlightColor: "-16777196"
                         BorderShadowColor: "8421504"
@@ -1423,15 +1423,15 @@ form:
                         BorderStyle: "0"
                         Caption: MIDI
                         CaptionAlignment: "1"
-                        CaptionFontBold: "0   'False"
+                        CaptionFontBold: "0"
                         CaptionFontColor: "-16777208"
-                        CaptionFontItalic: "0   'False"
+                        CaptionFontItalic: "0"
                         CaptionFontName: Tahoma
                         CaptionFontSize: "8"
-                        CaptionFontStrikeOut: "0   'False"
-                        CaptionFontUnderline: "0   'False"
+                        CaptionFontStrikeOut: "0"
+                        CaptionFontUnderline: "0"
                         CaptionMargin: "5"
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         Glyph: "\"Form_Main.frx\":B9D37"
                         Height: "18"
                         IndicatorAlignment: "3"
@@ -1441,14 +1441,14 @@ form:
                         Left: "7560"
                         MomentaryStyle: "0"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
-                        ShowFocusRect: "0   'False"
+                        OptionSaveAllProperties: "0"
+                        ShowFocusRect: "0"
                         TabIndex: "151"
                         Top: "930"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "65"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: CaptionFont
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -1456,15 +1456,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: Image1
@@ -1632,7 +1632,7 @@ form:
                   red: 0
                   green: 0
                   blue: 0
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -1696,7 +1696,7 @@ form:
                           red: 192
                           green: 192
                           blue: 192
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -1757,7 +1757,7 @@ form:
                                 ExtentY: "688"
                                 Height: "390"
                                 Left: "40"
-                                ShowLed: "-1  'True"
+                                ShowLed: "-1"
                                 TabIndex: "80"
                                 TextAlignment: "0"
                                 Top: "50"
@@ -1775,7 +1775,7 @@ form:
                                 ExtentY: "688"
                                 Height: "390"
                                 Left: "1200"
-                                ShowLed: "-1  'True"
+                                ShowLed: "-1"
                                 TabIndex: "81"
                                 TextAlignment: "0"
                                 Top: "50"
@@ -1796,7 +1796,7 @@ form:
                           red: 0
                           green: 0
                           blue: 0
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -1838,7 +1838,7 @@ form:
                       scale_top: 0
                       scale_width: 825
                       tab_index: 52
-                      tab_stop: Included
+                      tab_stop: ProgrammaticOnly
                       tool_tip_text: ""
                       top: 155
                       visible: Visible
@@ -1860,7 +1860,7 @@ form:
                           red: 192
                           green: 192
                           blue: 192
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -1943,7 +1943,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 6
                               tab_stop: Included
                               tool_tip_text: ""
@@ -1986,7 +1986,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 114
                               tab_stop: Included
                               tool_tip_text: ""
@@ -2029,7 +2029,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 5
                               tab_stop: Included
                               tool_tip_text: ""
@@ -2072,7 +2072,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 7
                               tab_stop: Included
                               tool_tip_text: ""
@@ -2115,7 +2115,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 8
                               tab_stop: Included
                               tool_tip_text: ""
@@ -2158,7 +2158,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 9
                               tab_stop: Included
                               tool_tip_text: ""
@@ -2201,7 +2201,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 11
                               tab_stop: Included
                               tool_tip_text: ""
@@ -2244,7 +2244,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 10
                               tab_stop: Included
                               tool_tip_text: ""
@@ -2268,7 +2268,7 @@ form:
                           red: 192
                           green: 192
                           blue: 192
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -2328,7 +2328,7 @@ form:
                         DigitDisplay: "00:00"
                         DigitFormat: "1"
                         DigitJustify: "0"
-                        DigitOutLine: "0   'False"
+                        DigitOutLine: "0"
                         DigitSize: "1"
                         ExtentX: "2037"
                         ExtentY: "714"
@@ -2348,7 +2348,7 @@ form:
                         DigitColor: "1"
                         DigitDisplay: "00"
                         DigitJustify: "0"
-                        DigitOutLine: "0   'False"
+                        DigitOutLine: "0"
                         DigitPlaceHolders: "2"
                         DigitSize: "1"
                         ExtentX: "953"
@@ -2384,7 +2384,7 @@ form:
                       stretch: false
                       tool_tip_text: ""
                       top: 240
-                      visible: Visible
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 135
               - name: Light_CD_Pause_On
@@ -2412,7 +2412,7 @@ form:
                       stretch: false
                       tool_tip_text: ""
                       top: 550
-                      visible: Visible
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 135
       - name: Element
@@ -2430,7 +2430,7 @@ form:
                   red: 0
                   green: 0
                   blue: 0
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -2487,32 +2487,32 @@ form:
                     properties:
                       property_store:
                         Alignment: "1"
-                        AutoFrameRate: "0   'False"
-                        AutoSize: "0   'False"
+                        AutoFrameRate: "0"
+                        AutoSize: "0"
                         BackGroundColor: "-16777201"
                         BorderStyle: "0"
                         Caption: Radio Tuner Memory
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         FontColor: "-16777208"
                         Height: "14"
                         Left: "4200"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
+                        OptionSaveAllProperties: "0"
                         OuterMarginBottom: "0"
                         OuterMarginLeft: "0"
                         OuterMarginRight: "0"
                         OuterMarginTop: "0"
                         ShadowColor: "16777215"
-                        ShadowShow: "-1  'True"
+                        ShadowShow: "-1"
                         ShadowXOffset: "-1"
                         ShadowYOffset: "-1"
                         TabIndex: "91"
                         Top: "120"
-                        Transparent: "-1  'True"
+                        Transparent: "-1"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "129"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: Font
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -2520,15 +2520,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "700"
               - name: Label_StreamTitle
@@ -2539,32 +2539,32 @@ form:
                     properties:
                       property_store:
                         Alignment: "2"
-                        AutoFrameRate: "0   'False"
-                        AutoSize: "0   'False"
+                        AutoFrameRate: "0"
+                        AutoSize: "0"
                         BackGroundColor: "-16777201"
                         BorderStyle: "0"
                         Caption: T(1054)
-                        Enabled: "-1  'True"
+                        Enabled: "-1"
                         FontColor: "-16777208"
                         Height: "14"
                         Left: "6120"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
+                        OptionSaveAllProperties: "0"
                         OuterMarginBottom: "0"
                         OuterMarginLeft: "0"
                         OuterMarginRight: "0"
                         OuterMarginTop: "0"
                         ShadowColor: "16777215"
-                        ShadowShow: "-1  'True"
+                        ShadowShow: "-1"
                         ShadowXOffset: "-1"
                         ShadowYOffset: "-1"
                         TabIndex: "100"
                         Top: "120"
-                        Transparent: "-1  'True"
+                        Transparent: "-1"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "209"
-                        WordWrap: "0   'False"
+                        WordWrap: "0"
                     property_groups:
                       - name: Font
                         guid: 0be35203-8f91-11ce-9de3-00aa004bb851
@@ -2572,15 +2572,15 @@ form:
                           Charset:
                             Left: "0"
                           Italic:
-                            Left: "0   'False"
+                            Left: "0"
                           Name:
                             Left: "\"Tahoma\""
                           Size:
                             Left: "8.25"
                           Strikethrough:
-                            Left: "0   'False"
+                            Left: "0"
                           Underline:
-                            Left: "0   'False"
+                            Left: "0"
                           Weight:
                             Left: "400"
               - name: Picture2
@@ -2654,20 +2654,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "0"
                                 Left: "120"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -2687,12 +2687,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "121"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -2702,20 +2702,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "1"
                                 Left: "240"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -2735,12 +2735,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "122"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -2750,20 +2750,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "2"
                                 Left: "360"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -2783,12 +2783,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "123"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -2798,20 +2798,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "3"
                                 Left: "480"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -2831,12 +2831,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "124"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -2846,20 +2846,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "4"
                                 Left: "600"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -2879,12 +2879,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "125"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -2894,20 +2894,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "5"
                                 Left: "720"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -2927,12 +2927,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "126"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -2942,20 +2942,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "6"
                                 Left: "840"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -2975,12 +2975,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "127"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -2990,20 +2990,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "7"
                                 Left: "960"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3023,12 +3023,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "128"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3038,20 +3038,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "8"
                                 Left: "1080"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3071,12 +3071,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "129"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3086,20 +3086,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "9"
                                 Left: "1200"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3119,12 +3119,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "130"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3134,20 +3134,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "10"
                                 Left: "1320"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3167,12 +3167,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "131"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3182,20 +3182,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "11"
                                 Left: "1440"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3215,12 +3215,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "132"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3230,20 +3230,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "12"
                                 Left: "1560"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3263,12 +3263,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "133"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3278,20 +3278,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "13"
                                 Left: "1680"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3311,12 +3311,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "134"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3326,20 +3326,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "14"
                                 Left: "1800"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3359,12 +3359,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "135"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3374,20 +3374,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "15"
                                 Left: "1920"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3407,12 +3407,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "136"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3422,20 +3422,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "16"
                                 Left: "2040"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3455,12 +3455,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "137"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3470,20 +3470,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "17"
                                 Left: "2160"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3503,12 +3503,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "138"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3518,20 +3518,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "18"
                                 Left: "2280"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3551,12 +3551,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "139"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3566,20 +3566,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "19"
                                 Left: "2400"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3599,12 +3599,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "140"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3614,20 +3614,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "20"
                                 Left: "2520"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3647,12 +3647,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "141"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3662,20 +3662,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "21"
                                 Left: "2640"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3695,12 +3695,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "142"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3710,20 +3710,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "22"
                                 Left: "2760"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3743,12 +3743,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "143"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3758,20 +3758,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "23"
                                 Left: "2880"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3791,12 +3791,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "144"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3806,20 +3806,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "24"
                                 Left: "3000"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3839,12 +3839,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "145"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3854,20 +3854,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "25"
                                 Left: "3120"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3887,12 +3887,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "146"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3902,20 +3902,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "26"
                                 Left: "3240"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3935,12 +3935,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "147"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3950,20 +3950,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "27"
                                 Left: "3360"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -3983,12 +3983,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "148"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: LedBar_Spectrum
@@ -3998,20 +3998,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "65"
                                 Index: "28"
                                 Left: "3480"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -4031,12 +4031,12 @@ form:
                                 SegmentSize: "3"
                                 SegmentSpacing: "2"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "149"
                                 Top: "15"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
               - name: Button_OpenStream
@@ -4073,7 +4073,7 @@ form:
                       ole_drop_mode: None
                       picture: ~
                       right_to_left: LeftToRight
-                      style: Standard
+                      style: Graphical
                       tab_index: 90
                       tab_stop: Included
                       tool_tip_text: Open stream
@@ -4116,7 +4116,7 @@ form:
                       ole_drop_mode: None
                       picture: ~
                       right_to_left: LeftToRight
-                      style: Standard
+                      style: Graphical
                       tab_index: 89
                       tab_stop: Included
                       tool_tip_text: Stop
@@ -4131,7 +4131,7 @@ form:
                 kind:
                   CommandButton:
                     properties:
-                      appearance: ThreeD
+                      appearance: Flat
                       back_color:
                         RGB:
                           red: 192
@@ -4159,7 +4159,7 @@ form:
                       ole_drop_mode: None
                       picture: ~
                       right_to_left: LeftToRight
-                      style: Standard
+                      style: Graphical
                       tab_index: 88
                       tab_stop: Included
                       tool_tip_text: Play
@@ -4181,7 +4181,7 @@ form:
                         Height: "390"
                         Index: "1"
                         Left: "4845"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "93"
                         TextAlignment: "1"
                         Top: "375"
@@ -4200,7 +4200,7 @@ form:
                         Height: "390"
                         Index: "0"
                         Left: "4200"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "92"
                         TextAlignment: "1"
                         Top: "375"
@@ -4282,7 +4282,7 @@ form:
                               back_color:
                                 System:
                                   index: 15
-                              back_style: Opaque
+                              back_style: Transparent
                               border_style: None
                               caption: T(1019)
                               data_field: ""
@@ -4328,7 +4328,7 @@ form:
                         Height: "390"
                         Index: "2"
                         Left: "5490"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "94"
                         TextAlignment: "1"
                         Top: "375"
@@ -4347,7 +4347,7 @@ form:
                         Height: "390"
                         Index: "3"
                         Left: "6135"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "95"
                         TextAlignment: "1"
                         Top: "375"
@@ -4366,7 +4366,7 @@ form:
                         Height: "390"
                         Index: "4"
                         Left: "6795"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "96"
                         TextAlignment: "1"
                         Top: "375"
@@ -4385,7 +4385,7 @@ form:
                         Height: "390"
                         Index: "5"
                         Left: "7440"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "97"
                         TextAlignment: "1"
                         Top: "375"
@@ -4404,7 +4404,7 @@ form:
                         Height: "390"
                         Index: "6"
                         Left: "8085"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "98"
                         TextAlignment: "1"
                         Top: "375"
@@ -4423,7 +4423,7 @@ form:
                         Height: "390"
                         Index: "7"
                         Left: "8730"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "99"
                         TextAlignment: "1"
                         Top: "375"
@@ -4444,7 +4444,7 @@ form:
                   red: 0
                   green: 0
                   blue: 0
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -4504,7 +4504,7 @@ form:
                         DigitDisplay: "00:00"
                         DigitFormat: "1"
                         DigitJustify: "0"
-                        DigitOutLine: "0   'False"
+                        DigitOutLine: "0"
                         DigitSize: "1"
                         ExtentX: "2037"
                         ExtentY: "714"
@@ -4529,7 +4529,7 @@ form:
                           red: 0
                           green: 0
                           blue: 0
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -4574,7 +4574,7 @@ form:
                       tab_stop: Included
                       tool_tip_text: ""
                       top: 200
-                      visible: Visible
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 255
                     controls:
@@ -4603,7 +4603,7 @@ form:
                               stretch: false
                               tool_tip_text: ""
                               top: 0
-                              visible: Visible
+                              visible: Hidden
                               whats_this_help_id: 0
                               width: 240
                       - name: Image4
@@ -4647,7 +4647,7 @@ form:
                       back_color:
                         System:
                           index: 15
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -4711,7 +4711,7 @@ form:
                                   red: 192
                                   green: 192
                                   blue: 192
-                              border_style: FixedSingle
+                              border_style: None
                               causes_validation: "Yes"
                               clip_controls: Clipped
                               data_field: ""
@@ -4766,13 +4766,13 @@ form:
                                 kind:
                                   Label:
                                     properties:
-                                      alignment: LeftJustify
+                                      alignment: Center
                                       appearance: ThreeD
                                       auto_size: Fixed
                                       back_color:
                                         System:
                                           index: 15
-                                      back_style: Opaque
+                                      back_style: Transparent
                                       border_style: None
                                       caption: Digital Audio Transport
                                       data_field: ""
@@ -4820,7 +4820,7 @@ form:
                                   red: 0
                                   green: 0
                                   blue: 0
-                              border_style: FixedSingle
+                              border_style: None
                               causes_validation: "Yes"
                               clip_controls: Clipped
                               data_field: ""
@@ -4878,13 +4878,13 @@ form:
                                       align: None
                                       appearance: ThreeD
                                       auto_redraw: Manual
-                                      auto_size: Fixed
+                                      auto_size: Resize
                                       back_color:
                                         RGB:
                                           red: 0
                                           green: 0
                                           blue: 0
-                                      border_style: FixedSingle
+                                      border_style: None
                                       causes_validation: "Yes"
                                       clip_controls: Clipped
                                       data_field: ""
@@ -4939,13 +4939,13 @@ form:
                                 kind:
                                   Label:
                                     properties:
-                                      alignment: LeftJustify
+                                      alignment: Center
                                       appearance: ThreeD
                                       auto_size: Fixed
                                       back_color:
                                         System:
                                           index: 15
-                                      back_style: Opaque
+                                      back_style: Transparent
                                       border_style: None
                                       caption: T(1019)
                                       data_field: ""
@@ -4973,7 +4973,7 @@ form:
                                       tab_index: 56
                                       tool_tip_text: ""
                                       top: 0
-                                      use_mnemonic: true
+                                      use_mnemonic: false
                                       visible: Visible
                                       whats_this_help_id: 0
                                       width: 1485
@@ -4993,7 +4993,7 @@ form:
                           red: 192
                           green: 192
                           blue: 192
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -5076,7 +5076,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 63
                               tab_stop: Included
                               tool_tip_text: ""
@@ -5119,7 +5119,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 16
                               tab_stop: Included
                               tool_tip_text: ""
@@ -5162,7 +5162,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 15
                               tab_stop: Included
                               tool_tip_text: ""
@@ -5205,7 +5205,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 17
                               tab_stop: Included
                               tool_tip_text: ""
@@ -5220,7 +5220,7 @@ form:
                         kind:
                           CommandButton:
                             properties:
-                              appearance: ThreeD
+                              appearance: Flat
                               back_color:
                                 RGB:
                                   red: 192
@@ -5248,7 +5248,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 18
                               tab_stop: Included
                               tool_tip_text: ""
@@ -5291,7 +5291,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 19
                               tab_stop: Included
                               tool_tip_text: ""
@@ -5334,7 +5334,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 21
                               tab_stop: Included
                               tool_tip_text: ""
@@ -5377,7 +5377,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 20
                               tab_stop: Included
                               tool_tip_text: ""
@@ -5420,7 +5420,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 61
                               tab_stop: Included
                               tool_tip_text: ""
@@ -5444,7 +5444,7 @@ form:
                           red: 192
                           green: 192
                           blue: 192
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -5534,19 +5534,19 @@ form:
                   Custom:
                     properties:
                       property_store:
-                        AutoFrameRate: "0   'False"
+                        AutoFrameRate: "0"
                         BackGroundColor: "0"
                         BorderStyle: "0"
                         CurrentMax: "0"
                         CurrentMin: "30"
-                        Enabled: "-1  'True"
-                        FillReferenceEnabled: "0   'False"
+                        Enabled: "-1"
+                        FillReferenceEnabled: "0"
                         FillReferenceValue: "0"
                         Height: "9"
                         Left: "7310"
-                        MinMaxFixed: "0   'False"
+                        MinMaxFixed: "0"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
+                        OptionSaveAllProperties: "0"
                         Position: "0"
                         PositionMax: "100"
                         PositionMin: "0"
@@ -5566,12 +5566,12 @@ form:
                         SegmentSize: "5"
                         SegmentSpacing: "2"
                         SegmentStyle: "0"
-                        ShowOffSegments: "-1  'True"
+                        ShowOffSegments: "-1"
                         TabIndex: "22"
                         Top: "240"
-                        Transparent: "0   'False"
+                        Transparent: "0"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "129"
                     property_groups: []
               - name: LedBar_DatRight
@@ -5581,19 +5581,19 @@ form:
                   Custom:
                     properties:
                       property_store:
-                        AutoFrameRate: "0   'False"
+                        AutoFrameRate: "0"
                         BackGroundColor: "0"
                         BorderStyle: "0"
                         CurrentMax: "0"
                         CurrentMin: "0"
-                        Enabled: "-1  'True"
-                        FillReferenceEnabled: "0   'False"
+                        Enabled: "-1"
+                        FillReferenceEnabled: "0"
                         FillReferenceValue: "0"
                         Height: "9"
                         Left: "7310"
-                        MinMaxFixed: "0   'False"
+                        MinMaxFixed: "0"
                         OPCItemCount: "0"
-                        OptionSaveAllProperties: "0   'False"
+                        OptionSaveAllProperties: "0"
                         Position: "0"
                         PositionMax: "100"
                         PositionMin: "0"
@@ -5613,12 +5613,12 @@ form:
                         SegmentSize: "5"
                         SegmentSpacing: "2"
                         SegmentStyle: "0"
-                        ShowOffSegments: "-1  'True"
+                        ShowOffSegments: "-1"
                         TabIndex: "23"
                         Top: "420"
-                        Transparent: "0   'False"
+                        Transparent: "0"
                         UpdateFrameRate: "60"
-                        Visible: "-1  'True"
+                        Visible: "-1"
                         Width: "129"
                     property_groups: []
               - name: DigitBox_DatTrack
@@ -5630,7 +5630,7 @@ form:
                       property_store:
                         DigitColor: "1"
                         DigitDisplay: "00"
-                        DigitOutLine: "0   'False"
+                        DigitOutLine: "0"
                         DigitPlaceHolders: "2"
                         DigitSize: "1"
                         ExtentX: "953"
@@ -5666,7 +5666,7 @@ form:
                       stretch: false
                       tool_tip_text: ""
                       top: 255
-                      visible: Visible
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 135
               - name: Light_Dat_Pause_On
@@ -5694,7 +5694,7 @@ form:
                       stretch: false
                       tool_tip_text: ""
                       top: 550
-                      visible: Visible
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 135
       - name: Element
@@ -5712,7 +5712,7 @@ form:
                   red: 0
                   green: 0
                   blue: 0
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -5771,7 +5771,7 @@ form:
                         DigitColor: "1"
                         DigitDisplay: "00:00"
                         DigitFormat: "1"
-                        DigitOutLine: "0   'False"
+                        DigitOutLine: "0"
                         ExtentX: "1508"
                         ExtentY: "556"
                         Height: "315"
@@ -5795,7 +5795,7 @@ form:
                           red: 0
                           green: 0
                           blue: 0
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -5851,20 +5851,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "0"
                                 Left: "0"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -5884,12 +5884,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "35"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -5899,20 +5899,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "1"
                                 Left: "120"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -5932,12 +5932,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "36"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -5947,20 +5947,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "2"
                                 Left: "240"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -5980,12 +5980,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "37"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -5995,20 +5995,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "3"
                                 Left: "360"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6028,12 +6028,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "38"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6043,20 +6043,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "4"
                                 Left: "480"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6076,12 +6076,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "39"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6091,20 +6091,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "5"
                                 Left: "600"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6124,12 +6124,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "40"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6139,20 +6139,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "6"
                                 Left: "720"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6172,12 +6172,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "41"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6187,20 +6187,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "7"
                                 Left: "840"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6220,12 +6220,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "42"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6235,20 +6235,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "8"
                                 Left: "960"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6268,12 +6268,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "43"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6283,20 +6283,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "9"
                                 Left: "1080"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6316,12 +6316,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "44"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6331,20 +6331,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "10"
                                 Left: "1200"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6364,12 +6364,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "45"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6379,20 +6379,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "11"
                                 Left: "1320"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6412,12 +6412,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "46"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6427,20 +6427,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "12"
                                 Left: "1440"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6460,12 +6460,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "47"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6475,20 +6475,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "13"
                                 Left: "1560"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6508,12 +6508,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "48"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6523,20 +6523,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "14"
                                 Left: "1680"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6556,12 +6556,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "49"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
                       - name: VU_Midi
@@ -6571,20 +6571,20 @@ form:
                           Custom:
                             properties:
                               property_store:
-                                AutoFrameRate: "0   'False"
+                                AutoFrameRate: "0"
                                 BackGroundColor: "0"
                                 BorderStyle: "0"
                                 CurrentMax: "0"
                                 CurrentMin: "0"
-                                Enabled: "-1  'True"
-                                FillReferenceEnabled: "0   'False"
+                                Enabled: "-1"
+                                FillReferenceEnabled: "0"
                                 FillReferenceValue: "0"
                                 Height: "27"
                                 Index: "15"
                                 Left: "1800"
-                                MinMaxFixed: "0   'False"
+                                MinMaxFixed: "0"
                                 OPCItemCount: "0"
-                                OptionSaveAllProperties: "0   'False"
+                                OptionSaveAllProperties: "0"
                                 Position: "0"
                                 PositionMax: "100"
                                 PositionMin: "0"
@@ -6604,12 +6604,12 @@ form:
                                 SegmentSize: "2"
                                 SegmentSpacing: "1"
                                 SegmentStyle: "0"
-                                ShowOffSegments: "-1  'True"
+                                ShowOffSegments: "-1"
                                 TabIndex: "50"
                                 Top: "0"
-                                Transparent: "0   'False"
+                                Transparent: "0"
                                 UpdateFrameRate: "60"
-                                Visible: "-1  'True"
+                                Visible: "-1"
                                 Width: "7"
                             property_groups: []
               - name: Picture13
@@ -6627,7 +6627,7 @@ form:
                           red: 192
                           green: 192
                           blue: 192
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -6710,7 +6710,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 27
                               tab_stop: Included
                               tool_tip_text: ""
@@ -6753,7 +6753,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 29
                               tab_stop: Included
                               tool_tip_text: ""
@@ -6796,7 +6796,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 32
                               tab_stop: Included
                               tool_tip_text: ""
@@ -6839,7 +6839,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 28
                               tab_stop: Included
                               tool_tip_text: ""
@@ -6882,7 +6882,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 30
                               tab_stop: Included
                               tool_tip_text: ""
@@ -6925,7 +6925,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 31
                               tab_stop: Included
                               tool_tip_text: ""
@@ -6968,7 +6968,7 @@ form:
                               ole_drop_mode: None
                               picture: ~
                               right_to_left: LeftToRight
-                              style: Standard
+                              style: Graphical
                               tab_index: 33
                               tab_stop: Included
                               tool_tip_text: ""
@@ -6992,7 +6992,7 @@ form:
                           red: 192
                           green: 192
                           blue: 192
-                      border_style: FixedSingle
+                      border_style: None
                       causes_validation: "Yes"
                       clip_controls: Clipped
                       data_field: ""
@@ -7085,7 +7085,7 @@ form:
                         DigitColor: "1"
                         DigitDisplay: "00"
                         DigitJustify: "0"
-                        DigitOutLine: "0   'False"
+                        DigitOutLine: "0"
                         DigitPlaceHolders: "2"
                         DigitSize: "1"
                         ExtentX: "953"
@@ -7121,7 +7121,7 @@ form:
                       stretch: false
                       tool_tip_text: ""
                       top: 555
-                      visible: Visible
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 495
               - name: Image6
@@ -7177,7 +7177,7 @@ form:
                       stretch: false
                       tool_tip_text: ""
                       top: 120
-                      visible: Visible
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 3225
               - name: FloppyOut
@@ -7220,7 +7220,7 @@ form:
                       back_color:
                         System:
                           index: 15
-                      back_style: Opaque
+                      back_style: Transparent
                       border_style: None
                       caption: T(1019)
                       data_field: ""
@@ -7278,7 +7278,7 @@ form:
                       stretch: false
                       tool_tip_text: ""
                       top: 250
-                      visible: Visible
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 135
               - name: Light_Midi_Pause_On
@@ -7306,7 +7306,7 @@ form:
                       stretch: false
                       tool_tip_text: ""
                       top: 550
-                      visible: Visible
+                      visible: Hidden
                       whats_this_help_id: 0
                       width: 135
       - name: Element
@@ -7324,7 +7324,7 @@ form:
                   red: 0
                   green: 0
                   blue: 0
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -7386,7 +7386,7 @@ form:
                         Height: "390"
                         Index: "5"
                         Left: "4320"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "101"
                         TextAlignment: "0"
                         Top: "120"
@@ -7405,7 +7405,7 @@ form:
                         Height: "390"
                         Index: "4"
                         Left: "5160"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "102"
                         TextAlignment: "0"
                         Top: "120"
@@ -7424,7 +7424,7 @@ form:
                         Height: "390"
                         Index: "3"
                         Left: "6000"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "103"
                         TextAlignment: "0"
                         Top: "120"
@@ -7443,7 +7443,7 @@ form:
                         Height: "390"
                         Index: "1"
                         Left: "7680"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "104"
                         TextAlignment: "0"
                         Top: "120"
@@ -7462,7 +7462,7 @@ form:
                         Height: "390"
                         Index: "2"
                         Left: "6840"
-                        ShowLed: "-1  'True"
+                        ShowLed: "-1"
                         TabIndex: "105"
                         TextAlignment: "0"
                         Top: "120"
@@ -7659,7 +7659,7 @@ form:
             index: 0
             properties:
               caption: "&Auto Stop"
-              checked: false
+              checked: true
               enabled: Enabled
               help_context_id: 1003
               negotiate_position: None
@@ -7685,7 +7685,7 @@ form:
             index: 0
             properties:
               caption: "&Play Single"
-              checked: false
+              checked: true
               enabled: Enabled
               help_context_id: 1005
               negotiate_position: None
@@ -7724,7 +7724,7 @@ form:
             index: 0
             properties:
               caption: "&No Repeat"
-              checked: false
+              checked: true
               enabled: Enabled
               help_context_id: 0
               negotiate_position: None
@@ -7828,7 +7828,7 @@ form:
             index: 0
             properties:
               caption: "&Show spectrum analyzer"
-              checked: false
+              checked: true
               enabled: Enabled
               help_context_id: 1011
               negotiate_position: None

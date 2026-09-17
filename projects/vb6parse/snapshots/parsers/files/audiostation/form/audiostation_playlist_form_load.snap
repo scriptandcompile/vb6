@@ -1,6 +1,5 @@
 ---
 source: projects/vb6parse/tests/files/audiostation/form.rs
-assertion_line: 260
 expression: form_file
 ---
 form:
@@ -16,7 +15,7 @@ form:
           red: 192
           green: 192
           blue: 192
-      border_style: Sizable
+      border_style: FixedDialog
       caption: "--"
       client_height: 8085
       client_left: 2565
@@ -48,13 +47,13 @@ form:
       height: 240
       help_context_id: 0
       icon: ~
-      key_preview: false
+      key_preview: true
       left: 0
       link_mode: None
       link_topic: Form1
-      max_button: Included
+      max_button: Excluded
       mdi_child: false
-      min_button: Included
+      min_button: Excluded
       mouse_icon: ~
       mouse_pointer: Default
       moveable: Moveable
@@ -69,8 +68,8 @@ form:
       scale_mode: Twip
       scale_top: 0
       scale_width: 12105
-      show_in_taskbar: Show
-      start_up_position: WindowsDefault
+      show_in_taskbar: Hide
+      start_up_position: CenterOwner
       top: 0
       visible: Visible
       whats_this_button: Excluded
@@ -117,13 +116,13 @@ form:
                 ExtentX: "17595"
                 ExtentY: "11880"
                 ForeColor: "-2147483640"
-                FullRowSelect: "-1  'True"
-                GridLines: "-1  'True"
+                FullRowSelect: "-1"
+                GridLines: "-1"
                 Height: "6735"
-                HideColumnHeaders: "-1  'True"
-                HideSelection: "-1  'True"
+                HideColumnHeaders: "-1"
+                HideSelection: "-1"
                 LabelEdit: "1"
-                LabelWrap: "-1  'True"
+                LabelWrap: "-1"
                 Left: "120"
                 NumItems: "3"
                 OLEDropMode: "1"
@@ -160,7 +159,7 @@ form:
         kind:
           FileListBox:
             properties:
-              appearance: ThreeD
+              appearance: Flat
               archive: Include
               back_color:
                 System:
@@ -189,7 +188,7 @@ form:
               tab_stop: Included
               tool_tip_text: ""
               top: 3600
-              visible: Visible
+              visible: Hidden
               whats_this_help_id: 0
               width: 1575
       - name: Combox_FilterType
@@ -224,7 +223,7 @@ form:
               ole_drop_mode: None
               right_to_left: LeftToRight
               sorted: false
-              style: DropDownCombo
+              style: DropDownList
               tab_index: 2
               tab_stop: Included
               text: ""
@@ -278,7 +277,7 @@ form:
                   red: 192
                   green: 192
                   blue: 192
-              border_style: FixedSingle
+              border_style: None
               causes_validation: "Yes"
               clip_controls: Clipped
               data_field: ""
@@ -429,7 +428,7 @@ form:
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: ""
               data_field: ""
@@ -468,11 +467,11 @@ form:
             properties:
               alignment: LeftJustify
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "0 File(s) in this playlist, total duration 00:00:00"
               data_field: ""
@@ -511,11 +510,11 @@ form:
             properties:
               alignment: LeftJustify
               appearance: ThreeD
-              auto_size: Fixed
+              auto_size: Resize
               back_color:
                 System:
                   index: 15
-              back_style: Opaque
+              back_style: Transparent
               border_style: None
               caption: "Filter Playlist:"
               data_field: ""
