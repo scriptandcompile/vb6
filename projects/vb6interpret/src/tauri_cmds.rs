@@ -94,8 +94,7 @@ pub fn load_form(form_data: Vec<u8>) -> u32 {
 /// needs to reflect the update.
 #[command]
 pub fn update_form(handle: u32) -> String {
-    let html = layout::render(handle, &layout::renderer::TauriRenderer::new(false));
-    format!("<div id='root'>{}</div>", html)
+    layout::render(handle, &layout::renderer::TauriRenderer::new(false))
 }
 
 /// Result of starting a project from the webview.

@@ -11,6 +11,7 @@ use std::time::{Duration, Instant};
 
 #[cfg(feature = "tauri")]
 use vb6interpret::tauri_cmds;
+use vb6runtime::layout::scale::twips_to_pixels;
 
 use vb6interpret::{Interpreter, LoadedProject, StartupObject, project};
 use vb6parse::errors::{ErrorKind, SourceFileError};
@@ -328,23 +329,45 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
     use tauri::Manager;
     use tauri::generate_handler;
 
-    // Extract startup form name before the project is moved into the engine.
-    let startup_form_name = match &project.startup_object {
-        StartupObject::Form { form_name } => form_name.clone(),
-        _ => String::new(),
+    // Extract startup form name before the project is moved into the engine,
+    // and calculate the window size from the form's total dimensions
+    // (including title bar, borders, and scrollbars).
+    let (startup_form_name, window_width, window_height) = match &project.startup_object {
+        StartupObject::Form { form_name } => {
+            let form = project.forms.iter().find(|f| f.name == *form_name);
+            let (w, h) = form
+                .map(|f| match &f.parsed.form {
+                    vb6parse::language::FormRoot::Form(frm) => {
+                        let dpi = 96;
+                        let w = twips_to_pixels(frm.properties.client_width, dpi) as f64;
+                        let h = twips_to_pixels(frm.properties.client_height, dpi) as f64;
+                        (w.max(10.0), h.max(10.0))
+                    }
+                    vb6parse::language::FormRoot::MDIForm(mdi) => {
+                        let dpi = 96;
+                        let w = twips_to_pixels(mdi.properties.width, dpi) as f64;
+                        let h = twips_to_pixels(mdi.properties.height, dpi) as f64;
+                        (w.max(10.0), h.max(10.0))
+                    }
+                })
+                .unwrap_or((10.0, 10.0));
+            (form_name.clone(), w, h)
+        }
+        _ => (String::new(), 10.0, 10.0),
     };
 
     let engine_handle = tauri_cmds::spawn_engine(project);
 
     // Bake the form HTML, CSS, and inline IPC script into a single HTML page
     // that the webview loads through the `vb6://` custom protocol below.
-    let (form_html, _handle) = startup_form_html;
+    let (form_html, form_handle) = startup_form_html;
     let css = vb6runtime::layout::vb6_css::bare_css();
     let _ = FORM_PAGE.set(vb6interpret::tauri_html::build_page(
         &form_html,
         &css,
         &startup_form_name,
         engine_handle,
+        form_handle,
     ));
 
     tauri::Builder::default()
@@ -389,20 +412,21 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
                 "http://vb6.localhost/index.html".parse().unwrap(),
             );
             #[cfg(not(any(windows, target_os = "android")))]
-            let page_url = tauri::WebviewUrl::CustomProtocol(
-                "vb6://localhost/index.html".parse().unwrap(),
-            );
+            let page_url =
+                tauri::WebviewUrl::CustomProtocol("vb6://localhost/index.html".parse().unwrap());
 
             // Create a new window — there is no pre-created window (windows: [] in tauri.conf.json).
             // The page is served by the `vb6://` custom protocol registered above,
             // so the webview loads a real document (with the form already in the
             // DOM) instead of an `about:blank` shell that needs JS injection.
             let window = tauri::WebviewWindowBuilder::new(app, "vb6interpret", page_url)
-            .title("VB6Interpret")
-            .inner_size(1024.0, 768.0)
-            .resizable(true)
-            .build()
-            .expect("failed to create webview window");
+                .title("VB6Interpret")
+                .inner_size(window_width, window_height)
+                .resizable(true)
+                .build()
+                .expect("failed to create webview window");
+
+            let _ = window.set_size(tauri::PhysicalSize::new(window_width, window_height));
             let _ = window.show();
             let _ = window.set_focus();
 

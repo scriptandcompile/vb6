@@ -17,12 +17,41 @@
 /// Build the complete HTML page shown in the Tauri webview for a form project.
 ///
 /// `form_html` is the rendered VB6 control markup (injected directly into
-/// `#root` so the form is visible before any script runs), `css` is the bare
-/// VB6 stylesheet, and `form_name`/`engine_handle` are exposed to the inline
-/// script so it can auto-attach event bindings and dispatch events over IPC.
-pub fn build_page(form_html: &str, css: &str, form_name: &str, engine_handle: u32) -> String {
+/// `<body>` so the form is visible before any script runs), `css` is the bare
+/// VB6 stylesheet, and `form_name`/`engine_handle`/`form_handle` are exposed
+/// to the inline script so it can auto-attach event bindings and dispatch
+/// events over IPC. The form handle is used to look up the form's natural
+/// dimensions for sizing the body.
+pub fn build_page(
+    form_html: &str,
+    css: &str,
+    form_name: &str,
+    engine_handle: u32,
+    form_handle: u32,
+) -> String {
     let form_name_json = serde_json::to_string(form_name).unwrap_or_else(|_| "\"\"".into());
     let engine_handle = engine_handle.to_string();
+
+    let (fw, fh) = vb6runtime::layout::renderer::TauriRenderer::form_dimensions(form_handle);
+    let body_style = if fw > 0.0 || fh > 0.0 {
+        format!(
+            " style=\"{}{}{}{}\"",
+            if fw > 0.0 {
+                format!("width:{fw:.1}px;")
+            } else {
+                String::new()
+            },
+            if fw > 0.0 { "" } else { "width:100%;" },
+            if fh > 0.0 {
+                format!("height:{fh:.1}px;")
+            } else {
+                String::new()
+            },
+            if fh > 0.0 { "" } else { "height:100%;" }
+        )
+    } else {
+        " style=\"width:100%;height:100%;\"".to_string()
+    };
 
     format!(
         r#"<!DOCTYPE html>
@@ -33,11 +62,9 @@ pub fn build_page(form_html: &str, css: &str, form_name: &str, engine_handle: u3
     <title>VB6Interpret</title>
     <style>
 {css}
-        html, body {{ height: 100%; }}
     </style>
 </head>
-<body>
-    <div id="root">{form_html}</div>
+<body{body_style}>{form_html}</body>
     <script>
     (function () {{
         'use strict';
@@ -54,7 +81,7 @@ pub fn build_page(form_html: &str, css: &str, form_name: &str, engine_handle: u3
         window.updateForm = function (handle) {{
             return invoke('update_form', {{ handle: handle }})
                 .then(function (html) {{
-                    document.getElementById('root').innerHTML = html;
+                    document.body.innerHTML = html;
                     return window._vb6AutoAttach();
                 }})
                 .catch(function (e) {{
