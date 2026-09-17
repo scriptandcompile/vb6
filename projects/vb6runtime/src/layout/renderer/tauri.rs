@@ -7,7 +7,7 @@
 //!
 //! | VB6 Control | HTML Element |
 //! |-------------|-------------|
-//! | Form | `<div class="vb6-form">` |
+//! | Form | *children only (no wrapper)* |
 //! | Label | `<div class="vb6-label">` |
 //! | TextBox | `<input type="text">` or `<textarea>` |
 //! | CommandButton | `<button class="vb6-commandbutton">` |
@@ -77,6 +77,21 @@ impl TauriRenderer {
         } else {
             String::new()
         }
+    }
+
+    /// Extract the form's natural width and height from the layout model.
+    ///
+    /// Returns `(0.0, 0.0)` if the handle is unknown or the root node is not a
+    /// container.
+    #[must_use]
+    pub fn form_dimensions(handle: u32) -> (f64, f64) {
+        super::super::form_store::get(handle, |form| {
+            if let LayoutNode::Container(c) = &form.root_node {
+                return (c.size.width as f64, c.size.height as f64);
+            }
+            (0.0, 0.0)
+        })
+        .unwrap_or((0.0, 0.0))
     }
 }
 
@@ -273,27 +288,13 @@ impl Renderer for TauriRenderer {
 
         match container.control_type {
             LayoutControlType::Form => {
-                // The form's background/foreground come from its own BackColor /
-                // ForeColor properties via the computed LayoutStyle; no hard-coded
-                // override so custom form colors (e.g. white forms) are honored.
-                let mut form_style = style;
-                if container.size.width > 0.0 {
-                    if !form_style.is_empty() {
-                        form_style.push_str("; ");
-                    }
-                    form_style.push_str(&format!("width: {:.1}px", container.size.width));
+                // Form renders its children directly — no wrapper div.
+                // Dimensions and visibility are applied by the call site
+                // (e.g. Tauri webview body, WASM container) rather than a
+                // nested element.
+                for child in &container.children {
+                    html.push_str(&self.render_node(child));
                 }
-                if container.size.height > 0.0 {
-                    if !form_style.is_empty() {
-                        form_style.push_str("; ");
-                    }
-                    form_style.push_str(&format!("height: {:.1}px", container.size.height));
-                }
-                html.push_str(&format!(
-                    r#"<div id="{}" class="vb6-form" style="{}">"#,
-                    html_escape(&container.name),
-                    html_escape(&form_style)
-                ));
             }
             LayoutControlType::Frame => {
                 let mut frame_style = style;
@@ -339,14 +340,19 @@ impl Renderer for TauriRenderer {
             }
         }
 
-        for child in &container.children {
-            html.push_str(&self.render_node(child));
+        match container.control_type {
+            LayoutControlType::Form => {} // children already rendered above
+            _ => {
+                for child in &container.children {
+                    html.push_str(&self.render_node(child));
+                }
+            }
         }
 
-        html.push_str(if container.control_type == LayoutControlType::Frame {
-            "</fieldset>"
-        } else {
-            "</div>"
+        html.push_str(match container.control_type {
+            LayoutControlType::Form => "", // no wrapper
+            LayoutControlType::Frame => "</fieldset>",
+            _ => "</div>",
         });
 
         html
@@ -934,6 +940,11 @@ mod tests {
     fn incremental_render_container_value_changed_returns_full_html() {
         let renderer = TauriRenderer::new(false);
         let mut container = make_container("frm1", LayoutControlType::Form);
+        container.children.push(LayoutNode::Leaf(make_leaf(
+            "lbl1",
+            LayoutControlType::Label,
+            Some("Hello".into()),
+        )));
         container.visible = false;
         let diff = DiffTree {
             leaf_changes: vec![DiffChange {
@@ -948,7 +959,7 @@ mod tests {
         };
         let result = renderer.render_node_with_diff(&LayoutNode::Container(container), Some(&diff));
         assert!(!result.is_empty());
-        assert!(result.contains("visibility: hidden"));
-        assert!(result.contains("vb6-form"));
+        assert!(result.contains("vb6-label"));
+        assert!(result.contains("Hello"));
     }
 }

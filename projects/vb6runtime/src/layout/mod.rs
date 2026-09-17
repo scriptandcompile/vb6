@@ -338,7 +338,6 @@ mod tests {
         let renderer = renderer::TauriRenderer::new(false);
         let html = render(handle, &renderer);
         assert!(!html.is_empty(), "html was empty: {html}");
-        assert!(html.contains("vb6-form"), "html missing vb6-form: {html}");
         assert!(html.contains("vb6-label"), "html missing vb6-label: {html}");
     }
 
@@ -383,8 +382,6 @@ mod tests {
         let renderer = renderer::TauriRenderer::new(false);
         let html1 = render(handle1, &renderer);
         let html2 = render(handle2, &renderer);
-        assert!(html1.contains("Form1"));
-        assert!(html2.contains("Form1"));
         assert!(html1.contains("vb6-label"));
         assert!(html2.contains("vb6-commandbutton"));
     }
@@ -455,11 +452,11 @@ mod tests {
         // First render: no diff, full render
         let html1 = render(handle, &renderer);
         assert!(!html1.is_empty());
-        assert!(html1.contains("vb6-form"));
+        assert!(html1.contains("vb6-label"));
         // Second render: diff exists, uses diff-aware rendering
         let html2 = render(handle, &renderer);
         assert!(!html2.is_empty());
-        assert!(html2.contains("vb6-form"));
+        assert!(html2.contains("vb6-label"));
     }
 
     #[test]
@@ -533,7 +530,6 @@ mod tests {
         let form_file = vb6parse::FormFile::parse(&source_file).unwrap_or_fail();
         let handle = load_form(&form_file.form, &LayoutConfig::default());
         let html = render(handle, &renderer::TauriRenderer::new(false));
-        assert!(html.contains("vb6-form"));
         assert!(html.contains("vb6-label"));
         assert!(html.contains("Hello"));
     }
@@ -585,8 +581,7 @@ mod tests {
         let config = LayoutConfig::default();
         let handle = load_form(&FormRoot::Form(form), &config);
         let html = render(handle, &renderer::TauriRenderer::new(false));
-        assert!(!html.is_empty());
-        assert!(html.contains("vb6-form"));
+        assert!(html.is_empty());
     }
 
     #[test]

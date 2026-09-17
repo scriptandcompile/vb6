@@ -37,7 +37,7 @@
 //!
 //! // Tauri: bare selectors (no .vb6-app prefix)
 //! let css = bare_css();
-//! assert!(css.contains(".vb6-form"));
+//! assert!(css.contains("body {"));
 //! assert!(!css.contains(".vb6-app"));
 //!
 //! // Dark theme override
@@ -91,6 +91,7 @@ body {
   padding: 0;
   box-sizing: border-box;
   background-color: var(--vb6-bg);
+  color: var(--vb6-fg);
   font-family: var(--vb6-font-family);
   font-size: var(--vb6-font-size);
   line-height: 1.2;
@@ -305,7 +306,6 @@ fn scoped_control_rules() -> Vec<String> {
 /// Bare control rules (no `.vb6-app` prefix, starts with `.vb6-<type>`).
 fn bare_control_rules() -> Vec<String> {
     vec![
-        vb6_rule(".vb6-form", &form_style()),
         vb6_rule(".vb6-label", &label_style()),
         vb6_rule(".vb6-textbox", &textbox_style()),
         vb6_rule(".vb6-commandbutton", &button_style()),
@@ -611,7 +611,7 @@ mod tests {
     #[test]
     fn bare_css_has_no_vb6_app_prefix() {
         let css = bare_css();
-        assert!(css.contains(".vb6-form"));
+        assert!(css.contains("body {"));
         assert!(css.contains(".vb6-label"));
         assert!(css.contains(".vb6-textbox"));
         assert!(!css.contains(".vb6-app"));
@@ -698,8 +698,9 @@ mod tests {
     #[test]
     fn bare_css_contains_all_control_types() {
         let css = bare_css();
+        assert!(css.contains("body {"));
+        assert!(css.contains("background-color: var(--vb6-bg)"));
         let controls = [
-            ".vb6-form",
             ".vb6-label",
             ".vb6-textbox",
             ".vb6-commandbutton",
@@ -734,7 +735,7 @@ mod tests {
         assert!(scoped.len() >= bare.len());
 
         // Bare rules should appear in scoped (without .vb6-app prefix)
-        assert!(bare.contains(".vb6-form"));
+        assert!(bare.contains("body {"));
         assert!(scoped.contains(".vb6-app .vb6-form"));
     }
 

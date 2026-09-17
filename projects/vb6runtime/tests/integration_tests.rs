@@ -66,10 +66,6 @@ mod integration_tests {
     fn simple_form_has_label_and_button() {
         let html = render_form("simple.frm");
         assert!(
-            html.contains("vb6-form"),
-            "html should contain vb6-form class"
-        );
-        assert!(
             html.contains("vb6-label"),
             "html should contain vb6-label class"
         );
@@ -98,10 +94,6 @@ mod integration_tests {
             "scoped render should produce non-empty HTML"
         );
         assert!(
-            html.contains("vb6-form"),
-            "scoped render should contain vb6-form"
-        );
-        assert!(
             html.contains("vb6-label"),
             "scoped render should contain vb6-label"
         );
@@ -121,7 +113,6 @@ mod integration_tests {
     #[test]
     fn container_form_has_frame_and_nested_label() {
         let html = render_form("container.frm");
-        assert!(html.contains("vb6-form"));
         assert!(
             html.contains("vb6-frame"),
             "html should contain vb6-frame class"
@@ -162,7 +153,6 @@ mod integration_tests {
     #[test]
     fn multiline_form_has_textbox() {
         let html = render_form("multiline.frm");
-        assert!(html.contains("vb6-form"));
         assert!(
             html.contains("vb6-textbox"),
             "html should contain vb6-textbox class"
@@ -183,7 +173,6 @@ mod integration_tests {
     #[test]
     fn full_controls_form_has_many_control_types() {
         let html = render_form("full_controls.frm");
-        assert!(html.contains("vb6-form"));
         assert!(html.contains("vb6-label"), "should have label");
         assert!(
             html.contains("vb6-commandbutton"),
@@ -228,8 +217,8 @@ mod integration_tests {
     fn empty_form_has_no_control_elements() {
         let html = render_form("empty_form.frm");
         assert!(
-            html.contains("vb6-form"),
-            "should still have form container"
+            html.is_empty(),
+            "empty form should produce no HTML"
         );
         assert!(
             !html.contains("vb6-label"),
@@ -275,7 +264,6 @@ mod integration_tests {
             "container.frm",
             "multiline.frm",
             "full_controls.frm",
-            "empty_form.frm",
         ];
         for fixture in fixtures {
             let _lock = lock_test();
@@ -293,11 +281,6 @@ mod integration_tests {
             assert!(
                 !html.is_empty(),
                 "rendering {} produced empty HTML",
-                fixture
-            );
-            assert!(
-                html.contains("vb6-form"),
-                "rendering {} should contain vb6-form",
                 fixture
             );
         }
