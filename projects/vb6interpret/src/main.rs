@@ -6,6 +6,7 @@ use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 use std::time::{Duration, Instant};
 
 #[cfg(feature = "tauri")]
@@ -335,7 +336,38 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
 
     let engine_handle = tauri_cmds::spawn_engine(project);
 
+    // Bake the form HTML, CSS, and inline IPC script into a single HTML page
+    // that the webview loads through the `vb6://` custom protocol below.
+    let (form_html, _handle) = startup_form_html;
+    let css = vb6runtime::layout::vb6_css::bare_css();
+    let _ = FORM_PAGE.set(vb6interpret::tauri_html::build_page(
+        &form_html,
+        &css,
+        &startup_form_name,
+        engine_handle,
+    ));
+
     tauri::Builder::default()
+        .register_uri_scheme_protocol("vb6", |_ctx, _request| {
+            use tauri::http::{
+                StatusCode,
+                header::{CONTENT_TYPE, HeaderValue},
+            };
+
+            let body = FORM_PAGE.get().cloned().unwrap_or_default();
+            tauri::http::Response::builder()
+                .header(
+                    CONTENT_TYPE,
+                    HeaderValue::from_static("text/html; charset=utf-8"),
+                )
+                .body(body.into_bytes())
+                .unwrap_or_else(|e| {
+                    tauri::http::Response::builder()
+                        .status(StatusCode::INTERNAL_SERVER_ERROR)
+                        .body(format!("failed to build response: {e}").into_bytes())
+                        .unwrap()
+                })
+        })
         .invoke_handler(generate_handler![
             tauri_cmds::update_form,
             tauri_cmds::run_project,
@@ -347,26 +379,33 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
             tauri_cmds::get_variable,
         ])
         .setup(move |app| {
-            let (html, _handle) = startup_form_html;
-            app.manage((html.clone(), _handle));
             app.manage(engine_handle);
-            let window = tauri::WebviewWindowBuilder::new(
-                app,
-                "main",
-                tauri::WebviewUrl::App("index.html".into()),
-            )
-            .title("VB6 Form Viewer")
+
+            // Custom protocol URLs are served per platform:
+            // - macOS/iOS/Linux (WebKit):  vb6://localhost/index.html
+            // - Windows/Android (WebView2): http://vb6.localhost/index.html
+            #[cfg(any(windows, target_os = "android"))]
+            let page_url = tauri::WebviewUrl::CustomProtocol(
+                "http://vb6.localhost/index.html".parse().unwrap(),
+            );
+            #[cfg(not(any(windows, target_os = "android")))]
+            let page_url = tauri::WebviewUrl::CustomProtocol(
+                "vb6://localhost/index.html".parse().unwrap(),
+            );
+
+            // Create a new window — there is no pre-created window (windows: [] in tauri.conf.json).
+            // The page is served by the `vb6://` custom protocol registered above,
+            // so the webview loads a real document (with the form already in the
+            // DOM) instead of an `about:blank` shell that needs JS injection.
+            let window = tauri::WebviewWindowBuilder::new(app, "vb6interpret", page_url)
+            .title("VB6Interpret")
             .inner_size(1024.0, 768.0)
             .resizable(true)
-            .build()?;
+            .build()
+            .expect("failed to create webview window");
+            let _ = window.show();
+            let _ = window.set_focus();
 
-            let form_name = startup_form_name.clone();
-            let _ = window.eval(format!(
-                "document.getElementById('root').innerHTML = {html:?}; document.getElementById('status').textContent = 'Form loaded'; \
-                 window.__vb6FormName__ = {form_name:?}; window.__vb6EngineHandle__ = {engine_handle};"
-            ));
-
-            let _ = window;
             Ok(())
         })
         .run(tauri::generate_context!())
@@ -374,6 +413,10 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
 
     unreachable!()
 }
+
+/// The complete HTML page served by the `vb6://` custom protocol.
+#[cfg(feature = "tauri")]
+static FORM_PAGE: OnceLock<String> = OnceLock::new();
 
 fn run_console_project(
     project: LoadedProject,

@@ -1,25 +1,21 @@
 {
-  "identifier": "com.vb6.viewer",
-  "productName": "VB6 Form Viewer",
+  "identifier": "com.vb6.interpret",
+  "productName": "VB6Interpret",
   "version": "0.1.0",
   "build": {
     "devUrl": "about:blank",
     "beforeDevCommand": "",
-    "beforeBuildCommand": "",
-    "frontendDist": "../tauri/dist"
+    "beforeBuildCommand": ""
   },
   "app": {
-    "windows": [{
-      "label": "main",
-      "title": "VB6 Form Viewer",
-      "width": 1024,
-      "height": 768,
-      "resizable": true
-    }],
-    "security": { "csp": null }
+    "windows": [],
+    "security": { 
+      "csp": null
+     }
   },
   "bundle": {
     "active": true,
-    "targets": "all"
+    "targets": ["deb", "rpm", "appimage"],
+    "icon": ["icons/icon.png"]
   }
 }

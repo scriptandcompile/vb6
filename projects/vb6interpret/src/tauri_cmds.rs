@@ -13,14 +13,14 @@
 //! handle, look up the engine, and dispatch operations.
 
 use std::collections::HashMap;
-use std::sync::{LazyLock, Mutex};
+use std::sync::{LazyLock, Mutex, OnceLock};
 
 use tauri::command;
 use vb6parse::io::SourceFile;
 use vb6runtime::VBVariant;
 use vb6runtime::layout::{self, LayoutConfig};
 
-use crate::tauri_engine::{TauriCommand, TauriEngine};
+use crate::tauri_engine::TauriEngine;
 
 /// Handle type for referencing a spawned engine in the store.
 ///
@@ -98,20 +98,39 @@ pub fn update_form(handle: u32) -> String {
     format!("<div id='root'>{}</div>", html)
 }
 
-/// Tauri command: start running the project associated with the given
-/// engine handle.
+/// Result of starting a project from the webview.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct RunProjectStatus {
+    /// Whether the project started and its startup procedure (`Sub Main` or
+    /// `Form_Load`) completed.
+    pub started: bool,
+    /// The error message when startup failed. Procedures are still merged
+    /// into the interpreter, so control event handlers remain callable.
+    pub error: Option<String>,
+}
+
+/// Tauri command: start the project associated with the given engine handle.
 ///
-/// Sends a [`RunProject`][TauriCommand::RunProject] command to the
-/// background thread. The frontend should poll the response channel
-/// for [`Running`][crate::TauriResponse::Running],
-/// [`Finished`][crate::TauriResponse::Finished], or
-/// [`Error`][crate::TauriResponse::Error] responses.
+/// Runs the project synchronously on the calling thread: procedures from all
+/// modules, classes, and forms are merged into the interpreter, module-level
+/// statements execute, and the startup procedure runs.
+///
+/// The command resolves only once startup completes so the webview can attach
+/// event bindings against a fully populated procedure map.
 #[command]
-pub fn run_project(engine_handle: EngineHandle) -> bool {
-    if let Some(engine) = get_engine(engine_handle) {
-        engine.cmd_tx.send(TauriCommand::RunProject).is_ok()
-    } else {
-        false
+pub fn run_project(engine_handle: EngineHandle) -> Option<RunProjectStatus> {
+    let engine = get_engine(engine_handle)?;
+    let mut interp = engine.interpreter.lock().unwrap();
+    let project = engine.project();
+    match interp.run_project(&project) {
+        Ok(()) => Some(RunProjectStatus {
+            started: true,
+            error: None,
+        }),
+        Err(e) => Some(RunProjectStatus {
+            started: false,
+            error: Some(e.error.to_string()),
+        }),
     }
 }
 
@@ -240,6 +259,64 @@ pub fn form_event_bindings(engine_handle: EngineHandle, form_name: String) -> Ve
         }
     }
     Vec::new()
+}
+
+/// A response returned by the `page_ready` IPC command.
+#[derive(Clone, serde::Serialize, Debug)]
+pub struct PageReadyResponse {
+    /// The form HTML markup to inject into rootEl.
+    pub form_html: String,
+    /// The VB6 form name (e.g. "Form1").
+    pub form_name: String,
+    /// The engine handle for the background interpreter.
+    pub engine_handle: EngineHandle,
+}
+
+/// Tauri command: called by the frontend when the page is ready to receive the
+/// full form HTML.
+///
+/// Returns the form HTML markup (without the surrounding shell HTML) along with
+/// the form name and engine handle. The frontend injects the markup into rootEl.
+///
+/// This avoids embedding the HTML as a string literal in the initial page —
+/// it flows through the IPC response layer where JSON serialization handles
+/// all escaping automatically.
+#[command]
+pub fn page_ready() -> Option<PageReadyResponse> {
+    eprintln!("page_ready command called");
+    let form_html = get_form_html();
+    eprintln!("  form_html is_none: {}", form_html.is_none());
+    if let Some(ref html) = form_html {
+        eprintln!("  form_html length: {}", html.len());
+        eprintln!("  form_html preview: {:.200}", html);
+    }
+    let (form_name, engine_handle) = get_page_ready_info()?;
+    eprintln!("  returning form_name={}, engine_handle={}", form_name, engine_handle);
+    Some(PageReadyResponse {
+        form_html: form_html.unwrap_or_default(),
+        form_name,
+        engine_handle,
+    })
+}
+
+fn get_page_ready_info() -> Option<(String, EngineHandle)> {
+    PAGE_READY_INFO.get().map(|(name, handle)| (name.clone(), *handle))
+}
+
+fn get_form_html() -> Option<String> {
+    FORM_HTML.get().cloned()
+}
+
+/// Stores the form HTML markup for the `page_ready` command.
+static FORM_HTML: OnceLock<String> = OnceLock::new();
+
+/// Stores form name and engine handle for the `page_ready` command.
+static PAGE_READY_INFO: OnceLock<(String, EngineHandle)> = OnceLock::new();
+
+/// Set the form HTML markup and page-ready info for later retrieval.
+pub fn set_page_ready_info(form_html: String, form_name: String, engine_handle: EngineHandle) {
+    FORM_HTML.set(form_html).ok();
+    PAGE_READY_INFO.set((form_name, engine_handle)).ok();
 }
 
 // ---------------------------------------------------------------------------

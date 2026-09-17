@@ -53,6 +53,9 @@ pub fn show_form(form_bytes: &[u8]) -> Result<JsValue, JsError> {
         .document()
         .ok_or("no document")?;
 
+    let css_injector = layout::renderer::WebSysRenderer::new(doc.clone());
+    css_injector.inject_css(&layout::vb6_css::scoped_css());
+
     let container = doc
         .get_element_by_id("vb6-container")
         .ok_or("#vb6-container element not found")?;
@@ -161,6 +164,9 @@ pub fn show_project_forms(form_files: Vec<(String, Vec<u8>)>) -> Result<Vec<u32>
         .ok_or("no window")?
         .document()
         .ok_or("no document")?;
+
+    let css_injector = layout::renderer::WebSysRenderer::new(doc.clone());
+    css_injector.inject_css(&layout::vb6_css::scoped_css());
 
     let container = doc
         .get_element_by_id("vb6-container")

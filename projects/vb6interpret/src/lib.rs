@@ -24,6 +24,10 @@ pub mod tauri_engine;
 #[cfg(feature = "tauri")]
 pub mod tauri_cmds;
 
+/// Embedded HTML for the Tauri webview (only compiled with `tauri` feature).
+#[cfg(feature = "tauri")]
+pub mod tauri_html;
+
 #[cfg(feature = "tauri")]
 pub use tauri_engine::{TauriCommand, TauriEngine, TauriEngineHandle, TauriResponse};
 
