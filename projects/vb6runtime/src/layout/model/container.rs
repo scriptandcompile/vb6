@@ -527,14 +527,16 @@ mod tests {
     fn layout_form_clone_preserves_empty_event_procedures() {
         let form = LayoutForm {
             name: "Form1".into(),
-            event_procedures: vec![
-                EventProcedure {
-                    node_id: NodeId { name: String::new(), kind: LayoutControlType::Form, index: 0 },
-                    control: "cmdOK".into(),
-                    event: "Click".into(),
-                    procedure: "cmdOK_Click".into(),
-                }
-            ],
+            event_procedures: vec![EventProcedure {
+                node_id: NodeId {
+                    name: String::new(),
+                    kind: LayoutControlType::Form,
+                    index: 0,
+                },
+                control: "cmdOK".into(),
+                event: "Click".into(),
+                procedure: "cmdOK_Click".into(),
+            }],
             ..LayoutForm::default()
         };
         let cloned = form.clone();

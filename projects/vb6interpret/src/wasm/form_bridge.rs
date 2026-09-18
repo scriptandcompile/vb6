@@ -19,6 +19,8 @@ use web_sys::window;
 
 use vb6runtime::layout::{self, LayoutConfig};
 
+use crate::project::LoadedForm;
+
 /// Parse form bytes (as produced by a VB6 `.frm` file), load into the layout
 /// engine, and render the DOM tree into `#vb6-container`.
 ///
@@ -45,8 +47,21 @@ pub fn show_form(form_bytes: &[u8]) -> Result<JsValue, JsError> {
             JsError::new(&message)
         })?;
 
+    // Compute event bindings from the form
+    let loaded_form = LoadedForm {
+        name: form_file.attributes.name.clone(),
+        file_name: "form.frm".to_string(),
+        parsed: form_file.clone(),
+        raw_bytes: form_bytes.to_vec(),
+    };
+    let bindings = loaded_form.event_bindings();
+    let event_procedures: Vec<_> = bindings
+        .into_iter()
+        .map(|((control, event), procedure)| (control, event, procedure))
+        .collect();
+
     let config = LayoutConfig::default();
-    let handle = layout::load_form(&form_file.form, &config);
+    let handle = layout::load_form(&form_file.form, event_procedures, &config);
 
     let doc = window()
         .ok_or("no window")?
@@ -189,7 +204,20 @@ pub fn show_project_forms(form_files: Vec<(String, Vec<u8>)>) -> Result<Vec<u32>
                 JsError::new(&message)
             })?;
 
-        let handle = layout::load_form(&form_file.form, &config);
+        // Compute event bindings for this form
+        let loaded_form = LoadedForm {
+            name: form_file.attributes.name.clone(),
+            file_name: file_name.clone(),
+            parsed: form_file.clone(),
+            raw_bytes: bytes.clone(),
+        };
+        let bindings = loaded_form.event_bindings();
+        let event_procedures: Vec<_> = bindings
+            .into_iter()
+            .map(|((control, event), procedure)| (control, event, procedure))
+            .collect();
+
+        let handle = layout::load_form(&form_file.form, event_procedures, &config);
         let model = layout::get_form(handle, |f| f.root_node.clone())
             .ok_or("form not found after loading")?;
         let dom_root = renderer.render_node(&model);

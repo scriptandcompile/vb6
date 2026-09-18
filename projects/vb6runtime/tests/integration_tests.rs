@@ -31,7 +31,7 @@ mod integration_tests {
         let source = SourceFile::decode_with_replacement(frm_path, &bytes)
             .expect("failed to decode source file");
         let form_file = FormFile::parse(&source).unwrap_or_fail();
-        let handle = layout::load_form(&form_file.form, &LayoutConfig::default());
+        let handle = layout::load_form(&form_file.form, vec![], &LayoutConfig::default());
         let renderer = TauriRenderer::new(false);
         layout::render(handle, &renderer)
     }
@@ -46,7 +46,7 @@ mod integration_tests {
         let source = SourceFile::decode_with_replacement(frm_path, &bytes)
             .expect("failed to decode source file");
         let form_file = FormFile::parse(&source).unwrap_or_fail();
-        let handle = layout::load_form(&form_file.form, &LayoutConfig::default());
+        let handle = layout::load_form(&form_file.form, vec![], &LayoutConfig::default());
         let renderer = TauriRenderer::new(true);
         layout::render(handle, &renderer)
     }
@@ -216,10 +216,7 @@ mod integration_tests {
     #[test]
     fn empty_form_has_no_control_elements() {
         let html = render_form("empty_form.frm");
-        assert!(
-            html.is_empty(),
-            "empty form should produce no HTML"
-        );
+        assert!(html.is_empty(), "empty form should produce no HTML");
         assert!(
             !html.contains("vb6-label"),
             "should not have label controls"
@@ -247,7 +244,7 @@ mod integration_tests {
         let bytes = std::fs::read(&path).unwrap();
         let source = SourceFile::decode_with_replacement("simple.frm", &bytes).unwrap();
         let form_file = FormFile::parse(&source).unwrap_or_fail();
-        let handle = layout::load_form(&form_file.form, &LayoutConfig::default());
+        let handle = layout::load_form(&form_file.form, vec![], &LayoutConfig::default());
         let width = layout::get_form(handle, |f| f.size.width);
         // 4000 twips at 96 DPI = 4000 / 15 = 266.67 px
         assert!(
@@ -275,7 +272,7 @@ mod integration_tests {
             let source = SourceFile::decode_with_replacement(fixture, &bytes)
                 .expect("failed to decode source file");
             let form_file = FormFile::parse(&source).unwrap_or_fail();
-            let handle = layout::load_form(&form_file.form, &LayoutConfig::default());
+            let handle = layout::load_form(&form_file.form, vec![], &LayoutConfig::default());
             let renderer = TauriRenderer::new(false);
             let html = layout::render(handle, &renderer);
             assert!(

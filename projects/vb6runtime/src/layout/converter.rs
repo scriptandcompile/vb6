@@ -14,14 +14,18 @@
 //! 7. Positions/sizes are converted from twips (or form scale mode) to pixels
 //! 8. The `LayoutForm` is stored in the form store and the handle is returned
 
+use std::collections::HashMap;
+
 use vb6parse::language::{
     Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm, ScaleMode,
     Visibility,
 };
+use vb6parse::parsers::{ConcreteSyntaxTree, SyntaxKind};
 
 use super::model::LayoutControlType;
 use super::model::{
-    LayoutContainer, LayoutForm, LayoutLeaf, LayoutNode, LayoutPosition, LayoutSize, LayoutStyle,
+    EventProcedure, LayoutContainer, LayoutForm, LayoutLeaf, LayoutNode, LayoutPosition,
+    LayoutSize, LayoutStyle, NodeId,
 };
 use super::scale::{scale_mode_to_pixels, twips_to_pixels};
 use super::{LayoutConfig, color::color_to_css, font_points_to_px};
@@ -83,30 +87,53 @@ pub type LayoutResult<T> = Result<T, LayoutError>;
 ///
 /// Walks the control tree, converts positions/sizes from twips to pixels,
 /// builds styles for each control, and stores the result in the form store.
+/// Event procedures are populated from the provided bindings.
+///
+/// # Arguments
+///
+/// * `root` - The parsed form root (Form or MDIForm).
+/// * `event_procedures` - Pre-computed event procedure bindings in `(control_name, event_name, procedure_name)` format.
+/// * `config` - Layout configuration.
 ///
 /// # Errors
 ///
 /// Returns `Err` if a Custom or OLE control is encountered (not supported in Phase 1).
-pub fn load_form(root: &vb6parse::language::FormRoot, config: &LayoutConfig) -> FormHandle {
-    let form = convert_form(root, config).expect("form conversion failed");
+pub fn load_form(
+    root: &vb6parse::language::FormRoot,
+    event_procedures: Vec<(String, String, String)>,
+    config: &LayoutConfig,
+) -> FormHandle {
+    let form = convert_form(root, event_procedures, config).expect("form conversion failed");
     form_store::insert(form)
 }
 
 /// Convert a parsed VB6 `FormRoot` into a [`LayoutForm`].
 ///
 /// This is the entry point for the converter. It dispatches to either
-/// [`convert_form`] or [`convert_mdi_form`] depending on the root type.
+/// [`convert_form_impl`] or [`convert_mdi_form_impl`] depending on the root type.
+/// Event procedures are populated from the provided bindings.
+///
+/// # Arguments
+///
+/// * `root` - The parsed form root (Form or MDIForm).
+/// * `event_procedures` - Pre-computed event procedure bindings in `(control_name, event_name, procedure_name)` format.
+/// * `config` - Layout configuration.
 ///
 /// # Errors
 ///
 /// Returns `Err` if a Custom or OLE control is encountered.
 pub fn convert_form(
     root: &vb6parse::language::FormRoot,
+    event_procedures: Vec<(String, String, String)>,
     config: &LayoutConfig,
 ) -> LayoutResult<LayoutForm> {
     match root {
-        vb6parse::language::FormRoot::Form(form) => convert_form_impl(form, config),
-        vb6parse::language::FormRoot::MDIForm(mdi) => convert_mdi_form_impl(mdi, config),
+        vb6parse::language::FormRoot::Form(form) => {
+            convert_form_impl(form, event_procedures, config)
+        }
+        vb6parse::language::FormRoot::MDIForm(mdi) => {
+            convert_mdi_form_impl(mdi, Vec::new(), config)
+        }
     }
 }
 
@@ -115,7 +142,11 @@ pub fn convert_form(
 // ---------------------------------------------------------------------------
 
 /// Convert a parsed VB6 [`Form`] into a [`LayoutForm`].
-fn convert_form_impl(form: &Form, config: &LayoutConfig) -> LayoutResult<LayoutForm> {
+fn convert_form_impl(
+    form: &Form,
+    event_procedures: Vec<(String, String, String)>,
+    config: &LayoutConfig,
+) -> LayoutResult<LayoutForm> {
     let dpi = config.dpi;
     let scale_mode = form.properties.scale_mode;
 
@@ -161,6 +192,28 @@ fn convert_form_impl(form: &Form, config: &LayoutConfig) -> LayoutResult<LayoutF
         top: twips_to_pixels(form.properties.top, dpi),
     };
 
+    // Build a name -> control type -> index -> NodeId map from the layout tree
+    let mut name_to_nodes: HashMap<String, Vec<NodeId>> = HashMap::new();
+    collect_node_ids_from_tree(&root_container, &mut name_to_nodes);
+
+    // Populate node_ids in event procedures
+    let event_procedures: Vec<EventProcedure> = event_procedures
+        .into_iter()
+        .filter_map(|(control, event, procedure)| {
+            // Find the first matching NodeId for this control name
+            let node_id = name_to_nodes
+                .get(&control)
+                .and_then(|nodes| nodes.first())
+                .cloned()?;
+            Some(EventProcedure {
+                node_id,
+                control,
+                event,
+                procedure,
+            })
+        })
+        .collect();
+
     Ok(LayoutForm {
         name: form.name.clone(),
         control_type: LayoutControlType::Form,
@@ -175,7 +228,7 @@ fn convert_form_impl(form: &Form, config: &LayoutConfig) -> LayoutResult<LayoutF
         current_value: None,
         snapshot: None,
         render_id: 0,
-        event_procedures: vec![],
+        event_procedures,
     })
 }
 
@@ -183,7 +236,11 @@ fn convert_form_impl(form: &Form, config: &LayoutConfig) -> LayoutResult<LayoutF
 ///
 /// MDIForms do not have `scale_mode`, `scale_width`, `scale_height`, or
 /// `border_style` fields — dimensions are always in twips.
-fn convert_mdi_form_impl(mdi: &MDIForm, config: &LayoutConfig) -> LayoutResult<LayoutForm> {
+fn convert_mdi_form_impl(
+    mdi: &MDIForm,
+    _event_procedures: Vec<EventProcedure>,
+    config: &LayoutConfig,
+) -> LayoutResult<LayoutForm> {
     let dpi = config.dpi;
 
     // MDIForm dimensions are in twips (no scale_mode field)
@@ -240,6 +297,171 @@ fn convert_mdi_form_impl(mdi: &MDIForm, config: &LayoutConfig) -> LayoutResult<L
         render_id: 0,
         event_procedures: vec![],
     })
+}
+
+// ---------------------------------------------------------------------------
+// Event procedure helpers
+// ---------------------------------------------------------------------------
+
+/// Common VB6 event names used when matching procedure names to controls.
+const VB6_EVENTS: &[&str] = &[
+    "Click",
+    "DblClick",
+    "MouseDown",
+    "MouseMove",
+    "MouseUp",
+    "Change",
+    "GotFocus",
+    "LostFocus",
+    "KeyPress",
+    "KeyDown",
+    "KeyUp",
+    "BeforeUpdate",
+    "AfterUpdate",
+    "OnDirty",
+    "Dirty",
+    "Enter",
+    "Exit",
+    "Error",
+    "AddNew",
+    "WriteComplete",
+    "WantsAccelerator",
+    "Validate",
+    "Paint",
+    "Resize",
+    "Initialize",
+    "Terminate",
+    "SelectionChange",
+];
+
+/// Recursively collect node IDs from a layout container, grouped by name.
+fn collect_node_ids_from_tree(container: &LayoutContainer, map: &mut HashMap<String, Vec<NodeId>>) {
+    let nid = container.node_id();
+    map.entry(nid.name.clone()).or_default().push(nid);
+    for child in &container.children {
+        match child {
+            LayoutNode::Container(c) => collect_node_ids_from_tree(c, map),
+            LayoutNode::Leaf(l) => {
+                let nid = l.node_id();
+                map.entry(nid.name.clone()).or_default().push(nid);
+            }
+        }
+    }
+}
+
+/// Check if a procedure name matches a control event binding.
+/// Returns `(control_name, event_name)` if the procedure follows the `controlName_eventName` pattern.
+fn find_event_binding(
+    proc_name: &str,
+    control_names: &[String],
+    form_name: &str,
+) -> Option<(String, String)> {
+    for event in VB6_EVENTS {
+        let pattern = format!("_{}", event);
+        if proc_name.ends_with(&pattern) {
+            let ctrl_name = &proc_name[..proc_name.len() - pattern.len()];
+            if ctrl_name.is_empty() {
+                continue;
+            }
+            if control_names.iter().any(|cn| cn.as_str() == ctrl_name) {
+                return Some((ctrl_name.to_string(), event.to_string()));
+            }
+        }
+    }
+
+    // Handle form-level events (no control prefix)
+    if proc_name.starts_with(&format!("{}_", form_name)) {
+        let event_part = &proc_name[form_name.len() + 1..];
+        if event_part.contains(|c: char| c.is_ascii_uppercase()) {
+            return Some((form_name.to_string(), event_part.to_string()));
+        }
+    }
+
+    None
+}
+
+/// Extract the procedure name from a Sub or Function statement CST node.
+fn procedure_name(node: &vb6parse::parsers::cst::CstNode) -> String {
+    node.significant_children()
+        .find(|c| c.kind() == SyntaxKind::Identifier)
+        .map(|c| c.text().trim().to_string())
+        .unwrap_or_default()
+}
+
+/// Build a list of event bindings from a `FormRoot` and its CST.
+///
+/// This extracts control names from the form structure and matches them against
+/// procedure declarations in the CST to find event handlers in the format
+/// `controlName_eventName` (e.g., `cmdOK_Click`).
+///
+/// Returns a vector of `(control_name, event_name, procedure_name)` tuples.
+pub fn build_event_bindings(
+    root: &vb6parse::language::FormRoot,
+    cst: &ConcreteSyntaxTree,
+) -> Vec<(String, String, String)> {
+    let mut bindings: HashMap<(String, String), String> = HashMap::new();
+
+    // Get the form name for form-level event detection
+    let form_name = match root {
+        vb6parse::language::FormRoot::Form(f) => f.name.clone(),
+        vb6parse::language::FormRoot::MDIForm(m) => m.name.clone(),
+    };
+
+    // Collect all control names recursively
+    let all_control_names: Vec<String> = match root {
+        vb6parse::language::FormRoot::Form(form) => {
+            let mut names = Vec::new();
+            for ctrl in &form.controls {
+                collect_layout_control_names(ctrl, &mut names);
+            }
+            names
+        }
+        vb6parse::language::FormRoot::MDIForm(mdi) => {
+            let mut names = Vec::new();
+            for ctrl in &mdi.controls {
+                collect_layout_control_names(ctrl, &mut names);
+            }
+            names
+        }
+    };
+
+    // Get procedure names from the CST
+    let root_node = cst.to_root_node();
+    for child in root_node.children() {
+        match child.kind() {
+            SyntaxKind::SubStatement | SyntaxKind::FunctionStatement => {
+                let proc_name = procedure_name(child);
+                if proc_name.is_empty() {
+                    continue;
+                }
+
+                if let Some((ctrl, event)) =
+                    find_event_binding(&proc_name, &all_control_names, &form_name)
+                {
+                    bindings.insert((ctrl, event), proc_name);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    bindings
+        .into_iter()
+        .map(|((control, event), procedure)| (control, event, procedure))
+        .collect()
+}
+
+/// Recursively collect control names from a parsed control tree.
+fn collect_layout_control_names(control: &Control, names: &mut Vec<String>) {
+    names.push(control.name().to_string());
+    match control.kind() {
+        ControlKind::Frame { controls, .. } | ControlKind::PictureBox { controls, .. } => {
+            for child in controls {
+                collect_layout_control_names(child, names);
+            }
+        }
+        _ => {}
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -363,7 +585,8 @@ fn convert_control(
 
             let mut child_nodes = Vec::new();
             for child in controls {
-                if let Some(node) = convert_control(child, &frame_container, scale_mode, dpi, config)?
+                if let Some(node) =
+                    convert_control(child, &frame_container, scale_mode, dpi, config)?
                 {
                     child_nodes.push(node);
                 }
@@ -397,13 +620,9 @@ fn convert_control(
                 // PictureBox may have its own scale_mode; use it if available,
                 // otherwise fall back to the parent form's scale_mode.
                 let child_scale_mode = properties.scale_mode;
-                if let Some(node) = convert_control(
-                    child,
-                    &picture_container,
-                    child_scale_mode,
-                    dpi,
-                    config,
-                )? {
+                if let Some(node) =
+                    convert_control(child, &picture_container, child_scale_mode, dpi, config)?
+                {
                     child_nodes.push(node);
                 }
             }
@@ -839,6 +1058,7 @@ fn mouse_pointer_css(pointer: vb6parse::language::MousePointer) -> Option<String
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::layout::form_store;
     use std::collections::HashMap;
     use vb6parse::language::{
         CheckBoxProperties, CheckBoxValue, CommandButtonProperties, CustomControlProperties,
@@ -1223,7 +1443,8 @@ mod tests {
     fn convert_simple_form() {
         let form = create_test_form();
         let config = LayoutConfig::default();
-        let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout_form =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         assert_eq!(layout_form.name, "Form1");
         let children: Vec<_> = layout_form.visible_children().collect();
@@ -1235,7 +1456,8 @@ mod tests {
     fn convert_form_with_button() {
         let form = create_test_form_with_button();
         let config = LayoutConfig::default();
-        let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout_form =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         assert_eq!(layout_form.name, "Form1");
         let children: Vec<_> = layout_form.visible_children().collect();
@@ -1252,7 +1474,8 @@ mod tests {
     fn convert_form_with_textbox() {
         let form = create_test_form_with_textbox();
         let config = LayoutConfig::default();
-        let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout_form =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         assert_eq!(layout_form.name, "Form1");
         let children: Vec<_> = layout_form.visible_children().collect();
@@ -1270,7 +1493,8 @@ mod tests {
         // Form → Frame → Label
         let form = create_test_form_with_frame();
         let config = LayoutConfig::default();
-        let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout_form =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         let children: Vec<_> = layout_form.visible_children().collect();
         assert_eq!(children.len(), 1);
@@ -1290,7 +1514,8 @@ mod tests {
             include_nonvisual: false,
             ..Default::default()
         };
-        let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout_form =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         let children: Vec<_> = layout_form.visible_children().collect();
         assert!(
@@ -1306,7 +1531,8 @@ mod tests {
             include_nonvisual: true,
             ..Default::default()
         };
-        let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout_form =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         let children: Vec<_> = layout_form.visible_children().collect();
         assert_eq!(children.len(), 1);
@@ -1324,7 +1550,8 @@ mod tests {
             include_nonvisual: false,
             ..Default::default()
         };
-        let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout_form =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         let children: Vec<_> = layout_form.visible_children().collect();
         assert!(
@@ -1337,7 +1564,7 @@ mod tests {
     fn reject_custom_control() {
         let form = create_test_form_with_custom();
         let config = LayoutConfig::default();
-        let result = convert_form(&vb6parse::language::FormRoot::Form(form), &config);
+        let result = convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config);
         assert!(
             matches!(result, Err(LayoutError::UnsupportedControl { kind, .. }) if kind == "Custom")
         );
@@ -1347,7 +1574,7 @@ mod tests {
     fn reject_ole_control() {
         let form = create_test_form_with_ole();
         let config = LayoutConfig::default();
-        let result = convert_form(&vb6parse::language::FormRoot::Form(form), &config);
+        let result = convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config);
         assert!(
             matches!(result, Err(LayoutError::UnsupportedControl { kind, .. }) if kind == "OLE")
         );
@@ -1360,7 +1587,8 @@ mod tests {
             dpi: 96,
             ..Default::default()
         };
-        let layout_form = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout_form =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         // scale_width = 4000 twips at 96 DPI
         // 4000 * 96 / 1440 = 266.666... px
@@ -1375,7 +1603,7 @@ mod tests {
         let mdi = create_test_mdi_form();
         let config = LayoutConfig::default();
         let layout_form =
-            convert_form(&vb6parse::language::FormRoot::MDIForm(mdi), &config).unwrap();
+            convert_form(&vb6parse::language::FormRoot::MDIForm(mdi), vec![], &config).unwrap();
 
         assert_eq!(layout_form.name, "MDIMain");
         // Width = 4800 twips at 96 DPI = 4800 * 96 / 1440 = 320 px
@@ -1438,6 +1666,7 @@ mod tests {
         };
         let layout = convert_form(
             &vb6parse::language::FormRoot::Form(form.clone()),
+            vec![],
             &config_skip,
         )
         .unwrap();
@@ -1449,8 +1678,12 @@ mod tests {
             include_nonvisual: true,
             ..Default::default()
         };
-        let layout =
-            convert_form(&vb6parse::language::FormRoot::Form(form), &config_include).unwrap();
+        let layout = convert_form(
+            &vb6parse::language::FormRoot::Form(form),
+            vec![],
+            &config_include,
+        )
+        .unwrap();
         let children: Vec<_> = layout.visible_children().collect();
         assert_eq!(children.len(), 5);
     }
@@ -1479,7 +1712,8 @@ mod tests {
             dpi: 96,
             ..Default::default()
         };
-        let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         // Form position: left=100 twips, top=200 twips at 96 DPI
         // 100 * 96 / 1440 = 6.67 px, 200 * 96 / 1440 = 13.33 px
@@ -1530,7 +1764,8 @@ mod tests {
             dpi: 120,
             ..Default::default()
         };
-        let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         let children: Vec<_> = layout.visible_children().collect();
         assert_eq!(children.len(), 1);
@@ -1566,7 +1801,8 @@ mod tests {
             dpi: 96,
             ..Default::default()
         };
-        let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         // Pixel mode: 1:1 mapping, no conversion
         assert_eq!(layout.size.width, 400.0);
@@ -1719,7 +1955,8 @@ mod tests {
         // (e.g. white forms) are honored instead of always using CSS var().
         let form = create_test_form();
         let config = LayoutConfig::default();
-        let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         assert!(layout.style.background_color.is_some());
         assert!(layout.style.color.is_some());
@@ -1729,7 +1966,8 @@ mod tests {
     fn leaf_value_is_set() {
         let form = create_test_form();
         let config = LayoutConfig::default();
-        let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         let children: Vec<_> = layout.visible_children().collect();
         if let LayoutNode::Leaf(leaf) = &children[0] {
@@ -1782,7 +2020,8 @@ mod tests {
             dpi: 96,
             ..Default::default()
         };
-        let layout = convert_form(&vb6parse::language::FormRoot::Form(form), &config).unwrap();
+        let layout =
+            convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
         let children: Vec<_> = layout.visible_children().collect();
         assert_eq!(children.len(), 1);
@@ -1802,7 +2041,7 @@ mod tests {
         let form = create_test_form();
         let config = LayoutConfig::default();
         let root = vb6parse::language::FormRoot::Form(form);
-        let handle = load_form(&root, &config);
+        let handle = load_form(&root, vec![], &config);
 
         // Handle should be valid and form should be retrievable
         let name = form_store::get(handle, |f| f.name.clone());
@@ -1819,8 +2058,8 @@ mod tests {
         };
 
         let config = LayoutConfig::default();
-        let h1 = load_form(&vb6parse::language::FormRoot::Form(f1), &config);
-        let h2 = load_form(&vb6parse::language::FormRoot::Form(f2), &config);
+        let h1 = load_form(&vb6parse::language::FormRoot::Form(f1), vec![], &config);
+        let h2 = load_form(&vb6parse::language::FormRoot::Form(f2), vec![], &config);
 
         // Handles should be incrementing, starting from 0 after reset
         assert_eq!(h2, h1 + 1);
@@ -1900,5 +2139,157 @@ mod tests {
         let (_, size, _) = extract_position_size_type(&kind, ScaleMode::Twip, 96);
         assert_eq!(size.width, 10.0);
         assert_eq!(size.height, 20.0);
+    }
+
+    #[test]
+    fn build_event_bindings_detects_control_click() {
+        let input = b"VERSION 5.00\r\n\
+                      Begin VB.CommandButton cmdOK \r\n\
+                         Caption         =   \"OK\"\r\n\
+                      End\r\n\
+                      Attribute VB_Name = \"cmdOK\"\r\n\
+                      Attribute VB_GlobalNameSpace = False\r\n\
+                      Attribute VB_Creatable = False\r\n\
+                      Attribute VB_PredeclaredId = True\r\n\
+                      Attribute VB_Exposed = False\r\n\
+                      Private Sub cmdOK_Click()\r\n\
+                      End Sub\r\n";
+
+        let source = vb6parse::io::SourceFile::decode_with_replacement("test.frm", input).unwrap();
+        let form_file = vb6parse::FormFile::parse(&source).unwrap_or_fail();
+
+        let bindings = build_event_bindings(&form_file.form, &form_file.cst);
+        assert!(
+            bindings.iter().any(|(ctrl, evt, proc)| {
+                ctrl == "cmdOK" && evt == "Click" && proc == "cmdOK_Click"
+            }),
+            "Expected cmdOK_Click binding, got: {:?}",
+            bindings
+        );
+    }
+
+    #[test]
+    fn build_event_bindings_excludes_form_level_events() {
+        let input = b"VERSION 5.00\r\n\
+                      Begin VB.Form Form1 \r\n\
+                         Caption         =   \"Form1\"\r\n\
+                      End\r\n\
+                      Attribute VB_Name = \"Form1\"\r\n\
+                      Attribute VB_GlobalNameSpace = False\r\n\
+                      Attribute VB_Creatable = False\r\n\
+                      Attribute VB_PredeclaredId = True\r\n\
+                      Attribute VB_Exposed = False\r\n\
+                      Private Sub Form_Load()\r\n\
+                      End Sub\r\n";
+
+        let source = vb6parse::io::SourceFile::decode_with_replacement("test.frm", input).unwrap();
+        let form_file = vb6parse::FormFile::parse(&source).unwrap_or_fail();
+
+        let bindings = build_event_bindings(&form_file.form, &form_file.cst);
+        assert!(
+            !bindings.iter().any(|(_, _, proc)| proc == "Form_Load"),
+            "Form_Load should not be included in control event bindings"
+        );
+    }
+
+    #[test]
+    fn load_form_populates_event_procedures_for_control_click() {
+        let _lock = lock_test();
+        let input = b"VERSION 5.00\r\n\
+Begin VB.Form Form1 \r\n\
+   Caption         =   \"Form1\"\r\n\
+   ClientHeight    =   3000\r\n\
+   ClientLeft      =   60\r\n\
+   ClientTop       =   345\r\n\
+   ClientWidth     =   4500\r\n\
+   LinkTopic       =   \"Form1\"\r\n\
+   ScaleHeight     =   3000\r\n\
+   ScaleWidth      =   4500\r\n\
+   Begin VB.CommandButton Command1 \r\n\
+      Caption         =   \"OK\"\r\n\
+      Height          =   375\r\n\
+      Left            =   1200\r\n\
+      TabIndex        =   0\r\n\
+      Top             =   600\r\n\
+      Width           =   1095\r\n\
+   End\r\n\
+End\r\n\
+Attribute VB_Name = \"Form1\"\r\n\
+Attribute VB_GlobalNameSpace = False\r\n\
+Attribute VB_Creatable = False\r\n\
+Attribute VB_PredeclaredId = True\r\n\
+Attribute VB_Exposed = False\r\n\
+Private Sub Command1_Click()\r\n\
+End Sub\r\n";
+
+        let source = vb6parse::io::SourceFile::decode_with_replacement("test.frm", input).unwrap();
+        let form_file = vb6parse::FormFile::parse(&source).unwrap_or_fail();
+
+        let bindings = build_event_bindings(&form_file.form, &form_file.cst);
+        let event_procedures: Vec<_> = bindings.into_iter().collect();
+
+        let handle = load_form(&form_file.form, event_procedures, &LayoutConfig::default());
+
+        let form = form_store::get(handle, |f| f.event_procedures.clone()).unwrap();
+        assert!(
+            form.iter()
+                .any(|ep| ep.control == "Command1" && ep.event == "Click"),
+            "Expected Command1_Click binding, got: {:?}",
+            form
+        );
+    }
+
+    #[test]
+    fn load_form_includes_nested_control_events() {
+        let _lock = lock_test();
+        let input = b"VERSION 5.00\r\n\
+Begin VB.Form Form1 \r\n\
+   Caption         =   \"Form1\"\r\n\
+   ClientHeight    =   3000\r\n\
+   ClientLeft      =   60\r\n\
+   ClientTop       =   345\r\n\
+   ClientWidth     =   4500\r\n\
+   LinkTopic       =   \"Form1\"\r\n\
+   ScaleHeight     =   3000\r\n\
+   ScaleWidth      =   4500\r\n\
+   Begin VB.Frame Frame1 \r\n\
+      Caption         =   \"Group\"\r\n\
+      Height          =   1000\r\n\
+      Left            =   300\r\n\
+      TabIndex        =   1\r\n\
+      Top             =   300\r\n\
+      Width           =   3900\r\n\
+      Begin VB.CommandButton cmdOK \r\n\
+         Caption         =   \"OK\"\r\n\
+         Height          =   375\r\n\
+         Left            =   600\r\n\
+         TabIndex        =   0\r\n\
+         Top             =   200\r\n\
+         Width           =   1095\r\n\
+      End\r\n\
+   End\r\n\
+End\r\n\
+Attribute VB_Name = \"Form1\"\r\n\
+Attribute VB_GlobalNameSpace = False\r\n\
+Attribute VB_Creatable = False\r\n\
+Attribute VB_PredeclaredId = True\r\n\
+Attribute VB_Exposed = False\r\n\
+Private Sub cmdOK_Click()\r\n\
+End Sub\r\n";
+
+        let source = vb6parse::io::SourceFile::decode_with_replacement("test.frm", input).unwrap();
+        let form_file = vb6parse::FormFile::parse(&source).unwrap_or_fail();
+
+        let bindings = build_event_bindings(&form_file.form, &form_file.cst);
+        let event_procedures: Vec<_> = bindings.into_iter().collect();
+
+        let handle = load_form(&form_file.form, event_procedures, &LayoutConfig::default());
+
+        let form = form_store::get(handle, |f| f.event_procedures.clone()).unwrap();
+        assert!(
+            form.iter().any(|ep| ep.control == "cmdOK"),
+            "Expected cmdOK event procedure for nested control, got: {:?}",
+            form
+        );
     }
 }

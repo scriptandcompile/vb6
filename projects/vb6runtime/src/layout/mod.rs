@@ -309,7 +309,7 @@ mod tests {
         let _lock = lock_test();
         let form = make_test_form_with_label();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let name = get_form(handle, |f| f.name.clone());
         assert_eq!(name, Some("Form1".into()));
     }
@@ -319,7 +319,7 @@ mod tests {
         let _lock = lock_test();
         let form = make_test_form_with_button();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let changed = get_form_mut(handle, |f| {
             f.caption = "Modified".into();
             f.caption.clone()
@@ -334,7 +334,7 @@ mod tests {
         let _lock = lock_test();
         let form = make_test_form_with_label();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let renderer = renderer::TauriRenderer::new(false);
         let html = render(handle, &renderer);
         assert!(!html.is_empty(), "html was empty: {html}");
@@ -346,7 +346,7 @@ mod tests {
         let _lock = lock_test();
         let form = make_test_form_with_label();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let renderer = renderer::TauriRenderer::new(true);
         let html = render(handle, &renderer);
         assert!(!html.is_empty());
@@ -377,8 +377,8 @@ mod tests {
         let form1 = make_test_form_with_label();
         let form2 = make_test_form_with_button();
         let config = LayoutConfig::default();
-        let handle1 = load_form(&FormRoot::Form(form1), &config);
-        let handle2 = load_form(&FormRoot::Form(form2), &config);
+        let handle1 = load_form(&FormRoot::Form(form1), vec![], &config);
+        let handle2 = load_form(&FormRoot::Form(form2), vec![], &config);
         let renderer = renderer::TauriRenderer::new(false);
         let html1 = render(handle1, &renderer);
         let html2 = render(handle2, &renderer);
@@ -392,7 +392,7 @@ mod tests {
         form_store::reset();
         let form = make_test_form_with_label();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         assert!(get_diff(handle).is_none());
     }
 
@@ -402,7 +402,7 @@ mod tests {
         form_store::reset();
         let form = make_test_form_with_label();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         // First render captures snapshot
         let renderer = renderer::TauriRenderer::new(false);
         let _html = render(handle, &renderer);
@@ -417,7 +417,7 @@ mod tests {
         form_store::reset();
         let form = make_test_form_with_label();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         // First render captures snapshot
         let renderer = renderer::TauriRenderer::new(false);
         let _html = render(handle, &renderer);
@@ -432,7 +432,7 @@ mod tests {
         form_store::reset();
         let form = make_test_form_with_label();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         assert!(get_diff(handle).is_none());
         capture_snapshot(handle);
         assert!(get_diff(handle).is_some());
@@ -447,7 +447,7 @@ mod tests {
         form_store::reset();
         let form = make_test_form_with_label();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let renderer = renderer::TauriRenderer::new(false);
         // First render: no diff, full render
         let html1 = render(handle, &renderer);
@@ -465,7 +465,7 @@ mod tests {
         form_store::reset();
         let form = make_test_form_with_label();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let renderer = renderer::TauriRenderer::new(false);
         // First render -> render_id = 1
         render(handle, &renderer);
@@ -484,7 +484,7 @@ mod tests {
         form_store::reset();
         let form = make_test_form_with_label();
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let renderer = renderer::TauriRenderer::new(false);
         let _html = render(handle, &renderer);
         // Insert a new child — diff engine can detect structural changes.
@@ -515,7 +515,7 @@ mod tests {
         let source_file = vb6parse::io::SourceFile::decode_with_replacement("form.frm", &bytes)
             .expect("failed to decode form");
         let form_file = vb6parse::FormFile::parse(&source_file).unwrap_or_fail();
-        let handle = load_form(&form_file.form, &LayoutConfig::default());
+        let handle = load_form(&form_file.form, vec![], &LayoutConfig::default());
         let name = get_form(handle, |f| f.name.clone());
         assert_eq!(name, Some("Form1".to_string()));
     }
@@ -528,7 +528,7 @@ mod tests {
         let source_file = vb6parse::io::SourceFile::decode_with_replacement("form.frm", &bytes)
             .expect("failed to decode form");
         let form_file = vb6parse::FormFile::parse(&source_file).unwrap_or_fail();
-        let handle = load_form(&form_file.form, &LayoutConfig::default());
+        let handle = load_form(&form_file.form, vec![], &LayoutConfig::default());
         let html = render(handle, &renderer::TauriRenderer::new(false));
         assert!(html.contains("vb6-label"));
         assert!(html.contains("Hello"));
@@ -579,7 +579,7 @@ mod tests {
             menus: Vec::new(),
         };
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let html = render(handle, &renderer::TauriRenderer::new(false));
         assert!(html.is_empty());
     }
@@ -625,7 +625,7 @@ mod tests {
         };
         let config = LayoutConfig::default();
         // ScaleMode::User falls back to twip conversion — should not panic
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let html = render(handle, &renderer::TauriRenderer::new(false));
         assert!(!html.is_empty());
     }
@@ -670,7 +670,7 @@ mod tests {
             menus: Vec::new(),
         };
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let html = render(handle, &renderer::TauriRenderer::new(false));
         assert!(!html.is_empty());
     }
@@ -698,7 +698,7 @@ mod tests {
             menus: Vec::new(),
         };
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let name = get_form(handle, |f| f.name.clone());
         assert_eq!(name, Some("CenterScreenForm".into()));
     }
@@ -726,7 +726,7 @@ mod tests {
             menus: Vec::new(),
         };
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let name = get_form(handle, |f| f.name.clone());
         assert_eq!(name, Some("CenterOwnerForm".into()));
     }
@@ -754,7 +754,7 @@ mod tests {
             menus: Vec::new(),
         };
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let name = get_form(handle, |f| f.name.clone());
         assert_eq!(name, Some("WinDefaultForm".into()));
     }
@@ -787,7 +787,7 @@ mod tests {
             menus: Vec::new(),
         };
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let name = get_form(handle, |f| f.name.clone());
         assert_eq!(name, Some("ManualForm".into()));
     }
@@ -831,7 +831,7 @@ mod tests {
             menus: Vec::new(),
         };
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let html = render(handle, &renderer::TauriRenderer::new(false));
         assert!(!html.is_empty());
         assert!(html.contains("vb6-label"));
@@ -876,7 +876,7 @@ mod tests {
             menus: Vec::new(),
         };
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let html = render(handle, &renderer::TauriRenderer::new(false));
         assert!(!html.is_empty());
         assert!(html.contains("vb6-label"));
@@ -957,7 +957,7 @@ mod tests {
             menus: Vec::new(),
         };
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let html = render(handle, &renderer::TauriRenderer::new(false));
         assert!(!html.is_empty());
         assert!(
@@ -1044,7 +1044,7 @@ mod tests {
             menus: Vec::new(),
         };
         let config = LayoutConfig::default();
-        let handle = load_form(&FormRoot::Form(form), &config);
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
         let html = render(handle, &renderer::TauriRenderer::new(false));
         assert!(!html.is_empty());
         assert!(html.contains("vb6-frame"), "missing vb6-frame in: {html}");

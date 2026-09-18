@@ -513,8 +513,15 @@ impl LoadedProject {
             .find(|f| f.name == form_name)
             .ok_or_else(|| anyhow::anyhow!("Form '{}' not found", form_name))?;
 
+        let bindings = loaded_form.event_bindings();
+        let event_procedures: Vec<_> = bindings
+            .into_iter()
+            .map(|((control, event), procedure)| (control, event, procedure))
+            .collect();
+
         let handle = vb6runtime::layout::load_form(
             &loaded_form.parsed.form,
+            event_procedures,
             &vb6runtime::layout::LayoutConfig::default(),
         );
         let html = vb6runtime::layout::render(

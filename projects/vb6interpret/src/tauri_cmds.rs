@@ -20,6 +20,7 @@ use vb6parse::io::SourceFile;
 use vb6runtime::VBVariant;
 use vb6runtime::layout::{self, LayoutConfig};
 
+use crate::project::LoadedForm;
 use crate::tauri_engine::TauriEngine;
 
 /// Handle type for referencing a spawned engine in the store.
@@ -83,7 +84,21 @@ pub fn load_form(form_data: Vec<u8>) -> u32 {
     let source_file =
         SourceFile::decode_with_replacement("form.frm", &form_data).expect("failed to decode form");
     let form_file = vb6parse::FormFile::parse(&source_file).unwrap_or_fail();
-    layout::load_form(&form_file.form, &LayoutConfig::default())
+
+    // Compute event bindings from the form
+    let loaded_form = LoadedForm {
+        name: form_file.attributes.name.clone(),
+        file_name: "form.frm".to_string(),
+        parsed: form_file.clone(),
+        raw_bytes: form_data,
+    };
+    let bindings = loaded_form.event_bindings();
+    let event_procedures: Vec<_> = bindings
+        .into_iter()
+        .map(|((control, event), procedure)| (control, event, procedure))
+        .collect();
+
+    layout::load_form(&form_file.form, event_procedures, &LayoutConfig::default())
 }
 
 /// Tauri command: render a form to an HTML fragment string.
@@ -172,7 +187,10 @@ pub fn form_event(engine_handle: EngineHandle, control: String, event: String) -
         match interp.call_sub(&proc_name, vec![]) {
             Ok(_) => FormEventStatus::Handled,
             Err(e) => {
-                eprintln!("Event handler error for '{}_{}': {}", control, event, e.error);
+                eprintln!(
+                    "Event handler error for '{}_{}': {}",
+                    control, event, e.error
+                );
                 FormEventStatus::Handled
             }
         }
@@ -240,7 +258,10 @@ pub struct FormEventBinding {
 /// are extracted from the loaded form's parsed structure using the
 /// `LoadedForm::event_bindings()` method.
 #[command]
-pub fn form_event_bindings(engine_handle: EngineHandle, form_name: String) -> Vec<FormEventBinding> {
+pub fn form_event_bindings(
+    engine_handle: EngineHandle,
+    form_name: String,
+) -> Vec<FormEventBinding> {
     if let Some(engine) = get_engine(engine_handle) {
         let project = engine.project();
         for loaded_form in &project.forms {
@@ -290,7 +311,10 @@ pub fn page_ready() -> Option<PageReadyResponse> {
         eprintln!("  form_html preview: {:.200}", html);
     }
     let (form_name, engine_handle) = get_page_ready_info()?;
-    eprintln!("  returning form_name={}, engine_handle={}", form_name, engine_handle);
+    eprintln!(
+        "  returning form_name={}, engine_handle={}",
+        form_name, engine_handle
+    );
     Some(PageReadyResponse {
         form_html: form_html.unwrap_or_default(),
         form_name,
@@ -299,7 +323,9 @@ pub fn page_ready() -> Option<PageReadyResponse> {
 }
 
 fn get_page_ready_info() -> Option<(String, EngineHandle)> {
-    PAGE_READY_INFO.get().map(|(name, handle)| (name.clone(), *handle))
+    PAGE_READY_INFO
+        .get()
+        .map(|(name, handle)| (name.clone(), *handle))
 }
 
 fn get_form_html() -> Option<String> {
