@@ -352,8 +352,8 @@ async function runForm(code) {
 
         const runResult = await run_project(
             formBytes,
-            new Map(),
-            new Map(),
+            {},
+            {},
             ""
         );
 
@@ -755,8 +755,8 @@ async function runFormE2EChecks() {
         // Run the project (create state handle)
         const runResult = await run_project(
             formBytes,
-            new Map(),
-            new Map(),
+            {},
+            {},
             ""
         );
 
@@ -1389,11 +1389,11 @@ function setupFilePicker() {
 
                     setStatus("Loading form", "pending");
                     const runResult = await run_project(
-                    bytes,
-                    new Map(),
-                    new Map(),
-                    ""
-                );
+                        bytes,
+                        {},
+                        {},
+                        ""
+                    );
 
                 if (runResult.error) {
                     renderError(runResult.error);

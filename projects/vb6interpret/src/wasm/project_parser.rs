@@ -4,8 +4,6 @@
 //! bridge (`run_bridge`) and the handle-based form-mode bridge
 //! (`exec_bridge`) can reuse the same parsing and project-detection logic.
 
-use std::collections::HashMap;
-
 use wasm_bindgen::prelude::*;
 
 use crate::project::{LoadedClass, LoadedForm, LoadedModule, StartupObject};
@@ -14,15 +12,29 @@ use vb6parse::files::FormFile;
 use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
 
-/// Extract key-value pairs from a JS `Map<K, Uint8Array>` into a
-/// `Vec<(String, Vec<u8>)>`.
+/// Extract key-value pairs from a JS object (keys: strings, values: Uint8Array)
+/// into a `Vec<(String, Vec<u8>)>`.
 pub(super) fn js_map_to_byte_pairs(map: &JsValue) -> Result<Vec<(String, Vec<u8>)>, JsError> {
-    if map.is_undefined() {
+    if map.is_undefined() || map.is_null() {
         return Ok(Vec::new());
     }
-    let pairs: HashMap<String, Vec<u8>> =
-        serde_wasm_bindgen::from_value(map.clone()).map_err(|e| JsError::new(&e.to_string()))?;
-    Ok(pairs.into_iter().collect())
+
+    let keys: js_sys::Array = js_sys::Reflect::own_keys(map)
+        .map_err(|_| JsError::new("failed to get object keys"))?;
+    let len = keys.length();
+    let mut result = Vec::with_capacity(len as usize);
+    for i in 0..len {
+        let key = keys.get(i);
+        let key_str = key
+            .as_string()
+            .ok_or_else(|| JsError::new("map key is not a string"))?;
+        let value = js_sys::Reflect::get(map, &key)
+            .map_err(|_| JsError::new("failed to get map value"))?;
+        let bytes: Vec<u8> = serde_wasm_bindgen::from_value(value)
+            .map_err(|e| JsError::new(&e.to_string()))?;
+        result.push((key_str, bytes));
+    }
+    Ok(result)
 }
 
 /// Parse a collection of `(filename, raw_bytes)` pairs into [`LoadedModule`] entries.
