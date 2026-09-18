@@ -148,6 +148,26 @@ pub fn get_form_procedures(form_handle: u32) -> Result<JsValue, JsError> {
     .and_then(|r| r)
 }
 
+/// Get the caption of a loaded form by handle.
+///
+/// # Arguments
+///
+/// * `form_handle` — The handle returned by [`show_form`].
+///
+/// # Errors
+///
+/// Returns a `JsValue` error if the form handle is unknown.
+#[wasm_bindgen]
+pub fn get_form_caption(form_handle: u32) -> Result<JsValue, JsError> {
+    layout::get_form(form_handle, |form| {
+        let js_val = to_value(&form.caption)
+            .map_err(|_| JsError::new("failed to serialize form caption"))?;
+        Ok(js_val)
+    })
+    .ok_or_else(|| JsError::new("unknown form handle"))
+    .and_then(|r| r)
+}
+
 /// Hide a loaded form by handle.
 ///
 /// Sets the form's visibility to false and re-renders the DOM.

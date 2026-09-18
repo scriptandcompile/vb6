@@ -150,9 +150,20 @@ fn convert_form_impl(
     let dpi = config.dpi;
     let scale_mode = form.properties.scale_mode;
 
-    // Convert form dimensions to pixels
-    let width = scale_mode_to_pixels(form.properties.scale_width, scale_mode, dpi);
-    let height = scale_mode_to_pixels(form.properties.scale_height, scale_mode, dpi);
+    // Convert form dimensions to pixels — use client area dimensions
+    // (ClientWidth/ClientHeight). In pixel scale mode these are pixel values;
+    // in all other modes they're twips.
+    let (width, height) = if form.properties.scale_mode == ScaleMode::Pixel {
+        (
+            form.properties.client_width as f32,
+            form.properties.client_height as f32,
+        )
+    } else {
+        (
+            twips_to_pixels(form.properties.client_width, dpi),
+            twips_to_pixels(form.properties.client_height, dpi),
+        )
+    };
 
     // Build a placeholder parent container for position lookups
     let client_area = LayoutContainer {
@@ -1396,13 +1407,13 @@ mod tests {
     }
 
     fn create_test_form_with_sized_control() -> Form {
-        // Form: scale_width = 4000 twips
-        // 4000 twips at 96 DPI = 4000 * 96 / 1440 = 266.67 px
         Form {
             name: "Form1".to_string(),
             tag: String::new(),
             index: 0,
             properties: vb6parse::language::FormProperties {
+                client_width: 4000,
+                client_height: 3000,
                 scale_width: 4000,
                 scale_height: 3000,
                 caption: "Form1".to_string(),
@@ -1423,6 +1434,8 @@ mod tests {
             tag: String::new(),
             index: 0,
             properties: vb6parse::language::FormProperties {
+                client_width: 4000,
+                client_height: 3000,
                 scale_width: 4000,
                 scale_height: 3000,
                 caption: "Form1".to_string(),
@@ -1590,10 +1603,10 @@ mod tests {
         let layout_form =
             convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
-        // scale_width = 4000 twips at 96 DPI
+        // client_width = 4000 twips at 96 DPI
         // 4000 * 96 / 1440 = 266.666... px
         assert!((layout_form.size.width - 266.67).abs() < 0.1);
-        // scale_height = 3000 twips at 96 DPI
+        // client_height = 3000 twips at 96 DPI
         // 3000 * 96 / 1440 = 200.0 px
         assert!((layout_form.size.height - 200.0).abs() < 0.1);
     }
@@ -1784,6 +1797,8 @@ mod tests {
             index: 0,
             properties: vb6parse::language::FormProperties {
                 scale_mode: ScaleMode::Pixel,
+                client_width: 400,
+                client_height: 300,
                 scale_width: 400,
                 scale_height: 300,
                 caption: "Form1".to_string(),
@@ -1804,7 +1819,7 @@ mod tests {
         let layout =
             convert_form(&vb6parse::language::FormRoot::Form(form), vec![], &config).unwrap();
 
-        // Pixel mode: 1:1 mapping, no conversion
+        // Pixel mode: client dimensions are used as pixel values directly
         assert_eq!(layout.size.width, 400.0);
         assert_eq!(layout.size.height, 300.0);
     }

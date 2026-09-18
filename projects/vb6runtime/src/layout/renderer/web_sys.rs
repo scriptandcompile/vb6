@@ -428,13 +428,18 @@ impl Renderer for WebSysRenderer {
         if let Some(ref value) = leaf.value {
             let tag_lower = tag.to_lowercase();
             if tag_lower == "button" {
-                el.set_text_content(Some(value));
+                el.set_inner_html(&process_mnemonic(value));
             } else if tag_lower == "input" {
                 let _ = el.set_attribute("value", value);
             } else if tag_lower == "img" {
                 let _ = el.set_attribute("src", value);
             } else {
-                el.set_text_content(Some(value));
+                let processed = process_mnemonic(value);
+                if processed.contains("<span") {
+                    el.set_inner_html(&processed);
+                } else {
+                    el.set_text_content(Some(value));
+                }
             }
         }
 
@@ -470,12 +475,15 @@ impl Renderer for WebSysRenderer {
         el.set_attribute("style", &style_css).ok();
 
         if let Some(ref caption) = container.caption {
-            if tag == "fieldset" {
+            if container.control_type == LayoutControlType::Frame {
                 let legend = self.doc.create_element("legend").expect("create legend");
-                legend.set_text_content(Some(caption));
+                let processed = process_mnemonic(caption);
+                if processed.contains("<span") {
+                    legend.set_inner_html(&processed);
+                } else {
+                    legend.set_text_content(Some(caption));
+                }
                 let _ = el.append_child(&legend);
-            } else {
-                el.set_text_content(Some(caption));
             }
         }
 
@@ -634,6 +642,42 @@ fn tag_for_control(control_type: LayoutControlType) -> &'static str {
     }
 }
 
+/// Process a VB6 caption string to handle ampersand mnemonics.
+///
+/// VB6 uses `&` to mark mnemonic/accelerator keys:
+/// - `&OK` → `<span class="vb6-mnemonic">O</span>K` (underlined via CSS)
+/// - `A&BB&C` → `<span class="vb6-mnemonic">A</span>BB<span class="vb6-mnemonic">C</span>` (each & marks the next char)
+/// - `&&` → `&` (escaped ampersand)
+///
+/// The result wraps the mnemonic characters in a `<span class="vb6-mnemonic">`
+/// element so CSS can style them (typically underline + font-weight).
+fn process_mnemonic(caption: &str) -> String {
+    let mut result = String::with_capacity(caption.len() + 8);
+    let mut chars = caption.chars().peekable();
+
+    while let Some(c) = chars.next() {
+        if c == '&' {
+            if let Some(&next) = chars.peek() {
+                if next == '&' {
+                    result.push('&');
+                    chars.next();
+                } else {
+                    chars.next();
+                    result.push_str("<span class=\"vb6-mnemonic\">");
+                    result.push(next);
+                    result.push_str("</span>");
+                }
+            } else {
+                result.push('&');
+            }
+        } else {
+            result.push(c);
+        }
+    }
+
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -667,5 +711,33 @@ mod tests {
         assert_eq!(tag_for_control(LayoutControlType::Image), "img");
         assert_eq!(tag_for_control(LayoutControlType::CheckBox), "input");
         assert_eq!(tag_for_control(LayoutControlType::ComboBox), "select");
+    }
+
+    #[test]
+    fn process_mnemonic_basic() {
+        assert_eq!(process_mnemonic("OK"), "OK");
+        assert_eq!(process_mnemonic("&OK"), "<span class=\"vb6-mnemonic\">O</span>K");
+        assert_eq!(process_mnemonic("&Cancel"), "<span class=\"vb6-mnemonic\">C</span>ancel");
+    }
+
+    #[test]
+    fn process_mnemonic_escaped_ampersand() {
+        assert_eq!(process_mnemonic("&&"), "&");
+        assert_eq!(process_mnemonic("A&&B"), "A&B");
+        assert_eq!(process_mnemonic("&A&&B"), "<span class=\"vb6-mnemonic\">A</span>&B");
+    }
+
+    #[test]
+    fn process_mnemonic_multiple() {
+        assert_eq!(
+            process_mnemonic("&File-&Edit"),
+            "<span class=\"vb6-mnemonic\">F</span>ile-\
+             <span class=\"vb6-mnemonic\">E</span>dit"
+        );
+    }
+
+    #[test]
+    fn process_mnemonic_trailing_ampersand() {
+        assert_eq!(process_mnemonic("Test&"), "Test&");
     }
 }
