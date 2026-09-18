@@ -116,6 +116,19 @@ export function dump_files(): any;
 export function dump_settings(): any;
 
 /**
+ * Get the caption of a loaded form by handle.
+ *
+ * # Arguments
+ *
+ * * `form_handle` — The handle returned by [`show_form`].
+ *
+ * # Errors
+ *
+ * Returns a `JsValue` error if the form handle is unknown.
+ */
+export function get_form_caption(form_handle: number): any;
+
+/**
  * Get event procedure bindings for a loaded form.
  *
  * Returns a JSON array of bindings in the same format as the Tauri
@@ -364,6 +377,7 @@ export interface InitOutput {
     readonly dump_env: (a: number) => void;
     readonly dump_files: (a: number) => void;
     readonly dump_settings: (a: number) => void;
+    readonly get_form_caption: (a: number, b: number) => void;
     readonly get_form_procedures: (a: number, b: number) => void;
     readonly get_output: (a: number, b: number) => void;
     readonly hide_form: (a: number, b: number) => void;

@@ -278,6 +278,35 @@ export function dump_settings() {
 }
 
 /**
+ * Get the caption of a loaded form by handle.
+ *
+ * # Arguments
+ *
+ * * `form_handle` — The handle returned by [`show_form`].
+ *
+ * # Errors
+ *
+ * Returns a `JsValue` error if the form handle is unknown.
+ * @param {number} form_handle
+ * @returns {any}
+ */
+export function get_form_caption(form_handle) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.get_form_caption(retptr, form_handle);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
  * Get event procedure bindings for a loaded form.
  *
  * Returns a JSON array of bindings in the same format as the Tauri
@@ -877,6 +906,10 @@ function __wbg_get_imports() {
             const ret = typeof(getObject(arg0)) === 'function';
             return ret;
         },
+        __wbg___wbindgen_is_null_5160b3e381865372: function(arg0) {
+            const ret = getObject(arg0) === null;
+            return ret;
+        },
         __wbg___wbindgen_is_object_edb6b15aa3afe12e: function(arg0) {
             const val = getObject(arg0);
             const ret = typeof(val) === 'object' && val !== null;
@@ -941,10 +974,6 @@ function __wbg_get_imports() {
         __wbg_done_cffed884d87aa22e: function(arg0) {
             const ret = getObject(arg0).done;
             return ret;
-        },
-        __wbg_entries_972a87586902cf87: function(arg0) {
-            const ret = Object.entries(getObject(arg0));
-            return addHeapObject(ret);
         },
         __wbg_error_757e9472f8410341: function(arg0, arg1) {
             let deferred0_0;
@@ -1069,6 +1098,10 @@ function __wbg_get_imports() {
         },
         __wbg_next_f31ecb8646d2c605: function() { return handleError(function (arg0) {
             const ret = getObject(arg0).next();
+            return addHeapObject(ret);
+        }, arguments); },
+        __wbg_ownKeys_2fa7299880410d24: function() { return handleError(function (arg0) {
+            const ret = Reflect.ownKeys(getObject(arg0));
             return addHeapObject(ret);
         }, arguments); },
         __wbg_prompt_20552ae58c489bab: function(arg0, arg1, arg2, arg3, arg4) {
