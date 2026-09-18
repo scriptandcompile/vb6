@@ -45,6 +45,16 @@
                     <option value="looping">Looping</option>
                     <option value="files">Files</option>
                 </select>
+                <label for="test-forms">Test Forms:</label>
+                <select id="test-forms" class="examples-selector">
+                    <option value="">-- Load Test Form --</option>
+                    <option value="simple-form">Simple Form (Label + TextBox + Button)</option>
+                    <option value="form-with-containers">Form with Containers (Frame + PictureBox)</option>
+                    <option value="form-with-events">Form with Form_Load / Form_Unload</option>
+                    <option value="form-with-module-reference">Form with Module Reference</option>
+                    <option value="full-controls">Full Controls Test</option>
+                    <option value="textbox-change-event">TextBox Change Event</option>
+                </select>
             </div>
             <div class="toolbar-right">
                 <button id="open-form-btn" class="btn btn-secondary">
@@ -124,6 +134,9 @@
                 </button>
                 <button class="tab-btn" data-tab="files">
                     <span class="tab-icon">💾</span> Files
+                </button>
+                <button class="tab-btn" data-tab="tests">
+                    <span class="tab-icon">🧪</span> Test Results
                 </button>
             </div>
 
@@ -279,6 +292,55 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="tests-tab" class="tab-pane">
+                    <div class="tab-toolbar">
+                        <span class="toggle-label helper-text">End-to-end test results for form rendering and event handling (Step 11).</span>
+                    </div>
+                    <div class="output-scroll info-content">
+                        <div class="info-section">
+                            <h4>Test Form Details</h4>
+                            <div id="test-form-info" class="debug-scope-box">Select a test form from the dropdown above to load it. Use the Output tab to see Debug.Print results and click controls on the form to test event handling.</div>
+                        </div>
+                        <div class="info-section">
+                            <h4>Event Bindings</h4>
+                            <div id="test-event-bindings" class="debug-scope-box">No form loaded yet.</div>
+                        </div>
+                        <div class="info-section">
+                            <h4>Verification Checklist</h4>
+                            <div id="test-checklist" class="test-checklist">
+                                <div class="test-item">
+                                    <span class="test-status pending">○</span>
+                                    <span class="test-label">Form renders correctly in overlay</span>
+                                </div>
+                                <div class="test-item">
+                                    <span class="test-status pending">○</span>
+                                    <span class="test-label">All controls visible (labels, buttons, etc.)</span>
+                                </div>
+                                <div class="test-item">
+                                    <span class="test-status pending">○</span>
+                                    <span class="test-label">Debug.Print output appears in Output tab</span>
+                                </div>
+                                <div class="test-item">
+                                    <span class="test-status pending">○</span>
+                                    <span class="test-label">Control events fire procedures correctly</span>
+                                </div>
+                                <div class="test-item">
+                                    <span class="test-status pending">○</span>
+                                    <span class="test-label">Form window is draggable</span>
+                                </div>
+                                <div class="test-item">
+                                    <span class="test-status pending">○</span>
+                                    <span class="test-label">Close button works</span>
+                                </div>
+                                <div class="test-item">
+                                    <span class="test-status pending">○</span>
+                                    <span class="test-label">No WASM panics or JS errors in console</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -292,6 +354,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
     <script src="assets/js/playground/form-windows.js"></script>
+    <script src="assets/js/playground/test-forms.js"></script>
     <script type="module" src="assets/js/playground/main.js?v=20260811"></script>
 </body>
 </html>
