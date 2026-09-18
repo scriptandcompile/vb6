@@ -251,34 +251,25 @@ pub struct FormEventBinding {
     pub procedure: String,
 }
 
-/// Tauri command: get all event bindings for a form in the given engine.
+/// Tauri command: get all event bindings for a form by layout handle.
 ///
 /// Returns a list of `{control, event, procedure}` tuples that the frontend
 /// can use to attach DOM event listeners to rendered controls. The bindings
-/// are extracted from the loaded form's parsed structure using the
-/// `LoadedForm::event_bindings()` method.
+/// are read directly from the `LayoutForm.event_procedures` field that was
+/// computed during `load_form()`.
 #[command]
-pub fn form_event_bindings(
-    engine_handle: EngineHandle,
-    form_name: String,
-) -> Vec<FormEventBinding> {
-    if let Some(engine) = get_engine(engine_handle) {
-        let project = engine.project();
-        for loaded_form in &project.forms {
-            if loaded_form.name == form_name {
-                let bindings = loaded_form.event_bindings();
-                return bindings
-                    .into_iter()
-                    .map(|((control, event), procedure)| FormEventBinding {
-                        control,
-                        event,
-                        procedure,
-                    })
-                    .collect();
-            }
-        }
-    }
-    Vec::new()
+pub fn form_event_bindings(form_handle: u32) -> Vec<FormEventBinding> {
+    layout::get_form(form_handle, |form| {
+        form.event_procedures
+            .iter()
+            .map(|p| FormEventBinding {
+                control: p.control.clone(),
+                event: p.event.clone(),
+                procedure: p.procedure.clone(),
+            })
+            .collect()
+    })
+    .unwrap_or_default()
 }
 
 /// A response returned by the `page_ready` IPC command.

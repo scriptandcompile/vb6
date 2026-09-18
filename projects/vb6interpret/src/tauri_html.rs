@@ -76,6 +76,7 @@ pub fn build_page(
 
         window.__vb6FormName__ = {form_name_json};
         window.__vb6EngineHandle__ = {engine_handle};
+        window.__vb6FormHandle__ = {form_handle};
 
         // updateForm: re-render a form by handle.
         window.updateForm = function (handle) {{
@@ -90,7 +91,7 @@ pub fn build_page(
         }};
 
         // attachFormEvents: attach DOM event listeners to rendered controls.
-        window.attachFormEvents = function (engineHandle, formName, bindings) {{
+        window.attachFormEvents = function (engineHandle, formHandle, bindings) {{
             if (!bindings || bindings.length === 0) return;
             bindings.forEach(function (binding) {{
                 var el = document.getElementById(binding.control);
@@ -120,17 +121,16 @@ pub fn build_page(
             }});
         }};
 
-        // Auto-attach event bindings once form name and engine handle are set.
+        // Auto-attach event bindings once form and engine are set.
         window._vb6AutoAttach = function () {{
-            if (!window.__vb6FormName__ || window.__vb6EngineHandle__ === undefined) return;
+            if (window.__vb6FormHandle__ === undefined) return;
             return invoke('form_event_bindings', {{
-                engineHandle: window.__vb6EngineHandle__,
-                formName: window.__vb6FormName__
+                formHandle: window.__vb6FormHandle__
             }})
                 .then(function (bindings) {{
                     return window.attachFormEvents(
                         window.__vb6EngineHandle__,
-                        window.__vb6FormName__,
+                        window.__vb6FormHandle__,
                         bindings
                     );
                 }})
