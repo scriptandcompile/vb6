@@ -261,10 +261,10 @@ pub fn parse_vb6_code(
     let parse_result = parsers::cst::ConcreteSyntaxTree::from_text("test.bas", code);
     let (cst_opt, failures, recovery_events) = parse_result.unpack_with_recovery();
     let Some(cst) = cst_opt else {
-        let message = failures
-            .first()
-            .map(|failure| failure.kind.to_string())
-            .unwrap_or_else(|| "Failed to parse the input code.".to_string());
+        let message = failures.first().map_or_else(
+            || "Failed to parse the input code.".to_string(),
+            |failure| failure.kind.to_string(),
+        );
         return Err(JsError::new(&message));
     };
 

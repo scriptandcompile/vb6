@@ -15,7 +15,7 @@ use wasm_bindgen::prelude::*;
 use super::project_parser::{
     detect_startup, js_map_to_byte_pairs, parse_classes, parse_forms, parse_modules,
 };
-use super::{build_debug_state, convert_run_error, WasmDebugState, WasmRunOutput};
+use super::{WasmDebugState, WasmRunOutput, build_debug_state, convert_run_error};
 use crate::Interpreter;
 use crate::interpreter::Flow;
 use crate::project::LoadedProject;
@@ -73,7 +73,9 @@ pub fn run_project(
         startup_object,
     };
 
-    let mut h = NEXT_STATE_HANDLE.lock().map_err(|_| JsError::new("lock poisoned"))?;
+    let mut h = NEXT_STATE_HANDLE
+        .lock()
+        .map_err(|_| JsError::new("lock poisoned"))?;
     let handle = *h;
     *h += 1;
 
@@ -93,7 +95,10 @@ pub fn run_project(
         interpreter: interp,
         output_lines: output_lines.clone(),
     };
-    RUN_STATE.lock().map_err(|_| JsError::new("lock poisoned"))?.insert(handle, state);
+    RUN_STATE
+        .lock()
+        .map_err(|_| JsError::new("lock poisoned"))?
+        .insert(handle, state);
 
     Ok(to_value(&WasmRunOutput {
         successful: result.is_ok(),
@@ -166,7 +171,9 @@ pub fn get_output(state_handle: u32) -> Result<Vec<String>, JsError> {
 /// Dispose a session and free its resources.
 #[wasm_bindgen]
 pub fn dispose_state(state_handle: u32) -> bool {
-    RUN_STATE.lock().map_err(|_| JsError::new("lock poisoned"))
+    RUN_STATE
+        .lock()
+        .map_err(|_| JsError::new("lock poisoned"))
         .ok()
         .map(|mut guard| guard.remove(&state_handle).is_some())
         .unwrap_or(false)

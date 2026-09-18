@@ -18,9 +18,14 @@ pub(super) fn js_map_to_byte_pairs(map: &JsValue) -> Result<Vec<(String, Vec<u8>
     if map.is_undefined() {
         return Ok(Vec::new());
     }
-    let map_obj: js_sys::Map = map.clone().dyn_into()
+    let map_obj: js_sys::Map = map
+        .clone()
+        .dyn_into()
         .map_err(|_| JsError::new("expected a JS Map"))?;
-    let keys: js_sys::Array = map_obj.keys().dyn_into().map_err(|_| JsError::new("expected iterable keys"))?;
+    let keys: js_sys::Array = map_obj
+        .keys()
+        .dyn_into()
+        .map_err(|_| JsError::new("expected iterable keys"))?;
     let len = keys.length();
     let mut result = Vec::with_capacity(len as usize);
     for i in 0..len {

@@ -8,10 +8,10 @@ use wasm_bindgen::prelude::*;
 use super::project_parser::{
     detect_startup, js_map_to_byte_pairs, parse_classes, parse_forms, parse_modules,
 };
-use super::{WasmDebugState, WasmDebugTrace, WasmProject, WasmRunOutput, WasmVariableInfo};
+use super::{WasmDebugState, WasmDebugTrace, WasmRunOutput, WasmVariableInfo};
 use crate::Interpreter;
 use crate::interpreter::{DebugSnapshot, DebugVariable};
-use crate::project::{LoadedForm, LoadedProject};
+use crate::project::LoadedProject;
 use vb6runtime::state::clock as clock_state;
 use vb6runtime::state::file as file_state;
 

@@ -29,10 +29,7 @@ const DEFAULT_CONTAINER_ID: &str = "vb6-container";
 
 /// Format a [`NodeId`] as a string.
 fn node_id_to_string(node_id: &vb6runtime::layout::model::NodeId) -> String {
-    format!(
-        "{}-{:?}-{}",
-        node_id.name, node_id.kind, node_id.index
-    )
+    format!("{}-{:?}-{}", node_id.name, node_id.kind, node_id.index)
 }
 
 /// Parse form bytes (as produced by a VB6 `.frm` file), load into the layout
@@ -62,9 +59,8 @@ pub fn show_form(form_bytes: &[u8], container_id: &str) -> Result<JsValue, JsErr
         container_id
     };
 
-    let source_file =
-        vb6parse::io::SourceFile::decode_with_replacement("form.frm", form_bytes)
-            .map_err(|e| JsError::new(&e.kind.to_string()))?;
+    let source_file = vb6parse::io::SourceFile::decode_with_replacement("form.frm", form_bytes)
+        .map_err(|e| JsError::new(&e.kind.to_string()))?;
     let form_file = vb6parse::FormFile::parse(&source_file)
         .ok_or_errors()
         .map_err(|e| {
@@ -145,7 +141,7 @@ pub fn get_form_procedures(form_handle: u32) -> Result<JsValue, JsError> {
             })
             .collect();
         let js_val = to_value(&bindings)
-            .map_err(|e| JsError::new("failed to serialize event procedures"))?;
+            .map_err(|_| JsError::new("failed to serialize event procedures"))?;
         Ok(js_val)
     })
     .ok_or_else(|| JsError::new("unknown form handle"))
@@ -195,10 +191,7 @@ pub fn show_form_by_handle(handle: u32) -> Result<(), JsError> {
 /// Sets the form's visibility to true and re-renders the DOM in the
 /// container identified by `container_id`.
 #[wasm_bindgen]
-pub fn show_form_by_handle_with_container(
-    handle: u32,
-    container_id: &str,
-) -> Result<(), JsError> {
+pub fn show_form_by_handle_with_container(handle: u32, container_id: &str) -> Result<(), JsError> {
     layout::get_form_mut(handle, |form| {
         form.visible = true;
     })
@@ -276,6 +269,11 @@ pub fn update_form_with_container(handle: u32, container_id: &str) -> Result<(),
 }
 
 /// Internal helper: render a single form into a container element.
+///
+/// Kept for future use — will be wired into a full form rendering pipeline
+/// that supports loading forms from raw `.frm` bytes with a configurable
+/// layout configuration and renderer instance.
+#[allow(dead_code)]
 fn render_form_into_container(
     bytes: &[u8],
     file_name: &str,
@@ -283,9 +281,8 @@ fn render_form_into_container(
     container: &web_sys::Element,
     renderer: &layout::renderer::WebSysRenderer,
 ) -> Result<u32, JsError> {
-    let source_file =
-        vb6parse::io::SourceFile::decode_with_replacement(file_name, bytes)
-            .map_err(|e| JsError::new(&e.kind.to_string()))?;
+    let source_file = vb6parse::io::SourceFile::decode_with_replacement(file_name, bytes)
+        .map_err(|e| JsError::new(&e.kind.to_string()))?;
     let form_file = vb6parse::FormFile::parse(&source_file)
         .ok_or_errors()
         .map_err(|e| {
@@ -335,6 +332,10 @@ fn render_form_into_container(
 ///
 /// This function uses the default container `"vb6-container"`. For
 /// multi-container support, use [`show_project_forms_with_container`].
+///
+/// Kept for future use — will be wired into a full project loading pipeline
+/// that handles multiple forms from a `.vbp` project.
+#[allow(dead_code)]
 pub fn show_project_forms(form_files: Vec<(String, Vec<u8>)>) -> Result<Vec<u32>, JsError> {
     show_project_forms_with_container(form_files, DEFAULT_CONTAINER_ID)
 }
@@ -349,6 +350,10 @@ pub fn show_project_forms(form_files: Vec<(String, Vec<u8>)>) -> Result<Vec<u32>
 /// Returns a vector of handles — one per successfully loaded form — in the
 /// same order as the input.  Any form that fails to parse halts and returns
 /// an error for the first failing entry.
+///
+/// Kept for future use — will be wired into a full project loading pipeline
+/// that handles multiple forms from a `.vbp` project with per-window containers.
+#[allow(dead_code)]
 pub fn show_project_forms_with_container(
     form_files: Vec<(String, Vec<u8>)>,
     container_id: &str,
@@ -370,13 +375,8 @@ pub fn show_project_forms_with_container(
     let mut handles = Vec::with_capacity(form_files.len());
 
     for (file_name, bytes) in form_files {
-        let handle = render_form_into_container(
-            &bytes,
-            &file_name,
-            &config,
-            &container,
-            &renderer,
-        )?;
+        let handle =
+            render_form_into_container(&bytes, &file_name, &config, &container, &renderer)?;
         handles.push(handle);
     }
 

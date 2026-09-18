@@ -28,20 +28,16 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 
-use crate::layout::css::style_to_css;
 use crate::layout::diff_tree::{DiffChange, DiffKind, DiffTree};
 use crate::layout::model::NodeId;
-use crate::layout::model::{LayoutContainer, LayoutLeaf, LayoutNode, LayoutStyle};
+use crate::layout::model::{LayoutContainer, LayoutLeaf, LayoutNode};
 use crate::layout::renderer::Renderer;
 use crate::layout::theme::{CssInjector, ThemeRenderer, Vb6Theme};
 
 use crate::layout::model::LayoutControlType;
 
 #[cfg(target_arch = "wasm32")]
-use wasm_bindgen::JsCast;
-
-#[cfg(target_arch = "wasm32")]
-use web_sys::{Document, Node};
+use web_sys::Document;
 
 #[cfg(target_arch = "wasm32")]
 pub use web_sys::Element;
@@ -139,7 +135,12 @@ impl WebSysRenderer {
     /// If the node is already in the DOM node cache, returns it.
     /// Otherwise creates a new element, appends it to `parent`,
     /// and caches it.
+    ///
+    /// Currently unused — planned for future incremental rendering of
+    /// inserted children where we need a guaranteed element regardless
+    /// of cache state.
     #[cfg(target_arch = "wasm32")]
+    #[allow(dead_code)]
     fn ensure_element(&self, node: &LayoutNode, parent: Option<&Element>) -> Element {
         let id = node.node_id();
         if let Some(el) = self.dom_nodes.borrow().get(&id) {
@@ -156,15 +157,17 @@ impl WebSysRenderer {
         el
     }
 
-    /// Look up a DOM element by node ID using `getElementById`.
+    /// This method is kept for future use in the incremental rendering
+    /// pipeline as an alternative way to locate existing DOM elements
+    /// without requiring a separate cache lookup.
     #[cfg(target_arch = "wasm32")]
+    #[allow(dead_code)]
     fn find_element_by_id(&self, id: &NodeId) -> Option<Element> {
         if let Some(el) = self.dom_nodes.borrow().get(id) {
             return Some(el.clone());
         }
-        self.doc.get_element_by_id(&id.name).and_then(|e| {
+        self.doc.get_element_by_id(&id.name).inspect(|e| {
             self.dom_nodes.borrow_mut().insert(id.clone(), e.clone());
-            Some(e)
         })
     }
 
@@ -180,10 +183,10 @@ impl WebSysRenderer {
         if let LayoutNode::Leaf(_) = node {
             // Try DOM tree walk from cached nodes
             for cached in self.dom_nodes.borrow().values() {
-                if let Some(parent) = cached.parent_element() {
-                    if self.node_is_child_of(&id, &parent) {
-                        return Some(parent);
-                    }
+                if let Some(parent) = cached.parent_element()
+                    && self.node_is_child_of(&id, &parent)
+                {
+                    return Some(parent);
                 }
             }
         }
@@ -268,10 +271,7 @@ impl WebSysRenderer {
         let dom = &self.dom_nodes;
 
         // If no diff or empty diff, do a full render
-        let use_diff = match diff {
-            Some(d) if !d.is_empty() => true,
-            _ => false,
-        };
+        let use_diff = matches!(diff, Some(d) if !d.is_empty());
 
         if !use_diff {
             return self.render_node(node);
@@ -354,7 +354,7 @@ impl WebSysRenderer {
                 ..
             }) => {
                 if let Some(el) = dom.borrow_mut().remove(&node.node_id()) {
-                    let _ = el.remove();
+                    el.remove();
                 }
                 self.doc.create_element("div").expect("create div element")
             }
@@ -540,7 +540,7 @@ impl Renderer for WebSysRenderer {
             }
             DiffKind::Removed => {
                 if let Some(el) = dom_nodes.borrow_mut().remove(&node.node_id()) {
-                    let _ = el.remove();
+                    el.remove();
                 }
                 None
             }
