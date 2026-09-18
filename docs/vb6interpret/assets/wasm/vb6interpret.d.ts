@@ -116,6 +116,15 @@ export function dump_files(): any;
 export function dump_settings(): any;
 
 /**
+ * Dispatch a form control event to the interpreter.
+ *
+ * Constructs a procedure name from `{control}_{event}` (e.g.
+ * `cmdOK_Click`) and calls it as a sub procedure on the interpreter.
+ * This simulates a user interaction with a rendered form control.
+ */
+export function form_event(state_handle: number, control: string, event: string): any;
+
+/**
  * Get the caption of a loaded form by handle.
  *
  * # Arguments
@@ -377,6 +386,7 @@ export interface InitOutput {
     readonly dump_env: (a: number) => void;
     readonly dump_files: (a: number) => void;
     readonly dump_settings: (a: number) => void;
+    readonly form_event: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
     readonly get_form_caption: (a: number, b: number) => void;
     readonly get_form_procedures: (a: number, b: number) => void;
     readonly get_output: (a: number, b: number) => void;

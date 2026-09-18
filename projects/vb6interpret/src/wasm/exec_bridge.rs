@@ -168,6 +168,45 @@ pub fn get_output(state_handle: u32) -> Result<Vec<String>, JsError> {
     Ok(state.output_lines.clone())
 }
 
+/// Dispatch a form control event to the interpreter.
+///
+/// Constructs a procedure name from `{control}_{event}` (e.g.
+/// `cmdOK_Click`) and calls it as a sub procedure on the interpreter.
+/// This simulates a user interaction with a rendered form control.
+#[wasm_bindgen]
+pub fn form_event(state_handle: u32, control: String, event: String) -> Result<JsValue, JsError> {
+    let mut guard = RUN_STATE
+        .lock()
+        .map_err(|_| JsError::new("lock poisoned"))?;
+    let state = guard
+        .get_mut(&state_handle)
+        .ok_or_else(|| JsError::new("unknown state handle"))?;
+
+    let proc_name = format!("{}_{}", control, event);
+    match state.interpreter.call_sub(&proc_name, Vec::new()) {
+        Ok(_) => Ok(to_value(&WasmRunOutput {
+            successful: true,
+            output_lines: state.interpreter.output().to_vec(),
+            output_text: state.interpreter.output_text(),
+            steps: state.interpreter.steps(),
+            terminated: state.interpreter.is_terminated(),
+            paused: false,
+            error: None,
+            debug: build_debug_state(&state.interpreter),
+        })?),
+        Err(e) => Ok(to_value(&WasmRunOutput {
+            successful: false,
+            output_lines: state.interpreter.output().to_vec(),
+            output_text: state.interpreter.output_text(),
+            steps: state.interpreter.steps(),
+            terminated: state.interpreter.is_terminated(),
+            paused: false,
+            error: Some(convert_run_error(e, "", 0)),
+            debug: build_debug_state(&state.interpreter),
+        })?),
+    }
+}
+
 /// Dispose a session and free its resources.
 #[wasm_bindgen]
 pub fn dispose_state(state_handle: u32) -> bool {

@@ -278,6 +278,37 @@ export function dump_settings() {
 }
 
 /**
+ * Dispatch a form control event to the interpreter.
+ *
+ * Constructs a procedure name from `{control}_{event}` (e.g.
+ * `cmdOK_Click`) and calls it as a sub procedure on the interpreter.
+ * This simulates a user interaction with a rendered form control.
+ * @param {number} state_handle
+ * @param {string} control
+ * @param {string} event
+ * @returns {any}
+ */
+export function form_event(state_handle, control, event) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(control, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(event, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len1 = WASM_VECTOR_LEN;
+        wasm.form_event(retptr, state_handle, ptr0, len0, ptr1, len1);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
  * Get the caption of a loaded form by handle.
  *
  * # Arguments

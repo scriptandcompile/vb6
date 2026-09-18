@@ -76,8 +76,8 @@ class FormWindowManager {
         window.unload_form(handle, containerId);
     }
 
-    dispatchEvent(stateHandle, controlName, eventName, procedureName) {
-        return window.call_sub(stateHandle, procedureName);
+    dispatchEvent(stateHandle, controlName, eventName) {
+        return window.form_event(stateHandle, controlName, eventName);
     }
 
     _nextZIndex() {
@@ -148,8 +148,7 @@ class FormWindow {
                 formManager.dispatchEvent(
                     this.stateHandle,
                     binding.control,
-                    binding.event,
-                    binding.procedure
+                    binding.event
                 );
             };
 

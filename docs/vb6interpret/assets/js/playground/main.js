@@ -1,4 +1,4 @@
-import init, { build_debug_trace, clear_files, call_sub, dispose_state, dump_clock, dump_env, dump_files, dump_settings, get_form_procedures, get_form_caption, install_file, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, run_project, set_clock, set_env, show_form, unload_form } from "../../wasm/vb6interpret.js";
+import init, { build_debug_trace, clear_files, call_sub, dispose_state, dump_clock, dump_env, dump_files, dump_settings, form_event, get_form_procedures, get_form_caption, install_file, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, run_project, set_clock, set_env, show_form, unload_form } from "../../wasm/vb6interpret.js";
 import { getDefaultExample, getExample } from "./examples.js";
 import * as Editor from "./editor.js";
 import { createZip } from "./zip.js";
@@ -176,6 +176,7 @@ async function initPlayground() {
         window.get_form_procedures = get_form_procedures;
         window.get_form_caption = get_form_caption;
         window.call_sub = call_sub;
+        window.form_event = form_event;
         window.unload_form = unload_form;
         loadSettingsFromLocalStorage();
         loadEnvFromLocalStorage();

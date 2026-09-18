@@ -13,6 +13,7 @@ export const dump_clock: (a: number) => void;
 export const dump_env: (a: number) => void;
 export const dump_files: (a: number) => void;
 export const dump_settings: (a: number) => void;
+export const form_event: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
 export const get_form_caption: (a: number, b: number) => void;
 export const get_form_procedures: (a: number, b: number) => void;
 export const get_output: (a: number, b: number) => void;
