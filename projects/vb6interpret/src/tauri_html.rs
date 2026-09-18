@@ -107,7 +107,7 @@ pub fn build_page(
                 // listeners on the same element.
                 var key = '__vb6Handler_' + binding.procedure;
                 if (el[key]) {{
-                    el.removeEventListener(binding.event, el[key]);
+                    el.removeEventListener(window._vb6ToDomEvent(binding.event), el[key]);
                     delete el[key];
                 }}
                 el[key] = function () {{
@@ -118,14 +118,35 @@ pub fn build_page(
                         event: binding.event
                     }})
                         .then(function (result) {{
-                            if (result !== 'Handled') console.log('Program terminated');
+                            if (result.status !== 'Handled') console.log('Program terminated');
                         }})
                         .catch(function (err) {{
                             console.error('Event error:', err);
                         }});
                 }};
-                el.addEventListener(binding.event, el[key]);
+                el.addEventListener(window._vb6ToDomEvent(binding.event), el[key]);
             }});
+        }};
+
+        // Map VB6 event names to DOM event names.
+        window._vb6ToDomEvent = function (vb6Event) {{
+            var map = {{
+                'Click': 'click',
+                'DblClick': 'dblclick',
+                'MouseDown': 'mousedown',
+                'MouseMove': 'mousemove',
+                'MouseUp': 'mouseup',
+                'Change': 'input',
+                'GotFocus': 'focus',
+                'LostFocus': 'blur',
+                'KeyPress': 'keypress',
+                'KeyDown': 'keydown',
+                'KeyUp': 'keyup',
+                'DragDrop': 'drop',
+                'DragOver': 'dragover',
+                'Paint': 'paint',
+            }};
+            return map[vb6Event] || 'click';
         }};
 
         // Auto-attach event bindings once form and engine are set.
