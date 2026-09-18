@@ -9,6 +9,6 @@ pub mod container;
 pub mod style;
 pub mod types;
 
-pub use container::{LayoutContainer, LayoutForm, LayoutLeaf, LayoutNode};
+pub use container::{EventProcedure, LayoutContainer, LayoutForm, LayoutLeaf, LayoutNode};
 pub use style::{CssColor, LayoutStyle};
 pub use types::{LayoutControlType, LayoutPosition, LayoutSize, NodeId};

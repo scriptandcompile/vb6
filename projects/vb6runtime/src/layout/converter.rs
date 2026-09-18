@@ -175,6 +175,7 @@ fn convert_form_impl(form: &Form, config: &LayoutConfig) -> LayoutResult<LayoutF
         current_value: None,
         snapshot: None,
         render_id: 0,
+        event_procedures: vec![],
     })
 }
 
@@ -237,6 +238,7 @@ fn convert_mdi_form_impl(mdi: &MDIForm, config: &LayoutConfig) -> LayoutResult<L
         current_value: None,
         snapshot: None,
         render_id: 0,
+        event_procedures: vec![],
     })
 }
 

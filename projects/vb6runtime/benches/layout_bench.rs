@@ -111,6 +111,7 @@ fn build_form_with_labels(count: usize) -> layout::model::LayoutForm {
         current_value: None,
         snapshot: None,
         render_id: 0,
+        event_procedures: vec![],
     }
 }
 
@@ -163,6 +164,7 @@ fn build_form_with_mixed_controls(count: usize) -> layout::model::LayoutForm {
         current_value: None,
         snapshot: None,
         render_id: 0,
+        event_procedures: vec![],
     }
 }
 

@@ -5,6 +5,19 @@ use std::fmt;
 use super::style::LayoutStyle;
 use super::types::{LayoutControlType, LayoutPosition, LayoutSize, NodeId};
 
+/// Links a layout node to the VB6 procedure that handles its events.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EventProcedure {
+    /// The node ID of the control in the layout tree.
+    pub node_id: NodeId,
+    /// The VB6 control name (e.g. "cmdOK").
+    pub control: String,
+    /// The VB6 event name (e.g. "Click").
+    pub event: String,
+    /// The full procedure name (e.g. "cmdOK_Click").
+    pub procedure: String,
+}
+
 impl Default for LayoutLeaf {
     fn default() -> Self {
         Self {
@@ -77,6 +90,8 @@ pub struct LayoutForm {
     /// Monotonically increasing render counter. Increments on each call to
     /// [`capture_snapshot`][super::super::capture_snapshot].
     pub render_id: u64,
+    /// Event procedures for controls on this form.
+    pub event_procedures: Vec<EventProcedure>,
 }
 
 impl Default for LayoutForm {
@@ -95,6 +110,7 @@ impl Default for LayoutForm {
             current_value: None,
             snapshot: None,
             render_id: 0,
+            event_procedures: vec![],
         }
     }
 }
@@ -499,5 +515,30 @@ mod tests {
         let cloned = form.clone();
         assert!(cloned.snapshot.is_some());
         assert_eq!(cloned.snapshot.unwrap().id.name, "Form1");
+    }
+
+    #[test]
+    fn layout_form_default_has_empty_event_procedures() {
+        let form = LayoutForm::default();
+        assert!(form.event_procedures.is_empty());
+    }
+
+    #[test]
+    fn layout_form_clone_preserves_empty_event_procedures() {
+        let form = LayoutForm {
+            name: "Form1".into(),
+            event_procedures: vec![
+                EventProcedure {
+                    node_id: NodeId { name: String::new(), kind: LayoutControlType::Form, index: 0 },
+                    control: "cmdOK".into(),
+                    event: "Click".into(),
+                    procedure: "cmdOK_Click".into(),
+                }
+            ],
+            ..LayoutForm::default()
+        };
+        let cloned = form.clone();
+        assert_eq!(cloned.event_procedures.len(), 1);
+        assert_eq!(cloned.event_procedures[0].control, "cmdOK");
     }
 }
