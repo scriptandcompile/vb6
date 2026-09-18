@@ -9,6 +9,7 @@
 //! the form-rendering bridge ([`form_bridge`]); this file keeps the wire
 //! structs and the output converters they share.
 
+mod exec_bridge;
 mod form_bridge;
 mod project_parser;
 mod run_bridge;
