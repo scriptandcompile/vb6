@@ -134,6 +134,7 @@ pub fn interpret_vb6_code(code: &str) -> Result<JsValue, JsError> {
                 paused: false,
                 error: Some(error),
                 debug: empty_debug_state(),
+                state_handle: None,
             })?);
         }
     };
@@ -144,13 +145,31 @@ pub fn interpret_vb6_code(code: &str) -> Result<JsValue, JsError> {
     interpreter.set_clock_backend(Box::new(clock_state::memory::MemoryBackend::new(
         jiff::Timestamp::now(),
     )));
-    match interpreter.run_module(&module) {
-        Ok(()) => Ok(to_value(&super::build_output(&interpreter, None))?),
-        Err(error) => Ok(to_value(&super::build_output(
-            &interpreter,
-            Some(super::convert_run_error(error, code, module.line_offset)),
-        ))?),
-    }
+    let (new_output, debug, steps, terminated, error) = match interpreter.run_module(&module) {
+        Ok(()) => {
+            let out = interpreter.drain_output();
+            let dbg = build_debug_state(&interpreter);
+            (out, dbg, interpreter.steps(), interpreter.is_terminated(), None)
+        }
+        Err(error) => {
+            let err = super::convert_run_error(error, code, module.line_offset);
+            let out = interpreter.drain_output();
+            let dbg = build_debug_state(&interpreter);
+            (out, dbg, interpreter.steps(), interpreter.is_terminated(), Some(err))
+        }
+    };
+
+    Ok(to_value(&WasmRunOutput {
+        successful: error.is_none(),
+        output_lines: Vec::new(),
+        output_text: new_output,
+        steps,
+        terminated,
+        paused: error.as_ref().is_some_and(|e| e.is_debug_pause),
+        error,
+        debug,
+        state_handle: None,
+    })?)
 }
 
 /// Execute a single VB6 module up to `pause_after_steps` statements and return
@@ -169,6 +188,7 @@ pub fn debug_vb6_code(code: &str, pause_after_steps: u32) -> Result<JsValue, JsE
                 paused: false,
                 error: Some(error),
                 debug: empty_debug_state(),
+                state_handle: None,
             })?);
         }
     };
@@ -181,13 +201,36 @@ pub fn debug_vb6_code(code: &str, pause_after_steps: u32) -> Result<JsValue, JsE
     )));
     interpreter.set_pause_after_steps(Some(u64::from(pause_after_steps)));
 
-    match interpreter.run_module(&module) {
-        Ok(()) => Ok(to_value(&super::build_output(&interpreter, None))?),
-        Err(error) => Ok(to_value(&super::build_output(
-            &interpreter,
-            Some(super::convert_run_error(error, code, module.line_offset)),
-        ))?),
-    }
+    let paused = interpreter
+        .pause_after_steps
+        .is_some_and(|pause_after_steps| interpreter.steps >= pause_after_steps);
+
+    let (new_output, debug, steps, terminated, error) = match interpreter.run_module(&module) {
+        Ok(()) => {
+            let out = interpreter.drain_output();
+            let dbg = build_debug_state(&interpreter);
+            (out, dbg, interpreter.steps(), interpreter.is_terminated(), None)
+        }
+        Err(error) => {
+            let err = super::convert_run_error(error, code, module.line_offset);
+            let out = interpreter.drain_output();
+            let dbg = build_debug_state(&interpreter);
+            (out, dbg, interpreter.steps(), interpreter.is_terminated(), Some(err))
+        }
+    };
+
+    let is_error = error.is_some() && !paused;
+    Ok(to_value(&WasmRunOutput {
+        successful: !is_error,
+        output_lines: Vec::new(),
+        output_text: new_output,
+        steps,
+        terminated,
+        paused: paused || error.as_ref().is_some_and(|e| e.is_debug_pause),
+        error,
+        debug,
+        state_handle: None,
+    })?)
 }
 
 /// Build a full statement-boundary execution trace that the browser can use
@@ -301,11 +344,29 @@ pub fn run_wasm_project(
         jiff::Timestamp::now(),
     )));
 
-    match interpreter.run_project(&project) {
-        Ok(()) => Ok(to_value(&super::build_output(&interpreter, None))?),
-        Err(error) => Ok(to_value(&super::build_output(
-            &interpreter,
-            Some(super::convert_run_error(error, "", 0)),
-        ))?),
-    }
+    let (new_output, debug, steps, terminated, error) = match interpreter.run_project(&project) {
+        Ok(()) => {
+            let out = interpreter.drain_output();
+            let dbg = build_debug_state(&interpreter);
+            (out, dbg, interpreter.steps(), interpreter.is_terminated(), None)
+        }
+        Err(error) => {
+            let err = super::convert_run_error(error, "", 0);
+            let out = interpreter.drain_output();
+            let dbg = build_debug_state(&interpreter);
+            (out, dbg, interpreter.steps(), interpreter.is_terminated(), Some(err))
+        }
+    };
+
+    Ok(to_value(&WasmRunOutput {
+        successful: error.is_none(),
+        output_lines: Vec::new(),
+        output_text: new_output,
+        steps,
+        terminated,
+        paused: false,
+        error,
+        debug,
+        state_handle: None,
+    })?)
 }

@@ -20,7 +20,6 @@ use run_bridge::{build_debug_state, build_debug_state_from_snapshot, byte_offset
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-use crate::Interpreter;
 use crate::error::{RunError, render_error_report, render_report_at_line};
 use crate::interpreter::DebugSnapshot;
 use vb6parse::files::ModuleFile;
@@ -172,6 +171,9 @@ pub struct WasmRunOutput {
     pub error: Option<WasmRunError>,
     /// Debug-oriented snapshot of the interpreter state.
     pub debug: WasmDebugState,
+    /// Persistent session handle for form-mode execution (only set after `run_project`).
+    #[serde(default)]
+    pub state_handle: Option<u32>,
 }
 
 fn parse_module(code: &str) -> Result<ModuleFile, WasmRunError> {
@@ -220,20 +222,6 @@ fn convert_run_error(error: RunError, code: &str, line_offset: usize) -> WasmRun
     }
 }
 
-fn build_output(interpreter: &Interpreter, error: Option<WasmRunError>) -> WasmRunOutput {
-    let paused = error.as_ref().is_some_and(|error| error.is_debug_pause);
-    WasmRunOutput {
-        successful: error.is_none() || paused,
-        output_lines: interpreter.output().to_vec(),
-        output_text: interpreter.output_text(),
-        steps: interpreter.steps(),
-        terminated: interpreter.is_terminated(),
-        paused,
-        error,
-        debug: build_debug_state(interpreter),
-    }
-}
-
 fn build_output_from_snapshot(
     snapshot: &DebugSnapshot,
     paused: bool,
@@ -251,5 +239,6 @@ fn build_output_from_snapshot(
         paused,
         error,
         debug: build_debug_state_from_snapshot(snapshot, code, delta),
+        state_handle: None,
     }
 }

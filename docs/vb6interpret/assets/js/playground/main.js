@@ -481,7 +481,19 @@ function renderOutput(result) {
     syncExecutionControls();
     renderEnvironment();
     renderFiles();
-    elements.stdout.textContent = result.output_text || "No output.";
+
+    if (result.output_text) {
+        let text = result.output_text;
+        if (text.endsWith('\n')) {
+            text = text.slice(0, -1);
+        }
+        if (elements.stdout.textContent === "Run a module to see Debug.Print output.") {
+            elements.stdout.textContent = text + '\n';
+        } else {
+            elements.stdout.textContent += text + '\n';
+        }
+    }
+
     renderDebugState(
         result.debug ?? emptyDebugState(),
         Boolean(result.debug?.current_line) && Boolean(result.paused || result.error || (result.steps ?? 0) > 0),
@@ -500,6 +512,8 @@ function renderOutput(result) {
         setStatus("Completed", "success");
     }
 }
+
+window.renderOutput = renderOutput;
 
 function updateSessionCompletion(result) {
     state.sessionComplete = !result?.paused;

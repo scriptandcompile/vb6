@@ -15,7 +15,7 @@ use wasm_bindgen::prelude::*;
 use super::project_parser::{
     detect_startup, js_map_to_byte_pairs, parse_classes, parse_forms, parse_modules,
 };
-use super::{WasmDebugState, WasmRunOutput, build_debug_state, convert_run_error};
+use super::{WasmRunOutput, build_debug_state, convert_run_error};
 use crate::Interpreter;
 use crate::interpreter::Flow;
 use crate::project::LoadedProject;
@@ -25,25 +25,12 @@ use vb6runtime::state::file as file_state;
 /// Persistent interpreter session for form-based execution.
 struct WasmRunState {
     interpreter: Interpreter,
-    output_lines: Vec<String>,
 }
 
 static RUN_STATE: LazyLock<Mutex<HashMap<u32, WasmRunState>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static NEXT_STATE_HANDLE: LazyLock<Mutex<u32>> = LazyLock::new(|| Mutex::new(0));
-
-fn empty_debug_state() -> WasmDebugState {
-    WasmDebugState {
-        current_steps: 0,
-        current_line: 1,
-        current_procedure: None,
-        stack_depth: 0,
-        globals: Vec::new(),
-        locals: Vec::new(),
-        cursor: None,
-    }
-}
 
 /// Run a project (forms + modules + classes) and return a state handle.
 ///
@@ -86,15 +73,12 @@ pub fn run_project(
     )));
 
     let result = interp.run_project(&project);
-    let output_text = interp.output_text();
+    let new_output = interp.drain_output();
     let steps = interp.steps();
     let terminated = interp.is_terminated();
-    let output_lines = interp.output().to_vec();
+    let debug = build_debug_state(&interp);
 
-    let state = WasmRunState {
-        interpreter: interp,
-        output_lines: output_lines.clone(),
-    };
+    let state = WasmRunState { interpreter: interp };
     RUN_STATE
         .lock()
         .map_err(|_| JsError::new("lock poisoned"))?
@@ -102,13 +86,14 @@ pub fn run_project(
 
     Ok(to_value(&WasmRunOutput {
         successful: result.is_ok(),
-        output_lines,
-        output_text,
+        output_lines: Vec::new(),
+        output_text: new_output,
         steps,
         terminated,
         paused: false,
         error: result.err().map(|e| convert_run_error(e, "", 0)),
-        debug: empty_debug_state(),
+        debug,
+        state_handle: Some(handle),
     })?)
 }
 
@@ -122,36 +107,45 @@ pub fn call_sub(state_handle: u32, name: &str) -> Result<JsValue, JsError> {
         .get_mut(&state_handle)
         .ok_or_else(|| JsError::new("unknown state handle"))?;
 
-    match state.interpreter.call_sub(name, Vec::new()) {
+    let result = state.interpreter.call_sub(name, Vec::new());
+    let new_output = state.interpreter.drain_output();
+    let steps = state.interpreter.steps();
+    let terminated = state.interpreter.is_terminated();
+    let debug = build_debug_state(&state.interpreter);
+
+    match result {
         Ok(Flow::Next | Flow::Return | Flow::BreakLoop) => Ok(to_value(&WasmRunOutput {
             successful: true,
-            output_lines: state.interpreter.output().to_vec(),
-            output_text: state.interpreter.output_text(),
-            steps: state.interpreter.steps(),
-            terminated: state.interpreter.is_terminated(),
+            output_lines: Vec::new(),
+            output_text: new_output,
+            steps,
+            terminated,
             paused: false,
             error: None,
-            debug: build_debug_state(&state.interpreter),
+            debug,
+            state_handle: None,
         })?),
         Ok(Flow::Terminate) => Ok(to_value(&WasmRunOutput {
             successful: true,
-            output_lines: state.interpreter.output().to_vec(),
-            output_text: state.interpreter.output_text(),
-            steps: state.interpreter.steps(),
+            output_lines: Vec::new(),
+            output_text: new_output,
+            steps,
             terminated: true,
             paused: false,
             error: None,
-            debug: build_debug_state(&state.interpreter),
+            debug,
+            state_handle: None,
         })?),
         Err(e) => Ok(to_value(&WasmRunOutput {
             successful: false,
-            output_lines: state.interpreter.output().to_vec(),
-            output_text: state.interpreter.output_text(),
-            steps: state.interpreter.steps(),
-            terminated: state.interpreter.is_terminated(),
+            output_lines: Vec::new(),
+            output_text: new_output,
+            steps,
+            terminated,
             paused: false,
             error: Some(convert_run_error(e, "", 0)),
-            debug: build_debug_state(&state.interpreter),
+            debug,
+            state_handle: None,
         })?),
     }
 }
@@ -159,13 +153,14 @@ pub fn call_sub(state_handle: u32, name: &str) -> Result<JsValue, JsError> {
 /// Get all captured output for a session.
 #[wasm_bindgen]
 pub fn get_output(state_handle: u32) -> Result<Vec<String>, JsError> {
-    let guard = RUN_STATE
+    let mut guard = RUN_STATE
         .lock()
         .map_err(|_| JsError::new("lock poisoned"))?;
     let state = guard
-        .get(&state_handle)
+        .get_mut(&state_handle)
         .ok_or_else(|| JsError::new("unknown state handle"))?;
-    Ok(state.output_lines.clone())
+    let new_output = state.interpreter.drain_output();
+    Ok(vec![new_output])
 }
 
 /// Dispatch a form control event to the interpreter.
@@ -183,26 +178,34 @@ pub fn form_event(state_handle: u32, control: String, event: String) -> Result<J
         .ok_or_else(|| JsError::new("unknown state handle"))?;
 
     let proc_name = format!("{}_{}", control, event);
-    match state.interpreter.call_sub(&proc_name, Vec::new()) {
+    let result = state.interpreter.call_sub(&proc_name, Vec::new());
+    let new_output = state.interpreter.drain_output();
+    let steps = state.interpreter.steps();
+    let terminated = state.interpreter.is_terminated();
+    let debug = build_debug_state(&state.interpreter);
+
+    match result {
         Ok(_) => Ok(to_value(&WasmRunOutput {
             successful: true,
-            output_lines: state.interpreter.output().to_vec(),
-            output_text: state.interpreter.output_text(),
-            steps: state.interpreter.steps(),
-            terminated: state.interpreter.is_terminated(),
+            output_lines: Vec::new(),
+            output_text: new_output,
+            steps,
+            terminated,
             paused: false,
             error: None,
-            debug: build_debug_state(&state.interpreter),
+            debug,
+            state_handle: None,
         })?),
         Err(e) => Ok(to_value(&WasmRunOutput {
             successful: false,
-            output_lines: state.interpreter.output().to_vec(),
-            output_text: state.interpreter.output_text(),
-            steps: state.interpreter.steps(),
-            terminated: state.interpreter.is_terminated(),
+            output_lines: Vec::new(),
+            output_text: new_output,
+            steps,
+            terminated,
             paused: false,
             error: Some(convert_run_error(e, "", 0)),
-            debug: build_debug_state(&state.interpreter),
+            debug,
+            state_handle: None,
         })?),
     }
 }

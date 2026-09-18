@@ -138,18 +138,40 @@ class FormWindow {
     }
 
     _attachBindings(contentEl) {
+        let allChildren = [];
+        function walk(node, depth) {
+            if (!node) return;
+            if (depth < 4) {
+                allChildren.push(depth + ': ' + node.tagName + (node.id ? '#'+node.id : '') + (node.className ? '.'+node.className : '') + (node.textContent ? ' "'+node.textContent.substring(0,20)+'"' : ''));
+            }
+            for (let i = 0; i < node.children.length; i++) {
+                walk(node.children[i], depth + 1);
+            }
+        }
+        walk(contentEl, 0);
         for (const binding of this.bindings) {
-            const el = contentEl.querySelector(`[id="${binding.control}"]`);
+            const control = binding.get('control');
+            const event = binding.get('event');
+            const el = contentEl.querySelector('[id="' + control + '"]');
             if (!el) continue;
-
             const handler = () => {
                 if (el.disabled) return;
                 if (this.stateHandle === null) return;
-                formManager.dispatchEvent(
-                    this.stateHandle,
-                    binding.control,
-                    binding.event
-                );
+                try {
+                    const result = formManager.dispatchEvent(
+                        this.stateHandle,
+                        control,
+                        event
+                    );
+                    if (window.renderOutput) {
+                        window.renderOutput(result);
+                    }
+                } catch (e) {
+                    console.error('form-windows: error dispatching event:', e);
+                    if (window.renderOutput) {
+                        window.renderOutput({ successful: false, output_text: '', output_lines: [], steps: 0, terminated: false, error: { message: e.message ?? 'Execution failed.' }, debug: { current_steps: 0, current_line: 1, current_procedure: null, stack_depth: 0, globals: [], locals: [], cursor: null } });
+                    }
+                }
             };
 
             const eventName = this._toDomEvent(binding.event);

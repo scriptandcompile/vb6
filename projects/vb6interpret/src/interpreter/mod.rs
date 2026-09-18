@@ -447,10 +447,12 @@ impl Interpreter {
         &self.output
     }
 
-    /// Return all accumulated output (completed lines plus the current
-    /// partial line) and clear the output buffers. This is a one-shot drain
-    /// used by the Tauri form event handler so that each event prints only
-    /// its own output, not everything that came before.
+    /// Drain all accumulated output (completed lines plus the current
+    /// partial line) and clear the output buffers in one shot.
+    ///
+    /// The interpreter playground appends the returned text to the current
+    /// output display so that each execution step or form event shows only
+    /// its own contribution rather than replacing the entire history.
     pub fn drain_output(&mut self) -> String {
         let mut text = self.output.join("\n");
         if !self.current_output.is_empty() {
