@@ -26,5 +26,6 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Sub cmdClose_Click()
-    Unload Me
+   Debug.Print "Clicked!"
+   Unload Me
 End Sub

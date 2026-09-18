@@ -162,6 +162,15 @@ pub fn stop_engine(engine_handle: EngineHandle) -> bool {
     }
 }
 
+/// Result of dispatching a form control event.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct FormEventResult {
+    /// Whether the event handler completed successfully.
+    pub status: FormEventStatus,
+    /// The interpreter's captured output (Debug.Print, Print) since the last output poll.
+    pub output: String,
+}
+
 /// Event dispatch status returned after calling a form control event handler.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub enum FormEventStatus {
@@ -177,25 +186,31 @@ pub enum FormEventStatus {
 /// `cmdOK_Click`) and calls it as a sub procedure on the interpreter.
 /// This simulates a user interaction with a rendered form control.
 ///
-/// Returns a status indicating whether the event handler completed
-/// normally or if the program was terminated during execution.
+/// Prints the interpreter's captured output (Debug.Print, Print) to stderr
+/// so the user can see it in the terminal.
 #[command]
-pub fn form_event(engine_handle: EngineHandle, control: String, event: String) -> FormEventStatus {
+pub fn form_event(engine_handle: EngineHandle, control: String, event: String) -> FormEventResult {
     if let Some(engine) = get_engine(engine_handle) {
         let proc_name = format!("{}_{}", control, event);
         let mut interp = engine.interpreter.lock().unwrap();
         match interp.call_sub(&proc_name, vec![]) {
-            Ok(_) => FormEventStatus::Handled,
+            Ok(_) => {
+                let output = interp.drain_output();
+                eprint!("{}", output);
+                FormEventResult { status: FormEventStatus::Handled, output: String::new() }
+            }
             Err(e) => {
                 eprintln!(
                     "Event handler error for '{}_{}': {}",
                     control, event, e.error
                 );
-                FormEventStatus::Handled
+                let output = interp.drain_output();
+                eprint!("{}", output);
+                FormEventResult { status: FormEventStatus::Handled, output: String::new() }
             }
         }
     } else {
-        FormEventStatus::Handled
+        FormEventResult { status: FormEventStatus::Handled, output: String::new() }
     }
 }
 
