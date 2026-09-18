@@ -34,6 +34,7 @@
                 <label for="file-type">File Type:</label>
                 <select id="file-type" class="file-type-selector" disabled>
                     <option value="module" selected>Module (.bas)</option>
+                    <option value="form">Form (.frm)</option>
                 </select>
                 <label for="examples">Examples:</label>
                 <select id="examples" class="examples-selector">
@@ -46,6 +47,9 @@
                 </select>
             </div>
             <div class="toolbar-right">
+                <button id="open-form-btn" class="btn btn-secondary">
+                    <span class="btn-icon">📂</span> Open Form
+                </button>
                 <button id="run-btn" class="btn btn-primary">
                     <span class="btn-icon">▶</span> Run Module
                 </button>

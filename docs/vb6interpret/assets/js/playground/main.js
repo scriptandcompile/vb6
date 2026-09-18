@@ -14,12 +14,15 @@ const state = {
     hasExecutionState: false,
     sessionComplete: false,
     activeFilePath: null,
+    currentStateHandle: null,
+    currentFormHandle: null,
 };
 
 const elements = {
     fileType: document.getElementById("file-type"),
     examples: document.getElementById("examples"),
     runButton: document.getElementById("run-btn"),
+    openFormButton: document.getElementById("open-form-btn"),
     panelRunButton: document.getElementById("panel-run-btn"),
     stepButton: document.getElementById("step-btn"),
     resetButton: document.getElementById("reset-btn"),
@@ -173,6 +176,8 @@ async function initPlayground() {
         renderEnvironment();
         renderFiles();
         syncExecutionControls();
+        updateRunButtonLabel();
+        enableFileTypeSelector();
         window.setInterval(() => {
             if (state.wasmReady) {
                 renderClock();
@@ -191,6 +196,7 @@ function bindEvents() {
         resetDebugProgress();
         Editor.clearExecutionHighlight();
         saveToLocalStorage();
+        updateRunButtonLabel();
     });
 
     elements.examples.addEventListener("change", (event) => {
@@ -204,7 +210,11 @@ function bindEvents() {
         event.target.value = "";
     });
 
-    elements.runButton.addEventListener("click", runModule);
+    elements.fileType.addEventListener("change", (event) => {
+        updateRunButtonLabel();
+    });
+
+    elements.runButton.addEventListener("click", runModuleOrForm);
     elements.panelRunButton.addEventListener("click", runModule);
     elements.stepButton.addEventListener("click", stepModule);
     elements.resetButton.addEventListener("click", resetExecutionSession);
@@ -225,6 +235,7 @@ function bindEvents() {
     document.getElementById("theme-toggle")?.addEventListener("click", handleThemeToggle);
 
     setupResizer();
+    setupFilePicker();
 }
 
 function loadInitialCode() {
@@ -243,6 +254,107 @@ function loadInitialCode() {
 
 function saveToLocalStorage() {
     window.localStorage.setItem("vb6interpret-playground-code", Editor.getEditorContent());
+}
+
+async function runModuleOrForm() {
+    if (!state.wasmReady) {
+        renderError({ message: "WebAssembly is not ready yet." });
+        return;
+    }
+
+    const code = Editor.getEditorContent().trim();
+    if (!code) {
+        renderOutput({
+            successful: false,
+            output_text: "",
+            output_lines: [],
+            steps: 0,
+            terminated: false,
+            error: { message: "Enter a VB6 module or form before running it." },
+        });
+        return;
+    }
+
+    if (detectFileType(code) === "form") {
+        return runForm(code);
+    }
+
+    return runModule();
+}
+
+function detectFileType(code) {
+    const trimmed = code.trim().toUpperCase();
+    if (trimmed.startsWith("VERSION") && trimmed.includes("BEGIN VB.FORM")) {
+        return "form";
+    }
+    return "module";
+}
+
+function updateRunButtonLabel() {
+    const code = Editor.getEditorContent();
+    if (detectFileType(code) === "form") {
+        elements.runButton.innerHTML = '<span class="btn-icon">▶</span> Run Form';
+    } else {
+        elements.runButton.innerHTML = '<span class="btn-icon">▶</span> Run Module';
+    }
+}
+
+function enableFileTypeSelector() {
+    if (!elements.fileType) return;
+    elements.fileType.disabled = false;
+    elements.fileType.addEventListener("change", () => {
+        const selected = elements.fileType.value;
+        if (selected === "form") {
+            elements.runButton.innerHTML = '<span class="btn-icon">▶</span> Run Form';
+        } else {
+            elements.runButton.innerHTML = '<span class="btn-icon">▶</span> Run Module';
+        }
+    });
+}
+
+async function runForm(code) {
+    if (state.currentStateHandle !== null) {
+        window.dispose_state(state.currentStateHandle);
+        state.currentStateHandle = null;
+    }
+
+    setStatus("Running form", "pending");
+
+    try {
+        const encoder = new TextEncoder();
+        const formBytes = encoder.encode(code);
+
+        const runResult = await window.run_project(
+            formBytes,
+            new Map(),
+            new Map(),
+            ""
+        );
+
+        if (runResult.error) {
+            renderError(runResult.error);
+            setStatus("Form error", "error");
+            return;
+        }
+
+        state.currentStateHandle = runResult.state_handle ?? null;
+
+        const { handle: formHandle, bindings, containerId } =
+            await formManager.showForm(formBytes, state.currentStateHandle);
+        state.currentFormHandle = formHandle;
+
+        const form = formManager.windows.get(formHandle);
+        if (form) {
+            form.setTitle("Form");
+        }
+
+        console.log("Form loaded:", formHandle, "container:", containerId);
+        setStatus("Form running", "success");
+    } catch (error) {
+        console.error("Failed to load form:", error);
+        setStatus("Form error", "error");
+        renderError({ message: `Failed to load form: ${error.message}` });
+    }
 }
 
 async function runModule() {
@@ -282,6 +394,7 @@ async function runModule() {
 
         updateSessionCompletion(result);
         renderOutput(result);
+        setStatus("Completed", "success");
     } catch (error) {
         console.error("Interpreter execution failed", error);
         updateSessionCompletion({ paused: false });
@@ -293,6 +406,7 @@ async function runModule() {
             terminated: false,
             error: { message: error.message ?? "Execution failed." },
         });
+        setStatus("Error", "error");
     }
 }
 
@@ -528,11 +642,13 @@ function resetExecutionSession() {
     state.sessionComplete = false;
     Editor.clearExecutionHighlight();
     syncExecutionControls();
-    // Each run installs a fresh memory file backend, so a session reset
-    // should wipe it too and refresh the Files tab to match.
     if (state.wasmReady) {
         clear_files();
         state.activeFilePath = null;
+    }
+    if (state.currentStateHandle !== null) {
+        window.dispose_state(state.currentStateHandle);
+        state.currentStateHandle = null;
     }
     renderOutput({
         successful: true,
@@ -1081,6 +1197,115 @@ function setupResizer() {
 
     window.addEventListener("mousemove", resizePanels);
     window.addEventListener("mouseup", stopResize);
+}
+
+function setupFilePicker() {
+    const btn = document.getElementById("open-form-btn");
+    if (!btn) return;
+
+    btn.addEventListener("click", () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".frm,.vbp";
+        input.onchange = async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const bytes = new Uint8Array(await file.arrayBuffer());
+                const ext = file.name.split(".").pop().toLowerCase();
+
+                if (ext === "frm") {
+                    if (state.currentStateHandle !== null) {
+                        window.dispose_state(state.currentStateHandle);
+                        state.currentStateHandle = null;
+                    }
+                    if (state.currentFormHandle !== null) {
+                        formManager.windows.delete(state.currentFormHandle);
+                        state.currentFormHandle = null;
+                    }
+
+                    setStatus("Loading form", "pending");
+                    const runResult = await window.run_project(
+                        bytes,
+                        new Map(),
+                        new Map(),
+                        ""
+                    );
+
+                    if (runResult.error) {
+                        renderError(runResult.error);
+                        setStatus("Form error", "error");
+                        return;
+                    }
+
+                    state.currentStateHandle = runResult.state_handle ?? null;
+                    const { handle: formHandle, bindings, containerId } =
+                        await formManager.showForm(bytes, state.currentStateHandle);
+                    state.currentFormHandle = formHandle;
+
+                    const form = formManager.windows.get(formHandle);
+                    if (form) {
+                        const title = file.name.replace(/\.frm$/i, "");
+                        form.setTitle(title);
+                    }
+
+                    setStatus("Form running", "success");
+                } else if (ext === "vbp") {
+                    const text = new TextDecoder("windows-1252").decode(bytes);
+                    const forms = parseVbpForms(text);
+                    if (forms.length === 0) {
+                        renderError({ message: "No forms found in .vbp file." });
+                        return;
+                    }
+                    const startupForm = forms[0].name || forms[0].file.replace(/\.frm$/i, "");
+                    setStatus(`Loading startup form: ${startupForm}`, "pending");
+
+                    const runResult = await window.run_project(
+                        bytes,
+                        new Map(),
+                        new Map(),
+                        startupForm
+                    );
+
+                    if (runResult.error) {
+                        renderError(runResult.error);
+                        setStatus("Project error", "error");
+                        return;
+                    }
+
+                    state.currentStateHandle = runResult.state_handle ?? null;
+                    const { handle: formHandle } = await formManager.showForm(bytes, state.currentStateHandle);
+                    state.currentFormHandle = formHandle;
+                    setStatus("Project running", "success");
+                }
+            } catch (error) {
+                console.error("Failed to load file:", error);
+                setStatus("Error", "error");
+                renderError({ message: `Failed to load file: ${error.message}` });
+            }
+        };
+        input.click();
+    });
+}
+
+function parseVbpForms(vbpText) {
+    const forms = [];
+    const lines = vbpText.split("\n");
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.toLowerCase().startsWith("form=")) {
+            const path = trimmed.slice(6).trim();
+            const name = path.split("\\").pop().replace(/\.frm$/i, "");
+            forms.push({ file: path, name });
+        }
+        if (trimmed.toLowerCase().startsWith("object=")) {
+            const match = trimmed.match(/object=\{[0-9A-Fa-f]+\}\;\{[0-9A-Fa-f]+\}\s+([\w.]+)/);
+            if (match) {
+                forms.push({ file: match[1], name: match[1].split(".").pop() });
+            }
+        }
+    }
+    return forms;
 }
 
 initPlayground();
