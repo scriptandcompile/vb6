@@ -1,6 +1,105 @@
 /* @ts-self-types="./vb6interpret.d.ts" */
 
 /**
+ * Chroma subsampling format
+ * @enum {0 | 1 | 2 | 3}
+ */
+export const ChromaSampling = Object.freeze({
+    /**
+     * Both vertically and horizontally subsampled.
+     */
+    Cs420: 0, "0": "Cs420",
+    /**
+     * Horizontally subsampled.
+     */
+    Cs422: 1, "1": "Cs422",
+    /**
+     * Not subsampled.
+     */
+    Cs444: 2, "2": "Cs444",
+    /**
+     * Monochrome.
+     */
+    Cs400: 3, "3": "Cs400",
+});
+
+/**
+ * A VB6 project loaded from JS-provided byte maps for multi-file VBP-style
+ * projects in the browser.
+ *
+ * The JS layer constructs a `WasmProject` by populating the `forms`,
+ * `modules`, and `classes` fields with [`JsMap`] instances whose keys are
+ * file names and whose values are `Uint8Array` (raw file bytes).  The
+ * `startup` field holds the startup object name (form name or module name).
+ *
+ * # Examples
+ *
+ * Constructed on the JS side from a file picker or a build tool:
+ *
+ * ```js
+ * const project = new WasmProject();
+ * project.forms.set("Form1.frm", form1Bytes);
+ * project.modules.set("Module1.bas", module1Bytes);
+ * project.startup = "Sub Main";
+ * ```
+ */
+export class WasmProject {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        WasmProjectFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmproject_free(ptr, 0);
+    }
+    /**
+     * The startup object name (form name or module name).
+     * @returns {string}
+     */
+    get startup() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.__wbg_get_wasmproject_startup(retptr, this.__wbg_ptr);
+            var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+            var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+            deferred1_0 = r0;
+            deferred1_1 = r1;
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_export4(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * The startup object name (form name or module name).
+     * @param {string} arg0
+     */
+    set startup(arg0) {
+        const ptr0 = passStringToWasm0(arg0, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.__wbg_set_wasmproject_startup(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * Create a new, empty `WasmProject`.
+     *
+     * Callers on the JS side should populate `forms`, `modules`, and
+     * `classes` with [`JsMap`] instances and set `startup` before passing
+     * the project to a WASM function.
+     */
+    constructor() {
+        const ret = wasm.wasmproject_new();
+        this.__wbg_ptr = ret;
+        WasmProjectFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+}
+if (Symbol.dispose) WasmProject.prototype[Symbol.dispose] = WasmProject.prototype.free;
+
+/**
  * Build a full statement-boundary execution trace that the browser can use
  * for true resume-from-current-state stepping.
  * @param {string} code
@@ -12,6 +111,30 @@ export function build_debug_trace(code) {
         const ptr0 = passStringToWasm0(code, wasm.__wbindgen_export, wasm.__wbindgen_export2);
         const len0 = WASM_VECTOR_LEN;
         wasm.build_debug_trace(retptr, ptr0, len0);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Call a Sub procedure by name within a running project session.
+ * @param {number} state_handle
+ * @param {string} name
+ * @returns {any}
+ */
+export function call_sub(state_handle, name) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(name, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.call_sub(retptr, state_handle, ptr0, len0);
         var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
         var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
         var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
@@ -55,6 +178,16 @@ export function debug_vb6_code(code, pause_after_steps) {
     } finally {
         wasm.__wbindgen_add_to_stack_pointer(16);
     }
+}
+
+/**
+ * Dispose a session and free its resources.
+ * @param {number} state_handle
+ * @returns {boolean}
+ */
+export function dispose_state(state_handle) {
+    const ret = wasm.dispose_state(state_handle);
+    return ret !== 0;
 }
 
 /**
@@ -139,6 +272,117 @@ export function dump_settings() {
             throw takeObject(r1);
         }
         return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Get event procedure bindings for a loaded form.
+ *
+ * Returns a JSON array of bindings in the same format as the Tauri
+ * `form_event_bindings` command. Each binding contains:
+ * - `node_id`: The unique node ID of the control in the layout tree.
+ * - `control`: The VB6 control name (e.g. `"cmdOK"`).
+ * - `event`: The VB6 event name (e.g. `"Click"`).
+ * - `procedure`: The full procedure name (e.g. `"cmdOK_Click"`).
+ *
+ * # Arguments
+ *
+ * * `form_handle` — The handle returned by [`show_form`].
+ *
+ * # Errors
+ *
+ * Returns a `JsValue` error if the form handle is unknown.
+ * @param {number} form_handle
+ * @returns {any}
+ */
+export function get_form_procedures(form_handle) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.get_form_procedures(retptr, form_handle);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Get all captured output for a session.
+ * @param {number} state_handle
+ * @returns {string[]}
+ */
+export function get_output(state_handle) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.get_output(retptr, state_handle);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        var r3 = getDataViewMemory0().getInt32(retptr + 4 * 3, true);
+        if (r3) {
+            throw takeObject(r2);
+        }
+        var v1 = getArrayJsValueFromWasm0(r0, r1);
+        wasm.__wbindgen_export4(r0, r1 * 4, 4);
+        return v1;
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Hide a loaded form by handle.
+ *
+ * Sets the form's visibility to false and re-renders the DOM.
+ * Uses the same container as the original [`show_form`] call.
+ *
+ * # Note
+ *
+ * This function uses the default container `"vb6-container"` for
+ * backward compatibility. For multi-container support, use
+ * [`hide_form_with_container`].
+ * @param {number} handle
+ */
+export function hide_form(handle) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.hide_form(retptr, handle);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        if (r1) {
+            throw takeObject(r0);
+        }
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Hide a loaded form by handle, targeting a specific container.
+ *
+ * Sets the form's visibility to false and re-renders the DOM in the
+ * container identified by `container_id`.
+ * @param {number} handle
+ * @param {string} container_id
+ */
+export function hide_form_with_container(handle, container_id) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(container_id, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.hide_form_with_container(retptr, handle, ptr0, len0);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        if (r1) {
+            throw takeObject(r0);
+        }
     } finally {
         wasm.__wbindgen_add_to_stack_pointer(16);
     }
@@ -288,6 +532,77 @@ export function remove_setting(appname, section, key) {
 }
 
 /**
+ * Run a project (forms + modules + classes) and return a state handle.
+ *
+ * The handle can be used with [`call_sub`] and [`get_output`] to interact
+ * with the running interpreter session. Returns a handle that JS must
+ * pass to subsequent calls.
+ * @param {any} form_bytes
+ * @param {any} module_bytes
+ * @param {any} class_bytes
+ * @param {string} startup
+ * @returns {any}
+ */
+export function run_project(form_bytes, module_bytes, class_bytes, startup) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(startup, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.run_project(retptr, addHeapObject(form_bytes), addHeapObject(module_bytes), addHeapObject(class_bytes), ptr0, len0);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Execute a multi-file VB6 project loaded from JS-provided byte maps.
+ *
+ * The `form_bytes`, `module_bytes`, and `class_bytes` arguments are JS
+ * `Map<string, Uint8Array>` instances.  Each map key is a file name and
+ * each value is the raw file contents as bytes.
+ *
+ * The `startup` field selects which procedure to run after all
+ * module-level statements have executed:
+ *
+ * * If a loaded form has a matching `VB_Name`, `Form_Load` is invoked.
+ * * If `startup` equals `"Sub Main"` or `"Main"`, the `Main` sub is called.
+ * * If `startup` matches a module name, `ModuleName.Main` is called.
+ * * If `startup` is empty, all module-level statements run but no entry
+ *   procedure is invoked.
+ *
+ * Returns a [`WasmRunOutput`] serialised as JSON.
+ * @param {any} form_bytes
+ * @param {any} module_bytes
+ * @param {any} class_bytes
+ * @param {string} startup
+ * @returns {any}
+ */
+export function run_wasm_project(form_bytes, module_bytes, class_bytes, startup) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(startup, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.run_wasm_project(retptr, addHeapObject(form_bytes), addHeapObject(module_bytes), addHeapObject(class_bytes), ptr0, len0);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
  * Set the in-memory clock to `date` (`YYYY-MM-DD`) and `time` (`HH:MM:SS`)
  * in the system's local time zone.
  *
@@ -332,6 +647,94 @@ export function set_env(name, value) {
 }
 
 /**
+ * Parse form bytes (as produced by a VB6 `.frm` file), load into the layout
+ * engine, and render the DOM tree into the container identified by `container_id`.
+ *
+ * Returns a handle that can be used with [`hide_form`], [`show_form_by_handle`],
+ * [`unload_form`], and [`update_form`].
+ *
+ * # Arguments
+ *
+ * * `form_bytes` — Raw bytes of a VB6 `.frm` file.
+ * * `container_id` — The `id` attribute of the DOM element to render into.
+ *   Defaults to `"vb6-container"` if empty.
+ *
+ * # Errors
+ *
+ * Returns a `JsValue` error string if:
+ * - The bytes cannot be parsed as a VB6 Form file.
+ * - The container element does not exist in the DOM.
+ * - The form cannot be retrieved from the layout store after loading.
+ * @param {Uint8Array} form_bytes
+ * @param {string} container_id
+ * @returns {any}
+ */
+export function show_form(form_bytes, container_id) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passArray8ToWasm0(form_bytes, wasm.__wbindgen_export);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(container_id, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len1 = WASM_VECTOR_LEN;
+        wasm.show_form(retptr, ptr0, len0, ptr1, len1);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Show (unhide) a previously hidden form by handle.
+ *
+ * Sets the form's visibility to true and re-renders the DOM.
+ * Uses the same container as the original [`show_form`] call.
+ * @param {number} handle
+ */
+export function show_form_by_handle(handle) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.show_form_by_handle(retptr, handle);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        if (r1) {
+            throw takeObject(r0);
+        }
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Show (unhide) a previously hidden form by handle, targeting a specific container.
+ *
+ * Sets the form's visibility to true and re-renders the DOM in the
+ * container identified by `container_id`.
+ * @param {number} handle
+ * @param {string} container_id
+ */
+export function show_form_by_handle_with_container(handle, container_id) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(container_id, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.show_form_by_handle_with_container(retptr, handle, ptr0, len0);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        if (r1) {
+            throw takeObject(r0);
+        }
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
  * Tokenizes VB6 code and returns a list of `TokenInfo` objects for quick preview.
  *
  * # Errors
@@ -364,12 +767,92 @@ export function tokenize_vb6_code(code) {
         wasm.__wbindgen_add_to_stack_pointer(16);
     }
 }
+
+/**
+ * Remove a form from the layout store and clear the DOM container.
+ *
+ * After calling this, the handle is no longer valid.
+ *
+ * # Arguments
+ *
+ * * `handle` — The form handle returned by [`show_form`].
+ * * `container_id` — The container to clear. Defaults to `"vb6-container"` if empty.
+ * @param {number} handle
+ * @param {string} container_id
+ */
+export function unload_form(handle, container_id) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(container_id, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.unload_form(retptr, handle, ptr0, len0);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        if (r1) {
+            throw takeObject(r0);
+        }
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Re-render a loaded form after state changes.
+ *
+ * Clears the DOM container and re-renders the form from the current
+ * layout model state. This should be called after mutating form properties
+ * via [`layout::get_form_mut`].
+ *
+ * Uses the same container as the original [`show_form`] call.
+ * @param {number} handle
+ */
+export function update_form(handle) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.update_form(retptr, handle);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        if (r1) {
+            throw takeObject(r0);
+        }
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
+/**
+ * Re-render a loaded form after state changes, targeting a specific container.
+ *
+ * Clears the DOM container identified by `container_id` and re-renders
+ * the form from the current layout model state.
+ * @param {number} handle
+ * @param {string} container_id
+ */
+export function update_form_with_container(handle, container_id) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(container_id, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.update_form_with_container(retptr, handle, ptr0, len0);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        if (r1) {
+            throw takeObject(r0);
+        }
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
         __wbg_Error_67e7344beaa85059: function(arg0, arg1) {
             const ret = Error(getStringFromWasm0(arg0, arg1));
             return addHeapObject(ret);
+        },
+        __wbg_Number_c54e7112a3fa7e3e: function(arg0) {
+            const ret = Number(getObject(arg0));
+            return ret;
         },
         __wbg_String_8564e559799eccda: function(arg0, arg1) {
             const ret = String(getObject(arg1));
@@ -378,12 +861,44 @@ function __wbg_get_imports() {
             getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
             getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
         },
+        __wbg___wbindgen_boolean_get_7a12af2b3f899c5a: function(arg0) {
+            const v = getObject(arg0);
+            const ret = typeof(v) === 'boolean' ? v : undefined;
+            return isLikeNone(ret) ? 0xFFFFFF : ret ? 1 : 0;
+        },
         __wbg___wbindgen_debug_string_0e68cf47c9cbd9b0: function(arg0, arg1) {
             const ret = debugString(getObject(arg1));
             const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_export, wasm.__wbindgen_export2);
             const len1 = WASM_VECTOR_LEN;
             getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
             getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+        },
+        __wbg___wbindgen_is_function_fcda5e3902d732fe: function(arg0) {
+            const ret = typeof(getObject(arg0)) === 'function';
+            return ret;
+        },
+        __wbg___wbindgen_is_object_edb6b15aa3afe12e: function(arg0) {
+            const val = getObject(arg0);
+            const ret = typeof(val) === 'object' && val !== null;
+            return ret;
+        },
+        __wbg___wbindgen_is_string_c4f7cb494a2a21f1: function(arg0) {
+            const ret = typeof(getObject(arg0)) === 'string';
+            return ret;
+        },
+        __wbg___wbindgen_is_undefined_8c687d0b90d5b524: function(arg0) {
+            const ret = getObject(arg0) === undefined;
+            return ret;
+        },
+        __wbg___wbindgen_jsval_loose_eq_3c30021c243b64cd: function(arg0, arg1) {
+            const ret = getObject(arg0) == getObject(arg1);
+            return ret;
+        },
+        __wbg___wbindgen_number_get_1dc732b810cb937c: function(arg0, arg1) {
+            const obj = getObject(arg1);
+            const ret = typeof(obj) === 'number' ? obj : undefined;
+            getDataViewMemory0().setFloat64(arg0 + 8 * 1, isLikeNone(ret) ? 0 : ret, true);
+            getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
         },
         __wbg___wbindgen_string_get_92ab86bb19cbc12f: function(arg0, arg1) {
             const obj = getObject(arg1);
@@ -399,9 +914,37 @@ function __wbg_get_imports() {
         __wbg_alert_8c452b1f9c41473b: function(arg0, arg1) {
             window.alert(getStringFromWasm0(arg0, arg1));
         },
+        __wbg_appendChild_0a61ee9a9da4556f: function() { return handleError(function (arg0, arg1) {
+            const ret = getObject(arg0).appendChild(getObject(arg1));
+            return addHeapObject(ret);
+        }, arguments); },
+        __wbg_body_7d83a19bffb260db: function(arg0) {
+            const ret = getObject(arg0).body;
+            return isLikeNone(ret) ? 0 : addHeapObject(ret);
+        },
+        __wbg_call_269c5566fbede3eb: function() { return handleError(function (arg0, arg1) {
+            const ret = getObject(arg0).call(getObject(arg1));
+            return addHeapObject(ret);
+        }, arguments); },
         __wbg_confirm_a41ee5e3ca8534e4: function(arg0, arg1) {
             const ret = window.confirm(getStringFromWasm0(arg0, arg1));
             return ret;
+        },
+        __wbg_createElement_b9024dc5ba95ac27: function() { return handleError(function (arg0, arg1, arg2) {
+            const ret = getObject(arg0).createElement(getStringFromWasm0(arg1, arg2));
+            return addHeapObject(ret);
+        }, arguments); },
+        __wbg_document_c7f486c52d63d24e: function(arg0) {
+            const ret = getObject(arg0).document;
+            return isLikeNone(ret) ? 0 : addHeapObject(ret);
+        },
+        __wbg_done_cffed884d87aa22e: function(arg0) {
+            const ret = getObject(arg0).done;
+            return ret;
+        },
+        __wbg_entries_972a87586902cf87: function(arg0) {
+            const ret = Object.entries(getObject(arg0));
+            return addHeapObject(ret);
         },
         __wbg_error_757e9472f8410341: function(arg0, arg1) {
             let deferred0_0;
@@ -411,23 +954,93 @@ function __wbg_get_imports() {
                 deferred0_1 = arg1;
                 console.error(getStringFromWasm0(arg0, arg1));
             } finally {
-                wasm.__wbindgen_export3(deferred0_0, deferred0_1, 1);
+                wasm.__wbindgen_export4(deferred0_0, deferred0_1, 1);
             }
         },
         __wbg_fromCodePoint_ec6e6b9b53f68733: function() { return handleError(function (arg0) {
             const ret = String.fromCodePoint(arg0 >>> 0);
             return addHeapObject(ret);
         }, arguments); },
+        __wbg_getElementById_ccc92d66acf76819: function(arg0, arg1, arg2) {
+            const ret = getObject(arg0).getElementById(getStringFromWasm0(arg1, arg2));
+            return isLikeNone(ret) ? 0 : addHeapObject(ret);
+        },
         __wbg_getTime_65922ba0b59d55a7: function(arg0) {
             const ret = getObject(arg0).getTime();
             return ret;
         },
+        __wbg_get_6cf5a4d4d8ad3c5a: function() { return handleError(function (arg0, arg1) {
+            const ret = Reflect.get(getObject(arg0), getObject(arg1));
+            return addHeapObject(ret);
+        }, arguments); },
         __wbg_get_989d0a1309644f2b: function() { return handleError(function (arg0, arg1) {
             const ret = Reflect.get(getObject(arg0), getObject(arg1));
             return addHeapObject(ret);
         }, arguments); },
+        __wbg_get_b1f0ab13c737f856: function(arg0, arg1) {
+            const ret = getObject(arg0)[arg1 >>> 0];
+            return addHeapObject(ret);
+        },
+        __wbg_get_unchecked_363572bdd397d473: function(arg0, arg1) {
+            const ret = getObject(arg0)[arg1 >>> 0];
+            return addHeapObject(ret);
+        },
+        __wbg_instanceof_ArrayBuffer_d4ff01f8247925ae: function(arg0) {
+            let result;
+            try {
+                result = getObject(arg0) instanceof ArrayBuffer;
+            } catch (_) {
+                result = false;
+            }
+            const ret = result;
+            return ret;
+        },
+        __wbg_instanceof_Uint8Array_598adc0fef426aa8: function(arg0) {
+            let result;
+            try {
+                result = getObject(arg0) instanceof Uint8Array;
+            } catch (_) {
+                result = false;
+            }
+            const ret = result;
+            return ret;
+        },
+        __wbg_instanceof_Window_a3b8566f0a9c5d1a: function(arg0) {
+            let result;
+            try {
+                result = getObject(arg0) instanceof Window;
+            } catch (_) {
+                result = false;
+            }
+            const ret = result;
+            return ret;
+        },
+        __wbg_isArray_5674713bb7b79043: function(arg0) {
+            const ret = Array.isArray(getObject(arg0));
+            return ret;
+        },
+        __wbg_isSafeInteger_8f51c743827d1ec5: function(arg0) {
+            const ret = Number.isSafeInteger(getObject(arg0));
+            return ret;
+        },
+        __wbg_iterator_22ddeb808cf55a6f: function() {
+            const ret = Symbol.iterator;
+            return addHeapObject(ret);
+        },
+        __wbg_length_31bdaf014f5fbde2: function(arg0) {
+            const ret = getObject(arg0).length;
+            return ret;
+        },
+        __wbg_length_4e1adc0d42e23620: function(arg0) {
+            const ret = getObject(arg0).length;
+            return ret;
+        },
         __wbg_new_0_35540e542ba689d2: function() {
             const ret = new Date();
+            return addHeapObject(ret);
+        },
+        __wbg_new_1da3429bc3c4541c: function(arg0) {
+            const ret = new Uint8Array(getObject(arg0));
             return addHeapObject(ret);
         },
         __wbg_new_227d7c05414eb861: function() {
@@ -438,6 +1051,10 @@ function __wbg_get_imports() {
             const ret = new Intl.DateTimeFormat(getObject(arg0), getObject(arg1));
             return addHeapObject(ret);
         },
+        __wbg_new_8d36e20aa758e411: function() {
+            const ret = new Map();
+            return addHeapObject(ret);
+        },
         __wbg_new_bebc3f4757acf305: function() {
             const ret = new Object();
             return addHeapObject(ret);
@@ -446,6 +1063,14 @@ function __wbg_get_imports() {
             const ret = new Array();
             return addHeapObject(ret);
         },
+        __wbg_next_95053e306b1c3aed: function(arg0) {
+            const ret = getObject(arg0).next;
+            return addHeapObject(ret);
+        },
+        __wbg_next_f31ecb8646d2c605: function() { return handleError(function (arg0) {
+            const ret = getObject(arg0).next();
+            return addHeapObject(ret);
+        }, arguments); },
         __wbg_prompt_20552ae58c489bab: function(arg0, arg1, arg2, arg3, arg4) {
             const ret = window.prompt(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
             var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_export, wasm.__wbindgen_export2);
@@ -453,15 +1078,37 @@ function __wbg_get_imports() {
             getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
             getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
         },
+        __wbg_prototypesetcall_ae9f5e7459250748: function(arg0, arg1, arg2) {
+            Uint8Array.prototype.set.call(getArrayU8FromWasm0(arg0, arg1), getObject(arg2));
+        },
         __wbg_resolvedOptions_a8a5a3f370c62607: function(arg0) {
             const ret = getObject(arg0).resolvedOptions();
             return addHeapObject(ret);
         },
+        __wbg_setAttribute_8c84e9351986b1f6: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
+            getObject(arg0).setAttribute(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
+        }, arguments); },
         __wbg_set_13d25b81ab403f5e: function(arg0, arg1, arg2) {
             getObject(arg0)[arg1 >>> 0] = takeObject(arg2);
         },
         __wbg_set_6be42768c690e380: function(arg0, arg1, arg2) {
             getObject(arg0)[takeObject(arg1)] = takeObject(arg2);
+        },
+        __wbg_set_bf6dde4923b9b059: function(arg0, arg1, arg2) {
+            const ret = getObject(arg0).set(getObject(arg1), getObject(arg2));
+            return addHeapObject(ret);
+        },
+        __wbg_set_className_f682baa8f21f2696: function(arg0, arg1, arg2) {
+            getObject(arg0).className = getStringFromWasm0(arg1, arg2);
+        },
+        __wbg_set_id_dc5bd387fca63e7d: function(arg0, arg1, arg2) {
+            getObject(arg0).id = getStringFromWasm0(arg1, arg2);
+        },
+        __wbg_set_innerHTML_ffa3d7ec0128d447: function(arg0, arg1, arg2) {
+            getObject(arg0).innerHTML = getStringFromWasm0(arg1, arg2);
+        },
+        __wbg_set_textContent_729c78ca859aa5a5: function(arg0, arg1, arg2) {
+            getObject(arg0).textContent = arg1 === 0 ? undefined : getStringFromWasm0(arg1, arg2);
         },
         __wbg_stack_3b0d974bbf31e44f: function(arg0, arg1) {
             const ret = getObject(arg1).stack;
@@ -470,17 +1117,42 @@ function __wbg_get_imports() {
             getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
             getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
         },
+        __wbg_static_accessor_GLOBAL_8eb4cd83130a11a0: function() {
+            const ret = typeof global === 'undefined' ? null : global;
+            return isLikeNone(ret) ? 0 : addHeapObject(ret);
+        },
+        __wbg_static_accessor_GLOBAL_THIS_1e7044f654e934db: function() {
+            const ret = typeof globalThis === 'undefined' ? null : globalThis;
+            return isLikeNone(ret) ? 0 : addHeapObject(ret);
+        },
+        __wbg_static_accessor_SELF_d8b50611246a6d92: function() {
+            const ret = typeof self === 'undefined' ? null : self;
+            return isLikeNone(ret) ? 0 : addHeapObject(ret);
+        },
+        __wbg_static_accessor_WINDOW_fd0bc376bf0f8b42: function() {
+            const ret = typeof window === 'undefined' ? null : window;
+            return isLikeNone(ret) ? 0 : addHeapObject(ret);
+        },
+        __wbg_value_c227f843d21da141: function(arg0) {
+            const ret = getObject(arg0).value;
+            return addHeapObject(ret);
+        },
         __wbindgen_generic_0000000000000001: function(arg0) {
             // Cast intrinsic for `F64 -> Externref`.
             const ret = arg0;
             return addHeapObject(ret);
         },
-        __wbindgen_generic_0000000000000002: function(arg0, arg1) {
+        __wbindgen_generic_0000000000000002: function(arg0) {
+            // Cast intrinsic for `I64 -> Externref`.
+            const ret = arg0;
+            return addHeapObject(ret);
+        },
+        __wbindgen_generic_0000000000000003: function(arg0, arg1) {
             // Cast intrinsic for `Ref(String) -> Externref`.
             const ret = getStringFromWasm0(arg0, arg1);
             return addHeapObject(ret);
         },
-        __wbindgen_generic_0000000000000003: function(arg0) {
+        __wbindgen_generic_0000000000000004: function(arg0) {
             // Cast intrinsic for `U64 -> Externref`.
             const ret = BigInt.asUintN(64, arg0);
             return addHeapObject(ret);
@@ -498,6 +1170,10 @@ function __wbg_get_imports() {
         "./vb6interpret_bg.js": import0,
     };
 }
+
+const WasmProjectFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_wasmproject_free(ptr, 1));
 
 function addHeapObject(obj) {
     if (heap_next === heap.length) heap.push(heap.length + 1);
@@ -579,6 +1255,21 @@ function dropObject(idx) {
     heap_next = idx;
 }
 
+function getArrayJsValueFromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    const mem = getDataViewMemory0();
+    const result = [];
+    for (let i = ptr; i < ptr + 4 * len; i += 4) {
+        result.push(takeObject(mem.getUint32(i, true)));
+    }
+    return result;
+}
+
+function getArrayU8FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
+}
+
 let cachedDataViewMemory0 = null;
 function getDataViewMemory0() {
     if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || (cachedDataViewMemory0.buffer.detached === undefined && cachedDataViewMemory0.buffer !== wasm.memory.buffer)) {
@@ -605,7 +1296,7 @@ function handleError(f, args) {
     try {
         return f.apply(this, args);
     } catch (e) {
-        wasm.__wbindgen_export4(addHeapObject(e));
+        wasm.__wbindgen_export3(addHeapObject(e));
     }
 }
 

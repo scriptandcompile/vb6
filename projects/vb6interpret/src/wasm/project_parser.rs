@@ -4,6 +4,8 @@
 //! bridge (`run_bridge`) and the handle-based form-mode bridge
 //! (`exec_bridge`) can reuse the same parsing and project-detection logic.
 
+use std::collections::HashMap;
+
 use wasm_bindgen::prelude::*;
 
 use crate::project::{LoadedClass, LoadedForm, LoadedModule, StartupObject};
@@ -18,26 +20,9 @@ pub(super) fn js_map_to_byte_pairs(map: &JsValue) -> Result<Vec<(String, Vec<u8>
     if map.is_undefined() {
         return Ok(Vec::new());
     }
-    let map_obj: js_sys::Map = map
-        .clone()
-        .dyn_into()
-        .map_err(|_| JsError::new("expected a JS Map"))?;
-    let keys: js_sys::Array = map_obj
-        .keys()
-        .dyn_into()
-        .map_err(|_| JsError::new("expected iterable keys"))?;
-    let len = keys.length();
-    let mut result = Vec::with_capacity(len as usize);
-    for i in 0..len {
-        let key = keys.get(i);
-        let key_str = key
-            .as_string()
-            .ok_or_else(|| JsError::new("map key is not a string"))?;
-        let value = map_obj.get(&key);
-        let bytes = js_sys::Uint8Array::from(value);
-        result.push((key_str, bytes.to_vec()));
-    }
-    Ok(result)
+    let pairs: HashMap<String, Vec<u8>> =
+        serde_wasm_bindgen::from_value(map.clone()).map_err(|e| JsError::new(&e.to_string()))?;
+    Ok(pairs.into_iter().collect())
 }
 
 /// Parse a collection of `(filename, raw_bytes)` pairs into [`LoadedModule`] entries.

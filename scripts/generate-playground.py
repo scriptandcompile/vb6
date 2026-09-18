@@ -123,6 +123,11 @@ def build_wasm(wasm_pack, project_config, output_dir, no_typescript):
     if project_config["no_default_features"]:
         cmd.append("--no-default-features")
 
+    cargo_feature = project_config.get("cargo_features")
+    if cargo_feature:
+        cmd.append("--features")
+        cmd.append(cargo_feature)
+
     if no_typescript:
         cmd.append("--no-typescript")
 
