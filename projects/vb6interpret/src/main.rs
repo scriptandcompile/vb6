@@ -333,31 +333,32 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
     use tauri::Manager;
     use tauri::generate_handler;
 
-    // Extract startup form name before the project is moved into the engine,
+    // Extract startup form name/caption before the project is moved into the engine,
     // and calculate the window size from the form's total dimensions
     // (including title bar, borders, and scrollbars).
-    let (startup_form_name, window_width, window_height) = match &project.startup_object {
+    let (startup_form_name, form_caption, window_width, window_height) = match &project.startup_object {
         StartupObject::Form { form_name } => {
-            let form = project.forms.iter().find(|f| f.name == *form_name);
-            let (w, h) = form
+            let (w, h, caption) = project.forms.iter().find(|f| f.name == *form_name)
                 .map(|f| match &f.parsed.form {
                     vb6parse::language::FormRoot::Form(frm) => {
                         let dpi = 96;
                         let w = twips_to_pixels(frm.properties.client_width, dpi) as f64;
                         let h = twips_to_pixels(frm.properties.client_height, dpi) as f64;
-                        (w.max(10.0), h.max(10.0))
+                        let caption = frm.properties.caption.clone();
+                        (w.max(10.0), h.max(10.0), caption)
                     }
                     vb6parse::language::FormRoot::MDIForm(mdi) => {
                         let dpi = 96;
                         let w = twips_to_pixels(mdi.properties.width, dpi) as f64;
                         let h = twips_to_pixels(mdi.properties.height, dpi) as f64;
-                        (w.max(10.0), h.max(10.0))
+                        let caption = mdi.properties.caption.clone();
+                        (w.max(10.0), h.max(10.0), caption)
                     }
                 })
-                .unwrap_or((10.0, 10.0));
-            (form_name.clone(), w, h)
+                .unwrap_or((10.0, 10.0, String::new()));
+            (form_name.clone(), caption, w, h)
         }
-        _ => (String::new(), 10.0, 10.0),
+        _ => (String::new(), String::new(), 10.0, 10.0),
     };
 
     let engine_handle = tauri_cmds::spawn_engine(project);
@@ -370,6 +371,7 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
         &form_html,
         &css,
         &startup_form_name,
+        &form_caption,
         engine_handle,
         form_handle,
     ));
@@ -424,7 +426,7 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
             // so the webview loads a real document (with the form already in the
             // DOM) instead of an `about:blank` shell that needs JS injection.
             let window = tauri::WebviewWindowBuilder::new(app, "vb6interpret", page_url)
-                .title("VB6Interpret")
+                .title(&form_caption)
                 .inner_size(window_width, window_height)
                 .resizable(true)
                 .build()

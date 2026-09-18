@@ -18,14 +18,15 @@
 ///
 /// `form_html` is the rendered VB6 control markup (injected directly into
 /// `<body>` so the form is visible before any script runs), `css` is the bare
-/// VB6 stylesheet, and `form_name`/`engine_handle`/`form_handle` are exposed
-/// to the inline script so it can auto-attach event bindings and dispatch
-/// events over IPC. The form handle is used to look up the form's natural
-/// dimensions for sizing the body.
+/// VB6 stylesheet, `form_name`/`form_caption`/`engine_handle`/`form_handle`
+/// are exposed to the inline script so it can auto-attach event bindings and
+/// dispatch events over IPC. The form handle is used to look up the form's
+/// natural dimensions for sizing the body.
 pub fn build_page(
     form_html: &str,
     css: &str,
     form_name: &str,
+    form_caption: &str,
     engine_handle: u32,
     form_handle: u32,
 ) -> String {
@@ -53,13 +54,19 @@ pub fn build_page(
         " style=\"width:100%;height:100%;\"".to_string()
     };
 
+    let title = if form_caption.is_empty() {
+        "VB6Interpret".to_string()
+    } else {
+        form_caption.to_string()
+    };
+
     format!(
         r#"<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VB6Interpret</title>
+    <title>{title}</title>
     <style>
 {css}
     </style>
