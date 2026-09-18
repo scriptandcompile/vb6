@@ -78,8 +78,8 @@ mod integration_tests {
             "html should contain label caption"
         );
         assert!(
-            html.contains("&amp;OK"),
-            "html should contain escaped button caption"
+            html.contains("vb6-mnemonic"),
+            "html should contain mnemonic span"
         );
     }
 
