@@ -306,6 +306,7 @@ fn scoped_control_rules() -> Vec<String> {
              .vb6-app .vb6-vscrollbar:disabled",
             &disabled_control_style(),
         ),
+        vb6_rule(".vb6-app .vb6-mnemonic", &mnemonic_style()),
     ]
 }
 
@@ -351,6 +352,7 @@ fn bare_control_rules() -> Vec<String> {
              .vb6-vscrollbar:disabled",
             &disabled_control_style(),
         ),
+        vb6_rule(".vb6-mnemonic", &mnemonic_style()),
     ]
 }
 
@@ -421,6 +423,12 @@ fn picturebox_style() -> String {
 fn image_style() -> String {
     r#"  background-color: transparent;
   border: none;"#
+        .to_string()
+}
+
+fn mnemonic_style() -> String {
+    r#"  text-decoration: underline;
+  cursor: default;"#
         .to_string()
 }
 

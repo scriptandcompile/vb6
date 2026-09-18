@@ -59,6 +59,38 @@ impl TauriRenderer {
         Self { with_scope }
     }
 
+    /// Process a VB6 caption string to handle ampersand mnemonics.
+    ///
+    /// VB6 uses `&` to mark mnemonic/accelerator keys:
+    /// - `&OK` → `<span class="vb6-mnemonic">O</span>K`
+    /// - `&&` → `&` (escaped ampersand)
+    fn process_mnemonic(caption: &str) -> String {
+        let mut result = String::with_capacity(caption.len() + 8);
+        let mut chars = caption.chars().peekable();
+
+        while let Some(c) = chars.next() {
+            if c == '&' {
+                if let Some(&next) = chars.peek() {
+                    if next == '&' {
+                        result.push('&');
+                        chars.next();
+                    } else {
+                        chars.next();
+                        result.push_str("<span class=\"vb6-mnemonic\">");
+                        result.push(next);
+                        result.push_str("</span>");
+                    }
+                } else {
+                    result.push('&');
+                }
+            } else {
+                result.push(c);
+            }
+        }
+
+        result
+    }
+
     /// Generate the opening tag for the scope root, if enabled.
     #[must_use]
     pub fn root_open(&self) -> String {
@@ -159,12 +191,18 @@ impl Renderer for TauriRenderer {
                 )
             }
             LayoutControlType::CommandButton => {
+                let caption = TauriRenderer::process_mnemonic(value);
+                let inner = if caption.contains("<span") {
+                    caption
+                } else {
+                    html_escape(value).to_string()
+                };
                 format!(
                     r#"<button id="{}" class="vb6-commandbutton" style="{}"{}>{}</button>"#,
                     html_escape(&leaf.name),
                     html_escape(&style),
                     disabled,
-                    html_escape(value)
+                    inner
                 )
             }
             LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => {
@@ -269,12 +307,18 @@ impl Renderer for TauriRenderer {
                 String::new()
             }
             _ => {
+                let processed = TauriRenderer::process_mnemonic(value);
+                let inner = if processed.contains("<span") {
+                    processed
+                } else {
+                    html_escape(value).to_string()
+                };
                 format!(
                     r#"<div id="{}" class="vb6-{}" style="{}">{}</div>"#,
                     html_escape(&leaf.name),
                     leaf.control_type.css_class(),
                     html_escape(&style),
-                    html_escape(value)
+                    inner
                 )
             }
         }
@@ -315,7 +359,8 @@ impl Renderer for TauriRenderer {
                     html_escape(&container.name),
                     html_escape(&frame_style)
                 ));
-                html.push_str(&format!("<legend>{}</legend>", html_escape(caption)));
+                let legend_caption = TauriRenderer::process_mnemonic(caption);
+                html.push_str(&format!("<legend>{}</legend>", legend_caption));
             }
             _ => {
                 let mut container_style = style;
@@ -496,7 +541,8 @@ mod tests {
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains("<button"));
         assert!(html.contains("vb6-commandbutton"));
-        assert!(html.contains("&amp;OK"));
+        assert!(html.contains("vb6-mnemonic"));
+        assert!(html.contains(">O</span>K"));
     }
 
     #[test]
