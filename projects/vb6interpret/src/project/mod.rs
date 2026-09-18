@@ -198,14 +198,14 @@ impl LoadedForm {
 /// Recursively collect control names from a control and its children.
 fn collect_control_names(control: &vb6parse::language::Control, names: &mut Vec<String>) {
     names.push(control.name().to_string());
-    if let vb6parse::language::ControlKind::Custom {
-        properties: _,
-        property_groups: _,
-    } = control.kind()
-    {
-        // Custom controls don't typically contain nested controls in the
-        // same way frames/pictures do - nested controls appear as siblings
-        // in the form's control list.
+    match control.kind() {
+        vb6parse::language::ControlKind::Frame { controls, .. }
+        | vb6parse::language::ControlKind::PictureBox { controls, .. } => {
+            for child in controls {
+                collect_control_names(child, names);
+            }
+        }
+        _ => {}
     }
 }
 
