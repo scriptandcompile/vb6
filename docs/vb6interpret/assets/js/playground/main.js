@@ -1,4 +1,4 @@
-import init, { build_debug_trace, clear_files, dump_clock, dump_env, dump_files, dump_settings, install_file, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, set_clock, set_env } from "../../wasm/vb6interpret.js";
+import init, { build_debug_trace, clear_files, call_sub, dispose_state, dump_clock, dump_env, dump_files, dump_settings, get_form_procedures, install_file, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, run_project, set_clock, set_env, show_form, unload_form } from "../../wasm/vb6interpret.js";
 import { getDefaultExample, getExample } from "./examples.js";
 import { getTestForm, getTestFormNames } from "./test-forms.js";
 import * as Editor from "./editor.js";
@@ -174,6 +174,14 @@ async function initPlayground() {
         await init();
         init_panic_hook();
         state.wasmReady = true;
+
+        // Expose WASM functions on window for form-windows.js (non-module script)
+        window.run_project = run_project;
+        window.dispose_state = dispose_state;
+        window.show_form = show_form;
+        window.get_form_procedures = get_form_procedures;
+        window.call_sub = call_sub;
+        window.unload_form = unload_form;
         loadSettingsFromLocalStorage();
         loadEnvFromLocalStorage();
         elements.wasmStatus.textContent = "WebAssembly ready";
@@ -332,7 +340,7 @@ function enableFileTypeSelector() {
 
 async function runForm(code) {
     if (state.currentStateHandle !== null) {
-        window.dispose_state(state.currentStateHandle);
+        dispose_state(state.currentStateHandle);
         state.currentStateHandle = null;
     }
 
@@ -342,7 +350,7 @@ async function runForm(code) {
         const encoder = new TextEncoder();
         const formBytes = encoder.encode(code);
 
-        const runResult = await window.run_project(
+        const runResult = await run_project(
             formBytes,
             new Map(),
             new Map(),
@@ -668,7 +676,7 @@ function resetExecutionSession() {
         state.activeFilePath = null;
     }
     if (state.currentStateHandle !== null) {
-        window.dispose_state(state.currentStateHandle);
+        dispose_state(state.currentStateHandle);
         state.currentStateHandle = null;
     }
     renderOutput({
@@ -745,7 +753,7 @@ async function runFormE2EChecks() {
         const formBytes = encoder.encode(code);
 
         // Run the project (create state handle)
-        const runResult = await window.run_project(
+        const runResult = await run_project(
             formBytes,
             new Map(),
             new Map(),
@@ -1364,23 +1372,23 @@ function setupFilePicker() {
         const input = document.createElement("input");
         input.type = "file";
         input.accept = ".frm";
-        input.onchange = async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-            try {
-                if (state.currentStateHandle !== null) {
-                    window.dispose_state(state.currentStateHandle);
-                    state.currentStateHandle = null;
-                }
-                if (state.currentFormHandle !== null) {
-                    formManager.windows.delete(state.currentFormHandle);
-                    state.currentFormHandle = null;
-                }
+            input.onchange = async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                try {
+                    if (state.currentStateHandle !== null) {
+                        dispose_state(state.currentStateHandle);
+                        state.currentStateHandle = null;
+                    }
+                    if (state.currentFormHandle !== null) {
+                        formManager.windows.delete(state.currentFormHandle);
+                        state.currentFormHandle = null;
+                    }
 
-                const bytes = new Uint8Array(await file.arrayBuffer());
+                    const bytes = new Uint8Array(await file.arrayBuffer());
 
-                setStatus("Loading form", "pending");
-                const runResult = await window.run_project(
+                    setStatus("Loading form", "pending");
+                    const runResult = await run_project(
                     bytes,
                     new Map(),
                     new Map(),
