@@ -50,6 +50,11 @@ class FormWindowManager {
         const container = document.createElement('div');
         container.id = containerId;
 
+        // Verify the element exists in the DOM before calling WASM
+        if (!document.getElementById(containerId)) {
+            document.body.appendChild(container);
+        }
+
         const handle = await window.show_form(formBytes, containerId);
 
         const bindings = await window.get_form_procedures(handle);
@@ -133,7 +138,7 @@ class FormWindow {
 
     _attachBindings(contentEl) {
         for (const binding of this.bindings) {
-            const el = contentEl.getElementById(binding.control);
+            const el = contentEl.querySelector(`[id="${binding.control}"]`);
             if (!el) continue;
 
             const handler = () => {
