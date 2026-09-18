@@ -1,4 +1,4 @@
-import init, { build_debug_trace, clear_files, call_sub, dispose_state, dump_clock, dump_env, dump_files, dump_settings, get_form_procedures, install_file, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, run_project, set_clock, set_env, show_form, unload_form } from "../../wasm/vb6interpret.js";
+import init, { build_debug_trace, clear_files, call_sub, dispose_state, dump_clock, dump_env, dump_files, dump_settings, get_form_procedures, get_form_caption, install_file, install_setting, interpret_vb6_code, init_panic_hook, remove_env, remove_setting, run_project, set_clock, set_env, show_form, unload_form } from "../../wasm/vb6interpret.js";
 import { getDefaultExample, getExample } from "./examples.js";
 import * as Editor from "./editor.js";
 import { createZip } from "./zip.js";
@@ -19,7 +19,6 @@ const state = {
 };
 
 const elements = {
-    fileType: document.getElementById("file-type"),
     examples: document.getElementById("examples"),
     runButton: document.getElementById("run-btn"),
     openFormButton: document.getElementById("open-form-btn"),
@@ -175,6 +174,7 @@ async function initPlayground() {
         window.dispose_state = dispose_state;
         window.show_form = show_form;
         window.get_form_procedures = get_form_procedures;
+        window.get_form_caption = get_form_caption;
         window.call_sub = call_sub;
         window.unload_form = unload_form;
         loadSettingsFromLocalStorage();
@@ -185,7 +185,6 @@ async function initPlayground() {
         renderFiles();
         syncExecutionControls();
         updateRunButtonLabel();
-        enableFileTypeSelector();
         window.setInterval(() => {
             if (state.wasmReady) {
                 renderClock();
@@ -204,7 +203,6 @@ function bindEvents() {
         resetDebugProgress();
         Editor.clearExecutionHighlight();
         saveToLocalStorage();
-        updateRunButtonLabel();
     });
 
     elements.examples.addEventListener("change", (event) => {
@@ -216,10 +214,6 @@ function bindEvents() {
         Editor.setEditorContent(example.code);
         saveToLocalStorage();
         event.target.value = "";
-    });
-
-    elements.fileType.addEventListener("change", (event) => {
-        updateRunButtonLabel();
     });
 
     elements.runButton.addEventListener("click", runModuleOrForm);
@@ -299,25 +293,7 @@ function detectFileType(code) {
 }
 
 function updateRunButtonLabel() {
-    const code = Editor.getEditorContent();
-    if (detectFileType(code) === "form") {
-        elements.runButton.innerHTML = '<span class="btn-icon">▶</span> Run Form';
-    } else {
-        elements.runButton.innerHTML = '<span class="btn-icon">▶</span> Run Module';
-    }
-}
-
-function enableFileTypeSelector() {
-    if (!elements.fileType) return;
-    elements.fileType.disabled = false;
-    elements.fileType.addEventListener("change", () => {
-        const selected = elements.fileType.value;
-        if (selected === "form") {
-            elements.runButton.innerHTML = '<span class="btn-icon">▶</span> Run Form';
-        } else {
-            elements.runButton.innerHTML = '<span class="btn-icon">▶</span> Run Module';
-        }
-    });
+    elements.runButton.innerHTML = '<span class="btn-icon">▶</span> Run';
 }
 
 async function runForm(code) {
@@ -348,13 +324,8 @@ async function runForm(code) {
         state.currentStateHandle = runResult.state_handle ?? null;
 
         const { handle: formHandle, bindings, containerId } =
-            await formManager.showForm(formBytes, state.currentStateHandle);
+            await window.formManager.showForm(formBytes, state.currentStateHandle);
         state.currentFormHandle = formHandle;
-
-        const form = formManager.windows.get(formHandle);
-        if (form) {
-            form.setTitle("Form");
-        }
 
         console.log("Form loaded:", formHandle, "container:", containerId);
         setStatus("Form running", "success");
@@ -1224,7 +1195,7 @@ function setupFilePicker() {
                         state.currentStateHandle = null;
                     }
                     if (state.currentFormHandle !== null) {
-                        formManager.windows.delete(state.currentFormHandle);
+                        window.formManager.windows.delete(state.currentFormHandle);
                         state.currentFormHandle = null;
                     }
 
@@ -1246,19 +1217,16 @@ function setupFilePicker() {
 
                 state.currentStateHandle = runResult.state_handle ?? null;
                 const { handle: formHandle, bindings, containerId } =
-                    await formManager.showForm(bytes, state.currentStateHandle);
+                    await window.formManager.showForm(bytes, state.currentStateHandle);
                 state.currentFormHandle = formHandle;
 
-                const form = formManager.windows.get(formHandle);
+                const form = window.formManager.windows.get(formHandle);
                 if (form) {
                     const title = file.name.replace(/\.frm$/i, "");
                     form.setTitle(title);
                 }
 
                 setStatus("Form running", "success");
-
-                // (Step 11 E2E Testing) Run verification after form loads from file
-                runFormE2EChecks();
             } catch (error) {
                 console.error("Failed to load file:", error);
                 setStatus("Error", "error");

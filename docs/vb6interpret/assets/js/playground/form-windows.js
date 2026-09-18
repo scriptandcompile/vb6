@@ -58,8 +58,9 @@ class FormWindowManager {
         const handle = await window.show_form(formBytes, containerId);
 
         const bindings = await window.get_form_procedures(handle);
+        const caption = await window.get_form_caption(handle);
 
-        const win = new FormWindow(container, bindings, stateHandle, containerId);
+        const win = new FormWindow(container, bindings, stateHandle, containerId, caption);
         win.formHandle = handle;
         this.windows.set(handle, win);
 
@@ -85,7 +86,7 @@ class FormWindowManager {
 }
 
 class FormWindow {
-    constructor(contentEl, bindings = [], stateHandle = null, containerId = 'vb6-container') {
+    constructor(contentEl, bindings = [], stateHandle = null, containerId = 'vb6-container', caption = null) {
         this.bindings = bindings;
         this.stateHandle = stateHandle;
         this.containerId = containerId;
@@ -93,8 +94,8 @@ class FormWindow {
 
         this.el = document.createElement('div');
         this.el.className = 'vb6-form-window';
-        this.el.style.left = '50px';
-        this.el.style.top = '50px';
+        this.el.style.left = '20px';
+        this.el.style.top = '120px';
         this.el.style.zIndex = formManager._nextZIndex();
 
         const titlebar = document.createElement('div');
@@ -102,7 +103,7 @@ class FormWindow {
 
         const title = document.createElement('span');
         title.className = 'vb6-form-title';
-        title.textContent = 'Form';
+        title.textContent = caption || 'Form';
         this.titleEl = title;
 
         const closeBtn = document.createElement('button');
@@ -204,5 +205,6 @@ class FormWindow {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    formManager = new FormWindowManager();
+    window.formManager = new FormWindowManager();
+    formManager = window.formManager;
 });
