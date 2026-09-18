@@ -41,7 +41,10 @@ use crate::layout::model::LayoutControlType;
 use wasm_bindgen::JsCast;
 
 #[cfg(target_arch = "wasm32")]
-use web_sys::{Document, Element, Node};
+use web_sys::{Document, Node};
+
+#[cfg(target_arch = "wasm32")]
+pub use web_sys::Element;
 
 /// WASM renderer that creates `web_sys::Element` objects.
 ///
@@ -191,7 +194,8 @@ impl WebSysRenderer {
     /// Check if a node with the given ID is a child of the given parent element.
     #[cfg(target_arch = "wasm32")]
     fn node_is_child_of(&self, id: &NodeId, parent: &Element) -> bool {
-        if let Some(child) = parent.get_element_by_id(&id.name) {
+        let selector = format!("#{}", id.name);
+        if let Ok(Some(child)) = parent.query_selector(&selector) {
             return child.id() == id.name;
         }
         false
@@ -200,7 +204,7 @@ impl WebSysRenderer {
     /// Update the content of an element based on a value change.
     #[cfg(target_arch = "wasm32")]
     fn apply_value_change(&self, el: &Element, node: &LayoutNode, new_value: &str) {
-        let tag = tag_for_control(node.control_type());
+        let tag = tag_for_control(*node.control_type());
         let tag_lower = tag.to_lowercase();
 
         if tag_lower == "button" {
@@ -291,15 +295,11 @@ impl WebSysRenderer {
                 }
             }
             Some(DiffChange {
-                kind:
-                    DiffKind::ValueChanged {
-                        new_value: ref new_val,
-                        ..
-                    },
+                kind: DiffKind::ValueChanged { new_value, .. },
                 ..
             }) => {
                 if let Some(el) = dom.borrow().get(&node.node_id()) {
-                    let val = new_val.as_deref().unwrap_or("");
+                    let val = new_value.as_deref().unwrap_or("");
                     self.apply_value_change(el, node, val);
                     el.clone()
                 } else {
@@ -310,16 +310,11 @@ impl WebSysRenderer {
                 }
             }
             Some(DiffChange {
-                kind:
-                    DiffKind::VisibilityChanged {
-                        new_visible,
-                        new_enabled,
-                        ..
-                    },
+                kind: DiffKind::VisibilityChanged { new_visible, .. },
                 ..
             }) => {
                 if let Some(el) = dom.borrow().get(&node.node_id()) {
-                    self.apply_visibility_change(el, *new_visible, *new_enabled);
+                    self.apply_visibility_change(el, *new_visible, true);
                     el.clone()
                 } else {
                     let el = self.render_node(node);
@@ -328,16 +323,11 @@ impl WebSysRenderer {
                 }
             }
             Some(DiffChange {
-                kind:
-                    DiffKind::EnabledChanged {
-                        new_enabled,
-                        new_visible,
-                        ..
-                    },
+                kind: DiffKind::EnabledChanged { new_enabled, .. },
                 ..
             }) => {
                 if let Some(el) = dom.borrow().get(&node.node_id()) {
-                    self.apply_visibility_change(el, *new_visible, *new_enabled);
+                    self.apply_visibility_change(el, true, *new_enabled);
                     el.clone()
                 } else {
                     let el = self.render_node(node);
@@ -346,7 +336,7 @@ impl WebSysRenderer {
                 }
             }
             Some(DiffChange {
-                kind: DiffKind::Inserted { node: ref inserted },
+                kind: DiffKind::Inserted { node: inserted },
                 ..
             }) => {
                 let parent_el = parent
@@ -409,7 +399,8 @@ impl WebSysRenderer {
     /// Get a child element by its node ID from a parent element.
     #[cfg(target_arch = "wasm32")]
     fn get_child_element(&self, parent: &Element, child: &LayoutNode) -> Option<Element> {
-        parent.get_element_by_id(&child.node_id().name).cloned()
+        let selector = format!("#{}", child.node_id().name);
+        parent.query_selector(&selector).ok().flatten()
     }
 }
 
@@ -517,7 +508,10 @@ impl Renderer for WebSysRenderer {
     ) -> Element {
         let result = self.render_node_with_diff(node, diff, parent);
         // Sync local cache with the provided external cache
-        *dom_nodes = self.dom_nodes.borrow().clone();
+        dom_nodes.borrow_mut().clear();
+        dom_nodes
+            .borrow_mut()
+            .extend(self.dom_nodes.borrow().clone());
         result
     }
 
@@ -531,7 +525,7 @@ impl Renderer for WebSysRenderer {
     ) -> Option<Element> {
         match &change.kind {
             DiffKind::Same => dom_nodes.borrow().get(&node.node_id()).cloned(),
-            DiffKind::Inserted { node: ref inserted } => {
+            DiffKind::Inserted { node: inserted } => {
                 let parent_el = parent
                     .cloned()
                     .or_else(|| self.find_parent_for(inserted.as_ref(), None));
@@ -559,25 +553,17 @@ impl Renderer for WebSysRenderer {
                     None
                 }
             }
-            DiffKind::VisibilityChanged {
-                new_visible,
-                new_enabled,
-                ..
-            } => {
+            DiffKind::VisibilityChanged { new_visible, .. } => {
                 if let Some(el) = dom_nodes.borrow().get(&node.node_id()) {
-                    self.apply_visibility_change(el, *new_visible, *new_enabled);
+                    self.apply_visibility_change(el, *new_visible, true);
                     Some(el.clone())
                 } else {
                     None
                 }
             }
-            DiffKind::EnabledChanged {
-                new_enabled,
-                new_visible,
-                ..
-            } => {
+            DiffKind::EnabledChanged { new_enabled, .. } => {
                 if let Some(el) = dom_nodes.borrow().get(&node.node_id()) {
-                    self.apply_visibility_change(el, *new_visible, *new_enabled);
+                    self.apply_visibility_change(el, true, *new_enabled);
                     Some(el.clone())
                 } else {
                     None
@@ -600,8 +586,8 @@ impl ThemeRenderer for WebSysRenderer {
             .create_element("style")
             .expect("create style element");
         style.set_text_content(Some(&css));
-        if let Some(head) = self.doc.head() {
-            let _ = head.append_child(&style);
+        if let Some(body) = self.doc.body() {
+            let _ = body.append_child(&style);
         }
     }
 }
@@ -617,8 +603,8 @@ impl CssInjector for WebSysRenderer {
             .create_element("style")
             .expect("create style element");
         style.set_text_content(Some(css));
-        if let Some(head) = self.doc.head() {
-            let _ = head.append_child(&style);
+        if let Some(body) = self.doc.body() {
+            let _ = body.append_child(&style);
         }
     }
 }

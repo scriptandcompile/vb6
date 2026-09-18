@@ -164,8 +164,8 @@ pub trait Renderer {
         _parent: Option<&Element>,
         _dom_nodes: &mut std::cell::RefCell<std::collections::HashMap<NodeId, Element>>,
     ) -> Element {
-        // Default: full re-render. Override in WebSysRenderer.
-        self.render_node(_node)
+        // Default: not implemented. Override in WebSysRenderer.
+        unimplemented!("render_node_with_diff_dom is only implemented by WebSysRenderer")
     }
 
     /// Apply a diff change directly to the DOM.

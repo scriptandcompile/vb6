@@ -151,6 +151,15 @@ impl LayoutNode {
         }
     }
 
+    /// Returns a reference to the control type of this node.
+    #[must_use]
+    pub fn control_type(&self) -> &LayoutControlType {
+        match self {
+            Self::Container(c) => &c.control_type,
+            Self::Leaf(l) => &l.control_type,
+        }
+    }
+
     /// Returns `true` if this node is visible.
     #[must_use]
     pub fn visible(&self) -> bool {
