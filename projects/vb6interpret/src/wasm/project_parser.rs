@@ -13,10 +13,16 @@ use vb6parse::files::ModuleFile;
 use vb6parse::io::SourceFile;
 
 /// Extract key-value pairs from a JS object (keys: strings, values: Uint8Array)
-/// into a `Vec<(String, Vec<u8>)>`.
+/// or a raw `Uint8Array` (treated as a single module/form file).
+/// Returns `Vec<(filename, bytes)>` — for raw bytes the filename is empty.
 pub(super) fn js_map_to_byte_pairs(map: &JsValue) -> Result<Vec<(String, Vec<u8>)>, JsError> {
     if map.is_undefined() || map.is_null() {
         return Ok(Vec::new());
+    }
+
+    // If the value is a raw Uint8Array, treat it as a single file.
+    if let Ok(bytes) = serde_wasm_bindgen::from_value::<Vec<u8>>(map.clone()) {
+        return Ok(vec![(String::new(), bytes)]);
     }
 
     let keys: js_sys::Array = js_sys::Reflect::own_keys(map)
