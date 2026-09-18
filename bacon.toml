@@ -1,0 +1,16 @@
+default-context = "native"
+
+[contexts.native]
+command = ["cargo", "check", "--workspace"]
+
+[contexts.wasm]
+command = [
+    "cargo", "check",
+    "--target", "wasm32-unknown-unknown",
+    "--package", "vb6parse",
+    "--package", "vb6semantic",
+    "--package", "vb6runtime",
+    "--features", "wasm",
+    "--package", "vb6interpret",
+    "--no-default-features", "--features", "wasm",
+]
