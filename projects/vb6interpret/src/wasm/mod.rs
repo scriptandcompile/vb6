@@ -147,6 +147,12 @@ impl WasmProject {
     }
 }
 
+impl Default for WasmProject {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Output returned from the interpreter playground.
 #[derive(Serialize, Deserialize)]
 pub struct WasmRunOutput {

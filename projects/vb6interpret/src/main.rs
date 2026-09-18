@@ -6,12 +6,16 @@ use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::sync::OnceLock;
 use std::time::{Duration, Instant};
+
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
+use std::sync::OnceLock;
+
+#[cfg(feature = "tauri")]
+use vb6runtime::layout::scale::twips_to_pixels;
 
 #[cfg(feature = "tauri")]
 use vb6interpret::tauri_cmds;
-use vb6runtime::layout::scale::twips_to_pixels;
 
 use vb6interpret::{Interpreter, LoadedProject, StartupObject, project};
 use vb6parse::errors::{ErrorKind, SourceFileError};
