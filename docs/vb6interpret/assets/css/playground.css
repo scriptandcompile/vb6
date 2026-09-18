@@ -800,3 +800,85 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ── Form Window Overlay ─────────────────────────────────────────── */
+
+#form-windows-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.vb6-form-window {
+    position: absolute;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #999;
+    background: rgb(192, 192, 192);
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.35);
+    border-radius: 2px;
+    font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;
+    font-size: 12px;
+    min-width: 120px;
+    min-height: 60px;
+    user-select: none;
+}
+
+.vb6-form-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 28px;
+    min-height: 28px;
+    background: linear-gradient(90deg, #0a246a, #2b6cb0);
+    color: white;
+    padding: 0 4px;
+    cursor: move;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 28px;
+}
+
+.vb6-form-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 4px;
+}
+
+.vb6-form-close {
+    width: 24px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+    padding: 0;
+    line-height: 1;
+}
+
+.vb6-form-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.vb6-form-close:active {
+    background: rgba(255, 0, 0, 0.4);
+}
+
+.vb6-form-content {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    background: rgb(192, 192, 192);
+}
