@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - '.github/workflows/playground-wasm.yml'
+      - 'scripts/generate-playground.py'
       - 'projects/vb6parse/**'
       - 'projects/vb6semantic/**'
       - 'projects/vb6interpret/**'
@@ -96,23 +97,17 @@ jobs:
 
           if [[ "$BUILD_PARSE" == "true" ]]; then
             echo "Building vb6parse WASM"
-            pushd projects/vb6parse > /dev/null
-            python3 scripts/build-wasm.py --optimize
-            popd > /dev/null
+            python3 scripts/generate-playground.py --project vb6parse --optimize
           fi
 
           if [[ "$BUILD_SEMANTIC" == "true" ]]; then
             echo "Building vb6semantic WASM"
-            pushd projects/vb6semantic > /dev/null
-            python3 scripts/build-wasm.py --optimize
-            popd > /dev/null
+            python3 scripts/generate-playground.py --project vb6semantic --optimize
           fi
 
           if [[ "$BUILD_INTERPRET" == "true" ]]; then
             echo "Building vb6interpret WASM"
-            pushd projects/vb6interpret > /dev/null
-            python3 scripts/build-wasm.py --optimize
-            popd > /dev/null
+            python3 scripts/generate-playground.py --project vb6interpret --optimize
           fi
 
       - name: Upload WASM to release
