@@ -47,12 +47,12 @@ class FormWindowManager {
     async showForm(formBytes, stateHandle = null) {
         const containerId = `vb6-container-${this._formIndex++}`;
 
+        const container = document.createElement('div');
+        container.id = containerId;
+
         const handle = await window.show_form(formBytes, containerId);
 
         const bindings = await window.get_form_procedures(handle);
-
-        const container = document.createElement('div');
-        container.id = containerId;
 
         const win = new FormWindow(container, bindings, stateHandle, containerId);
         win.formHandle = handle;
