@@ -24,7 +24,7 @@ impl ClockBackend for NativeBackend {
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(feature = "wasm"))]
 fn system_set_native(ts: Timestamp) -> Result<(), SystemClockError> {
     // jiff::Timestamp is seconds + subsec nanoseconds since Unix epoch.
     let epoch_sec = ts.as_second();
@@ -86,7 +86,7 @@ fn system_set_native(ts: Timestamp) -> Result<(), SystemClockError> {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "wasm")]
 fn system_set_native(_ts: Timestamp) -> Result<(), SystemClockError> {
     Err(SystemClockError::NotSupported)
 }
