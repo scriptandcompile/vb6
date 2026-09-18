@@ -54,6 +54,10 @@ wasm-bindgen = { workspace = true, optional = true }
 tempfile.workspace = true
 criterion.workspace = true
 
+[[bench]]
+name = "layout_bench"
+harness = false
+
 [features]
 default = []
 # com-interop = []  # Future: *might* be able to add COM object support.
