@@ -10,6 +10,7 @@
 //! structs and the output converters they share.
 
 mod form_bridge;
+mod project_parser;
 mod run_bridge;
 mod state_bridge;
 

@@ -5,13 +5,13 @@
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::prelude::*;
 
+use super::project_parser::{
+    detect_startup, js_map_to_byte_pairs, parse_classes, parse_forms, parse_modules,
+};
 use super::{WasmDebugState, WasmDebugTrace, WasmProject, WasmRunOutput, WasmVariableInfo};
 use crate::Interpreter;
 use crate::interpreter::{DebugSnapshot, DebugVariable};
-use crate::project::{LoadedClass, LoadedForm, LoadedModule, LoadedProject, StartupObject};
-use vb6parse::files::ClassFile;
-use vb6parse::files::FormFile;
-use vb6parse::io::SourceFile;
+use crate::project::{LoadedForm, LoadedProject};
 use vb6runtime::state::clock as clock_state;
 use vb6runtime::state::file as file_state;
 
@@ -85,7 +85,7 @@ fn cursor_to_wasm(snapshot: &DebugSnapshot, code: &str, delta: u32) -> Option<[u
     ])
 }
 
-pub(super) fn byte_offset_to_line_column(source: &str, offset: usize) -> (usize, usize) {
+pub fn byte_offset_to_line_column(source: &str, offset: usize) -> (usize, usize) {
     let target = offset.min(source.len());
     let mut line = 1usize;
     let mut line_start = 0usize;
@@ -256,86 +256,6 @@ pub fn build_debug_trace(code: &str) -> Result<JsValue, JsError> {
     })?)
 }
 
-/// Extract key-value pairs from a JS `Map<K, Uint8Array>` into a `Vec<(String, Vec<u8>)>`.
-fn js_map_to_byte_pairs(map: &JsValue) -> Result<Vec<(String, Vec<u8>)>, JsError> {
-    if map.is_undefined() {
-        return Ok(Vec::new());
-    }
-    let map_obj: js_sys::Map = map.dyn_into().map_err(|_| "expected a JS Map")?;
-    let entries: Vec<(String, Vec<u8>)> = js_sys::Uint8Array::new(&JsValue::NULL).to_vec(); // dummy — not used, just to get an iterator
-    // Actually iterate via keys() and values() together
-    let keys = map_obj.keys();
-    let len = keys.length();
-    let mut result = Vec::with_capacity(len as usize);
-    for i in 0..len {
-        let key = keys.get(i);
-        let key_str = key
-            .as_string()
-            .ok_or_else(|| JsError::new("map key is not a string"))?;
-        let value = map_obj.get(&key);
-        let bytes = js_sys::Uint8Array::from(value);
-        result.push((key_str, bytes.to_vec()));
-    }
-    Ok(result)
-}
-
-/// Parse a collection of `(filename, raw_bytes)` pairs into [`LoadedModule`] entries.
-fn parse_modules(pairs: Vec<(String, Vec<u8>)>) -> Result<Vec<LoadedModule>, JsError> {
-    pairs
-        .into_iter()
-        .map(|(file_name, bytes)| {
-            let source = SourceFile::decode_with_replacement(&file_name, &bytes).map_err(|e| {
-                JsError::new(&format!("Failed to decode module '{}': {:?}", file_name, e))
-            })?;
-            let parsed = ModuleFile::parse(&source).unwrap_or_fail();
-            Ok(LoadedModule {
-                name: parsed.name.clone(),
-                file_name,
-                parsed,
-                raw_bytes: bytes,
-            })
-        })
-        .collect()
-}
-
-/// Parse a collection of `(filename, raw_bytes)` pairs into [`LoadedForm`] entries.
-fn parse_forms(pairs: Vec<(String, Vec<u8>)>) -> Result<Vec<LoadedForm>, JsError> {
-    pairs
-        .into_iter()
-        .map(|(file_name, bytes)| {
-            let source = SourceFile::decode_with_replacement(&file_name, &bytes).map_err(|e| {
-                JsError::new(&format!("Failed to decode form '{}': {:?}", file_name, e))
-            })?;
-            let parsed = FormFile::parse(&source).unwrap_or_fail();
-            Ok(LoadedForm {
-                name: parsed.attributes.name.clone(),
-                file_name,
-                parsed,
-                raw_bytes: bytes,
-            })
-        })
-        .collect()
-}
-
-/// Parse a collection of `(filename, raw_bytes)` pairs into [`LoadedClass`] entries.
-fn parse_classes(pairs: Vec<(String, Vec<u8>)>) -> Result<Vec<LoadedClass>, JsError> {
-    pairs
-        .into_iter()
-        .map(|(file_name, bytes)| {
-            let source = SourceFile::decode_with_replacement(&file_name, &bytes).map_err(|e| {
-                JsError::new(&format!("Failed to decode class '{}': {:?}", file_name, e))
-            })?;
-            let parsed = ClassFile::parse(&source).unwrap_or_fail();
-            Ok(LoadedClass {
-                name: parsed.header.attributes.name.clone(),
-                file_name,
-                parsed,
-                raw_bytes: bytes,
-            })
-        })
-        .collect()
-}
-
 /// Execute a multi-file VB6 project loaded from JS-provided byte maps.
 ///
 /// The `form_bytes`, `module_bytes`, and `class_bytes` arguments are JS
@@ -388,54 +308,4 @@ pub fn run_wasm_project(
             Some(super::convert_run_error(error, "", 0)),
         ))?),
     }
-}
-
-/// Detect the startup object from a raw `startup` string and the loaded
-/// forms/modules.
-fn detect_startup(startup: &str, forms: &[LoadedForm], modules: &[LoadedModule]) -> StartupObject {
-    let startup = startup.trim();
-    if startup.is_empty() {
-        return StartupObject::None;
-    }
-
-    let form_names: Vec<&str> = forms.iter().map(|f| f.name.as_str()).collect();
-    let module_names: Vec<&str> = modules.iter().map(|m| m.name.as_str()).collect();
-
-    if form_names.iter().any(|&n| n.eq_ignore_ascii_case(startup)) {
-        let matched = form_names
-            .iter()
-            .find(|&n| n.eq_ignore_ascii_case(startup))
-            .unwrap();
-        return StartupObject::Form {
-            form_name: matched.to_string(),
-        };
-    }
-
-    if let Some(dot_pos) = startup.find('.') {
-        let mod_name = &startup[..dot_pos];
-        let sub_name = &startup[dot_pos + 1..];
-        return StartupObject::SubMain {
-            module_name: mod_name.to_string(),
-            sub_name: sub_name.to_string(),
-        };
-    }
-
-    if startup.eq_ignore_ascii_case("sub main") || startup.eq_ignore_ascii_case("main") {
-        return StartupObject::SubMain {
-            module_name: String::new(),
-            sub_name: "Main".to_string(),
-        };
-    }
-
-    if module_names
-        .iter()
-        .any(|&n| n.eq_ignore_ascii_case(startup))
-    {
-        return StartupObject::SubMain {
-            module_name: startup.to_string(),
-            sub_name: "Main".to_string(),
-        };
-    }
-
-    StartupObject::None
 }
