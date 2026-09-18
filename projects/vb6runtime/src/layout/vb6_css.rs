@@ -277,12 +277,18 @@ fn scoped_control_rules() -> Vec<String> {
             ".vb6-app .vb6-hscrollbar::-webkit-slider-runnable-track",
             &track_style(),
         ),
-        vb6_rule(".vb6-app .vb6-hscrollbar::-webkit-slider-thumb", &thumb_style()),
+        vb6_rule(
+            ".vb6-app .vb6-hscrollbar::-webkit-slider-thumb",
+            &thumb_style(),
+        ),
         vb6_rule(
             ".vb6-app .vb6-vscrollbar::-webkit-slider-runnable-track",
             &v_track_style(),
         ),
-        vb6_rule(".vb6-app .vb6-vscrollbar::-webkit-slider-thumb", &v_thumb_style()),
+        vb6_rule(
+            ".vb6-app .vb6-vscrollbar::-webkit-slider-thumb",
+            &v_thumb_style(),
+        ),
         vb6_rule(".vb6-app .vb6-shape", &shape_style()),
         vb6_rule(".vb6-app .vb6-line", &line_style()),
         vb6_rule(".vb6-app .vb6-timer", &timer_style()),

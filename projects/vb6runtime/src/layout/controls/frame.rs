@@ -86,7 +86,10 @@ mod tests {
         assert!(style.background_color.is_some());
         assert!(style.color.is_some());
         assert!(style.font_family.is_none());
-        assert_eq!(style.border, Some("1px solid rgb(120, 120, 120)".to_string()));
+        assert_eq!(
+            style.border,
+            Some("1px solid rgb(120, 120, 120)".to_string())
+        );
     }
 
     #[test]

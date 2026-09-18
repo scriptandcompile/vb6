@@ -168,7 +168,9 @@ mod tests {
         let style = build_button_style(&props, &config);
         assert_eq!(
             style.background_color,
-            Some(super::super::super::model::style::CssColor::Rgb(200, 100, 50))
+            Some(super::super::super::model::style::CssColor::Rgb(
+                200, 100, 50
+            ))
         );
     }
 

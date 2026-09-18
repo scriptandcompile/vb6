@@ -4111,7 +4111,10 @@ End Sub
 
             assert!(property.is_some(), "Expected property to be parsed");
             let (key, value) = property.expect("Expected property to be parsed");
-            assert_eq!(value, expected, "value for {key} should not include the comment");
+            assert_eq!(
+                value, expected,
+                "value for {key} should not include the comment"
+            );
         }
     }
 

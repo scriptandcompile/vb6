@@ -261,11 +261,8 @@ fn js_map_to_byte_pairs(map: &JsValue) -> Result<Vec<(String, Vec<u8>)>, JsError
     if map.is_undefined() {
         return Ok(Vec::new());
     }
-    let map_obj: js_sys::Map = map
-        .dyn_into()
-        .map_err(|_| "expected a JS Map")?;
-    let entries: Vec<(String, Vec<u8>)> = js_sys::Uint8Array::new(&JsValue::NULL)
-        .to_vec(); // dummy — not used, just to get an iterator
+    let map_obj: js_sys::Map = map.dyn_into().map_err(|_| "expected a JS Map")?;
+    let entries: Vec<(String, Vec<u8>)> = js_sys::Uint8Array::new(&JsValue::NULL).to_vec(); // dummy — not used, just to get an iterator
     // Actually iterate via keys() and values() together
     let keys = map_obj.keys();
     let len = keys.length();
@@ -287,10 +284,9 @@ fn parse_modules(pairs: Vec<(String, Vec<u8>)>) -> Result<Vec<LoadedModule>, JsE
     pairs
         .into_iter()
         .map(|(file_name, bytes)| {
-            let source =
-                SourceFile::decode_with_replacement(&file_name, &bytes).map_err(|e| {
-                    JsError::new(&format!("Failed to decode module '{}': {:?}", file_name, e))
-                })?;
+            let source = SourceFile::decode_with_replacement(&file_name, &bytes).map_err(|e| {
+                JsError::new(&format!("Failed to decode module '{}': {:?}", file_name, e))
+            })?;
             let parsed = ModuleFile::parse(&source).unwrap_or_fail();
             Ok(LoadedModule {
                 name: parsed.name.clone(),
@@ -307,10 +303,9 @@ fn parse_forms(pairs: Vec<(String, Vec<u8>)>) -> Result<Vec<LoadedForm>, JsError
     pairs
         .into_iter()
         .map(|(file_name, bytes)| {
-            let source =
-                SourceFile::decode_with_replacement(&file_name, &bytes).map_err(|e| {
-                    JsError::new(&format!("Failed to decode form '{}': {:?}", file_name, e))
-                })?;
+            let source = SourceFile::decode_with_replacement(&file_name, &bytes).map_err(|e| {
+                JsError::new(&format!("Failed to decode form '{}': {:?}", file_name, e))
+            })?;
             let parsed = FormFile::parse(&source).unwrap_or_fail();
             Ok(LoadedForm {
                 name: parsed.attributes.name.clone(),
@@ -327,10 +322,9 @@ fn parse_classes(pairs: Vec<(String, Vec<u8>)>) -> Result<Vec<LoadedClass>, JsEr
     pairs
         .into_iter()
         .map(|(file_name, bytes)| {
-            let source =
-                SourceFile::decode_with_replacement(&file_name, &bytes).map_err(|e| {
-                    JsError::new(&format!("Failed to decode class '{}': {:?}", file_name, e))
-                })?;
+            let source = SourceFile::decode_with_replacement(&file_name, &bytes).map_err(|e| {
+                JsError::new(&format!("Failed to decode class '{}': {:?}", file_name, e))
+            })?;
             let parsed = ClassFile::parse(&source).unwrap_or_fail();
             Ok(LoadedClass {
                 name: parsed.header.attributes.name.clone(),
@@ -389,19 +383,16 @@ pub fn run_wasm_project(
 
     match interpreter.run_project(&project) {
         Ok(()) => Ok(to_value(&super::build_output(&interpreter, None))?),
-        Err(error) => Ok(to_value(&super::build_output(&interpreter, Some(
-            super::convert_run_error(error, "", 0),
-        )))?),
+        Err(error) => Ok(to_value(&super::build_output(
+            &interpreter,
+            Some(super::convert_run_error(error, "", 0)),
+        ))?),
     }
 }
 
 /// Detect the startup object from a raw `startup` string and the loaded
 /// forms/modules.
-fn detect_startup(
-    startup: &str,
-    forms: &[LoadedForm],
-    modules: &[LoadedModule],
-) -> StartupObject {
+fn detect_startup(startup: &str, forms: &[LoadedForm], modules: &[LoadedModule]) -> StartupObject {
     let startup = startup.trim();
     if startup.is_empty() {
         return StartupObject::None;
@@ -436,7 +427,10 @@ fn detect_startup(
         };
     }
 
-    if module_names.iter().any(|&n| n.eq_ignore_ascii_case(startup)) {
+    if module_names
+        .iter()
+        .any(|&n| n.eq_ignore_ascii_case(startup))
+    {
         return StartupObject::SubMain {
             module_name: startup.to_string(),
             sub_name: "Main".to_string(),

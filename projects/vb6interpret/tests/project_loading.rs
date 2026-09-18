@@ -279,10 +279,7 @@ End Sub
     let bindings = project.forms[0].event_bindings();
 
     assert_eq!(bindings.len(), 1);
-    assert!(bindings.contains_key(&(
-        "cmdOK".to_string(),
-        "Click".to_string(),
-    )));
+    assert!(bindings.contains_key(&("cmdOK".to_string(), "Click".to_string(),)));
     assert_eq!(
         bindings[&("cmdOK".to_string(), "Click".to_string())],
         "cmdOK_Click"
@@ -344,18 +341,9 @@ End Sub
     let bindings = project.forms[0].event_bindings();
 
     assert_eq!(bindings.len(), 3);
-    assert!(bindings.contains_key(&(
-        "cmdOK".to_string(),
-        "Click".to_string(),
-    )));
-    assert!(bindings.contains_key(&(
-        "cmdCancel".to_string(),
-        "Click".to_string(),
-    )));
-    assert!(bindings.contains_key(&(
-        "Text1".to_string(),
-        "Change".to_string(),
-    )));
+    assert!(bindings.contains_key(&("cmdOK".to_string(), "Click".to_string(),)));
+    assert!(bindings.contains_key(&("cmdCancel".to_string(), "Click".to_string(),)));
+    assert!(bindings.contains_key(&("Text1".to_string(), "Change".to_string(),)));
 }
 
 #[test]
@@ -381,12 +369,7 @@ fn form_event_bindings_no_controls() {
 #[test]
 fn form_event_bindings_empty_form() {
     let dir = temp_dir();
-    write_form_with_code(
-        &dir,
-        "Form1.frm",
-        "",
-        "",
-    );
+    write_form_with_code(&dir, "Form1.frm", "", "");
     write_vbp(
         &dir,
         "TYPE=Exe\n\
@@ -425,10 +408,7 @@ End Sub
     let bindings = project.forms[0].event_bindings();
 
     assert_eq!(bindings.len(), 1);
-    assert!(bindings.contains_key(&(
-        "Text1".to_string(),
-        "KeyPress".to_string(),
-    )));
+    assert!(bindings.contains_key(&("Text1".to_string(), "KeyPress".to_string(),)));
     assert_eq!(
         bindings[&("Text1".to_string(), "KeyPress".to_string())],
         "Text1_KeyPress"
@@ -463,12 +443,6 @@ End Sub
     let bindings = project.forms[0].event_bindings();
 
     assert_eq!(bindings.len(), 2);
-    assert!(bindings.contains_key(&(
-        "Label1".to_string(),
-        "MouseDown".to_string(),
-    )));
-    assert!(bindings.contains_key(&(
-        "Label1".to_string(),
-        "MouseUp".to_string(),
-    )));
+    assert!(bindings.contains_key(&("Label1".to_string(), "MouseDown".to_string(),)));
+    assert!(bindings.contains_key(&("Label1".to_string(), "MouseUp".to_string(),)));
 }
