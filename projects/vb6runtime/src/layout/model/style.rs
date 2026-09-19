@@ -6,7 +6,10 @@
 //! Also provides CSS utility functions for converting VB6 font/alignment properties
 //! to CSS values.
 
-use vb6parse::language::Alignment;
+use vb6parse::language::{Alignment, Style, VB_BUTTON_FACE, VB_WINDOW_BACKGROUND, VB_WINDOW_TEXT};
+
+use super::super::color::color_to_css;
+use super::super::LayoutConfig;
 
 /// A CSS color value.
 ///
@@ -179,6 +182,312 @@ pub fn alignment_css(alignment: Alignment) -> Option<String> {
     }
 }
 
+/// The standard 3D bevel box-shadow string used across VB6 controls.
+const THREE_D_BOX_SHADOW: &str =
+    "inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)";
+
+/// Helper: compute the default border radius for a Shape based on its type.
+fn shape_border_radius(props: &vb6parse::language::ShapeProperties) -> Option<f32> {
+    match props.shape {
+        vb6parse::language::Shape::RoundedRectangle | vb6parse::language::Shape::RoundSquare => {
+            Some(props.border_width as f32)
+        }
+        vb6parse::language::Shape::Oval | vb6parse::language::Shape::Circle => Some(f32::INFINITY),
+        _ => None,
+    }
+}
+
+// ============================================================================
+// Default style functions — VB6 system defaults
+// ============================================================================
+//
+// Each function returns the LayoutStyle that a "bare" control (all properties at
+// their VB6 system defaults) would produce.  The diff_against() method (Step 2)
+// and style builders (Step 3) use these to zero-out matching fields, so that
+// controls at VB6 defaults produce zero inline CSS.
+
+impl LayoutStyle {
+    /// VB6 system defaults for a TextBox.
+    ///
+    /// A bare TextBox (all properties at VB6 defaults) produces this exact style.
+    /// If `build_textbox_style(props, config) == this`, zero inline CSS is emitted.
+    ///
+    /// Default properties:
+    /// - back_color = vbWindowBackground → Canvas
+    /// - fore_color = vbWindowText → ButtonText
+    /// - font = None (inherits from form / CSS class)
+    /// - border_style = FixedSingle (handled by .vb6-textbox CSS class, so `None`)
+    /// - multi_line = SingleLine (so `overflow` is `None`)
+    /// - appearance = ThreeD (standard 3D bevel)
+    /// - mouse_pointer = Default (cursor is `None`)
+    /// - right_to_left = LeftToRight (direction is `None`)
+    /// - alignment = LeftJustify → "left"
+    pub fn default_textbox(config: &LayoutConfig) -> Self {
+        let _ = config;
+        LayoutStyle {
+            background_color: Some(color_to_css(&VB_WINDOW_BACKGROUND)),
+            color: Some(color_to_css(&VB_WINDOW_TEXT)),
+            text_align: Some("left".to_string()),
+            box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
+            ..LayoutStyle::default()
+        }
+    }
+
+    /// VB6 system defaults for a CommandButton.
+    ///
+    /// Default properties:
+    /// - style = Standard (background handled by .vb6-commandbutton CSS class)
+    /// - appearance = ThreeD (standard 3D bevel)
+    /// - font = None (inherits from form / CSS class)
+    /// - mouse_pointer = Default (cursor is `None`)
+    /// - right_to_left = LeftToRight (direction is `None`)
+    pub fn default_button(config: &LayoutConfig, style: Style, appearance: vb6parse::language::Appearance) -> Self {
+        let _ = config;
+        let mut result = LayoutStyle {
+            display: Some("inline-block".to_string()),
+            ..LayoutStyle::default()
+        };
+        // Graphical buttons use the button's own back_color as default.
+        // Standard buttons delegate background to the .vb6-commandbutton CSS class.
+        if matches!(style, Style::Graphical) {
+            result.background_color = Some(color_to_css(&VB_BUTTON_FACE));
+        }
+        if matches!(appearance, vb6parse::language::Appearance::ThreeD) {
+            result.box_shadow = Some(THREE_D_BOX_SHADOW.to_string());
+        }
+        result
+    }
+
+    /// VB6 system defaults for a Label.
+    ///
+    /// Default properties:
+    /// - back_style = Transparent (background_color is `None`)
+    /// - fore_color = vbWindowText → ButtonText
+    /// - font = None (inherits from form / CSS class)
+    /// - word_wrap = Wrapping → "pre-wrap"
+    /// - border_style = FixedSingle (handled by .vb6-label CSS class)
+    /// - appearance = ThreeD (standard 3D bevel)
+    /// - mouse_pointer = Default (cursor is `None`)
+    /// - right_to_left = LeftToRight (direction is `None`)
+    /// - alignment = LeftJustify → "left"
+    pub fn default_label(config: &LayoutConfig) -> Self {
+        let _ = config;
+        LayoutStyle {
+            color: Some(color_to_css(&VB_WINDOW_TEXT)),
+            white_space: Some("pre-wrap".to_string()),
+            text_align: Some("left".to_string()),
+            box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
+            ..LayoutStyle::default()
+        }
+    }
+
+    /// VB6 system defaults for a Frame.
+    ///
+    /// Default properties:
+    /// - back_color = vbWindowBackground → Canvas
+    /// - fore_color = vbWindowText → ButtonText
+    /// - font = None (inherits from form / CSS class)
+    /// - border_style = FixedSingle → handled by CSS class
+    /// - appearance = ThreeD (standard 3D bevel)
+    /// - mouse_pointer = Default (cursor is `None`)
+    /// - right_to_left = LeftToRight (direction is `None`)
+    /// - clip_controls = Unbounded (overflow is `None`)
+    pub fn default_frame(config: &LayoutConfig) -> Self {
+        let _ = config;
+        LayoutStyle {
+            background_color: Some(color_to_css(&VB_WINDOW_BACKGROUND)),
+            color: Some(color_to_css(&VB_WINDOW_TEXT)),
+            box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
+            ..LayoutStyle::default()
+        }
+    }
+
+    /// VB6 system defaults for a PictureBox.
+    ///
+    /// Default properties:
+    /// - back_color = vbWindowBackground → Canvas
+    /// - fore_color = vbWindowText → ButtonText
+    /// - font = None (inherits from form / CSS class)
+    /// - border_style = FixedSingle (handled by .vb6-picturebox CSS class)
+    /// - appearance = ThreeD (standard 3D bevel)
+    /// - mouse_pointer = Default (cursor is `None`)
+    /// - right_to_left = LeftToRight (direction is `None`)
+    /// - align = None → "none"
+    /// - clip_controls = Unbounded (overflow is `None`)
+    /// - font_transparent = Opaque (background_color stays set)
+    /// - picture = None (no background image)
+    pub fn default_picturebox(config: &LayoutConfig) -> Self {
+        let _ = config;
+        LayoutStyle {
+            background_color: Some(color_to_css(&VB_WINDOW_BACKGROUND)),
+            color: Some(color_to_css(&VB_WINDOW_TEXT)),
+            box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
+            align: Some("none".to_string()),
+            ..LayoutStyle::default()
+        }
+    }
+
+    /// VB6 system defaults for an Image control.
+    ///
+    /// Default properties:
+    /// - stretch = False → object_fit "contain"
+    /// - border_style = None → "none"
+    /// - appearance = ThreeD (standard 3D bevel)
+    /// - mouse_pointer = Default (cursor is `None`)
+    pub fn default_image(config: &LayoutConfig) -> Self {
+        let _ = config;
+        LayoutStyle {
+            object_fit: Some("contain".to_string()),
+            border: Some("none".to_string()),
+            box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
+            ..LayoutStyle::default()
+        }
+    }
+
+    /// VB6 system defaults for a CheckBox.
+    ///
+    /// Default properties:
+    /// - back_color = vbWindowBackground → Canvas
+    /// - fore_color = vbWindowText → ButtonText
+    /// - font = None (inherits from form / CSS class)
+    /// - appearance = ThreeD (standard 3D bevel)
+    /// - mouse_pointer = Default (cursor is `None`)
+    /// - right_to_left = LeftToRight (direction is `None`)
+    /// - alignment = LeftJustify → "left"
+    pub fn default_checkbox(config: &LayoutConfig) -> Self {
+        let _ = config;
+        LayoutStyle {
+            background_color: Some(color_to_css(&VB_WINDOW_BACKGROUND)),
+            color: Some(color_to_css(&VB_WINDOW_TEXT)),
+            box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
+            text_align: Some("left".to_string()),
+            ..LayoutStyle::default()
+        }
+    }
+
+    /// VB6 system defaults for an OptionButton (radio button).
+    ///
+    /// Same defaults as CheckBox since the builders are identical.
+    pub fn default_optionbutton(config: &LayoutConfig) -> Self {
+        Self::default_checkbox(config)
+    }
+
+    /// VB6 system defaults for a ComboBox.
+    ///
+    /// Default properties:
+    /// - back_color = vbWindowBackground → Canvas
+    /// - fore_color = vbWindowText → ButtonText
+    /// - font = None (inherits from form / CSS class)
+    /// - appearance = ThreeD (standard 3D bevel)
+    /// - mouse_pointer = Default (cursor is `None`)
+    /// - right_to_left = LeftToRight (direction is `None`)
+    pub fn default_combobox(config: &LayoutConfig) -> Self {
+        let _ = config;
+        LayoutStyle {
+            background_color: Some(color_to_css(&VB_WINDOW_BACKGROUND)),
+            color: Some(color_to_css(&VB_WINDOW_TEXT)),
+            box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
+            ..LayoutStyle::default()
+        }
+    }
+
+    /// VB6 system defaults for a ListBox.
+    ///
+    /// Default properties:
+    /// - back_color = vbWindowBackground → Canvas
+    /// - fore_color = vbWindowText → ButtonText
+    /// - font = None (inherits from form / CSS class)
+    /// - appearance = ThreeD (standard 3D bevel)
+    /// - mouse_pointer = Default (cursor is `None`)
+    /// - right_to_left = LeftToRight (direction is `None`)
+    pub fn default_listbox(config: &LayoutConfig) -> Self {
+        let _ = config;
+        LayoutStyle {
+            background_color: Some(color_to_css(&VB_WINDOW_BACKGROUND)),
+            color: Some(color_to_css(&VB_WINDOW_TEXT)),
+            overflow: Some("auto".to_string()),
+            box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
+            ..LayoutStyle::default()
+        }
+    }
+
+    /// VB6 system defaults for a ScrollBar (HScrollBar / VScrollBar).
+    ///
+    /// Default properties:
+    /// - appearance = ThreeD (standard 3D bevel)
+    /// - mouse_pointer = Default (cursor is `None`)
+    /// - right_to_left = LeftToRight (direction is `None`)
+    pub fn default_scrollbar(config: &LayoutConfig) -> Self {
+        let _ = config;
+        LayoutStyle {
+            box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
+            ..LayoutStyle::default()
+        }
+    }
+
+    /// VB6 system defaults for a Shape control.
+    ///
+    /// Default properties:
+    /// - shape = Rectangle (border_radius is `None`)
+    /// - back_style = Transparent (background_color is `None`)
+    /// - border_style = Solid
+    /// - border_width = 1
+    /// - border_color = vbBlack
+    /// - fill_style = Transparent (fill_color is `None`)
+    ///
+    /// Note: border, border_width, border_style are always set for shapes
+    /// and cannot be delegated to CSS classes.
+    pub fn default_shape(props: &vb6parse::language::ShapeProperties, _config: &LayoutConfig) -> Self {
+        let _ = _config;
+        LayoutStyle {
+            background_color: match props.back_style {
+                vb6parse::language::BackStyle::Transparent => None,
+                vb6parse::language::BackStyle::Opaque => Some(color_to_css(&props.back_color)),
+            },
+            border: Some(format!(
+                "{}px solid {}",
+                props.border_width,
+                color_to_css(&props.border_color).to_css_string()
+            )),
+            border_style: draw_style_to_css_border_style(props.border_style),
+            fill_color: match props.fill_style {
+                vb6parse::language::DrawStyle::Transparent => None,
+                _ => Some(color_to_css(&props.fill_color)),
+            },
+            border_radius: shape_border_radius(props),
+            border_width: Some(props.border_width as f32),
+            ..LayoutStyle::default()
+        }
+    }
+
+    /// VB6 system defaults for a Line control.
+    ///
+    /// Default properties:
+    /// - border_color = vbBlack
+    /// - border_width = 0
+    /// - coordinates are instance-specific → always `None` (set by renderer)
+    pub fn default_line(props: &vb6parse::language::LineProperties, _config: &LayoutConfig) -> Self {
+        let _ = _config;
+        LayoutStyle {
+            line_color: Some(color_to_css(&props.border_color)),
+            line_width: Some(props.border_width as f32),
+            ..LayoutStyle::default()
+        }
+    }
+}
+
+/// Map VB6 DrawStyle to CSS border-style value.
+fn draw_style_to_css_border_style(style: vb6parse::language::DrawStyle) -> Option<String> {
+    match style {
+        vb6parse::language::DrawStyle::Transparent | vb6parse::language::DrawStyle::InsideSolid => Some("none"),
+        vb6parse::language::DrawStyle::Solid => Some("solid"),
+        vb6parse::language::DrawStyle::Dash => Some("dashed"),
+        vb6parse::language::DrawStyle::DashDot | vb6parse::language::DrawStyle::DashDotDot => Some("dashed"),
+        vb6parse::language::DrawStyle::Dot => Some("dotted"),
+    }
+    .map(String::from)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -239,5 +548,195 @@ mod tests {
     fn css_color_named_to_string() {
         let c = CssColor::Named("Window".into());
         assert_eq!(c.to_css_string(), "Window");
+    }
+
+    // -----------------------------------------------------------------------
+    // Default style functions — Step 1
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn default_textbox_has_expected_colors() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_textbox(&config);
+        assert!(defaults.background_color.is_some());
+        assert!(defaults.color.is_some());
+        // font should NOT be set — inherited from form/CSS class
+        assert!(defaults.font_family.is_none());
+        assert!(defaults.font_size.is_none());
+        // 3D bevel is the default appearance
+        assert!(defaults.box_shadow.is_some());
+        assert_eq!(defaults.box_shadow.as_deref(), Some(THREE_D_BOX_SHADOW));
+        // alignment is left by default
+        assert_eq!(defaults.text_align, Some("left".to_string()));
+    }
+
+    #[test]
+    fn default_button_standard_no_background() {
+        // Standard buttons delegate background to the .vb6-commandbutton CSS class
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_button(&config, Style::Standard, vb6parse::language::Appearance::ThreeD);
+        assert!(defaults.background_color.is_none());
+        assert_eq!(defaults.display, Some("inline-block".to_string()));
+        assert!(defaults.box_shadow.is_some());
+    }
+
+    #[test]
+    fn default_button_graphical_has_button_face() {
+        // Graphical buttons use their own back_color as default
+        let config = LayoutConfig::default();
+        let defaults =
+            LayoutStyle::default_button(&config, Style::Graphical, vb6parse::language::Appearance::ThreeD);
+        assert_eq!(defaults.background_color, Some(color_to_css(&VB_BUTTON_FACE)));
+    }
+
+    #[test]
+    fn default_button_flat_no_box_shadow() {
+        let config = LayoutConfig::default();
+        let defaults =
+            LayoutStyle::default_button(&config, Style::Standard, vb6parse::language::Appearance::Flat);
+        assert!(defaults.box_shadow.is_none());
+    }
+
+    #[test]
+    fn default_label_no_background() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_label(&config);
+        assert!(defaults.background_color.is_none()); // Transparent by default
+        assert!(defaults.color.is_some());
+        // word wrap → pre-wrap by default
+        assert_eq!(defaults.white_space, Some("pre-wrap".to_string()));
+        assert!(defaults.box_shadow.is_some());
+    }
+
+    #[test]
+    fn default_frame_has_window_colors() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_frame(&config);
+        assert_eq!(defaults.background_color, Some(color_to_css(&VB_WINDOW_BACKGROUND)));
+        assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
+        assert!(defaults.box_shadow.is_some());
+    }
+
+    #[test]
+    fn default_picturebox_has_window_colors() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_picturebox(&config);
+        assert_eq!(defaults.background_color, Some(color_to_css(&VB_WINDOW_BACKGROUND)));
+        assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
+        assert_eq!(defaults.align, Some("none".to_string()));
+        assert!(defaults.box_shadow.is_some());
+    }
+
+    #[test]
+    fn default_image_has_contain() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_image(&config);
+        assert_eq!(defaults.object_fit, Some("contain".to_string()));
+        assert_eq!(defaults.border, Some("none".to_string()));
+        assert!(defaults.box_shadow.is_some());
+    }
+
+    #[test]
+    fn default_checkbox_has_window_colors() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_checkbox(&config);
+        assert_eq!(defaults.background_color, Some(color_to_css(&VB_WINDOW_BACKGROUND)));
+        assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
+        assert!(defaults.box_shadow.is_some());
+        assert_eq!(defaults.text_align, Some("left".to_string()));
+    }
+
+    #[test]
+    fn default_optionbutton_same_as_checkbox() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_optionbutton(&config);
+        let checkbox = LayoutStyle::default_checkbox(&config);
+        assert_eq!(defaults, checkbox);
+    }
+
+    #[test]
+    fn default_combobox_has_window_colors() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_combobox(&config);
+        assert_eq!(defaults.background_color, Some(color_to_css(&VB_WINDOW_BACKGROUND)));
+        assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
+        assert!(defaults.box_shadow.is_some());
+    }
+
+    #[test]
+    fn default_listbox_has_auto_overflow() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_listbox(&config);
+        assert_eq!(defaults.background_color, Some(color_to_css(&VB_WINDOW_BACKGROUND)));
+        assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
+        assert_eq!(defaults.overflow, Some("auto".to_string()));
+        assert!(defaults.box_shadow.is_some());
+    }
+
+    #[test]
+    fn default_scrollbar_has_box_shadow() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_scrollbar(&config);
+        assert!(defaults.box_shadow.is_some());
+        assert!(defaults.background_color.is_none());
+        assert!(defaults.color.is_none());
+    }
+
+    #[test]
+    fn default_shape_rectangle_no_radius() {
+        let config = LayoutConfig::default();
+        let props = vb6parse::language::ShapeProperties::default();
+        let defaults = LayoutStyle::default_shape(&props, &config);
+        assert!(defaults.border.is_some());
+        assert!(defaults.border_width.is_some());
+        assert!(defaults.border_radius.is_none()); // Rectangle
+    }
+
+    #[test]
+    fn default_shape_rounded_rectangle_has_radius() {
+        let config = LayoutConfig::default();
+        let props = vb6parse::language::ShapeProperties {
+            shape: vb6parse::language::Shape::RoundedRectangle,
+            border_width: 5,
+            ..Default::default()
+        };
+        let defaults = LayoutStyle::default_shape(&props, &config);
+        assert_eq!(defaults.border_radius, Some(5.0));
+    }
+
+    #[test]
+    fn default_shape_circle_has_infinite_radius() {
+        let config = LayoutConfig::default();
+        let props = vb6parse::language::ShapeProperties {
+            shape: vb6parse::language::Shape::Circle,
+            ..Default::default()
+        };
+        let defaults = LayoutStyle::default_shape(&props, &config);
+        assert_eq!(defaults.border_radius, Some(f32::INFINITY));
+    }
+
+    #[test]
+    fn default_line_has_color_and_width() {
+        let config = LayoutConfig::default();
+        let props = vb6parse::language::LineProperties::default();
+        let defaults = LayoutStyle::default_line(&props, &config);
+        assert!(defaults.line_color.is_some());
+        assert!(defaults.line_width.is_some());
+        // Coordinates are NOT set — they're instance-specific
+        assert!(defaults.line_x1.is_none());
+        assert!(defaults.line_y1.is_none());
+        assert!(defaults.line_x2.is_none());
+        assert!(defaults.line_y2.is_none());
+    }
+
+    #[test]
+    fn default_line_custom_border_width() {
+        let config = LayoutConfig::default();
+        let props = vb6parse::language::LineProperties {
+            border_width: 3,
+            ..Default::default()
+        };
+        let defaults = LayoutStyle::default_line(&props, &config);
+        assert_eq!(defaults.line_width, Some(3.0));
     }
 }
