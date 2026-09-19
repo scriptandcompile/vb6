@@ -153,13 +153,12 @@ def optimize_wasm(wasm_opt, wasm_file):
             str(backup_file),
         ]
         run_command(cmd, "WASM optimization")
-        backup_file.unlink()
-
         original_size = backup_file.stat().st_size
         optimized_size = wasm_file.stat().st_size
         savings = original_size - optimized_size
         percent = (savings / original_size) * 100
         print(f"  Saved: {savings:,} bytes ({percent:.1f}%)")
+        backup_file.unlink()
 
     except Exception:
         shutil.move(backup_file, wasm_file)
