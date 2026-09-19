@@ -34,17 +34,19 @@
 use super::diff_tree::{DiffChange, DiffTree};
 use super::model::{LayoutContainer, LayoutLeaf, LayoutNode, LayoutStyle};
 
+#[cfg(not(target_arch = "wasm32"))]
 pub mod tauri;
+#[cfg(not(target_arch = "wasm32"))]
 pub use tauri::TauriRenderer;
 
-#[cfg(feature = "wasm")]
+#[cfg(any(target_arch = "wasm32", feature = "wasm"))]
 pub mod web_sys;
-#[cfg(feature = "wasm")]
+#[cfg(any(target_arch = "wasm32", feature = "wasm"))]
 pub use web_sys::WebSysRenderer;
 
-#[cfg(feature = "wasm")]
+#[cfg(any(target_arch = "wasm32", feature = "wasm"))]
 use super::model::NodeId;
-#[cfg(feature = "wasm")]
+#[cfg(any(target_arch = "wasm32", feature = "wasm"))]
 use web_sys::Element;
 
 /// Trait for converting a [`LayoutNode`] tree into platform-specific output.
@@ -156,7 +158,7 @@ pub trait Renderer {
     /// The rendered `Element`. For unchanged subtrees (`DiffKind::Same`),
     /// returns the cached element. For changed subtrees, returns the updated
     /// or newly created element.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn render_node_with_diff_dom(
         &self,
         _node: &LayoutNode,
@@ -179,7 +181,7 @@ pub trait Renderer {
     /// * `change` — The diff change describing what was modified.
     /// * `parent` — The parent DOM element for inserting new nodes.
     /// * `dom_nodes` — Mutable cache of node ID → DOM element, maintained across renders.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn apply_diff_dom(
         &self,
         _node: &LayoutNode,

@@ -173,7 +173,7 @@ fn show_dialog(request: &MsgBoxRequest) -> VBResult<MsgBoxButton> {
     {
         Ok(linux::zenity_dialog(request).unwrap_or_else(|| fallback(request)))
     }
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     {
         // Browser alert/confirm are modal and always answer, so this
         // cannot fail either.
@@ -202,7 +202,7 @@ fn show_input_dialog(request: &InputBoxRequest) -> VBResult<String> {
     {
         Ok(linux::entry_dialog(request).unwrap_or_else(|| input_fallback(request)))
     }
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     {
         // Browser prompt is modal and always answers (None = Cancel).
         Ok(wasm::prompt_dialog(request).unwrap_or_default())
@@ -1745,7 +1745,7 @@ fn browser_secondary_message(
     )
 }
 
-#[cfg(feature = "wasm")]
+#[cfg(any(target_arch = "wasm32", feature = "wasm"))]
 mod wasm {
     use wasm_bindgen::prelude::*;
 
@@ -1794,12 +1794,14 @@ mod wasm {
             [first, second, third] => {
                 if unsafe { window_confirm(&browser_message(title, prompt)) } {
                     *first
-                } else if unsafe { window_confirm(&browser_secondary_message(
-                    title,
-                    prompt,
-                    second.name(),
-                    third.name(),
-                )) } {
+                } else if unsafe {
+                    window_confirm(&browser_secondary_message(
+                        title,
+                        prompt,
+                        second.name(),
+                        third.name(),
+                    ))
+                } {
                     *second
                 } else {
                     *third

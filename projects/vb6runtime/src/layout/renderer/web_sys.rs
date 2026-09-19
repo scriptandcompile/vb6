@@ -36,10 +36,10 @@ use crate::layout::theme::{CssInjector, ThemeRenderer, Vb6Theme};
 
 use crate::layout::model::LayoutControlType;
 
-#[cfg(feature = "wasm")]
+#[cfg(any(target_arch = "wasm32", feature = "wasm"))]
 use web_sys::Document;
 
-#[cfg(feature = "wasm")]
+#[cfg(any(target_arch = "wasm32", feature = "wasm"))]
 pub use web_sys::Element;
 
 /// WASM renderer that creates `web_sys::Element` objects.
@@ -82,7 +82,7 @@ impl WebSysRenderer {
     ///
     /// The renderer will always wrap output in a `.vb6-app` scope root
     /// since WASM targets need CSS isolation from the parent page.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     #[must_use]
     pub fn new(doc: Document) -> Self {
         Self {
@@ -95,7 +95,7 @@ impl WebSysRenderer {
     ///
     /// For WASM, this is always `<div class="vb6-app" id="vb6-container">`
     /// since CSS isolation is required.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     #[must_use]
     pub fn root_open(&self) -> Element {
         let div = self.doc.create_element("div").expect("create div element");
@@ -107,7 +107,7 @@ impl WebSysRenderer {
     /// Render a [`LayoutNode`] to a `web_sys::Element`.
     ///
     /// Dispatches to [`render_container`] or [`render_leaf`] based on node type.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     pub fn render_node_to_element(&self, node: &LayoutNode) -> Element {
         match node {
             LayoutNode::Container(c) => self.render_container(c),
@@ -119,7 +119,7 @@ impl WebSysRenderer {
     ///
     /// Creates `<div class="vb6-app" id="vb6-container">` and appends
     /// the given child element as its only child.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     #[must_use]
     pub fn build_scoped_root(&self, child: &Element) -> Element {
         let root = self.root_open();
@@ -139,7 +139,7 @@ impl WebSysRenderer {
     /// Currently unused — planned for future incremental rendering of
     /// inserted children where we need a guaranteed element regardless
     /// of cache state.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     #[allow(dead_code)]
     fn ensure_element(&self, node: &LayoutNode, parent: Option<&Element>) -> Element {
         let id = node.node_id();
@@ -160,7 +160,7 @@ impl WebSysRenderer {
     /// This method is kept for future use in the incremental rendering
     /// pipeline as an alternative way to locate existing DOM elements
     /// without requiring a separate cache lookup.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     #[allow(dead_code)]
     fn find_element_by_id(&self, id: &NodeId) -> Option<Element> {
         if let Some(el) = self.dom_nodes.borrow().get(id) {
@@ -175,7 +175,7 @@ impl WebSysRenderer {
     ///
     /// Walks up the DOM tree from the first cached element that has the
     /// same parent node, or falls back to the provided fallback element.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn find_parent_for(&self, node: &LayoutNode, fallback: Option<&Element>) -> Option<Element> {
         let id = node.node_id();
 
@@ -195,7 +195,7 @@ impl WebSysRenderer {
     }
 
     /// Check if a node with the given ID is a child of the given parent element.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn node_is_child_of(&self, id: &NodeId, parent: &Element) -> bool {
         let selector = format!("#{}", id.name);
         if let Ok(Some(child)) = parent.query_selector(&selector) {
@@ -205,7 +205,7 @@ impl WebSysRenderer {
     }
 
     /// Update the content of an element based on a value change.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn apply_value_change(&self, el: &Element, node: &LayoutNode, new_value: &str) {
         let tag = tag_for_control(*node.control_type());
         let tag_lower = tag.to_lowercase();
@@ -222,7 +222,7 @@ impl WebSysRenderer {
     }
 
     /// Update an element's style based on visibility or enabled change.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn apply_visibility_change(&self, el: &Element, visible: bool, enabled: bool) {
         let current_style = el.get_attribute("style").unwrap_or_default();
         let mut style_parts: Vec<&str> = current_style
@@ -261,7 +261,7 @@ impl WebSysRenderer {
     ///
     /// New elements are cached in `dom_nodes` so subsequent changes can
     /// find them for in-place mutation.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     pub fn render_node_with_diff(
         &self,
         node: &LayoutNode,
@@ -372,7 +372,7 @@ impl WebSysRenderer {
     }
 
     /// Cache a rendered element by its node ID.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn cache_node(&self, node: &LayoutNode, element: &Element) {
         let id = node.node_id();
         // Also cache any descendants
@@ -381,7 +381,7 @@ impl WebSysRenderer {
     }
 
     /// Recursively cache all descendant DOM nodes.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn cache_descendants(&self, node: &LayoutNode, element: &Element) {
         match node {
             LayoutNode::Leaf(_) => {}
@@ -397,7 +397,7 @@ impl WebSysRenderer {
     }
 
     /// Get a child element by its node ID from a parent element.
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn get_child_element(&self, parent: &Element, child: &LayoutNode) -> Option<Element> {
         let selector = format!("#{}", child.node_id().name);
         parent.query_selector(&selector).ok().flatten()
@@ -407,12 +407,12 @@ impl WebSysRenderer {
 impl Renderer for WebSysRenderer {
     type Output = Element;
 
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn render_node(&self, node: &LayoutNode) -> Element {
         self.render_node_to_element(node)
     }
 
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn render_leaf(&self, leaf: &LayoutLeaf) -> Element {
         let tag = tag_for_control(leaf.control_type);
         let el = self.doc.create_element(tag).expect("create element");
@@ -446,7 +446,7 @@ impl Renderer for WebSysRenderer {
         el
     }
 
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn render_container(&self, container: &LayoutContainer) -> Element {
         let tag = match container.control_type {
             LayoutControlType::Form | LayoutControlType::MDIForm => "div",
@@ -497,7 +497,7 @@ impl Renderer for WebSysRenderer {
         el
     }
 
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn render_children(&self, children: &[LayoutNode]) -> Vec<Element> {
         children
             .iter()
@@ -506,7 +506,7 @@ impl Renderer for WebSysRenderer {
             .collect()
     }
 
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn render_node_with_diff_dom(
         &self,
         node: &LayoutNode,
@@ -523,7 +523,7 @@ impl Renderer for WebSysRenderer {
         result
     }
 
-    #[cfg(feature = "wasm")]
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
     fn apply_diff_dom(
         &self,
         node: &LayoutNode,
@@ -618,7 +618,7 @@ impl CssInjector for WebSysRenderer {
 }
 
 /// Map a [`LayoutControlType`] to an HTML tag name for use in element creation.
-#[cfg(feature = "wasm")]
+#[cfg(any(target_arch = "wasm32", feature = "wasm"))]
 fn tag_for_control(control_type: LayoutControlType) -> &'static str {
     match control_type {
         LayoutControlType::Form | LayoutControlType::MDIForm | LayoutControlType::Label => "div",
@@ -686,7 +686,7 @@ mod tests {
     fn web_sys_renderer_compiles_on_non_wasm() {
         // WebSysRenderer is conditionally compiled for wasm32 targets.
         // On non-wasm targets, the module should still compile (the struct
-        // and impls are behind #[cfg(feature = "wasm")] gates).
+        // and impls are behind #[cfg(any(target_arch = "wasm32", feature = "wasm"))] gates).
         assert!(cfg!(not(target_arch = "wasm32")));
     }
 
@@ -716,15 +716,24 @@ mod tests {
     #[test]
     fn process_mnemonic_basic() {
         assert_eq!(process_mnemonic("OK"), "OK");
-        assert_eq!(process_mnemonic("&OK"), "<span class=\"vb6-mnemonic\">O</span>K");
-        assert_eq!(process_mnemonic("&Cancel"), "<span class=\"vb6-mnemonic\">C</span>ancel");
+        assert_eq!(
+            process_mnemonic("&OK"),
+            "<span class=\"vb6-mnemonic\">O</span>K"
+        );
+        assert_eq!(
+            process_mnemonic("&Cancel"),
+            "<span class=\"vb6-mnemonic\">C</span>ancel"
+        );
     }
 
     #[test]
     fn process_mnemonic_escaped_ampersand() {
         assert_eq!(process_mnemonic("&&"), "&");
         assert_eq!(process_mnemonic("A&&B"), "A&B");
-        assert_eq!(process_mnemonic("&A&&B"), "<span class=\"vb6-mnemonic\">A</span>&B");
+        assert_eq!(
+            process_mnemonic("&A&&B"),
+            "<span class=\"vb6-mnemonic\">A</span>&B"
+        );
     }
 
     #[test]

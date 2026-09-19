@@ -19,9 +19,9 @@
 //!
 //! On Tauri, context menus use the native `tauri::menu::Submenu` API.
 
-#[cfg(feature = "tauri")]
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 use tauri::menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder};
-#[cfg(feature = "tauri")]
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 use tauri::{Manager, Wry};
 
 use vb6parse::language::MenuControl;
@@ -131,7 +131,7 @@ pub fn build_context_html(menus: &[MenuControl], menu_name: &str) -> Option<Stri
 ///
 /// # Examples
 /// ```
-/// # #[cfg(feature = "tauri")]
+/// # #[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 /// # {
 /// use vb6parse::language::{MenuControl, MenuProperties};
 /// use vb6runtime::layout::menu::build_tauri_menus;
@@ -152,7 +152,7 @@ pub fn build_context_html(menus: &[MenuControl], menu_name: &str) -> Option<Stri
 /// // let menu = build_tauri_menus(app.handle(), &menus);
 /// # }
 /// ```
-#[cfg(feature = "tauri")]
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 pub fn build_tauri_menus<M: Manager<Wry>>(
     manager: &M,
     menus: &[MenuControl],
@@ -191,7 +191,7 @@ pub fn build_tauri_menus<M: Manager<Wry>>(
 ///
 /// # Examples
 /// ```
-/// # #[cfg(feature = "tauri")]
+/// # #[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 /// # {
 /// use vb6parse::language::{MenuControl, MenuProperties};
 /// use vb6runtime::layout::menu::build_context_menu;
@@ -212,7 +212,7 @@ pub fn build_tauri_menus<M: Manager<Wry>>(
 /// // let ctx = build_context_menu(app.handle(), &menus, "ContextMenu1");
 /// # }
 /// ```
-#[cfg(feature = "tauri")]
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 pub fn build_context_menu<M: Manager<Wry>>(
     manager: &M,
     menus: &[MenuControl],

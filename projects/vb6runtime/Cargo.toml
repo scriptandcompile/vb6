@@ -20,7 +20,6 @@ serde.workspace = true
 anyhow.workspace = true
 
 # Tauri (optional, for native menu rendering)
-tauri = { workspace = true, optional = true }
 
 # For numeric operations
 num-traits.workspace = true
@@ -36,6 +35,8 @@ rand.workspace = true
 
 # Platform-specific system clock
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+# Tauri (optional, for native menu rendering)
+tauri = { workspace = true, optional = true }
 libc.workspace = true
 
 [target.'cfg(target_os = "windows")'.dependencies]
@@ -47,8 +48,8 @@ windows-sys.workspace = true
 # getrandom's `wasm_js` backend.
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { workspace = true, features = ["wasm_js"] }
-web-sys = { version = "0.3", features = ["HtmlElement", "Document", "Window", "Element", "HtmlDocument", "Node", "CssStyleDeclaration", "Event", "EventTarget"], optional = true }
-wasm-bindgen = { workspace = true, optional = true }
+web-sys = { version = "0.3", features = ["HtmlElement", "Document", "Window", "Element", "HtmlDocument", "Node", "CssStyleDeclaration", "Event", "EventTarget"] }
+wasm-bindgen = { workspace = true }
 
 [dev-dependencies]
 tempfile.workspace = true
@@ -61,7 +62,7 @@ harness = false
 [features]
 default = []
 # com-interop = []  # Future: *might* be able to add COM object support.
-wasm = ["dep:web-sys", "dep:wasm-bindgen"]
+wasm = []
 tauri = ["dep:tauri"]
 
 [package.metadata.docs.rs]

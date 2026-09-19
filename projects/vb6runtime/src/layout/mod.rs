@@ -329,6 +329,7 @@ mod tests {
         assert_eq!(check, Some("Modified".into()));
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
     #[test]
     fn render_with_tauri_renderer() {
         let _lock = lock_test();
