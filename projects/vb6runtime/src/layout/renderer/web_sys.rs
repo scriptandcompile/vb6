@@ -844,6 +844,9 @@ mod tests {
         assert_eq!(tag_for_control(LayoutControlType::Image), "img");
         assert_eq!(tag_for_control(LayoutControlType::CheckBox), "input");
         assert_eq!(tag_for_control(LayoutControlType::ComboBox), "select");
+        // ListBox uses <div> for checkbox mode; standard mode still uses <select>
+        // via the generic branch in render_leaf.
+        assert_eq!(tag_for_control(LayoutControlType::ListBox), "div");
     }
 
     #[test]

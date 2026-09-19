@@ -1396,4 +1396,62 @@ mod tests {
         assert!(result.contains("vb6-label"));
         assert!(result.contains("Hello"));
     }
+
+    #[test]
+    fn listbox_checkbox_mode_renders_items() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lst1", LayoutControlType::ListBox, None);
+        let leaf = LayoutLeaf {
+            listbox_style: Some("checkbox".to_string()),
+            list_items: vec!["First".to_string(), "Second".to_string(), "Third".to_string()],
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("vb6-listbox-checkbox"));
+        assert!(html.contains("type=\"checkbox\""));
+        assert!(html.contains(">First</input> First</label>"));
+        assert!(html.contains(">Second</input> Second</label>"));
+        assert!(html.contains(">Third</input> Third</label>"));
+        assert!(html.contains("lst1_item0"));
+        assert!(html.contains("lst1_item1"));
+        assert!(html.contains("lst1_item2"));
+    }
+
+    #[test]
+    fn listbox_checkbox_disabled_renders_disabled_inputs() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lst1", LayoutControlType::ListBox, None);
+        let leaf = LayoutLeaf {
+            listbox_style: Some("checkbox".to_string()),
+            list_items: vec!["Item".to_string()],
+            enabled: false,
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("disabled"));
+    }
+
+    #[test]
+    fn listbox_standard_mode_unchanged() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lst1", LayoutControlType::ListBox, None);
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("<select"));
+        assert!(html.contains("vb6-listbox"));
+        assert!(html.contains("</select>"));
+        assert!(!html.contains("vb6-listbox-checkbox"));
+    }
+
+    #[test]
+    fn listbox_standard_mode_with_items_unchanged() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lst1", LayoutControlType::ListBox, None);
+        let leaf = LayoutLeaf {
+            list_items: vec!["Item1".to_string(), "Item2".to_string()],
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains("<select"));
+        assert!(html.contains("</select>"));
+    }
 }
