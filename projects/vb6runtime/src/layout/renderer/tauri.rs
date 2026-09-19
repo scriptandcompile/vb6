@@ -206,15 +206,18 @@ impl Renderer for TauriRenderer {
                 )
             }
             LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => {
-                // Scrollbars render as <input type="range">; the vertical bar
-                // gets its orientation entirely from the CSS class (writing-mode),
-                // never as an inline override that could disable the custom
-                // track/thumb styling.
+                let min = leaf.range_min.unwrap_or(0);
+                let max = leaf.range_max.unwrap_or(100);
+                let step = leaf.range_step.unwrap_or(1);
+                let step_attr = if step != 1 { format!(" step=\"{}\"", step) } else { String::new() };
                 format!(
-                    r#"<input id="{}" class="vb6-{}" type="range" value="{}" min="0" max="100" style="{}"{}>"#,
+                    r#"<input id="{}" class="vb6-{}" type="range" value="{}" min="{}" max="{}"{} style="{}"{}>"#,
                     html_escape(&leaf.name),
                     leaf.control_type.css_class(),
                     html_escape(value),
+                    min,
+                    max,
+                    step_attr,
                     html_escape(&style),
                     disabled
                 )
@@ -499,6 +502,7 @@ mod tests {
             value,
             visible: true,
             enabled: true,
+            ..Default::default()
         }
     }
 

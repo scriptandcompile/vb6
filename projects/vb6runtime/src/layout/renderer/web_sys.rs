@@ -425,20 +425,37 @@ impl Renderer for WebSysRenderer {
         )
         .ok();
 
-        if let Some(ref value) = leaf.value {
-            let tag_lower = tag.to_lowercase();
-            if tag_lower == "button" {
-                el.set_inner_html(&process_mnemonic(value));
-            } else if tag_lower == "input" {
-                let _ = el.set_attribute("value", value);
-            } else if tag_lower == "img" {
-                let _ = el.set_attribute("src", value);
-            } else {
-                let processed = process_mnemonic(value);
-                if processed.contains("<span") {
-                    el.set_inner_html(&processed);
-                } else {
-                    el.set_text_content(Some(value));
+        match leaf.control_type {
+            LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => {
+                let _ = el.set_attribute("type", "range");
+                let _ = el.set_attribute("value", leaf.value.as_deref().unwrap_or("0"));
+                if let Some(min) = leaf.range_min {
+                    let _ = el.set_attribute("min", &min.to_string());
+                }
+                if let Some(max) = leaf.range_max {
+                    let _ = el.set_attribute("max", &max.to_string());
+                }
+                if let Some(step) = leaf.range_step {
+                    let _ = el.set_attribute("step", &step.to_string());
+                }
+            }
+            _ => {
+                if let Some(ref value) = leaf.value {
+                    let tag_lower = tag.to_lowercase();
+                    if tag_lower == "button" {
+                        el.set_inner_html(&process_mnemonic(value));
+                    } else if tag_lower == "input" {
+                        let _ = el.set_attribute("value", value);
+                    } else if tag_lower == "img" {
+                        let _ = el.set_attribute("src", value);
+                    } else {
+                        let processed = process_mnemonic(value);
+                        if processed.contains("<span") {
+                            el.set_inner_html(&processed);
+                        } else {
+                            el.set_text_content(Some(value));
+                        }
+                    }
                 }
             }
         }

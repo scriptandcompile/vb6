@@ -644,6 +644,11 @@ fn convert_control(
             })))
         }
 
+        ControlKind::HScrollBar { .. } | ControlKind::VScrollBar { .. } => {
+            let sb_leaf = extract_scrollbar_leaf(control.kind(), control.name().to_string(), control.index(), position, size, style);
+            Ok(Some(LayoutNode::Leaf(sb_leaf)))
+        }
+
         // Leaf controls
         _ => Ok(Some(LayoutNode::Leaf(LayoutLeaf {
             name: control.name().to_string(),
@@ -655,7 +660,40 @@ fn convert_control(
             value: extract_value(control.kind()),
             visible,
             enabled,
+            ..Default::default()
         }))),
+    }
+}
+
+/// Extract ScrollBar-specific range values into a [`LayoutLeaf`].
+fn extract_scrollbar_leaf(
+    kind: &ControlKind,
+    name: String,
+    index: i32,
+    position: LayoutPosition,
+    size: LayoutSize,
+    style: LayoutStyle,
+) -> LayoutLeaf {
+    let properties = match kind {
+        ControlKind::HScrollBar { properties, .. }
+        | ControlKind::VScrollBar { properties, .. } => properties,
+        _ => unreachable!("extract_scrollbar_leaf called with non-scrollbar control"),
+    };
+
+    LayoutLeaf {
+        name,
+        control_type: layout_type_from_kind(kind),
+        index,
+        position,
+        size,
+        style,
+        value: Some(properties.value.to_string()),
+        visible: properties.visible == Visibility::Visible,
+        enabled: properties.enabled == Activation::Enabled,
+        range_min: Some(properties.min),
+        range_max: Some(properties.max),
+        range_step: Some(properties.small_change),
+        ..Default::default()
     }
 }
 
