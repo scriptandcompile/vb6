@@ -30,6 +30,24 @@ impl Default for LayoutLeaf {
             value: None,
             visible: true,
             enabled: true,
+            tooltip: None,
+            tabindex: None,
+            is_default: false,
+            is_cancel: false,
+            is_locked: false,
+            max_length: None,
+            password_char: None,
+            hide_selection: false,
+            scroll_bars: None,
+            use_mnemonic: false,
+            range_min: None,
+            range_max: None,
+            range_step: None,
+            combo_style: None,
+            combo_items: vec![],
+            image_src: None,
+            listbox_style: None,
+            list_items: vec![],
         }
     }
 }
@@ -261,6 +279,46 @@ pub struct LayoutLeaf {
     pub visible: bool,
     /// Whether the control is enabled.
     pub enabled: bool,
+    /// HTML title attribute text (tooltip).
+    pub tooltip: Option<String>,
+    /// HTML tabindex attribute value.
+    pub tabindex: Option<i32>,
+    /// Whether this is the default button (autofocus).
+    pub is_default: bool,
+    /// Whether this is the cancel button (Escape key handler).
+    pub is_cancel: bool,
+    /// Whether the control is read-only (like HTML `readonly`).
+    pub is_locked: bool,
+    /// Maximum input length (HTML `maxlength`).
+    pub max_length: Option<i32>,
+    /// Password character for password fields (HTML `type="password"`).
+    pub password_char: Option<char>,
+    /// Whether selection is hidden when control loses focus.
+    pub hide_selection: bool,
+    /// Scroll bar configuration (overflow-x / overflow-y).
+    pub scroll_bars: Option<String>,
+    /// Whether the Label control uses mnemonics (& to underline next character).
+    pub use_mnemonic: bool,
+    /// Min value for ScrollBar controls (HTML `min`).
+    pub range_min: Option<i32>,
+    /// Max value for ScrollBar controls (HTML `max`).
+    pub range_max: Option<i32>,
+    /// Step value for ScrollBar controls (HTML `step`).
+    pub range_step: Option<i32>,
+    /// ComboBox style: "dropdown" (editable), "dropdown-readonly" (non-editable), "simple" (always-visible list).
+    pub combo_style: Option<String>,
+
+    /// ComboBox items for rendering `<option>` elements.
+    pub combo_items: Vec<String>,
+
+    /// Base64-encoded image data URL for Image controls (e.g. "data:image/png;base64,...").
+    pub image_src: Option<String>,
+
+    /// ListBox style: "checkbox" renders each item with a checkbox instead of <option>.
+    pub listbox_style: Option<String>,
+
+    /// ListBox items for checkbox mode rendering.
+    pub list_items: Vec<String>,
 }
 
 impl LayoutLeaf {
@@ -322,6 +380,7 @@ mod tests {
             value: Some("Hello".into()),
             visible: true,
             enabled: true,
+            ..Default::default()
         }
     }
 
@@ -356,6 +415,7 @@ mod tests {
             value: Some("Hello".into()),
             visible: true,
             enabled: true,
+            ..Default::default()
         };
         assert!(matches!(LayoutNode::Leaf(leaf), LayoutNode::Leaf(_)));
     }

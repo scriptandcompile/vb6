@@ -16,9 +16,11 @@
 
 use std::collections::HashMap;
 
+use base64::{Engine as _, engine::general_purpose::STANDARD};
+use image::DynamicImage;
 use vb6parse::language::{
-    Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm, ScaleMode,
-    Visibility,
+    Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm, MultiLine,
+    ReferenceOrValue, ScaleMode, ScrollBars, TabStop, TextDirection, Visibility,
 };
 use vb6parse::parsers::{ConcreteSyntaxTree, SyntaxKind};
 
@@ -28,7 +30,11 @@ use super::model::{
     LayoutSize, LayoutStyle, NodeId,
 };
 use super::scale::{scale_mode_to_pixels, twips_to_pixels};
-use super::{LayoutConfig, color::color_to_css, font_points_to_px};
+use super::{
+    LayoutConfig,
+    color::{color_to_css, mouse_pointer_css},
+    font_points_to_px,
+};
 
 use super::form_store::{self, FormHandle};
 
@@ -496,6 +502,11 @@ fn build_form_style(props: &vb6parse::language::FormProperties, dpi: u32) -> Lay
 
     style.border = form_border_style_css(props.border_style);
     style.cursor = mouse_pointer_css(props.mouse_pointer);
+    style.direction = if matches!(props.right_to_left, TextDirection::RightToLeft) {
+        Some("rtl".to_string())
+    } else {
+        None
+    };
     style
 }
 
@@ -514,6 +525,11 @@ fn build_mdi_form_style(props: &vb6parse::language::MDIFormProperties, dpi: u32)
     }
 
     style.cursor = mouse_pointer_css(props.mouse_pointer);
+    style.direction = if matches!(props.right_to_left, TextDirection::RightToLeft) {
+        Some("rtl".to_string())
+    } else {
+        None
+    };
     style
 }
 
@@ -644,6 +660,102 @@ fn convert_control(
             })))
         }
 
+        ControlKind::HScrollBar { .. } | ControlKind::VScrollBar { .. } => {
+            let sb_leaf = extract_scrollbar_leaf(
+                control.kind(),
+                control.name().to_string(),
+                control.index(),
+                position,
+                size,
+                style,
+            );
+            Ok(Some(LayoutNode::Leaf(sb_leaf)))
+        }
+
+        ControlKind::Image { .. } => {
+            let image_src = extract_image_leaf(control.kind());
+            Ok(Some(LayoutNode::Leaf(LayoutLeaf {
+                name: control.name().to_string(),
+                control_type: layout_type,
+                index: control.index(),
+                position,
+                size,
+                style,
+                value: extract_value(control.kind()),
+                visible,
+                enabled,
+                tooltip: extract_tooltip(control.kind()),
+                tabindex: extract_tabindex(control.kind()),
+                is_default: extract_is_default(control.kind()),
+                is_cancel: extract_is_cancel(control.kind()),
+                combo_style: extract_combo_style(control.kind()),
+                image_src,
+                ..Default::default()
+            })))
+        }
+
+        ControlKind::TextBox { .. } => {
+            let (locked, max_length, password_char, hide_selection, scroll_bars) =
+                extract_textbox_leaf(control.kind());
+            Ok(Some(LayoutNode::Leaf(LayoutLeaf {
+                name: control.name().to_string(),
+                control_type: layout_type,
+                index: control.index(),
+                position,
+                size,
+                style,
+                value: extract_value(control.kind()),
+                visible,
+                enabled,
+                tooltip: extract_tooltip(control.kind()),
+                tabindex: extract_tabindex(control.kind()),
+                is_default: extract_is_default(control.kind()),
+                is_cancel: extract_is_cancel(control.kind()),
+                combo_style: extract_combo_style(control.kind()),
+                use_mnemonic: extract_use_mnemonic(control.kind()),
+                is_locked: locked,
+                max_length,
+                password_char,
+                hide_selection,
+                scroll_bars,
+                ..Default::default()
+            })))
+        }
+
+        ControlKind::ListBox { .. } => {
+            let listbox_leaf = extract_listbox_leaf(
+                control.kind(),
+                control.name().to_string(),
+                control.index(),
+                position,
+                size,
+                style,
+            );
+            Ok(Some(LayoutNode::Leaf(listbox_leaf)))
+        }
+
+        ControlKind::ComboBox { .. } => {
+            Ok(Some(LayoutNode::Leaf(LayoutLeaf {
+                name: control.name().to_string(),
+                control_type: layout_type,
+                index: control.index(),
+                position,
+                size,
+                style,
+                value: extract_value(control.kind()),
+                visible,
+                enabled,
+                tooltip: extract_tooltip(control.kind()),
+                tabindex: extract_tabindex(control.kind()),
+                is_default: extract_is_default(control.kind()),
+                is_cancel: extract_is_cancel(control.kind()),
+                combo_style: extract_combo_style(control.kind()),
+                combo_items: extract_combo_items(control.kind()),
+                use_mnemonic: extract_use_mnemonic(control.kind()),
+                ..Default::default()
+            })))
+        }
+
         // Leaf controls
         _ => Ok(Some(LayoutNode::Leaf(LayoutLeaf {
             name: control.name().to_string(),
@@ -655,7 +767,54 @@ fn convert_control(
             value: extract_value(control.kind()),
             visible,
             enabled,
+            tooltip: extract_tooltip(control.kind()),
+            tabindex: extract_tabindex(control.kind()),
+            is_default: extract_is_default(control.kind()),
+            is_cancel: extract_is_cancel(control.kind()),
+            combo_style: extract_combo_style(control.kind()),
+            use_mnemonic: extract_use_mnemonic(control.kind()),
+            ..Default::default()
         }))),
+    }
+}
+
+/// Extract ScrollBar-specific range values into a [`LayoutLeaf`].
+fn extract_scrollbar_leaf(
+    kind: &ControlKind,
+    name: String,
+    index: i32,
+    position: LayoutPosition,
+    size: LayoutSize,
+    style: LayoutStyle,
+) -> LayoutLeaf {
+    let properties = match kind {
+        ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
+            properties
+        }
+        _ => unreachable!("extract_scrollbar_leaf called with non-scrollbar control"),
+    };
+
+    let tabindex = match properties.tab_stop {
+        TabStop::Included => Some(0),
+        TabStop::ProgrammaticOnly => Some(-1),
+    };
+
+    LayoutLeaf {
+        name,
+        control_type: layout_type_from_kind(kind),
+        index,
+        position,
+        size,
+        style,
+        value: Some(properties.value.to_string()),
+        visible: properties.visible == Visibility::Visible,
+        enabled: properties.enabled == Activation::Enabled,
+        tooltip: None,
+        tabindex,
+        range_min: Some(properties.min),
+        range_max: Some(properties.max),
+        range_step: Some(properties.small_change),
+        ..Default::default()
     }
 }
 
@@ -930,11 +1089,12 @@ fn extract_value(kind: &ControlKind) -> Option<String> {
         ControlKind::TextBox { properties, .. } => Some(properties.text.clone()),
         ControlKind::CommandButton { properties, .. } => Some(properties.caption.clone()),
         ControlKind::CheckBox { properties, .. } => Some(
-            if properties.value == vb6parse::language::CheckBoxValue::Checked {
-                "True".to_string()
-            } else {
-                "False".to_string()
-            },
+            match properties.value {
+                vb6parse::language::CheckBoxValue::Unchecked => "False",
+                vb6parse::language::CheckBoxValue::Checked => "True",
+                vb6parse::language::CheckBoxValue::Grayed => "Grayed",
+            }
+            .to_string(),
         ),
         ControlKind::OptionButton { properties, .. } => Some(
             if properties.value == vb6parse::language::OptionButtonValue::Selected {
@@ -948,7 +1108,9 @@ fn extract_value(kind: &ControlKind) -> Option<String> {
             properties.picture.as_ref().map(|p| format!("{:?}", p))
         }
         ControlKind::Image { properties, .. } => {
-            properties.picture.as_ref().map(|p| format!("{:?}", p))
+            // Image source is handled separately via extract_image_src.
+            // The `value` field is intentionally empty for Image controls.
+            properties.picture.as_ref().map(|_| String::new())
         }
         ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
             Some(properties.value.to_string())
@@ -983,6 +1145,299 @@ fn extract_value(kind: &ControlKind) -> Option<String> {
         ControlKind::Shape { .. } => None,
         ControlKind::Line { .. } => None,
         ControlKind::Custom { .. } | ControlKind::Ole { .. } | ControlKind::Menu { .. } => None,
+    }
+}
+
+/// Extract tooltip text from a [`ControlKind`] for the HTML `title` attribute.
+///
+/// Returns `None` when the control has no tooltip or the tooltip is empty.
+fn extract_tooltip(kind: &ControlKind) -> Option<String> {
+    match kind {
+        ControlKind::Label { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::TextBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::CommandButton { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::CheckBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::OptionButton { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::ComboBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::ListBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::Frame { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::PictureBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::Image { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::DriveListBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::DirListBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::FileListBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::Data { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::HScrollBar { .. }
+        | ControlKind::VScrollBar { .. }
+        | ControlKind::Shape { .. }
+        | ControlKind::Line { .. }
+        | ControlKind::Timer { .. }
+        | ControlKind::Custom { .. }
+        | ControlKind::Ole { .. }
+        | ControlKind::Menu { .. } => None,
+    }
+}
+
+/// Convert a string to an optional tooltip: empty strings become `None`.
+fn tooltip_text(s: &str) -> Option<String> {
+    if s.is_empty() {
+        None
+    } else {
+        Some(s.to_string())
+    }
+}
+
+/// Extract whether a [`ControlKind`] is the default button.
+///
+/// Returns `true` for `CommandButton { default: true }`, `false` otherwise.
+fn extract_is_default(kind: &ControlKind) -> bool {
+    matches!(kind, ControlKind::CommandButton { properties } if properties.default)
+}
+
+/// Extract whether a [`ControlKind`] is the cancel button.
+///
+/// Returns `true` for `CommandButton { cancel: true }`, `false` otherwise.
+fn extract_is_cancel(kind: &ControlKind) -> bool {
+    matches!(kind, ControlKind::CommandButton { properties } if properties.cancel)
+}
+
+/// Extract tabindex from a [`ControlKind`] for the HTML `tabindex` attribute.
+///
+/// Returns `Some(0)` for `TabStop::Included`, `Some(-1)` for
+/// `TabStop::ProgrammaticOnly`, and `None` for controls that don't have
+/// a `tab_stop` property.
+fn extract_tabindex(kind: &ControlKind) -> Option<i32> {
+    match kind {
+        ControlKind::CommandButton { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::TextBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::CheckBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::OptionButton { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::ComboBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::ListBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::PictureBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
+            match properties.tab_stop {
+                TabStop::Included => Some(0),
+                TabStop::ProgrammaticOnly => Some(-1),
+            }
+        }
+        ControlKind::DriveListBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::DirListBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::FileListBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::Label { .. }
+        | ControlKind::Frame { .. }
+        | ControlKind::Image { .. }
+        | ControlKind::Shape { .. }
+        | ControlKind::Line { .. }
+        | ControlKind::Timer { .. }
+        | ControlKind::Data { .. }
+        | ControlKind::Custom { .. }
+        | ControlKind::Ole { .. }
+        | ControlKind::Menu { .. } => None,
+    }
+}
+
+/// Extract ComboBox style from a [`ControlKind`].
+///
+/// Returns a string describing how the ComboBox should be rendered:
+/// - `"dropdown"` — editable dropdown (default, `DropDownCombo`)
+/// - `"dropdown-readonly"` — non-editable dropdown (`DropDownList`)
+/// - `"simple"` — always-visible list with editable text above (`SimpleCombo`)
+fn extract_combo_style(kind: &ControlKind) -> Option<String> {
+    match kind {
+        ControlKind::ComboBox { properties, .. } => Some(match properties.style {
+            vb6parse::language::ComboBoxStyle::DropDownCombo => "dropdown".to_string(),
+            vb6parse::language::ComboBoxStyle::DropDownList => "dropdown-readonly".to_string(),
+            vb6parse::language::ComboBoxStyle::SimpleCombo => "simple".to_string(),
+        }),
+        _ => None,
+    }
+}
+
+/// Extract ComboBox items from a [`ControlKind`].
+fn extract_combo_items(kind: &ControlKind) -> Vec<String> {
+    match kind {
+        ControlKind::ComboBox { properties, .. } => match &properties.list {
+            ReferenceOrValue::Value(items) => items.clone(),
+            ReferenceOrValue::Reference { .. } => vec![],
+        },
+        _ => vec![],
+    }
+}
+
+/// Extract the `use_mnemonic` property from a [`ControlKind`].
+///
+/// Returns `false` for controls that don't support mnemonics.
+/// For Label controls, returns the `use_mnemonic` property value.
+fn extract_use_mnemonic(kind: &ControlKind) -> bool {
+    match kind {
+        ControlKind::Label { properties, .. } => properties.use_mnemonic,
+        _ => false,
+    }
+}
+
+/// Convert a `DynamicImage` to a base64-encoded data URL.
+///
+/// Encodes the image as PNG and returns a data URL in the format
+/// `data:image/png;base64,...`.
+fn image_to_data_url(image: &DynamicImage) -> String {
+    let mut buffer = Vec::new();
+    if image
+        .write_to(
+            &mut std::io::Cursor::new(&mut buffer),
+            image::ImageFormat::Png,
+        )
+        .is_ok()
+    {
+        let encoded = STANDARD.encode(&buffer);
+        format!("data:image/png;base64,{encoded}")
+    } else {
+        String::new()
+    }
+}
+
+/// Extract the image data URL from an `ImageProperties` picture field.
+///
+/// Converts `ReferenceOrValue<DynamicImage>` to a base64 data URL.
+/// For `Reference` variants (external .frx resource), returns `None` since
+/// the image data is not embedded in the layout model.
+pub(crate) fn extract_image_src(
+    picture: &Option<ReferenceOrValue<DynamicImage>>,
+) -> Option<String> {
+    match picture {
+        Some(ReferenceOrValue::Value(img)) => {
+            let url = image_to_data_url(img);
+            if url.is_empty() { None } else { Some(url) }
+        }
+        Some(ReferenceOrValue::Reference { .. }) => {
+            // External .frx reference - data URL cannot be generated here.
+            // vb6interpret can resolve this at runtime.
+            None
+        }
+        None => None,
+    }
+}
+
+/// Extract Image-specific leaf fields from a [`ControlKind`].
+///
+/// Returns the base64 image data URL for the Image control.
+/// For non-Image controls, returns `None`.
+fn extract_image_leaf(kind: &ControlKind) -> Option<String> {
+    match kind {
+        ControlKind::Image { properties, .. } => extract_image_src(&properties.picture),
+        _ => None,
+    }
+}
+
+/// Extract TextBox-specific leaf fields from a [`ControlKind`].
+///
+/// Returns `(locked, max_length, password_char, hide_selection, scroll_bars)` for the TextBox control.
+/// For non-TextBox controls, returns `(false, None, None, false, None)`.
+fn extract_textbox_leaf(
+    kind: &ControlKind,
+) -> (bool, Option<i32>, Option<char>, bool, Option<String>) {
+    match kind {
+        ControlKind::TextBox { properties, .. } => {
+            let max_length = if properties.max_length == 0 {
+                None
+            } else {
+                Some(properties.max_length)
+            };
+            let scroll_bars = match (properties.multi_line, properties.scroll_bars) {
+                (MultiLine::SingleLine, ScrollBars::None) => None,
+                (MultiLine::SingleLine, ScrollBars::Horizontal) => Some("auto".to_string()),
+                (MultiLine::SingleLine, ScrollBars::Vertical)
+                | (MultiLine::SingleLine, ScrollBars::Both) => Some("hidden".to_string()),
+                (MultiLine::MultiLine, ScrollBars::None) => Some("hidden".to_string()),
+                (MultiLine::MultiLine, ScrollBars::Horizontal) => Some("auto".to_string()),
+                (MultiLine::MultiLine, ScrollBars::Vertical) => Some("auto".to_string()),
+                (MultiLine::MultiLine, ScrollBars::Both) => Some("auto".to_string()),
+            };
+            (
+                properties.locked,
+                max_length,
+                properties.password_char,
+                properties.hide_selection,
+                scroll_bars,
+            )
+        }
+        _ => (false, None, None, false, None),
+    }
+}
+
+/// Extract ListBox-specific style and data into a [`LayoutLeaf`].
+fn extract_listbox_leaf(
+    kind: &ControlKind,
+    name: String,
+    index: i32,
+    position: LayoutPosition,
+    size: LayoutSize,
+    style: LayoutStyle,
+) -> LayoutLeaf {
+    let properties = match kind {
+        ControlKind::ListBox { properties, .. } => properties,
+        _ => unreachable!("extract_listbox_leaf called with non-listbox control"),
+    };
+
+    let listbox_style = match properties.style {
+        vb6parse::language::ListBoxStyle::Standard => None,
+        vb6parse::language::ListBoxStyle::Checkbox => Some("checkbox".to_string()),
+    };
+
+    let list_items = match &properties.list {
+        ReferenceOrValue::Value(items) => items.clone(),
+        ReferenceOrValue::Reference { .. } => vec![],
+    };
+
+    LayoutLeaf {
+        name,
+        control_type: layout_type_from_kind(kind),
+        index,
+        position,
+        size,
+        style,
+        value: extract_value(kind),
+        visible: properties.visible == Visibility::Visible,
+        enabled: properties.enabled == Activation::Enabled,
+        tooltip: extract_tooltip(kind),
+        tabindex: extract_tabindex(kind),
+        is_default: extract_is_default(kind),
+        is_cancel: extract_is_cancel(kind),
+        combo_style: extract_combo_style(kind),
+        use_mnemonic: extract_use_mnemonic(kind),
+        listbox_style,
+        list_items,
+        ..Default::default()
     }
 }
 
@@ -1037,28 +1492,6 @@ fn border_style_css(style: BorderStyle) -> Option<String> {
     match style {
         BorderStyle::None => Some("none".to_string()),
         BorderStyle::FixedSingle => Some("1px solid rgb(120, 120, 120)".to_string()),
-    }
-}
-
-fn mouse_pointer_css(pointer: vb6parse::language::MousePointer) -> Option<String> {
-    use vb6parse::language::MousePointer;
-    match pointer {
-        MousePointer::Default => None,
-        MousePointer::Arrow => Some("default".to_string()),
-        MousePointer::Cross => Some("crosshair".to_string()),
-        MousePointer::IBeam => Some("text".to_string()),
-        MousePointer::Icon => None,
-        MousePointer::Size => None,
-        MousePointer::SizeAll => Some("move".to_string()),
-        MousePointer::SizeNESW => Some("ns-resize".to_string()),
-        MousePointer::SizeNS => Some("ns-resize".to_string()),
-        MousePointer::SizeNWSE => Some("nwse-resize".to_string()),
-        MousePointer::SizeWE => Some("ew-resize".to_string()),
-        MousePointer::UpArrow => Some("not-allowed".to_string()),
-        MousePointer::Hourglass => Some("wait".to_string()),
-        MousePointer::NoDrop => Some("not-allowed".to_string()),
-        MousePointer::Custom => None,
-        MousePointer::ArrowHourglass | MousePointer::ArrowQuestion => Some("default".to_string()),
     }
 }
 
@@ -1924,6 +2357,14 @@ mod tests {
             },
         };
         assert_eq!(extract_value(&unchecked), Some("False".to_string()));
+
+        let grayed = ControlKind::CheckBox {
+            properties: CheckBoxProperties {
+                value: CheckBoxValue::Grayed,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_value(&grayed), Some("Grayed".to_string()));
     }
 
     #[test]
@@ -2306,5 +2747,263 @@ End Sub\r\n";
             "Expected cmdOK event procedure for nested control, got: {:?}",
             form
         );
+    }
+
+    #[test]
+    fn extract_tabindex_included_returns_zero() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                tab_stop: vb6parse::language::TabStop::Included,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(0));
+    }
+
+    #[test]
+    fn extract_tabindex_programmatic_only_returns_neg_one() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                tab_stop: vb6parse::language::TabStop::ProgrammaticOnly,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(-1));
+    }
+
+    #[test]
+    fn extract_tabindex_label_returns_none() {
+        let kind = ControlKind::Label {
+            properties: LabelProperties::default(),
+        };
+        assert_eq!(extract_tabindex(&kind), None);
+    }
+
+    #[test]
+    fn extract_tabindex_textbox_included() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                tab_stop: vb6parse::language::TabStop::Included,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(0));
+    }
+
+    #[test]
+    fn extract_tabindex_checkbox_programmatic_only() {
+        let kind = ControlKind::CheckBox {
+            properties: CheckBoxProperties {
+                tab_stop: vb6parse::language::TabStop::ProgrammaticOnly,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(-1));
+    }
+
+    #[test]
+    fn extract_tabindex_scrollbar_included() {
+        let kind = ControlKind::HScrollBar {
+            properties: ScrollBarProperties {
+                tab_stop: vb6parse::language::TabStop::Included,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(0));
+    }
+
+    #[test]
+    fn extract_tabindex_combo_box_programmatic_only() {
+        let kind = ControlKind::ComboBox {
+            properties: vb6parse::language::ComboBoxProperties {
+                tab_stop: vb6parse::language::TabStop::ProgrammaticOnly,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(-1));
+    }
+
+    #[test]
+    fn extract_tabindex_list_box_included() {
+        let kind = ControlKind::ListBox {
+            properties: vb6parse::language::ListBoxProperties {
+                tab_stop: vb6parse::language::TabStop::Included,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(0));
+    }
+
+    #[test]
+    fn extract_is_default_true() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                default: true,
+                ..Default::default()
+            },
+        };
+        assert!(extract_is_default(&kind));
+    }
+
+    #[test]
+    fn extract_is_default_false() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                default: false,
+                ..Default::default()
+            },
+        };
+        assert!(!extract_is_default(&kind));
+    }
+
+    #[test]
+    fn extract_is_default_non_button_returns_false() {
+        let kind = ControlKind::Label {
+            properties: LabelProperties::default(),
+        };
+        assert!(!extract_is_default(&kind));
+    }
+
+    #[test]
+    fn extract_is_cancel_true() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                cancel: true,
+                ..Default::default()
+            },
+        };
+        assert!(extract_is_cancel(&kind));
+    }
+
+    #[test]
+    fn extract_is_cancel_false() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                cancel: false,
+                ..Default::default()
+            },
+        };
+        assert!(!extract_is_cancel(&kind));
+    }
+
+    #[test]
+    fn extract_is_cancel_non_button_returns_false() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties::default(),
+        };
+        assert!(!extract_is_cancel(&kind));
+    }
+
+    #[test]
+    fn extract_textbox_locked() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                locked: true,
+                ..Default::default()
+            },
+        };
+        let (locked, _, _, _, _) = extract_textbox_leaf(&kind);
+        assert!(locked);
+    }
+
+    #[test]
+    fn extract_textbox_max_length() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                max_length: 10,
+                ..Default::default()
+            },
+        };
+        let (_, max_length, _, _, _) = extract_textbox_leaf(&kind);
+        assert_eq!(max_length, Some(10));
+    }
+
+    #[test]
+    fn extract_textbox_max_length_zero_is_none() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                max_length: 0,
+                ..Default::default()
+            },
+        };
+        let (_, max_length, _, _, _) = extract_textbox_leaf(&kind);
+        assert_eq!(max_length, None);
+    }
+
+    #[test]
+    fn extract_textbox_password_char() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                password_char: Some('*'),
+                ..Default::default()
+            },
+        };
+        let (_, _, password_char, _, _) = extract_textbox_leaf(&kind);
+        assert_eq!(password_char, Some('*'));
+    }
+
+    #[test]
+    fn extract_textbox_hide_selection() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                hide_selection: false,
+                ..Default::default()
+            },
+        };
+        let (_, _, _, hide_selection, _) = extract_textbox_leaf(&kind);
+        assert!(!hide_selection);
+    }
+
+    #[test]
+    fn extract_textbox_scroll_bars_singleline_horizontal() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                multi_line: MultiLine::SingleLine,
+                scroll_bars: ScrollBars::Horizontal,
+                ..Default::default()
+            },
+        };
+        let (_, _, _, _, scroll_bars) = extract_textbox_leaf(&kind);
+        assert_eq!(scroll_bars, Some("auto".to_string()));
+    }
+
+    #[test]
+    fn extract_textbox_scroll_bars_multiline_both() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                multi_line: MultiLine::MultiLine,
+                scroll_bars: ScrollBars::Both,
+                ..Default::default()
+            },
+        };
+        let (_, _, _, _, scroll_bars) = extract_textbox_leaf(&kind);
+        assert_eq!(scroll_bars, Some("auto".to_string()));
+    }
+
+    #[test]
+    fn extract_textbox_scroll_bars_singleline_none() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                multi_line: MultiLine::SingleLine,
+                scroll_bars: ScrollBars::None,
+                ..Default::default()
+            },
+        };
+        let (_, _, _, _, scroll_bars) = extract_textbox_leaf(&kind);
+        assert_eq!(scroll_bars, None);
+    }
+
+    #[test]
+    fn extract_textbox_non_textbox_returns_defaults() {
+        let kind = ControlKind::Label {
+            properties: LabelProperties::default(),
+        };
+        let (locked, max_length, password_char, hide_selection, scroll_bars) =
+            extract_textbox_leaf(&kind);
+        assert!(!locked);
+        assert_eq!(max_length, None);
+        assert_eq!(password_char, None);
+        assert!(!hide_selection);
+        assert_eq!(scroll_bars, None);
     }
 }

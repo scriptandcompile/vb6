@@ -425,20 +425,153 @@ impl Renderer for WebSysRenderer {
         )
         .ok();
 
-        if let Some(ref value) = leaf.value {
-            let tag_lower = tag.to_lowercase();
-            if tag_lower == "button" {
-                el.set_inner_html(&process_mnemonic(value));
-            } else if tag_lower == "input" {
-                let _ = el.set_attribute("value", value);
-            } else if tag_lower == "img" {
-                let _ = el.set_attribute("src", value);
-            } else {
-                let processed = process_mnemonic(value);
-                if processed.contains("<span") {
-                    el.set_inner_html(&processed);
+        if let Some(ref tooltip) = leaf.tooltip {
+            let _ = el.set_attribute("title", tooltip);
+        }
+
+        if let Some(tabindex) = leaf.tabindex {
+            let _ = el.set_attribute("tabindex", &tabindex.to_string());
+        }
+
+        if leaf.is_default {
+            let _ = el.set_attribute("autofocus", "autofocus");
+            let _ = el.set_attribute("type", "submit");
+        }
+
+        if leaf.is_cancel {
+            let _ = el.set_attribute("type", "submit");
+            let _ = el.set_attribute("data-cancel", "true");
+        }
+
+        match leaf.control_type {
+            LayoutControlType::CheckBox => {
+                let _ = el.set_attribute("type", "checkbox");
+                if leaf.value.as_deref() == Some("True") {
+                    let _ = el.set_attribute("checked", "checked");
+                }
+                if leaf.value.as_deref() == Some("Grayed") {
+                    let current_style = el.get_attribute("style").unwrap_or_default();
+                    let _ = el.set_attribute("style", &format!("{} opacity: 0.5;", current_style));
+                }
+            }
+            LayoutControlType::OptionButton => {
+                let _ = el.set_attribute("type", "radio");
+                if let Some(ref group) = leaf.style.group {
+                    let _ = el.set_attribute("name", group);
                 } else {
-                    el.set_text_content(Some(value));
+                    let _ = el.set_attribute("name", &leaf.name);
+                }
+                if leaf.value.as_deref() == Some("True") {
+                    let _ = el.set_attribute("checked", "checked");
+                }
+            }
+            LayoutControlType::ComboBox => {
+                if leaf.combo_style.as_deref() == Some("dropdown-readonly") {
+                    let _ = el.set_attribute("disabled", "disabled");
+                }
+                for item in &leaf.combo_items {
+                    let option = self.doc.create_element("option").expect("create option");
+                    let _ = option.set_text_content(Some(item));
+                    let _ = el.append_child(&option);
+                }
+            }
+            LayoutControlType::ListBox => {
+                if leaf.listbox_style.as_deref() == Some("checkbox") {
+                    for (i, item) in leaf.list_items.iter().enumerate() {
+                        let label = self.doc.create_element("label").expect("create label");
+                        let input = self.doc.create_element("input").expect("create input");
+                        let _ = input.set_attribute("type", "checkbox");
+                        let _ = input.set_attribute("id", &format!("{}_item{}", leaf.name, i));
+                        let _ = input.set_attribute("class", "vb6-listbox-item-checkbox");
+                        let _ = input.set_attribute("style", "margin-right: 4px;");
+                        if !leaf.enabled {
+                            let _ = input.set_attribute("disabled", "disabled");
+                        }
+                        let text = self.doc.create_text_node(item);
+                        label.append_child(&input).ok();
+                        label.append_child(&text).ok();
+                        el.append_child(&label).ok();
+                    }
+                } else {
+                    // Standard ListBox: create <select> element
+                    let select = self.doc.create_element("select").expect("create select");
+                    let _ = select.set_id(&leaf.name);
+                    let _ = select.set_class_name(&format!("vb6-{}", leaf.control_type.css_class()));
+                    let _ = select.set_attribute(
+                        "style",
+                        &self.style_attr(&leaf.style, leaf.visible, leaf.enabled),
+                    );
+                    if let Some(ref tooltip) = leaf.tooltip {
+                        let _ = select.set_attribute("title", tooltip);
+                    }
+                    if let Some(tabindex) = leaf.tabindex {
+                        let _ = select.set_attribute("tabindex", &tabindex.to_string());
+                    }
+                    let _ = el.remove_child(&el).ok();
+                    let _ = el.replace_with_with_node_1(&select);
+                    // The select element is now in place; items would be added at runtime
+                    return select;
+                }
+            }
+            LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => {
+                let _ = el.set_attribute("type", "range");
+                let _ = el.set_attribute("value", leaf.value.as_deref().unwrap_or("0"));
+                if let Some(min) = leaf.range_min {
+                    let _ = el.set_attribute("min", &min.to_string());
+                }
+                if let Some(max) = leaf.range_max {
+                    let _ = el.set_attribute("max", &max.to_string());
+                }
+                if let Some(step) = leaf.range_step {
+                    let _ = el.set_attribute("step", &step.to_string());
+                }
+            }
+            LayoutControlType::TextBox => {
+                if leaf.password_char.is_some() {
+                    let _ = el.set_attribute("type", "password");
+                }
+                if leaf.is_locked {
+                    let _ = el.set_attribute("readonly", "");
+                }
+                if let Some(max_length) = leaf.max_length {
+                    let _ = el.set_attribute("maxlength", &max_length.to_string());
+                }
+                if let Some(ref value) = leaf.value {
+                    let _ = el.set_attribute("value", value);
+                }
+                if let Some(ref src) = leaf.image_src {
+                    let _ = el.set_attribute("src", src);
+                }
+            }
+            _ => {
+                if let Some(ref value) = leaf.value {
+                    let tag_lower = tag.to_lowercase();
+                    if tag_lower == "button" {
+                        // CommandButton always processes mnemonics (no use_mnemonic property)
+                        el.set_inner_html(&process_mnemonic(value));
+                    } else if tag_lower == "input" {
+                        let _ = el.set_attribute("value", value);
+                    } else if tag_lower == "img" {
+                        let _ = el.set_attribute("src", value);
+                    } else {
+                        let processed = if leaf.use_mnemonic {
+                            process_mnemonic(value)
+                        } else {
+                            value.to_string()
+                        };
+                        if processed.contains("<span") {
+                            el.set_inner_html(&processed);
+                        } else {
+                            el.set_text_content(Some(value));
+                        }
+                    }
+                }
+                // Image source is set from image_src, not value.
+                if let Some(ref src) = leaf.image_src {
+                    let tag_lower = tag.to_lowercase();
+                    if tag_lower == "img" {
+                        let _ = el.set_attribute("src", src);
+                    }
                 }
             }
         }
@@ -630,7 +763,7 @@ fn tag_for_control(control_type: LayoutControlType) -> &'static str {
         LayoutControlType::CheckBox => "input",
         LayoutControlType::OptionButton => "input",
         LayoutControlType::ComboBox => "select",
-        LayoutControlType::ListBox => "select",
+        LayoutControlType::ListBox => "div",
         LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => "input",
         LayoutControlType::Timer => "div",
         LayoutControlType::Shape => "div",
@@ -711,6 +844,9 @@ mod tests {
         assert_eq!(tag_for_control(LayoutControlType::Image), "img");
         assert_eq!(tag_for_control(LayoutControlType::CheckBox), "input");
         assert_eq!(tag_for_control(LayoutControlType::ComboBox), "select");
+        // ListBox uses <div> for checkbox mode; standard mode still uses <select>
+        // via the generic branch in render_leaf.
+        assert_eq!(tag_for_control(LayoutControlType::ListBox), "div");
     }
 
     #[test]

@@ -161,6 +161,7 @@ mod tests {
             value: Some("Hello".into()),
             visible: true,
             enabled: true,
+            ..Default::default()
         }
     }
 

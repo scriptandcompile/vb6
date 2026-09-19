@@ -94,6 +94,15 @@ pub fn style_to_css(style: &LayoutStyle) -> String {
     if let Some(ref v) = style.cursor {
         parts.push(format!("cursor: {}", v));
     }
+    if let Some(ref v) = style.direction {
+        parts.push(format!("direction: {}", v));
+    }
+    if let Some(ref v) = style.object_fit {
+        parts.push(format!("object-fit: {}", v));
+    }
+    if let Some(ref v) = style.background_image {
+        parts.push(format!("background-image: url(\"{}\")", v));
+    }
 
     parts.join("; ")
 }
@@ -247,6 +256,16 @@ mod tests {
         assert!(!css.contains("font-weight"));
         assert!(!css.contains("color"));
         assert!(!css.contains("background-color"));
+    }
+
+    #[test]
+    fn style_with_direction() {
+        let style = LayoutStyle {
+            direction: Some("rtl".into()),
+            ..LayoutStyle::default()
+        };
+        let css = style_to_css(&style);
+        assert!(css.contains("direction: rtl"));
     }
 
     #[test]

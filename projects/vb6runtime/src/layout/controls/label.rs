@@ -8,10 +8,10 @@
 //! - `word_wrap` → `white_space`
 //! - `back_style` → `background_color` (Transparent → None)
 
-use vb6parse::language::{Alignment, BackStyle, LabelProperties, WordWrap};
+use vb6parse::language::{Alignment, BackStyle, LabelProperties, TextDirection, WordWrap};
 
 use super::super::LayoutConfig;
-use super::super::color::color_to_css;
+use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
 use super::super::model::style::LayoutStyle;
 
@@ -41,6 +41,25 @@ pub fn build_label_style(props: &LabelProperties, config: &LayoutConfig) -> Layo
         white_space: match props.word_wrap {
             WordWrap::NonWrapping => Some("nowrap".to_string()),
             WordWrap::Wrapping => Some("pre-wrap".to_string()),
+        },
+        cursor: mouse_pointer_css(props.mouse_pointer),
+        direction: if matches!(props.right_to_left, TextDirection::RightToLeft) {
+            Some("rtl".to_string())
+        } else {
+            None
+        },
+        border: match props.border_style {
+            vb6parse::language::BorderStyle::None => Some("none".to_string()),
+            vb6parse::language::BorderStyle::FixedSingle => {
+                Some("1px solid rgb(120, 120, 120)".to_string())
+            }
+        },
+        box_shadow: match props.appearance {
+            vb6parse::language::Appearance::ThreeD => Some(
+                "inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)"
+                    .to_string(),
+            ),
+            vb6parse::language::Appearance::Flat => None,
         },
         ..LayoutStyle::default()
     }
@@ -75,13 +94,35 @@ fn alignment_css(alignment: Alignment) -> Option<String> {
 mod tests {
     use super::super::super::model::style::CssColor;
     use super::*;
-    use vb6parse::language::Color;
+    use vb6parse::language::{BorderStyle, Color};
 
     fn test_config() -> LayoutConfig {
         LayoutConfig {
             dpi: 96,
             ..Default::default()
         }
+    }
+
+    #[test]
+    fn label_threed_appearance() {
+        let props = LabelProperties {
+            appearance: vb6parse::language::Appearance::ThreeD,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert!(style.box_shadow.is_some());
+    }
+
+    #[test]
+    fn label_flat_appearance() {
+        let props = LabelProperties {
+            appearance: vb6parse::language::Appearance::Flat,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert!(style.box_shadow.is_none());
     }
 
     fn make_font(name: &str, size: f32) -> vb6parse::language::Font {
@@ -241,5 +282,30 @@ mod tests {
         let config = test_config();
         let style = build_label_style(&props, &config);
         assert_eq!(style.font_weight, Some("bold".to_string()));
+    }
+
+    #[test]
+    fn label_fixed_single_border() {
+        let props = LabelProperties {
+            border_style: BorderStyle::FixedSingle,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(
+            style.border,
+            Some("1px solid rgb(120, 120, 120)".to_string())
+        );
+    }
+
+    #[test]
+    fn label_border_none() {
+        let props = LabelProperties {
+            border_style: BorderStyle::None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.border, Some("none".to_string()));
     }
 }

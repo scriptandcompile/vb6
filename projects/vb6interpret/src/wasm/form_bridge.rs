@@ -15,6 +15,8 @@
 //! - [`unload_form`] — Remove a form from the store and clear the DOM container.
 //! - [`update_form`] — Re-render a loaded form after state changes.
 
+use std::sync::LazyLock;
+
 use wasm_bindgen::prelude::*;
 use web_sys::window;
 
@@ -26,6 +28,56 @@ use crate::project::LoadedForm;
 use serde_wasm_bindgen::to_value;
 
 const DEFAULT_CONTAINER_ID: &str = "vb6-container";
+
+/// One-time guard that ensures the default/cancel key handler is wired to
+/// `document` exactly once across all form show/hide cycles.
+static KEY_HANDLER_WIRED: LazyLock<std::sync::OnceLock<()>> = LazyLock::new(|| std::sync::OnceLock::new());
+
+/// Wire up Enter key to trigger default button, Escape to trigger cancel button.
+///
+/// This mirrors the Tauri HTML template's inline `<script>` block and provides
+/// the same keyboard shortcut behaviour for the WASM target.
+fn wire_default_cancel_key_handler() {
+    KEY_HANDLER_WIRED.get_or_init(|| {
+        let doc = window()
+            .and_then(|w| w.document())
+            .expect("document must exist");
+
+        let store_handler = Closure::wrap(Box::new(move |e: web_sys::Event| {
+            let ke = e.dyn_ref::<web_sys::KeyboardEvent>();
+            if let Some(ke) = ke {
+                let js_window = js_sys::global().unchecked_into::<js_sys::Object>();
+                js_sys::Reflect::set(&js_window, &"__vb6_last_keydown_event".into(), &ke)
+                    .ok();
+            }
+            js_sys::eval(
+                r#"
+                (function() {
+                    var event = window.__vb6_last_keydown_event;
+                    if (!event) return;
+                    if (event.key === 'Enter') {
+                        var btn = document.querySelector('[autofocus], [data-default="true"]');
+                        if (btn && !btn.disabled) {
+                            btn.click();
+                            event.preventDefault();
+                        }
+                    }
+                    if (event.key === 'Escape') {
+                        var btn = document.querySelector('[data-cancel="true"]');
+                        if (btn && !btn.disabled) {
+                            btn.click();
+                            event.preventDefault();
+                        }
+                    }
+                })()"#,
+            )
+            .ok();
+        }) as Box<dyn FnMut(_)>);
+
+        let _ = doc.add_event_listener_with_callback("keydown", store_handler.as_ref().unchecked_ref());
+        store_handler.forget();
+    });
+}
 
 /// Format a [`NodeId`] as a string.
 fn node_id_to_string(node_id: &vb6runtime::layout::model::NodeId) -> String {
@@ -92,6 +144,8 @@ pub fn show_form(form_bytes: &[u8], container_id: &str) -> Result<JsValue, JsErr
 
     let css_injector = layout::renderer::WebSysRenderer::new(doc.clone());
     css_injector.inject_css(&layout::vb6_css::scoped_css());
+
+    wire_default_cancel_key_handler();
 
     let container = doc
         .get_element_by_id(container_id)

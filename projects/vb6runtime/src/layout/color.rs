@@ -3,7 +3,7 @@
 //! Converts `vb6parse::language::Color` (RGB or System index) to
 //! the layout engine's `CssColor` type.
 
-use vb6parse::language::Color;
+use vb6parse::language::{Color, MousePointer};
 
 use super::model::style::CssColor;
 
@@ -66,6 +66,42 @@ pub fn color_to_css(color: &Color) -> CssColor {
     match color {
         Color::RGB { red, green, blue } => CssColor::Rgb(*red, *green, *blue),
         Color::System { index } => system_color_to_css(*index),
+    }
+}
+
+/// Convert a VB6 [`MousePointer`] to a CSS cursor string.
+///
+/// Returns `None` for pointers that should use the browser default.
+/// Known cursor types are mapped to their CSS equivalents.
+///
+/// # Examples
+/// ```
+/// use vb6parse::language::MousePointer;
+/// use vb6runtime::layout::color::mouse_pointer_css;
+///
+/// assert_eq!(mouse_pointer_css(MousePointer::Default), None);
+/// assert_eq!(mouse_pointer_css(MousePointer::Cross), Some("crosshair".to_string()));
+/// assert_eq!(mouse_pointer_css(MousePointer::Hourglass), Some("wait".to_string()));
+/// assert_eq!(mouse_pointer_css(MousePointer::IBeam), Some("text".to_string()));
+/// ```
+pub fn mouse_pointer_css(pointer: MousePointer) -> Option<String> {
+    match pointer {
+        MousePointer::Default => None,
+        MousePointer::Arrow => Some("default".to_string()),
+        MousePointer::Cross => Some("crosshair".to_string()),
+        MousePointer::IBeam => Some("text".to_string()),
+        MousePointer::Icon => None,
+        MousePointer::Size => None,
+        MousePointer::SizeAll => Some("move".to_string()),
+        MousePointer::SizeNESW => Some("ns-resize".to_string()),
+        MousePointer::SizeNS => Some("ns-resize".to_string()),
+        MousePointer::SizeNWSE => Some("nwse-resize".to_string()),
+        MousePointer::SizeWE => Some("ew-resize".to_string()),
+        MousePointer::UpArrow => Some("not-allowed".to_string()),
+        MousePointer::Hourglass => Some("wait".to_string()),
+        MousePointer::NoDrop => Some("not-allowed".to_string()),
+        MousePointer::Custom => None,
+        MousePointer::ArrowHourglass | MousePointer::ArrowQuestion => Some("default".to_string()),
     }
 }
 
@@ -277,5 +313,54 @@ mod tests {
         for (_, color) in vb6parse::language::color::PREDEFINED_COLORS {
             let _ = color_to_css(&color);
         }
+    }
+
+    #[test]
+    fn default_mouse_pointer() {
+        use vb6parse::language::MousePointer;
+        assert_eq!(mouse_pointer_css(MousePointer::Default), None);
+    }
+
+    #[test]
+    fn cross_mouse_pointer() {
+        use vb6parse::language::MousePointer;
+        assert_eq!(
+            mouse_pointer_css(MousePointer::Cross),
+            Some("crosshair".to_string())
+        );
+    }
+
+    #[test]
+    fn hourglass_mouse_pointer() {
+        use vb6parse::language::MousePointer;
+        assert_eq!(
+            mouse_pointer_css(MousePointer::Hourglass),
+            Some("wait".to_string())
+        );
+    }
+
+    #[test]
+    fn ibeam_mouse_pointer() {
+        use vb6parse::language::MousePointer;
+        assert_eq!(
+            mouse_pointer_css(MousePointer::IBeam),
+            Some("text".to_string())
+        );
+    }
+
+    #[test]
+    fn size_all_mouse_pointer() {
+        use vb6parse::language::MousePointer;
+        assert_eq!(
+            mouse_pointer_css(MousePointer::SizeAll),
+            Some("move".to_string())
+        );
+    }
+
+    #[test]
+    fn custom_mouse_pointer() {
+        use vb6parse::language::MousePointer;
+        // Custom cursors are not mappable to CSS
+        assert_eq!(mouse_pointer_css(MousePointer::Custom), None);
     }
 }

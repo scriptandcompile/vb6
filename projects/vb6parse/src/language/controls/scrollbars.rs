@@ -10,8 +10,8 @@
 
 use crate::files::common::Properties;
 use crate::language::controls::{
-    Activation, CausesValidation, DragMode, MousePointer, ReferenceOrValue, TabStop, TextDirection,
-    Visibility,
+    Activation, Appearance, CausesValidation, DragMode, MousePointer, ReferenceOrValue, TabStop,
+    TextDirection, Visibility,
 };
 
 use image::DynamicImage;
@@ -68,6 +68,8 @@ pub struct ScrollBarProperties {
     pub whats_this_help_id: i32,
     /// Width of the scrollbar control.
     pub width: i32,
+    /// The appearance of the scrollbar control.
+    pub appearance: Appearance,
 }
 
 impl Default for ScrollBarProperties {
@@ -94,6 +96,7 @@ impl Default for ScrollBarProperties {
             visible: Visibility::Visible,
             whats_this_help_id: 0,
             width: 100,
+            appearance: Appearance::ThreeD,
         }
     }
 }
@@ -134,6 +137,7 @@ impl Serialize for ScrollBarProperties {
         s.serialize_field("visible", &self.visible)?;
         s.serialize_field("whats_this_help_id", &self.whats_this_help_id)?;
         s.serialize_field("width", &self.width)?;
+        s.serialize_field("appearance", &self.appearance)?;
 
         s.end()
     }
@@ -175,6 +179,7 @@ impl From<Properties> for ScrollBarProperties {
         scroll_bar_prop.whats_this_help_id =
             prop.get_i32("WhatsThisHelpID", scroll_bar_prop.whats_this_help_id);
         scroll_bar_prop.width = prop.get_i32("Width", scroll_bar_prop.width);
+        scroll_bar_prop.appearance = prop.get_property("Appearance", scroll_bar_prop.appearance);
 
         scroll_bar_prop
     }
