@@ -2,6 +2,11 @@
 //!
 //! This struct is immutable once computed during the converter pass.
 //! Mutable state (visibility, value, enabled) lives in `LayoutNode` / `LayoutLeaf`.
+//!
+//! Also provides CSS utility functions for converting VB6 font/alignment properties
+//! to CSS values.
+
+use vb6parse::language::Alignment;
 
 /// A CSS color value.
 ///
@@ -107,6 +112,71 @@ pub struct LayoutStyle {
 
     /// Background image as a base64 data URL (for PictureBox controls).
     pub background_image: Option<String>,
+}
+
+/// Convert a VB6 font weight to a CSS font-weight string.
+///
+/// Maps VB6 font weights (100–900) to their CSS equivalents, with
+/// special handling for 400 (→ "normal") and 700 (→ "bold").
+/// Returns `None` for unrecognized weights.
+///
+/// # Examples
+///
+/// ```
+/// use vb6runtime::layout::model::style::font_weight_css;
+/// assert_eq!(font_weight_css(700), Some("bold".to_string()));
+/// assert_eq!(font_weight_css(400), Some("normal".to_string()));
+/// assert_eq!(font_weight_css(500), Some("500".to_string()));
+/// assert_eq!(font_weight_css(100), Some("100".to_string()));
+/// ```
+#[must_use]
+pub fn font_weight_css(weight: i32) -> Option<String> {
+    match weight {
+        100 => Some("100".to_string()),
+        200 => Some("200".to_string()),
+        300 => Some("300".to_string()),
+        400 => Some("normal".to_string()),
+        500 => Some("500".to_string()),
+        600 => Some("600".to_string()),
+        700 => Some("bold".to_string()),
+        800 => Some("800".to_string()),
+        900 => Some("900".to_string()),
+        _ => None,
+    }
+}
+
+/// Convert an italic boolean to a CSS font-style string.
+///
+/// # Examples
+///
+/// ```
+/// use vb6runtime::layout::model::style::font_style_css;
+/// assert_eq!(font_style_css(true), "italic");
+/// assert_eq!(font_style_css(false), "normal");
+/// ```
+#[must_use]
+pub fn font_style_css(italic: bool) -> String {
+    if italic { "italic".to_string() } else { "normal".to_string() }
+}
+
+/// Convert a VB6 [`Alignment`] to a CSS `text-align` string.
+///
+/// # Examples
+///
+/// ```
+/// use vb6parse::language::Alignment;
+/// use vb6runtime::layout::model::style::alignment_css;
+/// assert_eq!(alignment_css(Alignment::LeftJustify), Some("left".to_string()));
+/// assert_eq!(alignment_css(Alignment::Center), Some("center".to_string()));
+/// assert_eq!(alignment_css(Alignment::RightJustify), Some("right".to_string()));
+/// ```
+#[must_use]
+pub fn alignment_css(alignment: Alignment) -> Option<String> {
+    match alignment {
+        Alignment::RightJustify => Some("right".to_string()),
+        Alignment::Center => Some("center".to_string()),
+        Alignment::LeftJustify => Some("left".to_string()),
+    }
 }
 
 #[cfg(test)]

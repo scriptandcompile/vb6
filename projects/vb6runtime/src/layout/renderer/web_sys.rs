@@ -91,6 +91,20 @@ impl WebSysRenderer {
         }
     }
 
+    /// Create a new `WebSysRenderer` bound to the given document and inject CSS.
+    ///
+    /// This is a convenience constructor that creates the renderer and immediately
+    /// injects the provided CSS via [`inject_css`](Self::inject_css). Use this
+    /// when you need both CSS injection and rendering — it avoids creating two
+    /// separate renderer instances (one for CSS, one for rendering).
+    #[cfg(any(target_arch = "wasm32", feature = "wasm"))]
+    #[must_use]
+    pub fn new_with_css(doc: Document, css: &str) -> Self {
+        let renderer = Self::new(doc.clone());
+        renderer.inject_css(css);
+        renderer
+    }
+
     /// Generate the opening tag for the scope root.
     ///
     /// For WASM, this is always `<div class="vb6-app" id="vb6-container">`

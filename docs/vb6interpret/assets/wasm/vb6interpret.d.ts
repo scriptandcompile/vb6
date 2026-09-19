@@ -2,28 +2,6 @@
 /* eslint-disable */
 
 /**
- * Chroma subsampling format
- */
-export enum ChromaSampling {
-    /**
-     * Both vertically and horizontally subsampled.
-     */
-    Cs420 = 0,
-    /**
-     * Horizontally subsampled.
-     */
-    Cs422 = 1,
-    /**
-     * Not subsampled.
-     */
-    Cs444 = 2,
-    /**
-     * Monochrome.
-     */
-    Cs400 = 3,
-}
-
-/**
  * A VB6 project loaded from JS-provided byte maps for multi-file VBP-style
  * projects in the browser.
  *
@@ -411,10 +389,12 @@ export interface InitOutput {
     readonly update_form: (a: number, b: number) => void;
     readonly update_form_with_container: (a: number, b: number, c: number, d: number) => void;
     readonly wasmproject_new: () => number;
+    readonly __wasm_bindgen_func_elem_367: (a: number, b: number, c: number) => void;
     readonly __wbindgen_export: (a: number, b: number) => number;
     readonly __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_export3: (a: number) => void;
     readonly __wbindgen_export4: (a: number, b: number, c: number) => void;
+    readonly __wbindgen_export5: (a: number, b: number) => void;
     readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
 }
 
