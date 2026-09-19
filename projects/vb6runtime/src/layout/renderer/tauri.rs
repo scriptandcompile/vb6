@@ -221,7 +221,11 @@ impl Renderer for TauriRenderer {
                 let min = leaf.range_min.unwrap_or(0);
                 let max = leaf.range_max.unwrap_or(100);
                 let step = leaf.range_step.unwrap_or(1);
-                let step_attr = if step != 1 { format!(" step=\"{}\"", step) } else { String::new() };
+                let step_attr = if step != 1 {
+                    format!(" step=\"{}\"", step)
+                } else {
+                    String::new()
+                };
                 format!(
                     r#"<input id="{}" class="vb6-{}" type="range" value="{}" min="{}" max="{}"{} style="{}"{}{}{}>"#,
                     html_escape(&leaf.name),
@@ -292,11 +296,12 @@ impl Renderer for TauriRenderer {
             }
             LayoutControlType::Image => {
                 // Image uses <img> element for proper web semantics and object-fit styling.
-                // The `value` field holds the image path/URL.
+                // The `image_src` field holds the base64 data URL for the picture.
+                let src = leaf.image_src.as_deref().unwrap_or("");
                 format!(
                     r#"<img id="{}" class="vb6-image" src="{}" style="{}"{}{}>"#,
                     html_escape(&leaf.name),
-                    html_escape(value),
+                    html_escape(src),
                     html_escape(&style),
                     title_attr(leaf),
                     tabindex_attr(leaf)
@@ -726,7 +731,11 @@ mod tests {
     #[test]
     fn no_tooltip_means_no_title_attr() {
         let renderer = TauriRenderer::new(false);
-        let leaf = make_leaf("cmdNoTip", LayoutControlType::CommandButton, Some("Button".into()));
+        let leaf = make_leaf(
+            "cmdNoTip",
+            LayoutControlType::CommandButton,
+            Some("Button".into()),
+        );
         let html = renderer.render_leaf(&leaf);
         assert!(!html.contains("title="));
     }
@@ -734,7 +743,11 @@ mod tests {
     #[test]
     fn tooltip_html_escaping() {
         let renderer = TauriRenderer::new(false);
-        let leaf = make_leaf("cmdEsc", LayoutControlType::CommandButton, Some("Esc".into()));
+        let leaf = make_leaf(
+            "cmdEsc",
+            LayoutControlType::CommandButton,
+            Some("Esc".into()),
+        );
         let leaf = LayoutLeaf {
             tooltip: Some("A \"safe\" tip".into()),
             ..leaf
@@ -782,7 +795,11 @@ mod tests {
     #[test]
     fn tabindex_rendered_on_optionbutton() {
         let renderer = TauriRenderer::new(false);
-        let leaf = make_leaf("optChoice", LayoutControlType::OptionButton, Some("True".into()));
+        let leaf = make_leaf(
+            "optChoice",
+            LayoutControlType::OptionButton,
+            Some("True".into()),
+        );
         let leaf = LayoutLeaf {
             tabindex: Some(0),
             ..leaf
@@ -843,7 +860,11 @@ mod tests {
     #[test]
     fn cancel_button_has_submit_and_data_cancel() {
         let renderer = TauriRenderer::new(false);
-        let leaf = make_leaf("cmdCancel", LayoutControlType::CommandButton, Some("Cancel".into()));
+        let leaf = make_leaf(
+            "cmdCancel",
+            LayoutControlType::CommandButton,
+            Some("Cancel".into()),
+        );
         let leaf = LayoutLeaf {
             is_cancel: true,
             ..leaf
@@ -856,7 +877,11 @@ mod tests {
     #[test]
     fn default_and_cancel_button_has_both_attributes() {
         let renderer = TauriRenderer::new(false);
-        let leaf = make_leaf("cmdDefaultCancel", LayoutControlType::CommandButton, Some("OK".into()));
+        let leaf = make_leaf(
+            "cmdDefaultCancel",
+            LayoutControlType::CommandButton,
+            Some("OK".into()),
+        );
         let leaf = LayoutLeaf {
             is_default: true,
             is_cancel: true,
@@ -871,7 +896,11 @@ mod tests {
     #[test]
     fn regular_button_has_no_default_cancel_attributes() {
         let renderer = TauriRenderer::new(false);
-        let leaf = make_leaf("cmdRegular", LayoutControlType::CommandButton, Some("Click".into()));
+        let leaf = make_leaf(
+            "cmdRegular",
+            LayoutControlType::CommandButton,
+            Some("Click".into()),
+        );
         let html = renderer.render_leaf(&leaf);
         assert!(!html.contains("autofocus"));
         assert!(!html.contains("data-cancel"));
@@ -906,17 +935,41 @@ mod tests {
     #[test]
     fn render_image_leaf() {
         let renderer = TauriRenderer::new(false);
-        let leaf = make_leaf("imgLogo", LayoutControlType::Image, Some("logo.png".into()));
+        let leaf = LayoutLeaf {
+            name: "imgLogo".into(),
+            control_type: LayoutControlType::Image,
+            index: 0,
+            position: LayoutPosition::default(),
+            size: LayoutSize::default(),
+            style: LayoutStyle::default(),
+            value: None,
+            image_src: Some("data:image/png;base64,abc123".into()),
+            visible: true,
+            enabled: true,
+            ..Default::default()
+        };
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains("<img"));
         assert!(html.contains("vb6-image"));
-        assert!(html.contains("src=\"logo.png\""));
+        assert!(html.contains("src=\"data:image/png;base64,abc123\""));
     }
 
     #[test]
     fn render_image_leaf_empty_src() {
         let renderer = TauriRenderer::new(false);
-        let leaf = make_leaf("imgEmpty", LayoutControlType::Image, Some("".into()));
+        let leaf = LayoutLeaf {
+            name: "imgEmpty".into(),
+            control_type: LayoutControlType::Image,
+            index: 0,
+            position: LayoutPosition::default(),
+            size: LayoutSize::default(),
+            style: LayoutStyle::default(),
+            value: None,
+            image_src: None,
+            visible: true,
+            enabled: true,
+            ..Default::default()
+        };
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains("<img"));
         assert!(html.contains("src=\"\""));

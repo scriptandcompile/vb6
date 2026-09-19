@@ -16,9 +16,11 @@
 
 use std::collections::HashMap;
 
+use base64::{Engine as _, engine::general_purpose::STANDARD};
+use image::DynamicImage;
 use vb6parse::language::{
-    Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm, ScaleMode,
-    TabStop, TextDirection, Visibility,
+    Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm,
+    ReferenceOrValue, ScaleMode, TabStop, TextDirection, Visibility,
 };
 use vb6parse::parsers::{ConcreteSyntaxTree, SyntaxKind};
 
@@ -670,6 +672,29 @@ fn convert_control(
             Ok(Some(LayoutNode::Leaf(sb_leaf)))
         }
 
+        ControlKind::Image { .. } => {
+            let (image_src, stretch) = extract_image_leaf(control.kind());
+            Ok(Some(LayoutNode::Leaf(LayoutLeaf {
+                name: control.name().to_string(),
+                control_type: layout_type,
+                index: control.index(),
+                position,
+                size,
+                style,
+                value: extract_value(control.kind()),
+                visible,
+                enabled,
+                tooltip: extract_tooltip(control.kind()),
+                tabindex: extract_tabindex(control.kind()),
+                is_default: extract_is_default(control.kind()),
+                is_cancel: extract_is_cancel(control.kind()),
+                combo_style: extract_combo_style(control.kind()),
+                stretch,
+                image_src,
+                ..Default::default()
+            })))
+        }
+
         // Leaf controls
         _ => Ok(Some(LayoutNode::Leaf(LayoutLeaf {
             name: control.name().to_string(),
@@ -1021,7 +1046,9 @@ fn extract_value(kind: &ControlKind) -> Option<String> {
             properties.picture.as_ref().map(|p| format!("{:?}", p))
         }
         ControlKind::Image { properties, .. } => {
-            properties.picture.as_ref().map(|p| format!("{:?}", p))
+            // Image source is handled separately via extract_image_src.
+            // The `value` field is intentionally empty for Image controls.
+            properties.picture.as_ref().map(|_| String::new())
         }
         ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
             Some(properties.value.to_string())
@@ -1186,14 +1213,65 @@ fn extract_tabindex(kind: &ControlKind) -> Option<i32> {
 /// - `"simple"` — always-visible list with editable text above (`SimpleCombo`)
 fn extract_combo_style(kind: &ControlKind) -> Option<String> {
     match kind {
-        ControlKind::ComboBox { properties, .. } => {
-            Some(match properties.style {
-                vb6parse::language::ComboBoxStyle::DropDownCombo => "dropdown".to_string(),
-                vb6parse::language::ComboBoxStyle::DropDownList => "dropdown-readonly".to_string(),
-                vb6parse::language::ComboBoxStyle::SimpleCombo => "simple".to_string(),
-            })
-        }
+        ControlKind::ComboBox { properties, .. } => Some(match properties.style {
+            vb6parse::language::ComboBoxStyle::DropDownCombo => "dropdown".to_string(),
+            vb6parse::language::ComboBoxStyle::DropDownList => "dropdown-readonly".to_string(),
+            vb6parse::language::ComboBoxStyle::SimpleCombo => "simple".to_string(),
+        }),
         _ => None,
+    }
+}
+
+/// Convert a `DynamicImage` to a base64-encoded data URL.
+///
+/// Encodes the image as PNG and returns a data URL in the format
+/// `data:image/png;base64,...`.
+fn image_to_data_url(image: &DynamicImage) -> String {
+    let mut buffer = Vec::new();
+    if image
+        .write_to(
+            &mut std::io::Cursor::new(&mut buffer),
+            image::ImageFormat::Png,
+        )
+        .is_ok()
+    {
+        let encoded = STANDARD.encode(&buffer);
+        format!("data:image/png;base64,{encoded}")
+    } else {
+        String::new()
+    }
+}
+
+/// Extract the image data URL from an `ImageProperties` picture field.
+///
+/// Converts `ReferenceOrValue<DynamicImage>` to a base64 data URL.
+/// For `Reference` variants (external .frx resource), returns `None` since
+/// the image data is not embedded in the layout model.
+fn extract_image_src(picture: &Option<ReferenceOrValue<DynamicImage>>) -> Option<String> {
+    match picture {
+        Some(ReferenceOrValue::Value(img)) => {
+            let url = image_to_data_url(img);
+            if url.is_empty() { None } else { Some(url) }
+        }
+        Some(ReferenceOrValue::Reference { .. }) => {
+            // External .frx reference - data URL cannot be generated here.
+            // vb6interpret can resolve this at runtime.
+            None
+        }
+        None => None,
+    }
+}
+
+/// Extract Image-specific leaf fields from a [`ControlKind`].
+///
+/// Returns `(image_src, stretch)` tuple for the Image control.
+/// For non-Image controls, returns `(None, false)`.
+fn extract_image_leaf(kind: &ControlKind) -> (Option<String>, bool) {
+    match kind {
+        ControlKind::Image { properties, .. } => {
+            (extract_image_src(&properties.picture), properties.stretch)
+        }
+        _ => (None, false),
     }
 }
 

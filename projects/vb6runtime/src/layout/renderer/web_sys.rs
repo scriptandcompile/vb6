@@ -497,6 +497,13 @@ impl Renderer for WebSysRenderer {
                         }
                     }
                 }
+                // Image source is set from image_src, not value.
+                if let Some(ref src) = leaf.image_src {
+                    let tag_lower = tag.to_lowercase();
+                    if tag_lower == "img" {
+                        let _ = el.set_attribute("src", src);
+                    }
+                }
             }
         }
 
@@ -773,15 +780,24 @@ mod tests {
     #[test]
     fn process_mnemonic_basic() {
         assert_eq!(process_mnemonic("OK"), "OK");
-        assert_eq!(process_mnemonic("&OK"), "<span class=\"vb6-mnemonic\">O</span>K");
-        assert_eq!(process_mnemonic("&Cancel"), "<span class=\"vb6-mnemonic\">C</span>ancel");
+        assert_eq!(
+            process_mnemonic("&OK"),
+            "<span class=\"vb6-mnemonic\">O</span>K"
+        );
+        assert_eq!(
+            process_mnemonic("&Cancel"),
+            "<span class=\"vb6-mnemonic\">C</span>ancel"
+        );
     }
 
     #[test]
     fn process_mnemonic_escaped_ampersand() {
         assert_eq!(process_mnemonic("&&"), "&");
         assert_eq!(process_mnemonic("A&&B"), "A&B");
-        assert_eq!(process_mnemonic("&A&&B"), "<span class=\"vb6-mnemonic\">A</span>&B");
+        assert_eq!(
+            process_mnemonic("&A&&B"),
+            "<span class=\"vb6-mnemonic\">A</span>&B"
+        );
     }
 
     #[test]

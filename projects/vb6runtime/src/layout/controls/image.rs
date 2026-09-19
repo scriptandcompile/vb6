@@ -2,6 +2,7 @@
 //!
 //! Maps Image properties to [`LayoutStyle`]:
 //! - `border_style` → `border`
+//! - `stretch` → `object_fit`
 
 use super::super::LayoutConfig;
 use super::super::color::mouse_pointer_css;
@@ -18,6 +19,17 @@ pub fn build_image_style(props: &ImageProperties, config: &LayoutConfig) -> Layo
                     .to_string(),
             ),
             vb6parse::language::Appearance::Flat => None,
+        },
+        border: match props.border_style {
+            vb6parse::language::BorderStyle::None => Some("none".to_string()),
+            vb6parse::language::BorderStyle::FixedSingle => {
+                Some("1px solid rgb(120, 120, 120)".to_string())
+            }
+        },
+        object_fit: if props.stretch {
+            Some("fill".to_string())
+        } else {
+            Some("contain".to_string())
         },
         ..LayoutStyle::default()
     };
@@ -72,7 +84,8 @@ mod tests {
         let config = test_config();
         let style = build_image_style(&props, &config);
         assert!(style.background_color.is_none());
-        assert!(style.border.is_none());
+        // Default BorderStyle::None produces "none" border string
+        assert_eq!(style.border, Some("none".to_string()));
         assert!(style.font_family.is_none());
     }
 
@@ -85,5 +98,41 @@ mod tests {
         };
         let style = build_image_style(&props, &config);
         assert!(style.box_shadow.is_some());
+    }
+
+    #[test]
+    fn stretch_sets_object_fit() {
+        let props = ImageProperties {
+            stretch: true,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_image_style(&props, &config);
+        assert_eq!(style.object_fit, Some("fill".to_string()));
+    }
+
+    #[test]
+    fn no_stretch_sets_object_fit_contain() {
+        let props = ImageProperties {
+            stretch: false,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_image_style(&props, &config);
+        assert_eq!(style.object_fit, Some("contain".to_string()));
+    }
+
+    #[test]
+    fn fixed_single_border() {
+        let props = ImageProperties {
+            border_style: vb6parse::language::BorderStyle::FixedSingle,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_image_style(&props, &config);
+        assert_eq!(
+            style.border,
+            Some("1px solid rgb(120, 120, 120)".to_string())
+        );
     }
 }

@@ -1123,6 +1123,7 @@ impl Display for StartUpPosition {
 /// This is useful for handling properties such as images, icons, or other binary data that may be
 /// stored externally to keep the form file size manageable.
 #[derive(Debug, PartialEq, Clone, Serialize)]
+#[allow(missing_docs)]
 pub enum ReferenceOrValue<T> {
     Reference { filename: String, offset: u32 },
     Value(T),

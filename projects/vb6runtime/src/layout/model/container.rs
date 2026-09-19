@@ -44,6 +44,7 @@ impl Default for LayoutLeaf {
             range_max: None,
             range_step: None,
             combo_style: None,
+            image_src: None,
         }
     }
 }
@@ -303,6 +304,9 @@ pub struct LayoutLeaf {
     pub range_step: Option<i32>,
     /// ComboBox style: "dropdown" (editable), "dropdown-readonly" (non-editable), "simple" (always-visible list).
     pub combo_style: Option<String>,
+
+    /// Base64-encoded image data URL for Image controls (e.g. "data:image/png;base64,...").
+    pub image_src: Option<String>,
 }
 
 impl LayoutLeaf {

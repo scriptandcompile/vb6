@@ -101,6 +101,9 @@ pub struct LayoutStyle {
     pub cursor: Option<String>,
     /// CSS direction property ('rtl' for right-to-left).
     pub direction: Option<String>,
+
+    /// CSS object-fit property for Image controls ('fill', 'contain', 'cover', 'none', 'scale-down').
+    pub object_fit: Option<String>,
 }
 
 #[cfg(test)]
@@ -139,6 +142,7 @@ mod tests {
         assert!(s.line_y2.is_none());
         assert!(s.cursor.is_none());
         assert!(s.direction.is_none());
+        assert!(s.object_fit.is_none());
     }
 
     #[test]

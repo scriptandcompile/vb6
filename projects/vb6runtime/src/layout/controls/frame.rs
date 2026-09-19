@@ -5,7 +5,7 @@
 //! - `fore_color` → `color`
 //! - `font` → `font_family`, `font_size`, `font_weight`, `font_style`, `text_decoration`
 
-use vb6parse::language::{BorderStyle, FrameProperties, TextDirection};
+use vb6parse::language::{BorderStyle, ClipControls, FrameProperties, TextDirection};
 
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
@@ -56,6 +56,10 @@ pub fn build_frame_style(props: &FrameProperties, config: &LayoutConfig) -> Layo
     } else {
         None
     };
+
+    if matches!(props.clip_controls, ClipControls::Clipped) {
+        style.overflow = Some("hidden".to_string());
+    }
 
     style
 }
@@ -204,5 +208,27 @@ mod tests {
         let config = test_config();
         let style = build_frame_style(&props, &config);
         assert_eq!(style.color, Some(CssColor::Rgb(255, 0, 0)));
+    }
+
+    #[test]
+    fn clip_controls_clipped_sets_overflow() {
+        let props = FrameProperties {
+            clip_controls: vb6parse::language::ClipControls::Clipped,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_frame_style(&props, &config);
+        assert_eq!(style.overflow, Some("hidden".to_string()));
+    }
+
+    #[test]
+    fn clip_controls_unbounded_no_overflow() {
+        let props = FrameProperties {
+            clip_controls: vb6parse::language::ClipControls::Unbounded,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_frame_style(&props, &config);
+        assert_eq!(style.overflow, None);
     }
 }
