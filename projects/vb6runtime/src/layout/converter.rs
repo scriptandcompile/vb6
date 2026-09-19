@@ -711,6 +711,7 @@ fn convert_control(
             is_default: extract_is_default(control.kind()),
             is_cancel: extract_is_cancel(control.kind()),
             combo_style: extract_combo_style(control.kind()),
+            use_mnemonic: extract_use_mnemonic(control.kind()),
             ..Default::default()
         }))),
     }
@@ -1219,6 +1220,17 @@ fn extract_combo_style(kind: &ControlKind) -> Option<String> {
             vb6parse::language::ComboBoxStyle::SimpleCombo => "simple".to_string(),
         }),
         _ => None,
+    }
+}
+
+/// Extract the `use_mnemonic` property from a [`ControlKind`].
+///
+/// Returns `false` for controls that don't support mnemonics.
+/// For Label controls, returns the `use_mnemonic` property value.
+fn extract_use_mnemonic(kind: &ControlKind) -> bool {
+    match kind {
+        ControlKind::Label { properties, .. } => properties.use_mnemonic,
+        _ => false,
     }
 }
 

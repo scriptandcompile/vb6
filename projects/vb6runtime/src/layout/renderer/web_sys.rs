@@ -483,13 +483,18 @@ impl Renderer for WebSysRenderer {
                 if let Some(ref value) = leaf.value {
                     let tag_lower = tag.to_lowercase();
                     if tag_lower == "button" {
+                        // CommandButton always processes mnemonics (no use_mnemonic property)
                         el.set_inner_html(&process_mnemonic(value));
                     } else if tag_lower == "input" {
                         let _ = el.set_attribute("value", value);
                     } else if tag_lower == "img" {
                         let _ = el.set_attribute("src", value);
                     } else {
-                        let processed = process_mnemonic(value);
+                        let processed = if leaf.use_mnemonic {
+                            process_mnemonic(value)
+                        } else {
+                            value.to_string()
+                        };
                         if processed.contains("<span") {
                             el.set_inner_html(&processed);
                         } else {

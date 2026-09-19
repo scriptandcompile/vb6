@@ -199,6 +199,7 @@ impl Renderer for TauriRenderer {
                 )
             }
             LayoutControlType::CommandButton => {
+                // CommandButton always processes mnemonics (no use_mnemonic property)
                 let caption = TauriRenderer::process_mnemonic(value);
                 let inner = if caption.contains("<span") {
                     caption
@@ -344,7 +345,11 @@ impl Renderer for TauriRenderer {
                 String::new()
             }
             _ => {
-                let processed = TauriRenderer::process_mnemonic(value);
+                let processed = if leaf.use_mnemonic {
+                    TauriRenderer::process_mnemonic(value)
+                } else {
+                    html_escape(value).to_string()
+                };
                 let inner = if processed.contains("<span") {
                     processed
                 } else {
