@@ -48,6 +48,13 @@ pub fn build_label_style(props: &LabelProperties, config: &LayoutConfig) -> Layo
         } else {
             None
         },
+        box_shadow: match props.appearance {
+            vb6parse::language::Appearance::ThreeD => Some(
+                "inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)"
+                    .to_string(),
+            ),
+            vb6parse::language::Appearance::Flat => None,
+        },
         ..LayoutStyle::default()
     }
 }
@@ -88,6 +95,28 @@ mod tests {
             dpi: 96,
             ..Default::default()
         }
+    }
+
+    #[test]
+    fn label_threed_appearance() {
+        let props = LabelProperties {
+            appearance: vb6parse::language::Appearance::ThreeD,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert!(style.box_shadow.is_some());
+    }
+
+    #[test]
+    fn label_flat_appearance() {
+        let props = LabelProperties {
+            appearance: vb6parse::language::Appearance::Flat,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert!(style.box_shadow.is_none());
     }
 
     fn make_font(name: &str, size: f32) -> vb6parse::language::Font {

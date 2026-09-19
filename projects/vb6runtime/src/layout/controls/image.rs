@@ -12,6 +12,13 @@ use vb6parse::language::ImageProperties;
 pub fn build_image_style(props: &ImageProperties, config: &LayoutConfig) -> LayoutStyle {
     let style = LayoutStyle {
         cursor: mouse_pointer_css(props.mouse_pointer),
+        box_shadow: match props.appearance {
+            vb6parse::language::Appearance::ThreeD => Some(
+                "inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)"
+                    .to_string(),
+            ),
+            vb6parse::language::Appearance::Flat => None,
+        },
         ..LayoutStyle::default()
     };
     let _ = config;
@@ -34,7 +41,29 @@ mod tests {
         let props = ImageProperties::default();
         let config = test_config();
         let style = build_image_style(&props, &config);
-        assert_eq!(style, LayoutStyle::default());
+        assert!(style.box_shadow.is_some());
+    }
+
+    #[test]
+    fn image_threed_appearance() {
+        let props = ImageProperties {
+            appearance: vb6parse::language::Appearance::ThreeD,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_image_style(&props, &config);
+        assert!(style.box_shadow.is_some());
+    }
+
+    #[test]
+    fn image_flat_appearance() {
+        let props = ImageProperties {
+            appearance: vb6parse::language::Appearance::Flat,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_image_style(&props, &config);
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -55,6 +84,6 @@ mod tests {
             ..Default::default()
         };
         let style = build_image_style(&props, &config);
-        assert_eq!(style, LayoutStyle::default());
+        assert!(style.box_shadow.is_some());
     }
 }

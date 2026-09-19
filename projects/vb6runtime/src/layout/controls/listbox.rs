@@ -38,6 +38,13 @@ pub fn build_listbox_style(props: &ListBoxProperties, config: &LayoutConfig) -> 
 
     style.overflow = Some("auto".to_string());
 
+    style.box_shadow = match props.appearance {
+        vb6parse::language::Appearance::ThreeD => Some(
+            "inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)".to_string(),
+        ),
+        vb6parse::language::Appearance::Flat => None,
+    };
+
     style.cursor = mouse_pointer_css(props.mouse_pointer);
     style.direction = if matches!(props.right_to_left, TextDirection::RightToLeft) {
         Some("rtl".to_string())
@@ -74,6 +81,28 @@ mod tests {
             dpi: 96,
             ..Default::default()
         }
+    }
+
+    #[test]
+    fn listbox_threed_appearance() {
+        let props = ListBoxProperties {
+            appearance: vb6parse::language::Appearance::ThreeD,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_listbox_style(&props, &config);
+        assert!(style.box_shadow.is_some());
+    }
+
+    #[test]
+    fn listbox_flat_appearance() {
+        let props = ListBoxProperties {
+            appearance: vb6parse::language::Appearance::Flat,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_listbox_style(&props, &config);
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
