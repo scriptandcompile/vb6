@@ -48,7 +48,7 @@ jobs:
           python-version: '3.x'
 
       - name: Install system libraries
-        run: sudo apt-get update && sudo apt-get install -y libglib2.0-dev
+        run: sudo apt-get update && sudo apt-get install -y libglib2.0-dev libgtk-3-dev
 
       - name: Generate coverage
         run: python3 scripts/generate-coverage.py --project vb6parse
