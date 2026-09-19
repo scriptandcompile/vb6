@@ -314,7 +314,7 @@ fn run_bas_file(
 }
 
 #[allow(unused_variables)]
-fn run_form_project(project: LoadedProject, startup_form_html: (String, u32)) -> Result<!> {
+fn run_form_project(project: LoadedProject, startup_form_html: (String, u32)) -> Result<()> {
     #[cfg(feature = "tauri")]
     {
         launch_tauri(project, startup_form_html);
@@ -498,6 +498,7 @@ fn run_vbp_in_cwd(set: &[String], timeout: u64, res: Option<&Path>) -> Result<()
                 StartupObject::Form { form_name: _ } => {
                     let html = project.render_startup_form()?;
                     run_form_project(project, html)?;
+                    Ok(())
                 }
             }
         }
