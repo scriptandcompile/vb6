@@ -276,14 +276,37 @@ impl Renderer for TauriRenderer {
                 )
             }
             LayoutControlType::ListBox => {
-                format!(
-                    r#"<select id="{}" class="vb6-listbox" style="{}"{}{}{}></select>"#,
-                    html_escape(&leaf.name),
-                    html_escape(&style),
-                    disabled,
-                    title_attr(leaf),
-                    tabindex_attr(leaf)
-                )
+                if leaf.listbox_style.as_deref() == Some("checkbox") {
+                    let disabled_attr = if !leaf.enabled { " disabled" } else { "" };
+                    let mut items = String::new();
+                    for (i, item) in leaf.list_items.iter().enumerate() {
+                        let escaped_item = html_escape(item);
+                        items.push_str(&format!(
+                            r#"<label><input type="checkbox" id="{}_item{}"{}>{}</input> {}</label>"#,
+                            html_escape(&leaf.name),
+                            i,
+                            disabled_attr,
+                            escaped_item,
+                            escaped_item
+                        ));
+                    }
+                    format!(
+                        r#"<div id="{}" class="vb6-listbox vb6-listbox-checkbox" style="{}"{}>{}</div>"#,
+                        html_escape(&leaf.name),
+                        html_escape(&style),
+                        title_attr(leaf),
+                        items
+                    )
+                } else {
+                    format!(
+                        r#"<select id="{}" class="vb6-listbox" style="{}"{}{}{}></select>"#,
+                        html_escape(&leaf.name),
+                        html_escape(&style),
+                        disabled,
+                        title_attr(leaf),
+                        tabindex_attr(leaf)
+                    )
+                }
             }
             LayoutControlType::Line => {
                 // Line control renders as SVG

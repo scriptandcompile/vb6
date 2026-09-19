@@ -470,6 +470,44 @@ impl Renderer for WebSysRenderer {
                     let _ = el.set_attribute("disabled", "disabled");
                 }
             }
+            LayoutControlType::ListBox => {
+                if leaf.listbox_style.as_deref() == Some("checkbox") {
+                    for (i, item) in leaf.list_items.iter().enumerate() {
+                        let label = self.doc.create_element("label").expect("create label");
+                        let input = self.doc.create_element("input").expect("create input");
+                        let _ = input.set_attribute("type", "checkbox");
+                        let _ = input.set_attribute("id", &format!("{}_item{}", leaf.name, i));
+                        let _ = input.set_attribute("class", "vb6-listbox-item-checkbox");
+                        let _ = input.set_attribute("style", "margin-right: 4px;");
+                        if !leaf.enabled {
+                            let _ = input.set_attribute("disabled", "disabled");
+                        }
+                        let text = self.doc.create_text_node(item);
+                        label.append_child(&input).ok();
+                        label.append_child(&text).ok();
+                        el.append_child(&label).ok();
+                    }
+                } else {
+                    // Standard ListBox: create <select> element
+                    let select = self.doc.create_element("select").expect("create select");
+                    let _ = select.set_id(&leaf.name);
+                    let _ = select.set_class_name(&format!("vb6-{}", leaf.control_type.css_class()));
+                    let _ = select.set_attribute(
+                        "style",
+                        &self.style_attr(&leaf.style, leaf.visible, leaf.enabled),
+                    );
+                    if let Some(ref tooltip) = leaf.tooltip {
+                        let _ = select.set_attribute("title", tooltip);
+                    }
+                    if let Some(tabindex) = leaf.tabindex {
+                        let _ = select.set_attribute("tabindex", &tabindex.to_string());
+                    }
+                    let _ = el.remove_child(&el).ok();
+                    let _ = el.replace_with_with_node_1(&select);
+                    // The select element is now in place; items would be added at runtime
+                    return select;
+                }
+            }
             LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => {
                 let _ = el.set_attribute("type", "range");
                 let _ = el.set_attribute("value", leaf.value.as_deref().unwrap_or("0"));
@@ -720,7 +758,7 @@ fn tag_for_control(control_type: LayoutControlType) -> &'static str {
         LayoutControlType::CheckBox => "input",
         LayoutControlType::OptionButton => "input",
         LayoutControlType::ComboBox => "select",
-        LayoutControlType::ListBox => "select",
+        LayoutControlType::ListBox => "div",
         LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => "input",
         LayoutControlType::Timer => "div",
         LayoutControlType::Shape => "div",

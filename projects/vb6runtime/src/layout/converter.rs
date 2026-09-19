@@ -722,6 +722,18 @@ fn convert_control(
             })))
         }
 
+        ControlKind::ListBox { .. } => {
+            let listbox_leaf = extract_listbox_leaf(
+                control.kind(),
+                control.name().to_string(),
+                control.index(),
+                position,
+                size,
+                style,
+            );
+            Ok(Some(LayoutNode::Leaf(listbox_leaf)))
+        }
+
         // Leaf controls
         _ => Ok(Some(LayoutNode::Leaf(LayoutLeaf {
             name: control.name().to_string(),
@@ -1347,6 +1359,52 @@ fn extract_textbox_leaf(
             )
         }
         _ => (false, None, None, false, None),
+    }
+}
+
+/// Extract ListBox-specific style and data into a [`LayoutLeaf`].
+fn extract_listbox_leaf(
+    kind: &ControlKind,
+    name: String,
+    index: i32,
+    position: LayoutPosition,
+    size: LayoutSize,
+    style: LayoutStyle,
+) -> LayoutLeaf {
+    let properties = match kind {
+        ControlKind::ListBox { properties, .. } => properties,
+        _ => unreachable!("extract_listbox_leaf called with non-listbox control"),
+    };
+
+    let listbox_style = match properties.style {
+        vb6parse::language::ListBoxStyle::Standard => None,
+        vb6parse::language::ListBoxStyle::Checkbox => Some("checkbox".to_string()),
+    };
+
+    let list_items = match &properties.list {
+        ReferenceOrValue::Value(items) => items.clone(),
+        ReferenceOrValue::Reference { .. } => vec![],
+    };
+
+    LayoutLeaf {
+        name,
+        control_type: layout_type_from_kind(kind),
+        index,
+        position,
+        size,
+        style,
+        value: extract_value(kind),
+        visible: properties.visible == Visibility::Visible,
+        enabled: properties.enabled == Activation::Enabled,
+        tooltip: extract_tooltip(kind),
+        tabindex: extract_tabindex(kind),
+        is_default: extract_is_default(kind),
+        is_cancel: extract_is_cancel(kind),
+        combo_style: extract_combo_style(kind),
+        use_mnemonic: extract_use_mnemonic(kind),
+        listbox_style,
+        list_items,
+        ..Default::default()
     }
 }
 

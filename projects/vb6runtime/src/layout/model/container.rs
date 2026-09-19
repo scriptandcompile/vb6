@@ -45,6 +45,8 @@ impl Default for LayoutLeaf {
             range_step: None,
             combo_style: None,
             image_src: None,
+            listbox_style: None,
+            list_items: vec![],
         }
     }
 }
@@ -307,6 +309,12 @@ pub struct LayoutLeaf {
 
     /// Base64-encoded image data URL for Image controls (e.g. "data:image/png;base64,...").
     pub image_src: Option<String>,
+
+    /// ListBox style: "checkbox" renders each item with a checkbox instead of <option>.
+    pub listbox_style: Option<String>,
+
+    /// ListBox items for checkbox mode rendering.
+    pub list_items: Vec<String>,
 }
 
 impl LayoutLeaf {
