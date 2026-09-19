@@ -185,6 +185,24 @@ pub fn build_page(
         }};
 
         window._vb6StartProject();
+
+        // Wire up Enter key to trigger default button, Escape to trigger cancel button.
+        document.addEventListener('keydown', function (e) {{
+            if (e.key === 'Enter') {{
+                var defaultBtn = document.querySelector('[autofocus], [data-default="true"]');
+                if (defaultBtn && !defaultBtn.disabled) {{
+                    defaultBtn.click();
+                    e.preventDefault();
+                }}
+            }}
+            if (e.key === 'Escape') {{
+                var cancelBtn = document.querySelector('[data-cancel="true"]');
+                if (cancelBtn && !cancelBtn.disabled) {{
+                    cancelBtn.click();
+                    e.preventDefault();
+                }}
+            }}
+        }});
     }})();
     </script>
 </body>
