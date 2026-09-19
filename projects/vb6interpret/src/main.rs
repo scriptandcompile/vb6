@@ -11,10 +11,10 @@ use std::time::{Duration, Instant};
 #[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 use std::sync::OnceLock;
 
-#[cfg(feature = "tauri")]
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 use vb6runtime::layout::scale::twips_to_pixels;
 
-#[cfg(feature = "tauri")]
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 use vb6interpret::tauri_cmds;
 
 use vb6interpret::{Interpreter, LoadedProject, StartupObject, project};
@@ -120,8 +120,15 @@ fn run_cli() -> Result<()> {
                             bail!("No startup object found in project");
                         }
                         StartupObject::Form { form_name: _ } => {
-                            let html = project.render_startup_form()?;
-                            run_form_project(project, html)?;
+                            #[cfg(not(target_arch = "wasm32"))]
+                            {
+                                let html = project.render_startup_form()?;
+                                run_form_project(project, html)?;
+                            }
+                            #[cfg(target_arch = "wasm32")]
+                            {
+                                bail!("Form applications are not supported on wasm32 from CLI");
+                            }
                         }
                     }
                 }
@@ -315,11 +322,11 @@ fn run_bas_file(
 
 #[allow(unused_variables)]
 fn run_form_project(project: LoadedProject, startup_form_html: (String, u32)) -> Result<()> {
-    #[cfg(feature = "tauri")]
+    #[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
     {
         launch_tauri(project, startup_form_html);
     }
-    #[cfg(not(feature = "tauri"))]
+    #[cfg(any(not(feature = "tauri"), target_arch = "wasm32"))]
     {
         bail!(
             "{} is a Form application and requires the tauri feature. Rebuild with --features tauri",
@@ -328,7 +335,7 @@ fn run_form_project(project: LoadedProject, startup_form_html: (String, u32)) ->
     }
 }
 
-#[cfg(feature = "tauri")]
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
     use tauri::Manager;
     use tauri::generate_handler;
@@ -336,30 +343,34 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
     // Extract startup form name/caption before the project is moved into the engine,
     // and calculate the window size from the form's total dimensions
     // (including title bar, borders, and scrollbars).
-    let (startup_form_name, form_caption, window_width, window_height) = match &project.startup_object {
-        StartupObject::Form { form_name } => {
-            let (w, h, caption) = project.forms.iter().find(|f| f.name == *form_name)
-                .map(|f| match &f.parsed.form {
-                    vb6parse::language::FormRoot::Form(frm) => {
-                        let dpi = 96;
-                        let w = twips_to_pixels(frm.properties.client_width, dpi) as f64;
-                        let h = twips_to_pixels(frm.properties.client_height, dpi) as f64;
-                        let caption = frm.properties.caption.clone();
-                        (w.max(10.0), h.max(10.0), caption)
-                    }
-                    vb6parse::language::FormRoot::MDIForm(mdi) => {
-                        let dpi = 96;
-                        let w = twips_to_pixels(mdi.properties.width, dpi) as f64;
-                        let h = twips_to_pixels(mdi.properties.height, dpi) as f64;
-                        let caption = mdi.properties.caption.clone();
-                        (w.max(10.0), h.max(10.0), caption)
-                    }
-                })
-                .unwrap_or((10.0, 10.0, String::new()));
-            (form_name.clone(), caption, w, h)
-        }
-        _ => (String::new(), String::new(), 10.0, 10.0),
-    };
+    let (startup_form_name, form_caption, window_width, window_height) =
+        match &project.startup_object {
+            StartupObject::Form { form_name } => {
+                let (w, h, caption) = project
+                    .forms
+                    .iter()
+                    .find(|f| f.name == *form_name)
+                    .map(|f| match &f.parsed.form {
+                        vb6parse::language::FormRoot::Form(frm) => {
+                            let dpi = 96;
+                            let w = twips_to_pixels(frm.properties.client_width, dpi) as f64;
+                            let h = twips_to_pixels(frm.properties.client_height, dpi) as f64;
+                            let caption = frm.properties.caption.clone();
+                            (w.max(10.0), h.max(10.0), caption)
+                        }
+                        vb6parse::language::FormRoot::MDIForm(mdi) => {
+                            let dpi = 96;
+                            let w = twips_to_pixels(mdi.properties.width, dpi) as f64;
+                            let h = twips_to_pixels(mdi.properties.height, dpi) as f64;
+                            let caption = mdi.properties.caption.clone();
+                            (w.max(10.0), h.max(10.0), caption)
+                        }
+                    })
+                    .unwrap_or((10.0, 10.0, String::new()));
+                (form_name.clone(), caption, w, h)
+            }
+            _ => (String::new(), String::new(), 10.0, 10.0),
+        };
 
     let engine_handle = tauri_cmds::spawn_engine(project);
 
@@ -445,7 +456,7 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
 }
 
 /// The complete HTML page served by the `vb6://` custom protocol.
-#[cfg(feature = "tauri")]
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 static FORM_PAGE: OnceLock<String> = OnceLock::new();
 
 fn run_console_project(
@@ -496,9 +507,16 @@ fn run_vbp_in_cwd(set: &[String], timeout: u64, res: Option<&Path>) -> Result<()
                     bail!("No startup object found in project");
                 }
                 StartupObject::Form { form_name: _ } => {
-                    let html = project.render_startup_form()?;
-                    run_form_project(project, html)?;
-                    Ok(())
+                    #[cfg(not(target_arch = "wasm32"))]
+                    {
+                        let html = project.render_startup_form()?;
+                        run_form_project(project, html)?;
+                        Ok(())
+                    }
+                    #[cfg(target_arch = "wasm32")]
+                    {
+                        bail!("Form applications are not supported on wasm32 from CLI");
+                    }
                 }
             }
         }

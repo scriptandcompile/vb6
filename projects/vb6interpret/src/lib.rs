@@ -16,19 +16,19 @@ pub mod program;
 pub mod project;
 pub mod scope;
 
-/// Tauri background engine with IPC channels (only compiled with `tauri` feature).
-#[cfg(feature = "tauri")]
+/// Tauri background engine with IPC channels (only compiled with `tauri` feature, excluded on wasm32).
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 pub mod tauri_engine;
 
-/// Tauri command handlers for form rendering (only compiled with `tauri` feature).
-#[cfg(feature = "tauri")]
+/// Tauri command handlers for form rendering (only compiled with `tauri` feature, excluded on wasm32).
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 pub mod tauri_cmds;
 
-/// Embedded HTML for the Tauri webview (only compiled with `tauri` feature).
-#[cfg(feature = "tauri")]
+/// Embedded HTML for the Tauri webview (only compiled with `tauri` feature, excluded on wasm32).
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 pub mod tauri_html;
 
-#[cfg(feature = "tauri")]
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 pub use tauri_engine::{TauriCommand, TauriEngine, TauriEngineHandle, TauriResponse};
 
 /// Library version

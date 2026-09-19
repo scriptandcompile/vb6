@@ -501,6 +501,7 @@ impl LoadedProject {
     ///
     /// Returns an error if the project has no form startup object or if
     /// the named form is not found among the loaded forms.
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn render_startup_form(&self) -> Result<(String, u32)> {
         let form_name = match &self.startup_object {
             StartupObject::Form { form_name } => form_name.clone(),

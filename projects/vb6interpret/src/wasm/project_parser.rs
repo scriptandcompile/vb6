@@ -25,8 +25,8 @@ pub(super) fn js_map_to_byte_pairs(map: &JsValue) -> Result<Vec<(String, Vec<u8>
         return Ok(vec![(String::new(), bytes)]);
     }
 
-    let keys: js_sys::Array = js_sys::Reflect::own_keys(map)
-        .map_err(|_| JsError::new("failed to get object keys"))?;
+    let keys: js_sys::Array =
+        js_sys::Reflect::own_keys(map).map_err(|_| JsError::new("failed to get object keys"))?;
     let len = keys.length();
     let mut result = Vec::with_capacity(len as usize);
     for i in 0..len {
@@ -34,10 +34,10 @@ pub(super) fn js_map_to_byte_pairs(map: &JsValue) -> Result<Vec<(String, Vec<u8>
         let key_str = key
             .as_string()
             .ok_or_else(|| JsError::new("map key is not a string"))?;
-        let value = js_sys::Reflect::get(map, &key)
-            .map_err(|_| JsError::new("failed to get map value"))?;
-        let bytes: Vec<u8> = serde_wasm_bindgen::from_value(value)
-            .map_err(|e| JsError::new(&e.to_string()))?;
+        let value =
+            js_sys::Reflect::get(map, &key).map_err(|_| JsError::new("failed to get map value"))?;
+        let bytes: Vec<u8> =
+            serde_wasm_bindgen::from_value(value).map_err(|e| JsError::new(&e.to_string()))?;
         result.push((key_str, bytes));
     }
     Ok(result)

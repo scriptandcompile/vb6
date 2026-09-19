@@ -197,7 +197,10 @@ pub fn form_event(engine_handle: EngineHandle, control: String, event: String) -
             Ok(_) => {
                 let output = interp.drain_output();
                 eprint!("{}", output);
-                FormEventResult { status: FormEventStatus::Handled, output: String::new() }
+                FormEventResult {
+                    status: FormEventStatus::Handled,
+                    output: String::new(),
+                }
             }
             Err(e) => {
                 eprintln!(
@@ -206,11 +209,17 @@ pub fn form_event(engine_handle: EngineHandle, control: String, event: String) -
                 );
                 let output = interp.drain_output();
                 eprint!("{}", output);
-                FormEventResult { status: FormEventStatus::Handled, output: String::new() }
+                FormEventResult {
+                    status: FormEventStatus::Handled,
+                    output: String::new(),
+                }
             }
         }
     } else {
-        FormEventResult { status: FormEventStatus::Handled, output: String::new() }
+        FormEventResult {
+            status: FormEventStatus::Handled,
+            output: String::new(),
+        }
     }
 }
 
