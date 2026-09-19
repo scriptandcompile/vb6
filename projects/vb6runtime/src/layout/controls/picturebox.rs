@@ -10,6 +10,7 @@ use vb6parse::language::{BorderStyle, PictureBoxProperties, TextDirection};
 
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
+use super::super::converter::extract_image_src;
 use super::super::font_points_to_px;
 use super::super::model::style::LayoutStyle;
 
@@ -59,6 +60,23 @@ pub fn build_picturebox_style(props: &PictureBoxProperties, config: &LayoutConfi
     } else {
         None
     };
+
+    style.align = match props.align {
+        vb6parse::language::Align::None => Some("none".to_string()),
+        vb6parse::language::Align::Top => Some("top".to_string()),
+        vb6parse::language::Align::Bottom => Some("bottom".to_string()),
+        vb6parse::language::Align::Left => Some("left".to_string()),
+        vb6parse::language::Align::Right => Some("right".to_string()),
+    };
+
+    if matches!(
+        props.font_transparent,
+        vb6parse::language::FontTransparency::Transparent
+    ) {
+        style.background_color = None;
+    }
+
+    style.background_image = extract_image_src(&props.picture);
 
     style
 }
@@ -118,6 +136,7 @@ mod tests {
     fn basic_style_default() {
         let props = PictureBoxProperties {
             font: None,
+            font_transparent: vb6parse::language::FontTransparency::Opaque,
             ..Default::default()
         };
         let config = test_config();
@@ -192,11 +211,100 @@ mod tests {
                 green: 255,
                 blue: 255,
             },
+            font_transparent: vb6parse::language::FontTransparency::Opaque,
             ..Default::default()
         };
         let config = test_config();
         let style = build_picturebox_style(&props, &config);
         assert_eq!(style.background_color, Some(CssColor::Rgb(0, 128, 255)));
         assert_eq!(style.color, Some(CssColor::Rgb(255, 255, 255)));
+    }
+
+    #[test]
+    fn align_none() {
+        let props = PictureBoxProperties {
+            align: vb6parse::language::Align::None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_picturebox_style(&props, &config);
+        assert_eq!(style.align, Some("none".to_string()));
+    }
+
+    #[test]
+    fn align_top() {
+        let props = PictureBoxProperties {
+            align: vb6parse::language::Align::Top,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_picturebox_style(&props, &config);
+        assert_eq!(style.align, Some("top".to_string()));
+    }
+
+    #[test]
+    fn align_left() {
+        let props = PictureBoxProperties {
+            align: vb6parse::language::Align::Left,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_picturebox_style(&props, &config);
+        assert_eq!(style.align, Some("left".to_string()));
+    }
+
+    #[test]
+    fn align_right() {
+        let props = PictureBoxProperties {
+            align: vb6parse::language::Align::Right,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_picturebox_style(&props, &config);
+        assert_eq!(style.align, Some("right".to_string()));
+    }
+
+    #[test]
+    fn align_bottom() {
+        let props = PictureBoxProperties {
+            align: vb6parse::language::Align::Bottom,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_picturebox_style(&props, &config);
+        assert_eq!(style.align, Some("bottom".to_string()));
+    }
+
+    #[test]
+    fn font_transparent_opaque() {
+        let props = PictureBoxProperties {
+            font_transparent: vb6parse::language::FontTransparency::Opaque,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_picturebox_style(&props, &config);
+        assert!(style.background_color.is_some());
+    }
+
+    #[test]
+    fn font_transparent_transparent() {
+        let props = PictureBoxProperties {
+            font_transparent: vb6parse::language::FontTransparency::Transparent,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_picturebox_style(&props, &config);
+        assert!(style.background_color.is_none());
+    }
+
+    #[test]
+    fn picture_without_image_src() {
+        let props = PictureBoxProperties {
+            picture: None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_picturebox_style(&props, &config);
+        assert!(style.background_image.is_none());
     }
 }

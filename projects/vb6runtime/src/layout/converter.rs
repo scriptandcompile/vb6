@@ -1286,7 +1286,9 @@ fn image_to_data_url(image: &DynamicImage) -> String {
 /// Converts `ReferenceOrValue<DynamicImage>` to a base64 data URL.
 /// For `Reference` variants (external .frx resource), returns `None` since
 /// the image data is not embedded in the layout model.
-fn extract_image_src(picture: &Option<ReferenceOrValue<DynamicImage>>) -> Option<String> {
+pub(crate) fn extract_image_src(
+    picture: &Option<ReferenceOrValue<DynamicImage>>,
+) -> Option<String> {
     match picture {
         Some(ReferenceOrValue::Value(img)) => {
             let url = image_to_data_url(img);

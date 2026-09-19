@@ -100,6 +100,9 @@ pub fn style_to_css(style: &LayoutStyle) -> String {
     if let Some(ref v) = style.object_fit {
         parts.push(format!("object-fit: {}", v));
     }
+    if let Some(ref v) = style.background_image {
+        parts.push(format!("background-image: url(\"{}\")", v));
+    }
 
     parts.join("; ")
 }

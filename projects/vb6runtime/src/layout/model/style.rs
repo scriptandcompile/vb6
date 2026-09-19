@@ -104,6 +104,9 @@ pub struct LayoutStyle {
 
     /// CSS object-fit property for Image controls ('fill', 'contain', 'cover', 'none', 'scale-down').
     pub object_fit: Option<String>,
+
+    /// Background image as a base64 data URL (for PictureBox controls).
+    pub background_image: Option<String>,
 }
 
 #[cfg(test)]
