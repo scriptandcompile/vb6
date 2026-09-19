@@ -483,6 +483,23 @@ impl Renderer for WebSysRenderer {
                     let _ = el.set_attribute("step", &step.to_string());
                 }
             }
+            LayoutControlType::TextBox => {
+                if leaf.password_char.is_some() {
+                    let _ = el.set_attribute("type", "password");
+                }
+                if leaf.is_locked {
+                    let _ = el.set_attribute("readonly", "");
+                }
+                if let Some(max_length) = leaf.max_length {
+                    let _ = el.set_attribute("maxlength", &max_length.to_string());
+                }
+                if let Some(ref value) = leaf.value {
+                    let _ = el.set_attribute("value", value);
+                }
+                if let Some(ref src) = leaf.image_src {
+                    let _ = el.set_attribute("src", src);
+                }
+            }
             _ => {
                 if let Some(ref value) = leaf.value {
                     let tag_lower = tag.to_lowercase();

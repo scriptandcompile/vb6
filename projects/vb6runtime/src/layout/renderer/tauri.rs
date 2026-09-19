@@ -146,25 +146,40 @@ impl Renderer for TauriRenderer {
 
         match leaf.control_type {
             LayoutControlType::TextBox => {
+                let input_type = if leaf.password_char.is_some() {
+                    "password"
+                } else {
+                    "text"
+                };
+                let readonly = if leaf.is_locked { " readonly" } else { "" };
+                let maxlength = leaf
+                    .max_length
+                    .map(|n| format!(" maxlength=\"{}\"", n))
+                    .unwrap_or_default();
                 // Multi-line text boxes render as <textarea> so vertical
                 // scrolling and wrapped text behave like VB6.
                 if leaf.style.multi_line {
                     format!(
-                        r#"<textarea id="{}" class="vb6-textbox" style="{}"{}{}{}>{}</textarea>"#,
+                        r#"<textarea id="{}" class="vb6-textbox" style="{}"{}{}{}{}{}>{}</textarea>"#,
                         html_escape(&leaf.name),
                         html_escape(&style),
                         disabled,
+                        readonly,
+                        maxlength,
                         title_attr(leaf),
                         tabindex_attr(leaf),
                         html_escape(value)
                     )
                 } else {
                     format!(
-                        r#"<input id="{}" class="vb6-textbox" type="text" value="{}" style="{}"{}{}{}>"#,
+                        r#"<input id="{}" class="vb6-textbox" type="{}" value="{}" style="{}"{}{}{}{}{}>"#,
                         html_escape(&leaf.name),
+                        html_escape(input_type),
                         html_escape(value),
                         html_escape(&style),
                         disabled,
+                        readonly,
+                        maxlength,
                         title_attr(leaf),
                         tabindex_attr(leaf)
                     )

@@ -263,9 +263,21 @@ fn scoped_control_rules() -> Vec<String> {
         vb6_rule(".vb6-app .vb6-form", &form_style()),
         vb6_rule(".vb6-app .vb6-label", &label_style()),
         vb6_rule(".vb6-app .vb6-textbox", &textbox_style()),
+        vb6_rule(
+            ".vb6-app .vb6-textbox:focus::selection",
+            &textbox_focus_selection_style(),
+        ),
+        vb6_rule(
+            ".vb6-app .vb6-textbox:not(:focus)::selection",
+            &textbox_blur_selection_style(),
+        ),
         vb6_rule(".vb6-app .vb6-commandbutton", &button_style()),
         vb6_rule(".vb6-app .vb6-frame", &frame_style()),
         vb6_rule(".vb6-app .vb6-picturebox", &picturebox_style()),
+        vb6_rule(".vb6-app .vb6-align-top", &align_top_style()),
+        vb6_rule(".vb6-app .vb6-align-bottom", &align_bottom_style()),
+        vb6_rule(".vb6-app .vb6-align-left", &align_left_style()),
+        vb6_rule(".vb6-app .vb6-align-right", &align_right_style()),
         vb6_rule(".vb6-app .vb6-image", &image_style()),
         vb6_rule(".vb6-app .vb6-checkbox", &checkbox_style()),
         vb6_rule(".vb6-app .vb6-optionbutton", &optionbutton_style()),
@@ -315,9 +327,21 @@ fn bare_control_rules() -> Vec<String> {
     vec![
         vb6_rule(".vb6-label", &label_style()),
         vb6_rule(".vb6-textbox", &textbox_style()),
+        vb6_rule(
+            ".vb6-textbox:focus::selection",
+            &textbox_focus_selection_style(),
+        ),
+        vb6_rule(
+            ".vb6-textbox:not(:focus)::selection",
+            &textbox_blur_selection_style(),
+        ),
         vb6_rule(".vb6-commandbutton", &button_style()),
         vb6_rule(".vb6-frame", &frame_style()),
         vb6_rule(".vb6-picturebox", &picturebox_style()),
+        vb6_rule(".vb6-align-top", &align_top_style()),
+        vb6_rule(".vb6-align-bottom", &align_bottom_style()),
+        vb6_rule(".vb6-align-left", &align_left_style()),
+        vb6_rule(".vb6-align-right", &align_right_style()),
         vb6_rule(".vb6-image", &image_style()),
         vb6_rule(".vb6-checkbox", &checkbox_style()),
         vb6_rule(".vb6-optionbutton", &optionbutton_style()),
@@ -390,6 +414,14 @@ fn textbox_style() -> String {
         .to_string()
 }
 
+fn textbox_focus_selection_style() -> String {
+    "  background: #0078d4;\n  color: var(--vb6-window-text);".to_string()
+}
+
+fn textbox_blur_selection_style() -> String {
+    "  background: rgba(0, 0, 0, 0.1);\n  color: var(--vb6-window-text);".to_string()
+}
+
 fn button_style() -> String {
     r#"  background-color: var(--vb6-button-bg);
   color: var(--vb6-fg);
@@ -418,6 +450,22 @@ fn picturebox_style() -> String {
   border: 1px solid var(--vb6-button-border);
   overflow: hidden;"#
         .to_string()
+}
+
+fn align_top_style() -> String {
+    "  position: absolute;\n  left: 0;\n  width: 100%;\n  top: 0;".to_string()
+}
+
+fn align_bottom_style() -> String {
+    "  position: absolute;\n  left: 0;\n  width: 100%;\n  bottom: 0;".to_string()
+}
+
+fn align_left_style() -> String {
+    "  position: absolute;\n  top: 0;\n  height: 100%;\n  left: 0;".to_string()
+}
+
+fn align_right_style() -> String {
+    "  position: absolute;\n  top: 0;\n  height: 100%;\n  right: 0;".to_string()
 }
 
 fn image_style() -> String {
