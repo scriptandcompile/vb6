@@ -150,33 +150,36 @@ impl Renderer for TauriRenderer {
                 // scrolling and wrapped text behave like VB6.
                 if leaf.style.multi_line {
                     format!(
-                        r#"<textarea id="{}" class="vb6-textbox" style="{}"{}{}>{}</textarea>"#,
+                        r#"<textarea id="{}" class="vb6-textbox" style="{}"{}{}{}>{}</textarea>"#,
                         html_escape(&leaf.name),
                         html_escape(&style),
                         disabled,
                         title_attr(leaf),
+                        tabindex_attr(leaf),
                         html_escape(value)
                     )
                 } else {
                     format!(
-                        r#"<input id="{}" class="vb6-textbox" type="text" value="{}" style="{}"{}{}>"#,
+                        r#"<input id="{}" class="vb6-textbox" type="text" value="{}" style="{}"{}{}{}>"#,
                         html_escape(&leaf.name),
                         html_escape(value),
                         html_escape(&style),
                         disabled,
-                        title_attr(leaf)
+                        title_attr(leaf),
+                        tabindex_attr(leaf)
                     )
                 }
             }
             LayoutControlType::CheckBox => {
                 let checked = leaf.value.as_deref() == Some("True");
                 format!(
-                    r#"<input id="{}" class="vb6-checkbox" type="checkbox" {} style="{}"{}{}>"#,
+                    r#"<input id="{}" class="vb6-checkbox" type="checkbox" {} style="{}"{}{}{}>"#,
                     html_escape(&leaf.name),
                     if checked { "checked" } else { "" },
                     html_escape(&style),
                     disabled,
-                    title_attr(leaf)
+                    title_attr(leaf),
+                    tabindex_attr(leaf)
                 )
             }
             LayoutControlType::OptionButton => {
@@ -185,13 +188,14 @@ impl Renderer for TauriRenderer {
                 // so selecting one clears the others in the same group.
                 let group = leaf.style.group.as_deref().unwrap_or(&leaf.name);
                 format!(
-                    r#"<input id="{}" class="vb6-optionbutton" type="radio" name="{}" {} style="{}"{}{}>"#,
+                    r#"<input id="{}" class="vb6-optionbutton" type="radio" name="{}" {} style="{}"{}{}{}>"#,
                     html_escape(&leaf.name),
                     html_escape(group),
                     if checked { "checked" } else { "" },
                     html_escape(&style),
                     disabled,
-                    title_attr(leaf)
+                    title_attr(leaf),
+                    tabindex_attr(leaf)
                 )
             }
             LayoutControlType::CommandButton => {
@@ -202,11 +206,12 @@ impl Renderer for TauriRenderer {
                     html_escape(value).to_string()
                 };
                 format!(
-                    r#"<button id="{}" class="vb6-commandbutton" style="{}"{}{}>{}</button>"#,
+                    r#"<button id="{}" class="vb6-commandbutton" style="{}"{}{}{}>{}</button>"#,
                     html_escape(&leaf.name),
                     html_escape(&style),
                     disabled,
                     title_attr(leaf),
+                    tabindex_attr(leaf),
                     inner
                 )
             }
@@ -216,7 +221,7 @@ impl Renderer for TauriRenderer {
                 let step = leaf.range_step.unwrap_or(1);
                 let step_attr = if step != 1 { format!(" step=\"{}\"", step) } else { String::new() };
                 format!(
-                    r#"<input id="{}" class="vb6-{}" type="range" value="{}" min="{}" max="{}"{} style="{}"{}{}>"#,
+                    r#"<input id="{}" class="vb6-{}" type="range" value="{}" min="{}" max="{}"{} style="{}"{}{}{}>"#,
                     html_escape(&leaf.name),
                     leaf.control_type.css_class(),
                     html_escape(value),
@@ -225,25 +230,28 @@ impl Renderer for TauriRenderer {
                     step_attr,
                     html_escape(&style),
                     disabled,
-                    title_attr(leaf)
+                    title_attr(leaf),
+                    tabindex_attr(leaf)
                 )
             }
             LayoutControlType::ComboBox => {
                 format!(
-                    r#"<select id="{}" class="vb6-combobox" style="{}"{}{}></select>"#,
+                    r#"<select id="{}" class="vb6-combobox" style="{}"{}{}{}></select>"#,
                     html_escape(&leaf.name),
                     html_escape(&style),
                     disabled,
-                    title_attr(leaf)
+                    title_attr(leaf),
+                    tabindex_attr(leaf)
                 )
             }
             LayoutControlType::ListBox => {
                 format!(
-                    r#"<select id="{}" class="vb6-listbox" style="{}"{}{}></select>"#,
+                    r#"<select id="{}" class="vb6-listbox" style="{}"{}{}{}></select>"#,
                     html_escape(&leaf.name),
                     html_escape(&style),
                     disabled,
-                    title_attr(leaf)
+                    title_attr(leaf),
+                    tabindex_attr(leaf)
                 )
             }
             LayoutControlType::Line => {
@@ -260,7 +268,7 @@ impl Renderer for TauriRenderer {
                     .unwrap_or_else(|| "rgb(0, 0, 0)".to_string());
                 let width = leaf.style.line_width.unwrap_or(1.0);
                 format!(
-                    r#"<svg id="{}" class="vb6-line" style="{}" width="{}" height="{}" viewBox="0 0 {} {}"{}><line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" stroke-width="{}" /></svg>"#,
+                    r#"<svg id="{}" class="vb6-line" style="{}" width="{}" height="{}" viewBox="0 0 {} {}"{}{}><line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" stroke-width="{}" /></svg>"#,
                     html_escape(&leaf.name),
                     html_escape(&style),
                     leaf.size.width,
@@ -268,6 +276,7 @@ impl Renderer for TauriRenderer {
                     leaf.size.width,
                     leaf.size.height,
                     title_attr(leaf),
+                    tabindex_attr(leaf),
                     x1,
                     y1,
                     x2,
@@ -280,23 +289,25 @@ impl Renderer for TauriRenderer {
                 // Image uses <img> element for proper web semantics and object-fit styling.
                 // The `value` field holds the image path/URL.
                 format!(
-                    r#"<img id="{}" class="vb6-image" src="{}" style="{}"{}>"#,
+                    r#"<img id="{}" class="vb6-image" src="{}" style="{}"{}{}>"#,
                     html_escape(&leaf.name),
                     html_escape(value),
                     html_escape(&style),
-                    title_attr(leaf)
+                    title_attr(leaf),
+                    tabindex_attr(leaf)
                 )
             }
             LayoutControlType::DriveListBox
             | LayoutControlType::DirListBox
             | LayoutControlType::FileListBox => {
                 format!(
-                    r#"<select id="{}" class="vb6-{}" style="{}"{}{}></select>"#,
+                    r#"<select id="{}" class="vb6-{}" style="{}"{}{}{}></select>"#,
                     html_escape(&leaf.name),
                     leaf.control_type.css_class(),
                     html_escape(&style),
                     disabled,
-                    title_attr(leaf)
+                    title_attr(leaf),
+                    tabindex_attr(leaf)
                 )
             }
             LayoutControlType::Shape => {
@@ -309,10 +320,11 @@ impl Renderer for TauriRenderer {
                     }
                 }
                 format!(
-                    r#"<div id="{}" class="vb6-shape" style="{}"{}></div>"#,
+                    r#"<div id="{}" class="vb6-shape" style="{}"{}{}></div>"#,
                     html_escape(&leaf.name),
                     html_escape(&s),
-                    title_attr(leaf)
+                    title_attr(leaf),
+                    tabindex_attr(leaf)
                 )
             }
             LayoutControlType::Timer => {
@@ -329,11 +341,12 @@ impl Renderer for TauriRenderer {
                     html_escape(value).to_string()
                 };
                 format!(
-                    r#"<div id="{}" class="vb6-{}" style="{}"{}>{}</div>"#,
+                    r#"<div id="{}" class="vb6-{}" style="{}"{}{}>{}</div>"#,
                     html_escape(&leaf.name),
                     leaf.control_type.css_class(),
                     html_escape(&style),
                     title_attr(leaf),
+                    tabindex_attr(leaf),
                     inner
                 )
             }
@@ -504,6 +517,13 @@ fn title_attr(leaf: &LayoutLeaf) -> String {
     leaf.tooltip
         .as_deref()
         .map(|t| format!(r#" title="{}""#, html_escape(t)))
+        .unwrap_or_default()
+}
+
+/// Build a `tabindex` attribute string from a leaf's tabindex value.
+fn tabindex_attr(leaf: &LayoutLeaf) -> String {
+    leaf.tabindex
+        .map(|t| format!(r#" tabindex="{}""#, t))
         .unwrap_or_default()
 }
 
@@ -698,6 +718,98 @@ mod tests {
         };
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains(r#"title="A &quot;safe&quot; tip""#));
+    }
+
+    #[test]
+    fn tabindex_rendered_on_button() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("cmdOK", LayoutControlType::CommandButton, Some("OK".into()));
+        let leaf = LayoutLeaf {
+            tabindex: Some(0),
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"tabindex="0""#));
+    }
+
+    #[test]
+    fn tabindex_rendered_on_textbox() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("txtName", LayoutControlType::TextBox, Some("".into()));
+        let leaf = LayoutLeaf {
+            tabindex: Some(-1),
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"tabindex="-1""#));
+    }
+
+    #[test]
+    fn tabindex_rendered_on_checkbox() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("chkAgree", LayoutControlType::CheckBox, Some("True".into()));
+        let leaf = LayoutLeaf {
+            tabindex: Some(0),
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"tabindex="0""#));
+    }
+
+    #[test]
+    fn tabindex_rendered_on_optionbutton() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("optChoice", LayoutControlType::OptionButton, Some("True".into()));
+        let leaf = LayoutLeaf {
+            tabindex: Some(0),
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"tabindex="0""#));
+    }
+
+    #[test]
+    fn tabindex_rendered_on_combobox() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("cmbList", LayoutControlType::ComboBox, Some("".into()));
+        let leaf = LayoutLeaf {
+            tabindex: Some(0),
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"tabindex="0""#));
+    }
+
+    #[test]
+    fn tabindex_rendered_on_listbox() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lstItems", LayoutControlType::ListBox, Some("".into()));
+        let leaf = LayoutLeaf {
+            tabindex: Some(0),
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"tabindex="0""#));
+    }
+
+    #[test]
+    fn tabindex_rendered_on_scrollbar() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("scrValue", LayoutControlType::HScrollBar, Some("50".into()));
+        let leaf = LayoutLeaf {
+            tabindex: Some(0),
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"tabindex="0""#));
+    }
+
+    #[test]
+    fn no_tabindex_means_no_tabindex_attr() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("lblNoTab", LayoutControlType::Label, Some("Label".into()));
+        let html = renderer.render_leaf(&leaf);
+        assert!(!html.contains("tabindex="));
     }
 
     #[test]

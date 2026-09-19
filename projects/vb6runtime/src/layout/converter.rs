@@ -16,10 +16,10 @@
 
 use std::collections::HashMap;
 
-    use vb6parse::language::{
-        Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm, ScaleMode,
-        TextDirection, Visibility,
-    };
+use vb6parse::language::{
+    Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm, ScaleMode,
+    TabStop, TextDirection, Visibility,
+};
 use vb6parse::parsers::{ConcreteSyntaxTree, SyntaxKind};
 
 use super::model::LayoutControlType;
@@ -28,7 +28,11 @@ use super::model::{
     LayoutSize, LayoutStyle, NodeId,
 };
 use super::scale::{scale_mode_to_pixels, twips_to_pixels};
-use super::{LayoutConfig, color::{color_to_css, mouse_pointer_css}, font_points_to_px};
+use super::{
+    LayoutConfig,
+    color::{color_to_css, mouse_pointer_css},
+    font_points_to_px,
+};
 
 use super::form_store::{self, FormHandle};
 
@@ -655,7 +659,14 @@ fn convert_control(
         }
 
         ControlKind::HScrollBar { .. } | ControlKind::VScrollBar { .. } => {
-            let sb_leaf = extract_scrollbar_leaf(control.kind(), control.name().to_string(), control.index(), position, size, style);
+            let sb_leaf = extract_scrollbar_leaf(
+                control.kind(),
+                control.name().to_string(),
+                control.index(),
+                position,
+                size,
+                style,
+            );
             Ok(Some(LayoutNode::Leaf(sb_leaf)))
         }
 
@@ -671,6 +682,7 @@ fn convert_control(
             visible,
             enabled,
             tooltip: extract_tooltip(control.kind()),
+            tabindex: extract_tabindex(control.kind()),
             ..Default::default()
         }))),
     }
@@ -686,9 +698,15 @@ fn extract_scrollbar_leaf(
     style: LayoutStyle,
 ) -> LayoutLeaf {
     let properties = match kind {
-        ControlKind::HScrollBar { properties, .. }
-        | ControlKind::VScrollBar { properties, .. } => properties,
+        ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
+            properties
+        }
         _ => unreachable!("extract_scrollbar_leaf called with non-scrollbar control"),
+    };
+
+    let tabindex = match properties.tab_stop {
+        TabStop::Included => Some(0),
+        TabStop::ProgrammaticOnly => Some(-1),
     };
 
     LayoutLeaf {
@@ -702,6 +720,7 @@ fn extract_scrollbar_leaf(
         visible: properties.visible == Visibility::Visible,
         enabled: properties.enabled == Activation::Enabled,
         tooltip: None,
+        tabindex,
         range_min: Some(properties.min),
         range_max: Some(properties.max),
         range_step: Some(properties.small_change),
@@ -1072,6 +1091,72 @@ fn tooltip_text(s: &str) -> Option<String> {
         None
     } else {
         Some(s.to_string())
+    }
+}
+
+/// Extract tabindex from a [`ControlKind`] for the HTML `tabindex` attribute.
+///
+/// Returns `Some(0)` for `TabStop::Included`, `Some(-1)` for
+/// `TabStop::ProgrammaticOnly`, and `None` for controls that don't have
+/// a `tab_stop` property.
+fn extract_tabindex(kind: &ControlKind) -> Option<i32> {
+    match kind {
+        ControlKind::CommandButton { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::TextBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::CheckBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::OptionButton { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::ComboBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::ListBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::PictureBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::HScrollBar { properties, .. } | ControlKind::VScrollBar { properties, .. } => {
+            match properties.tab_stop {
+                TabStop::Included => Some(0),
+                TabStop::ProgrammaticOnly => Some(-1),
+            }
+        }
+        ControlKind::DriveListBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::DirListBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::FileListBox { properties, .. } => match properties.tab_stop {
+            TabStop::Included => Some(0),
+            TabStop::ProgrammaticOnly => Some(-1),
+        },
+        ControlKind::Label { .. }
+        | ControlKind::Frame { .. }
+        | ControlKind::Image { .. }
+        | ControlKind::Shape { .. }
+        | ControlKind::Line { .. }
+        | ControlKind::Timer { .. }
+        | ControlKind::Data { .. }
+        | ControlKind::Custom { .. }
+        | ControlKind::Ole { .. }
+        | ControlKind::Menu { .. } => None,
     }
 }
 
@@ -2373,5 +2458,90 @@ End Sub\r\n";
             "Expected cmdOK event procedure for nested control, got: {:?}",
             form
         );
+    }
+
+    #[test]
+    fn extract_tabindex_included_returns_zero() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                tab_stop: vb6parse::language::TabStop::Included,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(0));
+    }
+
+    #[test]
+    fn extract_tabindex_programmatic_only_returns_neg_one() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                tab_stop: vb6parse::language::TabStop::ProgrammaticOnly,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(-1));
+    }
+
+    #[test]
+    fn extract_tabindex_label_returns_none() {
+        let kind = ControlKind::Label {
+            properties: LabelProperties::default(),
+        };
+        assert_eq!(extract_tabindex(&kind), None);
+    }
+
+    #[test]
+    fn extract_tabindex_textbox_included() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                tab_stop: vb6parse::language::TabStop::Included,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(0));
+    }
+
+    #[test]
+    fn extract_tabindex_checkbox_programmatic_only() {
+        let kind = ControlKind::CheckBox {
+            properties: CheckBoxProperties {
+                tab_stop: vb6parse::language::TabStop::ProgrammaticOnly,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(-1));
+    }
+
+    #[test]
+    fn extract_tabindex_scrollbar_included() {
+        let kind = ControlKind::HScrollBar {
+            properties: ScrollBarProperties {
+                tab_stop: vb6parse::language::TabStop::Included,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(0));
+    }
+
+    #[test]
+    fn extract_tabindex_combo_box_programmatic_only() {
+        let kind = ControlKind::ComboBox {
+            properties: vb6parse::language::ComboBoxProperties {
+                tab_stop: vb6parse::language::TabStop::ProgrammaticOnly,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(-1));
+    }
+
+    #[test]
+    fn extract_tabindex_list_box_included() {
+        let kind = ControlKind::ListBox {
+            properties: vb6parse::language::ListBoxProperties {
+                tab_stop: vb6parse::language::TabStop::Included,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_tabindex(&kind), Some(0));
     }
 }

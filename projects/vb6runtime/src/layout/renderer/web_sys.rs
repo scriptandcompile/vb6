@@ -429,6 +429,10 @@ impl Renderer for WebSysRenderer {
             let _ = el.set_attribute("title", tooltip);
         }
 
+        if let Some(tabindex) = leaf.tabindex {
+            let _ = el.set_attribute("tabindex", &tabindex.to_string());
+        }
+
         match leaf.control_type {
             LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => {
                 let _ = el.set_attribute("type", "range");
