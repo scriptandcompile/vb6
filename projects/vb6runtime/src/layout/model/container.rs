@@ -43,6 +43,7 @@ impl Default for LayoutLeaf {
             range_min: None,
             range_max: None,
             range_step: None,
+            combo_style: None,
         }
     }
 }
@@ -300,6 +301,8 @@ pub struct LayoutLeaf {
     pub range_max: Option<i32>,
     /// Step value for ScrollBar controls (HTML `step`).
     pub range_step: Option<i32>,
+    /// ComboBox style: "dropdown" (editable), "dropdown-readonly" (non-editable), "simple" (always-visible list).
+    pub combo_style: Option<String>,
 }
 
 impl LayoutLeaf {

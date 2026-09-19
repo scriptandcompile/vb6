@@ -685,6 +685,7 @@ fn convert_control(
             tabindex: extract_tabindex(control.kind()),
             is_default: extract_is_default(control.kind()),
             is_cancel: extract_is_cancel(control.kind()),
+            combo_style: extract_combo_style(control.kind()),
             ..Default::default()
         }))),
     }
@@ -1001,11 +1002,12 @@ fn extract_value(kind: &ControlKind) -> Option<String> {
         ControlKind::TextBox { properties, .. } => Some(properties.text.clone()),
         ControlKind::CommandButton { properties, .. } => Some(properties.caption.clone()),
         ControlKind::CheckBox { properties, .. } => Some(
-            if properties.value == vb6parse::language::CheckBoxValue::Checked {
-                "True".to_string()
-            } else {
-                "False".to_string()
-            },
+            match properties.value {
+                vb6parse::language::CheckBoxValue::Unchecked => "False",
+                vb6parse::language::CheckBoxValue::Checked => "True",
+                vb6parse::language::CheckBoxValue::Grayed => "Grayed",
+            }
+            .to_string(),
         ),
         ControlKind::OptionButton { properties, .. } => Some(
             if properties.value == vb6parse::language::OptionButtonValue::Selected {
@@ -1173,6 +1175,25 @@ fn extract_tabindex(kind: &ControlKind) -> Option<i32> {
         | ControlKind::Custom { .. }
         | ControlKind::Ole { .. }
         | ControlKind::Menu { .. } => None,
+    }
+}
+
+/// Extract ComboBox style from a [`ControlKind`].
+///
+/// Returns a string describing how the ComboBox should be rendered:
+/// - `"dropdown"` — editable dropdown (default, `DropDownCombo`)
+/// - `"dropdown-readonly"` — non-editable dropdown (`DropDownList`)
+/// - `"simple"` — always-visible list with editable text above (`SimpleCombo`)
+fn extract_combo_style(kind: &ControlKind) -> Option<String> {
+    match kind {
+        ControlKind::ComboBox { properties, .. } => {
+            Some(match properties.style {
+                vb6parse::language::ComboBoxStyle::DropDownCombo => "dropdown".to_string(),
+                vb6parse::language::ComboBoxStyle::DropDownList => "dropdown-readonly".to_string(),
+                vb6parse::language::ComboBoxStyle::SimpleCombo => "simple".to_string(),
+            })
+        }
+        _ => None,
     }
 }
 
@@ -2092,6 +2113,14 @@ mod tests {
             },
         };
         assert_eq!(extract_value(&unchecked), Some("False".to_string()));
+
+        let grayed = ControlKind::CheckBox {
+            properties: CheckBoxProperties {
+                value: CheckBoxValue::Grayed,
+                ..Default::default()
+            },
+        };
+        assert_eq!(extract_value(&grayed), Some("Grayed".to_string()));
     }
 
     #[test]

@@ -5,7 +5,7 @@
 //! - `fore_color` → `color`
 //! - `font` → `font_family`, `font_size`, `font_weight`, `font_style`, `text_decoration`
 
-use vb6parse::language::{CheckBoxProperties, OptionButtonProperties, TextDirection};
+use vb6parse::language::{CheckBoxProperties, JustifyAlignment, OptionButtonProperties, TextDirection};
 
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
@@ -50,6 +50,11 @@ pub fn build_checkbox_style(props: &CheckBoxProperties, config: &LayoutConfig) -
         None
     };
 
+    style.text_align = match props.alignment {
+        JustifyAlignment::LeftJustify => Some("left".to_string()),
+        JustifyAlignment::RightJustify => Some("right".to_string()),
+    };
+
     style
 }
 
@@ -92,6 +97,11 @@ pub fn build_optionbutton_style(
         Some("rtl".to_string())
     } else {
         None
+    };
+
+    style.text_align = match props.alignment {
+        JustifyAlignment::LeftJustify => Some("left".to_string()),
+        JustifyAlignment::RightJustify => Some("right".to_string()),
     };
 
     style

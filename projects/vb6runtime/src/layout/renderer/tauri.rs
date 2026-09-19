@@ -237,11 +237,14 @@ impl Renderer for TauriRenderer {
                 )
             }
             LayoutControlType::ComboBox => {
+                let readonly = leaf.combo_style.as_deref() == Some("dropdown-readonly");
+                let readonly_attr = if readonly { " disabled" } else { "" };
                 format!(
-                    r#"<select id="{}" class="vb6-combobox" style="{}"{}{}{}></select>"#,
+                    r#"<select id="{}" class="vb6-combobox" style="{}"{}{}{}{}></select>"#,
                     html_escape(&leaf.name),
                     html_escape(&style),
                     disabled,
+                    readonly_attr,
                     title_attr(leaf),
                     tabindex_attr(leaf)
                 )

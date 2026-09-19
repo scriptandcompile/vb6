@@ -444,6 +444,28 @@ impl Renderer for WebSysRenderer {
         }
 
         match leaf.control_type {
+            LayoutControlType::CheckBox => {
+                let _ = el.set_attribute("type", "checkbox");
+                if leaf.value.as_deref() == Some("True") {
+                    let _ = el.set_attribute("checked", "checked");
+                }
+            }
+            LayoutControlType::OptionButton => {
+                let _ = el.set_attribute("type", "radio");
+                if let Some(ref group) = leaf.style.group {
+                    let _ = el.set_attribute("name", group);
+                } else {
+                    let _ = el.set_attribute("name", &leaf.name);
+                }
+                if leaf.value.as_deref() == Some("True") {
+                    let _ = el.set_attribute("checked", "checked");
+                }
+            }
+            LayoutControlType::ComboBox => {
+                if leaf.combo_style.as_deref() == Some("dropdown-readonly") {
+                    let _ = el.set_attribute("disabled", "disabled");
+                }
+            }
             LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => {
                 let _ = el.set_attribute("type", "range");
                 let _ = el.set_attribute("value", leaf.value.as_deref().unwrap_or("0"));
