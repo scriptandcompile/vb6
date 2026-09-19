@@ -48,6 +48,12 @@ pub fn build_label_style(props: &LabelProperties, config: &LayoutConfig) -> Layo
         } else {
             None
         },
+        border: match props.border_style {
+            vb6parse::language::BorderStyle::None => Some("none".to_string()),
+            vb6parse::language::BorderStyle::FixedSingle => {
+                Some("1px solid rgb(120, 120, 120)".to_string())
+            }
+        },
         box_shadow: match props.appearance {
             vb6parse::language::Appearance::ThreeD => Some(
                 "inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)"
@@ -88,7 +94,8 @@ fn alignment_css(alignment: Alignment) -> Option<String> {
 mod tests {
     use super::super::super::model::style::CssColor;
     use super::*;
-    use vb6parse::language::Color;
+    use vb6parse::language::{Color, BorderStyle};
+    
 
     fn test_config() -> LayoutConfig {
         LayoutConfig {
@@ -276,5 +283,30 @@ mod tests {
         let config = test_config();
         let style = build_label_style(&props, &config);
         assert_eq!(style.font_weight, Some("bold".to_string()));
+    }
+
+    #[test]
+    fn label_fixed_single_border() {
+        let props = LabelProperties {
+            border_style: BorderStyle::FixedSingle,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(
+            style.border,
+            Some("1px solid rgb(120, 120, 120)".to_string())
+        );
+    }
+
+    #[test]
+    fn label_border_none() {
+        let props = LabelProperties {
+            border_style: BorderStyle::None,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        assert_eq!(style.border, Some("none".to_string()));
     }
 }
