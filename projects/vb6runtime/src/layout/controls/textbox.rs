@@ -11,7 +11,7 @@
 use vb6parse::language::{Alignment, BorderStyle, TextBoxProperties};
 
 use super::super::LayoutConfig;
-use super::super::color::color_to_css;
+use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
 use super::super::model::style::LayoutStyle;
 
@@ -53,6 +53,8 @@ pub fn build_textbox_style(props: &TextBoxProperties, config: &LayoutConfig) -> 
     if props.multi_line == vb6parse::language::MultiLine::MultiLine {
         style.overflow = Some("auto".to_string());
     }
+
+    style.cursor = mouse_pointer_css(props.mouse_pointer);
 
     style
 }

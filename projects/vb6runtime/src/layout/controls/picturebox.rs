@@ -9,7 +9,7 @@
 use vb6parse::language::{BorderStyle, PictureBoxProperties};
 
 use super::super::LayoutConfig;
-use super::super::color::color_to_css;
+use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
 use super::super::model::style::LayoutStyle;
 
@@ -45,6 +45,8 @@ pub fn build_picturebox_style(props: &PictureBoxProperties, config: &LayoutConfi
     }
 
     style.overflow = Some("hidden".to_string());
+
+    style.cursor = mouse_pointer_css(props.mouse_pointer);
 
     style
 }

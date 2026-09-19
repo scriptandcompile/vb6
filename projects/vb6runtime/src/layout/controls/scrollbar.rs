@@ -5,13 +5,18 @@
 //! so the style builder provides minimal styling.
 
 use super::super::LayoutConfig;
+use super::super::color::mouse_pointer_css;
 use super::super::model::style::LayoutStyle;
 use vb6parse::language::ScrollBarProperties;
 
 /// Build CSS style for a ScrollBar control.
-pub fn build_scrollbar_style(_props: &ScrollBarProperties, config: &LayoutConfig) -> LayoutStyle {
+pub fn build_scrollbar_style(props: &ScrollBarProperties, config: &LayoutConfig) -> LayoutStyle {
+    let style = LayoutStyle {
+        cursor: mouse_pointer_css(props.mouse_pointer),
+        ..LayoutStyle::default()
+    };
     let _ = config;
-    LayoutStyle::default()
+    style
 }
 
 #[cfg(test)]

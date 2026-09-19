@@ -8,7 +8,7 @@
 use vb6parse::language::{CheckBoxProperties, OptionButtonProperties};
 
 use super::super::LayoutConfig;
-use super::super::color::color_to_css;
+use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
 use super::super::model::style::LayoutStyle;
 
@@ -35,6 +35,8 @@ pub fn build_checkbox_style(props: &CheckBoxProperties, config: &LayoutConfig) -
             Some("none".to_string())
         };
     }
+
+    style.cursor = mouse_pointer_css(props.mouse_pointer);
 
     style
 }
@@ -65,6 +67,8 @@ pub fn build_optionbutton_style(
             Some("none".to_string())
         };
     }
+
+    style.cursor = mouse_pointer_css(props.mouse_pointer);
 
     style
 }

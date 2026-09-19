@@ -11,7 +11,7 @@
 use vb6parse::language::{Alignment, BackStyle, LabelProperties, WordWrap};
 
 use super::super::LayoutConfig;
-use super::super::color::color_to_css;
+use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
 use super::super::model::style::LayoutStyle;
 
@@ -42,6 +42,7 @@ pub fn build_label_style(props: &LabelProperties, config: &LayoutConfig) -> Layo
             WordWrap::NonWrapping => Some("nowrap".to_string()),
             WordWrap::Wrapping => Some("pre-wrap".to_string()),
         },
+        cursor: mouse_pointer_css(props.mouse_pointer),
         ..LayoutStyle::default()
     }
 }

@@ -28,7 +28,7 @@ use super::model::{
     LayoutSize, LayoutStyle, NodeId,
 };
 use super::scale::{scale_mode_to_pixels, twips_to_pixels};
-use super::{LayoutConfig, color::color_to_css, font_points_to_px};
+use super::{LayoutConfig, color::{color_to_css, mouse_pointer_css}, font_points_to_px};
 
 use super::form_store::{self, FormHandle};
 
@@ -1075,28 +1075,6 @@ fn border_style_css(style: BorderStyle) -> Option<String> {
     match style {
         BorderStyle::None => Some("none".to_string()),
         BorderStyle::FixedSingle => Some("1px solid rgb(120, 120, 120)".to_string()),
-    }
-}
-
-fn mouse_pointer_css(pointer: vb6parse::language::MousePointer) -> Option<String> {
-    use vb6parse::language::MousePointer;
-    match pointer {
-        MousePointer::Default => None,
-        MousePointer::Arrow => Some("default".to_string()),
-        MousePointer::Cross => Some("crosshair".to_string()),
-        MousePointer::IBeam => Some("text".to_string()),
-        MousePointer::Icon => None,
-        MousePointer::Size => None,
-        MousePointer::SizeAll => Some("move".to_string()),
-        MousePointer::SizeNESW => Some("ns-resize".to_string()),
-        MousePointer::SizeNS => Some("ns-resize".to_string()),
-        MousePointer::SizeNWSE => Some("nwse-resize".to_string()),
-        MousePointer::SizeWE => Some("ew-resize".to_string()),
-        MousePointer::UpArrow => Some("not-allowed".to_string()),
-        MousePointer::Hourglass => Some("wait".to_string()),
-        MousePointer::NoDrop => Some("not-allowed".to_string()),
-        MousePointer::Custom => None,
-        MousePointer::ArrowHourglass | MousePointer::ArrowQuestion => Some("default".to_string()),
     }
 }
 

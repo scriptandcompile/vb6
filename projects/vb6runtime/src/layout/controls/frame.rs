@@ -8,7 +8,7 @@
 use vb6parse::language::{BorderStyle, FrameProperties};
 
 use super::super::LayoutConfig;
-use super::super::color::color_to_css;
+use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
 use super::super::model::style::LayoutStyle;
 
@@ -42,6 +42,8 @@ pub fn build_frame_style(props: &FrameProperties, config: &LayoutConfig) -> Layo
             Some("none".to_string())
         };
     }
+
+    style.cursor = mouse_pointer_css(props.mouse_pointer);
 
     style
 }
