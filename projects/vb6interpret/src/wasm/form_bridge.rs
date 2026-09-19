@@ -142,9 +142,6 @@ pub fn show_form(form_bytes: &[u8], container_id: &str) -> Result<JsValue, JsErr
     let win = window().ok_or_else(|| JsError::new("no window"))?;
     let doc = win.document().ok_or_else(|| JsError::new("no document"))?;
 
-    let css_injector = layout::renderer::WebSysRenderer::new(doc.clone());
-    css_injector.inject_css(&layout::vb6_css::scoped_css());
-
     wire_default_cancel_key_handler();
 
     let container = doc
@@ -152,7 +149,7 @@ pub fn show_form(form_bytes: &[u8], container_id: &str) -> Result<JsValue, JsErr
         .ok_or_else(|| JsError::new(&format!("#{container_id} element not found")))?;
     container.set_inner_html("");
 
-    let renderer = layout::renderer::WebSysRenderer::new(doc);
+    let renderer = layout::renderer::WebSysRenderer::new_with_css(doc, &layout::vb6_css::scoped_css());
     let model = layout::get_form(handle, |f| f.root_node.clone())
         .ok_or_else(|| JsError::new("form not found after loading"))?;
     let dom_root = renderer.render_node(&model);
@@ -437,15 +434,12 @@ pub fn show_project_forms_with_container(
     let win = window().ok_or_else(|| JsError::new("no window"))?;
     let doc = win.document().ok_or_else(|| JsError::new("no document"))?;
 
-    let css_injector = layout::renderer::WebSysRenderer::new(doc.clone());
-    css_injector.inject_css(&layout::vb6_css::scoped_css());
-
     let container = doc
         .get_element_by_id(container_id)
         .ok_or_else(|| JsError::new(&format!("#{container_id} element not found")))?;
     container.set_inner_html("");
 
-    let renderer = layout::renderer::WebSysRenderer::new(doc);
+    let renderer = layout::renderer::WebSysRenderer::new_with_css(doc, &layout::vb6_css::scoped_css());
     let mut handles = Vec::with_capacity(form_files.len());
 
     for (file_name, bytes) in form_files {
