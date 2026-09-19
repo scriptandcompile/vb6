@@ -10,7 +10,7 @@ use vb6parse::language::{CommandButtonProperties, Style, TextDirection};
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
-use super::super::model::style::LayoutStyle;
+use super::super::model::style::{font_weight_css, LayoutStyle};
 
 /// Build CSS style for a CommandButton control.
 pub fn build_button_style(props: &CommandButtonProperties, config: &LayoutConfig) -> LayoutStyle {
@@ -57,21 +57,6 @@ pub fn build_button_style(props: &CommandButtonProperties, config: &LayoutConfig
     };
 
     style
-}
-
-fn font_weight_css(weight: i32) -> Option<String> {
-    match weight {
-        100 => Some("100".to_string()),
-        200 => Some("200".to_string()),
-        300 => Some("300".to_string()),
-        400 => Some("normal".to_string()),
-        500 => Some("500".to_string()),
-        600 => Some("600".to_string()),
-        700 => Some("bold".to_string()),
-        800 => Some("800".to_string()),
-        900 => Some("900".to_string()),
-        _ => None,
-    }
 }
 
 #[cfg(test)]

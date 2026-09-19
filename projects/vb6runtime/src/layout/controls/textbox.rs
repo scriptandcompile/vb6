@@ -8,12 +8,12 @@
 //! - `scroll_bars` + `multi_line` → `overflow`
 //! - `border_style` → `border`
 
-use vb6parse::language::{Alignment, BorderStyle, TextBoxProperties, TextDirection};
+use vb6parse::language::{BorderStyle, TextBoxProperties, TextDirection};
 
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
-use super::super::model::style::LayoutStyle;
+use super::super::model::style::{alignment_css, font_weight_css, LayoutStyle};
 
 /// Build CSS style for a TextBox control.
 pub fn build_textbox_style(props: &TextBoxProperties, config: &LayoutConfig) -> LayoutStyle {
@@ -71,34 +71,11 @@ pub fn build_textbox_style(props: &TextBoxProperties, config: &LayoutConfig) -> 
     style
 }
 
-fn font_weight_css(weight: i32) -> Option<String> {
-    match weight {
-        100 => Some("100".to_string()),
-        200 => Some("200".to_string()),
-        300 => Some("300".to_string()),
-        400 => Some("normal".to_string()),
-        500 => Some("500".to_string()),
-        600 => Some("600".to_string()),
-        700 => Some("bold".to_string()),
-        800 => Some("800".to_string()),
-        900 => Some("900".to_string()),
-        _ => None,
-    }
-}
-
-fn alignment_css(alignment: Alignment) -> Option<String> {
-    match alignment {
-        Alignment::RightJustify => Some("right".to_string()),
-        Alignment::Center => Some("center".to_string()),
-        Alignment::LeftJustify => Some("left".to_string()),
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::super::super::model::style::CssColor;
     use super::*;
-    use vb6parse::language::BorderStyle;
+    use vb6parse::language::{Alignment, BorderStyle};
     use vb6parse::language::Color;
     use vb6parse::language::MultiLine;
 

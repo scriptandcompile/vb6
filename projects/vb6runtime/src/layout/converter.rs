@@ -25,10 +25,8 @@ use vb6parse::language::{
 use vb6parse::parsers::{ConcreteSyntaxTree, SyntaxKind};
 
 use super::model::LayoutControlType;
-use super::model::{
-    EventProcedure, LayoutContainer, LayoutForm, LayoutLeaf, LayoutNode, LayoutPosition,
-    LayoutSize, LayoutStyle, NodeId,
-};
+use super::model::style::{font_style_css, font_weight_css};
+use super::model::{EventProcedure, LayoutContainer, LayoutForm, LayoutLeaf, LayoutNode, LayoutPosition, LayoutSize, LayoutStyle, NodeId};
 use super::scale::{scale_mode_to_pixels, twips_to_pixels};
 use super::{
     LayoutConfig,
@@ -1444,29 +1442,6 @@ fn extract_listbox_leaf(
 // ---------------------------------------------------------------------------
 // CSS helper functions
 // ---------------------------------------------------------------------------
-
-fn font_weight_css(weight: i32) -> Option<String> {
-    match weight {
-        100 => Some("100".to_string()),
-        200 => Some("200".to_string()),
-        300 => Some("300".to_string()),
-        400 => Some("normal".to_string()),
-        500 => Some("500".to_string()),
-        600 => Some("600".to_string()),
-        700 => Some("bold".to_string()),
-        800 => Some("800".to_string()),
-        900 => Some("900".to_string()),
-        _ => None,
-    }
-}
-
-fn font_style_css(italic: bool) -> String {
-    if italic {
-        "italic".to_string()
-    } else {
-        "normal".to_string()
-    }
-}
 
 fn text_decoration_css(underline: bool) -> String {
     if underline {
