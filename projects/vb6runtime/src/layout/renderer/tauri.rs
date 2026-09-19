@@ -206,10 +206,12 @@ impl Renderer for TauriRenderer {
                     html_escape(value).to_string()
                 };
                 format!(
-                    r#"<button id="{}" class="vb6-commandbutton" style="{}"{}{}{}>{}</button>"#,
+                    r#"<button id="{}" class="vb6-commandbutton" style="{}"{}{}{}{}{}>{}</button>"#,
                     html_escape(&leaf.name),
                     html_escape(&style),
                     disabled,
+                    default_attr(leaf),
+                    cancel_attr(leaf),
                     title_attr(leaf),
                     tabindex_attr(leaf),
                     inner
@@ -527,6 +529,24 @@ fn tabindex_attr(leaf: &LayoutLeaf) -> String {
         .unwrap_or_default()
 }
 
+/// Build `autofocus` and `type="submit"` attribute strings for default buttons.
+fn default_attr(leaf: &LayoutLeaf) -> String {
+    if leaf.is_default {
+        r#" autofocus type="submit""#.to_string()
+    } else {
+        String::new()
+    }
+}
+
+/// Build `type="submit"` and `data-cancel` attribute strings for cancel buttons.
+fn cancel_attr(leaf: &LayoutLeaf) -> String {
+    if leaf.is_cancel {
+        r#" type="submit" data-cancel="true""#.to_string()
+    } else {
+        String::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -802,6 +822,56 @@ mod tests {
         };
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains(r#"tabindex="0""#));
+    }
+
+    #[test]
+    fn default_button_has_autofocus_and_submit() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("cmdOK", LayoutControlType::CommandButton, Some("OK".into()));
+        let leaf = LayoutLeaf {
+            is_default: true,
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"autofocus"#));
+        assert!(html.contains(r#"type="submit""#));
+    }
+
+    #[test]
+    fn cancel_button_has_submit_and_data_cancel() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("cmdCancel", LayoutControlType::CommandButton, Some("Cancel".into()));
+        let leaf = LayoutLeaf {
+            is_cancel: true,
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"type="submit""#));
+        assert!(html.contains(r#"data-cancel="true""#));
+    }
+
+    #[test]
+    fn default_and_cancel_button_has_both_attributes() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("cmdDefaultCancel", LayoutControlType::CommandButton, Some("OK".into()));
+        let leaf = LayoutLeaf {
+            is_default: true,
+            is_cancel: true,
+            ..leaf
+        };
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"autofocus"#));
+        assert!(html.contains(r#"type="submit""#));
+        assert!(html.contains(r#"data-cancel="true""#));
+    }
+
+    #[test]
+    fn regular_button_has_no_default_cancel_attributes() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf("cmdRegular", LayoutControlType::CommandButton, Some("Click".into()));
+        let html = renderer.render_leaf(&leaf);
+        assert!(!html.contains("autofocus"));
+        assert!(!html.contains("data-cancel"));
     }
 
     #[test]

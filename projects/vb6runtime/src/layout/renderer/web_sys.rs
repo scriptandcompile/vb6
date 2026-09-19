@@ -433,6 +433,16 @@ impl Renderer for WebSysRenderer {
             let _ = el.set_attribute("tabindex", &tabindex.to_string());
         }
 
+        if leaf.is_default {
+            let _ = el.set_attribute("autofocus", "autofocus");
+            let _ = el.set_attribute("type", "submit");
+        }
+
+        if leaf.is_cancel {
+            let _ = el.set_attribute("type", "submit");
+            let _ = el.set_attribute("data-cancel", "true");
+        }
+
         match leaf.control_type {
             LayoutControlType::HScrollBar | LayoutControlType::VScrollBar => {
                 let _ = el.set_attribute("type", "range");
