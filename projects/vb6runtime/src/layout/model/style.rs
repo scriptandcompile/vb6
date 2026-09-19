@@ -99,6 +99,8 @@ pub struct LayoutStyle {
 
     /// CSS cursor property ('default', 'pointer', 'wait').
     pub cursor: Option<String>,
+    /// CSS direction property ('rtl' for right-to-left).
+    pub direction: Option<String>,
 }
 
 #[cfg(test)]
@@ -136,6 +138,7 @@ mod tests {
         assert!(s.line_x2.is_none());
         assert!(s.line_y2.is_none());
         assert!(s.cursor.is_none());
+        assert!(s.direction.is_none());
     }
 
     #[test]

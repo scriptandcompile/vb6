@@ -26,6 +26,7 @@ fn make_label_leaf(index: i32, value: &str) -> LayoutLeaf {
         value: Some(value.to_string()),
         visible: true,
         enabled: true,
+        ..Default::default()
     }
 }
 
@@ -47,6 +48,7 @@ fn make_button_leaf(index: i32) -> LayoutLeaf {
         value: Some(format!("Button {}", index)),
         visible: true,
         enabled: true,
+        ..Default::default()
     }
 }
 
@@ -68,6 +70,7 @@ fn make_textbox_leaf(index: i32) -> LayoutLeaf {
         value: Some(format!("Text {}", index)),
         visible: true,
         enabled: true,
+        ..Default::default()
     }
 }
 

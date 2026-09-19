@@ -30,6 +30,19 @@ impl Default for LayoutLeaf {
             value: None,
             visible: true,
             enabled: true,
+            tooltip: None,
+            tabindex: None,
+            is_default: false,
+            is_cancel: false,
+            is_locked: false,
+            max_length: None,
+            password_char: None,
+            hide_selection: false,
+            scroll_bars: None,
+            stretch: false,
+            range_min: None,
+            range_max: None,
+            range_step: None,
         }
     }
 }
@@ -261,6 +274,32 @@ pub struct LayoutLeaf {
     pub visible: bool,
     /// Whether the control is enabled.
     pub enabled: bool,
+    /// HTML title attribute text (tooltip).
+    pub tooltip: Option<String>,
+    /// HTML tabindex attribute value.
+    pub tabindex: Option<i32>,
+    /// Whether this is the default button (autofocus).
+    pub is_default: bool,
+    /// Whether this is the cancel button (Escape key handler).
+    pub is_cancel: bool,
+    /// Whether the control is read-only (like HTML `readonly`).
+    pub is_locked: bool,
+    /// Maximum input length (HTML `maxlength`).
+    pub max_length: Option<i32>,
+    /// Password character for password fields (HTML `type="password"`).
+    pub password_char: Option<char>,
+    /// Whether selection is hidden when control loses focus.
+    pub hide_selection: bool,
+    /// Scroll bar configuration (overflow-x / overflow-y).
+    pub scroll_bars: Option<String>,
+    /// Whether the Image control stretches its picture to fill bounds.
+    pub stretch: bool,
+    /// Min value for ScrollBar controls (HTML `min`).
+    pub range_min: Option<i32>,
+    /// Max value for ScrollBar controls (HTML `max`).
+    pub range_max: Option<i32>,
+    /// Step value for ScrollBar controls (HTML `step`).
+    pub range_step: Option<i32>,
 }
 
 impl LayoutLeaf {
@@ -322,6 +361,7 @@ mod tests {
             value: Some("Hello".into()),
             visible: true,
             enabled: true,
+            ..Default::default()
         }
     }
 
@@ -356,6 +396,7 @@ mod tests {
             value: Some("Hello".into()),
             visible: true,
             enabled: true,
+            ..Default::default()
         };
         assert!(matches!(LayoutNode::Leaf(leaf), LayoutNode::Leaf(_)));
     }

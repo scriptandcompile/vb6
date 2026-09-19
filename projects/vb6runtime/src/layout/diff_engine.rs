@@ -272,6 +272,7 @@ mod tests {
             value,
             visible,
             enabled,
+            ..Default::default()
         }
     }
 
