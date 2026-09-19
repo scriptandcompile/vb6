@@ -172,11 +172,17 @@ impl Renderer for TauriRenderer {
             }
             LayoutControlType::CheckBox => {
                 let checked = leaf.value.as_deref() == Some("True");
+                let grayed_style = if leaf.value.as_deref() == Some("Grayed") {
+                    " opacity: 0.5"
+                } else {
+                    ""
+                };
                 format!(
-                    r#"<input id="{}" class="vb6-checkbox" type="checkbox" {} style="{}"{}{}{}>"#,
+                    r#"<input id="{}" class="vb6-checkbox" type="checkbox" {} style="{}{}"{}{}{}>"#,
                     html_escape(&leaf.name),
                     if checked { "checked" } else { "" },
                     html_escape(&style),
+                    html_escape(grayed_style),
                     disabled,
                     title_attr(leaf),
                     tabindex_attr(leaf)
@@ -661,6 +667,20 @@ mod tests {
         );
         let html = renderer.render_leaf(&leaf);
         assert!(html.contains(r#"type="checkbox""#));
+        assert!(!html.contains("checked"));
+    }
+
+    #[test]
+    fn render_checkbox_grayed() {
+        let renderer = TauriRenderer::new(false);
+        let leaf = make_leaf(
+            "chkMixed",
+            LayoutControlType::CheckBox,
+            Some("Grayed".into()),
+        );
+        let html = renderer.render_leaf(&leaf);
+        assert!(html.contains(r#"type="checkbox""#));
+        assert!(html.contains("opacity: 0.5"));
         assert!(!html.contains("checked"));
     }
 

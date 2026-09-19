@@ -19,8 +19,8 @@ use std::collections::HashMap;
 use base64::{Engine as _, engine::general_purpose::STANDARD};
 use image::DynamicImage;
 use vb6parse::language::{
-    Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm,
-    ReferenceOrValue, ScaleMode, TabStop, TextDirection, Visibility,
+    Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm, MultiLine,
+    ReferenceOrValue, ScaleMode, ScrollBars, TabStop, TextDirection, Visibility,
 };
 use vb6parse::parsers::{ConcreteSyntaxTree, SyntaxKind};
 
@@ -673,7 +673,7 @@ fn convert_control(
         }
 
         ControlKind::Image { .. } => {
-            let (image_src, stretch) = extract_image_leaf(control.kind());
+            let image_src = extract_image_leaf(control.kind());
             Ok(Some(LayoutNode::Leaf(LayoutLeaf {
                 name: control.name().to_string(),
                 control_type: layout_type,
@@ -689,8 +689,35 @@ fn convert_control(
                 is_default: extract_is_default(control.kind()),
                 is_cancel: extract_is_cancel(control.kind()),
                 combo_style: extract_combo_style(control.kind()),
-                stretch,
                 image_src,
+                ..Default::default()
+            })))
+        }
+
+        ControlKind::TextBox { .. } => {
+            let (locked, max_length, password_char, hide_selection, scroll_bars) =
+                extract_textbox_leaf(control.kind());
+            Ok(Some(LayoutNode::Leaf(LayoutLeaf {
+                name: control.name().to_string(),
+                control_type: layout_type,
+                index: control.index(),
+                position,
+                size,
+                style,
+                value: extract_value(control.kind()),
+                visible,
+                enabled,
+                tooltip: extract_tooltip(control.kind()),
+                tabindex: extract_tabindex(control.kind()),
+                is_default: extract_is_default(control.kind()),
+                is_cancel: extract_is_cancel(control.kind()),
+                combo_style: extract_combo_style(control.kind()),
+                use_mnemonic: extract_use_mnemonic(control.kind()),
+                is_locked: locked,
+                max_length,
+                password_char,
+                hide_selection,
+                scroll_bars,
                 ..Default::default()
             })))
         }
@@ -1276,14 +1303,48 @@ fn extract_image_src(picture: &Option<ReferenceOrValue<DynamicImage>>) -> Option
 
 /// Extract Image-specific leaf fields from a [`ControlKind`].
 ///
-/// Returns `(image_src, stretch)` tuple for the Image control.
-/// For non-Image controls, returns `(None, false)`.
-fn extract_image_leaf(kind: &ControlKind) -> (Option<String>, bool) {
+/// Returns the base64 image data URL for the Image control.
+/// For non-Image controls, returns `None`.
+fn extract_image_leaf(kind: &ControlKind) -> Option<String> {
     match kind {
-        ControlKind::Image { properties, .. } => {
-            (extract_image_src(&properties.picture), properties.stretch)
+        ControlKind::Image { properties, .. } => extract_image_src(&properties.picture),
+        _ => None,
+    }
+}
+
+/// Extract TextBox-specific leaf fields from a [`ControlKind`].
+///
+/// Returns `(locked, max_length, password_char, hide_selection, scroll_bars)` for the TextBox control.
+/// For non-TextBox controls, returns `(false, None, None, false, None)`.
+fn extract_textbox_leaf(
+    kind: &ControlKind,
+) -> (bool, Option<i32>, Option<char>, bool, Option<String>) {
+    match kind {
+        ControlKind::TextBox { properties, .. } => {
+            let max_length = if properties.max_length == 0 {
+                None
+            } else {
+                Some(properties.max_length)
+            };
+            let scroll_bars = match (properties.multi_line, properties.scroll_bars) {
+                (MultiLine::SingleLine, ScrollBars::None) => None,
+                (MultiLine::SingleLine, ScrollBars::Horizontal) => Some("auto".to_string()),
+                (MultiLine::SingleLine, ScrollBars::Vertical)
+                | (MultiLine::SingleLine, ScrollBars::Both) => Some("hidden".to_string()),
+                (MultiLine::MultiLine, ScrollBars::None) => Some("hidden".to_string()),
+                (MultiLine::MultiLine, ScrollBars::Horizontal) => Some("auto".to_string()),
+                (MultiLine::MultiLine, ScrollBars::Vertical) => Some("auto".to_string()),
+                (MultiLine::MultiLine, ScrollBars::Both) => Some("auto".to_string()),
+            };
+            (
+                properties.locked,
+                max_length,
+                properties.password_char,
+                properties.hide_selection,
+                scroll_bars,
+            )
         }
-        _ => (None, false),
+        _ => (false, None, None, false, None),
     }
 }
 
@@ -2738,5 +2799,118 @@ End Sub\r\n";
             properties: TextBoxProperties::default(),
         };
         assert!(!extract_is_cancel(&kind));
+    }
+
+    #[test]
+    fn extract_textbox_locked() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                locked: true,
+                ..Default::default()
+            },
+        };
+        let (locked, _, _, _, _) = extract_textbox_leaf(&kind);
+        assert!(locked);
+    }
+
+    #[test]
+    fn extract_textbox_max_length() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                max_length: 10,
+                ..Default::default()
+            },
+        };
+        let (_, max_length, _, _, _) = extract_textbox_leaf(&kind);
+        assert_eq!(max_length, Some(10));
+    }
+
+    #[test]
+    fn extract_textbox_max_length_zero_is_none() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                max_length: 0,
+                ..Default::default()
+            },
+        };
+        let (_, max_length, _, _, _) = extract_textbox_leaf(&kind);
+        assert_eq!(max_length, None);
+    }
+
+    #[test]
+    fn extract_textbox_password_char() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                password_char: Some('*'),
+                ..Default::default()
+            },
+        };
+        let (_, _, password_char, _, _) = extract_textbox_leaf(&kind);
+        assert_eq!(password_char, Some('*'));
+    }
+
+    #[test]
+    fn extract_textbox_hide_selection() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                hide_selection: false,
+                ..Default::default()
+            },
+        };
+        let (_, _, _, hide_selection, _) = extract_textbox_leaf(&kind);
+        assert!(!hide_selection);
+    }
+
+    #[test]
+    fn extract_textbox_scroll_bars_singleline_horizontal() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                multi_line: MultiLine::SingleLine,
+                scroll_bars: ScrollBars::Horizontal,
+                ..Default::default()
+            },
+        };
+        let (_, _, _, _, scroll_bars) = extract_textbox_leaf(&kind);
+        assert_eq!(scroll_bars, Some("auto".to_string()));
+    }
+
+    #[test]
+    fn extract_textbox_scroll_bars_multiline_both() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                multi_line: MultiLine::MultiLine,
+                scroll_bars: ScrollBars::Both,
+                ..Default::default()
+            },
+        };
+        let (_, _, _, _, scroll_bars) = extract_textbox_leaf(&kind);
+        assert_eq!(scroll_bars, Some("auto".to_string()));
+    }
+
+    #[test]
+    fn extract_textbox_scroll_bars_singleline_none() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties {
+                multi_line: MultiLine::SingleLine,
+                scroll_bars: ScrollBars::None,
+                ..Default::default()
+            },
+        };
+        let (_, _, _, _, scroll_bars) = extract_textbox_leaf(&kind);
+        assert_eq!(scroll_bars, None);
+    }
+
+    #[test]
+    fn extract_textbox_non_textbox_returns_defaults() {
+        let kind = ControlKind::Label {
+            properties: LabelProperties::default(),
+        };
+        let (locked, max_length, password_char, hide_selection, scroll_bars) =
+            extract_textbox_leaf(&kind);
+        assert!(!locked);
+        assert_eq!(max_length, None);
+        assert_eq!(password_char, None);
+        assert!(!hide_selection);
+        assert_eq!(scroll_bars, None);
     }
 }

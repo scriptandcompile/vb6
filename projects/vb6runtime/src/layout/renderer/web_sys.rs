@@ -449,6 +449,10 @@ impl Renderer for WebSysRenderer {
                 if leaf.value.as_deref() == Some("True") {
                     let _ = el.set_attribute("checked", "checked");
                 }
+                if leaf.value.as_deref() == Some("Grayed") {
+                    let current_style = el.get_attribute("style").unwrap_or_default();
+                    let _ = el.set_attribute("style", &format!("{} opacity: 0.5;", current_style));
+                }
             }
             LayoutControlType::OptionButton => {
                 let _ = el.set_attribute("type", "radio");

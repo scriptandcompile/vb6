@@ -94,8 +94,7 @@ fn alignment_css(alignment: Alignment) -> Option<String> {
 mod tests {
     use super::super::super::model::style::CssColor;
     use super::*;
-    use vb6parse::language::{Color, BorderStyle};
-    
+    use vb6parse::language::{BorderStyle, Color};
 
     fn test_config() -> LayoutConfig {
         LayoutConfig {

@@ -39,7 +39,6 @@ impl Default for LayoutLeaf {
             password_char: None,
             hide_selection: false,
             scroll_bars: None,
-            stretch: false,
             use_mnemonic: false,
             range_min: None,
             range_max: None,
@@ -295,8 +294,6 @@ pub struct LayoutLeaf {
     pub hide_selection: bool,
     /// Scroll bar configuration (overflow-x / overflow-y).
     pub scroll_bars: Option<String>,
-    /// Whether the Image control stretches its picture to fill bounds.
-    pub stretch: bool,
     /// Whether the Label control uses mnemonics (& to underline next character).
     pub use_mnemonic: bool,
     /// Min value for ScrollBar controls (HTML `min`).

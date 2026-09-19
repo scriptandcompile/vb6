@@ -11,7 +11,7 @@ use vb6parse::language::{ScrollBarProperties, TextDirection};
 
 /// Build CSS style for a ScrollBar control.
 pub fn build_scrollbar_style(props: &ScrollBarProperties, config: &LayoutConfig) -> LayoutStyle {
-    let style = LayoutStyle {
+    let mut style = LayoutStyle {
         cursor: mouse_pointer_css(props.mouse_pointer),
         direction: if matches!(props.right_to_left, TextDirection::RightToLeft) {
             Some("rtl".to_string())
@@ -19,6 +19,12 @@ pub fn build_scrollbar_style(props: &ScrollBarProperties, config: &LayoutConfig)
             None
         },
         ..LayoutStyle::default()
+    };
+    style.box_shadow = match props.appearance {
+        vb6parse::language::Appearance::ThreeD => Some(
+            "inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)".to_string(),
+        ),
+        vb6parse::language::Appearance::Flat => None,
     };
     let _ = config;
     style
@@ -40,7 +46,13 @@ mod tests {
         let props = ScrollBarProperties::default();
         let config = test_config();
         let style = build_scrollbar_style(&props, &config);
-        assert_eq!(style, LayoutStyle::default());
+        assert_eq!(
+            style.box_shadow,
+            Some(
+                "inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)"
+                    .to_string()
+            )
+        );
     }
 
     #[test]
@@ -60,6 +72,31 @@ mod tests {
             ..Default::default()
         };
         let style = build_scrollbar_style(&props, &config);
-        assert_eq!(style, LayoutStyle::default());
+        assert!(style.box_shadow.is_some());
+    }
+
+    #[test]
+    fn three_d_appearance_sets_box_shadow() {
+        let props = ScrollBarProperties {
+            appearance: vb6parse::language::Appearance::ThreeD,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_scrollbar_style(&props, &config);
+        assert_eq!(
+            style.box_shadow.as_deref(),
+            Some("inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)")
+        );
+    }
+
+    #[test]
+    fn flat_appearance_clears_box_shadow() {
+        let props = ScrollBarProperties {
+            appearance: vb6parse::language::Appearance::Flat,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_scrollbar_style(&props, &config);
+        assert!(style.box_shadow.is_none());
     }
 }
