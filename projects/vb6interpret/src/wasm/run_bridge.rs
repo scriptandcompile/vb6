@@ -149,13 +149,25 @@ pub fn interpret_vb6_code(code: &str) -> Result<JsValue, JsError> {
         Ok(()) => {
             let out = interpreter.drain_output();
             let dbg = build_debug_state(&interpreter);
-            (out, dbg, interpreter.steps(), interpreter.is_terminated(), None)
+            (
+                out,
+                dbg,
+                interpreter.steps(),
+                interpreter.is_terminated(),
+                None,
+            )
         }
         Err(error) => {
             let err = super::convert_run_error(error, code, module.line_offset);
             let out = interpreter.drain_output();
             let dbg = build_debug_state(&interpreter);
-            (out, dbg, interpreter.steps(), interpreter.is_terminated(), Some(err))
+            (
+                out,
+                dbg,
+                interpreter.steps(),
+                interpreter.is_terminated(),
+                Some(err),
+            )
         }
     };
 
@@ -209,13 +221,25 @@ pub fn debug_vb6_code(code: &str, pause_after_steps: u32) -> Result<JsValue, JsE
         Ok(()) => {
             let out = interpreter.drain_output();
             let dbg = build_debug_state(&interpreter);
-            (out, dbg, interpreter.steps(), interpreter.is_terminated(), None)
+            (
+                out,
+                dbg,
+                interpreter.steps(),
+                interpreter.is_terminated(),
+                None,
+            )
         }
         Err(error) => {
             let err = super::convert_run_error(error, code, module.line_offset);
             let out = interpreter.drain_output();
             let dbg = build_debug_state(&interpreter);
-            (out, dbg, interpreter.steps(), interpreter.is_terminated(), Some(err))
+            (
+                out,
+                dbg,
+                interpreter.steps(),
+                interpreter.is_terminated(),
+                Some(err),
+            )
         }
     };
 
@@ -348,13 +372,25 @@ pub fn run_wasm_project(
         Ok(()) => {
             let out = interpreter.drain_output();
             let dbg = build_debug_state(&interpreter);
-            (out, dbg, interpreter.steps(), interpreter.is_terminated(), None)
+            (
+                out,
+                dbg,
+                interpreter.steps(),
+                interpreter.is_terminated(),
+                None,
+            )
         }
         Err(error) => {
             let err = super::convert_run_error(error, "", 0);
             let out = interpreter.drain_output();
             let dbg = build_debug_state(&interpreter);
-            (out, dbg, interpreter.steps(), interpreter.is_terminated(), Some(err))
+            (
+                out,
+                dbg,
+                interpreter.steps(),
+                interpreter.is_terminated(),
+                Some(err),
+            )
         }
     };
 

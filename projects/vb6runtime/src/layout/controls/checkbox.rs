@@ -5,7 +5,9 @@
 //! - `fore_color` → `color`
 //! - `font` → `font_family`, `font_size`, `font_weight`, `font_style`, `text_decoration`
 
-use vb6parse::language::{CheckBoxProperties, JustifyAlignment, OptionButtonProperties, TextDirection};
+use vb6parse::language::{
+    CheckBoxProperties, JustifyAlignment, OptionButtonProperties, TextDirection,
+};
 
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};

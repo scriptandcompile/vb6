@@ -78,7 +78,9 @@ pub fn run_project(
     let terminated = interp.is_terminated();
     let debug = build_debug_state(&interp);
 
-    let state = WasmRunState { interpreter: interp };
+    let state = WasmRunState {
+        interpreter: interp,
+    };
     RUN_STATE
         .lock()
         .map_err(|_| JsError::new("lock poisoned"))?

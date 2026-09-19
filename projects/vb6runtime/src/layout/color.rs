@@ -324,25 +324,37 @@ mod tests {
     #[test]
     fn cross_mouse_pointer() {
         use vb6parse::language::MousePointer;
-        assert_eq!(mouse_pointer_css(MousePointer::Cross), Some("crosshair".to_string()));
+        assert_eq!(
+            mouse_pointer_css(MousePointer::Cross),
+            Some("crosshair".to_string())
+        );
     }
 
     #[test]
     fn hourglass_mouse_pointer() {
         use vb6parse::language::MousePointer;
-        assert_eq!(mouse_pointer_css(MousePointer::Hourglass), Some("wait".to_string()));
+        assert_eq!(
+            mouse_pointer_css(MousePointer::Hourglass),
+            Some("wait".to_string())
+        );
     }
 
     #[test]
     fn ibeam_mouse_pointer() {
         use vb6parse::language::MousePointer;
-        assert_eq!(mouse_pointer_css(MousePointer::IBeam), Some("text".to_string()));
+        assert_eq!(
+            mouse_pointer_css(MousePointer::IBeam),
+            Some("text".to_string())
+        );
     }
 
     #[test]
     fn size_all_mouse_pointer() {
         use vb6parse::language::MousePointer;
-        assert_eq!(mouse_pointer_css(MousePointer::SizeAll), Some("move".to_string()));
+        assert_eq!(
+            mouse_pointer_css(MousePointer::SizeAll),
+            Some("move".to_string())
+        );
     }
 
     #[test]

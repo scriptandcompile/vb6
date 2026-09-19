@@ -336,30 +336,34 @@ fn launch_tauri(project: LoadedProject, startup_form_html: (String, u32)) -> ! {
     // Extract startup form name/caption before the project is moved into the engine,
     // and calculate the window size from the form's total dimensions
     // (including title bar, borders, and scrollbars).
-    let (startup_form_name, form_caption, window_width, window_height) = match &project.startup_object {
-        StartupObject::Form { form_name } => {
-            let (w, h, caption) = project.forms.iter().find(|f| f.name == *form_name)
-                .map(|f| match &f.parsed.form {
-                    vb6parse::language::FormRoot::Form(frm) => {
-                        let dpi = 96;
-                        let w = twips_to_pixels(frm.properties.client_width, dpi) as f64;
-                        let h = twips_to_pixels(frm.properties.client_height, dpi) as f64;
-                        let caption = frm.properties.caption.clone();
-                        (w.max(10.0), h.max(10.0), caption)
-                    }
-                    vb6parse::language::FormRoot::MDIForm(mdi) => {
-                        let dpi = 96;
-                        let w = twips_to_pixels(mdi.properties.width, dpi) as f64;
-                        let h = twips_to_pixels(mdi.properties.height, dpi) as f64;
-                        let caption = mdi.properties.caption.clone();
-                        (w.max(10.0), h.max(10.0), caption)
-                    }
-                })
-                .unwrap_or((10.0, 10.0, String::new()));
-            (form_name.clone(), caption, w, h)
-        }
-        _ => (String::new(), String::new(), 10.0, 10.0),
-    };
+    let (startup_form_name, form_caption, window_width, window_height) =
+        match &project.startup_object {
+            StartupObject::Form { form_name } => {
+                let (w, h, caption) = project
+                    .forms
+                    .iter()
+                    .find(|f| f.name == *form_name)
+                    .map(|f| match &f.parsed.form {
+                        vb6parse::language::FormRoot::Form(frm) => {
+                            let dpi = 96;
+                            let w = twips_to_pixels(frm.properties.client_width, dpi) as f64;
+                            let h = twips_to_pixels(frm.properties.client_height, dpi) as f64;
+                            let caption = frm.properties.caption.clone();
+                            (w.max(10.0), h.max(10.0), caption)
+                        }
+                        vb6parse::language::FormRoot::MDIForm(mdi) => {
+                            let dpi = 96;
+                            let w = twips_to_pixels(mdi.properties.width, dpi) as f64;
+                            let h = twips_to_pixels(mdi.properties.height, dpi) as f64;
+                            let caption = mdi.properties.caption.clone();
+                            (w.max(10.0), h.max(10.0), caption)
+                        }
+                    })
+                    .unwrap_or((10.0, 10.0, String::new()));
+                (form_name.clone(), caption, w, h)
+            }
+            _ => (String::new(), String::new(), 10.0, 10.0),
+        };
 
     let engine_handle = tauri_cmds::spawn_engine(project);
 

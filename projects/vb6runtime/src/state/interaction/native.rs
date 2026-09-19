@@ -1794,12 +1794,14 @@ mod wasm {
             [first, second, third] => {
                 if unsafe { window_confirm(&browser_message(title, prompt)) } {
                     *first
-                } else if unsafe { window_confirm(&browser_secondary_message(
-                    title,
-                    prompt,
-                    second.name(),
-                    third.name(),
-                )) } {
+                } else if unsafe {
+                    window_confirm(&browser_secondary_message(
+                        title,
+                        prompt,
+                        second.name(),
+                        third.name(),
+                    ))
+                } {
                     *second
                 } else {
                     *third
