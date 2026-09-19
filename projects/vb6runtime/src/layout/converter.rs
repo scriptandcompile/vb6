@@ -670,6 +670,7 @@ fn convert_control(
             value: extract_value(control.kind()),
             visible,
             enabled,
+            tooltip: extract_tooltip(control.kind()),
             ..Default::default()
         }))),
     }
@@ -700,6 +701,7 @@ fn extract_scrollbar_leaf(
         value: Some(properties.value.to_string()),
         visible: properties.visible == Visibility::Visible,
         enabled: properties.enabled == Activation::Enabled,
+        tooltip: None,
         range_min: Some(properties.min),
         range_max: Some(properties.max),
         range_step: Some(properties.small_change),
@@ -1031,6 +1033,45 @@ fn extract_value(kind: &ControlKind) -> Option<String> {
         ControlKind::Shape { .. } => None,
         ControlKind::Line { .. } => None,
         ControlKind::Custom { .. } | ControlKind::Ole { .. } | ControlKind::Menu { .. } => None,
+    }
+}
+
+/// Extract tooltip text from a [`ControlKind`] for the HTML `title` attribute.
+///
+/// Returns `None` when the control has no tooltip or the tooltip is empty.
+fn extract_tooltip(kind: &ControlKind) -> Option<String> {
+    match kind {
+        ControlKind::Label { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::TextBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::CommandButton { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::CheckBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::OptionButton { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::ComboBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::ListBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::Frame { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::PictureBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::Image { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::DriveListBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::DirListBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::FileListBox { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::Data { properties, .. } => tooltip_text(&properties.tool_tip_text),
+        ControlKind::HScrollBar { .. }
+        | ControlKind::VScrollBar { .. }
+        | ControlKind::Shape { .. }
+        | ControlKind::Line { .. }
+        | ControlKind::Timer { .. }
+        | ControlKind::Custom { .. }
+        | ControlKind::Ole { .. }
+        | ControlKind::Menu { .. } => None,
+    }
+}
+
+/// Convert a string to an optional tooltip: empty strings become `None`.
+fn tooltip_text(s: &str) -> Option<String> {
+    if s.is_empty() {
+        None
+    } else {
+        Some(s.to_string())
     }
 }
 
