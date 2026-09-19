@@ -8,7 +8,7 @@
 //! - `scroll_bars` + `multi_line` → `overflow`
 //! - `border_style` → `border`
 
-use vb6parse::language::{Alignment, BorderStyle, TextBoxProperties};
+use vb6parse::language::{Alignment, BorderStyle, TextBoxProperties, TextDirection};
 
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
@@ -55,6 +55,11 @@ pub fn build_textbox_style(props: &TextBoxProperties, config: &LayoutConfig) -> 
     }
 
     style.cursor = mouse_pointer_css(props.mouse_pointer);
+    style.direction = if matches!(props.right_to_left, TextDirection::RightToLeft) {
+        Some("rtl".to_string())
+    } else {
+        None
+    };
 
     style
 }

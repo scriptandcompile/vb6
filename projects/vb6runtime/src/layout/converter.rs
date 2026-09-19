@@ -16,10 +16,10 @@
 
 use std::collections::HashMap;
 
-use vb6parse::language::{
-    Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm, ScaleMode,
-    Visibility,
-};
+    use vb6parse::language::{
+        Activation, BorderStyle, Control, ControlKind, Form, FormBorderStyle, MDIForm, ScaleMode,
+        TextDirection, Visibility,
+    };
 use vb6parse::parsers::{ConcreteSyntaxTree, SyntaxKind};
 
 use super::model::LayoutControlType;
@@ -496,6 +496,11 @@ fn build_form_style(props: &vb6parse::language::FormProperties, dpi: u32) -> Lay
 
     style.border = form_border_style_css(props.border_style);
     style.cursor = mouse_pointer_css(props.mouse_pointer);
+    style.direction = if matches!(props.right_to_left, TextDirection::RightToLeft) {
+        Some("rtl".to_string())
+    } else {
+        None
+    };
     style
 }
 
@@ -514,6 +519,11 @@ fn build_mdi_form_style(props: &vb6parse::language::MDIFormProperties, dpi: u32)
     }
 
     style.cursor = mouse_pointer_css(props.mouse_pointer);
+    style.direction = if matches!(props.right_to_left, TextDirection::RightToLeft) {
+        Some("rtl".to_string())
+    } else {
+        None
+    };
     style
 }
 

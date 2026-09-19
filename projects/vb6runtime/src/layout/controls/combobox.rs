@@ -5,7 +5,7 @@
 //! - `fore_color` → `color`
 //! - `font` → `font_family`, `font_size`, `font_weight`, `font_style`, `text_decoration`
 
-use vb6parse::language::ComboBoxProperties;
+use vb6parse::language::{ComboBoxProperties, TextDirection};
 
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
@@ -37,6 +37,11 @@ pub fn build_combobox_style(props: &ComboBoxProperties, config: &LayoutConfig) -
     }
 
     style.cursor = mouse_pointer_css(props.mouse_pointer);
+    style.direction = if matches!(props.right_to_left, TextDirection::RightToLeft) {
+        Some("rtl".to_string())
+    } else {
+        None
+    };
 
     style
 }

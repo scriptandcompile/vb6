@@ -5,7 +5,7 @@
 //! - `fore_color` → `color`
 //! - `font` → `font_family`, `font_size`, `font_weight`, `font_style`, `text_decoration`
 
-use vb6parse::language::{CheckBoxProperties, OptionButtonProperties};
+use vb6parse::language::{CheckBoxProperties, OptionButtonProperties, TextDirection};
 
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
@@ -37,6 +37,11 @@ pub fn build_checkbox_style(props: &CheckBoxProperties, config: &LayoutConfig) -
     }
 
     style.cursor = mouse_pointer_css(props.mouse_pointer);
+    style.direction = if matches!(props.right_to_left, TextDirection::RightToLeft) {
+        Some("rtl".to_string())
+    } else {
+        None
+    };
 
     style
 }
@@ -69,6 +74,11 @@ pub fn build_optionbutton_style(
     }
 
     style.cursor = mouse_pointer_css(props.mouse_pointer);
+    style.direction = if matches!(props.right_to_left, TextDirection::RightToLeft) {
+        Some("rtl".to_string())
+    } else {
+        None
+    };
 
     style
 }

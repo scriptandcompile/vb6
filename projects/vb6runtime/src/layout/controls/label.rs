@@ -8,7 +8,7 @@
 //! - `word_wrap` → `white_space`
 //! - `back_style` → `background_color` (Transparent → None)
 
-use vb6parse::language::{Alignment, BackStyle, LabelProperties, WordWrap};
+use vb6parse::language::{Alignment, BackStyle, LabelProperties, TextDirection, WordWrap};
 
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
@@ -43,6 +43,11 @@ pub fn build_label_style(props: &LabelProperties, config: &LayoutConfig) -> Layo
             WordWrap::Wrapping => Some("pre-wrap".to_string()),
         },
         cursor: mouse_pointer_css(props.mouse_pointer),
+        direction: if matches!(props.right_to_left, TextDirection::RightToLeft) {
+            Some("rtl".to_string())
+        } else {
+            None
+        },
         ..LayoutStyle::default()
     }
 }

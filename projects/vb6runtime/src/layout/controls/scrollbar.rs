@@ -7,12 +7,17 @@
 use super::super::LayoutConfig;
 use super::super::color::mouse_pointer_css;
 use super::super::model::style::LayoutStyle;
-use vb6parse::language::ScrollBarProperties;
+use vb6parse::language::{ScrollBarProperties, TextDirection};
 
 /// Build CSS style for a ScrollBar control.
 pub fn build_scrollbar_style(props: &ScrollBarProperties, config: &LayoutConfig) -> LayoutStyle {
     let style = LayoutStyle {
         cursor: mouse_pointer_css(props.mouse_pointer),
+        direction: if matches!(props.right_to_left, TextDirection::RightToLeft) {
+            Some("rtl".to_string())
+        } else {
+            None
+        },
         ..LayoutStyle::default()
     };
     let _ = config;
