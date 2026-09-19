@@ -469,6 +469,11 @@ impl Renderer for WebSysRenderer {
                 if leaf.combo_style.as_deref() == Some("dropdown-readonly") {
                     let _ = el.set_attribute("disabled", "disabled");
                 }
+                for item in &leaf.combo_items {
+                    let option = self.doc.create_element("option").expect("create option");
+                    let _ = option.set_text_content(Some(item));
+                    let _ = el.append_child(&option);
+                }
             }
             LayoutControlType::ListBox => {
                 if leaf.listbox_style.as_deref() == Some("checkbox") {

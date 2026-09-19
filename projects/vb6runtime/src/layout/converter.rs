@@ -734,6 +734,28 @@ fn convert_control(
             Ok(Some(LayoutNode::Leaf(listbox_leaf)))
         }
 
+        ControlKind::ComboBox { .. } => {
+            Ok(Some(LayoutNode::Leaf(LayoutLeaf {
+                name: control.name().to_string(),
+                control_type: layout_type,
+                index: control.index(),
+                position,
+                size,
+                style,
+                value: extract_value(control.kind()),
+                visible,
+                enabled,
+                tooltip: extract_tooltip(control.kind()),
+                tabindex: extract_tabindex(control.kind()),
+                is_default: extract_is_default(control.kind()),
+                is_cancel: extract_is_cancel(control.kind()),
+                combo_style: extract_combo_style(control.kind()),
+                combo_items: extract_combo_items(control.kind()),
+                use_mnemonic: extract_use_mnemonic(control.kind()),
+                ..Default::default()
+            })))
+        }
+
         // Leaf controls
         _ => Ok(Some(LayoutNode::Leaf(LayoutLeaf {
             name: control.name().to_string(),
@@ -1259,6 +1281,17 @@ fn extract_combo_style(kind: &ControlKind) -> Option<String> {
             vb6parse::language::ComboBoxStyle::SimpleCombo => "simple".to_string(),
         }),
         _ => None,
+    }
+}
+
+/// Extract ComboBox items from a [`ControlKind`].
+fn extract_combo_items(kind: &ControlKind) -> Vec<String> {
+    match kind {
+        ControlKind::ComboBox { properties, .. } => match &properties.list {
+            ReferenceOrValue::Value(items) => items.clone(),
+            ReferenceOrValue::Reference { .. } => vec![],
+        },
+        _ => vec![],
     }
 }
 

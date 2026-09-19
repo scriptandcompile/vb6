@@ -44,6 +44,7 @@ impl Default for LayoutLeaf {
             range_max: None,
             range_step: None,
             combo_style: None,
+            combo_items: vec![],
             image_src: None,
             listbox_style: None,
             list_items: vec![],
@@ -306,6 +307,9 @@ pub struct LayoutLeaf {
     pub range_step: Option<i32>,
     /// ComboBox style: "dropdown" (editable), "dropdown-readonly" (non-editable), "simple" (always-visible list).
     pub combo_style: Option<String>,
+
+    /// ComboBox items for rendering `<option>` elements.
+    pub combo_items: Vec<String>,
 
     /// Base64-encoded image data URL for Image controls (e.g. "data:image/png;base64,...").
     pub image_src: Option<String>,
