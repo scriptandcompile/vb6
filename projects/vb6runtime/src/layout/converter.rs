@@ -683,6 +683,8 @@ fn convert_control(
             enabled,
             tooltip: extract_tooltip(control.kind()),
             tabindex: extract_tabindex(control.kind()),
+            is_default: extract_is_default(control.kind()),
+            is_cancel: extract_is_cancel(control.kind()),
             ..Default::default()
         }))),
     }
@@ -1092,6 +1094,20 @@ fn tooltip_text(s: &str) -> Option<String> {
     } else {
         Some(s.to_string())
     }
+}
+
+/// Extract whether a [`ControlKind`] is the default button.
+///
+/// Returns `true` for `CommandButton { default: true }`, `false` otherwise.
+fn extract_is_default(kind: &ControlKind) -> bool {
+    matches!(kind, ControlKind::CommandButton { properties } if properties.default)
+}
+
+/// Extract whether a [`ControlKind`] is the cancel button.
+///
+/// Returns `true` for `CommandButton { cancel: true }`, `false` otherwise.
+fn extract_is_cancel(kind: &ControlKind) -> bool {
+    matches!(kind, ControlKind::CommandButton { properties } if properties.cancel)
 }
 
 /// Extract tabindex from a [`ControlKind`] for the HTML `tabindex` attribute.
@@ -2543,5 +2559,65 @@ End Sub\r\n";
             },
         };
         assert_eq!(extract_tabindex(&kind), Some(0));
+    }
+
+    #[test]
+    fn extract_is_default_true() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                default: true,
+                ..Default::default()
+            },
+        };
+        assert!(extract_is_default(&kind));
+    }
+
+    #[test]
+    fn extract_is_default_false() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                default: false,
+                ..Default::default()
+            },
+        };
+        assert!(!extract_is_default(&kind));
+    }
+
+    #[test]
+    fn extract_is_default_non_button_returns_false() {
+        let kind = ControlKind::Label {
+            properties: LabelProperties::default(),
+        };
+        assert!(!extract_is_default(&kind));
+    }
+
+    #[test]
+    fn extract_is_cancel_true() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                cancel: true,
+                ..Default::default()
+            },
+        };
+        assert!(extract_is_cancel(&kind));
+    }
+
+    #[test]
+    fn extract_is_cancel_false() {
+        let kind = ControlKind::CommandButton {
+            properties: CommandButtonProperties {
+                cancel: false,
+                ..Default::default()
+            },
+        };
+        assert!(!extract_is_cancel(&kind));
+    }
+
+    #[test]
+    fn extract_is_cancel_non_button_returns_false() {
+        let kind = ControlKind::TextBox {
+            properties: TextBoxProperties::default(),
+        };
+        assert!(!extract_is_cancel(&kind));
     }
 }
