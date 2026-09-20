@@ -292,7 +292,7 @@ impl LayoutStyle {
     /// VB6 system defaults for a Frame.
     ///
     /// Default properties:
-    /// - back_color = vbWindowBackground → Canvas
+    /// - back_color = ButtonFace (vb6parse default) → ButtonFace
     /// - fore_color = vbWindowText → ButtonText
     /// - font = None (inherits from form / CSS class)
     /// - border_style = FixedSingle → handled by CSS class
@@ -303,7 +303,7 @@ impl LayoutStyle {
     pub fn default_frame(config: &LayoutConfig) -> Self {
         let _ = config;
         LayoutStyle {
-            background_color: Some(color_to_css(&VB_WINDOW_BACKGROUND)),
+            background_color: Some(color_to_css(&VB_BUTTON_FACE)),
             color: Some(color_to_css(&VB_WINDOW_TEXT)),
             box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
             ..LayoutStyle::default()
@@ -313,7 +313,7 @@ impl LayoutStyle {
     /// VB6 system defaults for a PictureBox.
     ///
     /// Default properties:
-    /// - back_color = vbWindowBackground → Canvas
+    /// - back_color = ButtonFace (vb6parse default) → ButtonFace
     /// - fore_color = vbWindowText → ButtonText
     /// - font = None (inherits from form / CSS class)
     /// - border_style = FixedSingle (handled by .vb6-picturebox CSS class)
@@ -327,7 +327,7 @@ impl LayoutStyle {
     pub fn default_picturebox(config: &LayoutConfig) -> Self {
         let _ = config;
         LayoutStyle {
-            background_color: Some(color_to_css(&VB_WINDOW_BACKGROUND)),
+            background_color: Some(color_to_css(&VB_BUTTON_FACE)),
             color: Some(color_to_css(&VB_WINDOW_TEXT)),
             box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
             align: Some("none".to_string()),
@@ -355,7 +355,7 @@ impl LayoutStyle {
     /// VB6 system defaults for a CheckBox.
     ///
     /// Default properties:
-    /// - back_color = vbWindowBackground → Canvas
+    /// - back_color = ButtonFace (vb6parse default) → ButtonFace
     /// - fore_color = vbWindowText → ButtonText
     /// - font = None (inherits from form / CSS class)
     /// - appearance = ThreeD (standard 3D bevel)
@@ -365,7 +365,7 @@ impl LayoutStyle {
     pub fn default_checkbox(config: &LayoutConfig) -> Self {
         let _ = config;
         LayoutStyle {
-            background_color: Some(color_to_css(&VB_WINDOW_BACKGROUND)),
+            background_color: Some(color_to_css(&VB_BUTTON_FACE)),
             color: Some(color_to_css(&VB_WINDOW_TEXT)),
             box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
             text_align: Some("left".to_string()),
@@ -402,7 +402,7 @@ impl LayoutStyle {
     /// VB6 system defaults for a ListBox.
     ///
     /// Default properties:
-    /// - back_color = vbWindowBackground → Canvas
+    /// - back_color = ButtonFace (vb6parse default) → ButtonFace
     /// - fore_color = vbWindowText → ButtonText
     /// - font = None (inherits from form / CSS class)
     /// - appearance = ThreeD (standard 3D bevel)
@@ -411,7 +411,7 @@ impl LayoutStyle {
     pub fn default_listbox(config: &LayoutConfig) -> Self {
         let _ = config;
         LayoutStyle {
-            background_color: Some(color_to_css(&VB_WINDOW_BACKGROUND)),
+            background_color: Some(color_to_css(&VB_BUTTON_FACE)),
             color: Some(color_to_css(&VB_WINDOW_TEXT)),
             overflow: Some("auto".to_string()),
             box_shadow: Some(THREE_D_BOX_SHADOW.to_string()),
@@ -739,9 +739,10 @@ mod tests {
     fn default_frame_has_window_colors() {
         let config = LayoutConfig::default();
         let defaults = LayoutStyle::default_frame(&config);
+        // vb6parse default for FrameProperties is ButtonFace
         assert_eq!(
             defaults.background_color,
-            Some(color_to_css(&VB_WINDOW_BACKGROUND))
+            Some(color_to_css(&VB_BUTTON_FACE))
         );
         assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
         assert!(defaults.box_shadow.is_some());
@@ -751,9 +752,10 @@ mod tests {
     fn default_picturebox_has_window_colors() {
         let config = LayoutConfig::default();
         let defaults = LayoutStyle::default_picturebox(&config);
+        // vb6parse default for PictureBoxProperties is ButtonFace
         assert_eq!(
             defaults.background_color,
-            Some(color_to_css(&VB_WINDOW_BACKGROUND))
+            Some(color_to_css(&VB_BUTTON_FACE))
         );
         assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
         assert_eq!(defaults.align, Some("none".to_string()));
@@ -773,9 +775,10 @@ mod tests {
     fn default_checkbox_has_window_colors() {
         let config = LayoutConfig::default();
         let defaults = LayoutStyle::default_checkbox(&config);
+        // vb6parse default for CheckBoxProperties is ButtonFace
         assert_eq!(
             defaults.background_color,
-            Some(color_to_css(&VB_WINDOW_BACKGROUND))
+            Some(color_to_css(&VB_BUTTON_FACE))
         );
         assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
         assert!(defaults.box_shadow.is_some());
@@ -806,9 +809,10 @@ mod tests {
     fn default_listbox_has_auto_overflow() {
         let config = LayoutConfig::default();
         let defaults = LayoutStyle::default_listbox(&config);
+        // vb6parse default for ListBoxProperties is ButtonFace
         assert_eq!(
             defaults.background_color,
-            Some(color_to_css(&VB_WINDOW_BACKGROUND))
+            Some(color_to_css(&VB_BUTTON_FACE))
         );
         assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
         assert_eq!(defaults.overflow, Some("auto".to_string()));
