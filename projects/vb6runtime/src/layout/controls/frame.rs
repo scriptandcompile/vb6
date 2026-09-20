@@ -20,11 +20,11 @@ pub fn build_frame_style(props: &FrameProperties, config: &LayoutConfig) -> Layo
         ..LayoutStyle::default()
     };
 
-    // Frames always have a border in VB6 unless BorderStyle is None.
-    // The `<fieldset>` element supplies the caption notch on the top edge.
+    // A border is provided by the .vb6-frame class; an explicit
+    // BorderStyle::None must override it so borderless frames stay borderless.
     style.border = match props.border_style {
         BorderStyle::None => Some("none".to_string()),
-        BorderStyle::FixedSingle => Some("1px solid rgb(120, 120, 120)".to_string()),
+        BorderStyle::FixedSingle => None,
     };
 
     if let Some(ref font) = props.font {
@@ -89,7 +89,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_frame_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -112,13 +113,12 @@ mod tests {
         };
         let config = test_config();
         let style = build_frame_style(&props, &config);
-        assert!(style.background_color.is_some());
-        assert!(style.color.is_some());
+        // Default colors match vb6parse default → zeroed by diff_against
+        assert!(style.background_color.is_none());
+        assert!(style.color.is_none());
         assert!(style.font_family.is_none());
-        assert_eq!(
-            style.border,
-            Some("1px solid rgb(120, 120, 120)".to_string())
-        );
+        // FixedSingle border matches default → zeroed by diff_against
+        assert!(style.border.is_none());
     }
 
     #[test]
