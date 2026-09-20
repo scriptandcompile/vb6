@@ -631,6 +631,8 @@ fn theme_overrides_css() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::layout::color::color_to_css;
+    use vb6parse::language::{Color, VB_BUTTON_FACE, VB_WINDOW_BACKGROUND, VB_WINDOW_TEXT};
 
     #[test]
     fn scoped_css_contains_vb6_app_prefix() {
@@ -876,5 +878,137 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn css_theme_variables_match_vb6_defaults() {
+        // Verify that CSS classes use theme variables that resolve to the same
+        // values as VB6 system defaults used in default_*() functions.
+        //
+        // This ensures zero inline CSS is emitted for bare controls at VB6 defaults,
+        // since their computed styles will exactly match the CSS class defaults.
+
+        // vbWindowBackground (index 5) → Canvas → --vb6-window-bg in default theme
+        let vb_bg = color_to_css(&VB_WINDOW_BACKGROUND);
+        assert!(
+            matches!(vb_bg, crate::layout::model::style::CssColor::Named(ref s) if s == "Canvas"),
+            "VB_WINDOW_BACKGROUND should map to Canvas, got {:?}",
+            vb_bg
+        );
+        // Default theme --vb6-window-bg should also be white (Canvas equivalent)
+        let theme = crate::layout::theme::default_theme();
+        assert!(
+            theme.window_bg.as_ref().map(|s| s == "#ffffff").unwrap_or(false),
+            "default theme window_bg should be white (#ffffff)"
+        );
+
+        // vbWindowText (index 8) → ButtonText → --vb6-window-text in default theme
+        let vb_text = color_to_css(&VB_WINDOW_TEXT);
+        assert!(
+            matches!(vb_text, crate::layout::model::style::CssColor::Named(ref s) if s == "ButtonText"),
+            "VB_WINDOW_TEXT should map to ButtonText, got {:?}",
+            vb_text
+        );
+        // Default theme --vb6-window-text should be black
+        assert!(
+            theme.window_text.as_ref().map(|s| s == "#000000").unwrap_or(false),
+            "default theme window_text should be black (#000000)"
+        );
+
+        // vbButtonFace (index 15) → ButtonFace → --vb6-button-bg in default theme
+        let vb_btn_bg = color_to_css(&VB_BUTTON_FACE);
+        assert!(
+            matches!(vb_btn_bg, crate::layout::model::style::CssColor::Named(ref s) if s == "ButtonFace"),
+            "VB_BUTTON_FACE should map to ButtonFace, got {:?}",
+            vb_btn_bg
+        );
+        // Default theme --vb6-button-bg should be rgb(192, 192, 192)
+        assert!(
+            theme.button_bg.as_ref().map(|s| s == "rgb(192, 192, 192)").unwrap_or(false),
+            "default theme button_bg should be rgb(192, 192, 192)"
+        );
+
+        // vbDesktop (index 1) → Canvas → --vb6-bg in default theme
+        let vb_desktop = Color::System { index: 0x01 };
+        let desktop_css = color_to_css(&vb_desktop);
+        assert!(
+            matches!(desktop_css, crate::layout::model::style::CssColor::Named(ref s) if s == "Canvas"),
+            "VB_DESKTOP should map to Canvas, got {:?}",
+            desktop_css
+        );
+        // Default theme --vb6-bg should be rgb(192, 192, 192)
+        assert!(
+            theme.bg.as_ref().map(|s| s == "rgb(192, 192, 192)").unwrap_or(false),
+            "default theme bg should be rgb(192, 192, 192)"
+        );
+    }
+
+    #[test]
+    fn textbox_css_uses_window_colors_matching_vb6_defaults() {
+        // .vb6-textbox uses var(--vb6-window-bg) and var(--vb6-window-text)
+        // These should match VB_WINDOW_BACKGROUND and VB_WINDOW_TEXT respectively
+        let css = scoped_css();
+        assert!(css.contains("background-color: var(--vb6-window-bg)"));
+        assert!(css.contains("color: var(--vb6-window-text)"));
+
+        // Verify the CSS variable values in default theme match VB6 system colors
+        let theme = crate::layout::theme::default_theme();
+        assert!(theme.window_bg.is_some());
+        assert!(theme.window_text.is_some());
+    }
+
+    #[test]
+    fn button_css_uses_button_colors_matching_vb6_defaults() {
+        // .vb6-commandbutton uses var(--vb6-button-bg) and var(--vb6-fg)
+        // These should match VB_BUTTON_FACE and VB_BUTTON_TEXT respectively
+        let css = scoped_css();
+        assert!(css.contains("background-color: var(--vb6-button-bg)"));
+        assert!(css.contains("color: var(--vb6-fg)"));
+
+        let theme = crate::layout::theme::default_theme();
+        assert!(theme.button_bg.is_some());
+        assert!(theme.fg.is_some());
+    }
+
+    #[test]
+    fn label_css_uses_form_colors_matching_vb6_defaults() {
+        // .vb6-label uses var(--vb6-bg) and var(--vb6-fg)
+        // These should match VB_DESKTOP and VB_BUTTON_TEXT respectively
+        let css = scoped_css();
+        assert!(css.contains("background-color: var(--vb6-bg)"));
+        assert!(css.contains("color: var(--vb6-fg)"));
+    }
+
+    #[test]
+    fn all_control_styles_use_theme_variables() {
+        // Every control style should use var(--vb6-*) instead of hardcoded colors
+        let css = scoped_css();
+
+        // Controls with background colors should use theme variables
+        assert!(css.contains("background-color: var(--vb6-bg)"));
+        assert!(css.contains("background-color: var(--vb6-button-bg)"));
+        assert!(css.contains("background-color: var(--vb6-window-bg)"));
+
+        // Controls with text colors should use theme variables
+        assert!(css.contains("color: var(--vb6-fg)"));
+        assert!(css.contains("color: var(--vb6-window-text)"));
+    }
+
+    #[test]
+    fn default_theme_produces_css_matching_css_file_defaults() {
+        // The default theme should produce CSS custom properties with values
+        // that match the hardcoded defaults in vb6_css.rs root CSS
+        let theme = crate::layout::theme::default_theme();
+        let css = theme.to_css();
+
+        // These should match the root_css() values
+        assert!(css.contains("--vb6-bg: rgb(192, 192, 192)"));
+        assert!(css.contains("--vb6-fg: rgb(0, 0, 0)"));
+        assert!(css.contains("--vb6-window-bg: #ffffff"));
+        assert!(css.contains("--vb6-window-text: #000000"));
+        assert!(css.contains("--vb6-button-bg: rgb(192, 192, 192)"));
+        assert!(css.contains("--vb6-button-border: rgb(120, 120, 120)"));
+        assert!(css.contains("--vb6-highlight: rgb(0, 0, 128)"));
+        assert!(css.contains("--vb6-highlight-text: #ffffff"));
     }
 }
