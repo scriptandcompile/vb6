@@ -8,8 +8,8 @@
 
 use vb6parse::language::{Alignment, Style, VB_BUTTON_FACE, VB_WINDOW_BACKGROUND, VB_WINDOW_TEXT};
 
-use super::super::color::color_to_css;
 use super::super::LayoutConfig;
+use super::super::color::color_to_css;
 
 /// A CSS color value.
 ///
@@ -159,7 +159,11 @@ pub fn font_weight_css(weight: i32) -> Option<String> {
 /// ```
 #[must_use]
 pub fn font_style_css(italic: bool) -> String {
-    if italic { "italic".to_string() } else { "normal".to_string() }
+    if italic {
+        "italic".to_string()
+    } else {
+        "normal".to_string()
+    }
 }
 
 /// Convert a VB6 [`Alignment`] to a CSS `text-align` string.
@@ -241,7 +245,11 @@ impl LayoutStyle {
     /// - font = None (inherits from form / CSS class)
     /// - mouse_pointer = Default (cursor is `None`)
     /// - right_to_left = LeftToRight (direction is `None`)
-    pub fn default_button(config: &LayoutConfig, style: Style, appearance: vb6parse::language::Appearance) -> Self {
+    pub fn default_button(
+        config: &LayoutConfig,
+        style: Style,
+        appearance: vb6parse::language::Appearance,
+    ) -> Self {
         let _ = config;
         let mut result = LayoutStyle {
             display: Some("inline-block".to_string()),
@@ -437,7 +445,10 @@ impl LayoutStyle {
     ///
     /// Note: border, border_width, border_style are always set for shapes
     /// and cannot be delegated to CSS classes.
-    pub fn default_shape(props: &vb6parse::language::ShapeProperties, _config: &LayoutConfig) -> Self {
+    pub fn default_shape(
+        props: &vb6parse::language::ShapeProperties,
+        _config: &LayoutConfig,
+    ) -> Self {
         let _ = _config;
         LayoutStyle {
             background_color: match props.back_style {
@@ -466,7 +477,10 @@ impl LayoutStyle {
     /// - border_color = vbBlack
     /// - border_width = 0
     /// - coordinates are instance-specific → always `None` (set by renderer)
-    pub fn default_line(props: &vb6parse::language::LineProperties, _config: &LayoutConfig) -> Self {
+    pub fn default_line(
+        props: &vb6parse::language::LineProperties,
+        _config: &LayoutConfig,
+    ) -> Self {
         let _ = _config;
         LayoutStyle {
             line_color: Some(color_to_css(&props.border_color)),
@@ -479,13 +493,113 @@ impl LayoutStyle {
 /// Map VB6 DrawStyle to CSS border-style value.
 fn draw_style_to_css_border_style(style: vb6parse::language::DrawStyle) -> Option<String> {
     match style {
-        vb6parse::language::DrawStyle::Transparent | vb6parse::language::DrawStyle::InsideSolid => Some("none"),
+        vb6parse::language::DrawStyle::Transparent | vb6parse::language::DrawStyle::InsideSolid => {
+            Some("none")
+        }
         vb6parse::language::DrawStyle::Solid => Some("solid"),
         vb6parse::language::DrawStyle::Dash => Some("dashed"),
-        vb6parse::language::DrawStyle::DashDot | vb6parse::language::DrawStyle::DashDotDot => Some("dashed"),
+        vb6parse::language::DrawStyle::DashDot | vb6parse::language::DrawStyle::DashDotDot => {
+            Some("dashed")
+        }
         vb6parse::language::DrawStyle::Dot => Some("dotted"),
     }
     .map(String::from)
+}
+
+// ============================================================================
+// diff_against helpers and method
+// ============================================================================
+//
+// These helpers let style builders zero-out fields that match VB6 system defaults,
+// so that controls at defaults produce zero inline CSS.  The existing style_to_css()
+// already skips None fields, so this is the only change needed.
+
+/// Set a field to `None` when it matches the default value.
+///
+/// Generic helper for `Option<T>` fields where `T: PartialEq`.
+/// Returns `None` if `value == default`, otherwise returns `value`.
+#[must_use]
+fn diff_option<T: PartialEq>(value: Option<T>, default: Option<T>) -> Option<T> {
+    if value == default { None } else { value }
+}
+
+/// Compare `Option<String>` fields and return `None` when they match.
+///
+/// Used for string fields like `font_family`, `display`, `border`, etc.
+#[must_use]
+fn diff_option_string(value: Option<String>, default: Option<String>) -> Option<String> {
+    match (&value, &default) {
+        (Some(v), Some(d)) if v == d => None,
+        _ => value,
+    }
+}
+
+impl LayoutStyle {
+    /// Subtract `defaults` from `self`, setting matching fields to `None`.
+    ///
+    /// This is called after building a style to reduce it to only the properties
+    /// that differ from VB6 system defaults.  The result is suitable for
+    /// `style_to_css()` which already omits `None` fields.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use vb6runtime::layout::model::style::LayoutStyle;
+    /// use vb6runtime::layout::LayoutConfig;
+    ///
+    /// let config = LayoutConfig::default();
+    /// let defaults = LayoutStyle::default_textbox(&config);
+    /// let mut style = defaults.clone();
+    /// style.diff_against(&defaults);
+    /// // Every field is now None (or false for bools), so style_to_css(&style) == ""
+    /// ```
+    pub fn diff_against(&mut self, defaults: &Self) {
+        self.background_color = diff_option(
+            self.background_color.clone(),
+            defaults.background_color.clone(),
+        );
+        self.color = diff_option(self.color.clone(), defaults.color.clone());
+        self.font_family =
+            diff_option_string(self.font_family.clone(), defaults.font_family.clone());
+        self.font_size = diff_option(self.font_size, defaults.font_size);
+        self.font_weight =
+            diff_option_string(self.font_weight.clone(), defaults.font_weight.clone());
+        self.font_style = diff_option_string(self.font_style.clone(), defaults.font_style.clone());
+        self.text_decoration = diff_option_string(
+            self.text_decoration.clone(),
+            defaults.text_decoration.clone(),
+        );
+        self.display = diff_option_string(self.display.clone(), defaults.display.clone());
+        self.overflow = diff_option_string(self.overflow.clone(), defaults.overflow.clone());
+        self.white_space =
+            diff_option_string(self.white_space.clone(), defaults.white_space.clone());
+        self.text_align = diff_option_string(self.text_align.clone(), defaults.text_align.clone());
+        self.vertical_align =
+            diff_option_string(self.vertical_align.clone(), defaults.vertical_align.clone());
+        self.border = diff_option_string(self.border.clone(), defaults.border.clone());
+        self.border_style =
+            diff_option_string(self.border_style.clone(), defaults.border_style.clone());
+        self.box_shadow = diff_option_string(self.box_shadow.clone(), defaults.box_shadow.clone());
+        self.multi_line = self.multi_line && !defaults.multi_line;
+        self.group = diff_option_string(self.group.clone(), defaults.group.clone());
+        self.align = diff_option_string(self.align.clone(), defaults.align.clone());
+        self.border_radius = diff_option(self.border_radius, defaults.border_radius);
+        self.border_width = diff_option(self.border_width, defaults.border_width);
+        self.fill_color = diff_option(self.fill_color.clone(), defaults.fill_color.clone());
+        self.line_color = diff_option(self.line_color.clone(), defaults.line_color.clone());
+        self.line_width = diff_option(self.line_width, defaults.line_width);
+        self.line_x1 = diff_option(self.line_x1, defaults.line_x1);
+        self.line_y1 = diff_option(self.line_y1, defaults.line_y1);
+        self.line_x2 = diff_option(self.line_x2, defaults.line_x2);
+        self.line_y2 = diff_option(self.line_y2, defaults.line_y2);
+        self.cursor = diff_option_string(self.cursor.clone(), defaults.cursor.clone());
+        self.direction = diff_option_string(self.direction.clone(), defaults.direction.clone());
+        self.object_fit = diff_option_string(self.object_fit.clone(), defaults.object_fit.clone());
+        self.background_image = diff_option_string(
+            self.background_image.clone(),
+            defaults.background_image.clone(),
+        );
+    }
 }
 
 #[cfg(test)]
@@ -574,7 +688,11 @@ mod tests {
     fn default_button_standard_no_background() {
         // Standard buttons delegate background to the .vb6-commandbutton CSS class
         let config = LayoutConfig::default();
-        let defaults = LayoutStyle::default_button(&config, Style::Standard, vb6parse::language::Appearance::ThreeD);
+        let defaults = LayoutStyle::default_button(
+            &config,
+            Style::Standard,
+            vb6parse::language::Appearance::ThreeD,
+        );
         assert!(defaults.background_color.is_none());
         assert_eq!(defaults.display, Some("inline-block".to_string()));
         assert!(defaults.box_shadow.is_some());
@@ -584,16 +702,25 @@ mod tests {
     fn default_button_graphical_has_button_face() {
         // Graphical buttons use their own back_color as default
         let config = LayoutConfig::default();
-        let defaults =
-            LayoutStyle::default_button(&config, Style::Graphical, vb6parse::language::Appearance::ThreeD);
-        assert_eq!(defaults.background_color, Some(color_to_css(&VB_BUTTON_FACE)));
+        let defaults = LayoutStyle::default_button(
+            &config,
+            Style::Graphical,
+            vb6parse::language::Appearance::ThreeD,
+        );
+        assert_eq!(
+            defaults.background_color,
+            Some(color_to_css(&VB_BUTTON_FACE))
+        );
     }
 
     #[test]
     fn default_button_flat_no_box_shadow() {
         let config = LayoutConfig::default();
-        let defaults =
-            LayoutStyle::default_button(&config, Style::Standard, vb6parse::language::Appearance::Flat);
+        let defaults = LayoutStyle::default_button(
+            &config,
+            Style::Standard,
+            vb6parse::language::Appearance::Flat,
+        );
         assert!(defaults.box_shadow.is_none());
     }
 
@@ -612,7 +739,10 @@ mod tests {
     fn default_frame_has_window_colors() {
         let config = LayoutConfig::default();
         let defaults = LayoutStyle::default_frame(&config);
-        assert_eq!(defaults.background_color, Some(color_to_css(&VB_WINDOW_BACKGROUND)));
+        assert_eq!(
+            defaults.background_color,
+            Some(color_to_css(&VB_WINDOW_BACKGROUND))
+        );
         assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
         assert!(defaults.box_shadow.is_some());
     }
@@ -621,7 +751,10 @@ mod tests {
     fn default_picturebox_has_window_colors() {
         let config = LayoutConfig::default();
         let defaults = LayoutStyle::default_picturebox(&config);
-        assert_eq!(defaults.background_color, Some(color_to_css(&VB_WINDOW_BACKGROUND)));
+        assert_eq!(
+            defaults.background_color,
+            Some(color_to_css(&VB_WINDOW_BACKGROUND))
+        );
         assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
         assert_eq!(defaults.align, Some("none".to_string()));
         assert!(defaults.box_shadow.is_some());
@@ -640,7 +773,10 @@ mod tests {
     fn default_checkbox_has_window_colors() {
         let config = LayoutConfig::default();
         let defaults = LayoutStyle::default_checkbox(&config);
-        assert_eq!(defaults.background_color, Some(color_to_css(&VB_WINDOW_BACKGROUND)));
+        assert_eq!(
+            defaults.background_color,
+            Some(color_to_css(&VB_WINDOW_BACKGROUND))
+        );
         assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
         assert!(defaults.box_shadow.is_some());
         assert_eq!(defaults.text_align, Some("left".to_string()));
@@ -658,7 +794,10 @@ mod tests {
     fn default_combobox_has_window_colors() {
         let config = LayoutConfig::default();
         let defaults = LayoutStyle::default_combobox(&config);
-        assert_eq!(defaults.background_color, Some(color_to_css(&VB_WINDOW_BACKGROUND)));
+        assert_eq!(
+            defaults.background_color,
+            Some(color_to_css(&VB_WINDOW_BACKGROUND))
+        );
         assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
         assert!(defaults.box_shadow.is_some());
     }
@@ -667,7 +806,10 @@ mod tests {
     fn default_listbox_has_auto_overflow() {
         let config = LayoutConfig::default();
         let defaults = LayoutStyle::default_listbox(&config);
-        assert_eq!(defaults.background_color, Some(color_to_css(&VB_WINDOW_BACKGROUND)));
+        assert_eq!(
+            defaults.background_color,
+            Some(color_to_css(&VB_WINDOW_BACKGROUND))
+        );
         assert_eq!(defaults.color, Some(color_to_css(&VB_WINDOW_TEXT)));
         assert_eq!(defaults.overflow, Some("auto".to_string()));
         assert!(defaults.box_shadow.is_some());
@@ -738,5 +880,166 @@ mod tests {
         };
         let defaults = LayoutStyle::default_line(&props, &config);
         assert_eq!(defaults.line_width, Some(3.0));
+    }
+
+    // -----------------------------------------------------------------------
+    // diff_against tests
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn diff_against_clears_matching_fields() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_textbox(&config);
+        let mut style = defaults.clone();
+        style.diff_against(&defaults);
+        assert!(style.background_color.is_none());
+        assert!(style.color.is_none());
+        assert!(style.text_align.is_none());
+        assert!(style.box_shadow.is_none());
+        assert!(!style.multi_line);
+    }
+
+    #[test]
+    fn diff_against_preserves_non_matching_fields() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_textbox(&config);
+        let mut style = LayoutStyle {
+            background_color: Some(CssColor::Rgb(255, 255, 0)),
+            ..defaults.clone()
+        };
+        style.diff_against(&defaults);
+        assert_eq!(style.background_color, Some(CssColor::Rgb(255, 255, 0)));
+        assert!(style.color.is_none());
+        assert!(style.box_shadow.is_none());
+    }
+
+    #[test]
+    fn diff_against_clears_matching_strings() {
+        let defaults = LayoutStyle {
+            font_family: Some("Arial".to_string()),
+            display: Some("inline-block".to_string()),
+            ..LayoutStyle::default()
+        };
+        let mut style = defaults.clone();
+        style.diff_against(&defaults);
+        assert!(style.font_family.is_none());
+        assert!(style.display.is_none());
+    }
+
+    #[test]
+    fn diff_against_preserves_different_strings() {
+        let defaults = LayoutStyle {
+            font_family: Some("Arial".to_string()),
+            ..LayoutStyle::default()
+        };
+        let mut style = LayoutStyle {
+            font_family: Some("Times New Roman".to_string()),
+            ..defaults.clone()
+        };
+        style.diff_against(&defaults);
+        assert_eq!(style.font_family, Some("Times New Roman".to_string()));
+    }
+
+    #[test]
+    fn diff_against_clears_matching_f32() {
+        let defaults = LayoutStyle {
+            font_size: Some(14.0),
+            border_width: Some(3.0),
+            ..LayoutStyle::default()
+        };
+        let mut style = defaults.clone();
+        style.diff_against(&defaults);
+        assert!(style.font_size.is_none());
+        assert!(style.border_width.is_none());
+    }
+
+    #[test]
+    fn diff_against_handles_multi_line() {
+        let defaults = LayoutStyle {
+            multi_line: false,
+            ..LayoutStyle::default()
+        };
+        let mut style = LayoutStyle {
+            multi_line: true,
+            ..defaults.clone()
+        };
+        style.diff_against(&defaults);
+        assert!(style.multi_line);
+
+        let mut style2 = LayoutStyle {
+            multi_line: false,
+            ..defaults.clone()
+        };
+        style2.diff_against(&defaults);
+        assert!(!style2.multi_line);
+    }
+
+    #[test]
+    fn diff_against_button_standard_no_background() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_button(
+            &config,
+            Style::Standard,
+            vb6parse::language::Appearance::ThreeD,
+        );
+        let mut style = defaults.clone();
+        style.diff_against(&defaults);
+        assert!(style.display.is_none());
+        assert!(style.box_shadow.is_none());
+        assert!(style.background_color.is_none());
+    }
+
+    #[test]
+    fn diff_against_button_graphical_clears_background() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_button(
+            &config,
+            Style::Graphical,
+            vb6parse::language::Appearance::ThreeD,
+        );
+        let mut style = defaults.clone();
+        style.diff_against(&defaults);
+        assert!(style.background_color.is_none());
+        assert!(style.box_shadow.is_none());
+    }
+
+    #[test]
+    fn diff_against_preserves_custom_button_background() {
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_button(
+            &config,
+            Style::Graphical,
+            vb6parse::language::Appearance::ThreeD,
+        );
+        let mut style = LayoutStyle {
+            background_color: Some(CssColor::Rgb(255, 0, 0)),
+            ..defaults.clone()
+        };
+        style.diff_against(&defaults);
+        assert_eq!(style.background_color, Some(CssColor::Rgb(255, 0, 0)));
+    }
+
+    #[test]
+    fn diff_against_shape_clears_defaults() {
+        let props = vb6parse::language::ShapeProperties::default();
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_shape(&props, &config);
+        let mut style = defaults.clone();
+        style.diff_against(&defaults);
+        assert!(style.border.is_none());
+        assert!(style.border_style.is_none());
+        assert!(style.border_width.is_none());
+        assert!(style.border_radius.is_none());
+    }
+
+    #[test]
+    fn diff_against_line_clears_defaults() {
+        let props = vb6parse::language::LineProperties::default();
+        let config = LayoutConfig::default();
+        let defaults = LayoutStyle::default_line(&props, &config);
+        let mut style = defaults.clone();
+        style.diff_against(&defaults);
+        assert!(style.line_color.is_none());
+        assert!(style.line_width.is_none());
     }
 }
