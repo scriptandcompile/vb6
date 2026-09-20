@@ -11,7 +11,7 @@ use vb6parse::language::ImageProperties;
 
 /// Build CSS style for an Image control.
 pub fn build_image_style(props: &ImageProperties, config: &LayoutConfig) -> LayoutStyle {
-    let style = LayoutStyle {
+    let mut style = LayoutStyle {
         cursor: mouse_pointer_css(props.mouse_pointer),
         box_shadow: match props.appearance {
             vb6parse::language::Appearance::ThreeD => Some(
@@ -33,7 +33,11 @@ pub fn build_image_style(props: &ImageProperties, config: &LayoutConfig) -> Layo
         },
         ..LayoutStyle::default()
     };
-    let _ = config;
+
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_image(config);
+    style.diff_against(&defaults);
+
     style
 }
 

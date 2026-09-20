@@ -50,6 +50,10 @@ pub fn build_combobox_style(props: &ComboBoxProperties, config: &LayoutConfig) -
         None
     };
 
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_combobox(config);
+    style.diff_against(&defaults);
+
     style
 }
 

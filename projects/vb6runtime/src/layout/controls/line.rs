@@ -13,7 +13,7 @@ use vb6parse::language::{LineProperties, ScaleMode};
 
 /// Build CSS style for a Line control.
 pub fn build_line_style(props: &LineProperties, config: &LayoutConfig) -> LayoutStyle {
-    LayoutStyle {
+    let mut style = LayoutStyle {
         line_color: Some(color_to_css(&props.border_color)),
         line_width: Some(props.border_width as f32),
         line_x1: Some(scale_mode_to_pixels(props.x1, ScaleMode::Twip, config.dpi)),
@@ -21,7 +21,13 @@ pub fn build_line_style(props: &LineProperties, config: &LayoutConfig) -> Layout
         line_x2: Some(scale_mode_to_pixels(props.x2, ScaleMode::Twip, config.dpi)),
         line_y2: Some(scale_mode_to_pixels(props.y2, ScaleMode::Twip, config.dpi)),
         ..LayoutStyle::default()
-    }
+    };
+
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_line(props, config);
+    style.diff_against(&defaults);
+
+    style
 }
 
 #[cfg(test)]

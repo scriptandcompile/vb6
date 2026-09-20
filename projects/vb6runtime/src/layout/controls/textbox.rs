@@ -68,6 +68,10 @@ pub fn build_textbox_style(props: &TextBoxProperties, config: &LayoutConfig) -> 
         None
     };
 
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_textbox(config);
+    style.diff_against(&defaults);
+
     style
 }
 

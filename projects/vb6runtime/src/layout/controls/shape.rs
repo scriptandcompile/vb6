@@ -37,6 +37,11 @@ pub fn build_shape_style(props: &ShapeProperties, _config: &LayoutConfig) -> Lay
         ..LayoutStyle::default()
     };
     style.border_width = Some(props.border_width as f32);
+
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_shape(props, _config);
+    style.diff_against(&defaults);
+
     style
 }
 

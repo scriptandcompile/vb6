@@ -52,6 +52,10 @@ pub fn build_listbox_style(props: &ListBoxProperties, config: &LayoutConfig) -> 
         None
     };
 
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_listbox(config);
+    style.diff_against(&defaults);
+
     style
 }
 

@@ -56,6 +56,10 @@ pub fn build_button_style(props: &CommandButtonProperties, config: &LayoutConfig
         None
     };
 
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_button(config, props.style, props.appearance);
+    style.diff_against(&defaults);
+
     style
 }
 

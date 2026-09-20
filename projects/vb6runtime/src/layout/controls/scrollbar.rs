@@ -26,7 +26,11 @@ pub fn build_scrollbar_style(props: &ScrollBarProperties, config: &LayoutConfig)
         ),
         vb6parse::language::Appearance::Flat => None,
     };
-    let _ = config;
+
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_scrollbar(config);
+    style.diff_against(&defaults);
+
     style
 }
 

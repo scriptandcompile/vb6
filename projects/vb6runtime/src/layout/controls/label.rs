@@ -17,7 +17,7 @@ use super::super::model::style::{alignment_css, font_weight_css, LayoutStyle};
 
 /// Build CSS style for a Label control.
 pub fn build_label_style(props: &LabelProperties, config: &LayoutConfig) -> LayoutStyle {
-    LayoutStyle {
+    let mut style = LayoutStyle {
         background_color: match props.back_style {
             BackStyle::Transparent => None,
             BackStyle::Opaque => Some(color_to_css(&props.back_color)),
@@ -62,7 +62,13 @@ pub fn build_label_style(props: &LabelProperties, config: &LayoutConfig) -> Layo
             vb6parse::language::Appearance::Flat => None,
         },
         ..LayoutStyle::default()
-    }
+    };
+
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_label(config);
+    style.diff_against(&defaults);
+
+    style
 }
 #[cfg(test)]
 mod tests {

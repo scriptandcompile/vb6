@@ -61,6 +61,10 @@ pub fn build_frame_style(props: &FrameProperties, config: &LayoutConfig) -> Layo
         style.overflow = Some("hidden".to_string());
     }
 
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_frame(config);
+    style.diff_against(&defaults);
+
     style
 }
 

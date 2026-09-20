@@ -78,6 +78,10 @@ pub fn build_picturebox_style(props: &PictureBoxProperties, config: &LayoutConfi
 
     style.background_image = extract_image_src(&props.picture);
 
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_picturebox(config);
+    style.diff_against(&defaults);
+
     style
 }
 

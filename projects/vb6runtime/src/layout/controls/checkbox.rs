@@ -57,6 +57,10 @@ pub fn build_checkbox_style(props: &CheckBoxProperties, config: &LayoutConfig) -
         JustifyAlignment::RightJustify => Some("right".to_string()),
     };
 
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_checkbox(config);
+    style.diff_against(&defaults);
+
     style
 }
 
@@ -105,6 +109,10 @@ pub fn build_optionbutton_style(
         JustifyAlignment::LeftJustify => Some("left".to_string()),
         JustifyAlignment::RightJustify => Some("right".to_string()),
     };
+
+    // Diff against VB6 defaults — set matching fields to None
+    let defaults = LayoutStyle::default_optionbutton(config);
+    style.diff_against(&defaults);
 
     style
 }
