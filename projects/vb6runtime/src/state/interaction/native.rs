@@ -1781,27 +1781,25 @@ mod wasm {
 
         match offered {
             [only] => {
-                unsafe { alert(&browser_message(title, prompt)) };
+                alert(&browser_message(title, prompt));
                 *only
             }
             [first, second] => {
-                if unsafe { window_confirm(&browser_message(title, prompt)) } {
+                if window_confirm(&browser_message(title, prompt)) {
                     *first
                 } else {
                     *second
                 }
             }
             [first, second, third] => {
-                if unsafe { window_confirm(&browser_message(title, prompt)) } {
+                if window_confirm(&browser_message(title, prompt)) {
                     *first
-                } else if unsafe {
-                    window_confirm(&browser_secondary_message(
+                } else if window_confirm(&browser_secondary_message(
                         title,
                         prompt,
                         second.name(),
                         third.name(),
-                    ))
-                } {
+                    )) {
                     *second
                 } else {
                     *third
@@ -1819,7 +1817,7 @@ mod wasm {
     /// VB6.
     pub(super) fn prompt_dialog(request: &InputBoxRequest) -> Option<String> {
         let message = browser_message(request.title.as_deref(), &request.prompt);
-        unsafe { window_prompt(&message, &request.default_response) }
+        window_prompt(&message, &request.default_response)
     }
 }
 
