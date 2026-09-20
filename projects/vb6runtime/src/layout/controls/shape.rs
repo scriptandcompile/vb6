@@ -9,7 +9,7 @@
 
 use super::super::LayoutConfig;
 use super::super::color::color_to_css;
-use super::super::model::style::LayoutStyle;
+use super::super::model::style::{draw_style_to_css_border_style, LayoutStyle};
 use vb6parse::language::{BackStyle, DrawStyle, Shape, ShapeProperties};
 
 /// Build CSS style for a Shape control.
@@ -43,18 +43,6 @@ pub fn build_shape_style(props: &ShapeProperties, _config: &LayoutConfig) -> Lay
     style.diff_against(&defaults);
 
     style
-}
-
-/// Map VB6 DrawStyle to CSS border-style value.
-fn draw_style_to_css_border_style(style: DrawStyle) -> Option<String> {
-    match style {
-        DrawStyle::Transparent | DrawStyle::InsideSolid => Some("none"),
-        DrawStyle::Solid => Some("solid"),
-        DrawStyle::Dash => Some("dashed"),
-        DrawStyle::DashDot | DrawStyle::DashDotDot => Some("dashed"),
-        DrawStyle::Dot => Some("dotted"),
-    }
-    .map(String::from)
 }
 
 #[cfg(test)]

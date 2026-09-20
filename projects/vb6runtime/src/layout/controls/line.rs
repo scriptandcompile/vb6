@@ -32,8 +32,6 @@ pub fn build_line_style(props: &LineProperties, config: &LayoutConfig) -> Layout
 
 #[cfg(test)]
 mod tests {
-    use std::default;
-
     use super::*;
     use vb6parse::language::Color;
 
@@ -68,7 +66,7 @@ mod tests {
                 green: 0,
                 blue: 0,
             },
-            ..default::Default::default()
+            ..Default::default()
         };
         let config = test_config();
         let style = build_line_style(&props1, &config);

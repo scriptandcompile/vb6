@@ -491,7 +491,7 @@ impl LayoutStyle {
 }
 
 /// Map VB6 DrawStyle to CSS border-style value.
-fn draw_style_to_css_border_style(style: vb6parse::language::DrawStyle) -> Option<String> {
+pub(crate) fn draw_style_to_css_border_style(style: vb6parse::language::DrawStyle) -> Option<String> {
     match style {
         vb6parse::language::DrawStyle::Transparent | vb6parse::language::DrawStyle::InsideSolid => {
             Some("none")
