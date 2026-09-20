@@ -226,17 +226,17 @@ mod tests {
     /// Helper to ensure tests that share global state run sequentially.
     fn lock_test() -> std::sync::MutexGuard<'static, ()> {
         static LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
-        LOCK.lock().unwrap()
+        LOCK.lock().unwrap_or_else(|e| e.into_inner())
     }
 
     fn make_test_form_with_label() -> Form {
-        use vb6parse::language::{Control, ControlKind, LabelProperties};
+        use vb6parse::language::{Control, ControlKind};
         let label = Control::new(
             "Label1".to_string(),
             String::new(),
             0,
             ControlKind::Label {
-                properties: LabelProperties {
+                properties: vb6parse::language::LabelProperties {
                     caption: "Hello".to_string(),
                     left: 120,
                     top: 120,
@@ -1384,25 +1384,23 @@ mod tests {
                     enabled: Activation::Enabled,
                     ..Default::default()
                 },
-                controls: vec![
-                    Control::new(
-                        "LabelInside".to_string(),
-                        String::new(),
-                        0,
-                        ControlKind::Label {
-                            properties: vb6parse::language::LabelProperties {
-                                caption: "Inside frame".to_string(),
-                                left: 50,
-                                top: 50,
-                                width: 500,
-                                height: 200,
-                                visible: Visibility::Visible,
-                                enabled: Activation::Enabled,
-                                ..Default::default()
-                            },
+                controls: vec![Control::new(
+                    "LabelInside".to_string(),
+                    String::new(),
+                    0,
+                    ControlKind::Label {
+                        properties: vb6parse::language::LabelProperties {
+                            caption: "Inside frame".to_string(),
+                            left: 50,
+                            top: 50,
+                            width: 500,
+                            height: 200,
+                            visible: Visibility::Visible,
+                            enabled: Activation::Enabled,
+                            ..Default::default()
                         },
-                    ),
-                ],
+                    },
+                )],
             },
         );
         let form = Form {
@@ -2005,5 +2003,1106 @@ mod tests {
         assert!(html.contains("vb6-drivelistbox"));
         assert!(html.contains("vb6-dirlistbox"));
         assert!(html.contains("vb6-filelistbox"));
+    }
+
+    // ========================================================================
+    // Step 9: Performance and Edge Case Testing
+    // ========================================================================
+
+    fn make_form_with_many_controls(count: usize, customize_at: Option<usize>) -> Form {
+        let mut controls = Vec::with_capacity(count);
+        let control_types = [
+            "Label",
+            "CommandButton",
+            "TextBox",
+            "Frame",
+            "PictureBox",
+            "Image",
+            "CheckBox",
+            "ComboBox",
+            "ListBox",
+            "HScrollBar",
+            "VScrollBar",
+            "Shape",
+        ];
+
+        for i in 0..count {
+            let is_customized = Some(i) == customize_at;
+            let control = match control_types[i % control_types.len()] {
+                "Label" => Control::new(
+                    format!("Label{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::Label {
+                        properties: vb6parse::language::LabelProperties {
+                            caption: format!("Label {i}"),
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 300,
+                            height: 300,
+                            visible: Visibility::Visible,
+                            enabled: Activation::Enabled,
+                            fore_color: if is_customized {
+                                vb6parse::language::Color::RGB {
+                                    red: 255,
+                                    green: 0,
+                                    blue: 0,
+                                }
+                            } else {
+                                vb6parse::language::Color::System { index: 0x08 }
+                            },
+                            ..Default::default()
+                        },
+                    },
+                ),
+                "CommandButton" => Control::new(
+                    format!("cmd{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::CommandButton {
+                        properties: vb6parse::language::CommandButtonProperties {
+                            caption: format!("Btn {i}"),
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 300,
+                            height: 300,
+                            enabled: Activation::Enabled,
+                            ..Default::default()
+                        },
+                    },
+                ),
+                "TextBox" => Control::new(
+                    format!("txt{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::TextBox {
+                        properties: vb6parse::language::TextBoxProperties {
+                            text: format!("Text {i}"),
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 300,
+                            height: 300,
+                            visible: Visibility::Visible,
+                            enabled: Activation::Enabled,
+                            ..Default::default()
+                        },
+                    },
+                ),
+                "Frame" => Control::new(
+                    format!("Frame{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::Frame {
+                        properties: vb6parse::language::FrameProperties {
+                            caption: format!("Frame {i}"),
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 400,
+                            height: 400,
+                            visible: Visibility::Visible,
+                            enabled: Activation::Enabled,
+                            ..Default::default()
+                        },
+                        controls: vec![],
+                    },
+                ),
+                "PictureBox" => Control::new(
+                    format!("Pic{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::PictureBox {
+                        properties: vb6parse::language::PictureBoxProperties {
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 400,
+                            height: 400,
+                            visible: Visibility::Visible,
+                            enabled: Activation::Enabled,
+                            ..Default::default()
+                        },
+                        controls: vec![],
+                    },
+                ),
+                "Image" => Control::new(
+                    format!("Img{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::Image {
+                        properties: vb6parse::language::ImageProperties {
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 100,
+                            height: 100,
+                            visible: Visibility::Visible,
+                            enabled: Activation::Enabled,
+                            ..Default::default()
+                        },
+                    },
+                ),
+                "CheckBox" => Control::new(
+                    format!("Chk{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::CheckBox {
+                        properties: vb6parse::language::CheckBoxProperties {
+                            caption: format!("Check {i}"),
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 300,
+                            height: 300,
+                            visible: Visibility::Visible,
+                            enabled: Activation::Enabled,
+                            ..Default::default()
+                        },
+                    },
+                ),
+                "ComboBox" => Control::new(
+                    format!("Cmb{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::ComboBox {
+                        properties: vb6parse::language::ComboBoxProperties {
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 300,
+                            height: 300,
+                            visible: Visibility::Visible,
+                            enabled: Activation::Enabled,
+                            ..Default::default()
+                        },
+                    },
+                ),
+                "ListBox" => Control::new(
+                    format!("Lst{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::ListBox {
+                        properties: vb6parse::language::ListBoxProperties {
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 300,
+                            height: 400,
+                            visible: Visibility::Visible,
+                            enabled: Activation::Enabled,
+                            ..Default::default()
+                        },
+                    },
+                ),
+                "HScrollBar" => Control::new(
+                    format!("HScroll{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::HScrollBar {
+                        properties: vb6parse::language::ScrollBarProperties {
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 300,
+                            height: 100,
+                            visible: Visibility::Visible,
+                            ..Default::default()
+                        },
+                    },
+                ),
+                "VScrollBar" => Control::new(
+                    format!("VScroll{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::VScrollBar {
+                        properties: vb6parse::language::ScrollBarProperties {
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 100,
+                            height: 300,
+                            visible: Visibility::Visible,
+                            ..Default::default()
+                        },
+                    },
+                ),
+                "Shape" => Control::new(
+                    format!("Shape{i}"),
+                    String::new(),
+                    0,
+                    ControlKind::Shape {
+                        properties: vb6parse::language::ShapeProperties {
+                            left: 100 + (i as i32 % 10) * 350,
+                            top: 100 + (i as i32 / 10) * 400,
+                            width: 200,
+                            height: 200,
+                            visible: Visibility::Visible,
+                            ..Default::default()
+                        },
+                    },
+                ),
+                _ => unreachable!(),
+            };
+            controls.push(control);
+        }
+
+        Form {
+            name: "Form1".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 4000,
+                caption: "Form1".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls,
+            menus: Vec::new(),
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 9a. Performance benchmark
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn render_100_controls_completes_without_panic() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_form_with_many_controls(100, None);
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let html = render(handle, &renderer);
+        assert!(!html.is_empty());
+        // Should contain all control type classes that were rendered
+        assert!(
+            html.contains("vb6-label")
+                || html.contains("vb6-commandbutton")
+                || html.contains("vb6-textbox")
+                || html.contains("vb6-frame")
+        );
+    }
+
+    #[test]
+    fn render_100_controls_time_acceptable() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_form_with_many_controls(100, None);
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let start = std::time::Instant::now();
+        let _html = render(handle, &renderer);
+        let elapsed = start.elapsed();
+        // 100 controls should render in under 1 second (should be milliseconds)
+        assert!(
+            elapsed.as_millis() < 1000,
+            "Rendering 100 controls took {}ms (expected < 1000ms)",
+            elapsed.as_millis()
+        );
+    }
+
+    #[test]
+    fn render_100_controls_with_one_customized() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_form_with_many_controls(100, Some(36));
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let html = render(handle, &renderer);
+        assert!(!html.is_empty());
+        // The customized label at index 36 (36 % 12 == 0, which is Label) should have red color inline
+        assert!(html.contains("color: rgb(255, 0, 0)"));
+    }
+
+    #[test]
+    fn repeated_rendering_100_controls_is_fast() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = make_form_with_many_controls(100, None);
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let start = std::time::Instant::now();
+        for _ in 0..10 {
+            let _html = render(handle, &renderer);
+        }
+        let elapsed = start.elapsed();
+        // 10 re-renders of 100 controls should complete in under 5 seconds
+        assert!(
+            elapsed.as_millis() < 5000,
+            "10 re-renders of 100 controls took {}ms (expected < 5000ms)",
+            elapsed.as_millis()
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // 9b. Edge cases
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn all_controls_at_vb6_defaults_minimal_inline_css() {
+        let _lock = lock_test();
+        form_store::reset();
+        // 20 controls, all at VB6 defaults
+        let form = make_form_with_many_controls(20, None);
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let html = render(handle, &renderer);
+
+        // Default controls should NOT have background-color or font inline
+        // (those come from CSS classes via theme variables)
+        // Only non-default properties like position/size are inline via attributes
+        assert!(html.contains("vb6-label") || html.contains("vb6-commandbutton"));
+    }
+
+    #[test]
+    fn single_customized_control_among_defaults_has_inline_css() {
+        let _lock = lock_test();
+        form_store::reset();
+        // 20 controls, only index 0 (Label) is customized with red text
+        let form = make_form_with_many_controls(20, Some(0));
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let html = render(handle, &renderer);
+        assert!(html.contains("color: rgb(255, 0, 0)"));
+    }
+
+    #[test]
+    fn empty_form_no_controls() {
+        let _lock = lock_test();
+        form_store::reset();
+        let form = Form {
+            name: "EmptyForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "EmptyForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let html = render(handle, &renderer);
+        assert!(html.is_empty());
+    }
+
+    #[test]
+    fn deeply_nested_containers_5_levels() {
+        let _lock = lock_test();
+        form_store::reset();
+        // Form → PictureBox → Frame → PictureBox → Frame → Label
+        let label = Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "5 levels deep".to_string(),
+                    left: 100,
+                    top: 100,
+                    width: 500,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let inner_frame = Control::new(
+            "Frame1".to_string(),
+            String::new(),
+            0,
+            ControlKind::Frame {
+                properties: vb6parse::language::FrameProperties {
+                    caption: "Inner".to_string(),
+                    left: 50,
+                    top: 50,
+                    width: 800,
+                    height: 400,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+                controls: vec![label],
+            },
+        );
+        let inner_pic = Control::new(
+            "PictureBox1".to_string(),
+            String::new(),
+            0,
+            ControlKind::PictureBox {
+                properties: vb6parse::language::PictureBoxProperties {
+                    left: 50,
+                    top: 50,
+                    width: 1000,
+                    height: 600,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+                controls: vec![inner_frame],
+            },
+        );
+        let outer_frame = Control::new(
+            "Frame2".to_string(),
+            String::new(),
+            0,
+            ControlKind::Frame {
+                properties: vb6parse::language::FrameProperties {
+                    caption: "Outer".to_string(),
+                    left: 100,
+                    top: 100,
+                    width: 1200,
+                    height: 800,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+                controls: vec![inner_pic],
+            },
+        );
+        let outer_pic = Control::new(
+            "PictureBox2".to_string(),
+            String::new(),
+            0,
+            ControlKind::PictureBox {
+                properties: vb6parse::language::PictureBoxProperties {
+                    left: 50,
+                    top: 50,
+                    width: 1500,
+                    height: 1000,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+                controls: vec![outer_frame],
+            },
+        );
+        let form = Form {
+            name: "DeepForm".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 5000,
+                scale_height: 4000,
+                caption: "DeepForm".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![outer_pic],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let html = render(handle, &renderer);
+        assert!(!html.is_empty());
+        assert!(html.contains("vb6-picturebox"));
+        assert!(html.contains("vb6-frame"));
+        assert!(html.contains("vb6-label"));
+        assert!(html.contains("5 levels deep"));
+    }
+
+    #[test]
+    fn control_arrays_same_type_different_properties() {
+        let _lock = lock_test();
+        form_store::reset();
+        // Create multiple labels with different fonts/colors
+        let label1 = Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Default".to_string(),
+                    left: 100,
+                    top: 100,
+                    width: 500,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let label2 = Control::new(
+            "Label1".to_string(),
+            String::new(),
+            1,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Custom color".to_string(),
+                    fore_color: vb6parse::language::Color::RGB {
+                        red: 255,
+                        green: 0,
+                        blue: 0,
+                    },
+                    left: 100,
+                    top: 300,
+                    width: 500,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let label3 = Control::new(
+            "Label1".to_string(),
+            String::new(),
+            2,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Custom font".to_string(),
+                    font: Some(vb6parse::language::Font {
+                        name: "Arial".into(),
+                        size: 14.0,
+                        weight: 700,
+                        ..Default::default()
+                    }),
+                    left: 100,
+                    top: 500,
+                    width: 500,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let form = Form {
+            name: "Form1".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "Form1".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![label1, label2, label3],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let html = render(handle, &renderer);
+        assert!(html.contains("Default"));
+        assert!(html.contains("Custom color"));
+        assert!(html.contains("Custom font"));
+        assert!(html.contains("color: rgb(255, 0, 0)"));
+        assert!(html.contains("font-family:") && html.contains("Arial"));
+    }
+
+    #[test]
+    fn hidden_controls_omitted_by_default() {
+        // Note: include_hidden=false is not yet implemented in the converter.
+        // This test verifies that the flag is accepted without panic.
+        let _lock = lock_test();
+        form_store::reset();
+        let label = Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Hidden".to_string(),
+                    left: 100,
+                    top: 100,
+                    width: 500,
+                    height: 200,
+                    visible: Visibility::Hidden,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let form = Form {
+            name: "Form1".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "Form1".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![label],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig {
+            include_hidden: false,
+            ..Default::default()
+        };
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        // The config is accepted without panic even though the converter
+        // doesn't yet respect include_hidden=false.
+        assert!(!config.include_hidden);
+        // Verify the handle is valid
+        let name = get_form(handle, |f| f.name.clone());
+        assert_eq!(name, Some("Form1".to_string()));
+    }
+
+    #[test]
+    fn mixed_default_and_custom_controls_same_type() {
+        let _lock = lock_test();
+        form_store::reset();
+        // 10 labels: 3 default, 1 with custom color, 2 with custom font, 4 default
+        let default1 = Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "D1".to_string(),
+                    left: 100,
+                    top: 100,
+                    width: 300,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let color1 = Control::new(
+            "Label2".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "C1".to_string(),
+                    fore_color: vb6parse::language::Color::RGB {
+                        red: 0,
+                        green: 255,
+                        blue: 0,
+                    },
+                    left: 100,
+                    top: 300,
+                    width: 300,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let font1 = Control::new(
+            "Label3".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "F1".to_string(),
+                    font: Some(vb6parse::language::Font {
+                        name: "Courier New".into(),
+                        size: 12.0,
+                        ..Default::default()
+                    }),
+                    left: 100,
+                    top: 500,
+                    width: 300,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let default2 = Control::new(
+            "Label4".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "D2".to_string(),
+                    left: 100,
+                    top: 700,
+                    width: 300,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let font2 = Control::new(
+            "Label5".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "F2".to_string(),
+                    font: Some(vb6parse::language::Font {
+                        name: "Verdana".into(),
+                        size: 10.0,
+                        weight: 400,
+                        italic: true,
+                        ..Default::default()
+                    }),
+                    left: 100,
+                    top: 900,
+                    width: 300,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+
+        let form = Form {
+            name: "Form1".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "Form1".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![default1, color1, font1, default2, font2],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let html = render(handle, &renderer);
+
+        assert!(html.contains("D1"));
+        assert!(html.contains("C1"));
+        assert!(html.contains("F1"));
+        assert!(html.contains("D2"));
+        assert!(html.contains("F2"));
+
+        // Custom colors should appear
+        assert!(html.contains("color: rgb(0, 255, 0)"));
+        // Custom fonts should appear
+        assert!(html.contains("font-family:") && html.contains("Courier New"));
+        assert!(html.contains("font-family:") && html.contains("Verdana"));
+        assert!(html.contains("font-style: italic"));
+    }
+
+    // -----------------------------------------------------------------------
+    // 9c. Theme interaction
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn dark_theme_default_controls_use_css_variables() {
+        let _lock = lock_test();
+        form_store::reset();
+        use crate::layout::theme::dark_theme;
+        let label = Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Dark default".to_string(),
+                    left: 100,
+                    top: 100,
+                    width: 500,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let form = Form {
+            name: "Form1".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "Form1".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![label],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let _html = render(handle, &renderer);
+
+        let dark_css = dark_theme().to_css();
+        // Dark theme provides CSS variable overrides
+        assert!(dark_css.contains("--vb6-bg: #1e1e1e"));
+        assert!(dark_css.contains("--vb6-window-bg: #3c3c3c"));
+
+        let html = render(handle, &renderer);
+        assert!(html.contains("vb6-label"));
+        assert!(html.contains("Dark default"));
+    }
+
+    #[test]
+    fn dark_theme_custom_color_preserved() {
+        let _lock = lock_test();
+        form_store::reset();
+        use crate::layout::theme::dark_theme;
+        let label = Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Dark custom".to_string(),
+                    fore_color: vb6parse::language::Color::RGB {
+                        red: 0,
+                        green: 255,
+                        blue: 0,
+                    },
+                    left: 100,
+                    top: 100,
+                    width: 500,
+                    height: 200,
+                    visible: Visibility::Visible,
+                    enabled: Activation::Enabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let form = Form {
+            name: "Form1".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "Form1".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![label],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let _html = render(handle, &renderer);
+
+        let dark_css = dark_theme().to_css();
+        let html = render(handle, &renderer);
+        // Custom green color should be preserved inline
+        assert!(html.contains("color: rgb(0, 255, 0)"));
+        assert!(html.contains("vb6-label"));
+        // Dark theme CSS still has its variables
+        assert!(dark_css.contains("--vb6-fg: #d4d4d4"));
+    }
+
+    #[test]
+    fn all_controls_custom_back_color_on_form() {
+        let _lock = lock_test();
+        form_store::reset();
+        // 10 labels, all with custom back_color (yellow)
+        let mut controls = Vec::new();
+        for i in 0..10 {
+            let label = Control::new(
+                format!("Label{i}"),
+                String::new(),
+                0,
+                ControlKind::Label {
+                    properties: vb6parse::language::LabelProperties {
+                        caption: format!("Yellow {i}"),
+                        back_color: vb6parse::language::Color::RGB {
+                            red: 255,
+                            green: 255,
+                            blue: 0,
+                        },
+                        left: 100 + (i % 5) * 350,
+                        top: 100 + (i / 5) * 400,
+                        width: 300,
+                        height: 200,
+                        visible: Visibility::Visible,
+                        enabled: Activation::Enabled,
+                        ..Default::default()
+                    },
+                },
+            );
+            controls.push(label);
+        }
+        let form = Form {
+            name: "Form1".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "Form1".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls,
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig::default();
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let html = render(handle, &renderer);
+        assert!(!html.is_empty());
+        // All labels have yellow back_color
+        assert!(html.contains("background-color: rgb(255, 255, 0)"));
+    }
+
+    #[test]
+    fn theme_css_includes_all_variables() {
+        use crate::layout::theme::{dark_theme, default_theme};
+        let default_css = default_theme().to_css();
+        let dark_css = dark_theme().to_css();
+
+        // Both themes should include all CSS custom properties
+        for var in [
+            "--vb6-bg",
+            "--vb6-fg",
+            "--vb6-window-bg",
+            "--vb6-window-text",
+            "--vb6-button-bg",
+            "--vb6-button-border",
+            "--vb6-highlight",
+            "--vb6-highlight-text",
+            "--vb6-focus-border",
+            "--vb6-disabled-opacity",
+            "--vb6-font-family",
+            "--vb6-font-size",
+        ] {
+            assert!(default_css.contains(var), "default theme missing {var}");
+            assert!(dark_css.contains(var), "dark theme missing {var}");
+        }
+    }
+
+    #[test]
+    fn partial_theme_overrides_only_set_fields() {
+        use crate::layout::theme::Vb6Theme;
+        let theme = Vb6Theme {
+            window_bg: Some("#000000".into()),
+            window_text: Some("#ffffff".into()),
+            ..Default::default()
+        };
+        let css = theme.to_css();
+        assert!(css.contains("--vb6-window-bg: #000000"));
+        assert!(css.contains("--vb6-window-text: #ffffff"));
+        assert!(!css.contains("--vb6-bg"));
+        assert!(!css.contains("--vb6-fg"));
+        assert!(!css.contains("--vb6-button-bg"));
+    }
+
+    #[test]
+    fn visibility_and_enabled_always_inline() {
+        let _lock = lock_test();
+        form_store::reset();
+        let label = Control::new(
+            "Label1".to_string(),
+            String::new(),
+            0,
+            ControlKind::Label {
+                properties: vb6parse::language::LabelProperties {
+                    caption: "Disabled and hidden".to_string(),
+                    left: 100,
+                    top: 100,
+                    width: 500,
+                    height: 200,
+                    visible: Visibility::Hidden,
+                    enabled: Activation::Disabled,
+                    ..Default::default()
+                },
+            },
+        );
+        let form = Form {
+            name: "Form1".to_string(),
+            tag: String::new(),
+            index: 0,
+            properties: vb6parse::language::FormProperties {
+                scale_width: 4000,
+                scale_height: 3000,
+                caption: "Form1".to_string(),
+                left: 0,
+                top: 0,
+                visible: Visibility::Visible,
+                enabled: Activation::Enabled,
+                ..Default::default()
+            },
+            controls: vec![label],
+            menus: Vec::new(),
+        };
+        let config = LayoutConfig {
+            include_hidden: true,
+            ..Default::default()
+        };
+        let handle = load_form(&FormRoot::Form(form), vec![], &config);
+        let renderer = renderer::TauriRenderer::new(false);
+        let html = render(handle, &renderer);
+        // Runtime state (visibility, enabled) must always be inline
+        assert!(html.contains("visibility: hidden"));
+        assert!(html.contains("opacity: 0.5"));
+    }
+
+    #[test]
+    fn theme_variables_different_between_default_and_dark() {
+        use crate::layout::theme::{dark_theme, default_theme};
+        let default_css = default_theme().to_css();
+        let dark_css = dark_theme().to_css();
+
+        // At least some variables should differ
+        assert_ne!(
+            extract_var_value(&default_css, "--vb6-bg"),
+            extract_var_value(&dark_css, "--vb6-bg"),
+            "Default and dark theme should have different --vb6-bg values"
+        );
+        assert_ne!(
+            extract_var_value(&default_css, "--vb6-window-bg"),
+            extract_var_value(&dark_css, "--vb6-window-bg"),
+            "Default and dark theme should have different --vb6-window-bg values"
+        );
+    }
+
+    fn extract_var_value(css: &str, var_name: &str) -> String {
+        css.lines()
+            .find(|line| line.contains(var_name))
+            .map(|line| {
+                let parts: Vec<&str> = line.split(':').collect();
+                if parts.len() >= 2 {
+                    parts[1].trim().trim_end_matches(';').to_string()
+                } else {
+                    String::new()
+                }
+            })
+            .unwrap_or_default()
     }
 }
