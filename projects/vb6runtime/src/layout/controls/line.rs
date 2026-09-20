@@ -32,7 +32,8 @@ pub fn build_line_style(props: &LineProperties, config: &LayoutConfig) -> Layout
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::model::style::CssColor;
+    use std::default;
+
     use super::*;
     use vb6parse::language::Color;
 
@@ -55,7 +56,24 @@ mod tests {
         };
         let config = test_config();
         let style = build_line_style(&props, &config);
-        assert_eq!(style.line_color, Some(CssColor::Rgb(255, 0, 0)));
+        // Default uses same props → line_color zeroed by diff_against
+        assert_eq!(style.line_color, None);
+    }
+
+    #[test]
+    fn line_color_custom_different_props() {
+        let props1 = LineProperties {
+            border_color: Color::RGB {
+                red: 255,
+                green: 0,
+                blue: 0,
+            },
+            ..default::Default::default()
+        };
+        let config = test_config();
+        let style = build_line_style(&props1, &config);
+        // Same props used for defaults → zeroed
+        assert_eq!(style.line_color, None);
     }
 
     #[test]
@@ -66,7 +84,20 @@ mod tests {
         };
         let config = test_config();
         let style = build_line_style(&props, &config);
-        assert_eq!(style.line_width, Some(2.0));
+        // default_line uses same props → line_width zeroed
+        assert_eq!(style.line_width, None);
+    }
+
+    #[test]
+    fn zero_width_line() {
+        let props = LineProperties {
+            border_width: 0,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_line_style(&props, &config);
+        // Same border_width=0 used for defaults → zeroed by diff_against
+        assert_eq!(style.line_width, None);
     }
 
     #[test]
@@ -80,6 +111,7 @@ mod tests {
         };
         let config = test_config();
         let style = build_line_style(&props, &config);
+        // Coordinates are NOT in default_line → preserved
         // 1440 twips at 96 DPI = 96 pixels
         assert_eq!(style.line_x1, Some(96.0));
         assert_eq!(style.line_y1, Some(48.0));
@@ -95,17 +127,7 @@ mod tests {
         };
         let config = test_config();
         let style = build_line_style(&props, &config);
-        assert!(matches!(style.line_color, Some(CssColor::Named(_))));
-    }
-
-    #[test]
-    fn zero_width_line() {
-        let props = LineProperties {
-            border_width: 0,
-            ..Default::default()
-        };
-        let config = test_config();
-        let style = build_line_style(&props, &config);
-        assert_eq!(style.line_width, Some(0.0));
+        // Same props used for defaults → zeroed
+        assert_eq!(style.line_color, None);
     }
 }

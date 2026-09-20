@@ -84,9 +84,10 @@ mod tests {
         };
         let config = test_config();
         let style = build_button_style(&props, &config);
-        // Background color is handled by CSS class .vb6-commandbutton via --vb6-button-bg
+        // Standard button: background handled by CSS class → zeroed
+        // display is always set by builder but matches default → zeroed
         assert!(style.background_color.is_none());
-        assert_eq!(style.display, Some("inline-block".to_string()));
+        assert_eq!(style.display, None);
         assert!(style.border.is_none());
         assert!(style.font_family.is_none());
         assert!(style.font_size.is_none());
@@ -194,7 +195,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_button_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]

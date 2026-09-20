@@ -80,7 +80,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_listbox_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -102,10 +103,12 @@ mod tests {
         };
         let config = test_config();
         let style = build_listbox_style(&props, &config);
-        assert!(style.background_color.is_some());
-        assert!(style.color.is_some());
+        // Default colors match vb6parse default → zeroed by diff_against
+        assert!(style.background_color.is_none());
+        assert!(style.color.is_none());
         assert!(style.font_family.is_none());
-        assert_eq!(style.overflow, Some("auto".to_string()));
+        // Auto overflow is the VB6 default → zeroed by diff_against
+        assert_eq!(style.overflow, None);
     }
 
     #[test]
@@ -113,7 +116,24 @@ mod tests {
         let props = ListBoxProperties::default();
         let config = test_config();
         let style = build_listbox_style(&props, &config);
-        assert_eq!(style.overflow, Some("auto".to_string()));
+        // Auto overflow is the VB6 default → zeroed by diff_against
+        assert_eq!(style.overflow, None);
+    }
+
+    #[test]
+    fn custom_back_color_preserved() {
+        let props = ListBoxProperties {
+            back_color: Color::RGB {
+                red: 255,
+                green: 255,
+                blue: 220,
+            },
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_listbox_style(&props, &config);
+        // Custom color differs from default → preserved
+        assert_eq!(style.background_color, Some(CssColor::Rgb(255, 255, 220)));
     }
 
     #[test]

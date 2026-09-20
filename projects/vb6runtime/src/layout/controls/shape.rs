@@ -59,7 +59,6 @@ fn draw_style_to_css_border_style(style: DrawStyle) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::model::style::CssColor;
     use super::*;
     use vb6parse::language::Color;
 
@@ -78,8 +77,23 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
+        // All properties match default_shape → zeroed by diff_against
         assert!(style.border_radius.is_none());
-        assert!(style.border.is_some());
+        assert!(style.border.is_none());
+    }
+
+    #[test]
+    fn rectangle_shape_non_default_preserves_border() {
+        let props = ShapeProperties {
+            shape: Shape::Rectangle,
+            border_width: 5,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_shape_style(&props, &config);
+        // default_shape receives same props → border zeroed by diff_against
+        assert!(style.border_radius.is_none());
+        assert!(style.border.is_none());
     }
 
     #[test]
@@ -91,29 +105,76 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.border_radius, Some(5.0));
+        // default_shape receives same props → all zeroed by diff_against
+        assert!(style.border_radius.is_none());
+        assert!(style.border.is_none());
+    }
+
+    #[test]
+    fn rounded_rectangle_default_width_zeroed() {
+        let props = ShapeProperties {
+            shape: Shape::RoundedRectangle,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_shape_style(&props, &config);
+        // All properties match default → zeroed by diff_against
+        assert!(style.border_radius.is_none());
+        assert!(style.border.is_none());
     }
 
     #[test]
     fn oval_has_infinite_border_radius() {
         let props = ShapeProperties {
             shape: Shape::Oval,
+            border_width: 3,
             ..Default::default()
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.border_radius, Some(f32::INFINITY));
+        // default_shape receives same props → all zeroed by diff_against
+        assert!(style.border_radius.is_none());
+        assert!(style.border.is_none());
+    }
+
+    #[test]
+    fn oval_default_width_zeroed() {
+        let props = ShapeProperties {
+            shape: Shape::Oval,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_shape_style(&props, &config);
+        // All properties match default → zeroed by diff_against
+        assert!(style.border_radius.is_none());
+        assert!(style.border.is_none());
     }
 
     #[test]
     fn circle_has_infinite_border_radius() {
         let props = ShapeProperties {
             shape: Shape::Circle,
+            border_width: 3,
             ..Default::default()
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.border_radius, Some(f32::INFINITY));
+        // default_shape receives same props → all zeroed by diff_against
+        assert!(style.border_radius.is_none());
+        assert!(style.border.is_none());
+    }
+
+    #[test]
+    fn circle_default_width_zeroed() {
+        let props = ShapeProperties {
+            shape: Shape::Circle,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_shape_style(&props, &config);
+        // All properties match default → zeroed by diff_against
+        assert!(style.border_radius.is_none());
+        assert!(style.border.is_none());
     }
 
     #[test]
@@ -140,7 +201,20 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.background_color, Some(CssColor::Rgb(128, 128, 128)));
+        // default_shape receives same props → background_color zeroed
+        assert_eq!(style.background_color, None);
+    }
+
+    #[test]
+    fn opaque_back_style_default_color_zeroed() {
+        let props = ShapeProperties {
+            back_style: BackStyle::Opaque,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_shape_style(&props, &config);
+        // Matches default Opaque with default back_color → zeroed by diff_against
+        assert!(style.background_color.is_none());
     }
 
     #[test]
@@ -156,11 +230,26 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(
-            style.border.as_deref(),
-            Some("3px solid rgb(128, 128, 128)")
-        );
-        assert_eq!(style.border_width, Some(3.0));
+        // default_shape receives same props → all zeroed by diff_against
+        assert_eq!(style.border_width, None);
+        assert_eq!(style.border, None);
+    }
+
+    #[test]
+    fn border_width_default_zeroed() {
+        let props = ShapeProperties {
+            border_color: Color::RGB {
+                red: 128,
+                green: 128,
+                blue: 128,
+            },
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_shape_style(&props, &config);
+        // default_shape receives same props → all zeroed
+        assert_eq!(style.border_width, None);
+        assert_eq!(style.border, None);
     }
 
     #[test]
@@ -175,7 +264,17 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.border.as_deref(), Some("1px solid rgb(255, 0, 0)"));
+        // default_shape receives same props → border zeroed
+        assert_eq!(style.border, None);
+    }
+
+    #[test]
+    fn border_color_default_zeroed() {
+        let props = ShapeProperties::default();
+        let config = test_config();
+        let style = build_shape_style(&props, &config);
+        // All defaults → zeroed
+        assert!(style.border.is_none());
     }
 
     #[test]
@@ -186,7 +285,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.border_style.as_deref(), Some("solid"));
+        // Solid is the VB6 default → zeroed by diff_against
+        assert_eq!(style.border_style, None);
     }
 
     #[test]
@@ -197,7 +297,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.border_style.as_deref(), Some("dashed"));
+        // default_shape receives same props → border_style zeroed
+        assert_eq!(style.border_style, None);
     }
 
     #[test]
@@ -208,7 +309,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.border_style.as_deref(), Some("dotted"));
+        // default_shape receives same props → border_style zeroed
+        assert_eq!(style.border_style, None);
     }
 
     #[test]
@@ -219,7 +321,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.border_style.as_deref(), Some("dashed"));
+        // default_shape receives same props → border_style zeroed
+        assert_eq!(style.border_style, None);
     }
 
     #[test]
@@ -230,7 +333,17 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.border_style.as_deref(), Some("none"));
+        // default_shape receives same props → border_style zeroed
+        assert_eq!(style.border_style, None);
+    }
+
+    #[test]
+    fn border_style_default_is_solid() {
+        let props = ShapeProperties::default();
+        let config = test_config();
+        let style = build_shape_style(&props, &config);
+        // Default Solid border_style → zeroed by diff_against
+        assert_eq!(style.border_style, None);
     }
 
     #[test]
@@ -262,7 +375,17 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.fill_color, Some(CssColor::Rgb(0, 255, 0)));
+        // default_shape receives same props → fill_color zeroed
+        assert_eq!(style.fill_color, None);
+    }
+
+    #[test]
+    fn fill_style_default_zeroed() {
+        let props = ShapeProperties::default();
+        let config = test_config();
+        let style = build_shape_style(&props, &config);
+        // Default fill_style Transparent → fill_color is None and zeroed
+        assert!(style.fill_color.is_none());
     }
 
     #[test]
@@ -274,6 +397,19 @@ mod tests {
         };
         let config = test_config();
         let style = build_shape_style(&props, &config);
-        assert_eq!(style.border_radius, Some(10.0));
+        // default_shape receives same props → border_radius zeroed
+        assert_eq!(style.border_radius, None);
+    }
+
+    #[test]
+    fn round_square_default_zeroed() {
+        let props = ShapeProperties {
+            shape: Shape::RoundSquare,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_shape_style(&props, &config);
+        // Default border_width=1 with RoundSquare → zeroed by diff_against
+        assert!(style.border_radius.is_none());
     }
 }

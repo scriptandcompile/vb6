@@ -57,7 +57,8 @@ mod tests {
         let props = ImageProperties::default();
         let config = test_config();
         let style = build_image_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // All values match default → zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -68,7 +69,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_image_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -88,8 +90,8 @@ mod tests {
         let config = test_config();
         let style = build_image_style(&props, &config);
         assert!(style.background_color.is_none());
-        // Default BorderStyle::None produces "none" border string
-        assert_eq!(style.border, Some("none".to_string()));
+        // BorderStyle::None → "none" matches default → zeroed by diff_against
+        assert_eq!(style.border, None);
         assert!(style.font_family.is_none());
     }
 
@@ -101,7 +103,8 @@ mod tests {
             ..Default::default()
         };
         let style = build_image_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -123,7 +126,20 @@ mod tests {
         };
         let config = test_config();
         let style = build_image_style(&props, &config);
-        assert_eq!(style.object_fit, Some("contain".to_string()));
+        // contain is the VB6 default → zeroed by diff_against
+        assert_eq!(style.object_fit, None);
+    }
+
+    #[test]
+    fn stretch_sets_object_fit_fill() {
+        let props = ImageProperties {
+            stretch: true,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_image_style(&props, &config);
+        // fill differs from default contain → preserved
+        assert_eq!(style.object_fit, Some("fill".to_string()));
     }
 
     #[test]

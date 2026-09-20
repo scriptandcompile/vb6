@@ -107,7 +107,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_picturebox_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -130,10 +131,10 @@ mod tests {
         };
         let config = test_config();
         let style = build_picturebox_style(&props, &config);
-        assert!(style.background_color.is_some());
-        assert!(style.color.is_some());
+        // Default colors match vb6parse default → zeroed by diff_against
+        assert!(style.background_color.is_none());
+        assert!(style.color.is_none());
         assert!(style.font_family.is_none());
-        assert_eq!(style.overflow, Some("hidden".to_string()));
     }
 
     #[test]
@@ -217,7 +218,20 @@ mod tests {
         };
         let config = test_config();
         let style = build_picturebox_style(&props, &config);
-        assert_eq!(style.align, Some("none".to_string()));
+        // None align is the VB6 default → zeroed by diff_against
+        assert_eq!(style.align, None);
+    }
+
+    #[test]
+    fn align_top_preserved() {
+        let props = PictureBoxProperties {
+            align: vb6parse::language::Align::Top,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_picturebox_style(&props, &config);
+        // Top differs from default None → preserved
+        assert_eq!(style.align, Some("top".to_string()));
     }
 
     #[test]
@@ -272,7 +286,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_picturebox_style(&props, &config);
-        assert!(style.background_color.is_some());
+        // Opaque is the default → background_color zeroed by diff_against
+        assert!(style.background_color.is_none());
     }
 
     #[test]

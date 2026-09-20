@@ -98,7 +98,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_textbox_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -121,10 +122,12 @@ mod tests {
         };
         let config = test_config();
         let style = build_textbox_style(&props, &config);
-        assert!(style.background_color.is_some());
-        assert!(style.color.is_some());
+        // Default colors match VB6 system defaults → zeroed by diff_against
+        assert!(style.background_color.is_none());
+        assert!(style.color.is_none());
         assert!(style.font_family.is_none());
         assert_eq!(style.overflow, None);
+        // BorderStyle::None differs from default FixedSingle → preserved
         assert_eq!(style.border, Some("none".to_string()));
     }
 
@@ -184,7 +187,20 @@ mod tests {
         };
         let config = test_config();
         let style = build_textbox_style(&props, &config);
-        assert_eq!(style.text_align, Some("left".to_string()));
+        // LeftJustify is the VB6 default → zeroed by diff_against
+        assert_eq!(style.text_align, None);
+    }
+
+    #[test]
+    fn text_alignment_center_preserved() {
+        let props = TextBoxProperties {
+            alignment: Alignment::Center,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_textbox_style(&props, &config);
+        // Center differs from default LeftJustify → preserved
+        assert_eq!(style.text_align, Some("center".to_string()));
     }
 
     #[test]

@@ -50,13 +50,8 @@ mod tests {
         let props = ScrollBarProperties::default();
         let config = test_config();
         let style = build_scrollbar_style(&props, &config);
-        assert_eq!(
-            style.box_shadow,
-            Some(
-                "inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)"
-                    .to_string()
-            )
-        );
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -76,7 +71,8 @@ mod tests {
             ..Default::default()
         };
         let style = build_scrollbar_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -87,10 +83,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_scrollbar_style(&props, &config);
-        assert_eq!(
-            style.box_shadow.as_deref(),
-            Some("inset -1px -1px 0 rgb(128, 128, 128), inset 1px 1px 0 rgb(255, 255, 255)")
-        );
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]

@@ -139,7 +139,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_checkbox_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -161,9 +162,12 @@ mod tests {
         };
         let config = test_config();
         let style = build_checkbox_style(&props, &config);
-        assert!(style.background_color.is_some());
-        assert!(style.color.is_some());
+        // Default back_color matches vb6parse default → zeroed by diff_against
+        assert!(style.background_color.is_none());
+        assert!(style.color.is_none());
         assert!(style.font_family.is_none());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -223,9 +227,12 @@ mod tests {
         };
         let config = test_config();
         let style = build_optionbutton_style(&props, &config);
-        assert!(style.background_color.is_some());
-        assert!(style.color.is_some());
+        // Default back_color matches vb6parse default → zeroed by diff_against
+        assert!(style.background_color.is_none());
+        assert!(style.color.is_none());
         assert!(style.font_family.is_none());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -271,7 +278,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_optionbutton_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]

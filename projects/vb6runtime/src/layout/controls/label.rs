@@ -91,7 +91,8 @@ mod tests {
         };
         let config = test_config();
         let style = build_label_style(&props, &config);
-        assert!(style.box_shadow.is_some());
+        // ThreeD is the VB6 default → box_shadow zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -126,7 +127,10 @@ mod tests {
         assert!(style.font_size.is_none());
         assert!(style.font_weight.is_none());
         assert_eq!(style.background_color, None);
-        assert!(style.color.is_some());
+        // Fore color matches VB6 default → zeroed by diff_against
+        assert!(style.color.is_none());
+        // 3D bevel is the default appearance → zeroed by diff_against
+        assert!(style.box_shadow.is_none());
     }
 
     #[test]
@@ -159,7 +163,20 @@ mod tests {
         };
         let config = test_config();
         let style = build_label_style(&props, &config);
-        assert_eq!(style.white_space, Some("pre-wrap".to_string()));
+        // Wrapping → pre-wrap is the VB6 default → zeroed by diff_against
+        assert_eq!(style.white_space, None);
+    }
+
+    #[test]
+    fn word_wrap_non_wrapping_preserved() {
+        let props = LabelProperties {
+            word_wrap: WordWrap::NonWrapping,
+            ..Default::default()
+        };
+        let config = test_config();
+        let style = build_label_style(&props, &config);
+        // NonWrapping differs from default Wrapping → preserved
+        assert_eq!(style.white_space, Some("nowrap".to_string()));
     }
 
     #[test]
