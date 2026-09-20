@@ -26,7 +26,10 @@ use vb6parse::parsers::{ConcreteSyntaxTree, SyntaxKind};
 
 use super::model::LayoutControlType;
 use super::model::style::{font_style_css, font_weight_css};
-use super::model::{EventProcedure, LayoutContainer, LayoutForm, LayoutLeaf, LayoutNode, LayoutPosition, LayoutSize, LayoutStyle, NodeId};
+use super::model::{
+    EventProcedure, LayoutContainer, LayoutForm, LayoutLeaf, LayoutNode, LayoutPosition,
+    LayoutSize, LayoutStyle, NodeId,
+};
 use super::scale::{scale_mode_to_pixels, twips_to_pixels};
 use super::{
     LayoutConfig,
@@ -732,27 +735,25 @@ fn convert_control(
             Ok(Some(LayoutNode::Leaf(listbox_leaf)))
         }
 
-        ControlKind::ComboBox { .. } => {
-            Ok(Some(LayoutNode::Leaf(LayoutLeaf {
-                name: control.name().to_string(),
-                control_type: layout_type,
-                index: control.index(),
-                position,
-                size,
-                style,
-                value: extract_value(control.kind()),
-                visible,
-                enabled,
-                tooltip: extract_tooltip(control.kind()),
-                tabindex: extract_tabindex(control.kind()),
-                is_default: extract_is_default(control.kind()),
-                is_cancel: extract_is_cancel(control.kind()),
-                combo_style: extract_combo_style(control.kind()),
-                combo_items: extract_combo_items(control.kind()),
-                use_mnemonic: extract_use_mnemonic(control.kind()),
-                ..Default::default()
-            })))
-        }
+        ControlKind::ComboBox { .. } => Ok(Some(LayoutNode::Leaf(LayoutLeaf {
+            name: control.name().to_string(),
+            control_type: layout_type,
+            index: control.index(),
+            position,
+            size,
+            style,
+            value: extract_value(control.kind()),
+            visible,
+            enabled,
+            tooltip: extract_tooltip(control.kind()),
+            tabindex: extract_tabindex(control.kind()),
+            is_default: extract_is_default(control.kind()),
+            is_cancel: extract_is_cancel(control.kind()),
+            combo_style: extract_combo_style(control.kind()),
+            combo_items: extract_combo_items(control.kind()),
+            use_mnemonic: extract_use_mnemonic(control.kind()),
+            ..Default::default()
+        }))),
 
         // Leaf controls
         _ => Ok(Some(LayoutNode::Leaf(LayoutLeaf {

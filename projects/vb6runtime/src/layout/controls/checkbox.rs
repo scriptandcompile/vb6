@@ -12,7 +12,7 @@ use vb6parse::language::{
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
-use super::super::model::style::{font_weight_css, LayoutStyle};
+use super::super::model::style::{LayoutStyle, font_weight_css};
 
 /// Build CSS style for a CheckBox control.
 pub fn build_checkbox_style(props: &CheckBoxProperties, config: &LayoutConfig) -> LayoutStyle {

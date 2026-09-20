@@ -1403,7 +1403,11 @@ mod tests {
         let leaf = make_leaf("lst1", LayoutControlType::ListBox, None);
         let leaf = LayoutLeaf {
             listbox_style: Some("checkbox".to_string()),
-            list_items: vec!["First".to_string(), "Second".to_string(), "Third".to_string()],
+            list_items: vec![
+                "First".to_string(),
+                "Second".to_string(),
+                "Third".to_string(),
+            ],
             ..leaf
         };
         let html = renderer.render_leaf(&leaf);

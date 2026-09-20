@@ -13,7 +13,7 @@ use vb6parse::language::{BackStyle, LabelProperties, TextDirection, WordWrap};
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
-use super::super::model::style::{alignment_css, font_weight_css, LayoutStyle};
+use super::super::model::style::{LayoutStyle, alignment_css, font_weight_css};
 
 /// Build CSS style for a Label control.
 pub fn build_label_style(props: &LabelProperties, config: &LayoutConfig) -> LayoutStyle {

@@ -31,7 +31,8 @@ const DEFAULT_CONTAINER_ID: &str = "vb6-container";
 
 /// One-time guard that ensures the default/cancel key handler is wired to
 /// `document` exactly once across all form show/hide cycles.
-static KEY_HANDLER_WIRED: LazyLock<std::sync::OnceLock<()>> = LazyLock::new(|| std::sync::OnceLock::new());
+static KEY_HANDLER_WIRED: LazyLock<std::sync::OnceLock<()>> =
+    LazyLock::new(|| std::sync::OnceLock::new());
 
 /// Wire up Enter key to trigger default button, Escape to trigger cancel button.
 ///
@@ -47,8 +48,7 @@ fn wire_default_cancel_key_handler() {
             let ke = e.dyn_ref::<web_sys::KeyboardEvent>();
             if let Some(ke) = ke {
                 let js_window = js_sys::global().unchecked_into::<js_sys::Object>();
-                js_sys::Reflect::set(&js_window, &"__vb6_last_keydown_event".into(), &ke)
-                    .ok();
+                js_sys::Reflect::set(&js_window, &"__vb6_last_keydown_event".into(), &ke).ok();
             }
             js_sys::eval(
                 r#"
@@ -74,7 +74,8 @@ fn wire_default_cancel_key_handler() {
             .ok();
         }) as Box<dyn FnMut(_)>);
 
-        let _ = doc.add_event_listener_with_callback("keydown", store_handler.as_ref().unchecked_ref());
+        let _ =
+            doc.add_event_listener_with_callback("keydown", store_handler.as_ref().unchecked_ref());
         store_handler.forget();
     });
 }
@@ -149,7 +150,8 @@ pub fn show_form(form_bytes: &[u8], container_id: &str) -> Result<JsValue, JsErr
         .ok_or_else(|| JsError::new(&format!("#{container_id} element not found")))?;
     container.set_inner_html("");
 
-    let renderer = layout::renderer::WebSysRenderer::new_with_css(doc, &layout::vb6_css::scoped_css());
+    let renderer =
+        layout::renderer::WebSysRenderer::new_with_css(doc, &layout::vb6_css::scoped_css());
     let model = layout::get_form(handle, |f| f.root_node.clone())
         .ok_or_else(|| JsError::new("form not found after loading"))?;
     let dom_root = renderer.render_node(&model);
@@ -439,7 +441,8 @@ pub fn show_project_forms_with_container(
         .ok_or_else(|| JsError::new(&format!("#{container_id} element not found")))?;
     container.set_inner_html("");
 
-    let renderer = layout::renderer::WebSysRenderer::new_with_css(doc, &layout::vb6_css::scoped_css());
+    let renderer =
+        layout::renderer::WebSysRenderer::new_with_css(doc, &layout::vb6_css::scoped_css());
     let mut handles = Vec::with_capacity(form_files.len());
 
     for (file_name, bytes) in form_files {

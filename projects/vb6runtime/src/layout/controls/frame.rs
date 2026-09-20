@@ -10,7 +10,7 @@ use vb6parse::language::{BorderStyle, ClipControls, FrameProperties, TextDirecti
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
-use super::super::model::style::{font_weight_css, LayoutStyle};
+use super::super::model::style::{LayoutStyle, font_weight_css};
 
 /// Build CSS style for a Frame control.
 pub fn build_frame_style(props: &FrameProperties, config: &LayoutConfig) -> LayoutStyle {

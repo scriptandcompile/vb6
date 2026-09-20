@@ -898,7 +898,11 @@ mod tests {
         // Default theme --vb6-window-bg should also be white (Canvas equivalent)
         let theme = crate::layout::theme::default_theme();
         assert!(
-            theme.window_bg.as_ref().map(|s| s == "#ffffff").unwrap_or(false),
+            theme
+                .window_bg
+                .as_ref()
+                .map(|s| s == "#ffffff")
+                .unwrap_or(false),
             "default theme window_bg should be white (#ffffff)"
         );
 
@@ -911,7 +915,11 @@ mod tests {
         );
         // Default theme --vb6-window-text should be black
         assert!(
-            theme.window_text.as_ref().map(|s| s == "#000000").unwrap_or(false),
+            theme
+                .window_text
+                .as_ref()
+                .map(|s| s == "#000000")
+                .unwrap_or(false),
             "default theme window_text should be black (#000000)"
         );
 
@@ -924,7 +932,11 @@ mod tests {
         );
         // Default theme --vb6-button-bg should be rgb(192, 192, 192)
         assert!(
-            theme.button_bg.as_ref().map(|s| s == "rgb(192, 192, 192)").unwrap_or(false),
+            theme
+                .button_bg
+                .as_ref()
+                .map(|s| s == "rgb(192, 192, 192)")
+                .unwrap_or(false),
             "default theme button_bg should be rgb(192, 192, 192)"
         );
 
@@ -938,7 +950,11 @@ mod tests {
         );
         // Default theme --vb6-bg should be rgb(192, 192, 192)
         assert!(
-            theme.bg.as_ref().map(|s| s == "rgb(192, 192, 192)").unwrap_or(false),
+            theme
+                .bg
+                .as_ref()
+                .map(|s| s == "rgb(192, 192, 192)")
+                .unwrap_or(false),
             "default theme bg should be rgb(192, 192, 192)"
         );
     }

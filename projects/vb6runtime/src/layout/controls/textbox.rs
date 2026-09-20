@@ -13,7 +13,7 @@ use vb6parse::language::{BorderStyle, TextBoxProperties, TextDirection};
 use super::super::LayoutConfig;
 use super::super::color::{color_to_css, mouse_pointer_css};
 use super::super::font_points_to_px;
-use super::super::model::style::{alignment_css, font_weight_css, LayoutStyle};
+use super::super::model::style::{LayoutStyle, alignment_css, font_weight_css};
 
 /// Build CSS style for a TextBox control.
 pub fn build_textbox_style(props: &TextBoxProperties, config: &LayoutConfig) -> LayoutStyle {
@@ -79,9 +79,9 @@ pub fn build_textbox_style(props: &TextBoxProperties, config: &LayoutConfig) -> 
 mod tests {
     use super::super::super::model::style::CssColor;
     use super::*;
-    use vb6parse::language::{Alignment, BorderStyle};
     use vb6parse::language::Color;
     use vb6parse::language::MultiLine;
+    use vb6parse::language::{Alignment, BorderStyle};
 
     fn test_config() -> LayoutConfig {
         LayoutConfig {

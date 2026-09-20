@@ -510,7 +510,8 @@ impl Renderer for WebSysRenderer {
                     // Standard ListBox: create <select> element
                     let select = self.doc.create_element("select").expect("create select");
                     let _ = select.set_id(&leaf.name);
-                    let _ = select.set_class_name(&format!("vb6-{}", leaf.control_type.css_class()));
+                    let _ =
+                        select.set_class_name(&format!("vb6-{}", leaf.control_type.css_class()));
                     let _ = select.set_attribute(
                         "style",
                         &self.style_attr(&leaf.style, leaf.visible, leaf.enabled),
