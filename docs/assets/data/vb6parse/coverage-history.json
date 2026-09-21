@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-09-19T07:27:14Z",
+  "last_updated": "2026-09-21T00:21:56Z",
   "snapshots": [
     {
       "timestamp": "2026-09-13T19:22:06Z",
@@ -1055,6 +1055,40 @@
           "percent": 77.81
         }
       }
+    },
+    {
+      "timestamp": "2026-09-21T00:21:56Z",
+      "commit_sha": "b2275d4c86e3ddcbc7927c98326d482bd5ab3509",
+      "commit_message": "removed a bunch of unsafe brackets that aren't needed (hopefully for the last time!)",
+      "coverage": {
+        "line_coverage": 76.84,
+        "function_coverage": 66.24,
+        "region_coverage": 77.81
+      },
+      "tests": {
+        "total": 6144,
+        "lib_tests": 180,
+        "doc_tests": 123,
+        "integration_tests": 5841,
+        "fuzz_targets": 0
+      },
+      "details": {
+        "lines": {
+          "covered": 14858,
+          "total": 19336,
+          "percent": 76.84
+        },
+        "functions": {
+          "covered": 973,
+          "total": 1469,
+          "percent": 66.24
+        },
+        "regions": {
+          "covered": 24132,
+          "total": 31014,
+          "percent": 77.81
+        }
+      }
     }
   ],
   "coverage_summary": {
@@ -1072,7 +1106,7 @@
       "change_percent": 0.0,
       "best": 66.24,
       "worst": 66.12,
-      "average": 66.13
+      "average": 66.14
     },
     "region_coverage": {
       "latest": 77.81,
