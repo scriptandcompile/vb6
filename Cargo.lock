@@ -5356,8 +5356,10 @@ dependencies = [
  "thiserror 2.0.20",
  "vb6core",
  "vb6parse",
+ "vb6pcode",
  "vb6runtime",
  "vb6semantic",
+ "vba6-ast-codegen",
 ]
 
 [[package]]
@@ -5480,6 +5482,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "vb6pcode"
+version = "0.1.0"
+dependencies = [
+ "vb6core",
+]
+
+[[package]]
 name = "vb6runtime"
 version = "0.2.0"
 dependencies = [
@@ -5520,6 +5529,10 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-test",
 ]
+
+[[package]]
+name = "vba6-ast-codegen"
+version = "0.1.0"
 
 [[package]]
 name = "version-compare"

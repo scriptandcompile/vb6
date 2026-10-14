@@ -631,6 +631,7 @@ pub(crate) struct Parser<'a> {
     pub(crate) pos: usize,
     pub(crate) builder: GreenNodeBuilder<'static>,
     pub(crate) parsing_header: bool,
+    pub(crate) mx_extensions_enabled: bool,
     pub(crate) source_name: String,
     pub(crate) source_content: &'a str,
     pub(crate) failures: Vec<ErrorDetails<'a>>,
@@ -639,13 +640,29 @@ pub(crate) struct Parser<'a> {
 }
 
 impl<'a> Parser<'a> {
+    fn is_mx_continue_statement(&self) -> bool {
+        if !self.mx_extensions_enabled
+            || !self.tokens.get(self.pos).is_some_and(|(text, token)| {
+                *token == Token::Identifier && text.eq_ignore_ascii_case("Continue")
+            })
+        {
+            return false;
+        }
+        self.tokens[self.pos + 1..]
+            .iter()
+            .find(|(_, token)| *token != Token::Whitespace)
+            .is_some_and(|(_, token)| matches!(token, Token::ForKeyword | Token::DoKeyword))
+    }
     fn new(token_stream: TokenStream<'a>) -> Self {
         let source_name = token_stream.file_name().to_string();
+        let tokens = token_stream.into_tokens();
+        let mx_extensions_enabled = Self::mx_extensions_enabled(&tokens);
         Parser {
-            tokens: token_stream.into_tokens(),
+            tokens,
             pos: 0,
             builder: GreenNodeBuilder::new(),
             parsing_header: true,
+            mx_extensions_enabled,
             source_name,
             source_content: "",
             failures: Vec::new(),
@@ -665,12 +682,55 @@ impl<'a> Parser<'a> {
             pos,
             builder: GreenNodeBuilder::new(),
             parsing_header: true,
+            mx_extensions_enabled: false,
             source_name: String::new(),
             source_content: "",
             failures: Vec::new(),
             recovery_events: Vec::new(),
             next_recovery_event_id: 1,
         }
+    }
+
+    fn mx_extensions_enabled(tokens: &[(&str, Token)]) -> bool {
+        let mut enabled = false;
+        let mut line = Vec::new();
+        let read_option = |line: &[(&str, Token)], enabled: &mut bool| {
+            let Some((first, _)) = line.first() else {
+                return true;
+            };
+            if first.eq_ignore_ascii_case("Attribute") {
+                return true;
+            }
+            if !first.eq_ignore_ascii_case("Option") {
+                return false;
+            }
+            if line
+                .get(1)
+                .is_some_and(|(name, _)| name.eq_ignore_ascii_case("VB6RExtensions"))
+                && let Some((value, _)) = line.get(2)
+            {
+                if value.eq_ignore_ascii_case("On") {
+                    *enabled = true;
+                } else if value.eq_ignore_ascii_case("Off") {
+                    *enabled = false;
+                }
+            }
+            true
+        };
+        for (text, token) in tokens {
+            match token {
+                Token::Newline | Token::EndOfLineComment | Token::RemComment => {
+                    if !read_option(&line, &mut enabled) {
+                        return enabled;
+                    }
+                    line.clear();
+                }
+                Token::Whitespace => {}
+                _ => line.push((text, *token)),
+            }
+        }
+        let _ = read_option(&line, &mut enabled);
+        enabled
     }
 
     fn current_span(&self) -> Span {
@@ -2097,6 +2157,8 @@ impl<'a> Parser<'a> {
                     } else if self.at_compiler_directive_keyword(Token::IfKeyword) {
                         self.parse_compiler_directive();
                     // Try control flow statements
+                    } else if self.is_mx_continue_statement() {
+                        self.parse_continue_statement();
                     } else if self.is_control_flow_keyword() {
                         self.parse_control_flow_statement();
                     // Try built-in statements
@@ -2802,7 +2864,9 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_statement_list_fallback_non_keyword(&mut self) {
-        if self.is_at_label() {
+        if self.is_mx_continue_statement() {
+            self.parse_continue_statement();
+        } else if self.is_at_label() {
             self.parse_label_statement();
         } else if self.at_token(Token::LetKeyword)
             || (self.at_token(Token::Whitespace)
@@ -2983,6 +3047,10 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_single_line_if_statement_item(&mut self) -> bool {
+        if self.is_mx_continue_statement() {
+            self.parse_continue_statement();
+            return true;
+        }
         if self.is_control_flow_keyword() {
             self.parse_control_flow_statement();
             return true;

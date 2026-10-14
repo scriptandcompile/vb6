@@ -17,7 +17,9 @@ pub mod error;
 pub mod types;
 
 pub use error::{VBError, VBResult};
-pub use types::{ArrayBound, TypeInfo, VBType};
+pub use types::{
+    ArrayBound, ParameterPassingMode, ProcedureParameter, ProcedureSignature, TypeInfo, VBType,
+};
 
 /// Library version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

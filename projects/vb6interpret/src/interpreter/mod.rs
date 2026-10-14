@@ -19,6 +19,7 @@ use std::collections::HashMap;
 
 use vb6core::error::VBError;
 use vb6core::error::err_number;
+use vb6core::types::VBType;
 use vb6parse::files::ModuleFile;
 use vb6runtime::VBVariant;
 use vb6runtime::state::environment as env_state;
@@ -39,6 +40,8 @@ pub(crate) struct Frame {
     pub(crate) name: String,
     /// Whether the procedure returns a value (Function).
     pub(crate) is_function: bool,
+    /// Declared result type, used by MX `Return <expr>` conversions.
+    pub(crate) return_type: VBType,
     /// Local variables for this call.
     pub(crate) locals: Scope,
     /// The value written to the function name (the return value).
@@ -52,6 +55,9 @@ pub(crate) enum Flow {
     Next,
     /// `Exit For` / `Exit Do` / `Exit While`.
     BreakLoop,
+    /// `Continue For` and `Continue Do`, propagated to the matching loop.
+    ContinueFor,
+    ContinueDo,
     /// `Exit Sub` / `Exit Function` / end of procedure body.
     Return,
     /// `End` statement: terminate the whole program.
@@ -114,6 +120,14 @@ pub struct Interpreter {
     /// `LoadRes*` functions can read it. `None` means the program has no
     /// resource file, as a VB6 project that never added one.
     pub(crate) resource_file: Option<String>,
+    /// Active loop kinds scoped to the current procedure depth.
+    pub(crate) active_loops: Vec<(LoopKind, usize)>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum LoopKind {
+    For,
+    Do,
 }
 
 impl Default for Interpreter {
@@ -147,6 +161,7 @@ impl Interpreter {
             initial_date: None,
             initial_time: None,
             resource_file: None,
+            active_loops: Vec::new(),
         }
     }
 
@@ -684,6 +699,7 @@ impl Interpreter {
         let mut frame = Frame {
             name: procedure.name.clone(),
             is_function: procedure.is_function,
+            return_type: procedure.return_type.clone(),
             locals: Scope::new(),
             return_value: None,
         };

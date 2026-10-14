@@ -33,6 +33,9 @@ pub(crate) fn literal_value(text: &str, kind: SyntaxKind) -> Option<VBVariant> {
         }
         SyntaxKind::TrueKeyword => Some(VBVariant::Boolean(true)),
         SyntaxKind::FalseKeyword => Some(VBVariant::Boolean(false)),
+        SyntaxKind::NothingKeyword => Some(VBVariant::Nothing),
+        SyntaxKind::NullKeyword => Some(VBVariant::Null),
+        SyntaxKind::EmptyKeyword => Some(VBVariant::Empty),
         SyntaxKind::IntegerLiteral => parse_integer(raw),
         SyntaxKind::LongLiteral => parse_long(raw),
         SyntaxKind::SingleLiteral => {

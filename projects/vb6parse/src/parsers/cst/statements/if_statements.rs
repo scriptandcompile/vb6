@@ -289,7 +289,9 @@ impl Parser<'_> {
 
             let pos_before = self.pos;
 
-            if self.is_control_flow_keyword() {
+            if self.is_mx_continue_statement() {
+                self.parse_continue_statement();
+            } else if self.is_control_flow_keyword() {
                 self.parse_control_flow_statement();
             } else if self.is_library_statement_keyword() {
                 self.parse_library_statement();
