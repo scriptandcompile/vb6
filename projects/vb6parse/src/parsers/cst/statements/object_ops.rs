@@ -269,8 +269,7 @@ impl Parser<'_> {
                 }
                 // Consume optional named-argument prefix: `Identifier :=`
                 let _ = self.try_consume_named_argument_prefix_for_call_argument();
-                // Parse the argument expression
-                self.parse_expression();
+                self.parse_call_argument_expression();
             }
 
             self.builder.finish_node(); // Argument
@@ -321,8 +320,7 @@ impl Parser<'_> {
                 }
                 // Consume optional named-argument prefix: `Identifier :=`
                 let _ = self.try_consume_named_argument_prefix_for_call_argument();
-                // Parse the argument expression
-                self.parse_expression();
+                self.parse_call_argument_expression();
             }
 
             self.builder.finish_node(); // Argument
@@ -344,6 +342,31 @@ impl Parser<'_> {
         }
 
         self.builder.finish_node(); // ArgumentList
+    }
+
+    fn parse_call_argument_expression(&mut self) {
+        if self.mx_extensions_enabled
+            && self.current_token() == Some(&Token::PeriodOperator)
+            && self
+                .tokens
+                .get(self.pos + 1)
+                .is_some_and(|(_, token)| *token == Token::PeriodOperator)
+            && self
+                .tokens
+                .get(self.pos + 2)
+                .is_some_and(|(_, token)| *token == Token::PeriodOperator)
+        {
+            self.builder
+                .start_node(SyntaxKind::SpreadExpression.to_raw());
+            self.consume_token();
+            self.consume_token();
+            self.consume_token();
+            self.consume_whitespace();
+            self.parse_expression();
+            self.builder.finish_node();
+        } else {
+            self.parse_expression();
+        }
     }
 
     /// Try to consume a VB6 named-argument prefix (`name :=`) at the start

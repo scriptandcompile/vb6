@@ -41,9 +41,11 @@ fn system_set_native(ts: Timestamp) -> Result<(), SystemClockError> {
         if rc == 0 {
             Ok(())
         } else {
-            Err(SystemClockError::OsError(unsafe {
-                *libc::__errno_location()
-            }))
+            Err(SystemClockError::OsError(
+                std::io::Error::last_os_error()
+                    .raw_os_error()
+                    .unwrap_or_default(),
+            ))
         }
     }
 

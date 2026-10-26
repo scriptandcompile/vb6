@@ -830,6 +830,13 @@ fn value_to_byte(value: &VBVariant) -> VBResult<u8> {
             }
             Ok((*currency_value).clamp(0, 255) as u8)
         }
+        VBVariant::Decimal(_) => {
+            let decimal_value = value.as_f64()?;
+            if decimal_value < 0.0 {
+                return Err(crate::error::VBError::invalid_procedure_call());
+            }
+            Ok(decimal_value.clamp(0.0, 255.0) as u8)
+        }
         VBVariant::String(_) => Err(crate::error::VBError::type_mismatch()),
     }
 }

@@ -30,13 +30,28 @@ impl Interpreter {
             .unwrap_or_default();
 
         let argument_list = node.first_child_by_kind(SyntaxKind::ArgumentList);
-        let args = match argument_list {
-            Some(list) => self.eval_args(list)?,
-            None => Vec::new(),
+        let (args, spread_values) = match argument_list {
+            Some(list) => self.eval_args_with_spread(list)?,
+            None => (Vec::new(), Vec::new()),
         };
 
         // User-defined Sub.
         if self.procedures.contains_key(&name.to_lowercase()) {
+            if let Some(procedure) = self.procedures.get(&name.to_lowercase())
+                && procedure
+                    .params
+                    .iter()
+                    .zip(spread_values.iter())
+                    .any(|(param, spread)| *spread && param.by_ref)
+            {
+                return Err(self.error_here(
+                    VBError::with_description(
+                        err_number::INVALID_PROCEDURE_CALL,
+                        "Spread arguments cannot bind to ByRef parameters",
+                    ),
+                    None,
+                ));
+            }
             let flow = self.call_sub(&name, args)?;
             return Ok(flow);
         }

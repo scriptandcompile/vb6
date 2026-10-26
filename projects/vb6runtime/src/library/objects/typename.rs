@@ -255,6 +255,7 @@ pub fn type_name(value: &VBVariant) -> VBResult<VBVariant> {
         VBVariant::Single(_) => "Single",
         VBVariant::Double(_) => "Double",
         VBVariant::Currency(_) => "Currency",
+        VBVariant::Decimal(_) => "Decimal",
         VBVariant::Date(_) => "Date",
         VBVariant::String(_) => "String",
         VBVariant::Boolean(_) => "Boolean",

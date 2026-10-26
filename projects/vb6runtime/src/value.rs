@@ -15,6 +15,78 @@ use crate::types::{VBType, vartype};
 /// Number of scaled units per currency value (`1.00` == `10_000`).
 pub const CURRENCY_SCALE: i64 = 10_000;
 
+/// Exact decimal coefficient and scale carried by the Variant Decimal subtype.
+///
+/// This preserves the value representation only; full VB6 Decimal range and
+/// arithmetic semantics are not implied.
+#[derive(Debug, Clone, Copy)]
+pub struct VBDecimal {
+    coefficient: i128,
+    scale: u8,
+}
+
+impl PartialEq for VBDecimal {
+    fn eq(&self, other: &Self) -> bool {
+        normalize_decimal(*self) == normalize_decimal(*other)
+    }
+}
+
+impl Eq for VBDecimal {}
+
+fn decimal_to_scaled_i64(value: VBDecimal, target_scale: u8) -> Option<i64> {
+    let coefficient = value.coefficient;
+    let scale = value.scale;
+    let scaled = if scale <= target_scale {
+        let power = 10_i128.checked_pow(u32::from(target_scale - scale))?;
+        coefficient.checked_mul(power)?
+    } else {
+        let difference = scale - target_scale;
+        if difference > 38 {
+            return Some(0);
+        }
+        let divisor = 10_i128.checked_pow(u32::from(difference))?;
+        let quotient = coefficient / divisor;
+        let remainder = coefficient % divisor;
+        let doubled_remainder = remainder.unsigned_abs().checked_mul(2)?;
+        let divisor = divisor as u128;
+        if doubled_remainder > divisor || (doubled_remainder == divisor && quotient % 2 != 0) {
+            quotient.checked_add(if coefficient < 0 { -1 } else { 1 })?
+        } else {
+            quotient
+        }
+    };
+    i64::try_from(scaled).ok()
+}
+
+fn decimal_to_f64(value: VBDecimal) -> f64 {
+    value.coefficient as f64 / 10_f64.powi(i32::from(value.scale))
+}
+
+fn normalize_decimal(mut value: VBDecimal) -> (i128, u8) {
+    while value.scale > 0 && value.coefficient % 10 == 0 {
+        value.coefficient /= 10;
+        value.scale -= 1;
+    }
+    (value.coefficient, value.scale)
+}
+
+impl VBDecimal {
+    /// Creates a coefficient/scale carrier; this does not enforce VB6 Decimal limits.
+    pub const fn new(coefficient: i128, scale: u8) -> Self {
+        Self { coefficient, scale }
+    }
+
+    /// Returns the signed integer coefficient.
+    pub const fn coefficient(self) -> i128 {
+        self.coefficient
+    }
+
+    /// Returns the decimal scale.
+    pub const fn scale(self) -> u8 {
+        self.scale
+    }
+}
+
 /// A runtime object reference.
 ///
 /// Implement this trait for any object that can be held in a VB6 `Object` or
@@ -366,6 +438,55 @@ impl VBCurrency {
     pub fn as_i64(self) -> i64 {
         self.0
     }
+
+    /// Adds scaled Currency values, returning overflow if the result is out of range.
+    pub fn checked_add(self, other: Self) -> VBResult<Self> {
+        self.0
+            .checked_add(other.0)
+            .map(Self)
+            .ok_or_else(VBError::overflow)
+    }
+
+    /// Subtracts scaled Currency values, returning overflow if out of range.
+    pub fn checked_sub(self, other: Self) -> VBResult<Self> {
+        self.0
+            .checked_sub(other.0)
+            .map(Self)
+            .ok_or_else(VBError::overflow)
+    }
+
+    /// Negates the scaled value, returning overflow for the minimum `i64`.
+    pub fn checked_neg(self) -> VBResult<Self> {
+        self.0.checked_neg().map(Self).ok_or_else(VBError::overflow)
+    }
+
+    /// Currency multiplication with exact rescaling only. A rounding policy
+    /// is intentionally not guessed for results between scaled units.
+    pub fn checked_mul(self, other: Self) -> VBResult<Self> {
+        let product = i128::from(self.0) * i128::from(other.0);
+        let scale = i128::from(CURRENCY_SCALE);
+        if product % scale != 0 {
+            return Err(VBError::invalid_procedure_call());
+        }
+        i64::try_from(product / scale)
+            .map(Self)
+            .map_err(|_| VBError::overflow())
+    }
+
+    /// Currency division with exact rescaling only.
+    pub fn checked_div(self, other: Self) -> VBResult<Self> {
+        if other.0 == 0 {
+            return Err(VBError::division_by_zero());
+        }
+        let numerator = i128::from(self.0) * i128::from(CURRENCY_SCALE);
+        let divisor = i128::from(other.0);
+        if numerator % divisor != 0 {
+            return Err(VBError::invalid_procedure_call());
+        }
+        i64::try_from(numerator / divisor)
+            .map(Self)
+            .map_err(|_| VBError::overflow())
+    }
 }
 
 impl From<i64> for VBCurrency {
@@ -377,6 +498,12 @@ impl From<i64> for VBCurrency {
 impl From<VBCurrency> for VBVariant {
     fn from(value: VBCurrency) -> Self {
         VBVariant::from_currency_scaled(value.0)
+    }
+}
+
+impl From<VBDecimal> for VBVariant {
+    fn from(value: VBDecimal) -> Self {
+        VBVariant::Decimal(value)
     }
 }
 
@@ -417,6 +544,8 @@ pub enum VBVariant {
     Double(f64),
     /// A currency value stored as a scaled `i64` (raw / [`CURRENCY_SCALE`]).
     Currency(i64),
+    /// A Decimal Variant subtype; this does not use Currency scaling.
+    Decimal(VBDecimal),
     /// A Unicode string.
     String(String),
     /// A boolean.
@@ -443,6 +572,7 @@ impl Clone for VBVariant {
             VBVariant::Single(v) => VBVariant::Single(*v),
             VBVariant::Double(v) => VBVariant::Double(*v),
             VBVariant::Currency(v) => VBVariant::Currency(*v),
+            VBVariant::Decimal(v) => VBVariant::Decimal(*v),
             VBVariant::String(v) => VBVariant::String(v.clone()),
             VBVariant::Boolean(v) => VBVariant::Boolean(*v),
             VBVariant::Date(v) => VBVariant::Date(*v),
@@ -470,6 +600,7 @@ impl PartialEq for VBVariant {
             ),
             // Numeric cross-type comparison with VB6 coercion.
             (VBVariant::Currency(a), VBVariant::Currency(b)) => a == b,
+            (VBVariant::Decimal(a), VBVariant::Decimal(b)) => a == b,
             _ => match (self.numeric_i64_exact(), other.numeric_i64_exact()) {
                 (Some(a), Some(b)) => a == b,
                 _ => match (self.numeric_f64_coercion(), other.numeric_f64_coercion()) {
@@ -544,6 +675,19 @@ impl VBVariant {
         VBVariant::Currency(round_half_even(units * CURRENCY_SCALE as f64).unwrap_or(i64::MAX))
     }
 
+    /// Create a Decimal Variant subtype from its coefficient and scale.
+    pub fn from_decimal(coefficient: i128, scale: u8) -> Self {
+        VBVariant::Decimal(VBDecimal::new(coefficient, scale))
+    }
+
+    /// Return the exact Decimal coefficient and scale when this is a Decimal.
+    pub fn as_vbdecimal(&self) -> VBResult<VBDecimal> {
+        match self {
+            VBVariant::Decimal(value) => Ok(*value),
+            _ => Err(VBError::type_mismatch()),
+        }
+    }
+
     /// Create a string value.
     pub fn from_string(v: impl Into<String>) -> Self {
         VBVariant::String(v.into())
@@ -586,6 +730,7 @@ impl VBVariant {
             VBVariant::Single(_) => VBType::Single,
             VBVariant::Double(_) => VBType::Double,
             VBVariant::Currency(_) => VBType::Currency,
+            VBVariant::Decimal(_) => VBType::Decimal,
             VBVariant::String(_) => VBType::String,
             VBVariant::Boolean(_) => VBType::Boolean,
             VBVariant::Date(_) => VBType::Date,
@@ -607,6 +752,7 @@ impl VBVariant {
             VBVariant::Single(_) => vartype::SINGLE,
             VBVariant::Double(_) => vartype::DOUBLE,
             VBVariant::Currency(_) => vartype::CURRENCY,
+            VBVariant::Decimal(_) => vartype::DECIMAL,
             VBVariant::String(_) => vartype::STRING,
             VBVariant::Boolean(_) => vartype::BOOLEAN,
             VBVariant::Date(_) => vartype::DATE,
@@ -656,6 +802,7 @@ impl VBVariant {
                 | VBVariant::Single(_)
                 | VBVariant::Double(_)
                 | VBVariant::Currency(_)
+                | VBVariant::Decimal(_)
         )
     }
 
@@ -698,6 +845,7 @@ impl VBVariant {
             VBType::Single => VBVariant::Single(0.0),
             VBType::Double => VBVariant::Double(0.0),
             VBType::Currency => VBVariant::Currency(0),
+            VBType::Decimal => VBVariant::Decimal(VBDecimal::new(0, 0)),
             VBType::String => VBVariant::String(String::new()),
             VBType::Boolean => VBVariant::Boolean(false),
             VBType::Date => VBVariant::Date(0.0),
@@ -709,7 +857,7 @@ impl VBVariant {
             VBType::Empty => VBVariant::Empty,
             VBType::Null => VBVariant::Null,
             VBType::Error => VBVariant::Error(VBError::new(0)),
-            VBType::Sub | VBType::Function { .. } => VBVariant::Empty,
+            VBType::Sub | VBType::Function { .. } | VBType::Procedure(_) => VBVariant::Empty,
         }
     }
 
@@ -728,6 +876,7 @@ impl VBVariant {
             VBVariant::Single(v) => Ok(v.to_string()),
             VBVariant::Double(v) => Ok(v.to_string()),
             VBVariant::Currency(raw) => Ok(format_currency(*raw)),
+            VBVariant::Decimal(value) => Ok(format_decimal(*value)),
             VBVariant::String(s) => Ok(s.clone()),
             VBVariant::Boolean(b) => Ok(if *b { "True" } else { "False" }.to_string()),
             VBVariant::Date(serial) => Ok(date_serial_to_string(*serial)),
@@ -789,6 +938,9 @@ impl VBVariant {
             VBVariant::Currency(raw) => {
                 round_half_even(*raw as f64 / CURRENCY_SCALE as f64).ok_or_else(VBError::overflow)
             }
+            VBVariant::Decimal(value) => {
+                decimal_to_scaled_i64(*value, 0).ok_or_else(VBError::overflow)
+            }
             VBVariant::Single(v) => round_half_even(*v as f64).ok_or_else(VBError::overflow),
             VBVariant::Double(v) => round_half_even(*v).ok_or_else(VBError::overflow),
             VBVariant::Date(v) => round_half_even(*v).ok_or_else(VBError::overflow),
@@ -848,6 +1000,9 @@ impl VBVariant {
             VBVariant::Error(e) => Err(e.clone()),
             VBVariant::Boolean(b) => Ok(if *b { -CURRENCY_SCALE } else { 0 }),
             VBVariant::Currency(v) => Ok(*v),
+            VBVariant::Decimal(value) => {
+                decimal_to_scaled_i64(*value, 4).ok_or_else(VBError::overflow)
+            }
             VBVariant::Byte(v) => Ok(*v as i64 * CURRENCY_SCALE),
             VBVariant::Integer(v) => Ok(*v as i64 * CURRENCY_SCALE),
             VBVariant::Long(v) => Ok(*v as i64 * CURRENCY_SCALE),
@@ -1001,6 +1156,7 @@ impl VBVariant {
             VBVariant::Single(v) => Some(*v as f64),
             VBVariant::Double(v) => Some(*v),
             VBVariant::Currency(v) => Some(*v as f64 / CURRENCY_SCALE as f64),
+            VBVariant::Decimal(v) => Some(decimal_to_f64(*v)),
             VBVariant::Date(v) => Some(*v),
             VBVariant::Boolean(v) => Some(if *v { -1.0 } else { 0.0 }),
             VBVariant::String(s) => parse_vb_number(s),
@@ -1165,6 +1321,25 @@ fn format_currency(raw: i64) -> String {
         let frac_s = format!("{frac:04}");
         let frac_s = frac_s.trim_end_matches('0');
         format!("{sign}{whole}.{frac_s}")
+    }
+}
+
+fn format_decimal(value: VBDecimal) -> String {
+    let negative = value.coefficient < 0;
+    let digits = value.coefficient.unsigned_abs().to_string();
+    let scale = usize::from(value.scale);
+    let number = if scale == 0 {
+        digits
+    } else if digits.len() <= scale {
+        format!("0.{}{}", "0".repeat(scale - digits.len()), digits)
+    } else {
+        let split = digits.len() - scale;
+        format!("{}.{}", &digits[..split], &digits[split..])
+    };
+    if negative {
+        format!("-{number}")
+    } else {
+        number
     }
 }
 
@@ -1360,6 +1535,7 @@ mod tests {
         assert_eq!(VBVariant::empty().type_of(), VBType::Empty);
         assert_eq!(VBVariant::null().type_of(), VBType::Null);
         assert_eq!(VBVariant::Long(3).type_of(), VBType::Long);
+        assert_eq!(VBVariant::from_decimal(25, 1).type_of(), VBType::Decimal);
         assert_eq!(VBVariant::from_string("x").type_of(), VBType::String);
         assert_eq!(
             VBVariant::array_dynamic(VBType::Integer).type_of(),
@@ -1374,6 +1550,7 @@ mod tests {
         assert_eq!(VBVariant::Integer(5).var_type(), 2);
         assert_eq!(VBVariant::from_string("x").var_type(), 8);
         assert_eq!(VBVariant::Boolean(true).var_type(), 11);
+        assert_eq!(VBVariant::from_decimal(25, 1).var_type(), vartype::DECIMAL);
         assert_eq!(
             VBVariant::from_error(VBError::new(err_number::TYPE_MISMATCH)).var_type(),
             10
@@ -1492,6 +1669,32 @@ mod tests {
         assert_eq!(
             VBVariant::from_string("1.5").as_currency_scaled().unwrap(),
             15000
+        );
+    }
+
+    #[test]
+    fn decimal_variant_preserves_scale_and_converts_without_currency_aliasing() {
+        let value = VBVariant::from_decimal(12_345, 4);
+        assert_eq!(value.as_string().unwrap(), "1.2345");
+        assert_eq!(value.as_currency_scaled().unwrap(), 12_345);
+        assert_eq!(value.type_of(), VBType::Decimal);
+        assert_eq!(value.var_type(), vartype::DECIMAL);
+        assert_eq!(VBVariant::from_decimal(25, 1).as_i16().unwrap(), 2);
+        assert_eq!(VBVariant::from_decimal(35, 1).as_i16().unwrap(), 4);
+        assert_eq!(
+            VBVariant::from_decimal(10, 1),
+            VBVariant::from_decimal(100, 2)
+        );
+        assert_ne!(
+            VBVariant::from_decimal(10, 1).type_of(),
+            VBVariant::Currency(10_000).type_of()
+        );
+        assert_eq!(
+            VBVariant::from_decimal(i128::MAX, 0)
+                .as_i64()
+                .unwrap_err()
+                .number,
+            err_number::OVERFLOW
         );
     }
 

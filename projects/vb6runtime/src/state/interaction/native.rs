@@ -1086,7 +1086,9 @@ mod macos {
     use std::process::Command;
 
     use super::super::appactivate::AppActivateRequest;
+    use super::super::inputbox::InputBoxRequest;
     use super::super::msgbox::{MsgBoxButton, MsgBoxIcon, MsgBoxRequest};
+    use super::super::sendkeys::{SendKey, SendKeysRequest};
 
     /// Escape a string for embedding in a double-quoted AppleScript literal.
     fn escape(s: &str) -> String {
@@ -1795,11 +1797,11 @@ mod wasm {
                 if window_confirm(&browser_message(title, prompt)) {
                     *first
                 } else if window_confirm(&browser_secondary_message(
-                        title,
-                        prompt,
-                        second.name(),
-                        third.name(),
-                    )) {
+                    title,
+                    prompt,
+                    second.name(),
+                    third.name(),
+                )) {
                     *second
                 } else {
                     *third

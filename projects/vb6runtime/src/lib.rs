@@ -20,9 +20,13 @@ pub mod array;
 pub mod boundary;
 pub mod layout;
 pub mod library;
+/// Stable-slot storage and aliases for runtime ByRef values.
+pub mod reference;
 pub mod state;
 pub mod stdpicture;
 pub mod value;
+/// UTF-16 code-unit storage for VB6 strings.
+pub mod vbstring;
 
 /// `jiff` civil date/time types re-exported for consumers that need to pass
 /// them across crate boundaries (e.g. interpreter configuration).
@@ -39,7 +43,8 @@ pub use error::{VBError, VBResult};
 pub use types::VBType;
 
 pub use stdpicture::StdPicture;
-pub use value::{CURRENCY_SCALE, VBObject, VBVariant};
+pub use value::{CURRENCY_SCALE, VBDecimal, VBObject, VBVariant};
+pub use vbstring::VbString;
 
 /// Library version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

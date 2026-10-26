@@ -669,6 +669,18 @@ pub enum SyntaxKind {
     ErrorMissingTokens,
     /// Parent node wrapping recovered tokens during error recovery
     ErrorRecovery,
+    /// MX `Continue For` / `Continue Do` control-flow statement.
+    ContinueStatement,
+    /// MX interpolated string literal token.
+    InterpolatedStringLiteral,
+    /// MX null-coalescing operator token.
+    NullCoalescingOperator,
+    /// MX optional member access operator token.
+    OptionalMemberAccessOperator,
+    /// MX non-empty array literal expression.
+    ArrayLiteralExpression,
+    /// MX spread source in a call argument.
+    SpreadExpression,
 }
 
 impl Display for SyntaxKind {
@@ -729,6 +741,9 @@ impl From<Token> for SyntaxKind {
             Token::StringKeyword => SyntaxKind::StringKeyword,
             Token::IntegerKeyword => SyntaxKind::IntegerKeyword,
             Token::StringLiteral => SyntaxKind::StringLiteral,
+            Token::InterpolatedStringLiteral => SyntaxKind::InterpolatedStringLiteral,
+            Token::NullCoalescingOperator => SyntaxKind::NullCoalescingOperator,
+            Token::OptionalMemberAccessOperator => SyntaxKind::OptionalMemberAccessOperator,
             Token::IntegerLiteral => SyntaxKind::IntegerLiteral,
             Token::LongLiteral => SyntaxKind::LongLiteral,
             Token::SingleLiteral => SyntaxKind::SingleLiteral,
@@ -880,7 +895,7 @@ impl From<Token> for SyntaxKind {
 
 impl SyntaxKind {
     pub(crate) fn from_raw(raw: rowan::SyntaxKind) -> Self {
-        assert!(raw.0 <= SyntaxKind::ErrorRecovery as u16);
+        assert!(raw.0 <= SyntaxKind::SpreadExpression as u16);
         unsafe { std::mem::transmute::<u16, SyntaxKind>(raw.0) }
     }
 

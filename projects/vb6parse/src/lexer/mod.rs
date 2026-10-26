@@ -328,6 +328,11 @@ pub fn tokenize<'a>(input: &mut SourceStream<'a>) -> ParseResult<'a, TokenStream
             continue;
         }
 
+        if let Some(interpolated_string_tuple) = take_interpolated_string_literal(input) {
+            tokens.push(interpolated_string_tuple);
+            continue;
+        }
+
         if let Some(string_literal_tuple) = take_string_literal(input) {
             tokens.push(string_literal_tuple);
             continue;
@@ -1024,6 +1029,7 @@ fn take_string_literal<'a>(input: &mut SourceStream<'a>) -> Option<TextTokenTupl
             quote_character_count = 1;
             false
         }
+
         _ if quote_character_count == 2 => true,
         '\"' if quote_character_count < 2 => {
             quote_character_count += 1;
@@ -1035,6 +1041,38 @@ fn take_string_literal<'a>(input: &mut SourceStream<'a>) -> Option<TextTokenTupl
     input
         .take_until_lambda(take_string, false)
         .map(|text| (text, Token::StringLiteral))
+}
+
+fn take_interpolated_string_literal<'a>(
+    input: &mut SourceStream<'a>,
+) -> Option<TextTokenTuple<'a>> {
+    input.peek_text("$\"", crate::io::Comparator::CaseSensitive)?;
+    let start = input.offset;
+    let mut quote_character_count = 0;
+    let take_string = |next_character| match next_character {
+        '"' if quote_character_count == 2 => {
+            quote_character_count = 1;
+            false
+        }
+        _ if quote_character_count == 2 => true,
+        '"' if quote_character_count < 2 => {
+            quote_character_count += 1;
+            false
+        }
+        _ => false,
+    };
+    let text = input.take_until_lambda(take_string, false)?;
+    let is_resource_reference = input
+        .contents
+        .get(input.offset..)
+        .and_then(|suffix| suffix.strip_prefix(':'))
+        .and_then(|suffix| suffix.chars().next())
+        .is_some_and(|digit| digit.is_ascii_hexdigit());
+    if is_resource_reference {
+        input.offset = start;
+        return None;
+    }
+    Some((text, Token::InterpolatedStringLiteral))
 }
 
 /// Parses a VB6 keyword from the input stream.
@@ -1094,6 +1132,8 @@ fn take_symbol<'a>(input: &mut SourceStream<'a>) -> Option<TextTokenTuple<'a>> {
             "<>" => Some(Token::InequalityOperator),
             "<=" => Some(Token::LessThanOrEqualOperator),
             ">=" => Some(Token::GreaterThanOrEqualOperator),
+            "??" => Some(Token::NullCoalescingOperator),
+            "?." => Some(Token::OptionalMemberAccessOperator),
             _ => None,
         };
 
@@ -1258,6 +1298,18 @@ fn take_variable_name<'a>(input: &mut SourceStream<'a>) -> Option<TextTokenTuple
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn mx_interpolated_string_is_a_single_contextual_token() {
+        let source = r#"$"Hello {name}""#;
+        let mut input = SourceStream::new("", source);
+        let (tokens, failures) = tokenize(&mut input).unpack();
+        assert!(failures.is_empty());
+        assert_eq!(
+            tokens.expect("tokens should be present").into_tokens(),
+            vec![(source, Token::InterpolatedStringLiteral)]
+        );
+    }
 
     #[test]
     fn vb6_double_qoute_start_containing_string() {

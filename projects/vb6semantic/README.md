@@ -6,6 +6,10 @@ Semantic analysis and symbol table construction for Visual Basic 6 code.
 
 `vb6semantic` provides semantic analysis capabilities for VB6 code parsed by [vb6parse](../vb6parse). It builds symbol tables, performs type checking, resolves names, and validates semantic correctness of VB6 code.
 
+For compiler-facing analysis, `SemanticAnalyzer::analyze_module_hir` returns a
+typed HIR only when no blocking diagnostics remain. See [HIR status](docs/HIR.md)
+for the supported lowering subset and current limitations.
+
 The output of semantic analysis is used by:
 - [aspen](../aspen) - for calling out to compile, check, document, and test vb6 code.
 - [vb6compile](../vb6compile) - Before lowering to IR and compilation

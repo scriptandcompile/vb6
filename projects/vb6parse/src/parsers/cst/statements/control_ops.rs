@@ -207,7 +207,33 @@ impl Parser<'_> {
         // Consume "Return" keyword
         self.consume_token();
 
+        if self.mx_extensions_enabled {
+            self.consume_whitespace();
+            if !matches!(
+                self.current_token(),
+                Some(
+                    Token::Newline
+                        | Token::ColonOperator
+                        | Token::EndOfLineComment
+                        | Token::RemComment
+                )
+            ) && self.pos < self.tokens.len()
+            {
+                self.parse_expression();
+            }
+        }
+
         self.builder.finish_node(); // ReturnStatement
+    }
+
+    pub(crate) fn parse_continue_statement(&mut self) {
+        self.parsing_header = false;
+        self.builder
+            .start_node(SyntaxKind::ContinueStatement.to_raw());
+        self.consume_token();
+        self.consume_whitespace();
+        self.consume_token();
+        self.builder.finish_node();
     }
 
     /// Parse a `GoTo` statement.

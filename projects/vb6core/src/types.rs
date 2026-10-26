@@ -53,6 +53,26 @@ pub mod vartype {
     pub const ARRAY: i32 = 8192;
 }
 
+impl ArrayBound {
+    /// Creates array bounds; `None` represents an unspecified bound.
+    pub const fn new(lower: Option<i32>, upper: Option<i32>) -> Self {
+        Self { lower, upper }
+    }
+
+    /// Whether the upper bound is not fixed yet.
+    pub const fn is_dynamic(&self) -> bool {
+        self.upper.is_none()
+    }
+
+    /// Whether a fixed upper bound is not below its effective lower bound.
+    pub fn is_valid(&self) -> bool {
+        match self.upper {
+            Some(upper) => self.lower.unwrap_or(0) <= upper,
+            None => true,
+        }
+    }
+}
+
 /// The static type of a VB6 value, variable, or procedure.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum VBType {
@@ -69,6 +89,8 @@ pub enum VBType {
     Double,
     /// Scaled 64-bit fixed-point currency.
     Currency,
+    /// Decimal subtype stored in a Variant (not the Currency fixed-point type).
+    Decimal,
     /// Unicode string.
     String,
     /// Boolean.
@@ -108,6 +130,9 @@ pub enum VBType {
         /// The type the function returns.
         return_type: Box<TypeInfo>,
     },
+    /// An explicit procedure signature for values such as future delegates
+    /// and callbacks. Legacy `Function` and `Sub` variants remain unchanged.
+    Procedure(Box<ProcedureSignature>),
 
     /// An unresolved type, used when analysis cannot determine a type.
     Unknown,
@@ -123,6 +148,7 @@ impl VBType {
             Self::Single => "Single".to_string(),
             Self::Double => "Double".to_string(),
             Self::Currency => "Currency".to_string(),
+            Self::Decimal => "Decimal".to_string(),
             Self::String => "String".to_string(),
             Self::Boolean => "Boolean".to_string(),
             Self::Date => "Date".to_string(),
@@ -138,6 +164,7 @@ impl VBType {
             Self::Error => "Error".to_string(),
             Self::Sub => "Sub".to_string(),
             Self::Function { return_type } => format!("Function -> {}", return_type.kind),
+            Self::Procedure(signature) => signature.name(),
             Self::Unknown => "Unknown".to_string(),
         }
     }
@@ -152,6 +179,7 @@ impl VBType {
             Self::Single => SINGLE,
             Self::Double => DOUBLE,
             Self::Currency => CURRENCY,
+            Self::Decimal => DECIMAL,
             Self::String => STRING,
             Self::Boolean => BOOLEAN,
             Self::Date => DATE,
@@ -163,7 +191,7 @@ impl VBType {
             Self::Empty => EMPTY,
             Self::Null => NULL,
             Self::Error => ERROR,
-            Self::Sub => VARIANT,
+            Self::Sub | Self::Procedure(_) => VARIANT,
             Self::Function { return_type } => return_type.kind.var_type(),
             Self::Unknown => VARIANT,
         }
@@ -173,7 +201,13 @@ impl VBType {
     pub fn is_numeric(&self) -> bool {
         matches!(
             self,
-            Self::Byte | Self::Integer | Self::Long | Self::Single | Self::Double | Self::Currency
+            Self::Byte
+                | Self::Integer
+                | Self::Long
+                | Self::Single
+                | Self::Double
+                | Self::Currency
+                | Self::Decimal
         )
     }
 
@@ -192,6 +226,7 @@ impl VBType {
                 | Self::Single
                 | Self::Double
                 | Self::Currency
+                | Self::Decimal
                 | Self::String
                 | Self::Boolean
                 | Self::Date
@@ -215,6 +250,11 @@ impl VBType {
         }
         if self == target {
             return true;
+        }
+        // Decimal is a Variant subtype, not a declared widening step between
+        // the fixed-size numeric types and Currency.
+        if matches!(self, Self::Decimal) || matches!(target, Self::Decimal) {
+            return false;
         }
         // Numeric widening.
         if self.is_numeric() && target.is_numeric() {
@@ -256,7 +296,7 @@ impl VBType {
             vartype::ERROR => Some(Self::Error),
             vartype::BOOLEAN => Some(Self::Boolean),
             vartype::VARIANT => Some(Self::Variant),
-            vartype::DECIMAL => Some(Self::Currency),
+            vartype::DECIMAL => Some(Self::Decimal),
             vartype::BYTE => Some(Self::Byte),
             vartype::USER_DEFINED_TYPE => Some(Self::UserType(String::new())),
             _ => None,
@@ -272,6 +312,7 @@ impl VBType {
             Self::Single => 3,
             Self::Double => 4,
             Self::Currency => 5,
+            Self::Decimal => u8::MAX,
             _ => u8::MAX,
         }
     }
@@ -286,6 +327,74 @@ impl fmt::Display for VBType {
 impl From<&VBType> for VBType {
     fn from(value: &VBType) -> Self {
         value.clone()
+    }
+}
+
+/// How a procedure parameter is passed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum ParameterPassingMode {
+    /// Value passing.
+    ByVal,
+    /// Aliased variable storage.
+    ByRef,
+}
+
+/// Static metadata for one procedure parameter.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ProcedureParameter {
+    /// Parameter name, when known.
+    pub name: Option<String>,
+    /// Parameter value type.
+    pub type_info: TypeInfo,
+    /// Passing mode.
+    pub passing_mode: ParameterPassingMode,
+    /// Whether the parameter may be omitted.
+    pub optional: bool,
+    /// Whether the parameter collects a variable number of arguments.
+    pub param_array: bool,
+}
+
+/// Static signature metadata for future function values and callbacks.
+///
+/// This describes callable types only; it does not implement calls, closures,
+/// capture ownership, or VM frames.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ProcedureSignature {
+    /// Ordered parameters.
+    pub parameters: Vec<ProcedureParameter>,
+    /// `None` for a Sub-like procedure, otherwise its result type.
+    pub return_type: Option<Box<TypeInfo>>,
+}
+
+impl ProcedureSignature {
+    /// Human-readable type description for diagnostics.
+    pub fn name(&self) -> String {
+        let parameters = self
+            .parameters
+            .iter()
+            .map(|parameter| {
+                let mode = match parameter.passing_mode {
+                    ParameterPassingMode::ByVal => "ByVal",
+                    ParameterPassingMode::ByRef => "ByRef",
+                };
+                let optional = if parameter.optional { "Optional " } else { "" };
+                let name = parameter.name.as_deref().unwrap_or("_");
+                let param_array = if parameter.param_array {
+                    "ParamArray "
+                } else {
+                    ""
+                };
+                format!(
+                    "{optional}{param_array}{mode} {name} As {}",
+                    parameter.type_info
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
+        match &self.return_type {
+            Some(return_type) => format!("Function ({parameters}) As {return_type}"),
+            None => format!("Sub ({parameters})"),
+        }
     }
 }
 
@@ -368,6 +477,29 @@ impl TypeInfo {
         Self::new(VBType::Unknown)
     }
 
+    /// Mark this symbol as passed by reference.
+    pub fn with_by_ref(mut self, by_ref: bool) -> Self {
+        self.is_reference = by_ref;
+        self
+    }
+
+    /// Whether the symbol is passed by reference.
+    pub const fn is_by_ref(&self) -> bool {
+        self.is_reference
+    }
+
+    /// Attach declared array dimensions without changing the element type.
+    pub fn with_array_dimensions(mut self, dimensions: Vec<ArrayBound>) -> Self {
+        self.is_array = true;
+        self.array_dimensions = Some(dimensions);
+        self
+    }
+
+    /// The declared array rank, if dimensions are known.
+    pub fn array_rank(&self) -> Option<usize> {
+        self.array_dimensions.as_ref().map(Vec::len)
+    }
+
     /// Check if this type is compatible with another type.
     pub fn is_compatible_with(&self, other: &TypeInfo) -> bool {
         // Variant is compatible with everything
@@ -394,24 +526,7 @@ impl TypeInfo {
 
     /// Check if this type can be assigned to another type.
     pub fn can_assign_to(&self, other: &TypeInfo) -> bool {
-        // Variant can be assigned to anything
-        if matches!(other.kind, VBType::Variant) {
-            return true;
-        }
-
-        // Same types can be assigned
-        if self.kind == other.kind {
-            return true;
-        }
-
-        // Smaller numeric types can be assigned to larger
-        matches!(
-            (&self.kind, &other.kind),
-            (VBType::Integer, VBType::Long)
-                | (VBType::Integer, VBType::Double)
-                | (VBType::Long, VBType::Double)
-                | (VBType::Single, VBType::Double)
-        )
+        self.kind.can_assign_to(&other.kind)
     }
 }
 
@@ -423,6 +538,7 @@ impl fmt::Display for TypeInfo {
             VBType::Single => "Single",
             VBType::Double => "Double",
             VBType::Currency => "Currency",
+            VBType::Decimal => "Decimal",
             VBType::String => "String",
             VBType::Boolean => "Boolean",
             VBType::Byte => "Byte",
@@ -438,6 +554,7 @@ impl fmt::Display for TypeInfo {
             VBType::Error => "Error",
             VBType::Sub => "Sub",
             VBType::Function { return_type } => return write!(f, "Function -> {}", return_type),
+            VBType::Procedure(signature) => return write!(f, "{}", signature.name()),
             VBType::Unknown => "Unknown",
             VBType::Array(inner) => return write!(f, "{}()", inner),
         };
@@ -457,6 +574,8 @@ mod tests {
     #[test]
     fn names_match_vb6() {
         assert_eq!(VBType::Integer.name(), "Integer");
+        assert_eq!(VBType::Decimal.name(), "Decimal");
+        assert_eq!(TypeInfo::new(VBType::Decimal).to_string(), "Decimal");
         assert_eq!(VBType::Array(Box::new(VBType::String)).name(), "String()");
         assert_eq!(VBType::Class("Foo".to_string()).name(), "Foo");
         assert_eq!(VBType::Sub.name(), "Sub");
@@ -476,6 +595,8 @@ mod tests {
         assert_eq!(VBType::String.var_type(), 8);
         assert_eq!(VBType::Boolean.var_type(), 11);
         assert_eq!(VBType::Byte.var_type(), 17);
+        assert_eq!(VBType::Currency.var_type(), vartype::CURRENCY);
+        assert_eq!(VBType::Decimal.var_type(), vartype::DECIMAL);
         assert_eq!(VBType::Empty.var_type(), 0);
         assert_eq!(VBType::Null.var_type(), 1);
         assert_eq!(VBType::Class("x".into()).var_type(), 9);
@@ -496,6 +617,9 @@ mod tests {
         assert!(!VBType::String.is_numeric());
         assert!(!VBType::Boolean.is_numeric());
         assert!(!VBType::Date.is_numeric());
+        assert!(VBType::Decimal.is_numeric());
+        assert!(VBType::Decimal.is_primitive());
+        assert!(!VBType::Decimal.is_integral());
     }
 
     #[test]
@@ -520,6 +644,27 @@ mod tests {
             Some(VBType::Array(Box::new(VBType::Double)))
         );
         assert_eq!(VBType::from_var_type(13), None);
+        assert_eq!(
+            VBType::from_var_type(vartype::DECIMAL),
+            Some(VBType::Decimal)
+        );
+        assert_eq!(
+            VBType::from_var_type(vartype::ARRAY | vartype::DECIMAL),
+            Some(VBType::Array(Box::new(VBType::Decimal)))
+        );
+    }
+
+    #[test]
+    fn decimal_keeps_its_identity_and_does_not_widen_to_currency() {
+        assert_ne!(VBType::Decimal, VBType::Currency);
+        assert_eq!(VBType::Decimal.name(), "Decimal");
+        assert_eq!(VBType::Decimal.var_type(), vartype::DECIMAL);
+        assert_eq!(TypeInfo::new(VBType::Decimal).to_string(), "Decimal");
+        assert!(VBType::Decimal.can_assign_to(&VBType::Decimal));
+        assert!(VBType::Decimal.can_assign_to(&VBType::Variant));
+        assert!(!VBType::Decimal.can_assign_to(&VBType::Currency));
+        assert!(!VBType::Currency.can_assign_to(&VBType::Decimal));
+        assert!(!TypeInfo::new(VBType::Decimal).can_assign_to(&TypeInfo::new(VBType::Currency)));
     }
 
     #[test]
@@ -536,5 +681,98 @@ mod tests {
         assert!(TypeInfo::integer().can_assign_to(&TypeInfo::long()));
         assert!(!TypeInfo::string().can_assign_to(&TypeInfo::integer()));
         assert!(TypeInfo::integer().is_compatible_with(&TypeInfo::long()));
+    }
+
+    #[test]
+    fn type_info_assignment_uses_the_vbtype_widening_rules() {
+        let widening = [
+            (VBType::Byte, VBType::Integer),
+            (VBType::Byte, VBType::Long),
+            (VBType::Integer, VBType::Long),
+            (VBType::Long, VBType::Single),
+            (VBType::Single, VBType::Double),
+            (VBType::Double, VBType::Currency),
+            (VBType::Class("Widget".into()), VBType::Object),
+            (VBType::Enum("Color".into()), VBType::Enum("Color".into())),
+            (VBType::Integer, VBType::Variant),
+        ];
+
+        for (source, target) in widening {
+            assert!(
+                TypeInfo::new(source.clone()).can_assign_to(&TypeInfo::new(target.clone())),
+                "{source} should be assignable to {target}"
+            );
+            assert!(source.can_assign_to(&target));
+        }
+    }
+
+    #[test]
+    fn type_info_assignment_rejects_narrowing_and_distinct_named_types() {
+        let rejected = [
+            (VBType::Long, VBType::Integer),
+            (VBType::Double, VBType::Single),
+            (VBType::Currency, VBType::Double),
+            (
+                VBType::Class("Widget".into()),
+                VBType::Class("Gadget".into()),
+            ),
+            (VBType::Enum("Color".into()), VBType::Enum("Shape".into())),
+            (VBType::Integer, VBType::String),
+            (VBType::Null, VBType::Nothing),
+        ];
+
+        for (source, target) in rejected {
+            assert!(
+                !TypeInfo::new(source.clone()).can_assign_to(&TypeInfo::new(target.clone())),
+                "{source} should not be assignable to {target}"
+            );
+            assert!(!source.can_assign_to(&target));
+        }
+    }
+
+    #[test]
+    fn procedure_signatures_retain_typed_parameters_and_passing_modes() {
+        let signature = ProcedureSignature {
+            parameters: vec![
+                ProcedureParameter {
+                    name: Some("value".into()),
+                    type_info: TypeInfo::long(),
+                    passing_mode: ParameterPassingMode::ByVal,
+                    optional: false,
+                    param_array: false,
+                },
+                ProcedureParameter {
+                    name: Some("items".into()),
+                    type_info: TypeInfo::variant(),
+                    passing_mode: ParameterPassingMode::ByRef,
+                    optional: true,
+                    param_array: true,
+                },
+            ],
+            return_type: Some(Box::new(TypeInfo::boolean())),
+        };
+        let procedure = VBType::Procedure(Box::new(signature));
+        assert_eq!(
+            procedure.name(),
+            "Function (ByVal value As Long, Optional ParamArray ByRef items As Variant) As Boolean"
+        );
+        assert_eq!(procedure.var_type(), vartype::VARIANT);
+        assert_eq!(procedure, procedure.clone());
+    }
+
+    #[test]
+    fn array_and_byref_metadata_preserve_rank_and_bounds() {
+        let info = TypeInfo::long()
+            .with_by_ref(true)
+            .with_array_dimensions(vec![
+                ArrayBound::new(Some(0), Some(9)),
+                ArrayBound::new(None, Some(3)),
+            ]);
+        assert!(info.is_by_ref());
+        assert_eq!(info.array_rank(), Some(2));
+        assert_eq!(info.array_dimensions.as_ref().unwrap()[0].lower, Some(0));
+        assert!(!ArrayBound::new(Some(5), Some(4)).is_valid());
+        assert!(ArrayBound::new(None, None).is_dynamic());
+        assert!(ArrayBound::new(None, Some(2)).is_valid());
     }
 }
