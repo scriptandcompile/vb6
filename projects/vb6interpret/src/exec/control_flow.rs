@@ -9,7 +9,7 @@ use vb6runtime::VBVariant;
 use super::count_newlines;
 use crate::error::RunResult;
 use crate::eval::{ArithmeticOperator, arith};
-use crate::interpreter::{Flow, Interpreter};
+use crate::interpreter::{Flow, Interpreter, LoopKind};
 use crate::program::is_statement_kind;
 
 /// Whether a node kind is a literal token (usable as a case value or bound).
@@ -45,6 +45,13 @@ impl NextSignificant for CstNode {
 }
 
 impl Interpreter {
+    fn exec_loop_body(&mut self, kind: LoopKind, body: &CstNode, line: usize) -> RunResult<Flow> {
+        self.active_loops.push((kind, self.frames.len()));
+        let result = self.exec_statements(body, line);
+        self.active_loops.pop();
+        result
+    }
+
     /// `If` statement (block or single-line form).
     pub(crate) fn exec_if(&mut self, node: &CstNode, line: usize) -> RunResult<Flow> {
         let children: Vec<&CstNode> = node.children().iter().collect();
@@ -278,10 +285,12 @@ impl Interpreter {
                 self.step_marked(Some(cursor))?;
             }
             if let Some(idx) = body_index {
-                let flow = self.exec_statements(children[idx], body_line)?;
+                let flow = self.exec_loop_body(LoopKind::For, children[idx], body_line)?;
                 match flow {
                     Flow::Next => {}
                     Flow::BreakLoop => break,
+                    Flow::ContinueFor => {}
+                    Flow::ContinueDo => return Ok(flow),
                     Flow::Return | Flow::Terminate => return Ok(flow),
                 }
             }
@@ -395,10 +404,12 @@ impl Interpreter {
                 }
             }
             if let Some(idx) = body_index {
-                let flow = self.exec_statements(children[idx], body_line)?;
+                let flow = self.exec_loop_body(LoopKind::Do, children[idx], body_line)?;
                 match flow {
                     Flow::Next => {}
                     Flow::BreakLoop => break,
+                    Flow::ContinueDo => {}
+                    Flow::ContinueFor => return Ok(flow),
                     Flow::Return | Flow::Terminate => return Ok(flow),
                 }
             }
@@ -482,6 +493,7 @@ impl Interpreter {
                 match flow {
                     Flow::Next => {}
                     Flow::BreakLoop => break,
+                    Flow::ContinueFor | Flow::ContinueDo => return Ok(flow),
                     Flow::Return | Flow::Terminate => return Ok(flow),
                 }
             }

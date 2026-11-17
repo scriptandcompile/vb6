@@ -124,6 +124,16 @@ pub enum SemanticError {
         location: SourceLocation,
     },
 
+    /// A recognized language feature whose semantics are not implemented.
+    UnsupportedFeature {
+        /// Name of the unsupported feature
+        feature: String,
+        /// Reason the feature cannot be analyzed safely
+        reason: String,
+        /// Location where the feature occurs
+        location: SourceLocation,
+    },
+
     /// Represents a file read error, where a source file could not be read from disk
     FileReadError {
         /// Path of the file that could not be read
@@ -190,6 +200,11 @@ impl std::fmt::Display for SemanticError {
             SemanticError::ParameterMismatch { message, location } => {
                 write!(f, "Parameter mismatch: {message} at {location}")
             }
+            SemanticError::UnsupportedFeature {
+                feature,
+                reason,
+                location,
+            } => write!(f, "Unsupported feature {feature}: {reason} at {location}"),
             SemanticError::FileReadError { file, message } => {
                 write!(f, "Failed to read file {file}: {message}")
             }

@@ -161,7 +161,42 @@ impl ArrayValue {
     /// Write an element by indices.
     pub fn set(&mut self, indices: &[i32], value: VBVariant) -> VBResult<()> {
         let offset = self.offset(indices)?;
-        self.data[offset] = value;
+        self.data[offset] = coerce_array_value(&self.element_type, value)?;
+        Ok(())
+    }
+
+    /// Resize the array, optionally preserving its existing elements.
+    ///
+    /// With `Preserve`, only the upper bound of the final dimension may change.
+    pub fn redim(&mut self, dimensions: &[ArrayDimension], preserve: bool) -> VBResult<()> {
+        if !preserve {
+            *self = Self::new_fixed(self.element_type.clone(), dimensions)?;
+            return Ok(());
+        }
+        if self.dimensions.is_empty()
+            || dimensions.len() != self.dimensions.len()
+            || self.dimensions[..self.dimensions.len() - 1]
+                != dimensions[..dimensions.len().saturating_sub(1)]
+            || self.dimensions.last().map(|d| d.lower) != dimensions.last().map(|d| d.lower)
+        {
+            return Err(VBError::invalid_procedure_call());
+        }
+
+        let mut resized = Self::new_fixed(self.element_type.clone(), dimensions)?;
+        let old_last_len = self.dimensions.last().map_or(0, ArrayDimension::len);
+        let new_last_len = dimensions.last().map_or(0, ArrayDimension::len);
+        let copied_last_len = old_last_len.min(new_last_len);
+        let rows = self.dimensions[..self.dimensions.len() - 1]
+            .iter()
+            .try_fold(1usize, |n, dimension| n.checked_mul(dimension.len()))
+            .ok_or_else(VBError::out_of_memory)?;
+        for row in 0..rows {
+            let old_start = row * old_last_len;
+            let new_start = row * new_last_len;
+            resized.data[new_start..new_start + copied_last_len]
+                .clone_from_slice(&self.data[old_start..old_start + copied_last_len]);
+        }
+        *self = resized;
         Ok(())
     }
 
@@ -187,6 +222,31 @@ impl ArrayValue {
             offset = offset * dimension.len() + (index - dimension.lower) as usize;
         }
         Ok(offset)
+    }
+}
+
+fn coerce_array_value(element_type: &VBType, value: VBVariant) -> VBResult<VBVariant> {
+    match element_type {
+        VBType::Variant => Ok(value),
+        VBType::Byte => value.as_byte().map(VBVariant::Byte),
+        VBType::Integer => value.as_i16().map(VBVariant::Integer),
+        VBType::Long | VBType::Enum(_) => value.as_i32().map(VBVariant::Long),
+        VBType::Single => value.as_f32().map(VBVariant::Single),
+        VBType::Double => value.as_f64().map(VBVariant::Double),
+        VBType::Currency => value.as_currency_scaled().map(VBVariant::Currency),
+        VBType::Decimal => match value {
+            value @ VBVariant::Decimal(_) => Ok(value),
+            _ => Err(VBError::type_mismatch()),
+        },
+        VBType::String => value.as_string().map(VBVariant::String),
+        VBType::Boolean => value.as_bool().map(VBVariant::Boolean),
+        VBType::Date => value.as_date_serial().map(VBVariant::Date),
+        VBType::Object | VBType::Class(_) | VBType::Nothing => match value {
+            value @ (VBVariant::Nothing | VBVariant::Object(_)) => Ok(value),
+            _ => Err(VBError::type_mismatch()),
+        },
+        _ if &value.type_of() == element_type => Ok(value),
+        _ => Err(VBError::type_mismatch()),
     }
 }
 
@@ -256,7 +316,7 @@ mod tests {
     #[test]
     fn multidimension_offset_is_row_major() {
         let dims = [ArrayDimension::new(1, 2), ArrayDimension::new(1, 3)];
-        let mut arr = ArrayValue::new_fixed(VBType::Integer, &dims).unwrap();
+        let mut arr = ArrayValue::new_fixed(VBType::Long, &dims).unwrap();
         for i in 1..=2 {
             for j in 1..=3 {
                 arr.set(&[i, j], VBVariant::Long(i * 10 + j)).unwrap();
@@ -264,5 +324,47 @@ mod tests {
         }
         assert_eq!(arr.get(&[2, 3]).unwrap(), &VBVariant::Long(23));
         assert_eq!(arr.len(), 6);
+    }
+
+    #[test]
+    fn typed_array_rejects_mismatched_values_without_mutating() {
+        let mut arr = ArrayValue::new_fixed(VBType::Integer, &[ArrayDimension::new(1, 1)]).unwrap();
+        arr.set(&[1], VBVariant::Integer(8)).unwrap();
+        assert_eq!(
+            arr.set(&[1], VBVariant::String("not a number".into()))
+                .unwrap_err()
+                .number,
+            err_number::TYPE_MISMATCH
+        );
+        assert_eq!(arr.get(&[1]).unwrap(), &VBVariant::Integer(8));
+    }
+
+    #[test]
+    fn multidimensional_redim_preserve_retains_elements_and_defaults_growth() {
+        let mut arr = ArrayValue::new_fixed(
+            VBType::Integer,
+            &[ArrayDimension::new(1, 2), ArrayDimension::new(0, 1)],
+        )
+        .unwrap();
+        arr.set(&[1, 0], VBVariant::Integer(10)).unwrap();
+        arr.set(&[2, 1], VBVariant::Integer(21)).unwrap();
+        arr.redim(
+            &[ArrayDimension::new(1, 2), ArrayDimension::new(0, 2)],
+            true,
+        )
+        .unwrap();
+
+        assert_eq!(arr.get(&[1, 0]).unwrap(), &VBVariant::Integer(10));
+        assert_eq!(arr.get(&[2, 1]).unwrap(), &VBVariant::Integer(21));
+        assert_eq!(arr.get(&[2, 2]).unwrap(), &VBVariant::Integer(0));
+        assert_eq!(
+            arr.redim(
+                &[ArrayDimension::new(1, 3), ArrayDimension::new(0, 2)],
+                true,
+            )
+            .unwrap_err()
+            .number,
+            err_number::INVALID_PROCEDURE_CALL
+        );
     }
 }

@@ -311,6 +311,12 @@ pub enum Token {
     ///
     /// The string literal includes the enclosing double quotes.
     StringLiteral,
+    /// MX interpolated string literal prefixed with `$`.
+    InterpolatedStringLiteral,
+    /// MX null-coalescing operator `??`.
+    NullCoalescingOperator,
+    /// MX optional member access operator `?.`.
+    OptionalMemberAccessOperator,
     /// Represents the `If` keyword.
     ///
     /// Used to conditionally execute a block of code depending on the value
@@ -1199,6 +1205,8 @@ impl Token {
                 | Token::ColonOperator
                 | Token::ExponentiationOperator
                 | Token::Ampersand
+                | Token::NullCoalescingOperator
+                | Token::OptionalMemberAccessOperator
         )
     }
 

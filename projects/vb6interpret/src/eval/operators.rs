@@ -7,6 +7,7 @@
 
 use vb6core::error::{VBError, VBResult};
 use vb6runtime::VBVariant;
+use vb6runtime::value::VBCurrency;
 
 /// Logical/bitwise operators shared by `And`, `Or`, `Xor`, `Eqv`, `Imp`.
 #[derive(Clone, Copy, Debug)]
@@ -54,6 +55,21 @@ pub(crate) fn add(lhs: VBVariant, rhs: VBVariant) -> VBResult<VBVariant> {
 
 /// Generic arithmetic dispatch on an arithmetic operator.
 pub(crate) fn arith(lhs: VBVariant, rhs: VBVariant, op: ArithmeticOperator) -> VBResult<VBVariant> {
+    if let (VBVariant::Currency(left), VBVariant::Currency(right)) = (&lhs, &rhs) {
+        let left = VBCurrency::from(*left);
+        let right = VBCurrency::from(*right);
+        let result = match op {
+            ArithmeticOperator::Add => Some(left.checked_add(right)?),
+            ArithmeticOperator::Subtract => Some(left.checked_sub(right)?),
+            ArithmeticOperator::Multiply => Some(left.checked_mul(right)?),
+            ArithmeticOperator::Divide => Some(left.checked_div(right)?),
+            _ => None,
+        };
+        if let Some(value) = result {
+            return Ok(VBVariant::from(value));
+        }
+    }
+
     // Integer arithmetic when both operands are integral types. (This
     // must not fire for Singles/Doubles/Currency, which hold fractional
     // values that `as_i64` would silently round.)
@@ -233,6 +249,39 @@ mod tests {
         )
         .unwrap();
         assert_eq!(result, VBVariant::from_i64(1));
+    }
+
+    #[test]
+    fn currency_arithmetic_uses_checked_scaled_operations() {
+        assert_eq!(
+            arith(
+                VBVariant::Currency(15_000),
+                VBVariant::Currency(20_000),
+                ArithmeticOperator::Multiply,
+            )
+            .unwrap(),
+            VBVariant::Currency(30_000)
+        );
+        assert_eq!(
+            arith(
+                VBVariant::Currency(i64::MAX),
+                VBVariant::Currency(1),
+                ArithmeticOperator::Add,
+            )
+            .unwrap_err()
+            .number,
+            err_number::OVERFLOW
+        );
+        assert_eq!(
+            arith(
+                VBVariant::Currency(10_000),
+                VBVariant::Currency(0),
+                ArithmeticOperator::Divide,
+            )
+            .unwrap_err()
+            .number,
+            err_number::DIVISION_BY_ZERO
+        );
     }
 
     #[test]

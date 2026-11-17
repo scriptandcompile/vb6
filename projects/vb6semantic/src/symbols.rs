@@ -162,7 +162,10 @@ impl SymbolTable {
             }
         })?;
 
-        if let Some(existing) = scope.get(&symbol.name) {
+        if let Some(existing) = scope
+            .values()
+            .find(|existing| existing.name.eq_ignore_ascii_case(&symbol.name))
+        {
             return Err(crate::error::SemanticError::DuplicateSymbol {
                 name: symbol.name.clone(),
                 location: symbol.location.clone(),
@@ -176,7 +179,10 @@ impl SymbolTable {
 
     /// Look up a symbol in a specific scope
     pub fn lookup_in_scope(&self, scope_id: usize, name: &str) -> Option<&Symbol> {
-        self.symbols.get(&scope_id)?.get(name)
+        self.symbols
+            .get(&scope_id)?
+            .values()
+            .find(|symbol| symbol.name.eq_ignore_ascii_case(name))
     }
 
     /// Get all symbols in a scope
@@ -195,7 +201,11 @@ impl SymbolTable {
 
     /// Check if a symbol exists in any scope
     pub fn symbol_exists(&self, name: &str) -> bool {
-        self.symbols.values().any(|scope| scope.contains_key(name))
+        self.symbols.values().any(|scope| {
+            scope
+                .values()
+                .any(|symbol| symbol.name.eq_ignore_ascii_case(name))
+        })
     }
 }
 

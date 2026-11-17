@@ -40,17 +40,32 @@ impl Interpreter {
             let significant: Vec<&CstNode> = list.significant_children().collect();
             for child in &significant {
                 match child.kind() {
-                    SyntaxKind::Argument => {
-                        let value = match child.first_non_whitespace_child() {
-                            Some(expr) => self.eval_expr(expr)?,
-                            None => VBVariant::Empty,
-                        };
-                        if file_number.is_some() {
-                            file_values.push(value);
-                        } else {
-                            self.current_output.push_str(&value.as_string()?);
+                    SyntaxKind::Argument => match child.first_non_whitespace_child() {
+                        Some(expr) if expr.kind() == SyntaxKind::SpreadExpression => {
+                            return Err(self.error_here(
+                                VBError::with_description(
+                                    vb6core::error::err_number::INVALID_PROCEDURE_CALL,
+                                    "Spread arguments are supported only in procedure call argument lists",
+                                ),
+                                None,
+                            ));
                         }
-                    }
+                        Some(expr) => {
+                            let value = self.eval_expr(expr)?;
+                            if file_number.is_some() {
+                                file_values.push(value);
+                            } else {
+                                self.current_output.push_str(&value.as_string()?);
+                            }
+                        }
+                        None => {
+                            if file_number.is_some() {
+                                file_values.push(VBVariant::Empty);
+                            } else {
+                                self.current_output.push_str("");
+                            }
+                        }
+                    },
                     SyntaxKind::Comma => {
                         if file_number.is_none() {
                             self.current_output.push('\t');

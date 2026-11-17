@@ -89,6 +89,7 @@ use rowan::Checkpoint;
 /// Tracks the state of expression parsing to eliminate recursion.
 #[derive(Debug, Clone, Copy)]
 enum ExprParseFrame {
+    EndSpread,
     /// Parse a prefix expression and start the infix loop
     ParsePrefix {
         min_bp: BindingPower,
@@ -150,6 +151,9 @@ impl BindingPower {
 
     /// Logical implication operator (`Imp`) - lowest precedence
     pub(super) const IMP: BindingPower = BindingPower(10);
+
+    /// MX null coalescing; right-associative and weaker than logical operators.
+    pub(super) const NULL_COALESCING: BindingPower = BindingPower(5);
 
     /// Logical equivalence operator (`Eqv`)
     pub(super) const EQV: BindingPower = BindingPower(20);
@@ -273,6 +277,7 @@ impl Parser<'_> {
         frame_stack: &mut Vec<ExprParseFrame>,
     ) {
         match frame {
+            ExprParseFrame::EndSpread => self.builder.finish_node(),
             ExprParseFrame::ParsePrefix {
                 min_bp,
                 lhs_checkpoint,
@@ -584,6 +589,30 @@ impl Parser<'_> {
         });
 
         let arg_checkpoint = self.builder.checkpoint();
+        if self.mx_extensions_enabled
+            && self.current_token() == Some(&Token::PeriodOperator)
+            && self
+                .tokens
+                .get(self.pos + 1)
+                .is_some_and(|(_, token)| *token == Token::PeriodOperator)
+            && self
+                .tokens
+                .get(self.pos + 2)
+                .is_some_and(|(_, token)| *token == Token::PeriodOperator)
+        {
+            self.builder
+                .start_node(SyntaxKind::SpreadExpression.to_raw());
+            self.consume_token();
+            self.consume_token();
+            self.consume_token();
+            self.consume_whitespace();
+            frame_stack.push(ExprParseFrame::EndSpread);
+            frame_stack.push(ExprParseFrame::ParsePrefix {
+                min_bp: BindingPower::NONE,
+                lhs_checkpoint: arg_checkpoint,
+            });
+            return;
+        }
         frame_stack.push(ExprParseFrame::ParsePrefix {
             min_bp: BindingPower::NONE,
             lhs_checkpoint: arg_checkpoint,
@@ -705,7 +734,12 @@ impl Parser<'_> {
 
         let found_postfix = matches!(
             self.current_token(),
-            Some(Token::PeriodOperator | Token::LeftParenthesis | Token::ExclamationMark)
+            Some(
+                Token::PeriodOperator
+                    | Token::OptionalMemberAccessOperator
+                    | Token::LeftParenthesis
+                    | Token::ExclamationMark
+            )
         );
 
         self.pos = saved_pos;
@@ -750,6 +784,23 @@ impl Parser<'_> {
 
                     // Check for more postfix operators
                     frame_stack.push(ExprParseFrame::ParsePostfix {
+                        min_bp,
+                        lhs_checkpoint,
+                    });
+                }
+                Some(Token::OptionalMemberAccessOperator) if self.mx_extensions_enabled => {
+                    self.builder
+                        .start_node_at(lhs_checkpoint, SyntaxKind::MemberAccessExpression.to_raw());
+                    self.parse_member_access_content();
+                    self.builder.finish_node();
+                    frame_stack.push(ExprParseFrame::ParsePostfix {
+                        min_bp,
+                        lhs_checkpoint,
+                    });
+                }
+                Some(Token::OptionalMemberAccessOperator) => {
+                    self.consume_error(vec!["Option VB6RExtensions On".to_string()]);
+                    frame_stack.push(ExprParseFrame::InfixLoop {
                         min_bp,
                         lhs_checkpoint,
                     });
@@ -955,10 +1006,25 @@ impl Parser<'_> {
             Some(Token::StringLiteral) => {
                 self.parse_string_literal();
             }
+            Some(Token::InterpolatedStringLiteral) => {
+                if self.mx_extensions_enabled {
+                    self.builder
+                        .start_node(SyntaxKind::StringLiteralExpression.to_raw());
+                    self.consume_token();
+                    self.builder.finish_node();
+                } else {
+                    self.consume_error(vec!["Option VB6RExtensions On".to_string()]);
+                }
+            }
+            Some(Token::LeftSquareBracket)
+                if self.mx_extensions_enabled && self.starts_mx_array_literal() =>
+            {
+                self.parse_mx_array_literal();
+            }
             Some(Token::TrueKeyword | Token::FalseKeyword) => {
                 self.parse_boolean_literal();
             }
-            Some(Token::NullKeyword | Token::EmptyKeyword) => {
+            Some(Token::NothingKeyword | Token::NullKeyword | Token::EmptyKeyword) => {
                 self.parse_special_literal();
             }
             Some(Token::DateTimeLiteral) => {
@@ -1114,6 +1180,70 @@ impl Parser<'_> {
         ) {
             self.consume_token();
         }
+    }
+
+    fn starts_mx_array_literal(&self) -> bool {
+        let Some((_, first)) = self.tokens.get(self.pos) else {
+            return false;
+        };
+        if *first != Token::LeftSquareBracket {
+            return false;
+        }
+
+        let mut index = self.pos + 1;
+        while self
+            .tokens
+            .get(index)
+            .is_some_and(|(_, token)| *token == Token::Whitespace)
+        {
+            index += 1;
+        }
+        if self
+            .tokens
+            .get(index)
+            .is_some_and(|(_, token)| *token == Token::RightSquareBracket)
+        {
+            return true;
+        }
+
+        let mut only_identifier_text = true;
+        let mut has_comma = false;
+        while let Some((_, token)) = self.tokens.get(index) {
+            if *token == Token::RightSquareBracket {
+                break;
+            }
+            has_comma |= *token == Token::Comma;
+            only_identifier_text &=
+                *token == Token::Whitespace || *token == Token::Identifier || token.is_keyword();
+            index += 1;
+        }
+        if !has_comma && only_identifier_text {
+            return false;
+        }
+        true
+    }
+
+    fn parse_mx_array_literal(&mut self) {
+        self.builder
+            .start_node(SyntaxKind::ArrayLiteralExpression.to_raw());
+        self.consume_token();
+        self.consume_whitespace();
+        while !self.is_at_end() && !self.at_token(Token::RightSquareBracket) {
+            self.parse_expression();
+            self.consume_whitespace();
+            if self.at_token(Token::Comma) {
+                self.consume_token();
+                self.consume_whitespace();
+            } else {
+                break;
+            }
+        }
+        if self.at_token(Token::RightSquareBracket) {
+            self.consume_token();
+        } else {
+            self.consume_error(vec!["]".to_string()]);
+        }
+        self.builder.finish_node();
     }
 
     /// Parse a VB6 file-number reference used in expressions.
@@ -1296,7 +1426,7 @@ impl Parser<'_> {
 
     /// Parse the content of a member access (everything after the dot).
     fn parse_member_access_content(&mut self) {
-        // Consume the period
+        // Consume the member operator.
         self.consume_token();
 
         // Skip whitespace after period
@@ -1348,6 +1478,23 @@ impl Parser<'_> {
     /// - Right-associative: `right_bp = left_bp` (exponentiation)
     fn get_infix_binding_power(&self) -> Option<(BindingPower, BindingPower)> {
         let token = self.current_token()?;
+        if self.mx_extensions_enabled && *token == Token::NullCoalescingOperator {
+            return Some((BindingPower::NULL_COALESCING, BindingPower::NULL_COALESCING));
+        }
+        if self.mx_extensions_enabled
+            && let Some((text, Token::Identifier)) = self.tokens.get(self.pos)
+        {
+            let binding_power = if text.eq_ignore_ascii_case("AndAlso") {
+                Some(BindingPower::AND)
+            } else if text.eq_ignore_ascii_case("OrElse") {
+                Some(BindingPower::OR)
+            } else {
+                None
+            };
+            if let Some(bp) = binding_power {
+                return Some((bp, BindingPower(bp.0 + 1)));
+            }
+        }
 
         let (left_bp, right_bp) = match token {
             // Exponentiation (right-associative)

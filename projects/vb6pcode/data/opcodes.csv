@@ -1,0 +1,1632 @@
+# VB6 P-Code opcodes: encoding and runtime semantics.
+#
+# Every implemented row describes its handler in MSVBVM60.DLL 6.00.8176 (the
+# Visual Basic 6.0 release) and 6.00.9848, whose handlers are the same code at
+# other addresses: the operands it reads, its effect on the evaluation and x87
+# stacks, the object registers it uses.
+#
+# Encoding columns:
+#   table          - dispatch table (0 = primary, 1-5 = lead bytes 0xFB-0xFF)
+#   opcode         - opcode byte within the table
+#   size           - instruction bytes after the lead byte (-1 = variable:
+#                    a u16 byte count, then that payload; 0 = invalid)
+#   mnemonic       - opcode name
+#   operand_format - operands in order:
+#                    %1 %2 %4  1/2/4-byte literal
+#                    %a        i16 frame offset from ebp
+#                    %s %c     u16 constant pool index (%c: the entry is an address)
+#                    %l        u16 jump target (offset from the procedure's code start)
+#                    %v        u16 vtable offset, u16 pool index of the interface's IID
+#                    %x        u16 pool index of a procedure's address, u16 argument bytes
+#                    %N %D     named-argument list to the payload's end: u16 pool
+#                              indices of names / u32 DISPIDs
+#                    %L        jump table to the payload's end: u16 targets
+#                    %F        frame slots to the payload's end: i16 offsets
+#                    (a variable-length opcode with no format has an opaque
+#                    payload: GetRecOwner*/PutRecOwner*, an inline record
+#                    descriptor)
+#
+# Semantics columns (evaluation stack slots are 4 bytes; a Variant on the
+# stack is its address unless a note says by value, then it takes 4 slots):
+#   pops      - fixed evaluation stack slots consumed
+#   pushes    - evaluation stack slots produced
+#   fpu_pops  - x87 values consumed (read below the entry depth)
+#   fpu_push  - x87 values produced; c = a call that pushes nothing and
+#               leaves ST0 as its callee left it (a Single, Double or Date
+#               function's result; nothing for a Sub)
+#   stack     - operand-dependent slots consumed on top of `pops`:
+#                 callee        the callee releases its arguments (signature)
+#                 arg_bytes(i)  operand i's argument bytes / 4
+#                 variants(i)   4 * operand i (Variants by value)
+#                 count(i)      operand i
+#                 pairs(i)      2 * operand i
+#                 pairs1(i)     2 * max(operand i, 1)
+#                 bytes(i)      (operand i - 4) / 4
+#   popped    - every value popped, from both stacks, last operand first
+#               (on one stack: top first; a binary operation's right
+#               operand, then its left): a width in slots, f for an x87
+#               value, * where the `stack` rule's values sit (4 each for
+#               variants(i), 1 for count/pairs, the callee's parameters for
+#               callee/arg_bytes)
+#   object    - object registers: pr (the receiver or base is Pr,
+#               [ebp-0x4c]), me (Me, [ebp+8]), tos (the receiver is the
+#               Variant whose address it pops), >pr:<source> (loads Pr from:
+#               frame [ebp+%a]; me; pool the pool entry %c itself; indirect
+#               [[ebp+%a]]; member [Pr+%2]; frame_member [[ebp+%a]+%2];
+#               array a popped array element's address; variant a popped Variant's
+#               object; new a popped object variable, created when Nothing;
+#               with [[ebp+0x10]+%2]; late a late-bound get's result)
+#   movement  - what a load, store or literal moves, from its handler: one
+#               move or several joined by + (in order):
+#                 ld:<place>:<n>[z|u]  push n bytes (a 1- or 2-byte load
+#                                      fills its slot with zeros, z, or
+#                                      leaves the high bytes undefined, u)
+#                 ldfp:<place>:<n>     fld an n-byte float
+#                 ad:<place>           push the address of place
+#                 st:<place>:<n>       pop and store n bytes (nothing freed)
+#                 stfp:<place>:<n>     fstp ST0 as an n-byte float
+#                 zero:<place>:<n>     store n zero bytes
+#                 lit:<n>[s|s8]        push the n-byte literal operand
+#                                      (sign-extended to a slot / 8 bytes)
+#                 litfp:<n>[i]         fld the float operand (i: fild)
+#                 const:0              push 0
+#                 pool:<op>            push the pool entry itself
+#                 var:<vt>[=<data>]:<place>  build a Variant literal at place
+#                                      (data: a constant, lit or pool) and
+#                                      push its address
+#                 prn / pr / prad:<place>  load Pr with the 4 bytes at place
+#                                      (error 91 on 0 / unchecked) or with
+#                                      its address
+#                 x:<effect>:<place>[:<place>]  a move with side effects
+#                                      (freeing or releasing the old value,
+#                                      AddRef, copies, Variant conversions)
+#               places: f(%a) [ebp+%a]; fi(%a) [[ebp+%a]]; m(%a,%2)
+#               [[ebp+%a]+%2]; pr(%2) [Pr+%2]; g(%c) [pool[%c]]; w(%2)
+#               [[ebp+0x10]+%2]; wi(%2) [[[ebp+0x10]+%2]]; s(%2) [esp+%2];
+#               pop (an address popped first); a1 (a popped 1-D array's
+#               element at a popped index); an(%2) (of %2 dimensions);
+#               ar(%s,%2) (a fixed array in a popped record); f(8), f(-0x88),
+#               f(-0x94). An operand named twice is written %a and %a#2.
+#   category  - semantic category (branch = unconditional, branch_cond,
+#               gosub, return_gosub, resume, on_error, raise (Error: raises
+#               the popped number), end (End, Stop), call, ...)
+#   handler_8176, handler_9848 - handler address in each build
+#   notes     - description; Pr is the object register ([ebp-0x4c])
+#
+table,opcode,size,mnemonic,operand_format,pops,pushes,fpu_pops,fpu_push,stack,popped,object,movement,category,handler_8176,handler_9848,notes
+0,0x00,2,LargeBos,%1,0,0,0,0,,,,,bos,0x66104BFE,0x66108D56,"Starts a statement: stores its address to [ebp-0x14]; %1 is the statement's length in bytes, which Resume Next skips (0 for the last statement)"
+0,0x01,1,InvalidExcode,,0,0,0,0,,,,,,,,
+0,0x02,2,LargeBos,%1,0,0,0,0,,,,,bos,0x66104BFE,0x66108D56,"Starts a statement: stores its address to [ebp-0x14]; %1 is the statement's length in bytes, which Resume Next skips (0 for the last statement)"
+0,0x03,1,InvalidExcode,,0,0,0,0,,,,,,,,
+0,0x04,3,FLdRfVar,%a,0,1,0,0,,,,ad:f(%a),load_frame,0x661052BB,0x661093E1,Pushes the address of [ebp+%a]
+0,0x05,3,ImpAdLdRf,%c,0,1,0,0,,,,ad:g(%c),load_ind,0x661056EB,0x66109811,Pushes the address of the variable pool entry %c addresses
+0,0x06,3,MemLdRfVar,%2,0,1,0,0,,,pr,ad:pr(%2),load_mem,0x66105C0C,0x66109D1E,Pushes the address of [Pr+%2]
+0,0x07,5,FMemLdRf,%a %2,0,1,0,0,,,,"ad:m(%a,%2)",load_mem,0x66105CA3,0x66109DB5,Pushes the address of [[ebp+%a]+%2]
+0,0x08,3,FLdPr=,%a,0,0,0,0,,,>pr:frame,prn:f(%a),load_frame,0x66105EEA,0x66109FFC,Loads Pr with the object at [ebp+%a]; error 91 when it is Nothing
+0,0x09,5,ImpAdCallHresult,%x,0,0,0,0,arg_bytes(0),*,,,call,0x6610B8FE,0x6610FA6F,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); checks the HRESULT
+0,0x0A,5,ImpAdCallFPR4,%x,0,0,0,c,arg_bytes(0),*,,,call,0x6610628E,0x6610A38F,"Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes nothing (the mnemonic is no type): ST0 holds the result of a Single, Double or Date callee, nothing of a Sub"
+0,0x0B,5,ImpAdCallI2,%x,0,1,0,0,arg_bytes(0),*,,,call,0x661062CC,0x6610A3CD,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes eax
+0,0x0C,5,ImpAdCallCy,%x,0,2,0,0,arg_bytes(0),*,,,call,0x6610BAEA,0x6610FC5B,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes edx:eax
+0,0x0D,5,VCallHresult,%v,0,0,0,0,callee,*,pr,,call,0x6610633A,0x6610A43B,Calls Pr's vtable method (IID pool index in %v); the callee releases this and its arguments; checks the HRESULT; pushes nothing
+0,0x0E,3,VCallFPR8,%2,0,0,0,c,callee,*,pr,,call,0x661063A1,0x6610A4A2,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes nothing; ST0 holds the result of a callee returning a float
+0,0x0F,3,VCallAd,%2,0,1,0,0,callee,*,pr,,call,0x661063C8,0x6610A4C9,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+0,0x10,5,ThisVCallHresult,%v,0,0,0,0,callee,*,me,,call,0x6610630B,0x6610A40C,Calls Me's vtable method (IID pool index in %v); the callee releases this and its arguments; checks the HRESULT; pushes nothing
+0,0x11,3,ThisVCall,%2,0,0,0,c,callee,*,me,,call,0x6610BD78,0x6610FEE9,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes nothing; ST0 holds the result of a callee returning a float
+0,0x12,3,ThisVCallAd,%2,0,1,0,0,callee,*,me,,call,0x6610BCEE,0x6610FE5F,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+0,0x13,1,ExitProcHresult,,0,0,0,0,,,,,return,0x6610645F,0x6610A560,Returns eax = 0 (S_OK)
+0,0x14,1,ExitProc,,0,0,0,0,,,,,return,0x66106428,0x6610A529,"Returns eax = [ebp-0x88]: a Long, a String or an object result (a Sub leaves it unused)"
+0,0x15,1,ExitProcI2,,0,0,0,0,,,,,return,0x66106468,0x6610A569,"Returns eax = the Integer at [ebp-0x86], sign-extended"
+0,0x16,1,ExitProcR4,,0,0,0,0,,,,,return,0x6610BF3E,0x661100AF,Returns the Single at [ebp-0x88] in ST0 (fld)
+0,0x17,1,ExitProcR8,,0,0,0,0,,,,,return,0x6610BF4B,0x661100BC,Returns the Double or Date at [ebp-0x8C] in ST0 (fld)
+0,0x18,1,ExitProcCy,,0,0,0,0,,,,,return,0x6610BEC5,0x66110036,Returns the Currency at [ebp-0x8C] in edx:eax
+0,0x19,3,FStAdFunc,%a,1,0,0,0,,1,,x:set_obj_owned:f(%a),store_frame,0x66106024,0x6610A136,"Pops an object reference and stores it at frame %a without AddRef (the reference moves), Releasing the old one"
+0,0x1A,3,FFree1Ad,%a,0,0,0,0,,,,,stack,0x6610620E,0x6610A30F,Free COM object at [EBP+sext(op)]; Release + set to NULL; no stack change
+0,0x1B,3,LitStr,%s,0,1,0,0,,,,pool:%s,load_lit,0x6610592F,0x66109A55,Pushes the constant pool entry %s itself (a BSTR literal; nothing copied)
+0,0x1C,3,BranchF,%l,1,0,0,0,,1,,,branch_cond,0x66104E04,0x66108F5C,Pops a Boolean and jumps to %l when its low 16 bits are 0
+0,0x1D,3,BranchT,%l,1,0,0,0,,1,,,branch_cond,0x66104DEF,0x66108F47,Pops a Boolean and jumps to %l when its low 16 bits are not 0
+0,0x1E,3,Branch,%l,0,0,0,0,,,,,branch,0x66104DDD,0x66108F35,Unconditional branch; target = pcode_base + zx(u16 operand)
+0,0x1F,3,CRec2Ansi,%s,2,0,0,0,,1 1,,,convert,0x661099A9,0x6610DAF2,Converts the record (descriptor in pool %s) to ANSI: pops source and destination
+0,0x20,3,CRec2Uni,%s,2,0,0,0,,1 1,,,convert,0x661099C6,0x6610DB0F,Converts the record (descriptor in pool %s) to Unicode: pops source and destination
+0,0x21,1,FLdPrThis,,0,0,0,0,,,me >pr:me,pr:f(8),load_frame,0x661052D0,0x661093F6,Loads Pr with the object at [ebp+8]
+0,0x22,3,ImpAdLdPr,%c,0,0,0,0,,,>pr:pool,prad:g(%c),load_ind,0x6610B234,0x6610F390,Loads Pr with the address of the variable pool entry %c addresses
+0,0x23,3,FStStrNoPop,%a,0,0,0,0,,,,x:bstr_move_keep:f(%a),store_frame,0x66105F41,0x6610A053,"Stores the popped String at [ebp+%a], freeing the old one (the string moves); the value stays on the stack"
+0,0x24,3,NewIfNullPr,%c,1,0,0,0,,1,>pr:new,,stack,0x66105D33,0x66109E45,Pops the address of an object variable; creates the class in pool %c when it is Nothing; loads the object into Pr
+0,0x25,1,PopAdLdVar,,1,4,0,0,,1,,ld:pop:16,stack,0x6610652E,0x6610A613,Pops a Variant's address; pushes the Variant by value (four slots)
+0,0x26,3,AryDescTemp,%a,1,1,0,0,,1,,,stack,0x6610903A,0x6610D14A,Pops the data pointer into the array descriptor at frame %a; pushes the descriptor's address
+0,0x27,3,LitVar_Missing,%a,0,1,0,0,,,,var:10=0x80020004:f(%a),load_lit,0x66105947,0x66109A6D,Builds a Variant (vt 10 and the value 0x80020004) at [ebp+%a] and pushes its address (the old contents not freed)
+0,0x28,5,LitVarI2,%a %2,0,1,0,0,,,,var:2=lit:f(%a),load_lit,0x661059AE,0x66109AD4,Builds a Variant (vt 2 and the literal operand) at [ebp+%a] and pushes its address (the old contents not freed)
+0,0x29,-1,FFreeAd,%F,0,0,0,0,,,,,stack,0x6610623C,0x6610A33D,Frees the frame slots listed in the payload (i16 offsets); no stack effect
+0,0x2A,1,ConcatStr,,2,1,0,0,,1 1,,,arith,0x661067D9,0x6610A8A8,Pop 2 BSTR ptrs; concatenate via __vbaStrCat; push result BSTR ptr
+0,0x2B,3,PopTmpLdAd2,%a,1,1,0,0,,1,,st:f(%a):2+ad:f(%a),stack,0x66106546,0x6610A62B,Pops the value into the frame temp %a (2) and pushes the temp's address
+0,0x2C,5,LateIdSt,%4,4,0,0,0,,4,pr,,call,0x6610575C,0x66109882,Late-bound IDispatch call on Pr by DISPID %4; pops the value Variant (by value)
+0,0x2D,3,AryUnlock,%a,0,0,0,0,,,,,stack,0x66104D00,0x66108E58,Unlocks the SAFEARRAY recorded at frame %a and clears the slot
+0,0x2E,3,AryLock,%a,1,1,0,0,,1,,,stack,0x66104CD2,0x66108E2A,Locks the SAFEARRAY on top of the stack (left there) and records it at frame %a
+0,0x2F,3,FFree1Str,%a,0,0,0,0,,,,,stack,0x661061AF,0x6610A2B0,Free BSTR at [EBP+sext(op)]; SysFreeString + set to NULL
+0,0x30,3,PopTmpLdAd8,%a,2,1,0,0,,1 1,,st:f(%a):8+ad:f(%a),stack,0x6610BFDD,0x6611016A,Pops the value into the frame temp %a (8) and pushes the temp's address
+0,0x31,3,FStStr,%a,1,0,0,0,,1,,x:bstr_move:f(%a),store_frame,0x66105F45,0x6610A057,"Stores the popped String at [ebp+%a], freeing the old one (the string moves)"
+0,0x32,-1,FFreeStr,%F,0,0,0,0,,,,,stack,0x661061D8,0x6610A2D9,Frees the frame slots listed in the payload (i16 offsets); no stack effect
+0,0x33,3,LdFixedStr,%2,1,1,0,0,,1,,x:bstr_from_fixed:pop,stack,0x6610B24F,0x6610F3AB,Pops a fixed-length string's address; pushes it as a String (descriptor in pool %c)
+0,0x34,1,CStr2Ansi,,2,0,0,0,,1 1,,,convert,0x66105204,0x6610932A,Pops the destination's address and a String; stores its ANSI copy (Declare argument)
+0,0x35,3,FFree1Var,%a,0,0,0,0,,,,,stack,0x661061E2,0x6610A2E3,Clear Variant at [EBP+sext(op)]; __vbaVarClear; no stack change
+0,0x36,-1,FFreeVar,%F,0,0,0,0,,,,,stack,0x66106204,0x6610A305,Frees the frame slots listed in the payload (i16 offsets); no stack effect
+0,0x37,1,PopFPR4,,0,1,1,0,,f,,,stack,0x661064E7,0x6610A5E8,Pop x87 ST0 → store as f32 on eval stack; ESP-=4; fpu_pop=1 push=1
+0,0x38,3,CopyBytes,%2,2,0,0,0,,1 1,,,stack,0x661099E3,0x6610DB2C,Pops destination then source; copies %2 bytes
+0,0x39,1,PopFPR8,,0,2,1,0,,f,,,stack,0x66106503,0x66110136,Pop x87 ST0 → store as f64 on eval stack (2 slots); ESP-=8; fpu_pop=1 push=2
+0,0x3A,5,LitVarStr,%a %s,0,1,0,0,,,,var:8=pool:f(%a),load_lit,0x66105987,0x66109AAD,Builds a Variant (vt 8 and pool entry %s (shared)) at [ebp+%a] and pushes its address (the old contents not freed)
+0,0x3B,1,Ary1StStrCopy,,3,0,0,0,,1 1 1,,x:bstr_copy:a1,store_ind,0x6610B313,0x6610F46F,"Stores a copy of the String at the element of a popped array at a popped index, freeing the old one"
+0,0x3C,1,GetLastError,,0,0,0,0,,,,,stack,0x66106576,0x6610A65B,Stores kernel32 GetLastError() to Err.LastDllError (runtime context + 0x9C); follows every Declare call; no stack effect
+0,0x3D,3,CastAd,%c,1,1,0,0,,1,,,convert,0x66105D8D,0x66109E9F,Pop ptr; cast/validate COM interface; push validated ptr
+0,0x3E,3,FLdZeroAd,%a,0,1,0,0,,,,x:zero_source:f(%a),load_lit,0x66105275,0x6610939B,Pushes the 4 bytes at [ebp+%a] and zeroes them (the reference moves to the stack)
+0,0x3F,3,CVarCy,%a,2,1,0,0,,2,,,convert,0x661097E7,0x6610D916,Cy to Variant: pops the value (two slots); builds the Variant in the frame temp %a and pushes its address
+0,0x40,1,Ary1LdRf,,2,1,0,0,,1 1,,ad:a1,load_ind,0x66104C44,0x66108D9C,Pushes the address of the element of a popped array at a popped index
+0,0x41,1,Ary1LdPr,,2,0,0,0,,1 1,>pr:array,prad:a1,load_ind,0x66108F13,0x6610D023,Loads Pr with the address of the element of a popped array at a popped index
+0,0x42,1,CR4Var,,1,0,0,1,,1,,,convert,0x66104F06,0x6610905E,Variant to Single: pops the Variant's address; result in ST0
+0,0x43,3,FStStrCopy,%a,1,0,0,0,,1,,x:bstr_copy:f(%a),store_frame,0x66105F63,0x6610A075,"Stores a copy of the String at [ebp+%a], freeing the old one"
+0,0x44,3,CVarI2,%a,1,1,0,0,,1,,,convert,0x66105071,0x661091B1,I2 to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+0,0x45,1,Error,,1,0,0,0,,1,,,raise,0x6610B123,0x6610F27F,Pops the error number and raises it (0 or a number above 0xFFFF raises error 5); never falls through
+0,0x46,3,CVarStr,%a,1,1,0,0,,1,,,convert,0x661050B2,0x661091D8,Str to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+0,0x47,3,StFixedStr,%2,2,0,0,0,,1 1,,x:fixstr_lset:pop,store_frame,0x6610B377,0x6610F4D3,LSet of the popped String into the popped fixed-length string
+0,0x48,3,ILdPr,%a,0,0,0,0,,,>pr:indirect,prn:fi(%a),load_ind,0x66105F33,0x6610A045,Loads Pr with the object at where the pointer at [ebp+%a] points; error 91 when it is Nothing
+0,0x49,1,PopAdLd4,,1,1,0,0,,1,,ld:pop:4,stack,0x6610651F,0x6610A604,Pop address; load i32 from that address; push value (deref)
+0,0x4A,1,FnLenStr,,1,1,0,0,,1,,,stack,0x66106806,0x6610A8D5,Pop BSTR ptr; push SysStringLen result as i32
+0,0x4B,3,OnErrorGoto,%l,0,0,0,0,,,,,on_error,0x66105E46,0x66109F58,Sets the error handler to %l; falls through
+0,0x4C,1,FnLBound,,2,1,0,0,,1 1,,,stack,0x66104C9A,0x66108DF2,LBound: pops the dimension and the SAFEARRAY; pushes an i32
+0,0x4D,5,CVarRef,%a %2,1,1,0,0,,1,,,convert,0x66105123,0x66109263,Pops an address; builds a by-reference Variant (vartype %2) in frame temp %a; pushes its address
+0,0x4E,3,FStVarCopyObj,%a,1,0,0,0,,1,,x:var_dup:f(%a),store_frame,0x66106110,0x6610A222,Duplicates the Variant into [ebp+%a] (__vbaVarDup)
+0,0x4F,3,MidStr,%2,4,0,0,0,,1 1 1 1,,,stack,0x6610C2CB,0x6611046E,"Mid statement: pops the destination's address, start, length and the String"
+0,0x50,1,CI4Str,,1,1,0,0,,1,,,convert,0x66105012,0x66109163,Pop BSTR; convert to i32 via __vbaI4Str; push
+0,0x51,3,FLdZeroAd,%a,0,1,0,0,,,,x:zero_source:f(%a),load_lit,0x66105275,0x6610939B,Pushes the 4 bytes at [ebp+%a] and zeroes them (the reference moves to the stack)
+0,0x52,1,Ary1StVar,,3,0,0,0,,1 1 1,,x:var_let:a1,store_ind,0x661061A3,0x6610A2A4,Let of the popped Variant into the element of a popped array at a popped index (the source moves; an object source gives its default value)
+0,0x53,1,CBoolCy,,2,1,0,0,,2,,,convert,0x661095F8,0x6610D708,Pop 2 Cy slots; convert to VB Bool (i16 -1/0); push as i32
+0,0x54,5,FMemStStrCopy,%a %2,1,0,0,0,,1,,"x:bstr_copy:m(%a,%2)",store_mem,0x66105FC6,0x6610A0D8,"Stores a copy of the String at [[ebp+%a]+%2], freeing the old one"
+0,0x55,1,CI2Var,,1,1,0,0,,1,,,convert,0x66104E56,0x66108FAE,Variant to Integer: pops the Variant's address; result in one slot
+0,0x56,3,NewIfNullAd,%c,1,1,0,0,,1,,,stack,0x66105D41,0x66109E53,Pop addr ptr; if null allocate; push (non-null) ptr
+0,0x57,5,LateMemLdVar,%a %s,0,1,0,0,,,pr,,call,0x6610578E,0x661098B4,"Late-bound IDispatch call on Pr by name (pool %s); result Variant in frame %a, whose address it pushes"
+0,0x58,3,MemLdPr,%2,0,0,0,0,,,pr >pr:member,prn:pr(%2),load_mem,0x66105F0A,0x6610A01C,Loads Pr with the object at [Pr+%2]; error 91 when it is Nothing
+0,0x59,3,PopTmpLdAdStr,%a,1,1,0,0,,1,,st:f(%a):4+ad:f(%a),stack,0x6610655F,0x6610A644,Pops the value into the frame temp %a (String) and pushes the temp's address
+0,0x5A,1,Erase,,1,0,0,0,,1,,,stack,0x66104CBE,0x66108E16,Erase: pops the array's address
+0,0x5B,3,FStAdFuncNoPop,%a,0,0,0,0,,,,x:set_obj_owned_keep:f(%a),store_frame,0x66106020,0x6610A132,"Stores the popped object at [ebp+%a] without AddRef, Releasing the old one; the value stays on the stack"
+0,0x5C,3,BranchFVar,%l,1,0,0,0,,1,,,branch_cond,0x6610925D,0x6610D36D,Pops a Variant's address; jumps to %l when it is False
+0,0x5D,1,HardType,,1,1,0,0,,1,,,convert,0x6610510F,0x6610924F,Pop ptr; verify/cast COM type; push validated ptr
+0,0x5E,5,ImpAdCallI4,%x,0,1,0,0,arg_bytes(0),*,,,call,0x661062CC,0x6610A3CD,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes eax
+0,0x5F,5,FMemLdPr,%a %2,0,0,0,0,,,>pr:frame_member,"prn:m(%a,%2)",load_mem,0x66105F18,0x6610A02A,Loads Pr with the object at [[ebp+%a]+%2]; error 91 when it is Nothing
+0,0x60,1,CStrVarTmp,,1,1,0,0,,1,,,convert,0x66104F71,0x661090C9,Variant to String: pops the Variant's address; result in one slot
+0,0x61,7,LateIdLdVar,%a %4,0,1,0,0,,,pr,,call,0x66105720,0x66109846,"Late-bound IDispatch call on Pr by DISPID %4; result Variant in frame %a, whose address it pushes"
+0,0x62,3,IStDarg,%a,1,0,0,0,,1,,x:varg_let:fi(%a),store_ind,0x6610B78A,0x6610F8FB,"Stores the popped Variant through the by-reference argument at where the pointer at [ebp+%a] points, freeing the source"
+0,0x63,3,LitVar_TRUE,%a,0,1,0,0,,,,var:11=-1:f(%a),load_lit,0x66105970,0x66109A96,Builds a Variant (vt 11 and the value -1) at [ebp+%a] and pushes its address (the old contents not freed)
+0,0x64,5,NextI2,%a %l,1,0,0,0,,1,,,branch_cond,0x661053D3,0x661094F9,"Next (Integer): pops the counter's address, adds 1, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+0,0x65,5,NextStepI2,%a %l,1,0,0,0,,1,,,branch_cond,0x66105421,0x66109547,"Next (Integer): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+0,0x66,5,NextI4,%a %l,1,0,0,0,,1,,,branch_cond,0x661054B7,0x661095DD,"Next (Long): pops the counter's address, adds 1, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+0,0x67,5,NextStepI4,%a %l,1,0,0,0,,1,,,branch_cond,0x66109EA1,0x6610DFEA,"Next (Long): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+0,0x68,5,NextStepR4,%a %l,1,0,0,0,,1,,,branch_cond,0x66109F1C,0x6610E065,"Next (Single): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+0,0x69,5,NextStepR8,%a %l,1,0,0,0,,1,,,branch_cond,0x66109F6A,0x6610E0B3,"Next (Double): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+0,0x6A,5,NextStepCy,%a %l,1,0,0,0,,1,,,branch_cond,0x66109FDA,0x6610E123,"Next (Currency): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+0,0x6B,3,FLdI2,%a,0,1,0,0,,,,ld:f(%a):2u,load_frame,0x66105249,0x6610936F,Pushes the 2 bytes at [ebp+%a] (the rest of the slot undefined)
+0,0x6C,3,ILdRf,%a,0,1,0,0,,,,ld:f(%a):4,load_ind,0x66105260,0x66109386,Pushes the 4 bytes at [ebp+%a]
+0,0x6D,3,FLdR8,%a,0,2,0,0,,,,ld:f(%a):8,load_frame,0x66109DAC,0x6610DEF5,Pushes the 8 bytes at [ebp+%a]
+0,0x6E,3,FLdFPR4,%a,0,0,0,1,,,,ldfp:f(%a):4,load_frame,0x66105291,0x661093B7,Loads the 4-byte float at [ebp+%a] onto the x87 stack
+0,0x6F,3,FLdFPR8,%a,0,0,0,1,,,,ldfp:f(%a):8,load_frame,0x661052A6,0x661093CC,Loads the 8-byte float at [ebp+%a] onto the x87 stack
+0,0x70,3,FStI2,%a,1,0,0,0,,1,,st:f(%a):2,store_frame,0x661052E2,0x66109408,Pops and stores 2 bytes at [ebp+%a] (the old value not freed)
+0,0x71,3,FStR4,%a,1,0,0,0,,1,,st:f(%a):4,store_frame,0x661052F9,0x6610941F,Pops and stores 4 bytes at [ebp+%a] (the old value not freed)
+0,0x72,3,FStR8,%a,2,0,0,0,,2,,st:f(%a):8,store_frame,0x66109DDB,0x6610DF24,Pops and stores 8 bytes at [ebp+%a] (the old value not freed)
+0,0x73,3,FStFPR4,%a,0,0,1,0,,f,,stfp:f(%a):4,store_frame,0x6610530E,0x66109434,Stores ST0 as an 4-byte float at [ebp+%a]
+0,0x74,3,FStFPR8,%a,0,0,1,0,,f,,stfp:f(%a):8,store_frame,0x6610532D,0x66109453,Stores ST0 as an 8-byte float at [ebp+%a]
+0,0x75,3,ImpAdLdI2,%c,0,1,0,0,,,,ld:g(%c):2u,load_ind,0x661056B5,0x661097DB,Pushes the 2 bytes at the variable pool entry %c addresses (the rest of the slot undefined)
+0,0x76,3,ImpAdLdI4,%c,0,1,0,0,,,,ld:g(%c):4,load_ind,0x661056D1,0x661097F7,Pushes the 4 bytes at the variable pool entry %c addresses
+0,0x77,3,ImpAdLdCy,%c,0,2,0,0,,,,ld:g(%c):8,load_ind,0x6610A713,0x6610E85C,Pushes the 8 bytes at the variable pool entry %c addresses
+0,0x78,3,ImpAdLdFPR4,%c,0,0,0,1,,,,ldfp:g(%c):4,load_ind,0x6610A730,0x6610E879,Loads the 4-byte float at the variable pool entry %c addresses onto the x87 stack
+0,0x79,3,ImpAdLdFPR8,%c,0,0,0,1,,,,ldfp:g(%c):8,load_ind,0x6610A74A,0x6610E893,Loads the 8-byte float at the variable pool entry %c addresses onto the x87 stack
+0,0x7A,3,ImpAdStI2,%c,1,0,0,0,,1,,st:g(%c):2,store_ind,0x66105704,0x6610982A,Pops and stores 2 bytes at the variable pool entry %c addresses (the old value not freed)
+0,0x7B,3,ImpAdStR4,%c,1,0,0,0,,1,,st:g(%c):4,store_ind,0x6610A77F,0x6610E8C8,Pops and stores 4 bytes at the variable pool entry %c addresses (the old value not freed)
+0,0x7C,3,ImpAdStCy,%c,2,0,0,0,,2,,st:g(%c):8,store_ind,0x6610A799,0x6610E8E2,Pops and stores 8 bytes at the variable pool entry %c addresses (the old value not freed)
+0,0x7D,3,ImpAdStFPR4,%c,0,0,1,0,,f,,stfp:g(%c):4,store_ind,0x6610A7B6,0x6610E8FF,Stores ST0 as an 4-byte float at the variable pool entry %c addresses
+0,0x7E,3,ImpAdStFPR8,%c,0,0,1,0,,f,,stfp:g(%c):8,store_ind,0x6610A7DA,0x6610E923,Stores ST0 as an 8-byte float at the variable pool entry %c addresses
+0,0x7F,3,ILdI2,%a,0,1,0,0,,,,ld:fi(%a):2u,load_ind,0x66105651,0x66109777,Pushes the 2 bytes at where the pointer at [ebp+%a] points (the rest of the slot undefined)
+0,0x80,3,ILdI4,%a,0,1,0,0,,,,ld:fi(%a):4,load_ind,0x6610566B,0x66109791,Pushes the 4 bytes at where the pointer at [ebp+%a] points
+0,0x81,3,ILdR8,%a,0,2,0,0,,,,ld:fi(%a):8,load_ind,0x6610A384,0x6610E4CD,Pushes the 8 bytes at where the pointer at [ebp+%a] points
+0,0x82,3,ILdFPR4,%a,0,0,0,1,,,,ldfp:fi(%a):4,load_ind,0x66105683,0x661097A9,Loads the 4-byte float at where the pointer at [ebp+%a] points onto the x87 stack
+0,0x83,3,ILdFPR8,%a,0,0,0,1,,,,ldfp:fi(%a):8,load_ind,0x6610A39F,0x6610E4E8,Loads the 8-byte float at where the pointer at [ebp+%a] points onto the x87 stack
+0,0x84,3,IStI2,%a,1,0,0,0,,1,,st:fi(%a):2,store_ind,0x6610569B,0x661097C1,Pops and stores 2 bytes at where the pointer at [ebp+%a] points (the old value not freed)
+0,0x85,3,IStI4,%a,1,0,0,0,,1,,st:fi(%a):4,store_ind,0x6610A3D0,0x6610E519,Pops and stores 4 bytes at where the pointer at [ebp+%a] points (the old value not freed)
+0,0x86,3,IStR8,%a,2,0,0,0,,2,,st:fi(%a):8,store_ind,0x6610A3E8,0x6610E531,Pops and stores 8 bytes at where the pointer at [ebp+%a] points (the old value not freed)
+0,0x87,3,IStFPR4,%a,0,0,1,0,,f,,stfp:fi(%a):4,store_ind,0x6610A403,0x6610E54C,Stores ST0 as an 4-byte float at where the pointer at [ebp+%a] points
+0,0x88,3,IStFPR8,%a,0,0,1,0,,f,,stfp:fi(%a):8,store_ind,0x6610A425,0x6610E56E,Stores ST0 as an 8-byte float at where the pointer at [ebp+%a] points
+0,0x89,3,MemLdI2,%2,0,1,0,0,,,pr,ld:pr(%2):2z,load_mem,0x66105BDA,0x66109CEC,"Pushes the 2 bytes at [Pr+%2], zero-extended"
+0,0x8A,3,MemLdStr,%2,0,1,0,0,,,pr,ld:pr(%2):4,load_mem,0x66105BF4,0x66109D06,Pushes the 4 bytes at [Pr+%2]
+0,0x8B,3,MemLdR8,%2,0,2,0,0,,,pr,ld:pr(%2):8,load_mem,0x6610AE56,0x6610EFB2,Pushes the 8 bytes at [Pr+%2]
+0,0x8C,3,MemLdFPR4,%2,0,0,0,1,,,pr,ldfp:pr(%2):4,load_mem,0x6610AE72,0x6610EFCE,Loads the 4-byte float at [Pr+%2] onto the x87 stack
+0,0x8D,3,MemLdFPR8,%2,0,0,0,1,,,pr,ldfp:pr(%2):8,load_mem,0x6610AE8A,0x6610EFE6,Loads the 8-byte float at [Pr+%2] onto the x87 stack
+0,0x8E,3,MemStI2,%2,1,0,0,0,,1,pr,st:pr(%2):2,store_mem,0x66105C24,0x66109D36,Pops and stores 2 bytes at [Pr+%2] (the old value not freed)
+0,0x8F,3,MemStI4,%2,1,0,0,0,,1,pr,st:pr(%2):4,store_mem,0x66105C3E,0x66109D50,Pops and stores 4 bytes at [Pr+%2] (the old value not freed)
+0,0x90,3,MemStR8,%2,2,0,0,0,,2,pr,st:pr(%2):8,store_mem,0x6610AEBB,0x6610F017,Pops and stores 8 bytes at [Pr+%2] (the old value not freed)
+0,0x91,3,MemStFPR4,%2,0,0,1,0,,f,pr,stfp:pr(%2):4,store_mem,0x6610AED7,0x6610F033,Stores ST0 as an 4-byte float at [Pr+%2]
+0,0x92,3,MemStFPR8,%2,0,0,1,0,,f,pr,stfp:pr(%2):8,store_mem,0x6610AEF9,0x6610F055,Stores ST0 as an 8-byte float at [Pr+%2]
+0,0x93,5,FMemLdI2,%a %2,0,1,0,0,,,,"ld:m(%a,%2):2u",load_mem,0x66105C57,0x66109D69,Pushes the 2 bytes at [[ebp+%a]+%2] (the rest of the slot undefined)
+0,0x94,5,FMemLdR4,%a %2,0,1,0,0,,,,"ld:m(%a,%2):4",load_mem,0x66105C7E,0x66109D90,Pushes the 4 bytes at [[ebp+%a]+%2]
+0,0x95,5,FMemLdCy,%a %2,0,2,0,0,,,,"ld:m(%a,%2):8",load_mem,0x6610AF3D,0x6610F099,Pushes the 8 bytes at [[ebp+%a]+%2]
+0,0x96,5,FMemLdFPR4,%a %2,0,0,0,1,,,,"ldfp:m(%a,%2):4",load_mem,0x6610AF61,0x6610F0BD,Loads the 4-byte float at [[ebp+%a]+%2] onto the x87 stack
+0,0x97,5,FMemLdFPR8,%a %2,0,0,0,1,,,,"ldfp:m(%a,%2):8",load_mem,0x6610AF82,0x6610F0DE,Loads the 8-byte float at [[ebp+%a]+%2] onto the x87 stack
+0,0x98,5,FMemStI2,%a %2,1,0,0,0,,1,,"st:m(%a,%2):2",store_mem,0x66105CC7,0x66109DD9,Pops and stores 2 bytes at [[ebp+%a]+%2] (the old value not freed)
+0,0x99,5,FMemStI4,%a %2,1,0,0,0,,1,,"st:m(%a,%2):4",store_mem,0x66105CEE,0x66109E00,Pops and stores 4 bytes at [[ebp+%a]+%2] (the old value not freed)
+0,0x9A,5,FMemStR8,%a %2,2,0,0,0,,2,,"st:m(%a,%2):8",store_mem,0x6610AFCE,0x6610F12A,Pops and stores 8 bytes at [[ebp+%a]+%2] (the old value not freed)
+0,0x9B,5,FMemStFPR4,%a %2,0,0,1,0,,f,,"stfp:m(%a,%2):4",store_mem,0x6610AFF2,0x6610F14E,Stores ST0 as an 4-byte float at [[ebp+%a]+%2]
+0,0x9C,5,FMemStFPR8,%a %2,0,0,1,0,,f,,"stfp:m(%a,%2):8",store_mem,0x6610B01D,0x6610F179,Stores ST0 as an 8-byte float at [[ebp+%a]+%2]
+0,0x9D,1,Ary1LdI2,,2,1,0,0,,1 1,,ld:a1:2u,load_ind,0x66108E92,0x6610CFA2,Pushes the 2 bytes at the element of a popped array at a popped index (the rest of the slot undefined)
+0,0x9E,1,Ary1LdI4,,2,1,0,0,,1 1,,ld:a1:4,load_ind,0x66108EA8,0x6610CFB8,Pushes the 4 bytes at the element of a popped array at a popped index
+0,0x9F,1,Ary1LdCy,,2,2,0,0,,1 1,,ld:a1:8,load_ind,0x66108EBC,0x6610CFCC,Pushes the 8 bytes at the element of a popped array at a popped index
+0,0xA0,1,Ary1LdFPR4,,2,0,0,1,,1 1,,ldfp:a1:4,load_ind,0x66108ED4,0x6610CFE4,Loads the 4-byte float at the element of a popped array at a popped index onto the x87 stack
+0,0xA1,1,Ary1LdFPR8,,2,0,0,1,,1 1,,ldfp:a1:8,load_ind,0x66108EE8,0x6610CFF8,Loads the 8-byte float at the element of a popped array at a popped index onto the x87 stack
+0,0xA2,1,Ary1StI2,,3,0,0,0,,1 1 1,,st:a1:2,store_ind,0x66108F43,0x6610D053,Pops and stores 2 bytes at the element of a popped array at a popped index (the old value not freed)
+0,0xA3,1,Ary1StI4,,3,0,0,0,,1 1 1,,st:a1:4,store_ind,0x66108F59,0x6610D069,Pops and stores 4 bytes at the element of a popped array at a popped index (the old value not freed)
+0,0xA4,1,Ary1StCy,,4,0,0,0,,1 1 2,,st:a1:8,store_ind,0x66108F6D,0x6610D07D,Pops and stores 8 bytes at the element of a popped array at a popped index (the old value not freed)
+0,0xA5,1,Ary1StFPR4,,2,0,1,0,,1 1 f,,stfp:a1:4,store_ind,0x66108F85,0x6610D095,Stores ST0 as an 4-byte float at the element of a popped array at a popped index
+0,0xA6,1,Ary1StFPR8,,2,0,1,0,,1 1 f,,stfp:a1:8,store_ind,0x66108FA3,0x6610D0B3,Stores ST0 as an 8-byte float at the element of a popped array at a popped index
+0,0xA7,3,AryLdPr,%2,1,0,0,0,count(0),* 1,>pr:array,prad:an(%2),load_ind,0x66108FC1,0x6610D0D1,Loads Pr with the address of the element of a popped %2-dimensional array
+0,0xA8,3,AryLdRf,%2,1,1,0,0,count(0),* 1,,ad:an(%2),load_ind,0x66108FD8,0x6610D0E8,Pushes the address of the element of a popped %2-dimensional array
+0,0xA9,1,AddI2,,2,1,0,0,,1 1,,,arith,0x66105A02,0x66109B28,Pop TOS i16; add to new TOS i16 in-place; overflow check; result sign-extended i32
+0,0xAA,1,AddI4,,2,1,0,0,,1 1,,,arith,0x66105A19,0x66109B3F,Pop TOS; add to new TOS in-place; overflow check (err 6)
+0,0xAB,1,AddR8,,0,0,2,1,,f f,,,arith,0x66105A2F,0x66109B55,"x87: ST1 + ST0; consumes both, leaves the result in ST0"
+0,0xAC,1,AddCy,,4,2,0,0,,2 2,,,arith,0x6610AAD9,0x6610EC22,Pop 2+2 slots (two 8B Cy); __vbaCyAdd; push 2 slots (8B result)
+0,0xAD,1,SubI2,,2,1,0,0,,1 1,,,arith,0x66105A3D,0x66109B63,Pop TOS i16; sub from new TOS i16; overflow check; sign-extend result
+0,0xAE,1,SubI4,,2,1,0,0,,1 1,,,arith,0x66105A54,0x66109B7A,Pop TOS; subtract from new TOS in-place; overflow check (err 6)
+0,0xAF,1,SubR4,,0,0,2,1,,f f,,,arith,0x66105A6A,0x66109B90,"x87: ST1 - ST0; consumes both, leaves the result in ST0"
+0,0xB0,1,SubCy,,4,2,0,0,,2 2,,,arith,0x6610AB0A,0x6610EC53,Pop 2+2 slots (two 8B Cy); __vbaCySub; push 2 slots
+0,0xB1,1,MulI2,,2,1,0,0,,1 1,,,arith,0x66105A78,0x66109B9E,Pop TOS i16; mul with new TOS i16; overflow if result > 16-bit
+0,0xB2,1,MulI4,,2,1,0,0,,1 1,,,arith,0x6610AB3C,0x6610EC85,Pop TOS; multiply with new TOS; overflow check via imul
+0,0xB3,1,MulR8,,0,0,2,1,,f f,,,arith,0x66105A90,0x66109BB6,"x87: ST1 * ST0; consumes both, leaves the result in ST0"
+0,0xB4,1,MulCy,,4,2,0,0,,2 2,,,arith,0x6610AB53,0x6610EC9C,Pop 2+2 slots (two 8B Cy); __vbaCyMul; push 2 slots
+0,0xB5,1,MulCyI2,,3,2,0,0,,1 2,,,arith,0x6610AB84,0x6610ECCD,Pop 1 i16 + 2 Cy slots; multiply; push 2 Cy slots result
+0,0xB6,1,DivR8,,0,0,2,1,,f f,,,arith,0x66105AC6,0x66109BD8,"x87: ST1 / ST0; consumes both, leaves the result in ST0"
+0,0xB7,1,UMiI2,,1,1,0,0,,1,,,unary,0x6610AC4F,0x6610EDAB,Negate TOS i16 in-place; overflow check on -32768
+0,0xB8,1,UMiI4,,1,1,0,0,,1,,,unary,0x6610AC65,0x6610EDC1,Negate TOS in-place; overflow check on INT_MIN
+0,0xB9,1,UMiR8,,0,0,1,1,,f,,,unary,0x6610AC7A,0x6610EDD6,x87: negation of ST0 in place
+0,0xBA,1,UMiCy,,2,2,0,0,,2,,,unary,0x6610AC88,0x6610EDE4,Negate 2 eval slots (8B Cy) in-place via __vbaCyNeg
+0,0xBB,1,FnAbsI2,,1,1,0,0,,1,,,unary,0x6610ACA5,0x6610EE01,Abs of TOS i16 in-place; overflow on -32768
+0,0xBC,1,FnAbsI4,,1,1,0,0,,1,,,unary,0x6610ACC2,0x6610EE1E,Abs of TOS i32 in-place; overflow on INT_MIN
+0,0xBD,1,FnAbsR4,,0,0,1,1,,f,,,unary,0x6610ACF1,0x6610EE4D,x87: Abs of ST0 in place
+0,0xBE,1,FnAbsCy,,2,2,0,0,,2,,,unary,0x6610ACDD,0x6610EE39,Absolute value of 2 eval slots (8B Cy) via __vbaCyAbs
+0,0xBF,1,IDvI2,,2,1,0,0,,1 1,,,arith,0x66105A9E,0x66109BC4,Pop TOS (divisor); integer divide new TOS; overflow/div-zero check
+0,0xC0,1,IDvI4,,2,1,0,0,,1 1,,,arith,0x6610ABBF,0x6610ED1C,Pop TOS (divisor); integer divide new TOS; calls __vbaI4DivI4
+0,0xC1,1,ModI2,,2,1,0,0,,1 1,,,arith,0x66105AB2,0x6610ED08,Pop TOS (divisor); modulo new TOS; div-zero check
+0,0xC2,1,ModI4,,2,1,0,0,,1 1,,,arith,0x6610ABD1,0x6610ED2E,Pop TOS (divisor); modulo new TOS; div-by-zero check
+0,0xC3,1,NotI4,,1,1,0,0,,1,,,unary,0x66105ADA,0x66109BEC,Bitwise NOT of TOS in-place; no ESP change
+0,0xC4,1,AndI4,,2,1,0,0,,1 1,,,arith,0x66105AE9,0x66109BFB,Pop TOS; AND with new TOS in-place; no overflow check
+0,0xC5,1,OrI4,,2,1,0,0,,1 1,,,arith,0x66105AF9,0x66109C0B,Pop TOS; OR with new TOS in-place (same pattern as AndI4)
+0,0xC6,1,EqI2,,2,1,0,0,,1 1,,,compare,0x661065BC,0x6610A68B,Same as EqI4 but compares i16 (low words); result -1/0 in i32
+0,0xC7,1,EqI4,,2,1,0,0,,1 1,,,compare,0x661065D4,0x6610A6A3,Pop TOS; compare with new TOS; result: 0=False -1=True
+0,0xC8,1,EqR4,,0,1,2,0,,f f,,,compare,0x661065EA,0x6610A6B9,FPU: pop 2 FPR4; compare; push eval i32 bool -1/0
+0,0xC9,1,EqCy,,4,1,0,0,,2 2,,,compare,0x6610C0DE,0x66110281,Pop 2+2 slots (two 8B Cy); compare; push 1 (i32 bool -1/0)
+0,0xCA,1,EqCyR8,,2,1,1,0,,f 2,,,compare,0x6610C0E8,0x6611028B,"Currency = Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+0,0xCB,1,NeI2,,2,1,0,0,,1 1,,,compare,0x66106611,0x6610A6E0,Pop TOS i16; compare; result -1 if not equal
+0,0xCC,1,NeI4,,2,1,0,0,,1 1,,,compare,0x66106629,0x6610A6F8,Pop TOS; compare with new TOS; result: -1 if not equal else 0
+0,0xCD,1,NeR8,,0,1,2,0,,f f,,,compare,0x6610663F,0x6610A70E,FPU: pop 2 FPR8; compare; push eval i32 bool -1/0
+0,0xCE,1,NeCy,,4,1,0,0,,2 2,,,compare,0x6610C0F9,0x6611029C,Pop 2+2 slots; compare; push 1
+0,0xCF,1,NeCyR8,,2,1,1,0,,f 2,,,compare,0x6610C103,0x661102A6,"Currency <> Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+0,0xD0,1,LtI2,,2,1,0,0,,1 1,,,compare,0x66106666,0x6610A735,Pop TOS i16; compare with new TOS i16; result -1/0 signed
+0,0xD1,1,LtI4,,2,1,0,0,,1 1,,,compare,0x6610666D,0x6610A73C,Pop TOS; compare with new TOS; result: -1 if second<first else 0
+0,0xD2,1,LtR8,,0,1,2,0,,f f,,,compare,0x66106688,0x6610A757,FPU: pop 2; compare; push eval i32 bool
+0,0xD3,1,LtCy,,4,1,0,0,,2 2,,,compare,0x6610C127,0x661102CA,Pop 2+2 slots; compare; push 1
+0,0xD4,1,LtCyR8,,2,1,1,0,,f 2,,,compare,0x6610C131,0x661102D4,"Currency < Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+0,0xD5,1,LeI2,,2,1,0,0,,1 1,,,compare,0x6610669C,0x6610A76B,Pop TOS i16; compare; result -1 if second<=first
+0,0xD6,1,LeI4,,2,1,0,0,,1 1,,,compare,0x6610C163,0x66110306,Pop TOS; compare with new TOS; result: -1 if second<=first else 0
+0,0xD7,1,LeR8,,0,1,2,0,,f f,,,compare,0x661066B8,0x6610A787,FPU: pop 2; compare; push eval i32 bool
+0,0xD8,1,LeCy,,4,1,0,0,,2 2,,,compare,0x6610C16C,0x6611030F,Pop 2+2 slots; compare; push 1
+0,0xD9,1,LeCyR8,,2,1,1,0,,f 2,,,compare,0x6610C176,0x66110319,"Currency <= Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+0,0xDA,1,GtI2,,2,1,0,0,,1 1,,,compare,0x661066D4,0x6610A7A3,Pop TOS i16; compare; result -1 if second>first
+0,0xDB,1,GtI4,,2,1,0,0,,1 1,,,compare,0x661066F0,0x6610A7BF,Pop TOS; compare with new TOS; result: -1 if second>first else 0
+0,0xDC,1,GtR4,,0,1,2,0,,f f,,,compare,0x661066F6,0x6610A7C5,FPU: pop 2; compare; push eval i32 bool
+0,0xDD,1,GtCy,,4,1,0,0,,2 2,,,compare,0x6610C1A5,0x66110348,Pop 2+2 slots; compare; push 1
+0,0xDE,1,GtCyR8,,2,1,1,0,,f 2,,,compare,0x6610C1AF,0x66110352,"Currency > Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+0,0xDF,1,GeI2,,2,1,0,0,,1 1,,,compare,0x66106712,0x6610A7E1,Pop TOS i16; compare; result -1 if second>=first
+0,0xE0,1,GeI4,,2,1,0,0,,1 1,,,compare,0x6610C1E0,0x66110383,Pop TOS; compare with new TOS; result: -1 if second>=first else 0
+0,0xE1,1,GeR8,,0,1,2,0,,f f,,,compare,0x6610672E,0x6610A7FD,FPU: pop 2; compare; push eval i32 bool
+0,0xE2,1,GeCy,,4,1,0,0,,2 2,,,compare,0x6610C1E9,0x6611038C,Pop 2+2 slots; compare; push 1
+0,0xE3,1,GeCyR8,,2,1,1,0,,f 2,,,compare,0x6610C1F3,0x66110396,"Currency >= Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+0,0xE4,1,CI2I4,,1,1,0,0,,1,,,convert,0x66104E19,0x66108F71,Truncate TOS i32 to i16; overflow check if out of -32768..32767; store sign-extended
+0,0xE5,1,CI2R8,,0,1,1,0,,f,,,convert,0x66104E35,0x66108F8D,Rounds ST0 (consumed) to an integer; pushes it; overflow raises error 6
+0,0xE6,1,CI2Cy,,2,1,0,0,,2,,,convert,0x661094FE,0x6610D60E,Pop 2 slots (8B Cy); divide by 10000; push 1 slot (i16 sext); calls __vbaCyI2
+0,0xE7,1,CI4UI1,,1,1,0,0,,1,,,convert,0x66104E68,0x66108FC0,TOS i32 → mask to u8 (0-255); push i32; overflow check
+0,0xE8,1,CI4R8,,0,1,1,0,,f,,,convert,0x66104E77,0x66108FCF,Rounds ST0 (consumed) to an integer; pushes it; overflow raises error 6
+0,0xE9,1,CI4Cy,,2,1,0,0,,2,,,convert,0x6610950F,0x6610D61F,Pop 2 slots (8B Cy); divide by 10000; push 1 slot (i32); calls __vbaCyI4
+0,0xEA,1,CR4R4,,0,0,1,1,,f,,,convert,0x66104ECA,0x66109022,x87 conversion of ST0 in place (rounding to the target precision)
+0,0xEB,1,CR8I2,,1,0,0,1,,1,,,convert,0x66104EAA,0x66109002,Pop i32(zext i16) from eval; fild → push f64 on FPU; convert int→double
+0,0xEC,1,CR8I4,,1,0,0,1,,1,,,convert,0x66104EBA,0x66109012,Pop i32 from eval; fild → push f64 on FPU; convert int→double
+0,0xED,1,CR8R8,,0,0,1,1,,f,,,convert,0x66104EE8,0x66109040,x87 conversion of ST0 in place (rounding to the target precision)
+0,0xEE,1,CR8Cy,,2,0,0,1,,2,,,convert,0x66109520,0x6610D630,Pop 2 eval slots (8B Cy); convert to R8; push FPU ST0
+0,0xEF,1,CCyI2,,1,2,0,0,,1,,,convert,0x66109592,0x6610D6A2,Pop 1 slot (i16 sext); multiply by 10000; push 2 slots (8B Cy)
+0,0xF0,1,CCyI4,,1,2,0,0,,1,,,convert,0x661095A8,0x6610D6B8,Pop 1 slot (i32); multiply by 10000; push 2 slots (8B Cy)
+0,0xF1,1,CCyR4,,0,2,1,0,,f,,,convert,0x661095BD,0x6610D6CD,Pop FPU R4; convert to Cy via __vbaCyR4; push 2 eval slots
+0,0xF2,1,CDateR8,,0,0,1,1,,f,,,convert,0x66109701,0x6610D830,x87 conversion of ST0 in place (rounding to the target precision)
+0,0xF3,3,LitI2,%2,0,1,0,0,,,,lit:2s,load_lit,0x661058D8,0x661099FE,"Pushes the 2-byte literal operand, sign-extended to a slot"
+0,0xF4,2,LitI2_Byte,%1,0,1,0,0,,,,lit:1s,load_lit,0x661058EB,0x66109A11,"Pushes the 1-byte literal operand, sign-extended to a slot"
+0,0xF5,5,LitI4,%4,0,1,0,0,,,,lit:4,load_lit,0x661058FE,0x66109A24,Pushes the 4-byte literal operand
+0,0xF6,9,LitCy,%4 %4,0,2,0,0,,,,lit:8,load_lit,0x6610AA32,0x6610EB7B,Pushes the 8-byte literal operand
+0,0xF7,5,LitCy4,%4,0,2,0,0,,,,lit:4s8,load_lit,0x6610AA1E,0x6610EB67,"Pushes the 4-byte literal operand, sign-extended to 8 bytes (two slots)"
+0,0xF8,3,LitI2FP,%2,0,0,0,1,,,,litfp:2i,load_lit,0x6610AA48,0x6610EB91,"Loads the 2-byte float literal onto the x87 stack (an integer, fild)"
+0,0xF9,5,LitR4FP,%4,0,0,0,1,,,,litfp:4,load_lit,0x6610AA59,0x6610EBA2,Loads the 4-byte float literal onto the x87 stack
+0,0xFA,9,LitDate,%4 %4,0,0,0,1,,,,litfp:8,load_lit,0x6610591E,0x66109A44,Loads the 8-byte float literal onto the x87 stack
+0,0xFB,1,Lead0,,0,0,0,0,,,,,,0x66106845,0x6610A914,
+0,0xFC,1,Lead1,,0,0,0,0,,,,,,0x66106851,0x6610A920,
+0,0xFD,1,Lead2,,0,0,0,0,,,,,,0x6610685D,0x6610A92C,
+0,0xFE,1,Lead3,,0,0,0,0,,,,,,0x66106869,0x6610A938,
+0,0xFF,1,Lead4,,0,0,0,0,,,,,,0x66106875,0x6610A944,
+1,0x00,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x01,1,ImpUI1,,2,1,0,0,,1 1,,,arith,0x6610AD44,0x6610EEA0,Logical IMP (NOT a OR b) on UI1; pop TOS; NOT+OR with second in-place
+1,0x02,1,ImpI4,,2,1,0,0,,1 1,,,arith,0x6610AD57,0x6610EEB3,Logical IMP (NOT a OR b) on i32; pop TOS; NOT+OR with second in-place
+1,0x03,1,ImpI4,,2,1,0,0,,1 1,,,arith,0x6610AD57,0x6610EEB3,Logical IMP i32 (duplicate slot; same handler as 0x02)
+1,0x04,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x05,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x06,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x07,3,ImpVar,%a,2,1,0,0,,1 1,,,arith,0x6610AE31,0x6610EF8D,"Variant Imp: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0x08,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x09,1,EqvUI1,,2,1,0,0,,1 1,,,arith,0x6610AD1E,0x6610EE7A,Logical EQV (NOT(a XOR b)) on UI1; pop TOS; modify second
+1,0x0A,1,EqvI4,,2,1,0,0,,1 1,,,arith,0x6610AD31,0x6610EE8D,Logical EQV (NOT(a XOR b)) on i32; pop TOS; modify second
+1,0x0B,1,EqvI4,,2,1,0,0,,1 1,,,arith,0x6610AD31,0x6610EE8D,Logical EQV i32 (duplicate slot; same handler as 0x0A)
+1,0x0C,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x0D,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x0E,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x0F,3,EqvVar,%a,2,1,0,0,,1 1,,,arith,0x6610AE26,0x6610EF82,"Variant Eqv: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0x10,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x11,1,XorI4,,2,1,0,0,,1 1,,,arith,0x6610AD0E,0x6610EE6A,Bitwise XOR i32; pop TOS; XOR with second in-place
+1,0x12,1,XorI4,,2,1,0,0,,1 1,,,arith,0x6610AD0E,0x6610EE6A,Bitwise XOR i32 (duplicate slot; same handler as 0x11)
+1,0x13,1,XorI4,,2,1,0,0,,1 1,,,arith,0x6610AD0E,0x6610EE6A,Bitwise XOR i32 (duplicate slot)
+1,0x14,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x15,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x16,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x17,3,XorVar,%a,2,1,0,0,,1 1,,,arith,0x6610AE1B,0x6610EF77,"Variant Xor: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0x18,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x19,1,OrI2,,2,1,0,0,,1 1,,,arith,0x66105AF9,0x66109C0B,Bitwise OR i16; same handler as primary OrI4 (truncated to i16 in caller)
+1,0x1A,1,OrI2,,2,1,0,0,,1 1,,,arith,0x66105AF9,0x66109C0B,Bitwise OR i16 (duplicate slot)
+1,0x1B,1,OrI2,,2,1,0,0,,1 1,,,arith,0x66105AF9,0x66109C0B,Bitwise OR i16 (duplicate slot)
+1,0x1C,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x1D,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x1E,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x1F,3,OrVar,%a,2,1,0,0,,1 1,,,arith,0x66105BD2,0x66109CE4,"Variant Or: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0x20,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x21,1,AndUI1,,2,1,0,0,,1 1,,,arith,0x66105AE9,0x66109BFB,Bitwise AND UI1; same handler as primary AndI4
+1,0x22,1,AndUI1,,2,1,0,0,,1 1,,,arith,0x66105AE9,0x66109BFB,Bitwise AND UI1 (duplicate slot)
+1,0x23,1,AndUI1,,2,1,0,0,,1 1,,,arith,0x66105AE9,0x66109BFB,Bitwise AND UI1 (duplicate slot)
+1,0x24,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x25,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x26,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x27,3,AndVar,%a,2,1,0,0,,1 1,,,arith,0x66105BB4,0x66109CC6,"Variant And: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0x28,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x29,1,EqI2,,2,1,0,0,,1 1,,,compare,0x661065BC,0x6610A68B,Lead0 EqI2: same as primary table EqI2; pop 1 compare with TOS push bool
+1,0x2A,1,EqI2,,2,1,0,0,,1 1,,,compare,0x661065BC,0x6610A68B,Lead0 EqI2 (duplicate slot)
+1,0x2B,1,EqI4,,2,1,0,0,,1 1,,,compare,0x661065D4,0x6610A6A3,Lead0 EqI4: same as primary table EqI4; pop 1 compare push bool
+1,0x2C,1,EqR8,,0,1,2,0,,f f,,,compare,0x661065EA,0x6610A6B9,Lead0 EqR8: FPU compare; pop 2 FPU push eval i32 bool
+1,0x2D,1,EqR8,,0,1,2,0,,f f,,,compare,0x661065EA,0x6610A6B9,Lead0 EqR8 (duplicate slot)
+1,0x2E,1,EqCy,,4,1,0,0,,2 2,,,compare,0x6610C0DE,0x66110281,Lead0 EqCy: Currency compare; pop 2×8B push i32 bool
+1,0x2F,3,EqVar,%a,2,1,0,0,,1 1,,,compare,0x6610678B,0x6610A85A,"Variant =: pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x30,1,EqStr,,2,1,0,0,,1 1,,,compare,0x661065F1,0x6610A6C0,String equality via __vbaStrCmp(0=case-sensitive); pop 2 BSTRs push i32 bool
+1,0x31,3,EqTextVar,%a,2,1,0,0,,1 1,,,compare,0x6610C244,0x661103E7,"Variant = (Option Compare Text): pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x32,1,EqTextStr,,2,1,0,0,,1 1,,,compare,0x6610C0F2,0x66110295,String equality case-insensitive via __vbaStrCmp(1); pop 2 BSTRs push i32 bool
+1,0x33,1,EqVarBool,,2,1,0,0,,1 1,,,compare,0x661067B8,0x6610A887,Variant =: pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x34,1,EqTextVarBool,,2,1,0,0,,1 1,,,compare,0x6610C289,0x6611042C,Variant = (Option Compare Text): pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x35,1,EqCyR8,,2,1,1,0,,f 2,,,compare,0x6610C0E8,0x6611028B,"Currency = Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+1,0x36,1,NeUI1,,2,1,0,0,,1 1,,,compare,0x66106611,0x6610A6E0,Ne UI1 compare; pop 1 compare TOS; result -1 if not equal
+1,0x37,1,NeUI1,,2,1,0,0,,1 1,,,compare,0x66106611,0x6610A6E0,Ne UI1 (duplicate slot)
+1,0x38,1,NeI4,,2,1,0,0,,1 1,,,compare,0x66106629,0x6610A6F8,Ne I4 compare; pop 1 compare TOS; result -1 if not equal
+1,0x39,1,NeR4,,0,1,2,0,,f f,,,compare,0x6610663F,0x6610A70E,FPU R4 Ne compare; pop 2 FPU push eval i32 bool
+1,0x3A,1,NeR4,,0,1,2,0,,f f,,,compare,0x6610663F,0x6610A70E,FPU R4 Ne (duplicate)
+1,0x3B,1,NeCy,,4,1,0,0,,2 2,,,compare,0x6610C0F9,0x6611029C,Currency Ne; pop 2×8B push i32 bool
+1,0x3C,3,NeVar,%a,2,1,0,0,,1 1,,,compare,0x66106756,0x6610A825,"Variant <>: pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x3D,1,NeStr,,2,1,0,0,,1 1,,,compare,0x66106646,0x6610A715,String Ne case-sensitive; pop 2 BSTRs push i32 bool
+1,0x3E,3,NeTextVar,%a,2,1,0,0,,1 1,,,compare,0x6610C23D,0x661103E0,"Variant <> (Option Compare Text): pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x3F,1,NeTextStr,,2,1,0,0,,1 1,,,compare,0x6610C10D,0x661102B0,String Ne case-insensitive; pop 2 BSTRs push i32 bool
+1,0x40,1,NeVarBool,,2,1,0,0,,1 1,,,compare,0x6610679D,0x6610A86C,Variant <>: pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x41,1,NeTextVarBool,,2,1,0,0,,1 1,,,compare,0x6610C282,0x66110425,Variant <> (Option Compare Text): pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x42,1,NeCyR8,,2,1,1,0,,f 2,,,compare,0x6610C103,0x661102A6,"Currency <> Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+1,0x43,1,LeUI1,,2,1,0,0,,1 1,,,compare,0x6610C14D,0x661102F0,Le UI1 compare; pop 1 compare TOS; result -1 if second<=first
+1,0x44,1,LeI2,,2,1,0,0,,1 1,,,compare,0x6610669C,0x6610A76B,Le I2 compare; pop 1 compare TOS
+1,0x45,1,LeI4,,2,1,0,0,,1 1,,,compare,0x6610C163,0x66110306,Le I4 compare; pop 1 compare TOS
+1,0x46,1,LeR4,,0,1,2,0,,f f,,,compare,0x661066B8,0x6610A787,FPU R4 Le compare; pop 2 FPU push eval i32 bool
+1,0x47,1,LeR4,,0,1,2,0,,f f,,,compare,0x661066B8,0x6610A787,FPU R4 Le (duplicate)
+1,0x48,1,LeCy,,4,1,0,0,,2 2,,,compare,0x6610C16C,0x6611030F,Currency Le; pop 2×8B push i32 bool
+1,0x49,3,LeVar,%a,2,1,0,0,,1 1,,,compare,0x6610C21B,0x661103BE,"Variant <=: pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x4A,1,LeStr,,2,1,0,0,,1 1,,,compare,0x6610C18E,0x66110331,String Le case-sensitive; pop 2 BSTRs push i32 bool
+1,0x4B,3,LeTextVar,%a,2,1,0,0,,1 1,,,compare,0x6610C20F,0x661103B2,"Variant <= (Option Compare Text): pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x4C,1,LeTextStr,,2,1,0,0,,1 1,,,compare,0x6610C180,0x66110323,String Le case-insensitive; pop 2 BSTRs push i32 bool
+1,0x4D,1,LeVarBool,,2,1,0,0,,1 1,,,compare,0x66106794,0x6610A863,Variant <=: pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x4E,1,LeTextVarBool,,2,1,0,0,,1 1,,,compare,0x6610C24B,0x661103EE,Variant <= (Option Compare Text): pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x4F,1,LeCyR8,,2,1,1,0,,f 2,,,compare,0x6610C176,0x66110319,"Currency <= Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+1,0x50,1,GeUI1,,2,1,0,0,,1 1,,,compare,0x6610C1CB,0x6611036E,Ge UI1 compare; pop 1 compare TOS
+1,0x51,1,GeI2,,2,1,0,0,,1 1,,,compare,0x66106712,0x6610A7E1,Ge I2 compare; pop 1 compare TOS
+1,0x52,1,GeI4,,2,1,0,0,,1 1,,,compare,0x6610C1E0,0x66110383,Ge I4 compare; pop 1 compare TOS
+1,0x53,1,GeR4,,0,1,2,0,,f f,,,compare,0x6610672E,0x6610A7FD,FPU R4 Ge compare; pop 2 FPU push eval i32 bool
+1,0x54,1,GeR4,,0,1,2,0,,f f,,,compare,0x6610672E,0x6610A7FD,FPU R4 Ge (duplicate)
+1,0x55,1,GeCy,,4,1,0,0,,2 2,,,compare,0x6610C1E9,0x6611038C,Currency Ge; pop 2×8B push i32 bool
+1,0x56,3,GeVar,%a,2,1,0,0,,1 1,,,compare,0x6610C232,0x661103D5,"Variant >=: pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x57,1,GeStr,,2,1,0,0,,1 1,,,compare,0x6610C20B,0x661103AE,String Ge case-sensitive; pop 2 BSTRs push i32 bool
+1,0x58,3,GeTextVar,%a,2,1,0,0,,1 1,,,compare,0x6610C226,0x661103C9,"Variant >= (Option Compare Text): pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x59,1,GeTextStr,,2,1,0,0,,1 1,,,compare,0x6610C1FD,0x661103A0,String Ge case-insensitive; pop 2 BSTRs push i32 bool
+1,0x5A,1,GeVarBool,,2,1,0,0,,1 1,,,compare,0x6610C26E,0x66110411,Variant >=: pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x5B,1,GeTextVarBool,,2,1,0,0,,1 1,,,compare,0x6610C262,0x66110405,Variant >= (Option Compare Text): pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x5C,1,GeCyR8,,2,1,1,0,,f 2,,,compare,0x6610C1F3,0x66110396,"Currency >= Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+1,0x5D,1,LtUI1,,2,1,0,0,,1 1,,,compare,0x6610C114,0x661102B7,Lt UI1 compare; pop 1 compare TOS
+1,0x5E,1,LtI2,,2,1,0,0,,1 1,,,compare,0x66106666,0x6610A735,Lt I2 compare; pop 1 compare TOS
+1,0x5F,1,LtI4,,2,1,0,0,,1 1,,,compare,0x6610666D,0x6610A73C,Lt I4 compare; pop 1 compare TOS
+1,0x60,1,LtR4,,0,1,2,0,,f f,,,compare,0x66106688,0x6610A757,FPU R4 Lt compare; pop 2 FPU push eval i32 bool
+1,0x61,1,LtR4,,0,1,2,0,,f f,,,compare,0x66106688,0x6610A757,FPU R4 Lt (duplicate)
+1,0x62,1,LtCy,,4,1,0,0,,2 2,,,compare,0x6610C127,0x661102CA,Currency Lt; pop 2×8B push i32 bool
+1,0x63,3,LtVar,%a,2,1,0,0,,1 1,,,compare,0x66106744,0x6610A813,"Variant <: pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x64,1,LtStr,,2,1,0,0,,1 1,,,compare,0x6610C149,0x661102EC,String Lt case-sensitive via __vbaStrCmp; eax s<0 → True
+1,0x65,3,LtTextVar,%a,2,1,0,0,,1 1,,,compare,0x6610C21F,0x661103C2,"Variant < (Option Compare Text): pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x66,1,LtTextStr,,2,1,0,0,,1 1,,,compare,0x6610C13B,0x661102DE,String Lt case-insensitive
+1,0x67,1,LtVarBool,,2,1,0,0,,1 1,,,compare,0x6610C25E,0x66110401,Variant <: pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x68,1,LtTextVarBool,,2,1,0,0,,1 1,,,compare,0x6610C252,0x661103F5,Variant < (Option Compare Text): pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x69,1,LtCyR8,,2,1,1,0,,f 2,,,compare,0x6610C131,0x661102D4,"Currency < Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+1,0x6A,1,GtUI1,,2,1,0,0,,1 1,,,compare,0x6610C192,0x66110335,Gt UI1 compare; pop 1 compare TOS
+1,0x6B,1,GtI2,,2,1,0,0,,1 1,,,compare,0x661066D4,0x6610A7A3,Gt I2 compare; pop 1 compare TOS
+1,0x6C,1,GtI4,,2,1,0,0,,1 1,,,compare,0x661066F0,0x6610A7BF,Gt I4 compare; pop 1 compare TOS
+1,0x6D,1,GtR4,,0,1,2,0,,f f,,,compare,0x661066F6,0x6610A7C5,FPU R4 Gt compare; pop 2 FPU push eval i32 bool
+1,0x6E,1,GtR4,,0,1,2,0,,f f,,,compare,0x661066F6,0x6610A7C5,FPU R4 Gt (duplicate)
+1,0x6F,1,GtCy,,4,1,0,0,,2 2,,,compare,0x6610C1A5,0x66110348,Currency Gt; pop 2×8B push i32 bool
+1,0x70,3,GtVar,%a,2,1,0,0,,1 1,,,compare,0x6610674D,0x6610A81C,"Variant >: pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x71,1,GtStr,,2,1,0,0,,1 1,,,compare,0x6610C1C7,0x6611036A,String Gt case-sensitive; pop 2 BSTRs push i32 bool
+1,0x72,3,GtTextVar,%a,2,1,0,0,,1 1,,,compare,0x6610C236,0x661103D9,"Variant > (Option Compare Text): pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x73,1,GtTextStr,,2,1,0,0,,1 1,,,compare,0x6610C1B9,0x6611035C,String Gt case-insensitive
+1,0x74,1,GtVarBool,,2,1,0,0,,1 1,,,compare,0x6610C27E,0x66110421,Variant >: pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x75,1,GtTextVarBool,,2,1,0,0,,1 1,,,compare,0x6610C272,0x66110415,Variant > (Option Compare Text): pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x76,1,GtCyR8,,2,1,1,0,,f 2,,,compare,0x6610C1AF,0x66110352,"Currency > Double: pops the Double (ST0, the right operand) and the Currency (two slots, the left); compares them scaled by 10000; pushes an i32 Boolean"
+1,0x77,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x78,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x79,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x7A,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x7B,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x7C,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x7D,3,LikeVar,%a,2,1,0,0,,1 1,,,compare,0x6610C382,0x66110525,"Variant Like: pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x7E,1,LikeStr,,2,1,0,0,,1 1,,,compare,0x6610C361,0x66110504,String Like case-sensitive via __vbaStrLike(0); pop 2 BSTRs push i32 bool
+1,0x7F,3,LikeTextVar,%a,2,1,0,0,,1 1,,,compare,0x6610C365,0x66110508,"Variant Like (Option Compare Text): pops two Variant addresses; result Variant in the frame temp %a, whose address it pushes"
+1,0x80,1,LikeTextStr,,2,1,0,0,,1 1,,,compare,0x6610C34D,0x661104F0,String Like case-insensitive via __vbaStrLike(1); pop 2 push i32
+1,0x81,1,LikeVarBool,,2,1,0,0,,1 1,,,compare,0x6610C398,0x6611053B,Variant Like: pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x82,1,LikeTextVarBool,,2,1,0,0,,1 1,,,compare,0x6610C386,0x66110529,Variant Like (Option Compare Text): pops two Variant addresses; pushes the Boolean as i32 (-1/0)
+1,0x83,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x84,1,BetweenUI1,,3,1,0,0,,1 1 1,,,compare,0x66109365,0x6610D475,Between UI1; pop val+low+high; push i32 bool
+1,0x85,1,BetweenI2,,3,1,0,0,,1 1 1,,,compare,0x66109383,0x6610D493,Between I2; pop val+low+high; push i32 bool
+1,0x86,1,BetweenI4,,3,1,0,0,,1 1 1,,,compare,0x661093A5,0x6610D4B5,Between I4; pop val+low+high; push i32 bool
+1,0x87,1,BetweenR4,,0,1,3,0,,f f f,,,compare,0x661093B0,0x6610D4C0,FPU Between R4; pop 3 FPU vals; push eval i32 bool
+1,0x88,1,BetweenR4,,0,1,3,0,,f f f,,,compare,0x661093B0,0x6610D4C0,FPU Between R4 (duplicate)
+1,0x89,1,BetweenCy,,6,1,0,0,,2 2 2,,,compare,0x661093DE,0x6610D4EE,Currency Between; pop 3×8B; push i32 bool
+1,0x8A,1,BetweenVar,,3,1,0,0,,1 1 1,,,compare,0x6610946A,0x6610D57A,Variant Between (Select Case range): pops three Variant addresses; pushes i32 Boolean
+1,0x8B,1,BetweenStr,,3,1,0,0,,1 1 1,,,compare,0x66109429,0x6610D539,String Between; pop 3 BSTRs; push i32 bool
+1,0x8C,1,BetweenTextVar,,3,1,0,0,,1 1 1,,,compare,0x66109430,0x6610D540,Variant Between (Select Case range): pops three Variant addresses; pushes i32 Boolean
+1,0x8D,1,BetweenTextStr,,3,1,0,0,,1 1 1,,,compare,0x661093FF,0x6610D50F,String Between case-insensitive; pop 3 BSTRs; push i32
+1,0x8E,1,AddUI1,,2,1,0,0,,1 1,,,arith,0x6610AAC3,0x6610EC0C,UI1 unsigned add; pop TOS byte; add to second; unsigned overflow check (err 6)
+1,0x8F,1,AddI2,,2,1,0,0,,1 1,,,arith,0x66105A02,0x66109B28,Lead0 AddI2: shares primary table handler; i16 add with overflow
+1,0x90,1,AddI4,,2,1,0,0,,1 1,,,arith,0x66105A19,0x66109B3F,Lead0 AddI4: shares primary table handler; i32 add with overflow
+1,0x91,1,AddR4,,0,0,2,1,,f f,,,arith,0x66105A2F,0x66109B55,"x87: ST1 + ST0; consumes both, leaves the result in ST0"
+1,0x92,1,AddR4,,0,0,2,1,,f f,,,arith,0x66105A2F,0x66109B55,"x87: ST1 + ST0; consumes both, leaves the result in ST0"
+1,0x93,1,AddCy,,4,2,0,0,,2 2,,,arith,0x6610AAD9,0x6610EC22,Lead0 AddCy: shares primary table handler; __vbaCyAdd
+1,0x94,3,AddVar,%a,2,1,0,0,,1 1,,,arith,0x66105BAC,0x66109CBE,"Variant +: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0x95,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x96,1,SubUI1,,2,1,0,0,,1 1,,,arith,0x6610AAF4,0x6610EC3D,UI1 unsigned sub; pop TOS byte; sub from second; unsigned overflow
+1,0x97,1,SubI2,,2,1,0,0,,1 1,,,arith,0x66105A3D,0x66109B63,Lead0 SubI2: shares primary table handler
+1,0x98,1,SubI4,,2,1,0,0,,1 1,,,arith,0x66105A54,0x66109B7A,Lead0 SubI4: shares primary table handler
+1,0x99,1,SubR4,,0,0,2,1,,f f,,,arith,0x66105A6A,0x66109B90,"x87: ST1 - ST0; consumes both, leaves the result in ST0"
+1,0x9A,1,SubR4,,0,0,2,1,,f f,,,arith,0x66105A6A,0x66109B90,"x87: ST1 - ST0; consumes both, leaves the result in ST0"
+1,0x9B,1,SubCy,,4,2,0,0,,2 2,,,arith,0x6610AB0A,0x6610EC53,Lead0 SubCy: __vbaCySub
+1,0x9C,3,SubVar,%a,2,1,0,0,,1 1,,,arith,0x66105B8C,0x66109C9E,"Variant -: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0x9D,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0x9E,1,ModUI1,,2,1,0,0,,1 1,,,arith,0x6610ABAA,0x6610ECF3,UI1 unsigned mod
+1,0x9F,1,ModI2,,2,1,0,0,,1 1,,,arith,0x66105AB2,0x6610ED08,Lead0 ModI2: shares primary handler
+1,0xA0,1,ModI4,,2,1,0,0,,1 1,,,arith,0x6610ABD1,0x6610ED2E,Lead0 ModI4: shares primary handler
+1,0xA1,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xA2,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xA3,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xA4,3,ModVar,%a,2,1,0,0,,1 1,,,arith,0x6610AE10,0x6610EF6C,"Variant Mod: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0xA5,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xA6,1,IDvUI1,,2,1,0,0,,1 1,,,arith,0x6610AB97,0x6610ECE0,UI1 integer division
+1,0xA7,1,IDvI2,,2,1,0,0,,1 1,,,arith,0x66105A9E,0x66109BC4,Lead0 IDvI2: shares primary handler
+1,0xA8,1,IDvI4,,2,1,0,0,,1 1,,,arith,0x6610ABBF,0x6610ED1C,Lead0 IDvI4: shares primary handler
+1,0xA9,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xAA,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xAB,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xAC,3,IDvVar,%a,2,1,0,0,,1 1,,,arith,0x66105BA4,0x66109CB6,"Variant \: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0xAD,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xAE,1,MulUI1,,2,1,0,0,,1 1,,,arith,0x6610AB25,0x6610EC6E,UI1 unsigned mul; unsigned overflow check
+1,0xAF,1,MulI2,,2,1,0,0,,1 1,,,arith,0x66105A78,0x66109B9E,Lead0 MulI2: shares primary handler
+1,0xB0,1,MulI4,,2,1,0,0,,1 1,,,arith,0x6610AB3C,0x6610EC85,Lead0 MulI4: shares primary handler
+1,0xB1,1,MulR4,,0,0,2,1,,f f,,,arith,0x66105A90,0x66109BB6,"x87: ST1 * ST0; consumes both, leaves the result in ST0"
+1,0xB2,1,MulR4,,0,0,2,1,,f f,,,arith,0x66105A90,0x66109BB6,"x87: ST1 * ST0; consumes both, leaves the result in ST0"
+1,0xB3,1,MulCy,,4,2,0,0,,2 2,,,arith,0x6610AB53,0x6610EC9C,Lead0 MulCy: __vbaCyMul
+1,0xB4,3,MulVar,%a,2,1,0,0,,1 1,,,arith,0x66105B94,0x66109CA6,"Variant *: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0xB5,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xB6,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xB7,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xB8,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xB9,1,DivR8,,0,0,2,1,,f f,,,arith,0x66105AC6,0x66109BD8,"x87: ST1 / ST0; consumes both, leaves the result in ST0"
+1,0xBA,1,DivR8,,0,0,2,1,,f f,,,arith,0x66105AC6,0x66109BD8,"x87: ST1 / ST0; consumes both, leaves the result in ST0"
+1,0xBB,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xBC,3,DivVar,%a,2,1,0,0,,1 1,,,arith,0x66105B9C,0x66109CAE,"Variant /: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0xBD,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xBE,1,NotUI1,,1,1,0,0,,1,,,unary,0x6610ACFF,0x6610EE5B,UI1 bitwise NOT; modify TOS low byte in-place
+1,0xBF,1,NotI4,,1,1,0,0,,1,,,unary,0x66105ADA,0x66109BEC,Lead0 NotI4: shares primary handler
+1,0xC0,1,NotI4,,1,1,0,0,,1,,,unary,0x66105ADA,0x66109BEC,Lead0 NotI4 (duplicate)
+1,0xC1,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xC2,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xC3,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xC4,3,NotVar,%a,1,1,0,0,,1,,,unary,0x66105B6E,0x66109C80,"Variant Not: pops the operand's address; result in the frame temp %a, whose address it pushes"
+1,0xC5,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xC6,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xC7,1,UMiI2,,1,1,0,0,,1,,,unary,0x6610AC4F,0x6610EDAB,Lead0 UMiI2: shares primary handler; negate i16 in TOS
+1,0xC8,1,UMiI2,,1,1,0,0,,1,,,unary,0x6610AC65,0x6610EDC1,Lead0 UMiI2 (duplicate)
+1,0xC9,1,UMiR4,,0,0,1,1,,f,,,unary,0x6610AC7A,0x6610EDD6,x87: negation of ST0 in place
+1,0xCA,1,UMiR4,,0,0,1,1,,f,,,unary,0x6610AC7A,0x6610EDD6,x87: negation of ST0 in place
+1,0xCB,1,UMiCy,,2,2,0,0,,2,,,unary,0x6610AC88,0x6610EDE4,Lead0 UMiCy: __vbaCyNeg
+1,0xCC,3,UMiVar,%a,1,1,0,0,,1,,,unary,0x66105B66,0x66109C78,"Variant negation: pops the operand's address; result in the frame temp %a, whose address it pushes"
+1,0xCD,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xCE,3,PwrVar,%a,2,1,0,0,,1 1,,,arith,0x6610AE05,0x6610EF61,"Variant ^: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0xCF,1,PwrR8R8,,0,0,2,1,,f f,,,arith,0x66105B41,0x66109C53,"x87 power: stores ST1 and ST0, the helper returns the result in ST0"
+1,0xD0,1,PwrR8I2,,1,0,1,1,,1 f,,,arith,0x6610ADD7,0x6610EF33,x87 power with an Integer exponent: pops the exponent (fild); result in ST0
+1,0xD1,1,MulCyI2,,3,2,0,0,,1 2,,,arith,0x6610AB84,0x6610ECCD,Lead0 MulCyI2: shares primary handler; pop i16+2Cy push 2Cy
+1,0xD2,1,ObjIs,,2,1,0,0,,1 1,,,compare,0x66105DAD,0x66109EBF,COM Is operator; pop 2 obj ptrs; compare identity; push i32 bool
+1,0xD3,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xD4,1,FnAbsI2,,1,1,0,0,,1,,,unary,0x6610ACA5,0x6610EE01,Lead0 FnAbsI2: shares primary handler
+1,0xD5,1,FnAbsI4,,1,1,0,0,,1,,,unary,0x6610ACC2,0x6610EE1E,Lead0 FnAbsI4: shares primary handler
+1,0xD6,1,FnAbsR4,,0,0,1,1,,f,,,unary,0x6610ACF1,0x6610EE4D,x87: Abs of ST0 in place
+1,0xD7,1,FnAbsR4,,0,0,1,1,,f,,,unary,0x6610ACF1,0x6610EE4D,x87: Abs of ST0 in place
+1,0xD8,1,FnAbsCy,,2,2,0,0,,2,,,unary,0x6610ACDD,0x6610EE39,Lead0 FnAbsCy: __vbaCyAbs
+1,0xD9,3,FnAbsVar,%a,1,1,0,0,,1,,,unary,0x6610ADE4,0x6610EF40,"Variant Abs: pops the operand's address; result in the frame temp %a, whose address it pushes"
+1,0xDA,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xDB,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xDC,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xDD,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xDE,1,FnFixR8,,0,0,1,1,,f,,,unary,0x66105B09,0x66109C1B,x87: Fix of ST0 in place
+1,0xDF,1,FnFixR8,,0,0,1,1,,f,,,unary,0x66105B09,0x66109C1B,x87: Fix of ST0 in place
+1,0xE0,1,FnFixCy,,2,2,0,0,,2,,,unary,0x6610ADB1,0x6610EF0D,Currency Fix via __vbaCyFix
+1,0xE1,3,FnFixVar,%a,1,1,0,0,,1,,,unary,0x6610ADEF,0x6610EF4B,"Variant Fix: pops the operand's address; result in the frame temp %a, whose address it pushes"
+1,0xE2,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xE3,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xE4,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xE5,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xE6,1,FnIntR8,,0,0,1,1,,f,,,unary,0x66105B25,0x66109C37,x87: Int of ST0 in place
+1,0xE7,1,FnIntR8,,0,0,1,1,,f,,,unary,0x66105B25,0x66109C37,x87: Int of ST0 in place
+1,0xE8,1,FnIntCy,,2,2,0,0,,2,,,unary,0x6610ADC4,0x6610EF20,Currency Int via __vbaCyInt
+1,0xE9,3,FnIntVar,%a,1,1,0,0,,1,,,unary,0x6610ADFA,0x6610EF56,"Variant Int: pops the operand's address; result in the frame temp %a, whose address it pushes"
+1,0xEA,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xEB,3,FnLenVar,%a,1,1,0,0,,1,,,stack,0x66106818,0x6610A8E7,"Len/LenB of a Variant: pops its address; result Variant in the frame temp %a, whose address it pushes"
+1,0xEC,1,FnLenStr,,1,1,0,0,,1,,,stack,0x66106806,0x6610A8D5,Lead0 FnLenStr: shares primary handler; SysStringLen
+1,0xED,3,FnLenBVar,%a,1,1,0,0,,1,,,stack,0x6610C332,0x661104D5,"Len/LenB of a Variant: pops its address; result Variant in the frame temp %a, whose address it pushes"
+1,0xEE,1,FnLenBStr,,1,1,0,0,,1,,,stack,0x6610C31D,0x661104C0,String LenB; pop BSTR push byte length (SysStringByteLen)
+1,0xEF,3,ConcatVar,%a,2,1,0,0,,1 1,,,arith,0x661067EB,0x6610A8BA,"Variant &: pops the right then the left operand's address; result in the frame temp %a, whose address it pushes"
+1,0xF0,1,ConcatStr,,2,1,0,0,,1 1,,,arith,0x661067D9,0x6610A8A8,Lead0 ConcatStr: shares primary handler; __vbaStrCat
+1,0xF1,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xF2,1,FnSgnUI1,,1,1,0,0,,1,,,unary,0x6610AD6A,0x6610EEC6,UI1 Sgn; TOS → 0 or 1 (always positive for unsigned)
+1,0xF3,1,FnSgnUI1,,1,1,0,0,,1,,,unary,0x6610AD6A,0x6610EEC6,FnSgnUI1 (duplicate)
+1,0xF4,1,FnSgnI4,,1,1,0,0,,1,,,unary,0x6610AD7E,0x6610EEDA,I4 Sgn; TOS → -1/0/1
+1,0xF5,1,FnSgnR8,,0,1,1,0,,f,,,unary,0x6610AD8A,0x6610EEE6,"Sgn of ST0 (consumed); pushes -1, 0 or 1 as i32"
+1,0xF6,1,FnSgnR4,,0,1,1,0,,f,,,unary,0x6610AD8A,0x6610EEE6,"Sgn of ST0 (consumed); pushes -1, 0 or 1 as i32"
+1,0xF7,1,FnSgnCy,,2,1,0,0,,2,,,unary,0x6610AD81,0x6610EEDD,"Sgn of a Currency (two slots); pushes -1, 0 or 1 as i32"
+1,0xF8,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xF9,1,InvalidExcode,,0,0,0,0,,,,,,,,
+1,0xFA,1,SeekFile,,2,0,0,0,,1 1,,,call,0x66109D51,0x6610DE9A,VB Seek statement; pop filenum + position
+1,0xFB,1,NameFile,,2,0,0,0,,1 1,,,call,0x66109D62,0x6610DEAB,VB Name statement; pop 2 BSTRs (old new); rename file
+1,0xFC,1,CStrI2,,1,1,0,0,,1,,,convert,0x66104FB8,0x66109109,Convert I2 to BSTR via __vbaCStrI2; pop i32 push BSTR ptr
+1,0xFD,1,CStrUI1,,1,1,0,0,,1,,,convert,0x66104FB8,0x66109109,Convert UI1 to BSTR via __vbaCStrUI1; pop i32 push BSTR ptr
+1,0xFE,1,CStrI4,,1,1,0,0,,1,,,convert,0x66104FCA,0x6610911B,Convert I4 to BSTR via __vbaCStrI4; pop i32 push BSTR ptr
+1,0xFF,1,CStrR4,,0,1,1,0,,f,,,convert,0x66104FDC,0x6610912D,Convert FPU R4 to BSTR; pop FPU ST0 push BSTR ptr
+2,0x00,1,CStrR8,,0,1,1,0,,f,,,convert,0x66109647,0x6610D765,R8(FPU)→Str via __vbaStrR8; pop FPU ST0; push BSTR ptr
+2,0x01,1,CStrCy,,2,1,0,0,,2,,,convert,0x6610968B,0x6610D7A9,Cy(2 slots)→Str via __vbaStrCy; pop 8B; push BSTR ptr
+2,0x02,1,CStrVar,,1,1,0,0,,1,,,convert,0x66104F5F,0x661090B7,Variant to String: pops the Variant's address; result in one slot
+2,0x03,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x04,1,CCyI2,,1,2,0,0,,1,,,convert,0x66109592,0x6610D6A2,I2→Cy; pop 1 slot; multiply by 10000; push 2 slots (8B Cy)
+2,0x05,1,CCyI2,,1,2,0,0,,1,,,convert,0x66109592,0x6610D6A2,I2→Cy (duplicate slot); same handler as 0x04
+2,0x06,1,CCyI4,,1,2,0,0,,1,,,convert,0x661095A8,0x6610D6B8,I4→Cy; pop 1 slot; multiply by 10000; push 2 slots (8B Cy)
+2,0x07,1,CCyR4,,0,2,1,0,,f,,,convert,0x661095BD,0x6610D6CD,R4(FPU)→Cy via __vbaCyR4; pop FPU; push 2 eval slots
+2,0x08,1,CCyR4,,0,2,1,0,,f,,,convert,0x661095BD,0x6610D6CD,R4(FPU)→Cy (duplicate slot); same handler as 0x07
+2,0x09,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x0A,1,CCyVar,,1,2,0,0,,1,,,convert,0x661095E5,0x6610D6F5,Variant to Currency: pops the Variant's address; result in two slots
+2,0x0B,1,CCyStr,,1,2,0,0,,1,,,convert,0x661096EE,0x6610D81D,Str→Cy; pop BSTR; convert to Cy; push 2 eval slots
+2,0x0C,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x0D,1,CUI1I2,,1,1,0,0,,1,,,convert,0x66109471,0x6610D581,I2→UI1; in-place range check (byte must be 0); overflow error if >255
+2,0x0E,1,CUI1I4,,1,1,0,0,,1,,,convert,0x66109488,0x6610D598,I4→UI1; in-place range check (upper 3 bytes must be 0)
+2,0x0F,1,CUI1R4,,0,1,1,0,,f,,,convert,0x661094AD,0x6610D5BD,R4(FPU)→UI1; round FPU to int; range check 0-255; push eval
+2,0x10,1,CUI1R4,,0,1,1,0,,f,,,convert,0x661094AD,0x6610D5BD,R4(FPU)→UI1 (duplicate slot); same handler as 0x0F
+2,0x11,1,CUI1Cy,,2,1,0,0,,2,,,convert,0x661094A1,0x6610D5B1,Cy→UI1; pop 2 Cy slots; divide by 10000; range check; push UI1
+2,0x12,1,CUI1Var,,1,1,0,0,,1,,,convert,0x661094EC,0x6610D5FC,Variant to Byte: pops the Variant's address; result in one slot
+2,0x13,1,CUI1Str,,1,1,0,0,,1,,,convert,0x661096AA,0x6610D7C8,Str→UI1; pop BSTR; convert to byte; push UI1
+2,0x14,1,CI2UI1,,1,1,0,0,,1,,,convert,0x66104E29,0x66108F81,UI1→I2; trivial widening; byte value already valid i16
+2,0x15,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x16,1,CI2I4,,1,1,0,0,,1,,,convert,0x66104E19,0x66108F71,I4→I2; truncate with overflow check (-32768..32767)
+2,0x17,1,CI2R8,,0,1,1,0,,f,,,convert,0x66104E35,0x66108F8D,R8(FPU)→I2; pop FPU; round to i16; overflow check; push eval
+2,0x18,1,CI2R8,,0,1,1,0,,f,,,convert,0x66104E35,0x66108F8D,R8(FPU)→I2 (duplicate slot); same handler as 0x17
+2,0x19,1,CI2Cy,,2,1,0,0,,2,,,convert,0x661094FE,0x6610D60E,Cy→I2; pop 2 slots; divide by 10000; push i16 as i32
+2,0x1A,1,CI2Var,,1,1,0,0,,1,,,convert,0x66104E56,0x66108FAE,Variant to Integer: pops the Variant's address; result in one slot
+2,0x1B,1,CI2Str,,1,1,0,0,,1,,,convert,0x66105008,0x66109159,Str→I2; pop BSTR; convert to i16; push as i32
+2,0x1C,1,CI4UI1,,1,1,0,0,,1,,,convert,0x66104E68,0x66108FC0,UI1→I4; in-place zero-extend byte to i32
+2,0x1D,1,CI4UI1,,1,1,0,0,,1,,,convert,0x66104E68,0x66108FC0,UI1→I4 (duplicate slot); same handler as 0x1C
+2,0x1E,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x1F,1,CI4R8,,0,1,1,0,,f,,,convert,0x66104E77,0x66108FCF,R8(FPU)→I4; pop FPU; round to i32 via __vbaFpI4; overflow check
+2,0x20,1,CI4R8,,0,1,1,0,,f,,,convert,0x66104E77,0x66108FCF,R8(FPU)→I4 (duplicate slot); same handler as 0x1F
+2,0x21,1,CI4Cy,,2,1,0,0,,2,,,convert,0x6610950F,0x6610D61F,Cy→I4; pop 2 slots (8B); divide by 10000; push i32
+2,0x22,1,CI4Var,,1,1,0,0,,1,,,convert,0x66104E98,0x66108FF0,Variant to Long: pops the Variant's address; result in one slot
+2,0x23,1,CI4Str,,1,1,0,0,,1,,,convert,0x66105012,0x66109163,Str→I4; pop BSTR; convert via __vbaI4Str; push i32
+2,0x24,1,FnCSngI2,,1,0,0,1,,1,,,convert,0x66104EAA,0x66109002,I2→R8(FPU); pop eval i16; fild push FPU double
+2,0x25,1,FnCSngI2,,1,0,0,1,,1,,,convert,0x66104EAA,0x66109002,I2→R8(FPU) (duplicate slot); same handler
+2,0x26,1,CR4I4,,1,0,0,1,,1,,,convert,0x66104EBA,0x66109012,I4→R8(FPU); pop eval i32; fild push FPU double
+2,0x27,1,CR4R8,,0,0,1,1,,f,,,convert,0x66104ECA,0x66109022,x87 conversion of ST0 in place (rounding to the target precision)
+2,0x28,1,CR4R8,,0,0,1,1,,f,,,convert,0x66104ECA,0x66109022,x87 conversion of ST0 in place (rounding to the target precision)
+2,0x29,1,CR8Cy,,2,0,0,1,,2,,,convert,0x66109520,0x6610D630,Cy→R8(FPU); pop 2 eval slots; convert to double; push FPU
+2,0x2A,1,CR8Var,,1,0,0,1,,1,,,convert,0x66104F06,0x6610905E,Variant to Double: pops the Variant's address; result in ST0
+2,0x2B,1,CR4Str,,1,0,0,1,,1,,,convert,0x66105024,0x66109175,Str→R4(FPU); pop BSTR; convert via __vbaR4Str; push FPU
+2,0x2C,1,FnCSngI2,,1,0,0,1,,1,,,convert,0x66104EAA,0x66109002,I2→FPU (duplicate slot); same handler as 0x24
+2,0x2D,1,FnCSngI2,,1,0,0,1,,1,,,convert,0x66104EAA,0x66109002,I2→FPU (duplicate slot); same handler as 0x24
+2,0x2E,1,CR4I4,,1,0,0,1,,1,,,convert,0x66104EBA,0x66109012,I4→FPU (duplicate slot); same handler as 0x26
+2,0x2F,1,CR8R4,,0,0,1,1,,f,,,convert,0x66104EE8,0x66109040,x87 conversion of ST0 in place (rounding to the target precision)
+2,0x30,1,CR8R4,,0,0,1,1,,f,,,convert,0x66104EE8,0x66109040,x87 conversion of ST0 in place (rounding to the target precision)
+2,0x31,1,CR8Cy,,2,0,0,1,,2,,,convert,0x66109520,0x6610D630,Cy→R8(FPU) (duplicate slot); same handler as 0x29
+2,0x32,1,CR8Var,,1,0,0,1,,1,,,convert,0x66104F06,0x6610905E,Variant to Double: pops the Variant's address; result in ST0
+2,0x33,1,CR8Str,,1,0,0,1,,1,,,convert,0x661096DD,0x6610D7FB,Str→R8(FPU); pop BSTR; convert via __vbaR8Str; push FPU
+2,0x34,1,CAdVar,,1,1,0,0,,1,,,convert,0x6610516F,0x661092AF,Variant to object: pops the Variant's address; result in one slot
+2,0x35,1,CRefVarAry,,1,1,0,0,,1,,,convert,0x661051A9,0x661092E9,Pops a Variant's address; pushes the array it holds
+2,0x36,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x37,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x38,1,CUI1Bool,,1,1,0,0,,1,,,convert,0x661094DB,0x6610D5EB,Bool→UI1; pop i32 bool; mask to byte; push UI1
+2,0x39,1,FnCDblCy,,2,0,0,1,,2,,,convert,0x66109574,0x6610D684,Cy→Double(FPU); pop 2 Cy slots; convert; push FPU
+2,0x3A,1,FnCDblR8,,0,0,1,1,,f,,,convert,0x66109580,0x6610D690,x87 conversion of ST0 in place (rounding to the target precision)
+2,0x3B,1,FnCDblR8,,0,0,1,1,,f,,,convert,0x66109580,0x6610D690,x87 conversion of ST0 in place (rounding to the target precision)
+2,0x3C,1,FnCSngI2,,1,0,0,1,,1,,,convert,0x66104EAA,0x66109002,I2→FPU (duplicate slot); same handler as 0x24
+2,0x3D,1,FnCSngI2,,1,0,0,1,,1,,,convert,0x66104EAA,0x66109002,I2→FPU (duplicate slot); same handler as 0x24
+2,0x3E,1,FnCSngI4,,1,0,0,1,,1,,,convert,0x66109538,0x6610D648,I4→Single(FPU); pop eval i32; push FPU float
+2,0x3F,1,CSng,,0,0,1,1,,f,,,convert,0x6610953C,0x6610D64C,x87 conversion of ST0 in place (rounding to the target precision)
+2,0x40,1,CSng,,0,0,1,1,,f,,,convert,0x6610953C,0x6610D64C,x87 conversion of ST0 in place (rounding to the target precision)
+2,0x41,1,FnCSngCy,,2,0,0,1,,2,,,convert,0x66109555,0x6610D665,Cy→Single(FPU); pop 2 Cy slots; convert; push FPU
+2,0x42,1,FnCSngVar,,1,0,0,1,,1,,,convert,0x6610954E,0x6610D65E,Variant to Single: pops the Variant's address; result in ST0
+2,0x43,1,FnCSngStr,,1,0,0,1,,1,,,convert,0x66105024,0x66109175,Str→Single(FPU); pop BSTR; convert; push FPU (same as CR4Str)
+2,0x44,1,FnCByteVar,,1,1,0,0,,1,,,convert,0x6610973E,0x6610D86D,Variant to Byte: pops the Variant's address; result in one slot
+2,0x45,1,FnCIntVar,,1,1,0,0,,1,,,convert,0x6610503F,0x6610917F,Variant to Integer: pops the Variant's address; result in one slot
+2,0x46,1,FnCLngVar,,1,1,0,0,,1,,,convert,0x66105051,0x66109191,Variant to Long: pops the Variant's address; result in one slot
+2,0x47,1,CDateR8,,0,0,1,1,,f,,,convert,0x66109701,0x6610D830,x87 conversion of ST0 in place (rounding to the target precision)
+2,0x48,1,FnCDblVar,,1,0,0,1,,1,,,convert,0x66109563,0x6610D673,Variant to Double: pops the Variant's address; result in ST0
+2,0x49,1,FnCCurVar,,1,2,0,0,,1,,,convert,0x66109750,0x6610D87F,Variant to Currency: pops the Variant's address; result in two slots
+2,0x4A,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x4B,1,FnCStrVar,,1,1,0,0,,1,,,convert,0x66109763,0x6610D892,Variant to String: pops the Variant's address; result in one slot
+2,0x4C,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x4D,1,FnCBoolVar,,1,1,0,0,,1,,,convert,0x66109775,0x6610D8A4,Variant to Boolean: pops the Variant's address; result in one slot
+2,0x4E,1,FnCDateVar,,1,0,0,1,,1,,,convert,0x6610972D,0x6610D85C,Variant to Date: pops the Variant's address; result in ST0
+2,0x4F,1,FnCDateVar,,1,0,0,1,,1,,,convert,0x6610972D,0x6610D85C,Variant to Date: pops the Variant's address; result in ST0
+2,0x50,1,CBoolUI1,,1,1,0,0,,1,,,convert,0x66104F1D,0x66109075,UI1→Bool; pop byte; convert to VB bool (-1/0); push i32
+2,0x51,1,CBoolUI1,,1,1,0,0,,1,,,convert,0x66104F1D,0x66109075,UI1→Bool (duplicate slot); same handler as 0x50
+2,0x52,1,CBoolI4,,1,1,0,0,,1,,,convert,0x66104F17,0x6610906F,I4→Bool; pop i32; convert to VB bool (-1/0); push
+2,0x53,1,CBoolR4,,0,1,1,0,,f,,,convert,0x66109601,0x6610D711,R4(FPU)→Bool; pop FPU; compare to 0; push VB bool
+2,0x54,1,CBoolR4,,0,1,1,0,,f,,,convert,0x66109601,0x6610D711,R4(FPU)→Bool (duplicate slot); same handler as 0x53
+2,0x55,1,CBoolCy,,2,1,0,0,,2,,,convert,0x661095F8,0x6610D708,Cy→Bool; pop 2 Cy slots; convert to VB bool; push i32
+2,0x56,1,CBoolVar,,1,1,0,0,,1,,,convert,0x66104F3B,0x66109093,Variant to Boolean: pops the Variant's address; result in one slot
+2,0x57,1,CBoolStr,,1,1,0,0,,1,,,convert,0x66104FFE,0x6610914F,Str→Bool; pop BSTR; convert to VB bool; push i32
+2,0x58,1,CStr2Uni,,2,0,0,0,,1 1,,,convert,0x66109976,0x6610DABF,Pops the destination's address and an ANSI string; stores the Unicode copy
+2,0x59,1,CStrAry2Uni,,2,0,0,0,,1 1,,,convert,0x66109987,0x6610DAD0,Pops the destination's address and an ANSI array; stores the Unicode copy
+2,0x5A,1,CStr2Ansi,,2,0,0,0,,1 1,,,convert,0x66105204,0x6610932A,Pops the destination's address and a String; stores its ANSI copy (Declare argument)
+2,0x5B,1,CStrAry2Ansi,,2,0,0,0,,1 1,,,convert,0x66109998,0x6610DAE1,Pops the destination's address and a String array; stores its ANSI copy
+2,0x5C,1,PopAdLd4,,1,1,0,0,,1,,ld:pop:4,stack,0x6610651F,0x6610A604,Pop address; load i32 from that address; push value (deref)
+2,0x5D,3,CRecAnsi2Uni,%s,2,0,0,0,,1 1,,,convert,0x661099C6,0x6610DB0F,Converts the record (descriptor in pool %s) ANSI to Unicode: pops source and destination
+2,0x5E,3,CRecUni2Ansi,%s,2,0,0,0,,1 1,,,convert,0x661099A9,0x6610DAF2,Converts the record (descriptor in pool %s) Unicode to ANSI: pops source and destination
+2,0x5F,3,CStr2Vec,%a,1,0,0,0,,1,,,convert,0x661051D0,0x6610DA6D,Pops a String; converts it to a Byte array at frame %a
+2,0x60,3,CVar2Vec,%a,1,0,0,0,,1,,,convert,0x661051EA,0x66109310,Pops a Variant's address; converts it to a Byte array at frame %a
+2,0x61,5,CVec2Var,%a %a,0,0,0,0,,,,,convert,0x6610993E,0x6610DA87,"Moves the Byte array at frame %a (the second) into the Variant at frame %a (the first) as VT_ARRAY | VT_UI1, freeing its old value and zeroing the source"
+2,0x62,1,SetLastError,,0,0,0,0,,,,,stack,0x66106576,0x6610A65B,Stores kernel32 GetLastError() to Err.LastDllError (runtime context + 0x9C); follows every Declare call; no stack effect
+2,0x63,1,LitNothing,,0,1,0,0,,,,const:0,load_lit,0x66105910,0x66109A36,Pushes 0
+2,0x64,3,LitVar_Null,%a,0,1,0,0,,,,var:1:f(%a),load_lit,0x6610AA7B,0x6610EBC4,Builds a Variant (vt 1) at [ebp+%a] and pushes its address (the old contents not freed)
+2,0x65,3,LitVar_TRUE,%a,0,1,0,0,,,,var:11=-1:f(%a),load_lit,0x66105970,0x66109A96,Builds a Variant (vt 11 and the value -1) at [ebp+%a] and pushes its address (the old contents not freed)
+2,0x66,3,LitVar_FALSE,%a,0,1,0,0,,,,var:11=0:f(%a),load_lit,0x6610596A,0x66109A90,Builds a Variant (vt 11 and the value 0) at [ebp+%a] and pushes its address (the old contents not freed)
+2,0x67,3,LitVar_Empty,%a,0,1,0,0,,,,var:0:f(%a),load_lit,0x6610AA6A,0x6610EBB3,Builds a Variant (vt 0) at [ebp+%a] and pushes its address (the old contents not freed)
+2,0x68,3,LitVar_Missing,%a,0,1,0,0,,,,var:10=0x80020004:f(%a),load_lit,0x66105947,0x66109A6D,Builds a Variant (vt 10 and the value 0x80020004) at [ebp+%a] and pushes its address (the old contents not freed)
+2,0x69,5,VCallHresult,%v,0,0,0,0,callee,*,pr,,call,0x6610633A,0x6610A43B,Calls Pr's vtable method (IID pool index in %v); the callee releases this and its arguments; checks the HRESULT; pushes nothing
+2,0x6A,5,ThisVCallHresult,%v,0,0,0,0,callee,*,me,,call,0x6610630B,0x6610A40C,Calls Me's vtable method (IID pool index in %v); the callee releases this and its arguments; checks the HRESULT; pushes nothing
+2,0x6B,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x6C,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x6D,1,ExitProcHresult,,0,0,0,0,,,,,return,0x6610645F,0x6610A560,Returns eax = 0 (S_OK)
+2,0x6E,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x6F,3,CheckTypeVar,%c,1,1,0,0,,1,,,compare,0x6610B070,0x6610F1CC,TypeOf on a Variant (class in pool %c): pops its address; pushes an i32 Boolean
+2,0x70,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x71,1,CUnkVar,,1,1,0,0,,1,,,convert,0x66105189,0x661092C9,Variant to IUnknown: pops the Variant's address; result in one slot
+2,0x72,3,CVarUnk,%a,1,1,0,0,,1,,,convert,0x661097B9,0x6610D8E8,Unk to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+2,0x73,1,LdPrUnkVar,,1,0,0,0,,1,>pr:variant,prn:vobj(pop),load_frame,0x66109E1D,0x6610DF66,Loads Pr with the object at the popped Variant's object; error 91 when it is Nothing
+2,0x74,9,FLdLateIdUnkVar,%a %4 %a,0,0,0,0,,,>pr:late,x:late_get_pr:f(%a#2):f(%a),load_frame,0x6610A7FE,0x6610E947,Late-bound get of DISPID %4 into a frame temp; Pr := its object
+2,0x75,1,GetRec3,,3,0,0,0,,1 1 1,,,io,0x66109BF3,0x6610DD3C,Get record from file (3-arg); pop filenum+recnum+buffer
+2,0x76,1,GetRec4,,4,0,0,0,,1 1 1 1,,,io,0x66109C15,0x6610DD5E,Get record from file (4-arg); pop filenum+recnum+buffer+len
+2,0x77,1,PutRec3,,3,0,0,0,,1 1 1,,,io,0x66109C04,0x6610DD4D,Put record to file (3-arg); pop filenum+recnum+buffer
+2,0x78,1,PutRec4,,4,0,0,0,,1 1 1 1,,,io,0x66109C26,0x6610DD6F,Put record to file (4-arg); pop filenum+recnum+buffer+len
+2,0x79,-1,GetRecOwner3,,2,0,0,0,,1 1,,,io,0x66109C37,0x6610DD80,Get # of a record described by the inline payload (its address is passed to the runtime helper); pops file number and destination
+2,0x7A,-1,GetRecOwner4,,3,0,0,0,,1 1 1,,,io,0x66109C5C,0x6610DDA5,"Get # of a record described by the inline payload, with a record number: pops file number, record number and destination"
+2,0x7B,-1,PutRecOwner3,,2,0,0,0,,1 1,,,io,0x66109C54,0x6610DD9D,Put # of a record described by the inline payload (its address is passed to the runtime helper); pops file number and source
+2,0x7C,-1,PutRecOwner4,,3,0,0,0,,1 1 1,,,io,0x66109C79,0x6610DDC2,"Put # of a record described by the inline payload, with a record number: pops file number, record number and source"
+2,0x7D,1,Input,,1,0,0,0,,1,,,io,0x66109A79,0x6610DBC2,Input #: pops the file number; starts reading
+2,0x7E,1,InputDone,,0,0,0,0,,,,,io,0x66109A8A,0x6610DBD3,End Input# sequence; finalize parsing
+2,0x7F,1,InputItemUI1,,1,0,0,0,,1,,,io,0x66109A9B,0x6610DBE4,Input# read UI1 item; pop dest addr; store byte
+2,0x80,1,InputItemI2,,1,0,0,0,,1,,,io,0x66109ADF,0x6610DC28,Input# read I2 item; pop dest addr; store i16
+2,0x81,1,InputItemI4,,1,0,0,0,,1,,,io,0x66109B30,0x6610DC79,Input# read I4 item; pop dest addr; store i32
+2,0x82,1,InputItemR4,,1,0,0,0,,1,,,io,0x66109B0F,0x6610DC58,Input# read R4 item; pop dest addr; store float
+2,0x83,1,InputItemR8,,1,0,0,0,,1,,,io,0x66109B5B,0x6610DCA4,Input# read R8 item; pop dest addr; store double
+2,0x84,1,InputItemCy,,1,0,0,0,,1,,,io,0x66109B61,0x6610DCAA,Input# read Cy item; pop dest addr; store 8B currency
+2,0x85,1,InputItemVar,,1,0,0,0,,1,,,io,0x66109B67,0x6610DCB0,Input# read Variant item; pop dest addr; store 16B Variant
+2,0x86,1,InputItemStr,,1,0,0,0,,1,,,io,0x66109AE5,0x6610DC2E,Input# read String item; pop dest BSTR ptr addr; store
+2,0x87,1,InputItemBool,,1,0,0,0,,1,,,io,0x66109ABB,0x6610DC04,Input# read Bool item; pop dest addr; store VB bool
+2,0x88,1,InputItemDate,,1,0,0,0,,1,,,io,0x66109B36,0x6610DC7F,Input# read Date item; pop dest addr; store R8 date
+2,0x89,1,PopFPR4,,0,1,1,0,,f,,,stack,0x661064E7,0x6610A5E8,Pop x87 ST0; store as f32 on eval stack (1 slot); fpu_pop=1
+2,0x8A,1,PopFPR8,,0,2,1,0,,f,,,stack,0x66106503,0x66110136,Pop x87 ST0; store as f64 on eval stack (2 slots); fpu_pop=1
+2,0x8B,1,PopAd,,1,0,0,0,,1,,,stack,0x661064D8,0x6610A5D9,"Discards the top slot (add esp, 4)"
+2,0x8C,1,PopAdLdVar,,1,4,0,0,,1,,ld:pop:16,stack,0x6610652E,0x6610A613,Pops a Variant's address; pushes the Variant by value (four slots)
+2,0x8D,3,AryLdPr,%2,1,0,0,0,count(0),* 1,>pr:array,prad:an(%2),load_ind,0x66108FC1,0x6610D0D1,Loads Pr with the address of the element of a popped %2-dimensional array
+2,0x8E,3,AryLdRf,%2,1,1,0,0,count(0),* 1,,ad:an(%2),load_ind,0x66108FD8,0x6610D0E8,Pushes the address of the element of a popped %2-dimensional array
+2,0x8F,5,ParmAry1St,%a %2,1,0,0,0,,1,,,stack,0x66104D66,0x66108EBE,Stores the popped Variant into element %2 of the ParamArray at frame %a
+2,0x90,1,Ary1LdUI1,,2,1,0,0,,1 1,,ld:a1:1z,load_ind,0x66108E7B,0x6610CF8B,"Pushes the 1 bytes at the element of a popped array at a popped index, zero-extended"
+2,0x91,1,Ary1LdI2,,2,1,0,0,,1 1,,ld:a1:2u,load_ind,0x66108E92,0x6610CFA2,Pushes the 2 bytes at the element of a popped array at a popped index (the rest of the slot undefined)
+2,0x92,1,Ary1LdI4,,2,1,0,0,,1 1,,ld:a1:4,load_ind,0x66108EA8,0x6610CFB8,Pushes the 4 bytes at the element of a popped array at a popped index
+2,0x93,1,Ary1LdI4,,2,1,0,0,,1 1,,ld:a1:4,load_ind,0x66108EA8,0x6610CFB8,Pushes the 4 bytes at the element of a popped array at a popped index
+2,0x94,1,Ary1LdR8,,2,2,0,0,,1 1,,ld:a1:8,load_ind,0x66108EBC,0x6610CFCC,Pushes the 8 bytes at the element of a popped array at a popped index
+2,0x95,1,Ary1LdR8,,2,2,0,0,,1 1,,ld:a1:8,load_ind,0x66108EBC,0x6610CFCC,Pushes the 8 bytes at the element of a popped array at a popped index
+2,0x96,1,Ary1LdRfVar,,2,1,0,0,,1 1,,ad:a1,load_ind,0x66108EFC,0x6610D00C,Pushes the address of the element of a popped array at a popped index
+2,0x97,1,Ary1LdI4,,2,1,0,0,,1 1,,ld:a1:4,load_ind,0x66108EA8,0x6610CFB8,Pushes the 4 bytes at the element of a popped array at a popped index
+2,0x98,1,Ary1LdI4,,2,1,0,0,,1 1,,ld:a1:4,load_ind,0x66108EA8,0x6610CFB8,Pushes the 4 bytes at the element of a popped array at a popped index
+2,0x99,1,Ary1LdFPR4,,2,0,0,1,,1 1,,ldfp:a1:4,load_ind,0x66108ED4,0x6610CFE4,Loads the 4-byte float at the element of a popped array at a popped index onto the x87 stack
+2,0x9A,1,Ary1LdFPR8,,2,0,0,1,,1 1,,ldfp:a1:8,load_ind,0x66108EE8,0x6610CFF8,Loads the 8-byte float at the element of a popped array at a popped index onto the x87 stack
+2,0x9B,1,Ary1LdPr,,2,0,0,0,,1 1,>pr:array,prad:a1,load_ind,0x66108F13,0x6610D023,Loads Pr with the address of the element of a popped array at a popped index
+2,0x9C,1,Ary1LdRf,,2,1,0,0,,1 1,,ad:a1,load_ind,0x66104C44,0x66108D9C,Pushes the address of the element of a popped array at a popped index
+2,0x9D,1,Ary1LdVar,,2,4,0,0,,1 1,,ld:a1:16,load_ind,0x6610B178,0x6610F2D4,Pushes the 16 bytes at the element of a popped array at a popped index
+2,0x9E,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0x9F,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xA0,1,Ary1StUI1,,3,0,0,0,,1 1 1,,st:a1:1,store_ind,0x66108F2E,0x6610D03E,Pops and stores 1 bytes at the element of a popped array at a popped index (the old value not freed)
+2,0xA1,1,Ary1StI2,,3,0,0,0,,1 1 1,,st:a1:2,store_ind,0x66108F43,0x6610D053,Pops and stores 2 bytes at the element of a popped array at a popped index (the old value not freed)
+2,0xA2,1,Ary1StR4,,3,0,0,0,,1 1 1,,st:a1:4,store_ind,0x66108F59,0x6610D069,Pops and stores 4 bytes at the element of a popped array at a popped index (the old value not freed)
+2,0xA3,1,Ary1StR4,,3,0,0,0,,1 1 1,,st:a1:4,store_ind,0x66108F59,0x6610D069,Pops and stores 4 bytes at the element of a popped array at a popped index (the old value not freed)
+2,0xA4,1,Ary1StCy,,4,0,0,0,,1 1 2,,st:a1:8,store_ind,0x66108F6D,0x6610D07D,Pops and stores 8 bytes at the element of a popped array at a popped index (the old value not freed)
+2,0xA5,1,Ary1StCy,,4,0,0,0,,1 1 2,,st:a1:8,store_ind,0x66108F6D,0x6610D07D,Pops and stores 8 bytes at the element of a popped array at a popped index (the old value not freed)
+2,0xA6,1,Ary1StVar,,3,0,0,0,,1 1 1,,x:var_let:a1,store_ind,0x661061A3,0x6610A2A4,Let of the popped Variant into the element of a popped array at a popped index (the source moves; an object source gives its default value)
+2,0xA7,1,Ary1StStr,,3,0,0,0,,1 1 1,,x:bstr_move:a1,store_ind,0x6610B301,0x6610F45D,"Stores the popped String at the element of a popped array at a popped index, freeing the old one (the string moves)"
+2,0xA8,1,Ary1StAd,,3,0,0,0,,1 1 1,,x:set_obj:a1,store_ind,0x6610B3ED,0x6610F549,"Stores the popped object at the element of a popped array at a popped index, AddRef'd, Releasing the old one"
+2,0xA9,1,Ary1StFPR4,,2,0,1,0,,1 1 f,,stfp:a1:4,store_ind,0x66108F85,0x6610D095,Stores ST0 as an 4-byte float at the element of a popped array at a popped index
+2,0xAA,1,Ary1StFPR8,,2,0,1,0,,1 1 f,,stfp:a1:8,store_ind,0x66108FA3,0x6610D0B3,Stores ST0 as an 8-byte float at the element of a popped array at a popped index
+2,0xAB,1,Ary1StVarAd,,3,0,0,0,,1 1 1,,x:set_var9:a1,store_ind,0x66106097,0x6610A1A9,"Sets the Variant at the element of a popped array at a popped index to the popped object (VT_DISPATCH, AddRef'd)"
+2,0xAC,1,Ary1StVarAdFunc,,3,0,0,0,,1 1 1,,x:set_var9_owned:a1,store_ind,0x6610B4CB,0x6610F627,"Sets the Variant at the element of a popped array at a popped index to the popped object (VT_DISPATCH, not AddRef'd)"
+2,0xAD,1,Ary1StVarUnk,,3,0,0,0,,1 1 1,,x:set_var13:a1,store_ind,0x6610B562,0x6610F6BE,Sets the Variant at the element of a popped array at a popped index to the popped IUnknown (AddRef'd)
+2,0xAE,1,Ary1StVarUnkFunc,,3,0,0,0,,1 1 1,,x:set_var13_owned:a1,store_ind,0x6610B546,0x6610F6A2,Sets the Variant at the element of a popped array at a popped index to the popped IUnknown (not AddRef'd)
+2,0xAF,1,Ary1StAdFunc,,3,0,0,0,,1 1 1,,x:set_obj_owned:a1,store_ind,0x6610B3D7,0x6610F533,"Stores the popped object at the element of a popped array at a popped index without AddRef, Releasing the old one"
+2,0xB0,1,Ary1StVarCopy,,3,0,0,0,,1 1 1,,x:var_copy:a1,store_ind,0x6610B6C2,0x6610F81E,"Copies the popped Variant into the element of a popped array at a popped index (strings, objects and arrays duplicated)"
+2,0xB1,1,Ary1StStrCopy,,3,0,0,0,,1 1 1,,x:bstr_copy:a1,store_ind,0x6610B313,0x6610F46F,"Stores a copy of the String at the element of a popped array at a popped index, freeing the old one"
+2,0xB2,3,Ary1LdRfVarg,%a,2,1,0,0,,1 1,,x:ad_varg:a1:f(%a),load_ind,0x6610B1E0,0x6610F33C,Pushes the address of the Variant at the element of a popped array at a popped index (or of the one it references)
+2,0xB3,1,Ary1LdVarg,,2,4,0,0,,1 1,,x:ld_varg:a1,load_ind,0x6610B187,0x6610F2E3,"Pushes the Variant at the element of a popped array at a popped index by value, as a reference when it is not one"
+2,0xB4,1,Ary1LdRfVargParam,,2,1,0,0,,1 1,,x:ad_unref:a1,load_ind,0x6610B201,0x6610F35D,Pushes the address of the Variant at the element of a popped array at a popped index (or of the one it references)
+2,0xB5,1,Ary1StVarg,,3,0,0,0,,1 1 1,,x:varg_let:a1,store_ind,0x6610B773,0x6610F8E4,"Stores the popped Variant through the by-reference argument at the element of a popped array at a popped index, freeing the source"
+2,0xB6,1,Ary1StVargCopy,,3,0,0,0,,1 1 1,,x:varg_copy:a1,store_ind,0x6610B751,0x6610F8C2,Stores a copy of the popped Variant through the by-reference argument at the element of a popped array at a popped index
+2,0xB7,1,Ary1StVargAd,,3,0,0,0,,1 1 1,,x:set_varg9:a1,store_ind,0x6610B4ED,0x6610F649,Sets the by-reference Variant at the element of a popped array at a popped index to the popped object (AddRef'd)
+2,0xB8,1,Ary1StVargAdFunc,,3,0,0,0,,1 1 1,,x:set_varg9_owned:a1,store_ind,0x6610B4D5,0x6610F631,Sets the by-reference Variant at the element of a popped array at a popped index to the popped object
+2,0xB9,1,Ary1StVargUnk,,3,0,0,0,,1 1 1,,x:set_varg13:a1,store_ind,0x6610B5F1,0x6610F74D,Sets the by-reference Variant at the element of a popped array at a popped index to the popped IUnknown (AddRef'd)
+2,0xBA,1,Ary1StVargUnkFunc,,3,0,0,0,,1 1 1,,x:set_varg13_owned:a1,store_ind,0x6610B5DC,0x6610F738,Sets the by-reference Variant at the element of a popped array at a popped index to the popped IUnknown
+2,0xBB,1,MidVar,,4,0,0,0,,1 1 1 1,,,stack,0x6610C2FB,0x6611049E,"Mid statement on a Variant: pops destination, start, length and the value"
+2,0xBC,3,MidBStr,%2,4,0,0,0,,1 1 1 1,,,stack,0x6610C2CB,0x6611046E,"MidB statement: pops the destination's address, start, length and the String"
+2,0xBD,1,MidBVar,,4,0,0,0,,1 1 1 1,,,stack,0x6610C30C,0x661104AF,"MidB statement on a Variant: pops destination, start, length and the value"
+2,0xBE,3,MidBStrB,%2,4,0,0,0,,1 1 1 1,,,stack,0x6610C2E3,0x66110486,"MidB statement (byte form): pops destination, start, length and the String"
+2,0xBF,1,LineInputVar,,2,0,0,0,,1 1,,,io,0x66109BE2,0x6610DD2B,Line Input #: pops the file number and the destination Variant's address
+2,0xC0,1,LineInputStr,,2,0,0,0,,1 1,,,io,0x66109BD1,0x6610DD1A,Line Input #: pops the file number and the destination String's address
+2,0xC1,1,Error,,1,0,0,0,,1,,,raise,0x6610B123,0x6610F27F,Pops the error number and raises it (0 or a number above 0xFFFF raises error 5); never falls through
+2,0xC2,1,Stop,,0,0,0,0,,,,,end,0x66108E2E,0x6610CF3E,"Stop: jumps to __vbaStopExe, which ends the program; never falls through"
+2,0xC3,1,Erase,,1,0,0,0,,1,,,stack,0x66104CBE,0x66108E16,Erase: pops the array's address
+2,0xC4,2,LargeBos,%1,0,0,0,0,,,,,bos,0x66104BFE,0x66108D56,"Starts a statement: stores its address to [ebp-0x14]; %1 is the statement's length in bytes, which Resume Next skips (0 for the last statement)"
+2,0xC5,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xC6,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xC7,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xC8,1,End,,0,0,0,0,,,,,end,0x66104BF3,0x66108D4B,"End: raises the runtime's internal end code 0x9C68, ending the program; never falls through"
+2,0xC9,1,Return,,1,0,0,0,,1,,,return_gosub,0x66104DC0,0x66108F18,Return from GoSub: pops the return position and continues there
+2,0xCA,1,FnLBound,,2,1,0,0,,1 1,,,stack,0x66104C9A,0x66108DF2,LBound: pops the dimension and the SAFEARRAY; pushes an i32
+2,0xCB,1,FnUBound,,2,1,0,0,,1 1,,,stack,0x66104CAC,0x66108E04,UBound: pops the dimension and the SAFEARRAY; pushes an i32
+2,0xCC,1,ExitProcUI1,,0,0,0,0,,,,,return,0x6610BF58,0x661100C9,"Returns eax = the Byte at [ebp-0x86], zero-extended"
+2,0xCD,1,ExitProcI2,,0,0,0,0,,,,,return,0x66106468,0x6610A569,"Returns eax = the Integer at [ebp-0x86], sign-extended"
+2,0xCE,1,ExitProcStr,,0,0,0,0,,,,,return,0x66106428,0x6610A529,"Returns eax = [ebp-0x88]: a Long, a String or an object result (a Sub leaves it unused)"
+2,0xCF,1,ExitProcR4,,0,0,0,0,,,,,return,0x6610BF3E,0x661100AF,Returns the Single at [ebp-0x88] in ST0 (fld)
+2,0xD0,1,ExitProcR8,,0,0,0,0,,,,,return,0x6610BF4B,0x661100BC,Returns the Double or Date at [ebp-0x8C] in ST0 (fld)
+2,0xD1,1,ExitProcCy,,0,0,0,0,,,,,return,0x6610BEC5,0x66110036,Returns the Currency at [ebp-0x8C] in edx:eax
+2,0xD2,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xD3,1,ExitProcStr,,0,0,0,0,,,,,return,0x66106428,0x6610A529,"Returns eax = [ebp-0x88]: a Long, a String or an object result (a Sub leaves it unused)"
+2,0xD4,1,ExitProcStr,,0,0,0,0,,,,,return,0x66106428,0x6610A529,"Returns eax = [ebp-0x88]: a Long, a String or an object result (a Sub leaves it unused)"
+2,0xD5,1,ExitProcStr,,0,0,0,0,,,,,return,0x66106428,0x6610A529,"Returns eax = [ebp-0x88]: a Long, a String or an object result (a Sub leaves it unused)"
+2,0xD6,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xD7,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xD8,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xD9,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xDA,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xDB,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xDC,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xDD,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xDE,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xDF,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xE0,3,FLdUI1,%a,0,1,0,0,,,,ld:f(%a):1z,load_frame,0x66109D73,0x6610DEBC,"Pushes the 1 bytes at [ebp+%a], zero-extended"
+2,0xE1,3,FLdI2,%a,0,1,0,0,,,,ld:f(%a):2u,load_frame,0x66105249,0x6610936F,Pushes the 2 bytes at [ebp+%a] (the rest of the slot undefined)
+2,0xE2,3,FLdR4,%a,0,1,0,0,,,,ld:f(%a):4,load_frame,0x66105260,0x66109386,Pushes the 4 bytes at [ebp+%a]
+2,0xE3,3,FLdR4,%a,0,1,0,0,,,,ld:f(%a):4,load_frame,0x66105260,0x66109386,Pushes the 4 bytes at [ebp+%a]
+2,0xE4,3,FLdR8,%a,0,2,0,0,,,,ld:f(%a):8,load_frame,0x66109DAC,0x6610DEF5,Pushes the 8 bytes at [ebp+%a]
+2,0xE5,3,FLdR8,%a,0,2,0,0,,,,ld:f(%a):8,load_frame,0x66109DAC,0x6610DEF5,Pushes the 8 bytes at [ebp+%a]
+2,0xE6,3,FLdRfVar,%a,0,1,0,0,,,,ad:f(%a),load_frame,0x661052BB,0x661093E1,Pushes the address of [ebp+%a]
+2,0xE7,3,FLdR4,%a,0,1,0,0,,,,ld:f(%a):4,load_frame,0x66105260,0x66109386,Pushes the 4 bytes at [ebp+%a]
+2,0xE8,3,FLdR4,%a,0,1,0,0,,,,ld:f(%a):4,load_frame,0x66105260,0x66109386,Pushes the 4 bytes at [ebp+%a]
+2,0xE9,3,FLdFPR4,%a,0,0,0,1,,,,ldfp:f(%a):4,load_frame,0x66105291,0x661093B7,Loads the 4-byte float at [ebp+%a] onto the x87 stack
+2,0xEA,3,FLdFPR8,%a,0,0,0,1,,,,ldfp:f(%a):8,load_frame,0x661052A6,0x661093CC,Loads the 8-byte float at [ebp+%a] onto the x87 stack
+2,0xEB,3,FLdPr,%a,0,0,0,0,,,>pr:frame,prn:f(%a),load_frame,0x66105EEA,0x66109FFC,Loads Pr with the object at [ebp+%a]; error 91 when it is Nothing
+2,0xEC,3,FLdRfVar,%a,0,1,0,0,,,,ad:f(%a),load_frame,0x661052BB,0x661093E1,Pushes the address of [ebp+%a]
+2,0xED,3,FLdVar,%a,0,4,0,0,,,,ld:f(%a):16,load_frame,0x66105E8F,0x66109FA1,Pushes the 16 bytes at [ebp+%a]
+2,0xEE,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xEF,1,InvalidExcode,,0,0,0,0,,,,,,,,
+2,0xF0,3,FStUI1,%a,1,0,0,0,,1,,st:f(%a):1,store_frame,0x66109DC5,0x6610DF0E,Pops and stores 1 bytes at [ebp+%a] (the old value not freed)
+2,0xF1,3,FStI2,%a,1,0,0,0,,1,,st:f(%a):2,store_frame,0x661052E2,0x66109408,Pops and stores 2 bytes at [ebp+%a] (the old value not freed)
+2,0xF2,3,FStR4,%a,1,0,0,0,,1,,st:f(%a):4,store_frame,0x661052F9,0x6610941F,Pops and stores 4 bytes at [ebp+%a] (the old value not freed)
+2,0xF3,3,FStR4,%a,1,0,0,0,,1,,st:f(%a):4,store_frame,0x661052F9,0x6610941F,Pops and stores 4 bytes at [ebp+%a] (the old value not freed)
+2,0xF4,3,FStR8,%a,2,0,0,0,,2,,st:f(%a):8,store_frame,0x66109DDB,0x6610DF24,Pops and stores 8 bytes at [ebp+%a] (the old value not freed)
+2,0xF5,3,FStR8,%a,2,0,0,0,,2,,st:f(%a):8,store_frame,0x66109DDB,0x6610DF24,Pops and stores 8 bytes at [ebp+%a] (the old value not freed)
+2,0xF6,3,FStVar,%a,1,0,0,0,,1,,x:var_let:f(%a),store_frame,0x6610613D,0x6610A24F,Let of the popped Variant into [ebp+%a] (the source moves; an object source gives its default value)
+2,0xF7,3,FStStr,%a,1,0,0,0,,1,,x:bstr_move:f(%a),store_frame,0x66105F45,0x6610A057,"Stores the popped String at [ebp+%a], freeing the old one (the string moves)"
+2,0xF8,3,FStAd,%a,1,0,0,0,,1,,x:set_obj:f(%a),store_frame,0x6610604A,0x6610A15C,"Stores the popped object at [ebp+%a], AddRef'd, Releasing the old one"
+2,0xF9,3,FStFPR4,%a,0,0,1,0,,f,,stfp:f(%a):4,store_frame,0x6610530E,0x66109434,Stores ST0 as an 4-byte float at [ebp+%a]
+2,0xFA,3,FStFPR8,%a,0,0,1,0,,f,,stfp:f(%a):8,store_frame,0x6610532D,0x66109453,Stores ST0 as an 8-byte float at [ebp+%a]
+2,0xFB,3,FStVarAd,%a,1,0,0,0,,1,,x:set_var9:f(%a),store_frame,0x6610B3F1,0x6610F54D,"Sets the Variant at [ebp+%a] to the popped object (VT_DISPATCH, AddRef'd)"
+2,0xFC,3,FStVarAdFunc,%a,1,0,0,0,,1,,x:set_var9_owned:f(%a),store_frame,0x66106061,0x6610A173,"Sets the Variant at [ebp+%a] to the popped object (VT_DISPATCH, not AddRef'd)"
+2,0xFD,3,FStVarUnk,%a,1,0,0,0,,1,,x:set_var13:f(%a),store_frame,0x6610B507,0x6610F663,Sets the Variant at [ebp+%a] to the popped IUnknown (AddRef'd)
+2,0xFE,3,FStVarUnkFunc,%a,1,0,0,0,,1,,x:set_var13_owned:f(%a),store_frame,0x6610B4F1,0x6610F64D,Sets the Variant at [ebp+%a] to the popped IUnknown (not AddRef'd)
+2,0xFF,3,FStAdFunc,%a,1,0,0,0,,1,,x:set_obj_owned:f(%a),store_frame,0x66106024,0x6610A136,"Stores the popped object at [ebp+%a] without AddRef, Releasing the old one"
+3,0x00,3,FStVarCopy,%a,1,0,0,0,,1,,x:var_copy:f(%a),store_frame,0x661060E3,0x6610A1F5,"Copies the popped Variant into [ebp+%a] (strings, objects and arrays duplicated)"
+3,0x01,3,FStStrCopy,%a,1,0,0,0,,1,,x:bstr_copy:f(%a),store_frame,0x66105F63,0x6610A075,"Stores a copy of the String at [ebp+%a], freeing the old one"
+3,0x02,1,HardType,,1,1,0,0,,1,,,convert,0x6610510F,0x6610924F,Pop ptr; verify/cast COM type; push validated ptr
+3,0x03,3,Branch,%l,0,0,0,0,,,,,branch,0x66104DDD,0x66108F35,Unconditional branch; target = pcode_base + zx(u16 operand)
+3,0x04,3,BranchF,%l,1,0,0,0,,1,,,branch_cond,0x66104E04,0x66108F5C,Pops a Boolean and jumps to %l when its low 16 bits are 0
+3,0x05,3,BranchFVar,%l,1,0,0,0,,1,,,branch_cond,0x6610925D,0x6610D36D,Pops a Variant's address; jumps to %l when it is False
+3,0x06,3,BranchFVarFree,%l,1,0,0,0,,1,,,branch_cond,0x66109285,0x6610D395,Pops a Variant's address; clears it; jumps to %l when it was False
+3,0x07,3,BranchT,%l,1,0,0,0,,1,,,branch_cond,0x66104DEF,0x66108F47,Pops a Boolean and jumps to %l when its low 16 bits are not 0
+3,0x08,3,BranchTVar,%l,1,0,0,0,,1,,,branch_cond,0x66109278,0x6610D388,Pops a Variant's address; jumps to %l when it is True
+3,0x09,3,BranchTVarFree,%l,1,0,0,0,,1,,,branch_cond,0x661092A7,0x6610D3B7,Pops a Variant's address; clears it; jumps to %l when it was True
+3,0x0A,3,Gosub,%l,0,1,0,0,,,,,gosub,0x66104D96,0x66108EEE,GoSub: pushes the return position on the evaluation stack; jumps to %l
+3,0x0B,3,OnErrorGoto,%l,0,0,0,0,,,,,on_error,0x66105E46,0x66109F58,Sets the error handler to %l; falls through
+3,0x0C,3,Resume,%l,0,0,0,0,,,,,resume,0x6610B0B6,0x6610F212,"Resume label (%l), or the sentinels 0xFFFF (Resume Next) and 0xFFFE (Resume)"
+3,0x0D,3,AryLock,%a,1,1,0,0,,1,,,stack,0x66104CD2,0x66108E2A,Locks the SAFEARRAY on top of the stack (left there) and records it at frame %a
+3,0x0E,3,AryUnlock,%a,0,0,0,0,,,,,stack,0x66104D00,0x66108E58,Unlocks the SAFEARRAY recorded at frame %a and clears the slot
+3,0x0F,3,AryDescTemp,%a,1,1,0,0,,1,,,stack,0x6610903A,0x6610D14A,Pops the data pointer into the array descriptor at frame %a; pushes the descriptor's address
+3,0x10,3,ILdUI1,%a,0,1,0,0,,,,ld:fi(%a):1z,load_ind,0x6610A36A,0x6610E4B3,"Pushes the 1 bytes at where the pointer at [ebp+%a] points, zero-extended"
+3,0x11,3,ILdI2,%a,0,1,0,0,,,,ld:fi(%a):2u,load_ind,0x66105651,0x66109777,Pushes the 2 bytes at where the pointer at [ebp+%a] points (the rest of the slot undefined)
+3,0x12,3,ILdAd,%a,0,1,0,0,,,,ld:fi(%a):4,load_ind,0x6610566B,0x66109791,Pushes the 4 bytes at where the pointer at [ebp+%a] points
+3,0x13,3,ILdAd,%a,0,1,0,0,,,,ld:fi(%a):4,load_ind,0x6610566B,0x66109791,Pushes the 4 bytes at where the pointer at [ebp+%a] points
+3,0x14,3,ILdR8,%a,0,2,0,0,,,,ld:fi(%a):8,load_ind,0x6610A384,0x6610E4CD,Pushes the 8 bytes at where the pointer at [ebp+%a] points
+3,0x15,3,ILdR8,%a,0,2,0,0,,,,ld:fi(%a):8,load_ind,0x6610A384,0x6610E4CD,Pushes the 8 bytes at where the pointer at [ebp+%a] points
+3,0x16,5,ILdRfDarg,%a %a,0,1,0,0,,,,x:ad_varg:fi(%a):f(%a#2),load_ind,0x66105EAE,0x66109FC0,Pushes the address of the Variant at where the pointer at [ebp+%a] points (or of the one it references)
+3,0x17,3,ILdAd,%a,0,1,0,0,,,,ld:fi(%a):4,load_ind,0x6610566B,0x66109791,Pushes the 4 bytes at where the pointer at [ebp+%a] points
+3,0x18,3,ILdAd,%a,0,1,0,0,,,,ld:fi(%a):4,load_ind,0x6610566B,0x66109791,Pushes the 4 bytes at where the pointer at [ebp+%a] points
+3,0x19,3,ILdFPR4,%a,0,0,0,1,,,,ldfp:fi(%a):4,load_ind,0x66105683,0x661097A9,Loads the 4-byte float at where the pointer at [ebp+%a] points onto the x87 stack
+3,0x1A,3,ILdFPR8,%a,0,0,0,1,,,,ldfp:fi(%a):8,load_ind,0x6610A39F,0x6610E4E8,Loads the 8-byte float at where the pointer at [ebp+%a] points onto the x87 stack
+3,0x1B,3,ILdPr,%a,0,0,0,0,,,>pr:indirect,prn:fi(%a),load_ind,0x66105F33,0x6610A045,Loads Pr with the object at where the pointer at [ebp+%a] points; error 91 when it is Nothing
+3,0x1C,3,FLdR4,%a,0,1,0,0,,,,ld:f(%a):4,load_ind,0x66105260,0x66109386,Pushes the 4 bytes at [ebp+%a]
+3,0x1D,3,ILdDarg,%a,0,4,0,0,,,,x:ld_varg:fi(%a),load_ind,0x6610B1D4,0x6610F330,"Pushes the Variant at where the pointer at [ebp+%a] points by value, as a reference when it is not one"
+3,0x1E,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x1F,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x20,3,IStUI1,%a,1,0,0,0,,1,,st:fi(%a):1,store_ind,0x6610A3B7,0x6610E500,Pops and stores 1 bytes at where the pointer at [ebp+%a] points (the old value not freed)
+3,0x21,3,IStI2,%a,1,0,0,0,,1,,st:fi(%a):2,store_ind,0x6610569B,0x661097C1,Pops and stores 2 bytes at where the pointer at [ebp+%a] points (the old value not freed)
+3,0x22,3,IStI4,%a,1,0,0,0,,1,,st:fi(%a):4,store_ind,0x6610A3D0,0x6610E519,Pops and stores 4 bytes at where the pointer at [ebp+%a] points (the old value not freed)
+3,0x23,3,IStI4,%a,1,0,0,0,,1,,st:fi(%a):4,store_ind,0x6610A3D0,0x6610E519,Pops and stores 4 bytes at where the pointer at [ebp+%a] points (the old value not freed)
+3,0x24,3,IStR8,%a,2,0,0,0,,2,,st:fi(%a):8,store_ind,0x6610A3E8,0x6610E531,Pops and stores 8 bytes at where the pointer at [ebp+%a] points (the old value not freed)
+3,0x25,3,IStR8,%a,2,0,0,0,,2,,st:fi(%a):8,store_ind,0x6610A3E8,0x6610E531,Pops and stores 8 bytes at where the pointer at [ebp+%a] points (the old value not freed)
+3,0x26,3,IStDarg,%a,1,0,0,0,,1,,x:varg_let:fi(%a),store_ind,0x6610B78A,0x6610F8FB,"Stores the popped Variant through the by-reference argument at where the pointer at [ebp+%a] points, freeing the source"
+3,0x27,3,IStStr,%a,1,0,0,0,,1,,x:bstr_move:fi(%a),store_ind,0x66105F84,0x6610A096,"Stores the popped String at where the pointer at [ebp+%a] points, freeing the old one (the string moves)"
+3,0x28,3,IStAd,%a,1,0,0,0,,1,,x:set_obj:fi(%a),store_ind,0x6610B38F,0x6610F4EB,"Stores the popped object at where the pointer at [ebp+%a] points, AddRef'd, Releasing the old one"
+3,0x29,3,IStFPR4,%a,0,0,1,0,,f,,stfp:fi(%a):4,store_ind,0x6610A403,0x6610E54C,Stores ST0 as an 4-byte float at where the pointer at [ebp+%a] points
+3,0x2A,3,IStFPR8,%a,0,0,1,0,,f,,stfp:fi(%a):8,store_ind,0x6610A425,0x6610E56E,Stores ST0 as an 8-byte float at where the pointer at [ebp+%a] points
+3,0x2B,3,IStDargAd,%a,1,0,0,0,,1,,x:set_varg9:fi(%a),store_ind,0x6610B442,0x6610F59E,Sets the by-reference Variant at where the pointer at [ebp+%a] points to the popped object (AddRef'd)
+3,0x2C,3,IStDargAdFunc,%a,1,0,0,0,,1,,x:set_varg9_owned:fi(%a),store_ind,0x6610B3F8,0x6610F554,Sets the by-reference Variant at where the pointer at [ebp+%a] points to the popped object
+3,0x2D,3,IStDargUnk,%a,1,0,0,0,,1,,x:set_varg13:fi(%a),store_ind,0x6610B5D8,0x6610F734,Sets the by-reference Variant at where the pointer at [ebp+%a] points to the popped IUnknown (AddRef'd)
+3,0x2E,3,IStDargUnkFunc,%a,1,0,0,0,,1,,x:set_varg13_owned:fi(%a),store_ind,0x6610B566,0x6610F6C2,Sets the by-reference Variant at where the pointer at [ebp+%a] points to the popped IUnknown
+3,0x2F,3,IStAdFunc,%a,1,0,0,0,,1,,x:set_obj_owned:fi(%a),store_ind,0x66105FE0,0x6610A0F2,"Stores the popped object at where the pointer at [ebp+%a] points without AddRef, Releasing the old one"
+3,0x30,3,IStDargCopy,%a,1,0,0,0,,1,,x:varg_copy:fi(%a),store_ind,0x6610B77A,0x6610F8EB,Stores a copy of the popped Variant through the by-reference argument at where the pointer at [ebp+%a] points
+3,0x31,3,IStStrCopy,%a,1,0,0,0,,1,,x:bstr_copy:fi(%a),store_ind,0x66105F91,0x6610A0A3,"Stores a copy of the String at where the pointer at [ebp+%a] points, freeing the old one"
+3,0x32,1,PrintChan,,1,0,0,0,,1,,,io,0x66109A57,0x6610DBA0,Pop file number; set print channel for subsequent Print ops
+3,0x33,1,WriteChan,,1,0,0,0,,1,,,io,0x66109A68,0x6610DBB1,Pop file number; set write channel for Write# statement
+3,0x34,1,PrintComma,,0,0,0,0,,,,,io,0x6610B890,0x6610FA01,Print comma separator (advance to next print zone)
+3,0x35,1,PrintEos,,0,0,0,0,,,,,io,0x6610B85D,0x6610F9CE,Print end-of-statement; finalize current Print# line
+3,0x36,1,PrintNL,,0,0,0,0,,,,,io,0x6610B8AD,0x6610FA1E,Print newline; output CR+LF
+3,0x37,1,PrintItemComma,,1,0,0,0,,1,,,io,0x6610B82A,0x6610F99B,Pop value; print it; followed by comma separator
+3,0x38,1,PrintItemSemi,,1,0,0,0,,1,,,io,0x6610B84C,0x6610F9BD,Pop value; print it; followed by semicolon (no separator)
+3,0x39,1,PrintItemNL,,1,0,0,0,,1,,,io,0x6610B83B,0x6610F9AC,Pop value; print it; followed by newline
+3,0x3A,3,PrintObj,%a,0,0,0,0,,,pr,,io,0x6610B8B5,0x6610FA26,Queries Pr for the interface {000204F0-0000-0000-C000-000000000046} (helper 0x660e7df5 in 8176) and stores it at frame %a
+3,0x3B,1,PrintSpc,,1,0,0,0,,1,,,io,0x6610B86E,0x6610F9DF,Pop count; output Spc(n) spaces
+3,0x3C,1,PrintTab,,1,0,0,0,,1,,,io,0x6610B87F,0x6610F9F0,Pop column; Tab(n) to column position
+3,0x3D,1,Close,,1,0,0,0,,1,,,io,0x6610522D,0x66109353,Pop file number; Close file
+3,0x3E,1,CloseAll,,0,0,0,0,,,,,io,0x66109A43,0x6610DB8C,Close all open files; no stack effect
+3,0x3F,3,FLdZeroAd,%a,0,1,0,0,,,,x:zero_source:f(%a),load_lit,0x66105275,0x6610939B,Pushes the 4 bytes at [ebp+%a] and zeroes them (the reference moves to the stack)
+3,0x40,3,IWMemLdUI1,%2,0,1,0,0,,,,ld:wi(%2):1z,load_mem,0x6610A447,0x6610E590,"Pushes the 1 bytes at where the pointer at [[ebp+0x10]+%2] points, zero-extended"
+3,0x41,3,IWMemLdI2,%2,0,1,0,0,,,,ld:wi(%2):2u,load_mem,0x6610A462,0x6610E5AB,Pushes the 2 bytes at where the pointer at [[ebp+0x10]+%2] points (the rest of the slot undefined)
+3,0x42,3,IWMemLdI4,%2,0,1,0,0,,,,ld:wi(%2):4,load_mem,0x6610A47D,0x6610E5C6,Pushes the 4 bytes at where the pointer at [[ebp+0x10]+%2] points
+3,0x43,3,IWMemLdI4,%2,0,1,0,0,,,,ld:wi(%2):4,load_mem,0x6610A47D,0x6610E5C6,Pushes the 4 bytes at where the pointer at [[ebp+0x10]+%2] points
+3,0x44,3,IWMemLdCy,%2,0,2,0,0,,,,ld:wi(%2):8,load_mem,0x6610A496,0x6610E5DF,Pushes the 8 bytes at where the pointer at [[ebp+0x10]+%2] points
+3,0x45,3,IWMemLdCy,%2,0,2,0,0,,,,ld:wi(%2):8,load_mem,0x6610A496,0x6610E5DF,Pushes the 8 bytes at where the pointer at [[ebp+0x10]+%2] points
+3,0x46,5,IWMemLdRfDarg,%2 %a,0,1,0,0,,,,x:ad_varg:wi(%2):f(%a),load_mem,0x6610B1F1,0x6610F34D,Pushes the address of the Variant at where the pointer at [[ebp+0x10]+%2] points (or of the one it references)
+3,0x47,3,IWMemLdI4,%2,0,1,0,0,,,,ld:wi(%2):4,load_mem,0x6610A47D,0x6610E5C6,Pushes the 4 bytes at where the pointer at [[ebp+0x10]+%2] points
+3,0x48,3,IWMemLdI4,%2,0,1,0,0,,,,ld:wi(%2):4,load_mem,0x6610A47D,0x6610E5C6,Pushes the 4 bytes at where the pointer at [[ebp+0x10]+%2] points
+3,0x49,3,IWMemLdFPR4,%2,0,0,0,1,,,,ldfp:wi(%2):4,load_mem,0x6610A4B2,0x6610E5FB,Loads the 4-byte float at where the pointer at [[ebp+0x10]+%2] points onto the x87 stack
+3,0x4A,3,IWMemLdFPR8,%2,0,0,0,1,,,,ldfp:wi(%2):8,load_mem,0x6610A4CB,0x6610E614,Loads the 8-byte float at where the pointer at [[ebp+0x10]+%2] points onto the x87 stack
+3,0x4B,3,IWMemLdPr,%2,0,0,0,0,,,>pr:with,prn:w(%2),load_mem,0x6610B224,0x6610F380,Loads Pr with the object at [[ebp+0x10]+%2]; error 91 when it is Nothing
+3,0x4C,3,IWMemLdRf,%2,0,1,0,0,,,,ld:w(%2):4,load_mem,0x6610A4E4,0x6610E62D,Pushes the 4 bytes at [[ebp+0x10]+%2]
+3,0x4D,3,IWMemLdDarg,%2,0,4,0,0,,,,x:ld_varg:wi(%2),load_mem,0x6610B1B9,0x6610F315,"Pushes the Variant at where the pointer at [[ebp+0x10]+%2] points by value, as a reference when it is not one"
+3,0x4E,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x4F,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x50,3,IWMemStUI1,%2,1,0,0,0,,1,,st:wi(%2):1,store_mem,0x6610A4FC,0x6610E645,Pops and stores 1 bytes at where the pointer at [[ebp+0x10]+%2] points (the old value not freed)
+3,0x51,3,IWMemStI2,%2,1,0,0,0,,1,,st:wi(%2):2,store_mem,0x6610A516,0x6610E65F,Pops and stores 2 bytes at where the pointer at [[ebp+0x10]+%2] points (the old value not freed)
+3,0x52,3,IWMemStR4,%2,1,0,0,0,,1,,st:wi(%2):4,store_mem,0x6610A531,0x6610E67A,Pops and stores 4 bytes at where the pointer at [[ebp+0x10]+%2] points (the old value not freed)
+3,0x53,3,IWMemStR4,%2,1,0,0,0,,1,,st:wi(%2):4,store_mem,0x6610A531,0x6610E67A,Pops and stores 4 bytes at where the pointer at [[ebp+0x10]+%2] points (the old value not freed)
+3,0x54,3,IWMemStCy,%2,2,0,0,0,,2,,st:wi(%2):8,store_mem,0x6610A54A,0x6610E693,Pops and stores 8 bytes at where the pointer at [[ebp+0x10]+%2] points (the old value not freed)
+3,0x55,3,IWMemStCy,%2,2,0,0,0,,2,,st:wi(%2):8,store_mem,0x6610A54A,0x6610E693,Pops and stores 8 bytes at where the pointer at [[ebp+0x10]+%2] points (the old value not freed)
+3,0x56,3,IWMemStDarg,%2,1,0,0,0,,1,,x:varg_let:wi(%2),store_mem,0x6610B7B4,0x6610F925,"Stores the popped Variant through the by-reference argument at where the pointer at [[ebp+0x10]+%2] points, freeing the source"
+3,0x57,3,IWMemStStr,%2,1,0,0,0,,1,,x:bstr_move:wi(%2),store_mem,0x6610B28C,0x6610F3E8,"Stores the popped String at where the pointer at [[ebp+0x10]+%2] points, freeing the old one (the string moves)"
+3,0x58,3,IWMemStAd,%2,1,0,0,0,,1,,x:set_obj:wi(%2),store_mem,0x6610B3AB,0x6610F507,"Stores the popped object at where the pointer at [[ebp+0x10]+%2] points, AddRef'd, Releasing the old one"
+3,0x59,3,IWMemStFPR4,%2,0,0,1,0,,f,,stfp:wi(%2):4,store_mem,0x6610A566,0x6610E6AF,Stores ST0 as an 4-byte float at where the pointer at [[ebp+0x10]+%2] points
+3,0x5A,3,IWMemStFPR8,%2,0,0,1,0,,f,,stfp:wi(%2):8,store_mem,0x6610A589,0x6610E6D2,Stores ST0 as an 8-byte float at where the pointer at [[ebp+0x10]+%2] points
+3,0x5B,3,IWMemStDargAd,%2,1,0,0,0,,1,,x:set_varg9:wi(%2),store_mem,0x6610B458,0x6610F5B4,Sets the by-reference Variant at where the pointer at [[ebp+0x10]+%2] points to the popped object (AddRef'd)
+3,0x5C,3,IWMemStDargAdFunc,%2,1,0,0,0,,1,,x:set_varg9_owned:wi(%2),store_mem,0x6610B446,0x6610F5A2,Sets the by-reference Variant at where the pointer at [[ebp+0x10]+%2] points to the popped object
+3,0x5D,3,IWMemStDargUnk,%2,1,0,0,0,,1,,x:set_varg13:wi(%2),store_mem,0x6610B60A,0x6610F766,Sets the by-reference Variant at where the pointer at [[ebp+0x10]+%2] points to the popped IUnknown (AddRef'd)
+3,0x5E,3,IWMemStDargUnkFunc,%2,1,0,0,0,,1,,x:set_varg13_owned:wi(%2),store_mem,0x6610B5F5,0x6610F751,Sets the by-reference Variant at where the pointer at [[ebp+0x10]+%2] points to the popped IUnknown
+3,0x5F,3,IWMemStAdFunc,%2,1,0,0,0,,1,,x:set_obj_owned:wi(%2),store_mem,0x6610B396,0x6610F4F2,"Stores the popped object at where the pointer at [[ebp+0x10]+%2] points without AddRef, Releasing the old one"
+3,0x60,3,IWMemStDargCopy,%2,1,0,0,0,,1,,x:varg_copy:wi(%2),store_mem,0x6610B791,0x6610F902,Stores a copy of the popped Variant through the by-reference argument at where the pointer at [[ebp+0x10]+%2] points
+3,0x61,3,IWMemStStrCopy,%2,1,0,0,0,,1,,x:bstr_copy:wi(%2),store_mem,0x6610B2AC,0x6610F408,"Stores a copy of the String at where the pointer at [[ebp+0x10]+%2] points, freeing the old one"
+3,0x62,3,FLdZeroAd,%a,0,1,0,0,,,,x:zero_source:f(%a),load_lit,0x66105275,0x6610939B,Pushes the 4 bytes at [ebp+%a] and zeroes them (the reference moves to the stack)
+3,0x63,3,FStVarNoPop,%a,0,0,0,0,,,,x:var_copy_keep:f(%a),store_frame,0x6610B6F0,0x6610F84C,"Copies the popped Variant into [ebp+%a] (strings, objects and arrays duplicated); the value stays on the stack"
+3,0x64,3,FStStrNoPop,%a,0,0,0,0,,,,x:bstr_move_keep:f(%a),store_frame,0x66105F41,0x6610A053,"Stores the popped String at [ebp+%a], freeing the old one (the string moves); the value stays on the stack"
+3,0x65,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x66,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x67,3,CVarUI1,%a,1,1,0,0,,1,,,convert,0x66109787,0x6610D8B6,UI1 to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+3,0x68,3,CVarI2,%a,1,1,0,0,,1,,,convert,0x66105071,0x661091B1,I2 to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+3,0x69,3,CVarI4,%a,1,1,0,0,,1,,,convert,0x661050B8,0x661091F8,I4 to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+3,0x6A,3,CVarR4,%a,0,1,1,0,,f,,,convert,0x661050BE,0x661091FE,R4 to Variant: pops the value (ST0); builds the Variant in the frame temp %a and pushes its address
+3,0x6B,3,CVarR8,%a,0,1,1,0,,f,,,convert,0x661050E5,0x66109225,R8 to Variant: pops the value (ST0); builds the Variant in the frame temp %a and pushes its address
+3,0x6C,3,CVarCy,%a,2,1,0,0,,2,,,convert,0x661097E7,0x6610D916,Cy to Variant: pops the value (two slots); builds the Variant in the frame temp %a and pushes its address
+3,0x6D,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x6E,3,CVarStr,%a,1,1,0,0,,1,,,convert,0x661050B2,0x661091D8,Str to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+3,0x6F,3,CVarAd,%a,1,1,0,0,,1,,,convert,0x66105092,0x661091D2,Ad to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+3,0x70,3,MemLdUI1,%2,0,1,0,0,,,pr,ld:pr(%2):1z,load_mem,0x6610AE3C,0x6610EF98,"Pushes the 1 bytes at [Pr+%2], zero-extended"
+3,0x71,3,MemLdI2,%2,0,1,0,0,,,pr,ld:pr(%2):2z,load_mem,0x66105BDA,0x66109CEC,"Pushes the 2 bytes at [Pr+%2], zero-extended"
+3,0x72,3,MemLdR4,%2,0,1,0,0,,,pr,ld:pr(%2):4,load_mem,0x66105BF4,0x66109D06,Pushes the 4 bytes at [Pr+%2]
+3,0x73,3,MemLdR4,%2,0,1,0,0,,,pr,ld:pr(%2):4,load_mem,0x66105BF4,0x66109D06,Pushes the 4 bytes at [Pr+%2]
+3,0x74,3,MemLdR8,%2,0,2,0,0,,,pr,ld:pr(%2):8,load_mem,0x6610AE56,0x6610EFB2,Pushes the 8 bytes at [Pr+%2]
+3,0x75,3,MemLdR8,%2,0,2,0,0,,,pr,ld:pr(%2):8,load_mem,0x6610AE56,0x6610EFB2,Pushes the 8 bytes at [Pr+%2]
+3,0x76,3,MemLdRfVar,%2,0,1,0,0,,,pr,ad:pr(%2),load_mem,0x66105C0C,0x66109D1E,Pushes the address of [Pr+%2]
+3,0x77,3,MemLdR4,%2,0,1,0,0,,,pr,ld:pr(%2):4,load_mem,0x66105BF4,0x66109D06,Pushes the 4 bytes at [Pr+%2]
+3,0x78,3,MemLdR4,%2,0,1,0,0,,,pr,ld:pr(%2):4,load_mem,0x66105BF4,0x66109D06,Pushes the 4 bytes at [Pr+%2]
+3,0x79,3,MemLdFPR4,%2,0,0,0,1,,,pr,ldfp:pr(%2):4,load_mem,0x6610AE72,0x6610EFCE,Loads the 4-byte float at [Pr+%2] onto the x87 stack
+3,0x7A,3,MemLdFPR8,%2,0,0,0,1,,,pr,ldfp:pr(%2):8,load_mem,0x6610AE8A,0x6610EFE6,Loads the 8-byte float at [Pr+%2] onto the x87 stack
+3,0x7B,3,MemLdPr,%2,0,0,0,0,,,pr >pr:member,prn:pr(%2),load_mem,0x66105F0A,0x6610A01C,Loads Pr with the object at [Pr+%2]; error 91 when it is Nothing
+3,0x7C,3,MemLdRfVar,%2,0,1,0,0,,,pr,ad:pr(%2),load_mem,0x66105C0C,0x66109D1E,Pushes the address of [Pr+%2]
+3,0x7D,3,MemLdVar,%2,0,4,0,0,,,pr,ld:pr(%2):16,load_mem,0x6610B13D,0x6610F299,Pushes the 16 bytes at [Pr+%2]
+3,0x7E,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x7F,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x80,3,MemStUI1,%2,1,0,0,0,,1,pr,st:pr(%2):1,store_mem,0x6610AEA2,0x6610EFFE,Pops and stores 1 bytes at [Pr+%2] (the old value not freed)
+3,0x81,3,MemStI2,%2,1,0,0,0,,1,pr,st:pr(%2):2,store_mem,0x66105C24,0x66109D36,Pops and stores 2 bytes at [Pr+%2] (the old value not freed)
+3,0x82,3,MemStR4,%2,1,0,0,0,,1,pr,st:pr(%2):4,store_mem,0x66105C3E,0x66109D50,Pops and stores 4 bytes at [Pr+%2] (the old value not freed)
+3,0x83,3,MemStR4,%2,1,0,0,0,,1,pr,st:pr(%2):4,store_mem,0x66105C3E,0x66109D50,Pops and stores 4 bytes at [Pr+%2] (the old value not freed)
+3,0x84,3,MemStCy,%2,2,0,0,0,,2,pr,st:pr(%2):8,store_mem,0x6610AEBB,0x6610F017,Pops and stores 8 bytes at [Pr+%2] (the old value not freed)
+3,0x85,3,MemStCy,%2,2,0,0,0,,2,pr,st:pr(%2):8,store_mem,0x6610AEBB,0x6610F017,Pops and stores 8 bytes at [Pr+%2] (the old value not freed)
+3,0x86,3,MemStVar,%2,1,0,0,0,,1,pr,x:var_let:pr(%2),store_mem,0x6610B743,0x6610F8B4,Let of the popped Variant into [Pr+%2] (the source moves; an object source gives its default value)
+3,0x87,3,MemStStr,%2,1,0,0,0,,1,pr,x:bstr_move:pr(%2),store_mem,0x6610B2CC,0x6610F428,"Stores the popped String at [Pr+%2], freeing the old one (the string moves)"
+3,0x88,3,MemStAd,%2,1,0,0,0,,1,pr,x:set_obj:pr(%2),store_mem,0x66105FF1,0x6610A103,"Stores the popped object at [Pr+%2], AddRef'd, Releasing the old one"
+3,0x89,3,MemStFPR4,%2,0,0,1,0,,f,pr,stfp:pr(%2):4,store_mem,0x6610AED7,0x6610F033,Stores ST0 as an 4-byte float at [Pr+%2]
+3,0x8A,3,MemStFPR8,%2,0,0,1,0,,f,pr,stfp:pr(%2):8,store_mem,0x6610AEF9,0x6610F055,Stores ST0 as an 8-byte float at [Pr+%2]
+3,0x8B,3,MemStVarAd,%2,1,0,0,0,,1,pr,x:set_var9:pr(%2),store_mem,0x6610B488,0x6610F5E4,"Sets the Variant at [Pr+%2] to the popped object (VT_DISPATCH, AddRef'd)"
+3,0x8C,3,MemStVarAdFunc,%2,1,0,0,0,,1,pr,x:set_var9_owned:pr(%2),store_mem,0x6610B473,0x6610F5CF,"Sets the Variant at [Pr+%2] to the popped object (VT_DISPATCH, not AddRef'd)"
+3,0x8D,3,MemStVarUnk,%2,1,0,0,0,,1,pr,x:set_var13:pr(%2),store_mem,0x6610B524,0x6610F680,Sets the Variant at [Pr+%2] to the popped IUnknown (AddRef'd)
+3,0x8E,3,MemStVarUnkFunc,%2,1,0,0,0,,1,pr,x:set_var13_owned:pr(%2),store_mem,0x6610B50B,0x6610F667,Sets the Variant at [Pr+%2] to the popped IUnknown (not AddRef'd)
+3,0x8F,3,MemStAdFunc,%2,1,0,0,0,,1,pr,x:set_obj_owned:pr(%2),store_mem,0x6610B3C6,0x6610F522,"Stores the popped object at [Pr+%2] without AddRef, Releasing the old one"
+3,0x90,3,MemStVarCopy,%2,1,0,0,0,,1,pr,x:var_copy:pr(%2),store_mem,0x6610B6E2,0x6610F83E,"Copies the popped Variant into [Pr+%2] (strings, objects and arrays duplicated)"
+3,0x91,3,MemStStrCopy,%2,1,0,0,0,,1,pr,x:bstr_copy:pr(%2),store_mem,0x66105F9E,0x6610A0B0,"Stores a copy of the String at [Pr+%2], freeing the old one"
+3,0x92,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x93,3,CDargRef,%2,1,4,0,0,,1,,,convert,0x66105151,0x66109291,Pops an address; pushes a by-reference Variant (vartype %2) by value (four slots)
+3,0x94,5,CVarRef,%a %2,1,1,0,0,,1,,,convert,0x66105123,0x66109263,Pops an address; builds a by-reference Variant (vartype %2) in frame temp %a; pushes its address
+3,0x95,3,ExitProcCb,%2,0,0,0,0,,,,,return,0x6610BF2B,0x6611009C,"Copies %2 bytes of the result (from ebp-0x84-%2, rounded down to even) to the hidden result pointer at [ebp+0xC]; returns that pointer in eax"
+3,0x96,3,ExitProcCbStack,%2,0,0,0,0,,,,,return,0x6610BEAC,0x6611001D,"Returns the result at the top of the locals in al, ax, eax or edx:eax by the width code %2 (1, 2, 4, else 8)"
+3,0x97,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x98,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0x99,3,FFree1Var,%a,0,0,0,0,,,,,stack,0x661061E2,0x6610A2E3,Clear Variant at [EBP+sext(op)]; __vbaVarClear
+3,0x9A,3,FFree1Str,%a,0,0,0,0,,,,,stack,0x661061AF,0x6610A2B0,Free BSTR at [EBP+sext(op)]; SysFreeString + set NULL
+3,0x9B,3,FFree1Ad,%a,0,0,0,0,,,,,stack,0x6610620E,0x6610A30F,Free COM obj at [EBP+sext(op)]; Release + set NULL
+3,0x9C,3,FStAdNoPop,%a,0,0,0,0,,,,x:set_obj_keep:f(%a),store_frame,0x66106046,0x6610A158,"Stores the popped object at [ebp+%a], AddRef'd, Releasing the old one; the value stays on the stack"
+3,0x9D,3,FStAdFuncNoPop,%a,0,0,0,0,,,,x:set_obj_owned_keep:f(%a),store_frame,0x66106020,0x6610A132,"Stores the popped object at [ebp+%a] without AddRef, Releasing the old one; the value stays on the stack"
+3,0x9E,1,FLdPrThis,,0,0,0,0,,,me >pr:me,pr:f(8),load_frame,0x661052D0,0x661093F6,Loads Pr with the object at [ebp+8]
+3,0x9F,1,LdPrVar,,1,0,0,0,,1,>pr:variant,prn:vdisp(pop),load_frame,0x66105369,0x6610948F,Loads Pr with the object at the popped Variant's object; error 91 when it is Nothing
+3,0xA0,3,ImpAdLdUI1,%c,0,1,0,0,,,,ld:g(%c):1z,load_ind,0x6610A6F7,0x6610E840,"Pushes the 1 bytes at the variable pool entry %c addresses, zero-extended"
+3,0xA1,3,ImpAdLdI2,%c,0,1,0,0,,,,ld:g(%c):2u,load_ind,0x661056B5,0x661097DB,Pushes the 2 bytes at the variable pool entry %c addresses (the rest of the slot undefined)
+3,0xA2,3,ImpAdLdStr,%c,0,1,0,0,,,,ld:g(%c):4,load_ind,0x661056D1,0x661097F7,Pushes the 4 bytes at the variable pool entry %c addresses
+3,0xA3,3,ImpAdLdStr,%c,0,1,0,0,,,,ld:g(%c):4,load_ind,0x661056D1,0x661097F7,Pushes the 4 bytes at the variable pool entry %c addresses
+3,0xA4,3,ImpAdLdCy,%c,0,2,0,0,,,,ld:g(%c):8,load_ind,0x6610A713,0x6610E85C,Pushes the 8 bytes at the variable pool entry %c addresses
+3,0xA5,3,ImpAdLdCy,%c,0,2,0,0,,,,ld:g(%c):8,load_ind,0x6610A713,0x6610E85C,Pushes the 8 bytes at the variable pool entry %c addresses
+3,0xA6,3,ImpAdLdRf,%c,0,1,0,0,,,,ad:g(%c),load_ind,0x661056EB,0x66109811,Pushes the address of the variable pool entry %c addresses
+3,0xA7,3,ImpAdLdStr,%c,0,1,0,0,,,,ld:g(%c):4,load_ind,0x661056D1,0x661097F7,Pushes the 4 bytes at the variable pool entry %c addresses
+3,0xA8,3,ImpAdLdStr,%c,0,1,0,0,,,,ld:g(%c):4,load_ind,0x661056D1,0x661097F7,Pushes the 4 bytes at the variable pool entry %c addresses
+3,0xA9,3,ImpAdLdFPR4,%c,0,0,0,1,,,,ldfp:g(%c):4,load_ind,0x6610A730,0x6610E879,Loads the 4-byte float at the variable pool entry %c addresses onto the x87 stack
+3,0xAA,3,ImpAdLdFPR8,%c,0,0,0,1,,,,ldfp:g(%c):8,load_ind,0x6610A74A,0x6610E893,Loads the 8-byte float at the variable pool entry %c addresses onto the x87 stack
+3,0xAB,3,ImpAdLdPr,%c,0,0,0,0,,,>pr:pool,prad:g(%c),load_ind,0x6610B234,0x6610F390,Loads Pr with the address of the variable pool entry %c addresses
+3,0xAC,3,ImpAdLdRf,%c,0,1,0,0,,,,ad:g(%c),load_ind,0x661056EB,0x66109811,Pushes the address of the variable pool entry %c addresses
+3,0xAD,3,ImpAdLdVar,%c,0,4,0,0,,,,ld:g(%c):16,load_ind,0x6610B167,0x6610F2C3,Pushes the 16 bytes at the variable pool entry %c addresses
+3,0xAE,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0xAF,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0xB0,3,ImpAdStUI1,%c,1,0,0,0,,1,,st:g(%c):1,store_ind,0x6610A764,0x6610E8AD,Pops and stores 1 bytes at the variable pool entry %c addresses (the old value not freed)
+3,0xB1,3,ImpAdStI2,%c,1,0,0,0,,1,,st:g(%c):2,store_ind,0x66105704,0x6610982A,Pops and stores 2 bytes at the variable pool entry %c addresses (the old value not freed)
+3,0xB2,3,ImpAdStR4,%c,1,0,0,0,,1,,st:g(%c):4,store_ind,0x6610A77F,0x6610E8C8,Pops and stores 4 bytes at the variable pool entry %c addresses (the old value not freed)
+3,0xB3,3,ImpAdStR4,%c,1,0,0,0,,1,,st:g(%c):4,store_ind,0x6610A77F,0x6610E8C8,Pops and stores 4 bytes at the variable pool entry %c addresses (the old value not freed)
+3,0xB4,3,ImpAdStR8,%c,2,0,0,0,,2,,st:g(%c):8,store_ind,0x6610A799,0x6610E8E2,Pops and stores 8 bytes at the variable pool entry %c addresses (the old value not freed)
+3,0xB5,3,ImpAdStR8,%c,2,0,0,0,,2,,st:g(%c):8,store_ind,0x6610A799,0x6610E8E2,Pops and stores 8 bytes at the variable pool entry %c addresses (the old value not freed)
+3,0xB6,3,ImpAdStVar,%c,1,0,0,0,,1,,x:var_let:g(%c),store_ind,0x6610B716,0x6610F887,Let of the popped Variant into the variable pool entry %c addresses (the source moves; an object source gives its default value)
+3,0xB7,3,ImpAdStStr,%c,1,0,0,0,,1,,x:bstr_move:g(%c),store_ind,0x6610B2DD,0x6610F439,"Stores the popped String at the variable pool entry %c addresses, freeing the old one (the string moves)"
+3,0xB8,3,ImpAdStAd,%c,1,0,0,0,,1,,x:set_obj:g(%c),store_ind,0x6610B3D0,0x6610F52C,"Stores the popped object at the variable pool entry %c addresses, AddRef'd, Releasing the old one"
+3,0xB9,3,ImpAdStFPR4,%c,0,0,1,0,,f,,stfp:g(%c):4,store_ind,0x6610A7B6,0x6610E8FF,Stores ST0 as an 4-byte float at the variable pool entry %c addresses
+3,0xBA,3,ImpAdStFPR8,%c,0,0,1,0,,f,,stfp:g(%c):8,store_ind,0x6610A7DA,0x6610E923,Stores ST0 as an 8-byte float at the variable pool entry %c addresses
+3,0xBB,3,ImpAdStVarAd,%c,1,0,0,0,,1,,x:set_var9:g(%c),store_ind,0x6610B4C7,0x6610F623,"Sets the Variant at the variable pool entry %c addresses to the popped object (VT_DISPATCH, AddRef'd)"
+3,0xBC,3,ImpAdStVarAdFunc,%c,1,0,0,0,,1,,x:set_var9_owned:g(%c),store_ind,0x6610B4B1,0x6610F60D,"Sets the Variant at the variable pool entry %c addresses to the popped object (VT_DISPATCH, not AddRef'd)"
+3,0xBD,3,ImpAdStVarUnk,%c,1,0,0,0,,1,,x:set_var13:g(%c),store_ind,0x6610B542,0x6610F69E,Sets the Variant at the variable pool entry %c addresses to the popped IUnknown (AddRef'd)
+3,0xBE,3,ImpAdStVarUnkFunc,%c,1,0,0,0,,1,,x:set_var13_owned:g(%c),store_ind,0x6610B528,0x6610F684,Sets the Variant at the variable pool entry %c addresses to the popped IUnknown (not AddRef'd)
+3,0xBF,3,ImpAdStAdFunc,%c,1,0,0,0,,1,,x:set_obj_owned:g(%c),store_ind,0x6610604E,0x6610A160,"Stores the popped object at the variable pool entry %c addresses without AddRef, Releasing the old one"
+3,0xC0,3,ImpAdStVarCopy,%c,1,0,0,0,,1,,x:var_copy:g(%c),store_ind,0x6610B6D1,0x6610F82D,"Copies the popped Variant into the variable pool entry %c addresses (strings, objects and arrays duplicated)"
+3,0xC1,3,ImpAdStStrCopy,%c,1,0,0,0,,1,,x:bstr_copy:g(%c),store_ind,0x6610B2EF,0x6610F44B,"Stores a copy of the String at the variable pool entry %c addresses, freeing the old one"
+3,0xC2,3,PopTmpLdAd1,%a,1,1,0,0,,1,,st:f(%a):1+ad:f(%a),stack,0x6610BFC5,0x66110152,Pops the value into the frame temp %a (1) and pushes the temp's address
+3,0xC3,3,PopTmpLdAd2,%a,1,1,0,0,,1,,st:f(%a):2+ad:f(%a),stack,0x66106546,0x6610A62B,Pops the value into the frame temp %a (2) and pushes the temp's address
+3,0xC4,3,PopTmpLdAdStr,%a,1,1,0,0,,1,,st:f(%a):4+ad:f(%a),stack,0x6610655F,0x6610A644,Pops the value into the frame temp %a (String) and pushes the temp's address
+3,0xC5,3,PopTmpLdAd8,%a,2,1,0,0,,1 1,,st:f(%a):8+ad:f(%a),stack,0x6610BFDD,0x6611016A,Pops the value into the frame temp %a (8) and pushes the temp's address
+3,0xC6,3,PopTmpLdAdVar,%a,4,1,0,0,,4,,st:f(%a):16+ad:f(%a),stack,0x6610BFF7,0x66110184,Pops the value into the frame temp %a (Variant) and pushes the temp's address
+3,0xC7,3,PopTmpLdAdStr,%a,1,1,0,0,,1,,st:f(%a):4+ad:f(%a),stack,0x6610655F,0x6610A644,Pops the value into the frame temp %a (String) and pushes the temp's address
+3,0xC8,3,PopTmpLdAdFPR4,%a,0,1,1,0,,f,,stfp:f(%a):4+ad:f(%a),stack,0x6610C017,0x661101A4,Pops the value into the frame temp %a (Single (x87)) and pushes the temp's address
+3,0xC9,3,PopTmpLdAdFPR8,%a,0,1,1,0,,f,,stfp:f(%a):8+ad:f(%a),stack,0x6610C038,0x661101C5,Pops the value into the frame temp %a (Double (x87)) and pushes the temp's address
+3,0xCA,3,CopyBytes,%2,2,0,0,0,,1 1,,,stack,0x661099E3,0x6610DB2C,Pops destination then source; copies %2 bytes
+3,0xCB,5,ExitForCollObj,%a %l,0,0,0,0,,,,,branch,0x6610A314,0x6610E45D,Exit For Each (collection/object); cleanup iterator; branch %l
+3,0xCC,5,ExitForCollObj,%a %l,0,0,0,0,,,,,branch,0x6610A314,0x6610E45D,Exit For Each (duplicate slot); same handler
+3,0xCD,5,ExitForCollObj,%a %l,0,0,0,0,,,,,branch,0x6610A314,0x6610E45D,Exit For Each (duplicate slot); same handler
+3,0xCE,5,ExitForAryVar,%a %l,0,0,0,0,,,,,branch,0x6610A354,0x6610E49D,Exit For Each (array Variant); cleanup; branch %l; %a=frame
+3,0xCF,5,ExitForVar,%a %l,0,0,0,0,,,,,branch,0x6610A344,0x6610E48D,Exit For (Variant counter); cleanup; branch %l; %a=frame
+3,0xD0,5,FMemLdUI1,%a %2,0,1,0,0,,,,"ld:m(%a,%2):1z",load_mem,0x6610AF1B,0x6610F077,"Pushes the 1 bytes at [[ebp+%a]+%2], zero-extended"
+3,0xD1,5,FMemLdI2,%a %2,0,1,0,0,,,,"ld:m(%a,%2):2u",load_mem,0x66105C57,0x66109D69,Pushes the 2 bytes at [[ebp+%a]+%2] (the rest of the slot undefined)
+3,0xD2,5,FMemLdR4,%a %2,0,1,0,0,,,,"ld:m(%a,%2):4",load_mem,0x66105C7E,0x66109D90,Pushes the 4 bytes at [[ebp+%a]+%2]
+3,0xD3,5,FMemLdR4,%a %2,0,1,0,0,,,,"ld:m(%a,%2):4",load_mem,0x66105C7E,0x66109D90,Pushes the 4 bytes at [[ebp+%a]+%2]
+3,0xD4,5,FMemLdR8,%a %2,0,2,0,0,,,,"ld:m(%a,%2):8",load_mem,0x6610AF3D,0x6610F099,Pushes the 8 bytes at [[ebp+%a]+%2]
+3,0xD5,5,FMemLdR8,%a %2,0,2,0,0,,,,"ld:m(%a,%2):8",load_mem,0x6610AF3D,0x6610F099,Pushes the 8 bytes at [[ebp+%a]+%2]
+3,0xD6,5,FMemLdRf,%a %2,0,1,0,0,,,,"ad:m(%a,%2)",load_mem,0x66105CA3,0x66109DB5,Pushes the address of [[ebp+%a]+%2]
+3,0xD7,5,FMemLdR4,%a %2,0,1,0,0,,,,"ld:m(%a,%2):4",load_mem,0x66105C7E,0x66109D90,Pushes the 4 bytes at [[ebp+%a]+%2]
+3,0xD8,5,FMemLdR4,%a %2,0,1,0,0,,,,"ld:m(%a,%2):4",load_mem,0x66105C7E,0x66109D90,Pushes the 4 bytes at [[ebp+%a]+%2]
+3,0xD9,5,FMemLdFPR4,%a %2,0,0,0,1,,,,"ldfp:m(%a,%2):4",load_mem,0x6610AF61,0x6610F0BD,Loads the 4-byte float at [[ebp+%a]+%2] onto the x87 stack
+3,0xDA,5,FMemLdFPR8,%a %2,0,0,0,1,,,,"ldfp:m(%a,%2):8",load_mem,0x6610AF82,0x6610F0DE,Loads the 8-byte float at [[ebp+%a]+%2] onto the x87 stack
+3,0xDB,5,FMemLdPr,%a %2,0,0,0,0,,,>pr:frame_member,"prn:m(%a,%2)",load_mem,0x66105F18,0x6610A02A,Loads Pr with the object at [[ebp+%a]+%2]; error 91 when it is Nothing
+3,0xDC,5,FMemLdRf,%a %2,0,1,0,0,,,,"ad:m(%a,%2)",load_mem,0x66105CA3,0x66109DB5,Pushes the address of [[ebp+%a]+%2]
+3,0xDD,5,FMemLdVar,%a %2,0,4,0,0,,,,"ld:m(%a,%2):16",load_mem,0x6610B14B,0x6610F2A7,Pushes the 16 bytes at [[ebp+%a]+%2]
+3,0xDE,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0xDF,1,InvalidExcode,,0,0,0,0,,,,,,,,
+3,0xE0,5,FMemStUI1,%a %2,1,0,0,0,,1,,"st:m(%a,%2):1",store_mem,0x6610AFAD,0x6610F109,Pops and stores 1 bytes at [[ebp+%a]+%2] (the old value not freed)
+3,0xE1,5,FMemStI2,%a %2,1,0,0,0,,1,,"st:m(%a,%2):2",store_mem,0x66105CC7,0x66109DD9,Pops and stores 2 bytes at [[ebp+%a]+%2] (the old value not freed)
+3,0xE2,5,FMemStR4,%a %2,1,0,0,0,,1,,"st:m(%a,%2):4",store_mem,0x66105CEE,0x66109E00,Pops and stores 4 bytes at [[ebp+%a]+%2] (the old value not freed)
+3,0xE3,5,FMemStR4,%a %2,1,0,0,0,,1,,"st:m(%a,%2):4",store_mem,0x66105CEE,0x66109E00,Pops and stores 4 bytes at [[ebp+%a]+%2] (the old value not freed)
+3,0xE4,5,FMemStR8,%a %2,2,0,0,0,,2,,"st:m(%a,%2):8",store_mem,0x6610AFCE,0x6610F12A,Pops and stores 8 bytes at [[ebp+%a]+%2] (the old value not freed)
+3,0xE5,5,FMemStR8,%a %2,2,0,0,0,,2,,"st:m(%a,%2):8",store_mem,0x6610AFCE,0x6610F12A,Pops and stores 8 bytes at [[ebp+%a]+%2] (the old value not freed)
+3,0xE6,5,FMemStVar,%a %2,1,0,0,0,,1,,"x:var_let:m(%a,%2)",store_mem,0x6610B727,0x6610F898,Let of the popped Variant into [[ebp+%a]+%2] (the source moves; an object source gives its default value)
+3,0xE7,5,FMemStStr,%a %2,1,0,0,0,,1,,"x:bstr_move:m(%a,%2)",store_mem,0x66105FAC,0x6610A0BE,"Stores the popped String at [[ebp+%a]+%2], freeing the old one (the string moves)"
+3,0xE8,5,FMemStAd,%a %2,1,0,0,0,,1,,"x:set_obj:m(%a,%2)",store_mem,0x6610601C,0x6610A117,"Stores the popped object at [[ebp+%a]+%2], AddRef'd, Releasing the old one"
+3,0xE9,5,FMemStFPR4,%a %2,0,0,1,0,,f,,"stfp:m(%a,%2):4",store_mem,0x6610AFF2,0x6610F14E,Stores ST0 as an 4-byte float at [[ebp+%a]+%2]
+3,0xEA,5,FMemStFPR8,%a %2,0,0,1,0,,f,,"stfp:m(%a,%2):8",store_mem,0x6610B01D,0x6610F179,Stores ST0 as an 8-byte float at [[ebp+%a]+%2]
+3,0xEB,5,FMemStVarAd,%a %2,1,0,0,0,,1,,"x:set_var9:m(%a,%2)",store_mem,0x6610B4AD,0x6610F609,"Sets the Variant at [[ebp+%a]+%2] to the popped object (VT_DISPATCH, AddRef'd)"
+3,0xEC,5,FMemStVarAdFunc,%a %2,1,0,0,0,,1,,"x:set_var9_owned:m(%a,%2)",store_mem,0x6610B48C,0x6610F5E8,"Sets the Variant at [[ebp+%a]+%2] to the popped object (VT_DISPATCH, not AddRef'd)"
+3,0xED,5,FMemStVarUnk,%a %2,1,0,0,0,,1,,"x:set_var13:m(%a,%2)",store_mem,0x6610B64E,0x6610F7AA,Sets the Variant at [[ebp+%a]+%2] to the popped IUnknown (AddRef'd)
+3,0xEE,5,FMemStVarUnkFunc,%a %2,1,0,0,0,,1,,"x:set_var13_owned:m(%a,%2)",store_mem,0x6610B629,0x6610F785,Sets the Variant at [[ebp+%a]+%2] to the popped IUnknown (not AddRef'd)
+3,0xEF,5,FMemStAdFunc,%a %2,1,0,0,0,,1,,"x:set_obj_owned:m(%a,%2)",store_mem,0x66105FFE,0x6610A110,"Stores the popped object at [[ebp+%a]+%2] without AddRef, Releasing the old one"
+3,0xF0,5,FMemStVarCopy,%a %2,1,0,0,0,,1,,"x:var_copy:m(%a,%2)",store_mem,0x661060CA,0x6610A1DC,"Copies the popped Variant into [[ebp+%a]+%2] (strings, objects and arrays duplicated)"
+3,0xF1,5,FMemStStrCopy,%a %2,1,0,0,0,,1,,"x:bstr_copy:m(%a,%2)",store_mem,0x66105FC6,0x6610A0D8,"Stores a copy of the String at [[ebp+%a]+%2], freeing the old one"
+3,0xF2,3,CastAd,%c,1,1,0,0,,1,,,convert,0x66105D8D,0x66109E9F,Pop ptr; cast/validate COM interface; push validated ptr; %c=import
+3,0xF3,3,CastAdVar,%c,1,1,0,0,,1,,,convert,0x66105D79,0x66109E8B,Pops a Variant's address; pushes its object cast to the interface in pool %c
+3,0xF4,3,New,%c,0,1,0,0,,,,,stack,0x66105D13,0x66109E25,Create new COM object; %c=class import; push ptr
+3,0xF5,3,NewIfNullRf,%c,1,1,0,0,,1,,,stack,0x6610B04C,0x6610F1A8,Pop ref; if null create new instance; push (non-null) ref
+3,0xF6,3,NewIfNullAd,%c,1,1,0,0,,1,,,stack,0x66105D41,0x66109E53,Pop ptr; if null create new; push (non-null) ptr
+3,0xF7,3,NewIfNullPr,%c,1,0,0,0,,1,>pr:new,,stack,0x66105D33,0x66109E45,Pops the address of an object variable; creates the class in pool %c when it is Nothing; loads the object into Pr
+3,0xF8,3,CVarBoolI2,%a,1,1,0,0,,1,,,convert,0x66105063,0x661091A3,BoolI2 to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+3,0xF9,3,CVarDateVar,%a,1,1,0,0,,1,,,convert,0x661097CC,0x6610D8FB,DateVar to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+3,0xFA,3,CVarErrI4,%a,1,1,0,0,,1,,,convert,0x66109790,0x6610D8BF,ErrI4 to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+3,0xFB,3,CVarDate,%a,0,1,1,0,,f,,,convert,0x661097C2,0x6610D8F1,Date to Variant: pops the value (ST0); builds the Variant in the frame temp %a and pushes its address
+3,0xFC,3,CVarAryVarg,%a,1,1,0,0,,1,,,convert,0x6610991A,0x6610DA49,AryVarg to Variant: pops the value (one slot); builds the Variant in the frame temp %a and pushes its address
+3,0xFD,1,CStrVarTmp,,1,1,0,0,,1,,,convert,0x66104F71,0x661090C9,Variant to String: pops the Variant's address; result in one slot
+3,0xFE,3,CStrVarVal,%a,1,1,0,0,,1,,,convert,0x66104F97,0x661090E8,"Pops a Variant's address; pushes its String: the BSTR it holds, else a copy converted by __vbaStrVarCopy into the frame temp %a"
+3,0xFF,5,DestructOFrame,%a %s,0,0,0,0,,,,,stack,0x6610C079,0x66110206,Destroys the record at frame %a (descriptor in pool %s)
+4,0x00,3,ThisVCallUI1,%2,0,1,0,0,callee,*,me,,call,0x6610BD32,0x6610FEA3,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x01,3,ThisVCallI2,%2,0,1,0,0,callee,*,me,,call,0x6610BCEE,0x6610FE5F,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x02,3,ThisVCallI2,%2,0,1,0,0,callee,*,me,,call,0x6610BCEE,0x6610FE5F,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x03,3,ThisVCallR4,%2,0,1,0,0,callee,*,me,,call,0x6610BC48,0x6610FDB9,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x04,3,ThisVCallR8,%2,0,2,0,0,callee,*,me,,call,0x6610BC9B,0x6610FE0C,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x05,3,ThisVCallCy,%2,0,2,0,0,callee,*,me,,call,0x6610BC03,0x6610FD74,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x06,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x07,3,ThisVCallI2,%2,0,1,0,0,callee,*,me,,call,0x6610BCEE,0x6610FE5F,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x08,3,ThisVCallI2,%2,0,1,0,0,callee,*,me,,call,0x6610BCEE,0x6610FE5F,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x09,3,ThisVCallHidden,%2,0,0,0,0,callee,*,me,,call,0x6610BD78,0x6610FEE9,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes nothing
+4,0x0A,3,ThisVCallHidden,%2,0,0,0,0,callee,*,me,,call,0x6610BD78,0x6610FEE9,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes nothing
+4,0x0B,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x0C,3,ThisVCallHidden,%2,0,0,0,0,callee,*,me,,call,0x6610BD78,0x6610FEE9,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes nothing
+4,0x0D,5,ThisVCallCbFrame,%2 %2,0,0,0,0,callee,*,me,,call,0x6610BBC4,0x6610FD35,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; stores the result (width code %2) to a frame slot
+4,0x0E,3,StLsetFixStr,%2,2,0,0,0,,1 1,,x:fixstr_lset:pop,store_frame,0x6610B377,0x6610F4D3,LSet of the popped String into the popped fixed-length string
+4,0x0F,3,StFixedStrFree,%2,2,0,0,0,,1 1,,x:fixstr_lset_free:pop,store_frame,0x6610B35F,0x6610F4BB,"LSet of the popped String into the popped fixed-length string, then frees it"
+4,0x10,3,VCallUI1,%2,0,1,0,0,callee,*,pr,,call,0x6610BE3C,0x6610FFAD,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x11,3,VCallStr,%2,0,1,0,0,callee,*,pr,,call,0x661063C8,0x6610A4C9,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x12,3,VCallStr,%2,0,1,0,0,callee,*,pr,,call,0x661063C8,0x6610A4C9,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x13,3,VCallR4,%2,0,1,0,0,callee,*,pr,,call,0x6610BE2C,0x6610FF9D,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x14,3,VCallR8,%2,0,2,0,0,callee,*,pr,,call,0x6610BE34,0x6610FFA5,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x15,3,VCallCy,%2,0,2,0,0,callee,*,pr,,call,0x6610BE24,0x6610FF95,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x16,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x17,3,VCallStr,%2,0,1,0,0,callee,*,pr,,call,0x661063C8,0x6610A4C9,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x18,3,VCallStr,%2,0,1,0,0,callee,*,pr,,call,0x661063C8,0x6610A4C9,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes the result
+4,0x19,3,VCallFPR8,%2,0,0,0,c,callee,*,pr,,call,0x661063A1,0x6610A4A2,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes nothing; ST0 holds the result of a callee returning a float
+4,0x1A,3,VCallFPR8,%2,0,0,0,c,callee,*,pr,,call,0x661063A1,0x6610A4A2,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes nothing; ST0 holds the result of a callee returning a float
+4,0x1B,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x1C,3,VCallFPR8,%2,0,0,0,c,callee,*,pr,,call,0x661063A1,0x6610A4A2,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes nothing; ST0 holds the result of a callee returning a float
+4,0x1D,5,VCallCbFrame,%2 %2,0,0,0,0,callee,*,pr,,call,0x6610BE1C,0x6610FF8D,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; stores the result (width code %2) to a frame slot
+4,0x1E,3,StFixedStrR,%2,2,0,0,0,,1 1,,x:fixstr_rset:pop,store_frame,0x6610B347,0x6610F4A3,RSet of the popped String into the popped fixed-length string
+4,0x1F,3,StFixedStrRFree,%2,2,0,0,0,,1 1,,x:fixstr_rset_free:pop,store_frame,0x6610B32F,0x6610F48B,"RSet of the popped String into the popped fixed-length string, then frees it"
+4,0x20,5,ImpAdCallUI1,%x,0,1,0,0,arg_bytes(0),*,,,call,0x6610BB6B,0x6610FCDC,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes eax
+4,0x21,5,ImpAdCallI4,%x,0,1,0,0,arg_bytes(0),*,,,call,0x661062CC,0x6610A3CD,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes eax
+4,0x22,5,ImpAdCallI4,%x,0,1,0,0,arg_bytes(0),*,,,call,0x661062CC,0x6610A3CD,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes eax
+4,0x23,5,ImpAdCallR4,%x,0,1,0,0,arg_bytes(0),*,,,call,0x6610BA22,0x6610FB93,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes the ST0 result as a Single
+4,0x24,5,ImpAdCallR8,%x,0,2,0,0,arg_bytes(0),*,,,call,0x6610BA84,0x6610FBF5,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes the ST0 result as a Double
+4,0x25,5,ImpAdCallCy,%x,0,2,0,0,arg_bytes(0),*,,,call,0x6610BAEA,0x6610FC5B,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes edx:eax
+4,0x26,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x27,5,ImpAdCallI4,%x,0,1,0,0,arg_bytes(0),*,,,call,0x661062CC,0x6610A3CD,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes eax
+4,0x28,5,ImpAdCallI4,%x,0,1,0,0,arg_bytes(0),*,,,call,0x661062CC,0x6610A3CD,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes eax
+4,0x29,5,ImpAdCallFPR4,%x,0,0,0,c,arg_bytes(0),*,,,call,0x6610628E,0x6610A38F,"Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes nothing (the mnemonic is no type): ST0 holds the result of a Single, Double or Date callee, nothing of a Sub"
+4,0x2A,5,ImpAdCallFPR4,%x,0,0,0,c,arg_bytes(0),*,,,call,0x6610628E,0x6610A38F,"Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes nothing (the mnemonic is no type): ST0 holds the result of a Single, Double or Date callee, nothing of a Sub"
+4,0x2B,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x2C,5,ImpAdCallFPR4,%x,0,0,0,c,arg_bytes(0),*,,,call,0x6610628E,0x6610A38F,"Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); pushes nothing (the mnemonic is no type): ST0 holds the result of a Single, Double or Date callee, nothing of a Sub"
+4,0x2D,9,ImpAdCallCbFrame,%a %x %2,0,0,0,0,arg_bytes(1),*,,,call,0x6610B96E,0x6610FADF,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); stores eax to frame %a (width code)
+4,0x2E,3,LdStkRf,%2,0,1,0,0,,,,ad:s(%2),stack,0x6610BF9B,0x6611010C,Load stack reference; push addr of stack slot at %2 offset
+4,0x2F,3,LdFrameRf,%a,0,1,0,0,,,,ad:f(%a),load_frame,0x6610BFB0,0x66110121,Pushes the address of [ebp+%a]
+4,0x30,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x31,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x32,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x33,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x34,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x35,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x36,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x37,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x38,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x39,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x3A,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x3B,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x3C,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x3D,5,LitVarUI1,%a %2,0,1,0,0,,,,var:17=lit:f(%a),load_lit,0x6610AA8C,0x6610EBD5,Builds a Variant (vt 17 and the literal operand) at [ebp+%a] and pushes its address (the old contents not freed)
+4,0x3E,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x3F,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x40,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x41,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x42,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x43,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x44,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x45,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x46,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x47,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x48,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x49,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x4A,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x4B,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x4C,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x4D,1,SetVarVar,,2,0,0,0,,1 1,,x:set_var_var:pop,store_ind,0x6610B665,0x6610F7C1,Set of the popped Variant to the next popped Variant's object (AddRef'd)
+4,0x4E,1,SetVarVarFunc,,2,0,0,0,,1 1,,x:set_var_var_move:pop,store_ind,0x6610B652,0x6610F7AE,"Set of the popped Variant to the next popped Variant's object, emptying it"
+4,0x4F,5,ImpAdCallHresult,%x,0,0,0,0,arg_bytes(0),*,,,call,0x6610B8FE,0x6610FA6F,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); checks the HRESULT
+4,0x50,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x51,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x52,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x53,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x54,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x55,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x56,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x57,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x58,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x59,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x5A,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x5B,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x5C,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x5D,3,OpenFile,%2,3,0,0,0,,1 1 1,,,io,0x66105215,0x6610933B,"Open: pops the path, file number and record length; %2 holds mode and access"
+4,0x5E,3,LockFile,%2,3,0,0,0,,1 1 1,,,io,0x66109D39,0x6610DE82,Lock/Unlock: pops the file number and the record range; %2 selects the form
+4,0x5F,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x60,3,EraseDestruct,%s,1,0,0,0,,1,,,stack,0x66109143,0x6610D253,Erase array with destructor; %s=type desc; pop array ref
+4,0x61,3,LdFixedStr,%2,1,1,0,0,,1,,x:bstr_from_fixed:pop,load_frame,0x6610B24F,0x6610F3AB,Pops a fixed-length string's address; pushes a new String of %2 characters
+4,0x62,5,ForUI1,%a %l,3,0,0,0,,1 1 1,,,branch_cond,0x66109E39,0x6610DF82,For (Byte): pops the counter's address and the start and limit; saves limit and step at frame %a; jumps to %l when the loop does not run
+4,0x63,5,ForI2,%a %l,3,0,0,0,,1 1 1,,,branch_cond,0x661053A4,0x661094CA,For (Integer): pops the counter's address and the start and limit; saves limit and step at frame %a; jumps to %l when the loop does not run
+4,0x64,5,ForI4,%a %l,3,0,0,0,,1 1 1,,,branch_cond,0x66105477,0x6610959D,For (Long): pops the counter's address and the start and limit; saves limit and step at frame %a; jumps to %l when the loop does not run
+4,0x65,5,ForR4,%a %l,1,0,2,0,,f 1 f,,,branch_cond,0x66109ED4,0x6610E01D,For (Single): pops the counter's address and the start and limit; saves limit and step at frame %a; jumps to %l when the loop does not run
+4,0x66,5,ForR8,%a %l,1,0,2,0,,f 1 f,,,branch_cond,0x66109F42,0x6610E08B,For (Double): pops the counter's address and the start and limit; saves limit and step at frame %a; jumps to %l when the loop does not run
+4,0x67,5,ForCy,%a %l,5,0,0,0,,2 1 2,,,branch_cond,0x66109F82,0x6610E0CB,For (Currency): pops the counter's address and the start and limit; saves limit and step at frame %a; jumps to %l when the loop does not run
+4,0x68,5,ForVar,%a %l,3,0,0,0,,1 1 1,,,branch_cond,0x661054DF,0x66109605,For (Variant): pops the counter's address and the start and limit; saves limit and step at frame %a; jumps to %l when the loop does not run
+4,0x69,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x6A,5,ForStepUI1,%a %l,4,0,0,0,,1 1 1 1,,,branch_cond,0x66109E3D,0x6610DF86,"For (Byte): pops the counter's address and the start, limit and step; saves limit and step at frame %a; jumps to %l when the loop does not run"
+4,0x6B,5,ForStepI2,%a %l,4,0,0,0,,1 1 1 1,,,branch_cond,0x66105402,0x66109528,"For (Integer): pops the counter's address and the start, limit and step; saves limit and step at frame %a; jumps to %l when the loop does not run"
+4,0x6C,5,ForStepI4,%a %l,4,0,0,0,,1 1 1 1,,,branch_cond,0x6610547B,0x661095A1,"For (Long): pops the counter's address and the start, limit and step; saves limit and step at frame %a; jumps to %l when the loop does not run"
+4,0x6D,5,ForStepR4,%a %l,1,0,3,0,,f f 1 f,,,branch_cond,0x66109ED8,0x6610E021,"For (Single): pops the counter's address and the start, limit and step; saves limit and step at frame %a; jumps to %l when the loop does not run"
+4,0x6E,5,ForStepR8,%a %l,1,0,3,0,,f f 1 f,,,branch_cond,0x66109F46,0x6610E08F,"For (Double): pops the counter's address and the start, limit and step; saves limit and step at frame %a; jumps to %l when the loop does not run"
+4,0x6F,5,ForStepCy,%a %l,7,0,0,0,,2 2 1 2,,,branch_cond,0x66109F8A,0x6610E0D3,"For (Currency): pops the counter's address and the start, limit and step; saves limit and step at frame %a; jumps to %l when the loop does not run"
+4,0x70,5,ForStepVar,%a %l,4,0,0,0,,1 1 1 1,,,branch_cond,0x661054EF,0x66109615,"For (Variant): pops the counter's address and the start, limit and step; saves limit and step at frame %a; jumps to %l when the loop does not run"
+4,0x71,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x72,5,ForEachCollVar,%a %l,2,0,0,0,,1 1,,,branch_cond,0x6610A2A0,0x6610E3E9,For Each: pops the collection or array; starts the enumerator at frame %a; jumps to %l when it is empty
+4,0x73,5,NextEachCollVar,%a %l,1,0,0,0,,1,,,branch_cond,0x6610A2C0,0x6610E409,Next of For Each: pops the element's destination; advances the enumerator at frame %a; jumps to %l while elements remain
+4,0x74,5,ForEachCollAd,%a %l,2,0,0,0,,1 1,,,branch_cond,0x661055ED,0x66109713,For Each: pops the collection or array; starts the enumerator at frame %a; jumps to %l when it is empty
+4,0x75,5,NextEachCollAd,%a %l,1,0,0,0,,1,,,branch_cond,0x6610A2C7,0x6610E410,Next of For Each: pops the element's destination; advances the enumerator at frame %a; jumps to %l while elements remain
+4,0x76,7,ForEachAryVar,%a %2 %l,2,0,0,0,,1 1,,,branch_cond,0x6610A2DE,0x6610E427,For Each: pops the collection or array; starts the enumerator at frame %a; jumps to %l when it is empty
+4,0x77,7,NextEachAryVar,%a %2 %l,1,0,0,0,,1,,,branch_cond,0x6610A2F8,0x6610E441,Next of For Each: pops the element's destination; advances the enumerator at frame %a; jumps to %l while elements remain
+4,0x78,5,NextUI1,%a %l,1,0,0,0,,1,,,branch_cond,0x66109E69,0x6610DFB2,"Next (Byte): pops the counter's address, adds 1, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x79,5,NextI2,%a %l,1,0,0,0,,1,,,branch_cond,0x661053D3,0x661094F9,"Next (Integer): pops the counter's address, adds 1, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x7A,5,NextI4,%a %l,1,0,0,0,,1,,,branch_cond,0x661054B7,0x661095DD,"Next (Long): pops the counter's address, adds 1, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x7B,5,NextStepR4,%a %l,1,0,0,0,,1,,,branch_cond,0x66109F1C,0x6610E065,"Next (Single): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x7C,5,NextR8,%a %l,1,0,0,0,,1,,,branch_cond,0x66109F6A,0x6610E0B3,"Next (Double): pops the counter's address, adds 1, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x7D,5,NextStepCy,%a %l,1,0,0,0,,1,,,branch_cond,0x66109FDA,0x6610E123,"Next (Currency): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x7E,5,NextStepVar,%a %l,1,0,0,0,,1,,,branch_cond,0x6610551E,0x66109644,"Next (Variant): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x7F,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x80,5,NextStepUI1,%a %l,1,0,0,0,,1,,,branch_cond,0x66109E69,0x6610DFB2,"Next (Byte): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x81,5,NextStepI2,%a %l,1,0,0,0,,1,,,branch_cond,0x66105421,0x66109547,"Next (Integer): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x82,5,NextStepI4,%a %l,1,0,0,0,,1,,,branch_cond,0x66109EA1,0x6610DFEA,"Next (Long): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x83,5,NextStepR4,%a %l,1,0,0,0,,1,,,branch_cond,0x66109F1C,0x6610E065,"Next (Single): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x84,5,NextR8,%a %l,1,0,0,0,,1,,,branch_cond,0x66109F6A,0x6610E0B3,"Next (Double): pops the counter's address, adds 1, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x85,5,NextStepCy,%a %l,1,0,0,0,,1,,,branch_cond,0x66109FDA,0x6610E123,"Next (Currency): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x86,5,NextStepVar,%a %l,1,0,0,0,,1,,,branch_cond,0x6610551E,0x66109644,"Next (Variant): pops the counter's address, adds its step, compares with the limit saved at frame %a; jumps to %l while the loop runs"
+4,0x87,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x88,7,ForEachCollObj,%a %s %l,2,0,0,0,,1 1,,,branch_cond,0x661055FF,0x66109725,For Each: pops the collection or array; starts the enumerator at frame %a; jumps to %l when it is empty
+4,0x89,5,ForEachVar,%a %l,2,0,0,0,,1 1,,,branch_cond,0x6610A299,0x6610E3E2,For Each: pops the collection or array; starts the enumerator at frame %a; jumps to %l when it is empty
+4,0x8A,5,ForEachVarFree,%a %l,2,0,0,0,,1 1,,,branch_cond,0x6610A282,0x6610E3CB,For Each: pops the collection or array; starts the enumerator at frame %a; jumps to %l when it is empty
+4,0x8B,7,NextEachCollObj,%a %s %l,1,0,0,0,,1,,,branch_cond,0x6610561B,0x66109741,Next of For Each: pops the element's destination; advances the enumerator at frame %a; jumps to %l while elements remain
+4,0x8C,5,NextEachVar,%a %l,1,0,0,0,,1,,,branch_cond,0x6610A2A7,0x6610E3F0,Next of For Each: pops the element's destination; advances the enumerator at frame %a; jumps to %l while elements remain
+4,0x8D,3,CheckType,%c,1,1,0,0,,1,,,compare,0x66105DBF,0x66109ED1,TypeOf..Is check; pop obj ptr; check against %c type; push i32 bool
+4,0x8E,9,Redim,%2 %2 %2 %2,1,0,0,0,pairs1(0),* 1,,,stack,0x66104D26,0x66108E7E,"ReDim: %2 dims, vartype or record pool index, element size, features; pops the array's address and 2*max(dims,1) bounds"
+4,0x8F,9,RedimPreserve,%2 %2 %2 %2,1,0,0,0,pairs1(0),* 1,,,stack,0x66109169,0x6610D279,"ReDim: %2 dims, vartype or record pool index, element size, features; pops the array's address and 2*max(dims,1) bounds"
+4,0x90,5,RedimVar,%2 %2,1,0,0,0,pairs(0),* 1,,,stack,0x661091C3,0x6610D2D3,ReDim of a Variant array: pops the address and 2*dims bounds
+4,0x91,5,RedimPreserveVar,%2 %2,1,0,0,0,pairs(0),* 1,,,stack,0x66109192,0x6610D2A2,ReDim of a Variant array: pops the address and 2*dims bounds
+4,0x92,5,FDupVar,%a %a,0,0,0,0,,,,x:var_dup:f(%a#2):f(%a),load_frame,0x661060A9,0x6610A1BB,Duplicates the Variant into [ebp+%a] (__vbaVarDup)
+4,0x93,5,FDupStr,%a %a,0,0,0,0,,,,x:bstr_copy:f(%a#2):f(%a),load_frame,0x6610B278,0x6610F3D4,"Stores a copy of the String at [ebp+%a], freeing the old one"
+4,0x94,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0x95,-1,OnGosub,%L,1,1,0,0,,1,,,gosub,0x66109205,0x6610D315,"On n GoSub: pops n; jumps to the n-th target of the payload, pushing the return position; past the list it falls through"
+4,0x96,-1,OnGoto,%L,1,0,0,0,,1,,,branch_cond,0x66109238,0x6610D348,On n GoTo: pops n; jumps to the n-th target of the payload; past the list it falls through
+4,0x97,1,AddRef,,1,1,0,0,,1,,,stack,0x6610B811,0x6610F982,Pop COM ptr; AddRef; push same ptr back (increment ref count)
+4,0x98,5,LateMemCall,%s %2,0,0,0,0,variants(1),*,pr,,call,0x661057D6,0x661098FC,Late-bound IDispatch call on Pr by name (pool %s); argc Variants by value
+4,0x99,5,LateMemLdVar,%a %s,0,1,0,0,,,pr,,call,0x6610578E,0x661098B4,"Late-bound IDispatch call on Pr by name (pool %s); result Variant in frame %a, whose address it pushes"
+4,0x9A,7,LateMemCallLdVar,%a %s %2,0,1,0,0,variants(2),*,pr,,call,0x661057E9,0x6610990F,"Late-bound IDispatch call on Pr by name (pool %s); argc Variants by value; result Variant in frame %a, whose address it pushes"
+4,0x9B,3,LateMemSt,%s,4,0,0,0,,4,pr,,call,0x66105800,0x66109926,Late-bound IDispatch call on Pr by name (pool %s); pops the value Variant (by value)
+4,0x9C,5,LateMemCallSt,%s %2,4,0,0,0,variants(1),4 *,pr,,call,0x6610584E,0x66109974,Late-bound IDispatch call on Pr by name (pool %s); argc Variants by value; pops the value Variant (by value)
+4,0x9D,5,LateMemStAd,%s %2,4,0,0,0,variants(1),4 *,pr,,call,0x6610583D,0x66109963,Late-bound IDispatch call on Pr by name (pool %s); pops the value Variant (by value)
+4,0x9E,5,ExitProcFrameCb,%a %2,0,0,0,0,,,,,return,0x6610BEE4,0x66110055,Copies %2 bytes from frame %a to the hidden result pointer at [ebp+0xC]; returns that pointer in eax
+4,0x9F,5,ExitProcFrameCbStack,%a %2,0,0,0,0,,,,,return,0x6610BE5F,0x6610FFD0,"Returns the value at frame %a in al, ax, eax or edx:eax by the width code %2 (1, 2, 4, else 8)"
+4,0xA0,7,LateIdCall,%4 %2,0,0,0,0,variants(1),*,pr,,call,0x66105734,0x6610985A,Late-bound IDispatch call on Pr by DISPID %4; argc Variants by value
+4,0xA1,7,LateIdLdVar,%a %4,0,1,0,0,,,pr,,call,0x66105720,0x66109846,"Late-bound IDispatch call on Pr by DISPID %4; result Variant in frame %a, whose address it pushes"
+4,0xA2,9,LateIdCallLdVar,%a %4 %2,0,1,0,0,variants(2),*,pr,,call,0x66105746,0x6610986C,"Late-bound IDispatch call on Pr by DISPID %4; argc Variants by value; result Variant in frame %a, whose address it pushes"
+4,0xA3,5,LateIdSt,%4,4,0,0,0,,4,pr,,call,0x6610575C,0x66109882,Late-bound IDispatch call on Pr by DISPID %4; pops the value Variant (by value)
+4,0xA4,7,LateIdCallSt,%4 %2,4,0,0,0,variants(1),4 *,pr,,call,0x66105780,0x661098A6,Late-bound IDispatch call on Pr by DISPID %4; argc Variants by value; pops the value Variant (by value)
+4,0xA5,7,LateIdStAd,%4 %2,4,0,0,0,variants(1),4 *,pr,,call,0x6610576D,0x66109893,Late-bound IDispatch call on Pr by DISPID %4; pops the value Variant (by value)
+4,0xA6,-1,LateMemNamedCall,%s %2 %N,0,0,0,0,variants(1),*,pr,,call,0x6610A964,0x6610EAAD,Late-bound IDispatch call on Pr by name (pool %s); argc Variants by value; named arguments follow
+4,0xA7,-1,LateMemNamedCallLdVar,%a %s %2 %N,0,1,0,0,variants(2),*,pr,,call,0x6610A99E,0x6610EAE7,"Late-bound IDispatch call on Pr by name (pool %s); argc Variants by value; named arguments follow; result Variant in frame %a, whose address it pushes"
+4,0xA8,-1,LateMemNamedCallSt,%s %2 %N,4,0,0,0,variants(1),4 *,pr,,call,0x6610A9BC,0x6610EB05,Late-bound IDispatch call on Pr by name (pool %s); argc Variants by value; named arguments follow; pops the value Variant (by value)
+4,0xA9,-1,LateMemNamedStAd,%s %2 %N,4,0,0,0,variants(1),4 *,pr,,call,0x6610A9EA,0x6610EB33,Late-bound IDispatch call on Pr by name (pool %s); named arguments follow; pops the value Variant (by value)
+4,0xAA,-1,LateIdNamedCall,%4 %2 %D,0,0,0,0,variants(1),*,pr,,call,0x6610A864,0x6610E9AD,Late-bound IDispatch call on Pr by DISPID %4; argc Variants by value; named arguments follow
+4,0xAB,-1,LateIdNamedCallLdVar,%a %4 %2 %D,0,1,0,0,variants(2),*,pr,,call,0x6610A89C,0x6610E9E5,"Late-bound IDispatch call on Pr by DISPID %4; argc Variants by value; named arguments follow; result Variant in frame %a, whose address it pushes"
+4,0xAC,-1,LateIdNamedCallSt,%4 %2 %D,4,0,0,0,variants(1),4 *,pr,,call,0x6610A8B9,0x6610EA02,Late-bound IDispatch call on Pr by DISPID %4; argc Variants by value; named arguments follow; pops the value Variant (by value)
+4,0xAD,-1,LateIdNamedStAd,%4 %2 %D,4,0,0,0,variants(1),4 *,pr,,call,0x6610A8E5,0x6610EA2E,Late-bound IDispatch call on Pr by DISPID %4; named arguments follow; pops the value Variant (by value)
+4,0xAE,5,VarIndexLdVar,%a %2,1,1,0,0,variants(1),1 *,,x:var_index_copy:pop:f(%a),load_ind,0x66104C5D,0x66108DB5,Copies an element of the popped Variant (popped indices) into a frame temp; pushes its address
+4,0xAF,5,VarIndexLdRfVar,%a %2,1,1,0,0,variants(1),1 *,,x:var_index_ad:pop:f(%a),load_ind,0x66109079,0x6610D189,Pushes the address of an element of the popped Variant (popped indices)
+4,0xB0,3,VarIndexSt,%2,5,0,0,0,variants(0),1 * 4,,x:var_index_let:pop,store_ind,0x66109086,0x6610D196,Let of the popped value into an element of the popped Variant
+4,0xB1,3,VarIndexStAd,%2,5,0,0,0,variants(0),1 * 4,,x:var_index_set:pop,store_ind,0x661090B1,0x6610D1C1,Set of the popped value into an element of the popped Variant
+4,0xB2,-1,FFreeVar,%F,0,0,0,0,,,,,stack,0x66106204,0x6610A305,Frees the frame slots listed in the payload (i16 offsets); no stack effect
+4,0xB3,-1,FFreeStr,%F,0,0,0,0,,,,,stack,0x661061D8,0x6610A2D9,Frees the frame slots listed in the payload (i16 offsets); no stack effect
+4,0xB4,-1,FFreeAd,%F,0,0,0,0,,,,,stack,0x6610623C,0x6610A33D,Frees the frame slots listed in the payload (i16 offsets); no stack effect
+4,0xB5,3,LitI2,%2,0,1,0,0,,,,lit:2s,load_lit,0x661058D8,0x661099FE,"Pushes the 2-byte literal operand, sign-extended to a slot"
+4,0xB6,3,LitI2FP,%2,0,0,0,1,,,,litfp:2i,load_lit,0x6610AA48,0x6610EB91,"Loads the 2-byte float literal onto the x87 stack (an integer, fild)"
+4,0xB7,5,LitCy4,%4,0,2,0,0,,,,lit:4s8,load_lit,0x6610AA1E,0x6610EB67,"Pushes the 4-byte literal operand, sign-extended to 8 bytes (two slots)"
+4,0xB8,5,LitI4,%4,0,1,0,0,,,,lit:4,load_lit,0x661058FE,0x66109A24,Pushes the 4-byte literal operand
+4,0xB9,5,LitI4,%4,0,1,0,0,,,,lit:4,load_lit,0x661058FE,0x66109A24,Pushes the 4-byte literal operand
+4,0xBA,5,LitR4FP,%4,0,0,0,1,,,,litfp:4,load_lit,0x6610AA59,0x6610EBA2,Loads the 4-byte float literal onto the x87 stack
+4,0xBB,9,LitR8,%4 %4,0,2,0,0,,,,lit:8,load_lit,0x6610AA32,0x6610EB7B,Pushes the 8-byte literal operand
+4,0xBC,9,LitR8,%4 %4,0,2,0,0,,,,lit:8,load_lit,0x6610AA32,0x6610EB7B,Pushes the 8-byte literal operand
+4,0xBD,9,LitR8FP,%4 %4,0,0,0,1,,,,litfp:8,load_lit,0x6610591E,0x66109A44,Loads the 8-byte float literal onto the x87 stack
+4,0xBE,9,LitR8FP,%4 %4,0,0,0,1,,,,litfp:8,load_lit,0x6610591E,0x66109A44,Loads the 8-byte float literal onto the x87 stack
+4,0xBF,3,LitStr,%s,0,1,0,0,,,,pool:%s,load_lit,0x6610592F,0x66109A55,Pushes the constant pool entry %s itself (a BSTR literal; nothing copied)
+4,0xC0,5,LitVarI2,%a %2,0,1,0,0,,,,var:2=lit:f(%a),load_lit,0x661059AE,0x66109AD4,Builds a Variant (vt 2 and the literal operand) at [ebp+%a] and pushes its address (the old contents not freed)
+4,0xC1,7,LitVarI4,%a %4,0,1,0,0,,,,var:3=lit:f(%a),load_lit,0x661059C5,0x66109AEB,Builds a Variant (vt 3 and the literal operand) at [ebp+%a] and pushes its address (the old contents not freed)
+4,0xC2,7,LitVarR4,%a %4,0,1,0,0,,,,var:4=lit:f(%a),load_lit,0x6610AAA5,0x6610EBEE,Builds a Variant (vt 4 and the literal operand) at [ebp+%a] and pushes its address (the old contents not freed)
+4,0xC3,11,LitVarCy,%a %4 %4,0,1,0,0,,,,var:6=lit:f(%a),load_lit,0x6610AAAF,0x6610EBF8,Builds a Variant (vt 6 and the literal operand) at [ebp+%a] and pushes its address (the old contents not freed)
+4,0xC4,11,LitVarR8,%a %4 %4,0,1,0,0,,,,var:5=lit:f(%a),load_lit,0x661059E0,0x66109B06,Builds a Variant (vt 5 and the literal operand) at [ebp+%a] and pushes its address (the old contents not freed)
+4,0xC5,11,LitVarDate,%a %4 %4,0,1,0,0,,,,var:7=lit:f(%a),load_lit,0x6610AAB9,0x6610EC02,Builds a Variant (vt 7 and the literal operand) at [ebp+%a] and pushes its address (the old contents not freed)
+4,0xC6,5,LitVarStr,%a %s,0,1,0,0,,,,var:8=pool:f(%a),load_lit,0x66105987,0x66109AAD,Builds a Variant (vt 8 and pool entry %s (shared)) at [ebp+%a] and pushes its address (the old contents not freed)
+4,0xC7,1,CStrBool,,1,1,0,0,,1,,,convert,0x66109635,0x6610D753,"Bool→Str; pop VB bool; convert to ""True""/""False"" BSTR; push"
+4,0xC8,1,CStrDate,,0,1,1,0,,f,,,convert,0x66109669,0x6610D787,Date(FPU)→Str; pop FPU R8 date; convert to BSTR; push
+4,0xC9,1,CDateStr,,1,0,0,1,,1,,,convert,0x6610502E,0x6610D80C,Str→Date(FPU); pop BSTR; parse date; push FPU R8
+4,0xCA,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0xCB,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0xCC,1,FreeStrNoPop,,1,1,0,0,,1,,,stack,0x6610B7BB,0x6610F92C,"Frees the String the top of the stack points to, which stays"
+4,0xCD,1,FreeVarNoPop,,1,1,0,0,,1,,,stack,0x6610B7FD,0x6610F96E,"Clears the Variant the top of the stack points to, which stays"
+4,0xCE,1,FreeAdNoPop,,1,1,0,0,,1,,,stack,0x6610B7DC,0x6610F94D,"Releases the object the top of the stack points to, which stays"
+4,0xCF,1,EraseNoPop,,1,1,0,0,,1,,,stack,0x66109105,0x6610D215,"Erases the array on top of the stack, which stays"
+4,0xD0,3,WMemLdUI1,%2,0,1,0,0,,,,ld:w(%2):1z,load_mem,0x6610A5AC,0x6610E6F5,"Pushes the 1 bytes at [[ebp+0x10]+%2], zero-extended"
+4,0xD1,3,WMemLdI2,%2,0,1,0,0,,,,ld:w(%2):2u,load_mem,0x6610A5C5,0x6610E70E,Pushes the 2 bytes at [[ebp+0x10]+%2] (the rest of the slot undefined)
+4,0xD2,3,WMemLdStr,%2,0,1,0,0,,,,ld:w(%2):4,load_mem,0x6610A5DE,0x6610E727,Pushes the 4 bytes at [[ebp+0x10]+%2]
+4,0xD3,3,WMemLdStr,%2,0,1,0,0,,,,ld:w(%2):4,load_mem,0x6610A5DE,0x6610E727,Pushes the 4 bytes at [[ebp+0x10]+%2]
+4,0xD4,3,WMemLdCy,%2,0,2,0,0,,,,ld:w(%2):8,load_mem,0x6610A5F5,0x6610E73E,Pushes the 8 bytes at [[ebp+0x10]+%2]
+4,0xD5,3,WMemLdCy,%2,0,2,0,0,,,,ld:w(%2):8,load_mem,0x6610A5F5,0x6610E73E,Pushes the 8 bytes at [[ebp+0x10]+%2]
+4,0xD6,3,WMemLdRfVar,%2,0,1,0,0,,,,ad:w(%2),load_mem,0x6610A63D,0x6610E786,Pushes the address of [[ebp+0x10]+%2]
+4,0xD7,3,WMemLdStr,%2,0,1,0,0,,,,ld:w(%2):4,load_mem,0x6610A5DE,0x6610E727,Pushes the 4 bytes at [[ebp+0x10]+%2]
+4,0xD8,3,WMemLdStr,%2,0,1,0,0,,,,ld:w(%2):4,load_mem,0x6610A5DE,0x6610E727,Pushes the 4 bytes at [[ebp+0x10]+%2]
+4,0xD9,3,WMemLdFPR4,%2,0,0,0,1,,,,ldfp:w(%2):4,load_mem,0x6610A60F,0x6610E758,Loads the 4-byte float at [[ebp+0x10]+%2] onto the x87 stack
+4,0xDA,3,WMemLdFPR8,%2,0,0,0,1,,,,ldfp:w(%2):8,load_mem,0x6610A626,0x6610E76F,Loads the 8-byte float at [[ebp+0x10]+%2] onto the x87 stack
+4,0xDB,3,IWMemLdPr,%2,0,0,0,0,,,>pr:with,prn:w(%2),load_mem,0x6610B224,0x6610F380,Loads Pr with the object at [[ebp+0x10]+%2]; error 91 when it is Nothing
+4,0xDC,3,WMemLdRfVar,%2,0,1,0,0,,,,ad:w(%2),load_mem,0x6610A63D,0x6610E786,Pushes the address of [[ebp+0x10]+%2]
+4,0xDD,3,WMemLdVar,%2,0,4,0,0,,,,ld:w(%2):16,load_mem,0x6610B1C6,0x6610F322,Pushes the 16 bytes at [[ebp+0x10]+%2]
+4,0xDE,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0xDF,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0xE0,3,WMemStUI1,%2,1,0,0,0,,1,,st:w(%2):1,store_mem,0x6610A653,0x6610E79C,Pops and stores 1 bytes at [[ebp+0x10]+%2] (the old value not freed)
+4,0xE1,3,WMemStI2,%2,1,0,0,0,,1,,st:w(%2):2,store_mem,0x6610A66B,0x6610E7B4,Pops and stores 2 bytes at [[ebp+0x10]+%2] (the old value not freed)
+4,0xE2,3,WMemStR4,%2,1,0,0,0,,1,,st:w(%2):4,store_mem,0x6610A684,0x6610E7CD,Pops and stores 4 bytes at [[ebp+0x10]+%2] (the old value not freed)
+4,0xE3,3,WMemStR4,%2,1,0,0,0,,1,,st:w(%2):4,store_mem,0x6610A684,0x6610E7CD,Pops and stores 4 bytes at [[ebp+0x10]+%2] (the old value not freed)
+4,0xE4,3,WMemStR8,%2,2,0,0,0,,2,,st:w(%2):8,store_mem,0x6610A69B,0x6610E7E4,Pops and stores 8 bytes at [[ebp+0x10]+%2] (the old value not freed)
+4,0xE5,3,WMemStR8,%2,2,0,0,0,,2,,st:w(%2):8,store_mem,0x6610A69B,0x6610E7E4,Pops and stores 8 bytes at [[ebp+0x10]+%2] (the old value not freed)
+4,0xE6,3,WMemStVar,%2,1,0,0,0,,1,,x:var_let:w(%2),store_mem,0x6610B708,0x6610F879,Let of the popped Variant into [[ebp+0x10]+%2] (the source moves; an object source gives its default value)
+4,0xE7,3,WMemStStr,%2,1,0,0,0,,1,,x:bstr_move:w(%2),store_mem,0x6610B29D,0x6610F3F9,"Stores the popped String at [[ebp+0x10]+%2], freeing the old one (the string moves)"
+4,0xE8,3,WMemStAd,%2,1,0,0,0,,1,,x:set_obj:w(%2),store_mem,0x6610B3C2,0x6610F51E,"Stores the popped object at [[ebp+0x10]+%2], AddRef'd, Releasing the old one"
+4,0xE9,3,WMemStFPR4,%2,0,0,1,0,,f,,stfp:w(%2):4,store_mem,0x6610A6B5,0x6610E7FE,Stores ST0 as an 4-byte float at [[ebp+0x10]+%2]
+4,0xEA,3,WMemStFPR8,%2,0,0,1,0,,f,,stfp:w(%2):8,store_mem,0x6610A6D6,0x6610E81F,Stores ST0 as an 8-byte float at [[ebp+0x10]+%2]
+4,0xEB,3,WMemStVarAd,%2,1,0,0,0,,1,,x:set_var9:w(%2),store_mem,0x6610B46F,0x6610F5CB,"Sets the Variant at [[ebp+0x10]+%2] to the popped object (VT_DISPATCH, AddRef'd)"
+4,0xEC,3,WMemStVarAdFunc,%2,1,0,0,0,,1,,x:set_var9_owned:w(%2),store_mem,0x6610B45C,0x6610F5B8,"Sets the Variant at [[ebp+0x10]+%2] to the popped object (VT_DISPATCH, not AddRef'd)"
+4,0xED,3,WMemStVarUnk,%2,1,0,0,0,,1,,x:set_var13:w(%2),store_mem,0x6610B625,0x6610F781,Sets the Variant at [[ebp+0x10]+%2] to the popped IUnknown (AddRef'd)
+4,0xEE,3,WMemStVarUnkFunc,%2,1,0,0,0,,1,,x:set_var13_owned:w(%2),store_mem,0x6610B60E,0x6610F76A,Sets the Variant at [[ebp+0x10]+%2] to the popped IUnknown (not AddRef'd)
+4,0xEF,3,WMemStAdFunc,%2,1,0,0,0,,1,,x:set_obj_owned:w(%2),store_mem,0x6610B3AF,0x6610F50B,"Stores the popped object at [[ebp+0x10]+%2] without AddRef, Releasing the old one"
+4,0xF0,3,WMemStVarCopy,%2,1,0,0,0,,1,,x:var_copy:w(%2),store_mem,0x6610B6B4,0x6610F810,"Copies the popped Variant into [[ebp+0x10]+%2] (strings, objects and arrays duplicated)"
+4,0xF1,3,WMemStStrCopy,%2,1,0,0,0,,1,,x:bstr_copy:w(%2),store_mem,0x6610B2BD,0x6610F419,"Stores a copy of the String at [[ebp+0x10]+%2], freeing the old one"
+4,0xF2,7,VarIndexLdRfVarLock,%a %a %2,1,1,0,0,variants(2),1 *,,x:var_index_ad:pop:f(%a),load_ind,0x66109052,0x6610D162,Pushes the address of an element of the popped Variant (popped indices)
+4,0xF3,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0xF4,1,InvalidExcode,,0,0,0,0,,,,,,,,
+4,0xF5,3,AssignRecord,%s,2,0,0,0,,1 1,,,stack,0x6610C0C1,0x6611024E,Assign UDT record; pop src+dst ptrs; memcpy; %s=type desc
+4,0xF6,5,DestructAnsiOFrame,%a %s,0,0,0,0,,,,,stack,0x6610C09D,0x6611022A,Destroys the ANSI record at frame %a (descriptor in pool %s)
+4,0xF7,3,FStVarZero,%a,1,0,0,0,,1,,x:var_move:f(%a),store_frame,0x6610B678,0x6610F7D4,"Moves the popped Variant into [ebp+%a], emptying the source"
+4,0xF8,3,FStVarCopyObj,%a,1,0,0,0,,1,,x:var_dup:f(%a),store_frame,0x66106110,0x6610A222,Duplicates the Variant into [ebp+%a] (__vbaVarDup)
+4,0xF9,1,VerifyVarObj,,4,4,0,0,,4,,,stack,0x6610534C,0x66109472,Checks that the Variant by value on top (four slots) holds an object; leaves it
+4,0xFA,1,VerifyPVarObj,,1,1,0,0,,1,,,stack,0x66109DF4,0x6610DF3D,Verify ptr-to-Variant contains Object; pop addr; validate; push
+4,0xFB,1,FnInStrB4,,4,1,0,0,,1 1 1 1,,,stack,0x6610C3AA,0x6611054D,InStrB (4-arg byte); pop start+str1+str2+compare; push i32 pos
+4,0xFC,3,FnInStrB4Var,%a,4,1,0,0,,1 1 1 1,,,stack,0x6610C3BC,0x6611055F,"InStrB(start, s1, s2, compare) as a Variant in frame %a; pops four arguments, pushes its address"
+4,0xFD,1,FnInStr4,,4,1,0,0,,1 1 1 1,,,stack,0x66106833,0x6610A902,InStr (4-arg); pop start+str1+str2+compare; push i32 position
+4,0xFE,3,FnInStr4Var,%a,4,1,0,0,,1 1 1 1,,,stack,0x6610C3D7,0x6611057A,"InStr(start, s1, s2, compare) as a Variant in frame %a; pops four arguments, pushes its address"
+4,0xFF,1,FnStrComp3,,3,1,0,0,,1 1 1,,,stack,0x6610C3F2,0x66110595,StrComp (3-arg); pop str1+str2+compare; push i32 result
+5,0x00,3,FnStrComp3Var,%a,3,1,0,0,,1 1 1,,,stack,0x6610C404,0x661105A7,"StrComp(s1, s2, compare) as a Variant in frame %a; pops three arguments, pushes its address"
+5,0x01,1,StAryMove,,2,0,0,0,,1 1,,x:ary_move:pop,store_ind,0x66104C89,0x66108DE1,Moves the popped source array into the popped destination (__vbaAryMove)
+5,0x02,1,StAryCopy,,2,0,0,0,,1 1,,x:ary_copy:pop,store_ind,0x661090B8,0x6610D1C8,Copies the popped source array into the popped destination (__vbaAryCopy)
+5,0x03,3,StAryRecMove,%s,2,0,0,0,,1 1,,x:ary_rec_move:pop,store_ind,0x661090E7,0x6610D1F7,Moves the popped record array into the popped destination
+5,0x04,3,StAryRecCopy,%s,2,0,0,0,,1 1,,x:ary_rec_copy:pop,store_ind,0x661090C9,0x6610D1D9,Copies the popped record array into the popped destination
+5,0x05,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x06,5,AryInRecLdPr,%s %2,1,0,0,0,count(1),* 1,>pr:array,"prad:ar(%s,%2)",load_ind,0x6610901C,0x6610D12C,Loads Pr with the address of the element of the array %s describes in a popped record
+5,0x07,5,AryInRecLdRf,%s %2,1,1,0,0,count(1),* 1,,"ad:ar(%s,%2)",load_ind,0x66108FED,0x6610D0FD,Pushes the address of the element of the array %s describes in a popped record
+5,0x08,1,CExtInstUnk,,1,1,0,0,,1,,,convert,0x6610B090,0x6610F1EC,Convert external instance to IUnknown; pop ptr; QI; push
+5,0x09,3,IStVarCopyObj,%a,1,0,0,0,,1,,x:var_dup:fi(%a),store_ind,0x6610B6F9,0x6610F855,Duplicates the Variant into where the pointer at [ebp+%a] points (__vbaVarDup)
+5,0x0A,1,ArrayRebase1Var,,1,1,0,0,,1,,,stack,0x661091F3,0x6610D303,Pops a Variant array's address; rebases it to 1; pushes the address
+5,0x0B,1,Assert,,1,0,0,0,,1,,,stack,0x66108E22,0x6610CF32,Debug.Assert; pop bool; break if False; no-op in release
+5,0x0C,7,RaiseEvent,%4 %2,0,0,0,0,variants(1),*,me,,call,0x6610A847,0x6610E990,RaiseEvent DISPID %4 on Me with %2 Variant arguments by value
+5,0x0D,5,PrintObject,%s %2,0,0,0,0,bytes(1),*,,,io,0x66106246,0x6610A347,"Print/Write/Input #: pushes the pool descriptor %s, calls the cdecl helper, releases %2 bytes (the descriptor and the arguments)"
+5,0x0E,5,PrintFile,%s %2,0,0,0,0,bytes(1),*,,,io,0x6610626A,0x6610A36B,"Print/Write/Input #: pushes the pool descriptor %s, calls the cdecl helper, releases %2 bytes (the descriptor and the arguments)"
+5,0x0F,5,WriteFile,%s %2,0,0,0,0,bytes(1),*,,,io,0x6610B8D2,0x6610FA43,"Print/Write/Input #: pushes the pool descriptor %s, calls the cdecl helper, releases %2 bytes (the descriptor and the arguments)"
+5,0x10,5,InputFile,%s %2,0,0,0,0,bytes(1),*,,,io,0x66109BAD,0x6610DCF6,"Print/Write/Input #: pushes the pool descriptor %s, calls the cdecl helper, releases %2 bytes (the descriptor and the arguments)"
+5,0x11,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x12,1,GetRecFxStr3,,3,0,0,0,,1 1 1,,,io,0x66109C81,0x6610DDCA,Get with fixed string (3-arg); pop filenum+recnum+buffer
+5,0x13,1,GetRecFxStr4,,4,0,0,0,,1 1 1 1,,,io,0x66109CA3,0x6610DDEC,Get with fixed string (4-arg); pop filenum+recnum+buffer+len
+5,0x14,1,PutRecFxStr3,,3,0,0,0,,1 1 1,,,io,0x66109C92,0x6610DDDB,Put with fixed string (3-arg); pop filenum+recnum+buffer
+5,0x15,1,PutRecFxStr4,,4,0,0,0,,1 1 1 1,,,io,0x66109CB4,0x6610DDFD,Put with fixed string (4-arg); pop filenum+recnum+buffer+len
+5,0x16,3,GetRecOwn3,%s,2,0,0,0,,1 1,,,io,0x66109CC5,0x6610DE0E,Get # of a record (descriptor in pool %s): pops file number and destination
+5,0x17,3,GetRecOwn4,%s,3,0,0,0,,1 1 1,,,io,0x66109CE2,0x6610DE2B,Get # of a record (descriptor in pool %s) with record number: pops three
+5,0x18,3,PutRecOwn3,%s,2,0,0,0,,1 1,,,io,0x66109CFF,0x6610DE48,Put # of a record (descriptor in pool %s): pops file number and source
+5,0x19,3,PutRecOwn4,%s,3,0,0,0,,1 1 1,,,io,0x66109D1C,0x6610DE65,Put # of a record (descriptor in pool %s) with record number: pops three
+5,0x1A,2,LitI2_Byte,%1,0,1,0,0,,,,lit:1s,load_lit,0x661058EB,0x66109A11,"Pushes the 1-byte literal operand, sign-extended to a slot"
+5,0x1B,1,CBoolVarNull,,1,1,0,0,,1,,,convert,0x66104F4D,0x661090A5,Variant to Boolean: pops the Variant's address; result in one slot
+5,0x1C,2,LargeBos,%1,0,0,0,0,,,,,bos,0x66104BFE,0x66108D56,"Starts a statement: stores its address to [ebp-0x14]; %1 is the statement's length in bytes, which Resume Next skips (0 for the last statement)"
+5,0x1D,0,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x1E,5,ImpAdCallNonVirt,%x,0,0,0,0,arg_bytes(0),*,,,call,0x6610B8F6,0x6610FA67,Calls the procedure whose address is in the pool entry of %x; the callee releases the %x argument bytes (checked); checks the HRESULT
+5,0x1F,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x20,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x21,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x22,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x23,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x24,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x25,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x26,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x27,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x28,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x29,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x2A,3,DestructRecord,%s,0,0,0,0,,,,,stack,0x6610C059,0x661101E6,Destroys the record whose address is on top of the stack (stays; descriptor in pool %s)
+5,0x2B,3,VCallFPR8,%2,0,0,0,c,callee,*,pr,,call,0x661063A1,0x6610A4A2,Calls Pr's vtable method (vtable offset %2); the callee releases this and its arguments; pushes nothing; ST0 holds the result of a callee returning a float
+5,0x2C,3,ThisVCallHidden,%2,0,0,0,0,callee,*,me,,call,0x6610BD78,0x6610FEE9,Calls Me's vtable method (vtable offset %2); the callee releases this and its arguments; pushes nothing
+5,0x2D,1,ZeroRetVal,,0,0,0,0,,,,zero:f(-0x88):4,store_frame,0x66106590,0x6610A675,Zeroes 4 bytes at [ebp+-0x88]
+5,0x2E,1,ZeroRetValVar,,0,0,0,0,,,,zero:f(-0x94):4,store_frame,0x661065A6,0x6611026B,Zeroes 4 bytes at [ebp+-0x94]
+5,0x2F,5,ExitProcCbHresult,%a %2,0,0,0,0,,,,,return,0x661063F0,0x6610A4F1,"Copies %2 bytes of the result (from ebp-0x84-%2, rounded down to even: the top of the locals) to the [out, retval] pointer in argument %a; returns eax = 0 (S_OK)"
+5,0x30,7,ExitProcFrameCbHresult,%a %a %2,0,0,0,0,,,,,return,0x6610BF05,0x66110076,"Copies %2 bytes from frame %a (the first) to the [out, retval] pointer in argument %a (the second); returns eax = 0 (S_OK)"
+5,0x31,3,EraseDestrKeepData,%s,1,0,0,0,,1,,,stack,0x66109126,0x6610D236,Erase array but keep data; destructor variant; %s=type desc
+5,0x32,5,CDargRefUdt,%2 %s,1,4,0,0,,1,,,convert,0x661098A3,0x6610D9D2,Pops a record's address; pushes a by-reference record Variant (descriptor in pool %s) by value
+5,0x33,5,CVarRefUdt,%a %s,1,1,0,0,,1,,,convert,0x66109875,0x6610D9A4,Pops a record's address; builds a by-reference record Variant (descriptor pool %s) in frame %a; pushes its address
+5,0x34,5,CVarUdt,%a %s,1,1,0,0,,1,,,convert,0x66109807,0x6610D936,Pops a record's address; builds a record Variant (descriptor pool %s) in frame %a; pushes its address
+5,0x35,3,StUdtVar,%s,1,1,0,0,,1,,x:udt_from_var:pop,load_ind,0x661098D0,0x6610D9FF,Pops a Variant's address; pushes the record it holds
+5,0x36,3,StAryVar,%2,1,1,0,0,,1,,x:ary_from_var:pop,load_ind,0x661098F0,0x6610DA1F,"Pops a Variant's address; __vbaAryVar(%2 = the VARTYPE of the array, the Variant) checks it holds such an array; pushes the array"
+5,0x37,3,CopyBytesZero,%2,2,0,0,0,,1 1,,,stack,0x66109A09,0x6610DB52,Pops destination then source; copies %2 bytes and zeroes the source
+5,0x38,5,FLdZeroAry,%a %a,0,1,0,0,,,,x:ld_zero_ary:f(%a):f(%a#2),load_lit,0x66109D8A,0x6610DED3,Pushes __vbaLdZeroAry of the array variable
+5,0x39,3,FStVarZero,%a,1,0,0,0,,1,,x:var_move:f(%a),store_frame,0x6610B678,0x6610F7D4,"Moves the popped Variant into [ebp+%a], emptying the source"
+5,0x3A,7,CVarAryUdt,%a %2 %s,1,1,0,0,,1,,,convert,0x66109835,0x6610D964,"Pops an array; builds an array Variant (vartype %2, descriptor pool %s) in frame %a; pushes its address"
+5,0x3B,7,RedimVarUdt,%2 %2 %s,1,0,0,0,pairs(0),* 1,,,stack,0x661091CA,0x6610D2DA,ReDim of a Variant array: pops the address and 2*dims bounds
+5,0x3C,7,RedimPreserveVarUdt,%2 %2 %s,1,0,0,0,pairs(0),* 1,,,stack,0x661091EC,0x6610D2FC,ReDim of a Variant array: pops the address and 2*dims bounds
+5,0x3D,5,VarLateMemLdRfVar,%a %s,1,1,0,0,,1,tos,,call,0x66105875,0x6610999B,"Late-bound IDispatch call on the Variant whose address it pops by name (pool %s); result Variant in frame %a, whose address it pushes"
+5,0x3E,7,VarLateMemCallLdRfVar,%a %s %2,1,1,0,0,variants(2),1 *,tos,,call,0x6610A917,0x6610EA60,"Late-bound IDispatch call on the Variant whose address it pops by name (pool %s); argc Variants by value; result Variant in frame %a, whose address it pushes"
+5,0x3F,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x40,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x41,5,VarLateMemLdVar,%a %s,1,1,0,0,,1,tos,,call,0x6610587C,0x661099A2,"Late-bound IDispatch call on the Variant whose address it pops by name (pool %s); result Variant in frame %a, whose address it pushes"
+5,0x42,7,VarLateMemCallLdVar,%a %s %2,1,1,0,0,variants(2),1 *,tos,,call,0x6610A931,0x6610EA7A,"Late-bound IDispatch call on the Variant whose address it pops by name (pool %s); argc Variants by value; result Variant in frame %a, whose address it pushes"
+5,0x43,3,VarLateMemSt,%s,5,0,0,0,,1 4,tos,,call,0x661058C7,0x661099ED,Late-bound IDispatch call on the Variant whose address it pops by name (pool %s); pops the value Variant (by value)
+5,0x44,5,VarLateMemCallSt,%s %2,5,0,0,0,variants(1),1 * 4,tos,,call,0x6610A94E,0x6610EA97,Late-bound IDispatch call on the Variant whose address it pops by name (pool %s); argc Variants by value; pops the value Variant (by value)
+5,0x45,5,VarLateMemStAd,%s %2,5,0,0,0,variants(1),1 * 4,tos,,call,0x6610A938,0x6610EA81,Late-bound IDispatch call on the Variant whose address it pops by name (pool %s); pops the value Variant (by value)
+5,0x46,1,InvalidExcode,,0,0,0,0,,,,,,,,
+5,0x47,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x48,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x49,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x4A,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x4B,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x4C,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x4D,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x4E,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x4F,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x50,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x51,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x52,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x53,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x54,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x55,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x56,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x57,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x58,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x59,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x5A,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x5B,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x5C,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x5D,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x5E,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x5F,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x60,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x61,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x62,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x63,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x64,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x65,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x66,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x67,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x68,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x69,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x6A,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x6B,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x6C,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x6D,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x6E,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x6F,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x70,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x71,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x72,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x73,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x74,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x75,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x76,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x77,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x78,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x79,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x7A,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x7B,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x7C,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x7D,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x7E,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x7F,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x80,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x81,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x82,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x83,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x84,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x85,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x86,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x87,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x88,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x89,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x8A,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x8B,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x8C,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x8D,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x8E,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x8F,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x90,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x91,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x92,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x93,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x94,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x95,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x96,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x97,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x98,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x99,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x9A,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x9B,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x9C,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x9D,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x9E,0,Unknown,,0,0,0,0,,,,,,,,
+5,0x9F,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xA0,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xA1,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xA2,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xA3,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xA4,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xA5,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xA6,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xA7,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xA8,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xA9,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xAA,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xAB,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xAC,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xAD,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xAE,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xAF,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xB0,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xB1,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xB2,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xB3,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xB4,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xB5,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xB6,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xB7,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xB8,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xB9,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xBA,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xBB,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xBC,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xBD,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xBE,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xBF,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xC0,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xC1,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xC2,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xC3,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xC4,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xC5,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xC6,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xC7,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xC8,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xC9,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xCA,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xCB,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xCC,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xCD,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xCE,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xCF,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xD0,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xD1,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xD2,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xD3,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xD4,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xD5,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xD6,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xD7,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xD8,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xD9,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xDA,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xDB,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xDC,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xDD,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xDE,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xDF,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xE0,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xE1,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xE2,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xE3,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xE4,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xE5,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xE6,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xE7,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xE8,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xE9,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xEA,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xEB,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xEC,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xED,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xEE,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xEF,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xF0,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xF1,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xF2,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xF3,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xF4,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xF5,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xF6,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xF7,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xF8,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xF9,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xFA,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xFB,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xFC,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xFD,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xFE,0,Unknown,,0,0,0,0,,,,,,,,
+5,0xFF,0,Unknown,,0,0,0,0,,,,,,,,

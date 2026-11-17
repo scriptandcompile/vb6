@@ -241,7 +241,11 @@ impl ScopeManager {
             }
         })?;
 
-        if let Some(existing) = scope.symbols.get(&symbol.name) {
+        if let Some(existing) = scope
+            .symbols
+            .values()
+            .find(|existing| existing.name.eq_ignore_ascii_case(&symbol.name))
+        {
             return Err(crate::error::SemanticError::DuplicateSymbol {
                 name: symbol.name.clone(),
                 location: symbol.location.clone(),
@@ -259,7 +263,11 @@ impl ScopeManager {
 
         while let Some(scope_id) = current {
             if let Some(scope) = self.scopes.get(&scope_id) {
-                if let Some(symbol) = scope.symbols.get(name) {
+                if let Some(symbol) = scope
+                    .symbols
+                    .values()
+                    .find(|symbol| symbol.name.eq_ignore_ascii_case(name))
+                {
                     return Some(symbol);
                 }
                 current = scope.parent;
@@ -276,21 +284,23 @@ impl ScopeManager {
         // are searched in `Reference=` line order. Private symbols are only
         // visible within their own module, so the cross-module pass skips them.
         for module_scope_id in &self.module_scopes {
-            if let Some(symbol) = self
-                .scopes
-                .get(module_scope_id)
-                .and_then(|scope| scope.symbols.get(name))
-                && self.can_access(symbol)
+            if let Some(symbol) = self.scopes.get(module_scope_id).and_then(|scope| {
+                scope
+                    .symbols
+                    .values()
+                    .find(|symbol| symbol.name.eq_ignore_ascii_case(name))
+            }) && self.can_access(symbol)
             {
                 return Some(symbol);
             }
         }
         for reference_scope_id in &self.reference_scopes {
-            if let Some(symbol) = self
-                .scopes
-                .get(reference_scope_id)
-                .and_then(|scope| scope.symbols.get(name))
-                && self.can_access(symbol)
+            if let Some(symbol) = self.scopes.get(reference_scope_id).and_then(|scope| {
+                scope
+                    .symbols
+                    .values()
+                    .find(|symbol| symbol.name.eq_ignore_ascii_case(name))
+            }) && self.can_access(symbol)
             {
                 return Some(symbol);
             }
@@ -300,7 +310,11 @@ impl ScopeManager {
 
     /// Lookup a symbol in a specific scope (no parent walk)
     pub fn lookup_in_scope(&self, scope_id: usize, name: &str) -> Option<&Symbol> {
-        self.scopes.get(&scope_id)?.symbols.get(name)
+        self.scopes
+            .get(&scope_id)?
+            .symbols
+            .values()
+            .find(|symbol| symbol.name.eq_ignore_ascii_case(name))
     }
 
     /// Check if we can access a symbol from the current scope

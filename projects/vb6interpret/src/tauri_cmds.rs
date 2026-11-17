@@ -373,6 +373,24 @@ fn variant_to_string(value: &VBVariant) -> String {
         VBVariant::Byte(b) => b.to_string(),
         VBVariant::Single(s) => s.to_string(),
         VBVariant::Currency(c) => c.to_string(),
+        VBVariant::Decimal(value) => {
+            let negative = value.coefficient() < 0;
+            let digits = value.coefficient().unsigned_abs().to_string();
+            let scale = usize::from(value.scale());
+            let number = if scale == 0 {
+                digits
+            } else if digits.len() <= scale {
+                format!("0.{}{}", "0".repeat(scale - digits.len()), digits)
+            } else {
+                let split = digits.len() - scale;
+                format!("{}.{}", &digits[..split], &digits[split..])
+            };
+            if negative {
+                format!("-{number}")
+            } else {
+                number
+            }
+        }
         VBVariant::Date(d) => d.to_string(),
         VBVariant::Empty | VBVariant::Null | VBVariant::Nothing => String::new(),
         VBVariant::Error(e) => format!("Error {}: {}", e.number, e.description),
